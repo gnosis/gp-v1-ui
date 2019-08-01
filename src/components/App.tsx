@@ -10,10 +10,8 @@ import { client } from 'data/apollo'
 
 const App: React.FC = () => (
     <ApolloProvider client={client}>
-        <>
-            <Global />
-            <AppRoutes />
-        </>
+        <Global />
+        <AppRoutes />
     </ApolloProvider>
 )
 
