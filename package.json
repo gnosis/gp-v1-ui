@@ -14,11 +14,16 @@
   "license": "MIT",
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",
+    "apollo-boost": "^0.4.3",
+    "apollo-link-ws": "^1.0.18",
+    "graphql": "^14.4.2",
     "react": "^16.8.6",
+    "react-apollo": "^2.5.8",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.12.10",
     "react-router-dom": "^5.0.1",
     "styled-components": "^4.3.2",
+    "subscriptions-transport-ws": "^0.9.16",
     "web3": "^2.0.0-alpha"
   },
   "devDependencies": {
