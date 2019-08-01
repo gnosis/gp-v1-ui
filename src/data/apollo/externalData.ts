@@ -5,11 +5,11 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { createHttpLink } from 'apollo-link-http'
 import { getMainDefinition } from 'apollo-utilities'
 
-import { HTTP_GRAPHQL_URI, WSS_GRAPHQL_URI } from '../../globals'
+import { HTTP_GRAPHQL_URI, WSS_GRAPHQL_URI } from 'globals'
 
 const wssLink = new WebSocketLink({
     uri: WSS_GRAPHQL_URI,
-    options: { reconnect: true }
+    options: { reconnect: true },
 })
 const httpLink = createHttpLink({ uri: HTTP_GRAPHQL_URI })
 
@@ -26,7 +26,7 @@ const link = split(
 
 export const client = new ApolloClient({
     link,
-    cache: new InMemoryCache()
+    cache: new InMemoryCache(),
 })
 
 export default client

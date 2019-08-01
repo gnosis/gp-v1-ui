@@ -2,7 +2,7 @@ import React from 'react'
 import { hot } from 'react-hot-loader/root'
 import { Global } from 'styles'
 
-import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider } from 'react-apollo'
 
 import AppRoutes from 'routes/'
 

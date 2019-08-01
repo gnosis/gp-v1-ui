@@ -9,5 +9,5 @@ export const mockLocalData = {
     },
     BALANCES: {
         ETHER: 50,
-    }
+    },
 }
