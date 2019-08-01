@@ -51,7 +51,7 @@ module.exports = ({ stats = false } = {}) => ({
         alias: {
             'react-dom': '@hot-loader/react-dom',
         },
-        modules: ['node_modules', 'src'],
+        modules: ['src', 'node_modules'],
         extensions: ['.ts', '.tsx', '.js'],
     },
     plugins: [
