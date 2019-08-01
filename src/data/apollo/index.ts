@@ -1,2 +1,2 @@
-export * from './externalData'
-export * from './localData'
+export * from './store'
+export * from './mock/local'
