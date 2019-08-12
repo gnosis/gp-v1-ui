@@ -15,3 +15,10 @@ To run `eslint --fix` on save add to the settings.json file:
   {"language":  "typescriptreact",  "autoFix":  true  }
 ]
 ```
+
+# Running the app
+
+```
+npm install
+npm start
+```
