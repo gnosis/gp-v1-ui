@@ -11,7 +11,6 @@
     "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist"
   },
   "author": "",
-  "license": "MIT",
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",
     "react": "^16.8.6",
