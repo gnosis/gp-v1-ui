@@ -57,7 +57,7 @@ module.exports = ({ stats = false } = {}) => ({
     plugins: [
         new HtmlWebPackPlugin({
             template: './src/html/index.html',
-            title: 'apollo-ts-react',
+            title: 'dex-react',
         }),
         isProduction && new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime/]),
         new webpack.EnvironmentPlugin({
