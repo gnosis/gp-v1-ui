@@ -10,10 +10,21 @@ const Wrapper = styled.header`
 
   nav {
     display: flex;
+    align-items: center;
   }
 
-  ul.menu {
+  .nav-links {
     flex: 1;
+    display: flex;
+    justify-content: flex-end;
+
+    list-style-type: none;
+    margin-right: 3rem;
+    white-space: nowrap;
+
+    a {
+      padding: 1em;
+    }
   }
 
   .logo,.connect-wallet {
@@ -33,6 +44,20 @@ const Wrapper = styled.header`
   .logo {
     font-size: 1.2em;
   }
+
+  .header-title {
+    width: 30rem;
+    margin: 0 auto;
+  }
+
+  h1 {
+    margin-bottom: 0;
+  }
+  h2 {
+    font-size: 1.6rem;
+    margin-top: 0;
+    color: #ffbae9;
+  }
 `
 
 function connectWallet () {
@@ -45,16 +70,18 @@ const Header: React.FC = () => (
         <a className="logo">
           dFusion PoC
         </a>
-        <ul className="menu">
-          <li>Page A</li>
-          <li>Page B</li>
+        <ul className="nav-links">
+          <li><a href="#">Page A</a></li>
+          <li><a href="#">Page B</a></li>
         </ul>
         <a className="connect-wallet" onClick={connectWallet}>
           Connect to Wallet
         </a>
       </nav>
-      <h1>Swap stable coins</h1>
-      <h2>Fair, efficient prices, Onchain</h2>
+      <div class="header-title">
+        <h1>Swap stable coins</h1>
+        <h2>Fair, Efficient prices, Onchain</h2>
+      </div>
     </Wrapper>
 )
 

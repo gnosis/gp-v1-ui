@@ -6,7 +6,7 @@ const variables = css`
     // Colors
     --color-content-bg: #FAFAFA;
     --color-content: #2F2F2F;
-    --color-header-bg: #40A4FA;
+    --color-header-bg: #3340a9;
     --color-btn-border: #ff5097;
 
     // Layout
@@ -27,7 +27,6 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: 'Open Sans', sans-serif;
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
     line-height: 1.15;
