@@ -13,6 +13,7 @@
   "author": "",
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",
+    "polished": "^3.4.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.12.10",

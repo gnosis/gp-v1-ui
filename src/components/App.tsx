@@ -1,16 +1,14 @@
 import React from 'react'
 import { hot } from 'react-hot-loader/root'
-import { Global } from 'styles'
+import GlobalStyles from './layout/GlobalStyles'
 
 import AppRoutes from 'routes/'
 
 const App: React.FC = () => (
-    // <Providers>
     <>
-        <Global />
+        <GlobalStyles />
         <AppRoutes />
     </>
-    // </Providers>
 )
 
 export default hot(App)
