@@ -23,7 +23,8 @@ const Wrapper = styled.header`
     white-space: nowrap;
 
     a {
-      padding: 1em;
+      color: white;
+      padding: 0.8em;
     }
   }
 
@@ -56,7 +57,7 @@ const Wrapper = styled.header`
   h2 {
     font-size: 1.6rem;
     margin-top: 0;
-    color: #ffbae9;
+    color: #e0aacf;
   }
 `
 

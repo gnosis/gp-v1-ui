@@ -1,7 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
-import Header from 'components/layout/Header'
-import Footer from 'components/layout/Footer'
+import Layout from 'components/layout/'
 
 const Hello: React.FC = () => (
   <>
@@ -12,9 +11,9 @@ const Hello: React.FC = () => (
 
 const AppRouter: React.FC = () => (
     <Router basename={process.env.BASE_URL}>
-        <Header />
-        <Route path="/" exact component={Hello} />
-        <Footer />
+        <Layout>
+          <Route path="/" exact component={Hello} />
+        </Layout>
     </Router>
 )
 

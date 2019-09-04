@@ -4,6 +4,8 @@ import { createGlobalStyle, css } from 'styled-components';
 const variables = css`
   :root {
     // Colors
+    --color-text-primary: #131f3e;
+    --color-text-secondary: #8c8c8c;
     --color-content-bg: #FAFAFA;
     --color-content: #2F2F2F;
     --color-header-bg: #3340a9;
@@ -21,25 +23,26 @@ const GlobalStyles = createGlobalStyle`
   ${variables}
 
   html {
-    box-sizing: border-box;
     overflow-y: scroll;
     font-size: 16px;
+    box-sizing: border-box;
   }
 
-  body {
+  body {    
+    min-height: 100vh;
+    margin: 0;
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
     line-height: 1.15;
     background-color: var(--color-content-bg);
+    color: var(--color-text-primary);
   }
 
   *, *:before, *:after {
     box-sizing: inherit;
   }
 
-  a {
-    text-decoration: none;
-    
+  a {   
     &, &:link, &:visited {
       color: var(--color-text-primary);  
     }
@@ -57,8 +60,9 @@ const GlobalStyles = createGlobalStyle`
   h2 {
     font-size: 2rem;
   }
-  
-  .content {
+
+  #root {
+    min-height: 100vh;
   }
 `;
 
