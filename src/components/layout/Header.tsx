@@ -79,7 +79,7 @@ const Header: React.FC = () => (
           Connect to Wallet
         </a>
       </nav>
-      <div class="header-title">
+      <div className="header-title">
         <h1>Swap stable coins</h1>
         <h2>Fair, Efficient prices, Onchain</h2>
       </div>
