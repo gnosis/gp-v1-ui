@@ -2,9 +2,7 @@ if: (branch = develop) OR (branch = master) OR (type = pull_request) OR (tag IS 
 language: node_js
 node_js:
   - "stable"
-cache:
-  directories:
-  - node_modules
+cache: 'yarn'
 script:
   - yarn test
   - yarn build
