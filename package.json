@@ -6,10 +6,17 @@
   "scripts": {
     "start": "NODE_ENV=development webpack-dashboard -- webpack-dev-server --mode development --hot",
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
-    "eslint": "eslint . --ext .ts,.tsx,.js",
-    "eslint-fix": "eslint --fix . --ext .ts,.tsx,.js",
+    "eslint": "eslint src --ext .ts,.tsx,.js",
+    "eslint:fix": "eslint --fix . --ext .ts,.tsx,.js",
     "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
-    "test": "echo Testing... && echo OK"
+    "test": "echo Testing... && echo OK",
+    "verify": "npm run eslint && npm run test"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run verify",
+      "pre-push": "npm run verify"
+    }
   },
   "author": "",
   "dependencies": {
@@ -48,6 +55,7 @@
     "eslint-plugin-react": "^7.14.3",
     "fork-ts-checker-webpack-plugin": "^1.4.3",
     "html-webpack-plugin": "^4.0.0-beta.8",
+    "husky": "^3.0.5",
     "jest": "^24.8.0",
     "prettier": "^1.18.2",
     "react-dev-utils": "^9.0.1",
