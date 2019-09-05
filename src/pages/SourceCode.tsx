@@ -1,24 +1,27 @@
 import React from 'react'
 
 interface Link {
-  label: string,
+  label: string
   src: string
 }
 
-const links: Array<Link> = [
+const links: Link[] = [
   {
     label: 'Smart Contracts',
-    src: 'https://github.com/gnosis/dex-contracts'
-  }, {
+    src: 'https://github.com/gnosis/dex-contracts',
+  },
+  {
     label: 'Services',
-    src: 'https://github.com/gnosis/dex-services'
-  }, {
+    src: 'https://github.com/gnosis/dex-services',
+  },
+  {
     label: 'Research',
-    src: 'https://github.com/gnosis/dex-research'
-  }, {
+    src: 'https://github.com/gnosis/dex-research',
+  },
+  {
     label: 'Telegram',
-    src: 'https://github.com/gnosis/dex-telegram'
-  }
+    src: 'https://github.com/gnosis/dex-telegram',
+  },
 ]
 
 const About: React.FC = () => (
@@ -27,13 +30,10 @@ const About: React.FC = () => (
     <p>dFusion is an Open Protocol, build on top of Ethereum</p>
     <ul>
       {links.map(link => (
-        <li>
+        <li key={link.src}>
           <strong>{link.label}</strong>:&nbsp;
-          <a
-            href={link.src}
-            target="_blank"
-            rel='noreferrer noopener'>
-              {link.src}
+          <a href={link.src} target="_blank" rel="noreferrer noopener">
+            {link.src}
           </a>
         </li>
       ))}

@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 const Wrapper = styled.header`
-  color: #FFFFFF;
+  color: #ffffff;
   background-color: var(--color-header-bg);
-  min-height: var(--header-height);  
+  min-height: var(--header-height);
   font-size: 1.5am;
   //position: relative;
 
@@ -29,7 +29,8 @@ const Wrapper = styled.header`
     }
   }
 
-  .logo,.connect-wallet {
+  .logo,
+  .connect-wallet {
     padding: 1rem;
     margin: 1rem;
     border: 2px solid var(--color-btn-border);
@@ -63,29 +64,33 @@ const Wrapper = styled.header`
   }
 `
 
-function connectWallet () {
-  alert("TODO: Connect to Wallet")
+function connectWallet(): void {
+  alert('TODO: Connect to Wallet')
 }
 
 const Header: React.FC = () => (
-    <Wrapper>
-      <nav>
-        <Link className="logo" to="/">
-          dFusion PoC
-        </Link>
-        <ul className="nav-links">
-          <li><Link to="/">Trade</Link></li>
-          <li><Link to="/deposit">Deposit</Link></li>
-        </ul>
-        <a className="connect-wallet" onClick={connectWallet}>
-          Connect to Wallet
-        </a>
-      </nav>
-      <div className="header-title">
-        <h1>Swap stable coins</h1>
-        <h2>Fair, Efficient prices, Onchain</h2>
-      </div>
-    </Wrapper>
+  <Wrapper>
+    <nav>
+      <Link className="logo" to="/">
+        dFusion PoC
+      </Link>
+      <ul className="nav-links">
+        <li>
+          <Link to="/">Trade</Link>
+        </li>
+        <li>
+          <Link to="/deposit">Deposit</Link>
+        </li>
+      </ul>
+      <a className="connect-wallet" onClick={connectWallet}>
+        Connect to Wallet
+      </a>
+    </nav>
+    <div className="header-title">
+      <h1>Swap stable coins</h1>
+      <h2>Fair, Efficient prices, Onchain</h2>
+    </div>
+  </Wrapper>
 )
 
 export default Header

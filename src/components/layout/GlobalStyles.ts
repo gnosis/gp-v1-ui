@@ -1,13 +1,13 @@
-import { rem } from 'polished';
-import { createGlobalStyle, css } from 'styled-components';
+import { rem } from 'polished'
+import { createGlobalStyle, css } from 'styled-components'
 
 const variables = css`
   :root {
     // Colors
     --color-text-primary: #131f3e;
     --color-text-secondary: #8c8c8c;
-    --color-content-bg: #FAFAFA;
-    --color-content: #2F2F2F;
+    --color-content-bg: #fafafa;
+    --color-content: #2f2f2f;
     --color-header-bg: #3340a9;
     --color-btn-border: #ff5097;
 
@@ -17,7 +17,7 @@ const variables = css`
     // Animations
     --animation-duration: 250ms;
   }
-`;
+`
 
 const GlobalStyles = createGlobalStyle`
   ${variables}
@@ -64,6 +64,6 @@ const GlobalStyles = createGlobalStyle`
   #root {
     min-height: 100vh;
   }
-`;
+`
 
-export default GlobalStyles;
+export default GlobalStyles

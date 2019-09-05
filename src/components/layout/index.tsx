@@ -3,7 +3,7 @@ import Header from './Header'
 import Footer from './Footer'
 import styled from 'styled-components'
 
-const Wrapper = styled.div`  
+const Wrapper = styled.div`
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -15,14 +15,16 @@ const Wrapper = styled.div`
   }
 `
 
-const Layout: React.FC = ({ children }) => (
-    <Wrapper>
-      <Header />
-      <main>
-        {children}
-      </main>
-      <Footer />
-    </Wrapper>
+interface LayoutProps {
+  children: React.ReactNode
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => (
+  <Wrapper>
+    <Header />
+    <main>{children}</main>
+    <Footer />
+  </Wrapper>
 )
 
 export default Layout
