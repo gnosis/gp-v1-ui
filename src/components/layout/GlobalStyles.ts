@@ -33,7 +33,7 @@ const GlobalStyles = createGlobalStyle`
     margin: 0;
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
-    line-height: 1.15;
+    line-height: 1.5;
     background-color: var(--color-content-bg);
     color: var(--color-text-primary);
   }

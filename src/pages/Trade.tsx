@@ -1,20 +1,10 @@
 import React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import Layout from 'components/layout/'
 
-const Hello: React.FC = () => (
+const About: React.FC = () => (
   <>
-    <h1>Hello World!</h1>
+    <h1>Trade</h1>
     <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</p>
   </>
 )
 
-const AppRouter: React.FC = () => (
-    <Router basename={process.env.BASE_URL}>
-        <Layout>
-          <Route path="/" exact component={Hello} />
-        </Layout>
-    </Router>
-)
-
-export default AppRouter
+export default About
