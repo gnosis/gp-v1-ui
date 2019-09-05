@@ -21,7 +21,6 @@ deploy:
     local_dir: dist
     on:
       branch: develop
-      node: '9'
 
   - provider: s3
     bucket: $STAGING_BUCKET_NAME
