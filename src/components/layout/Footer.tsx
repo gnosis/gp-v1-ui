@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 const Wrapper = styled.footer`  
   text-align: center;  
@@ -27,8 +28,8 @@ const Wrapper = styled.footer`
 const Footer: React.FC = () => (
     <Wrapper>
       <ul>
-        <li><a href="#">About dFusion</a></li>
-        <li><a href="#">Source code</a></li>
+        <li><Link to="/about">About dFusion</Link></li>
+        <li><Link to="/source-code">Source code</Link></li>
       </ul>
     </Wrapper>
 )

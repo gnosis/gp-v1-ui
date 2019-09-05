@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 const Wrapper = styled.header`
   color: #FFFFFF;
@@ -49,6 +50,7 @@ const Wrapper = styled.header`
   .header-title {
     width: 30rem;
     margin: 0 auto;
+    line-height: 1.15;
   }
 
   h1 {
@@ -68,18 +70,18 @@ function connectWallet () {
 const Header: React.FC = () => (
     <Wrapper>
       <nav>
-        <a className="logo">
+        <Link className="logo" to="/">
           dFusion PoC
-        </a>
+        </Link>
         <ul className="nav-links">
-          <li><a href="#">Page A</a></li>
-          <li><a href="#">Page B</a></li>
+          <li><Link to="/">Trade</Link></li>
+          <li><Link to="/deposit">Deposit</Link></li>
         </ul>
         <a className="connect-wallet" onClick={connectWallet}>
           Connect to Wallet
         </a>
       </nav>
-      <div class="header-title">
+      <div className="header-title">
         <h1>Swap stable coins</h1>
         <h2>Fair, Efficient prices, Onchain</h2>
       </div>
