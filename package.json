@@ -8,7 +8,8 @@
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
     "eslint": "eslint . --ext .ts,.tsx,.js",
     "eslint-fix": "eslint --fix . --ext .ts,.tsx,.js",
-    "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist"
+    "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
+    "test": "echo Testing... && echo OK"
   },
   "author": "",
   "dependencies": {

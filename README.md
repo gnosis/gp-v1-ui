@@ -19,3 +19,8 @@ To run `eslint --fix` on save add to the settings.json file:
 npm install
 npm start
 ```
+
+# Run tests
+```
+npm test
+```
