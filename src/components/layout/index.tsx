@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   main {
     flex: 1;
     padding: 4rem 3rem 10rem 3rem;
+    margin: auto;
   }
 `
 
