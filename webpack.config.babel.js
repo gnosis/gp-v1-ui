@@ -5,7 +5,7 @@ import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 
 const isProduction = process.env.NODE_ENV == 'production'
-const baseUrl = isProduction && process.env.CI ? '/when-hosting-not-at-root/' : '/'
+const baseUrl = '/'
 
 module.exports = ({ stats = false } = {}) => ({
   devtool: 'eval-source-map',
