@@ -7,9 +7,13 @@ const variables = css`
     --color-text-primary: #131f3e;
     --color-text-secondary: #8c8c8c;
     --color-content-bg: #fafafa;
+    --color-widget-bg: #efefef;
     --color-content: #2f2f2f;
     --color-header-bg: #3340a9;
     --color-btn-border: #ff5097;
+    --color-deposit-btn-bg: blue;
+    --color-withdraw-btn-bg: red;
+    --color-enable-btn-bg: green;
 
     // Layout
     --header-height: ${rem('325px')};
