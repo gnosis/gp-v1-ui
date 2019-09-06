@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 
 const Wrapper = styled.footer`
   text-align: center;
+  position: relative;
+  color: var(--color-text-secondary);
 
   ul {
     margin: 0;
@@ -23,6 +25,14 @@ const Wrapper = styled.footer`
       color: var(--color-text-secondary);
     }
   }
+
+  .version {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 3em;
+    font-size: 0.85em;
+  }
 `
 
 const Footer: React.FC = () => (
@@ -35,6 +45,7 @@ const Footer: React.FC = () => (
         <Link to="/source-code">Source code</Link>
       </li>
     </ul>
+    <div className="version">dFusion PoC v{VERSION}</div>
   </Wrapper>
 )
 
