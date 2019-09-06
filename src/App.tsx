@@ -15,20 +15,20 @@ import NotFound from 'pages/NotFound'
 
 // App
 const App: React.FC = () => (
-    <>
-        <GlobalStyles />
-        <Router basename={process.env.BASE_URL}>
-            <Layout>
-              <Switch>
-                <Route path="/" exact component={Trade} />
-                <Route path="/about" exact component={About} />
-                <Route path="/deposit" exact component={Deposit} />
-                <Route path="/source-code" exact component={SourceCode} />
-                <Route component={NotFound} />
-              </Switch>
-            </Layout>
-        </Router>
-    </>
+  <>
+    <GlobalStyles />
+    <Router basename={process.env.BASE_URL}>
+      <Layout>
+        <Switch>
+          <Route path="/" exact component={Trade} />
+          <Route path="/about" exact component={About} />
+          <Route path="/deposit" exact component={Deposit} />
+          <Route path="/source-code" exact component={SourceCode} />
+          <Route component={NotFound} />
+        </Switch>
+      </Layout>
+    </Router>
+  </>
 )
 
 export default hot(App)

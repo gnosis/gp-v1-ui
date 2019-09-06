@@ -2,8 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
-const Wrapper = styled.footer`  
-  text-align: center;  
+const Wrapper = styled.footer`
+  text-align: center;
 
   ul {
     margin: 0;
@@ -16,7 +16,7 @@ const Wrapper = styled.footer`
     white-space: nowrap;
     margin-bottom: 2rem;
   }
-  
+
   li {
     margin: 0 1rem;
     a {
@@ -26,12 +26,16 @@ const Wrapper = styled.footer`
 `
 
 const Footer: React.FC = () => (
-    <Wrapper>
-      <ul>
-        <li><Link to="/about">About dFusion</Link></li>
-        <li><Link to="/source-code">Source code</Link></li>
-      </ul>
-    </Wrapper>
+  <Wrapper>
+    <ul>
+      <li>
+        <Link to="/about">About dFusion</Link>
+      </li>
+      <li>
+        <Link to="/source-code">Source code</Link>
+      </li>
+    </ul>
+  </Wrapper>
 )
 
 export default Footer

@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 function deploy_pull_request {
   REVIEW_ENVIRONMENT_DOMAIN='review.gnosisdev.com'
@@ -15,7 +16,7 @@ function deploy_pull_request {
   REVIEW_FEATURE_FOLDER="$REPO_NAME_ALPHANUMERIC/$PULL_REQUEST_NAME"
 
   # Deploy project
-  aws s3 sync dist/prod s3://${REVIEW_BUCKET_NAME}/${REVIEW_FEATURE_FOLDER} --delete
+  aws s3 sync dist s3://${REVIEW_BUCKET_NAME}/${REVIEW_FEATURE_FOLDER} --delete
 }
 
 function publish_pull_request_urls_in_github {
