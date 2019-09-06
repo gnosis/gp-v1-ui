@@ -66,6 +66,9 @@ module.exports = ({ stats = false } = {}) => ({
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     isProduction && new DashboardPlugin(),
+    new webpack.DefinePlugin({
+      VERSION: JSON.stringify(require('./package.json').version),
+    }),
   ].filter(Boolean),
   optimization: {
     splitChunks: {
