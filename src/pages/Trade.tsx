@@ -1,6 +1,6 @@
 import React from 'react'
 
-const About: React.FC = () => (
+const Trade: React.FC = () => (
   <>
     <h1>Trade</h1>
     <p>
@@ -12,4 +12,4 @@ const About: React.FC = () => (
   </>
 )
 
-export default About
+export default Trade
