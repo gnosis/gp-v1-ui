@@ -24,7 +24,7 @@ const links: Link[] = [
   },
 ]
 
-const About: React.FC = () => (
+const SourceCode: React.FC = () => (
   <>
     <h1>Source code</h1>
     <p>dFusion is an Open Protocol, build on top of Ethereum</p>
@@ -41,4 +41,4 @@ const About: React.FC = () => (
   </>
 )
 
-export default About
+export default SourceCode

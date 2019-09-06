@@ -1,6 +1,6 @@
 import React from 'react'
 
-const About: React.FC = () => (
+const Deposit: React.FC = () => (
   <>
     <h1>Deposit</h1>
     <p>
@@ -12,4 +12,4 @@ const About: React.FC = () => (
   </>
 )
 
-export default About
+export default Deposit
