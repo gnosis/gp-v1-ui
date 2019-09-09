@@ -3,9 +3,8 @@ import styled from 'styled-components'
 import { Row, RowProps } from './Row'
 
 const TableWrapper = styled.table`
-  display: table;
-  flex-direction: colum;
 `
+
 const rowData: RowProps[] = [
   {
     tokenLogo: 'img.png', tokenName: 'TTT', exchangeWallet: 0, pendingDeposits: 0, pendingWithdraws: 0
