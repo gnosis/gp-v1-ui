@@ -11,9 +11,9 @@ const variables = css`
     --color-content: #2f2f2f;
     --color-header-bg: #3340a9;
     --color-btn-border: #ff5097;
-    --color-deposit-btn-bg: blue;
-    --color-withdraw-btn-bg: red;
-    --color-enable-btn-bg: green;
+    --color-deposit-btn-bg: #2f7eec;
+    --color-withdraw-btn-bg: #d96465;
+    --color-enable-btn-bg: #169c20;
 
     // Layout
     --header-height: ${rem('325px')};
