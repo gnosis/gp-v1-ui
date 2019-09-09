@@ -65,6 +65,15 @@ const GlobalStyles = createGlobalStyle`
     font-size: 2rem;
   }
 
+  // cleaning default browser styles
+  button {
+    font-family: inherit;
+    font-size: 100%;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
   #root {
     min-height: 100vh;
   }
