@@ -8,7 +8,8 @@ const TableWrapper = styled.table`
 const rowData: RowProps[] = [
   {
     tokenLogo: 'img.png', tokenName: 'TTT', exchangeWallet: 0, pendingDeposits: 0, pendingWithdraws: 0
-  }
+  },
+  { tokenLogo: 'img.png', tokenName: 'SSS', exchangeWallet: 0, pendingDeposits: 0, pendingWithdraws: 0, enableToken: true }
 ]
 
 const Table: React.FC = () => (
