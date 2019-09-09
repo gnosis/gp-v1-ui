@@ -10,7 +10,13 @@ interface ButtonProps {
 }
 
 const WrapperButton = styled.button<ButtonProps>`
-  background-color: var(--color-${props => props.btnType}-btn-bg)
+  background-color: var(--color-${props => props.btnType}-btn-bg);
+  color: white;
+  min-width: 100px;
+  height: 25px;
+  border: 0.2em solid black;
+  box-shadow: 0.2em 0.2em black;
+  width: 100%;
 `
 
 enum ButtonTypes {
@@ -51,6 +57,20 @@ export interface RowProps {
   exchangeWallet: number
   pendingDeposits: number
   pendingWithdraws: number
+  enableToken?: boolean
+}
+
+const getButtons = (tokenName: string, enableToken?: boolean) => {
+  if (enableToken) {
+    return <td colSpan={2}><Button btnType={ButtonTypes.ENABLE} tokenName={tokenName} /></td>
+  } else {
+    return (
+      <div>
+        <td><Button btnType={ButtonTypes.DEPOSIT} /></td>
+        <td><Button btnType={ButtonTypes.WITHDRAW} /></td>
+      </div>
+    )
+  }
 }
 
 export const Row: React.FC<RowProps> = (props) => (
@@ -61,8 +81,7 @@ export const Row: React.FC<RowProps> = (props) => (
     <td>{props.exchangeWallet}</td>
     <td>{props.pendingDeposits}</td>
     <td>{props.pendingWithdraws}</td>
-    <td><Button btnType={ButtonTypes.DEPOSIT} /></td>
-    <td><Button btnType={ButtonTypes.WITHDRAW} /></td>
+    {getButtons(props.tokenName, props.enableToken)}
   </WrapperRow>
 )
 
