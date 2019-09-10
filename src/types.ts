@@ -1,4 +1,4 @@
-export declare var VERSION: string
+import 'global'
 
 export enum Network {
   Mainnet = 1,
