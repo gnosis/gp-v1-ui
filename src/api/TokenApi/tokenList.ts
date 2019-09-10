@@ -95,7 +95,7 @@ const tokens: TokenDetailsByNetwork[] = [
   {
     name: 'DAI',
     addressByNetwork: {
-      1: 'https://etherscan.io/token/0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
+      1: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
       4: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
     },
     symbol: 'WETH',
@@ -104,12 +104,24 @@ const tokens: TokenDetailsByNetwork[] = [
 ]
 
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
+  // Get mainnet address by token (required for examples to get the image)
+  const mainnetAddresses = tokens.reduce((acc, { symbol, addressByNetwork }) => {
+    const addressMainnet = addressByNetwork[1]
+    if (symbol && addressMainnet) {
+      acc[symbol] = addressMainnet
+    }
+    return acc
+  }, {})
+
+  // Return token details
   const tokenDetails: (TokenDetails | null)[] = tokens.map(token => {
     const address = token.addressByNetwork[networkId]
     if (address) {
       // There's an address for the current network
       const { name, symbol, decimals } = token
-      return { name, symbol, decimals, address }
+      const addressMainnet = mainnetAddresses[symbol]
+
+      return { name, symbol, decimals, address, addressMainnet }
     } else {
       return null
     }

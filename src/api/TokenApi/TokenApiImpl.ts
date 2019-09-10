@@ -29,7 +29,7 @@ export class TokenApiImpl implements TokenApi {
         // Add image to the tokens
         return {
           ...token,
-          image: _getImageUrl(token.address),
+          image: _getImageUrl(token.addressMainnet),
         }
       })
 

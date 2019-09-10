@@ -10,7 +10,15 @@ export interface TokenDetails {
   symbol?: string
   decimals?: number
   address: string
+  addressMainnet?: string
   image?: string
+}
+
+export interface TokenBalanceDetails extends TokenDetails {
+  exchangeWallet: number
+  pendingDeposits: number
+  pendingWithdraws: number
+  enabled: boolean
 }
 
 export interface TokenApi {
