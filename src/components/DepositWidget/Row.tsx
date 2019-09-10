@@ -19,13 +19,13 @@ const WrapperButton = styled.button<ButtonProps>`
   width: 100%;
 `
 
-enum ButtonTypes {
+export enum ButtonTypes {
   DEPOSIT = 'deposit',
   WITHDRAW = 'withdraw',
   ENABLE = 'enable',
 }
 
-const getButtonText = (btnType: ButtonTypes, tokenName: string): string => {
+export const getButtonText = (btnType: ButtonTypes, tokenName: string): string => {
   let text
   switch (btnType) {
     case ButtonTypes.DEPOSIT: {
