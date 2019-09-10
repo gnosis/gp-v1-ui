@@ -51,6 +51,10 @@ const getButtonText = (btnType: ButtonTypes, tokenName: string): string => {
   return text
 }
 
+function loadFallbackTokenImage(event: React.SyntheticEvent): void {
+  event.target.src = 'https://i.dlpng.com/static/png/3856032_preview.png'
+}
+
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => (
   <WrapperButton {...props}>{getButtonText(props.btnType, props.tokenName)}</WrapperButton>
 )
@@ -91,14 +95,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   return (
     <WrapperRow data-address={tokenBalances.address} data-address-mainnet={tokenBalances.addressMainnet}>
       <td>
-        <img src={tokenBalances.image} alt={tokenBalances.name} />
+        <img src={tokenBalances.image} alt={tokenBalances.name} onError={loadFallbackTokenImage} />
       </td>
       <td>{tokenBalances.name}</td>
       <td>{tokenBalances.exchangeWallet}</td>
       <td>{tokenBalances.pendingDeposits}</td>
       <td>{tokenBalances.pendingWithdraws}</td>
       {Buttons({
-        tokenName: tokenBalances.name,
+        tokenName: tokenBalances.symbol,
         enableToken: tokenBalances.enabled,
       })}
     </WrapperRow>

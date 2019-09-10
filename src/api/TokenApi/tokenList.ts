@@ -93,13 +93,13 @@ const tokens: TokenDetailsByNetwork[] = [
   //  https://makerdao.com/
   //  crypto-collateralized cryptocurrency: stable coin which is pegged to USD
   {
-    name: 'DAI',
+    name: 'DAI Stablecoin',
+    symbol: 'DAI',
+    decimals: 18,
     addressByNetwork: {
       1: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
       4: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
     },
-    symbol: 'WETH',
-    decimals: 18,
   },
 ]
 
