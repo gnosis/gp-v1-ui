@@ -12,3 +12,7 @@ export interface TokenDetails {
   address: string
   image?: string
 }
+
+export interface TokenApi {
+  getTokens: (networkId: number) => TokenDetails[]
+}
