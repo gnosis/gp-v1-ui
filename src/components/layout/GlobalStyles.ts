@@ -7,9 +7,13 @@ const variables = css`
     --color-text-primary: #131f3e;
     --color-text-secondary: #8c8c8c;
     --color-content-bg: #fafafa;
+    --color-widget-bg: #efefef;
     --color-content: #2f2f2f;
     --color-header-bg: #3340a9;
     --color-btn-border: #ff5097;
+    --color-deposit-btn-bg: #2f7eec;
+    --color-withdraw-btn-bg: #d96465;
+    --color-enable-btn-bg: #169c20;
 
     // Layout
     --header-height: ${rem('325px')};
@@ -59,6 +63,15 @@ const GlobalStyles = createGlobalStyle`
 
   h2 {
     font-size: 2rem;
+  }
+
+  // cleaning default browser styles
+  button {
+    font-family: inherit;
+    font-size: 100%;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
   }
 
   #root {
