@@ -2,14 +2,24 @@ import React from 'react'
 import styled from 'styled-components'
 import { Row, RowProps } from './Row'
 
-const TableWrapper = styled.table`
-`
+const TableWrapper = styled.table``
 
 const rowData: RowProps[] = [
   {
-    tokenLogo: 'img.png', tokenName: 'TTT', exchangeWallet: 0, pendingDeposits: 0, pendingWithdraws: 0
+    tokenLogo: 'img.png',
+    tokenName: 'TTT',
+    exchangeWallet: 0,
+    pendingDeposits: 0,
+    pendingWithdraws: 0,
   },
-  { tokenLogo: 'img.png', tokenName: 'SSS', exchangeWallet: 0, pendingDeposits: 0, pendingWithdraws: 0, enableToken: true }
+  {
+    tokenLogo: 'img.png',
+    tokenName: 'SSS',
+    exchangeWallet: 0,
+    pendingDeposits: 0,
+    pendingWithdraws: 0,
+    enableToken: true,
+  },
 ]
 
 const Table: React.FC = () => (
@@ -26,9 +36,9 @@ const Table: React.FC = () => (
       </tr>
     </thead>
     <tbody>
-      {rowData.map(data =>
+      {rowData.map(data => (
         <Row key={data.tokenName} {...data} />
-      )}
+      ))}
     </tbody>
   </TableWrapper>
 )
