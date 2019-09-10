@@ -1,4 +1,4 @@
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 
 interface TokenDetailsByNetwork extends Omit<TokenDetails, 'address' | 'image'> {
   addressByNetwork: { [networkId: number]: string }
@@ -104,22 +104,13 @@ const tokens: TokenDetailsByNetwork[] = [
 ]
 
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
-  // Get mainnet address by token (required for examples to get the image)
-  const mainnetAddresses = tokens.reduce((acc, { symbol, addressByNetwork }) => {
-    const addressMainnet = addressByNetwork[1]
-    if (symbol && addressMainnet) {
-      acc[symbol] = addressMainnet
-    }
-    return acc
-  }, {})
-
   // Return token details
   const tokenDetails: (TokenDetails | null)[] = tokens.map(token => {
     const address = token.addressByNetwork[networkId]
     if (address) {
       // There's an address for the current network
       const { name, symbol, decimals } = token
-      const addressMainnet = mainnetAddresses[symbol]
+      const addressMainnet = token.addressByNetwork[Network.Mainnet]
 
       return { name, symbol, decimals, address, addressMainnet }
     } else {
