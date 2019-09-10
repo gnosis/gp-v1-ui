@@ -14,10 +14,6 @@ interface WidgetProps {
   children: React.ReactNode
 }
 
-const Widget: React.FC<WidgetProps> = ({ children }: WidgetProps) => (
-  <Wrapper>
-    {children}
-  </Wrapper>
-)
+const Widget: React.FC<WidgetProps> = ({ children }: WidgetProps) => <Wrapper>{children}</Wrapper>
 
 export default Widget

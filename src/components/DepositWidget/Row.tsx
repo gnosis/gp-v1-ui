@@ -1,16 +1,16 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const WrapperRow = styled.tr`
-`
+const WrapperRow = styled.tr``
 
 interface ButtonProps {
-  btnType: ButtonTypes,
+  btnType: ButtonTypes
   tokenName?: string
 }
 
+// prettier-ignore
 const WrapperButton = styled.button<ButtonProps>`
-  background-color: var(--color-${props => props.btnType}-btn-bg);
+  background-color: var(--color-${(props: ButtonProps): string => props.btnType}-btn-bg);
   color: white;
   min-width: 100px;
   height: 25px;
@@ -22,7 +22,7 @@ const WrapperButton = styled.button<ButtonProps>`
 enum ButtonTypes {
   DEPOSIT = 'deposit',
   WITHDRAW = 'withdraw',
-  ENABLE = 'enable'
+  ENABLE = 'enable',
 }
 
 const getButtonText = (btnType: ButtonTypes, tokenName: string): string => {
@@ -44,11 +44,8 @@ const getButtonText = (btnType: ButtonTypes, tokenName: string): string => {
   return text
 }
 
-const Button: React.FC<ButtonProps> = (props) => (
-
-  <WrapperButton {...props}>
-    {getButtonText(props.btnType, props.tokenName)}
-  </WrapperButton>
+const Button: React.FC<ButtonProps> = (props: ButtonProps) => (
+  <WrapperButton {...props}>{getButtonText(props.btnType, props.tokenName)}</WrapperButton>
 )
 
 export interface RowProps {
@@ -60,28 +57,42 @@ export interface RowProps {
   enableToken?: boolean
 }
 
-const getButtons = (tokenName: string, enableToken?: boolean) => {
-  if (enableToken) {
-    return <td colSpan={2}><Button btnType={ButtonTypes.ENABLE} tokenName={tokenName} /></td>
+interface ButtonsProps {
+  tokenName: string
+  enableToken?: boolean
+}
+
+const Buttons: React.FC<ButtonsProps> = (props: ButtonsProps) => {
+  if (props.enableToken) {
+    return (
+      <td colSpan={2}>
+        <Button btnType={ButtonTypes.ENABLE} tokenName={props.tokenName} />
+      </td>
+    )
   } else {
     return (
       <div>
-        <td><Button btnType={ButtonTypes.DEPOSIT} /></td>
-        <td><Button btnType={ButtonTypes.WITHDRAW} /></td>
+        <td>
+          <Button btnType={ButtonTypes.DEPOSIT} />
+        </td>
+        <td>
+          <Button btnType={ButtonTypes.WITHDRAW} />
+        </td>
       </div>
     )
   }
 }
 
-export const Row: React.FC<RowProps> = (props) => (
-
+export const Row: React.FC<RowProps> = (props: RowProps) => (
   <WrapperRow>
-    <td><img src={props.tokenLogo} alt={props.tokenName} /></td>
+    <td>
+      <img src={props.tokenLogo} alt={props.tokenName} />
+    </td>
     <td>{props.tokenName}</td>
     <td>{props.exchangeWallet}</td>
     <td>{props.pendingDeposits}</td>
     <td>{props.pendingWithdraws}</td>
-    {getButtons(props.tokenName, props.enableToken)}
+    {Buttons({ tokenName: props.tokenName, enableToken: props.enableToken })}
   </WrapperRow>
 )
 

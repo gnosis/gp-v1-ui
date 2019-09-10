@@ -12,12 +12,14 @@ const Wrapper = styled.div`
   }
 `
 // TODO: add correct source address
-const contractSource: string = "https://gnosis.io"
+const contractSource = 'https://gnosis.io'
 
 const DepositWidget: React.FC = () => (
   <Widget>
     <Wrapper>
-      <a href={contractSource} className='contractLink'>View verified contract</a>
+      <a href={contractSource} className="contractLink">
+        View verified contract
+      </a>
       <Table />
     </Wrapper>
   </Widget>
