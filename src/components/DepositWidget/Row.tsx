@@ -51,8 +51,9 @@ const getButtonText = (btnType: ButtonTypes, tokenName: string): string => {
   return text
 }
 
-function loadFallbackTokenImage(event: React.SyntheticEvent): void {
-  event.target.src = 'https://i.dlpng.com/static/png/3856032_preview.png'
+function loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void {
+  const image = event.target as HTMLImageElement
+  image.src = 'https://i.dlpng.com/static/png/3856032_preview.png'
 }
 
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => (
