@@ -8,8 +8,9 @@ interface ButtonProps {
   tokenName?: string
 }
 
+// prettier-ignore
 const WrapperButton = styled.button<ButtonProps>`
-  background-color: var(--color- ${(props: ButtonProps): string => props.btnType}-btn-bg);
+  background-color: var(--color-${(props: ButtonProps): string => props.btnType}-btn-bg);
   color: white;
   min-width: 100px;
   height: 25px;
