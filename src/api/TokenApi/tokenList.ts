@@ -21,7 +21,7 @@ const tokens: TokenDetailsByNetwork[] = [
 
   // Tether:
   //  https://tether.to/
-  //  Fiat enabled collateralized stable coin, that is backed by the most popular fiat currency, USD (US Dollar) in a [Network.Mainnet]:1 ratio
+  //  Fiat enabled collateralized stable coin, that is backed by the most popular fiat currency, USD (US Dollar) in a 1:1 ratio
   {
     name: 'Tether USD',
     symbol: 'USDT',
@@ -62,7 +62,7 @@ const tokens: TokenDetailsByNetwork[] = [
 
   // Paxos Standard (PAX)
   //  https://www.paxos.com/standard
-  //  regulated stable coin. PAX is backed by US Dollar in equivalent [Network.Mainnet]:1.
+  //  regulated stable coin. PAX is backed by US Dollar in equivalent 1:1.
   //  launched by Paxos Trust Company
   //  approved by the New York State Department of Financial Services
   {
