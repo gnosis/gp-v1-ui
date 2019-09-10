@@ -18,6 +18,10 @@ module.exports = ({ stats = false } = {}) => ({
   module: {
     rules: [
       {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: ['file-loader']
+      },
+      {
         test: /\.jsx?$/,
         exclude: /node_modules/,
         use: {
