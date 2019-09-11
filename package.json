@@ -20,7 +20,7 @@
   },
   "jest": {
     "roots": [
-      "<rootDir>"
+      "<rootDir>/test"
     ],
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
