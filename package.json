@@ -10,7 +10,8 @@
     "lint:fix": "eslint --fix . --ext .ts,.tsx,.js",
     "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "jest",
-    "verify": "npm run lint && npm run test"
+    "verify": "npm run lint && npm run test",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\""
   },
   "husky": {
     "hooks": {
