@@ -1,11 +1,8 @@
 import { TokenApi, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 
-const IMAGE_BASE_URL =
-  'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${name}/logo.png'
-
 function _getImageUrl(tokenAddress: string): string {
-  return IMAGE_BASE_URL.replace(/\${name}/, tokenAddress)
+  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
 }
 
 /**
