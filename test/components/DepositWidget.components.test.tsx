@@ -53,9 +53,3 @@ describe('<Row /> with enable', () => {
     expect(wrapper.find('button')).toHaveLength(1)
   })
 })
-// describe('<Button />', () => {
-//   it('renders Deposit', () => {
-//     const wrapper = render(<Button btnType={ButtonTypes.DEPOSIT} />)
-//     expect(wrapper.find(React.Button)).to.have.lengthOf(1)
-//   })
-// })
