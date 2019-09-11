@@ -18,6 +18,29 @@
       "pre-commit": "npm run verify"
     }
   },
+  "jest": {
+    "roots": [
+      "<rootDir>"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/setupEnzyme.ts"
+    ]
+  },
   "author": "",
   "dependencies": {
     "@hot-loader/react-dom": "^16.8.6",
