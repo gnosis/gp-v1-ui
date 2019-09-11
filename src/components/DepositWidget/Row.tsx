@@ -1,7 +1,14 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const WrapperRow = styled.tr``
+import { TokenBalanceDetails } from 'types'
+
+const WrapperRow = styled.tr`
+  img {
+    width: 30px;
+    height: 30px;
+  }
+`
 
 interface ButtonProps {
   btnType: ButtonTypes
@@ -44,17 +51,17 @@ export const getButtonText = (btnType: ButtonTypes, tokenName: string): string =
   return text
 }
 
+function loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void {
+  const image = event.target as HTMLImageElement
+  image.src = 'https://i.dlpng.com/static/png/3856032_preview.png'
+}
+
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => (
   <WrapperButton {...props}>{getButtonText(props.btnType, props.tokenName)}</WrapperButton>
 )
 
 export interface RowProps {
-  tokenLogo: string
-  tokenName: string
-  exchangeWallet: number
-  pendingDeposits: number
-  pendingWithdraws: number
-  enableToken?: boolean
+  tokenBalances: TokenBalanceDetails
 }
 
 interface ButtonsProps {
@@ -83,17 +90,24 @@ const Buttons: React.FC<ButtonsProps> = (props: ButtonsProps) => {
   }
 }
 
-export const Row: React.FC<RowProps> = (props: RowProps) => (
-  <WrapperRow>
-    <td>
-      <img src={props.tokenLogo} alt={props.tokenName} />
-    </td>
-    <td>{props.tokenName}</td>
-    <td>{props.exchangeWallet}</td>
-    <td>{props.pendingDeposits}</td>
-    <td>{props.pendingWithdraws}</td>
-    {Buttons({ tokenName: props.tokenName, enableToken: props.enableToken })}
-  </WrapperRow>
-)
+export const Row: React.FC<RowProps> = (props: RowProps) => {
+  const tokenBalances = props.tokenBalances
+
+  return (
+    <WrapperRow data-address={tokenBalances.address} data-address-mainnet={tokenBalances.addressMainnet}>
+      <td>
+        <img src={tokenBalances.image} alt={tokenBalances.name} onError={loadFallbackTokenImage} />
+      </td>
+      <td>{tokenBalances.name}</td>
+      <td>{tokenBalances.exchangeWallet}</td>
+      <td>{tokenBalances.pendingDeposits}</td>
+      <td>{tokenBalances.pendingWithdraws}</td>
+      {Buttons({
+        tokenName: tokenBalances.symbol,
+        enableToken: tokenBalances.enabled,
+      })}
+    </WrapperRow>
+  )
+}
 
 export default Row
