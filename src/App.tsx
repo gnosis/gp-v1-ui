@@ -1,6 +1,6 @@
 import 'types'
 
-import * as React from 'react'
+import React from 'react'
 import { hot } from 'react-hot-loader/root'
 import GlobalStyles from './components/layout/GlobalStyles'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
