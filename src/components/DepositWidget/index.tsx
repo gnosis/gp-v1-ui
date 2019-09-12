@@ -1,5 +1,5 @@
 import Widget from '../layout/Widget'
-import React from 'react'
+import * as React from 'react'
 import styled from 'styled-components'
 import Table from './Table'
 
