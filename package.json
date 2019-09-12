@@ -10,11 +10,39 @@
     "lint:fix": "eslint --fix . --ext .ts,.tsx,.js",
     "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "jest",
-    "verify": "npm run lint && npm run test"
+    "verify": "npm run lint && npm run test",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\""
   },
   "husky": {
     "hooks": {
       "pre-commit": "npm run verify"
+    }
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>/test"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setupEnzyme.ts"
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/mocks/fileMock.js"
     }
   },
   "author": "",
@@ -40,6 +68,10 @@
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.6.0",
     "@babel/register": "^7.5.5",
+    "@types/enzyme": "^3.10.3",
+    "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/jest": "^24.0.18",
+    "@types/node": "^12.7.4",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.5",
     "@types/react-router": "^5.0.3",
@@ -51,20 +83,26 @@
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-styled-components": "^1.10.6",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "enzyme-to-json": "^3.4.0",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.14.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.14.3",
+    "file-loader": "^4.2.0",
     "fork-ts-checker-webpack-plugin": "^1.4.3",
     "html-webpack-plugin": "^4.0.0-beta.8",
     "husky": "^3.0.5",
     "jest": "^24.9.0",
+    "jest-enzyme": "^7.1.1",
     "prettier": "^1.18.2",
     "react-dev-utils": "^9.0.1",
     "react-test-renderer": "^16.9.0",
     "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.4",
     "typescript": "^3.5.3",
     "webpack": "^4.38.0",
