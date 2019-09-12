@@ -1,4 +1,4 @@
-import { getButtonText, ButtonTypes } from '../../src/components/DepositWidget/Row'
+import { getButtonText, ButtonTypes } from 'components/DepositWidget/Row'
 
 describe('Get text for buttons', () => {
   test('Deposit', () => {
