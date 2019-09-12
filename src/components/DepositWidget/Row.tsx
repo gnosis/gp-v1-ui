@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import { TokenBalanceDetails } from 'types'
+import unknownTokenImg from 'img/unknown-token.png'
 
 const WrapperRow = styled.tr`
   img {
@@ -53,7 +54,7 @@ export const getButtonText = (btnType: ButtonTypes, tokenName: string): string =
 
 function loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void {
   const image = event.target as HTMLImageElement
-  image.src = 'https://i.dlpng.com/static/png/3856032_preview.png'
+  image.src = unknownTokenImg
 }
 
 const Button: React.FC<ButtonProps> = (props: ButtonProps) => (

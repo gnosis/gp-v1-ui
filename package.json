@@ -39,7 +39,11 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/test/setupEnzyme.ts"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
+      "\\.(css|less)$": "<rootDir>/mocks/fileMock.js"
+    }
   },
   "author": "",
   "dependencies": {
@@ -85,6 +89,7 @@
     "eslint-plugin-jest": "^22.14.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.14.3",
+    "file-loader": "^4.2.0",
     "fork-ts-checker-webpack-plugin": "^1.4.3",
     "html-webpack-plugin": "^4.0.0-beta.8",
     "husky": "^3.0.5",
