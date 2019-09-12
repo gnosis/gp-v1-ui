@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { render } from 'enzyme'
 
-import { Row } from '../../src/components/DepositWidget/Row'
-import { TokenBalanceDetails } from '../../src/types'
+import { TokenBalanceDetails } from 'types'
+import { Row } from 'components/DepositWidget/Row'
 
 describe('<Row /> with deposit and withdraw', () => {
   const tokenBalanceDetails: TokenBalanceDetails = {
