@@ -46,7 +46,7 @@ export class DepositApiMock implements DepositApi {
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
-    balanceState.pendingDeposits = {
+    balanceState.pendingWithdraws = {
       amount,
       stateIndex: currentStateIndex,
     }

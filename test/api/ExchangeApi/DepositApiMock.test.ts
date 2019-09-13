@@ -1,6 +1,6 @@
 import { DepositApi } from 'types'
 
-import { BATCH_TIME, ZERO } from 'constants/'
+import { BATCH_TIME, ZERO, TWO } from 'constants/'
 import { DepositApiMock } from 'api/ExchangeApi/mock/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
 
@@ -9,21 +9,6 @@ const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, AMOUNT } = 
 let instance: DepositApi
 
 beforeAll(() => {
-  instance = new DepositApiMock({
-    [USER_1]: {
-      [TOKEN_1]: {
-        balance: ZERO,
-        pendingDeposits: {
-          amount: ZERO,
-          stateIndex: 0,
-        },
-        pendingWithdraws: {
-          amount: ZERO,
-          stateIndex: 0,
-        },
-      },
-    },
-  })
   testHelpers.mockTimes()
 })
 
@@ -209,7 +194,7 @@ describe('Deposit', () => {
   })
 
   test('Applicable pending balance', async () => {
-    // GIVEN: An user with no balance for TOKEN_4 but and an applicable pending deposits
+    // GIVEN: An user with no balance for TOKEN_4, and applicable pending deposits
     expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_4)).toEqual(AMOUNT)
 
@@ -237,7 +222,66 @@ describe('Deposit', () => {
     // THEN: There's a pending deposit of AMOUNT + AMOUNT
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT.add(AMOUNT))
   })
+})
 
-  // TODO: requestWithdraw
-  // TODO: withdraw
+describe.only('Request withdraw', () => {
+  test('Unknown token', async () => {
+    // GIVEN: An user with no token balance for TOKEN_3 and no pending withdraw
+    expect(await instance.getBalance(USER_1, TOKEN_3)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_3)).toEqual(ZERO)
+
+    // WHEN: Requesting a withdraw of AMOUNT
+    await instance.requestWithdraw(USER_1, TOKEN_3, AMOUNT)
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_3)).toEqual(ZERO)
+
+    // THEN: There's a pending withdraw of AMOUNT
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_3)).toEqual(AMOUNT)
+  })
+
+  test('No balance', async () => {
+    // GIVEN: An user with no token balance for TOKEN_1 and no pending withdraw
+    expect(await instance.getBalance(USER_1, TOKEN_1)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_1)).toEqual(ZERO)
+
+    // WHEN: Requesting a withdraw of AMOUNT
+    await instance.requestWithdraw(USER_1, TOKEN_1, AMOUNT)
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_1)).toEqual(ZERO)
+
+    // THEN: There's a pending deposit of AMOUNT
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_1)).toEqual(AMOUNT)
+  })
+
+  test('Increase previous withdraw request amount', async () => {
+    // GIVEN: An user with no balance for TOKEN_4, and a previous pending withdraw of AMOUNT
+    expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT)
+
+    // WHEN: Requesting a withdraw of 2 * AMOUNT
+    await instance.requestWithdraw(USER_1, TOKEN_4, AMOUNT.mul(TWO))
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
+
+    // THEN: There's a pending deposit of 2 * AMOUNT
+    expect((await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toString()).toEqual(AMOUNT.mul(TWO).toString())
+  })
+
+  test('Decrease previous withdraw request amount', async () => {
+    // GIVEN: An user with no balance for TOKEN_4, and a previous pending withdraw of AMOUNT
+    expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT)
+
+    // WHEN: Requesting a withdraw of 2 * AMOUNT
+    await instance.requestWithdraw(USER_1, TOKEN_4, AMOUNT.div(TWO))
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
+
+    // THEN: There's a pending deposit of 2 * AMOUNT
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT.div(TWO))
+  })
 })
