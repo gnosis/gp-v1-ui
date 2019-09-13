@@ -6,8 +6,16 @@ import { ZERO, BATCH_TIME } from 'constants/'
 
 import { DepositApi, BalanceState } from 'types'
 
+interface BalancesByUserAndToken {
+  [userAddress: string]: { [tokenAddress: string]: BalanceState }
+}
+
 export class DepositApiMock implements DepositApi {
-  private _balanceStates: { [userAddress: string]: { [tokenAddress: string]: BalanceState } } = {}
+  private _balanceStates: BalancesByUserAndToken
+
+  public constructor(balanceStates: BalancesByUserAndToken = {}) {
+    this._balanceStates = balanceStates
+  }
 
   public async getBatchTime(): Promise<number> {
     return BATCH_TIME
@@ -24,24 +32,20 @@ export class DepositApiMock implements DepositApi {
   public async deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
     // Create the balance state if it's the first deposit
     const currentStateIndex = await this.getCurrentBatchNumber()
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
-    if (!balanceState) {
-      balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
-    }
+    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
     // Update any unapplied deposit
     this._updateDepositsBalance(userAddress, tokenAddress, currentStateIndex)
 
-    balanceState.pendingDeposits.amount.add(amount)
-    balanceState.pendingDeposits.stateIndex = currentStateIndex
+    const pendingDeposits = balanceState.pendingDeposits
+    pendingDeposits.amount = pendingDeposits.amount.add(amount)
+    pendingDeposits.stateIndex = currentStateIndex
   }
 
   public async requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
     const currentStateIndex = await this.getCurrentBatchNumber()
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
-    if (!balanceState) {
-      balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
-    }
+    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
+
     balanceState.pendingDeposits = {
       amount,
       stateIndex: currentStateIndex,
@@ -50,7 +54,8 @@ export class DepositApiMock implements DepositApi {
 
   public async withdraw(userAddress: string, tokenAddress: string): Promise<void> {
     const currentStateIndex = await this.getCurrentBatchNumber()
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
+    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
+
     const pendingWithdraws = balanceState.pendingWithdraws
     const amount = pendingWithdraws.amount
 
@@ -61,50 +66,76 @@ export class DepositApiMock implements DepositApi {
     balanceState.balance = balanceState.balance.sub(amount)
   }
   public async getBalance(userAddress: string, tokenAddress: string): Promise<BN> {
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return ZERO
+    }
 
-    return balanceState.balance
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.balance : ZERO
   }
 
   public async getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN> {
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return ZERO
+    }
+    const balanceState = userBalanceStates[tokenAddress]
 
-    return balanceState.pendingDeposits.amount
+    return balanceState ? balanceState.pendingDeposits.amount : ZERO
   }
 
   public async getPendingDepositBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
-
-    return balanceState.pendingDeposits.stateIndex
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return 0
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.pendingDeposits.stateIndex : 0
   }
 
   public async getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN> {
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
-
-    return balanceState.pendingWithdraws.amount
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return ZERO
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.pendingWithdraws.amount : ZERO
   }
 
   public async getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
-    let balanceState = this._balanceStates[userAddress][tokenAddress]
-
-    return balanceState.pendingWithdraws.stateIndex
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return 0
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.pendingWithdraws.stateIndex : 0
   }
 
   /********************************    private methods   ********************************/
   private _initBalanceState(userAddress: string, tokenAddress: string, currentStateIndex: number): BalanceState {
-    const balanceState: BalanceState = {
-      balance: ZERO,
-      pendingDeposits: {
-        stateIndex: currentStateIndex,
-        amount: ZERO,
-      },
-      pendingWithdraws: {
-        stateIndex: currentStateIndex,
-        amount: ZERO,
-      },
+    let userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      userBalanceStates = {}
+      this._balanceStates[userAddress] = userBalanceStates
     }
 
-    this._balanceStates[userAddress][tokenAddress] = balanceState
+    let balanceState = userBalanceStates[tokenAddress]
+    if (!balanceState) {
+      balanceState = {
+        balance: ZERO,
+        pendingDeposits: {
+          stateIndex: currentStateIndex,
+          amount: ZERO,
+        },
+        pendingWithdraws: {
+          stateIndex: currentStateIndex,
+          amount: ZERO,
+        },
+      }
+      userBalanceStates[tokenAddress] = balanceState
+    }
+
     return balanceState
   }
 
