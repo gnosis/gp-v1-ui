@@ -57,11 +57,14 @@ export class DepositApiMock implements DepositApi {
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
     const pendingWithdraws = balanceState.pendingWithdraws
-    const amount = pendingWithdraws.amount
 
-    assert(!amount.isZero, "There wasn't any previous pending withdraw")
+    // Check that the user has balance, and the proper request
+    //  The restrictions are stronger than in the smart contract
+    assert(!pendingWithdraws.amount.isZero(), "There wasn't any previous pending withdraw")
+    assert(!balanceState.balance.isZero(), "There user doesn't have any balance")
     assert(pendingWithdraws.stateIndex < currentStateIndex, 'The withdraw request is not settled yet')
 
+    const amount = BN.min(pendingWithdraws.amount, balanceState.balance)
     pendingWithdraws.amount = ZERO
     balanceState.balance = balanceState.balance.sub(amount)
   }

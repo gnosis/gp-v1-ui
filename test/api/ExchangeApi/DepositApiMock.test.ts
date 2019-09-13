@@ -4,7 +4,7 @@ import { BATCH_TIME, ZERO, TWO } from 'constants/'
 import { DepositApiMock } from 'api/ExchangeApi/mock/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
 
-const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, AMOUNT } = testHelpers
+const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, AMOUNT, AMOUNT_SMALL } = testHelpers
 
 let instance: DepositApi
 
@@ -31,9 +31,14 @@ beforeEach(() => {
         pendingWithdraws: { amount: AMOUNT, stateIndex: 1 },
       },
       [TOKEN_5]: {
-        balance: ZERO,
+        balance: AMOUNT,
         pendingDeposits: { amount: AMOUNT, stateIndex: testHelpers.BATCH_NUMBER },
         pendingWithdraws: { amount: AMOUNT, stateIndex: testHelpers.BATCH_NUMBER },
+      },
+      [TOKEN_6]: {
+        balance: AMOUNT,
+        pendingDeposits: { amount: AMOUNT_SMALL, stateIndex: 1 },
+        pendingWithdraws: { amount: AMOUNT_SMALL, stateIndex: 1 },
       },
     },
   })
@@ -209,22 +214,22 @@ describe('Deposit', () => {
   })
 
   test('Unapplicable pending balance', async () => {
-    // GIVEN: An user with no balance for TOKEN_5 and a non applicable pending deposit
-    expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(ZERO)
+    // GIVEN: An user with an unapplicable pending deposit for TOKEN_5
+    expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT)
 
     // WHEN: Deposits AMOUNT
     await instance.deposit(USER_1, TOKEN_5, AMOUNT)
 
-    // THEN: There's still no balance
-    expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(ZERO)
+    // THEN: There's still the same balance
+    expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
 
     // THEN: There's a pending deposit of AMOUNT + AMOUNT
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT.add(AMOUNT))
   })
 })
 
-describe.only('Request withdraw', () => {
+describe('Request withdraw', () => {
   test('Unknown token', async () => {
     // GIVEN: An user with no token balance for TOKEN_3 and no pending withdraw
     expect(await instance.getBalance(USER_1, TOKEN_3)).toEqual(ZERO)
@@ -251,7 +256,7 @@ describe.only('Request withdraw', () => {
     // THEN: There's still no balance
     expect(await instance.getBalance(USER_1, TOKEN_1)).toEqual(ZERO)
 
-    // THEN: There's a pending deposit of AMOUNT
+    // THEN: There's a pending withdraw of AMOUNT
     expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_1)).toEqual(AMOUNT)
   })
 
@@ -266,8 +271,8 @@ describe.only('Request withdraw', () => {
     // THEN: There's still no balance
     expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
 
-    // THEN: There's a pending deposit of 2 * AMOUNT
-    expect((await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toString()).toEqual(AMOUNT.mul(TWO).toString())
+    // THEN: There's a pending withdraw of 2 * AMOUNT
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT.mul(TWO))
   })
 
   test('Decrease previous withdraw request amount', async () => {
@@ -281,7 +286,98 @@ describe.only('Request withdraw', () => {
     // THEN: There's still no balance
     expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
 
-    // THEN: There's a pending deposit of 2 * AMOUNT
+    // THEN: There's a pending withdraw of 2 * AMOUNT
     expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT.div(TWO))
+  })
+})
+
+describe('Withdraw', () => {
+  test('Unknown token', async () => {
+    // GIVEN: An user with no token balance for TOKEN_3 and no pending withdraw
+    expect(await instance.getBalance(USER_1, TOKEN_3)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_3)).toEqual(ZERO)
+
+    // WHEN: Withdraw AMOUNT
+    const withdrawPromise = instance.withdraw(USER_1, TOKEN_3)
+
+    // THEN: The withdraw fails
+    await expect(withdrawPromise).rejects.toBeTruthy()
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_3)).toEqual(ZERO)
+
+    // THEN: There's still no pending withdraw
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_3)).toEqual(ZERO)
+  })
+
+  test('No balance', async () => {
+    // GIVEN: An user with no token balance for TOKEN_1 and no pending withdraw
+    expect(await instance.getBalance(USER_1, TOKEN_1)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_1)).toEqual(ZERO)
+
+    // WHEN: Withdraw AMOUNT
+    const withdrawPromise = instance.withdraw(USER_1, TOKEN_1)
+
+    // THEN: The withdraw fails
+    await expect(withdrawPromise).rejects.toBeTruthy()
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_1)).toEqual(ZERO)
+
+    // THEN: There's still no pending withdraw
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_1)).toEqual(ZERO)
+  })
+
+  test('Settled withdraw request, but not balance', async () => {
+    // GIVEN: An user with no balance for TOKEN_4, and a previous pending withdraw of AMOUNT
+    expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT)
+
+    // WHEN: Withdraw AMOUNT
+    const withdrawPromise = instance.withdraw(USER_1, TOKEN_4)
+
+    // THEN: The withdraw fails
+    await expect(withdrawPromise).rejects.toBeTruthy()
+
+    // THEN: There's still no balance
+    expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
+
+    // THEN: There's still a withdraw requestx
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT)
+  })
+
+  test('Settled withdraw request', async () => {
+    // GIVEN: An user with AMOUNT balance for TOKEN_6, and a previous pending withdraw of AMOUNT_SMALL
+    expect(await instance.getBalance(USER_1, TOKEN_6)).toEqual(AMOUNT)
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_6)).toEqual(AMOUNT_SMALL)
+
+    // WHEN: Withdraw AMOUNT_SMALL
+    await instance.withdraw(USER_1, TOKEN_6)
+
+    // THEN: There remining balance is AMOUNT - AMOUNT_SMALL
+    expect(await instance.getBalance(USER_1, TOKEN_6)).toEqual(AMOUNT.sub(AMOUNT_SMALL))
+
+    // THEN: There's no pending withdraw anymore
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_6)).toEqual(ZERO)
+  })
+
+  test('Unsettled withdraw request', async () => {
+    // GIVEN: An user with a non applicable withdraw request on TOKEN_5
+    expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
+    expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT)
+    expect(await instance.getCurrentBatchNumber())
+      .toBeGreaterThanOrEqual(await instance.getPendingDepositBatchNumber(USER_1, TOKEN_5))
+
+    // WHEN: Withdraw AMOUNT
+    const withdrawPromise = instance.withdraw(USER_1, TOKEN_5)
+
+    // THEN: The withdraw fails
+    await expect(withdrawPromise).rejects.toBeTruthy()
+
+    // THEN: There's still the same balance
+    expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
+
+    // THEN: There's still the same withdraw request
+    expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_5)).toEqual(AMOUNT)
   })
 })
