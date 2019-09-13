@@ -64,25 +64,13 @@ export interface DepositApi {
   getCurrentBatchNumber(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
 
-  deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
-  requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
-  withdraw(userAddress: string, tokenAddress: string): Promise<void>
-
   getBalance(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingDepositBatchNumber(userAddress: string, tokenAddress: string): Promise<number>
   getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number>
-}
 
-export interface ExchangeApi extends DepositApi {
-  getOrders(userAddress: string): Promise<Order[]>
-  getNumTokens(): Promise<number>
-  getFeeDenominator(): Promise<number>
-  addToken(tokenAddress: string): Promise<void>
-  placeOrder(orderParams: AddOrderParams): Promise<number>
-  cancelOrder(orderId: number): Promise<void>
-  getUserAddress(userId: number): Promise<string> // tokenAddressToIdMap
-  getUserId(userAddress: string): Promise<number>
-  getCurrentPrice(tokenId: number): Promise<BN>
+  deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
+  requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
+  withdraw(userAddress: string, tokenAddress: string): Promise<void>
 }
