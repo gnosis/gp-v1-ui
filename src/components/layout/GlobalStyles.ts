@@ -8,7 +8,6 @@ const variables = css`
     --color-text-secondary: #8c8c8c;
     --color-content: #2f2f2f;
     --color-header-bg: #3340a9;
-    --color-btn-border: #ff5097;
     --color-deposit-btn-bg: #2f7eec;
     --color-withdraw-btn-bg: #d96465;
     --color-enable-btn-bg: #169c20;
@@ -74,6 +73,38 @@ const GlobalStyles = createGlobalStyle`
 
   #root {
     min-height: 100vh;
+  }
+
+  button {
+    padding: 0.5rem;
+    margin: 0rem;
+    border: 2px solid #8332bf;
+    color: #8332bf;
+    
+    :hover {
+      border-color: #9201fd;
+      color: #9201fd;
+    }
+
+    &.success {
+      border-color: #63ab52;
+      color: #63ab52;
+
+      :hover {
+        border-color: #167500;
+        color: #167500;
+      }
+    }
+
+    &.danger {
+      border-color: #ff5097;
+      color: #ff5097;
+
+      :hover {
+        border-color: #ea005f;
+        color: #ea005f;
+      }
+    }
   }
 
   .widget {

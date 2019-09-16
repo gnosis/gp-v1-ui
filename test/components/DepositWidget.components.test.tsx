@@ -4,7 +4,7 @@ import { render } from 'enzyme'
 import { TokenBalanceDetails } from 'types'
 import { Row } from 'components/DepositWidget/Row'
 
-describe('<Row /> with deposit and withdraw', () => {
+describe('<Row /> not enabled', () => {
   const tokenBalanceDetails: TokenBalanceDetails = {
     address: '0x0',
     exchangeWallet: 25,
@@ -18,14 +18,14 @@ describe('<Row /> with deposit and withdraw', () => {
     expect(wrapper.is('tr')).toBe(true)
   })
 
-  it('contains 7 <td> elements', () => {
+  it('contains 6 <td> elements', () => {
     const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.find('td')).toHaveLength(7)
+    expect(wrapper.find('td')).toHaveLength(6)
   })
 
-  it('contains 2 <button> elements', () => {
+  it('contains 1 <button> elements', () => {
     const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.find('button')).toHaveLength(2)
+    expect(wrapper.find('button')).toHaveLength(1)
   })
 })
 
@@ -48,8 +48,9 @@ describe('<Row /> with enable', () => {
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
-  it('contains 1 <button> element', () => {
+  it('contains 2 <button> element', () => {
     const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.find('button')).toHaveLength(1)
+
+    expect(wrapper.find('button')).toHaveLength(2)
   })
 })

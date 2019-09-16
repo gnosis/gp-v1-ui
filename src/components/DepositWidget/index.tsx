@@ -16,7 +16,7 @@ const Wrapper = styled.section`
 
   th {
     color: #000000;
-    line-height: 3;
+    line-height: 1.5;
     font-size: 0.8em;
     text-transform: uppercase;
     overflow-wrap: break-word;
@@ -48,7 +48,7 @@ function _getBalances(): TokenBalanceDetails[] {
     exchangeWallet: 10.4,
     pendingDeposits: 1500,
     pendingWithdraws: 75,
-    enabled: index == 3,
+    enabled: index !== 3,
   }))
 }
 
@@ -63,9 +63,21 @@ const DepositWidget: React.FC = () => {
         <thead>
           <tr>
             <th colSpan={2}>Token</th>
-            <th>Exchange wallet</th>
-            <th>Pending deposits</th>
-            <th>Pending withdraws</th>
+            <th>
+              Exchange
+              <br />
+              wallet
+            </th>
+            <th>
+              Pending
+              <br />
+              deposits
+            </th>
+            <th>
+              Pending
+              <br />
+              withdrawals
+            </th>
             <th></th>
             <th></th>
           </tr>

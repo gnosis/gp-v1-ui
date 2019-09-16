@@ -33,8 +33,8 @@ const Wrapper = styled.header`
   .connect-wallet {
     padding: 1rem;
     margin: 1rem;
-    border: 2px solid var(--color-btn-border);
-    color: var(--color-btn-border);
+    border: 2px solid #ff5097;
+    color: #ff5097;
     vertical-align: middle;
 
     &:hover {
