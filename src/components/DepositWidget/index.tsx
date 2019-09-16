@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import Widget from '../layout/Widget'
 import { Row } from './Row'
 import { tokenApi } from 'api'
 import { Network, TokenBalanceDetails } from 'types'
@@ -33,31 +32,29 @@ const contractSource = 'https://gnosis.io'
 const DepositWidget: React.FC = () => {
   const tokenBalancesList = _getBalances()
   return (
-    <Widget>
-      <Wrapper>
-        <a href={contractSource} className="contractLink">
-          View verified contract
-        </a>
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Token</th>
-              <th>Exchange wallet</th>
-              <th>Pending deposits</th>
-              <th>Pending withdraws</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {tokenBalancesList.map(tokenBalances => (
-              <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />
-            ))}
-          </tbody>
-        </table>
-      </Wrapper>
-    </Widget>
+    <Wrapper className="widget">
+      <a href={contractSource} className="contractLink">
+        View verified contract
+      </a>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Token</th>
+            <th>Exchange wallet</th>
+            <th>Pending deposits</th>
+            <th>Pending withdraws</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {tokenBalancesList.map(tokenBalances => (
+            <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />
+          ))}
+        </tbody>
+      </table>
+    </Wrapper>
   )
 }
 
