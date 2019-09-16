@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Trade: React.FC = () => (
-  <>
+  <div className="page">
     <h1>Trade</h1>
     <p>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
@@ -9,7 +9,7 @@ const Trade: React.FC = () => (
       consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
       Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum
     </p>
-  </>
+  </div>
 )
 
 export default Trade

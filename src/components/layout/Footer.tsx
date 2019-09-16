@@ -6,6 +6,7 @@ const Wrapper = styled.footer`
   text-align: center;
   position: relative;
   color: var(--color-text-secondary);
+  margin-top: 3rem;
 
   ul {
     margin: 0;

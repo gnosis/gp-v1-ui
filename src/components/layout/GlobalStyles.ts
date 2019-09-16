@@ -79,12 +79,17 @@ const GlobalStyles = createGlobalStyle`
   }
 
   .widget {
-    min-height: 40vh;
-    width: 600px;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
     background-color: var(--color-widget-bg);
+    padding: 3em;
+    marging-top
+  }
+
+  .page {
+    padding: 2rem 2rem 5rem 2rem;
+    margin-bottom: 3rem;
+    margin: auto;
+    max-width: 70rem;
+    width: 50vw;
   }
 `
 

@@ -6,11 +6,9 @@ import { tokenApi } from 'api'
 import { Network, TokenBalanceDetails } from 'types'
 
 const Wrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-
   .contractLink {
-    align-self: flex-end;
+    text-align: right;
+    padding: 1.5em 1em;
   }
 `
 
