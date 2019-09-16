@@ -43,12 +43,12 @@ const Wrapper = styled.section`
 function _getBalances(): TokenBalanceDetails[] {
   const tokens = tokenApi.getTokens(Network.Rinkeby)
   // Mock implementation
-  return tokens.map(token => ({
+  return tokens.map((token, index) => ({
     ...token,
-    exchangeWallet: 0,
-    pendingDeposits: 0,
-    pendingWithdraws: 0,
-    enabled: true,
+    exchangeWallet: 10.4,
+    pendingDeposits: 1500,
+    pendingWithdraws: 75,
+    enabled: index == 3,
   }))
 }
 
