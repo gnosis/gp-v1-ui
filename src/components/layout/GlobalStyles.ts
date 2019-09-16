@@ -4,10 +4,8 @@ import { createGlobalStyle, css } from 'styled-components'
 const variables = css`
   :root {
     // Colors
-    --color-text-primary: #131f3e;
+    --color-text-primary: #3d414c;
     --color-text-secondary: #8c8c8c;
-    --color-content-bg: #fafafa;
-    --color-widget-bg: #efefef;
     --color-content: #2f2f2f;
     --color-header-bg: #3340a9;
     --color-btn-border: #ff5097;
@@ -38,7 +36,7 @@ const GlobalStyles = createGlobalStyle`
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
     line-height: 1.5;
-    background-color: var(--color-content-bg);
+    background-color: #f7f7f7;
     color: var(--color-text-primary);
   }
 
@@ -79,9 +77,11 @@ const GlobalStyles = createGlobalStyle`
   }
 
   .widget {
-    background-color: var(--color-widget-bg);
-    padding: 3em;
-    marging-top
+    background-color: white;
+    padding: 2em;
+    margin-top: -3rem;
+    border-radius: 10px;
+    box-shadow: 1px 1px #e8e8e8;
   }
 
   .page {

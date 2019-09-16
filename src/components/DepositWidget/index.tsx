@@ -5,10 +5,38 @@ import { Row } from './Row'
 import { tokenApi } from 'api'
 import { Network, TokenBalanceDetails } from 'types'
 
-const Wrapper = styled.div`
-  .contractLink {
+const Wrapper = styled.section`
+  font-size: 0.85rem;
+  padding-bottom: 4em;
+
+  td,
+  th {
+    text-align: center;
+  }
+
+  th {
+    color: #000000;
+    line-height: 3;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    overflow-wrap: break-word;
+    padding: 0.5em;
+    font-weight: 800;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  td {
+    padding: 1em 0.5em;
+    border-bottom: 1px solid #f2f2f2;
+  }
+
+  .view-in-etherscan {
     text-align: right;
-    padding: 1.5em 1em;
+    margin-bottom: 3em;
+    display: block;
   }
 `
 
@@ -24,21 +52,17 @@ function _getBalances(): TokenBalanceDetails[] {
   }))
 }
 
-// TODO: add correct source address
-const contractSource = 'https://gnosis.io'
-
 const DepositWidget: React.FC = () => {
   const tokenBalancesList = _getBalances()
   return (
     <Wrapper className="widget">
-      <a href={contractSource} className="contractLink">
-        View verified contract
+      <a href="https://etherscan.io" className="view-in-etherscan">
+        <small>View verified contract</small>
       </a>
       <table>
         <thead>
           <tr>
-            <th></th>
-            <th>Token</th>
+            <th colSpan={2}>Token</th>
             <th>Exchange wallet</th>
             <th>Pending deposits</th>
             <th>Pending withdraws</th>
