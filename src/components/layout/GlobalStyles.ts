@@ -77,7 +77,7 @@ const GlobalStyles = createGlobalStyle`
 
   button {
     padding: 0.5rem;
-    margin: 0rem;
+    margin: 0.5rem;
     border: 2px solid #8332bf;
     color: #8332bf;
     
@@ -110,18 +110,20 @@ const GlobalStyles = createGlobalStyle`
   .widget {
     background-color: white;
     padding: 2em;
-    margin-top: -3rem;
+    margin: -3rem auto 3rem auto;
     border-radius: 10px;
     box-shadow: 1px 1px #e8e8e8;
   }
 
   .page {
-    padding: 2rem 2rem 5rem 2rem;
-    margin-bottom: 3rem;
-    margin: auto;
-    max-width: 70rem;
-    width: 50vw;
+    padding: 2rem 10vw 2rem 10vw;
+    margin: -3rem auto 3rem auto;
+    background-color: white;
+    width: 95vw;
+    min-height: 25rem;
+    box-shadow: 1px 1px #e8e8e8;
   }
+
 `
 
 export default GlobalStyles

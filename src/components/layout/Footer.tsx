@@ -6,14 +6,16 @@ const Wrapper = styled.footer`
   text-align: center;
   position: relative;
   color: var(--color-text-secondary);
-  margin-top: 3rem;
   font-size: 0.85rem;
 
   ul {
     margin: 0;
     padding: 0;
+    margin-block-end: 0;
+    margin-block-start: 0;
+    padding-inline-start: 0;
     //background-color: red;
-    height: 100%;
+    // height: 100%;
     display: flex;
     list-style-type: none;
     justify-content: center;
