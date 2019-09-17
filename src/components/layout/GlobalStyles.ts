@@ -1,25 +1,10 @@
-import { rem } from 'polished'
 import { createGlobalStyle, css } from 'styled-components'
 
 const variables = css`
   :root {
     // Colors
-    --color-text-primary: #131f3e;
+    --color-text-primary: #3d414c;
     --color-text-secondary: #8c8c8c;
-    --color-content-bg: #fafafa;
-    --color-widget-bg: #efefef;
-    --color-content: #2f2f2f;
-    --color-header-bg: #3340a9;
-    --color-btn-border: #ff5097;
-    --color-deposit-btn-bg: #2f7eec;
-    --color-withdraw-btn-bg: #d96465;
-    --color-enable-btn-bg: #169c20;
-
-    // Layout
-    --header-height: ${rem('325px')};
-
-    // Animations
-    --animation-duration: 250ms;
   }
 `
 
@@ -38,7 +23,7 @@ const GlobalStyles = createGlobalStyle`
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
     line-height: 1.5;
-    background-color: var(--color-content-bg);
+    background-color: #f7f7f7;
     color: var(--color-text-primary);
   }
 
@@ -78,14 +63,55 @@ const GlobalStyles = createGlobalStyle`
     min-height: 100vh;
   }
 
-  .widget {
-    min-height: 40vh;
-    width: 600px;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-    background-color: var(--color-widget-bg);
+  button {
+    padding: 0.5rem;
+    margin: 0.5rem;
+    border: 2px solid #8332bf;
+    color: #8332bf;
+    
+    :hover {
+      border-color: #9201fd;
+      color: #9201fd;
+    }
+
+    &.success {
+      border-color: #63ab52;
+      color: #63ab52;
+
+      :hover {
+        border-color: #167500;
+        color: #167500;
+      }
+    }
+
+    &.danger {
+      border-color: #ff5097;
+      color: #ff5097;
+
+      :hover {
+        border-color: #ea005f;
+        color: #ea005f;
+      }
+    }
   }
+
+  .widget {
+    background-color: white;
+    padding: 2em;
+    margin: -3rem auto 3rem auto;
+    border-radius: 10px;
+    box-shadow: 1px 1px #e8e8e8;
+  }
+
+  .page {
+    padding: 2rem 10vw 2rem 10vw;
+    margin: -3rem auto 3rem auto;
+    background-color: white;
+    width: 95vw;
+    min-height: 25rem;
+    box-shadow: 1px 1px #e8e8e8;
+  }
+
 `
 
 export default GlobalStyles

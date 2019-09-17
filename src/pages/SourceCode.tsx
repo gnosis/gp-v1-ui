@@ -25,7 +25,7 @@ const links: Link[] = [
 ]
 
 const SourceCode: React.FC = () => (
-  <>
+  <div className="page">
     <h1>Source code</h1>
     <p>dFusion is an Open Protocol, build on top of Ethereum</p>
     <ul>
@@ -38,7 +38,7 @@ const SourceCode: React.FC = () => (
         </li>
       ))}
     </ul>
-  </>
+  </div>
 )
 
 export default SourceCode
