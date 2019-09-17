@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import BN from 'bn.js'
 
 import { Row } from './Row'
 import { tokenApi } from 'api'
@@ -45,9 +46,9 @@ function _getBalances(): TokenBalanceDetails[] {
   // Mock implementation
   return tokens.map((token, index) => ({
     ...token,
-    exchangeWallet: 10.4,
-    pendingDeposits: 1500,
-    pendingWithdraws: 75,
+    exchangeWallet: new BN(10.4),
+    pendingDeposits: new BN(1500),
+    pendingWithdraws: new BN(75),
     enabled: index !== 3,
   }))
 }
