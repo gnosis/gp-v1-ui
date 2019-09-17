@@ -56,7 +56,7 @@ const DepositWidget: React.FC = () => {
   const tokenBalancesList = _getBalances()
   return (
     <Wrapper className="widget">
-      <a href="https://etherscan.io" className="view-in-etherscan">
+      <a href="https://etherscan.io" target="_blank" rel="noopener noreferrer" className="view-in-etherscan">
         <small>View verified contract</small>
       </a>
       <table>
