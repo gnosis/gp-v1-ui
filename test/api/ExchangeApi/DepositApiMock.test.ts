@@ -1,6 +1,6 @@
 import { DepositApi } from 'types'
 
-import { BATCH_TIME, ZERO, TWO } from 'constants/'
+import { BATCH_TIME, ZERO, TWO } from 'const'
 import { DepositApiMock } from 'api/ExchangeApi/mock/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
 

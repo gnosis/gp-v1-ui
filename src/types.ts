@@ -17,9 +17,9 @@ export interface TokenDetails {
 }
 
 export interface TokenBalanceDetails extends TokenDetails {
-  exchangeWallet: number
-  pendingDeposits: number
-  pendingWithdraws: number
+  exchangeWallet: BN
+  pendingDeposits: BN
+  pendingWithdraws: BN
   enabled: boolean
 }
 

@@ -1,4 +1,4 @@
-import { BATCH_TIME } from 'constants/'
+import { BATCH_TIME } from 'const'
 import BN from 'bn.js'
 
 export const DATE: Date = new Date('2017-04-23T08:30:15.500Z') // Epoch: 1492936215500 mills
