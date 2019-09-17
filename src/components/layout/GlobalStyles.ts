@@ -77,6 +77,15 @@ const GlobalStyles = createGlobalStyle`
   #root {
     min-height: 100vh;
   }
+
+  .widget {
+    min-height: 40vh;
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: var(--color-widget-bg);
+  }
 `
 
 export default GlobalStyles
