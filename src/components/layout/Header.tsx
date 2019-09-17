@@ -1,11 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
+import { rem } from 'polished'
 import { Link } from 'react-router-dom'
 
 const Wrapper = styled.header`
   color: #ffffff;
-  background-color: var(--color-header-bg);
-  min-height: var(--header-height);
+  background-color: #3340a9;
+  min-height: ${rem('325px')};
   font-size: 1.5am;
   //position: relative;
 

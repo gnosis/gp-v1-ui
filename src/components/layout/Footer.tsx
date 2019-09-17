@@ -14,8 +14,6 @@ const Wrapper = styled.footer`
     margin-block-end: 0;
     margin-block-start: 0;
     padding-inline-start: 0;
-    //background-color: red;
-    // height: 100%;
     display: flex;
     list-style-type: none;
     justify-content: center;

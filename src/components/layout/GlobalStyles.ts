@@ -1,4 +1,3 @@
-import { rem } from 'polished'
 import { createGlobalStyle, css } from 'styled-components'
 
 const variables = css`
@@ -6,17 +5,6 @@ const variables = css`
     // Colors
     --color-text-primary: #3d414c;
     --color-text-secondary: #8c8c8c;
-    --color-content: #2f2f2f;
-    --color-header-bg: #3340a9;
-    --color-deposit-btn-bg: #2f7eec;
-    --color-withdraw-btn-bg: #d96465;
-    --color-enable-btn-bg: #169c20;
-
-    // Layout
-    --header-height: ${rem('325px')};
-
-    // Animations
-    --animation-duration: 250ms;
   }
 `
 
