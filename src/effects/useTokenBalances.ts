@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { Network, TokenBalanceDetails } from 'types'
-import { depositApi } from 'api'
-import { tokenApi } from 'api'
+import { TokenBalanceDetails } from 'types'
+import { tokenApi, walletApi, depositApi } from 'api'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -9,8 +8,11 @@ interface UseTokenBalanceResult {
 }
 
 async function _getBalances(): Promise<TokenBalanceDetails[]> {
-  const tokens = tokenApi.getTokens(Network.Rinkeby)
-  const userAddress = '0x1111111111111111111111111111111111111111'
+  // TODO: Remove connect once login is done
+  await walletApi.connect()
+
+  const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
+  const tokens = tokenApi.getTokens(networkId)
 
   const balancePromises = tokens.map(async (token, index) => {
     const tokenAddress = token.address

@@ -1,4 +1,4 @@
-import { WalletApi } from 'types'
+import { WalletApi, Network } from 'types'
 import BN from 'bn.js'
 
 import { ADDRESS } from '../../../test/data'
@@ -24,6 +24,10 @@ export class WalletApiMock implements WalletApi {
 
   public async getBalance(): Promise<BN> {
     return this._balance
+  }
+
+  public async getNetworkId(): Promise<number> {
+    return Network.Rinkeby
   }
 }
 

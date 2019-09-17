@@ -59,4 +59,5 @@ export interface WalletApi {
   connect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
+  getNetworkId(): Promise<number>
 }
