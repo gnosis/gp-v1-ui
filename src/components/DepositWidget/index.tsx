@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import BN from 'bn.js'
 
 import { Row } from './Row'
 import { useTokenBalances } from 'effects/useTokenBalances'
