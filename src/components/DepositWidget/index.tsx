@@ -68,13 +68,9 @@ const DepositWidget: React.FC = () => {
               <th>
                 Pending
                 <br />
-                deposits
-              </th>
-              <th>
-                Pending
-                <br />
                 withdrawals
               </th>
+              <th>Wallet</th>
               <th></th>
               <th></th>
             </tr>
