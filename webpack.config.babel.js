@@ -73,6 +73,9 @@ module.exports = ({ stats = false } = {}) => ({
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
     }),
+    new webpack.DefinePlugin({
+      'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
+    }),
   ].filter(Boolean),
   optimization: {
     splitChunks: {

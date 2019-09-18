@@ -53,3 +53,11 @@ export interface DepositApi {
   requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
   withdraw(userAddress: string, tokenAddress: string): Promise<void>
 }
+
+export interface WalletApi {
+  isConnected(): boolean
+  connect(): Promise<void>
+  getAddress(): Promise<string>
+  getBalance(): Promise<BN>
+  getNetworkId(): Promise<number>
+}
