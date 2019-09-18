@@ -72,4 +72,5 @@ export interface Erc20Api {
   balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
   approve(tokenAddress: string, userAddress: string, spenderAddress: string, amount: BN): Promise<boolean>
   allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
+  transfer(tokenAddress: string, fromAddress: string, toAddress: string, amount: BN): Promise<boolean>
 }

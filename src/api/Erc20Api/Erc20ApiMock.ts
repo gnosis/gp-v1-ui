@@ -1,5 +1,6 @@
 import { Erc20Api } from 'types'
 import BN from 'bn.js'
+import assert from 'assert'
 import { ZERO } from 'const'
 
 interface Balances {
@@ -53,14 +54,26 @@ export class Erc20ApiMock implements Erc20Api {
     spenderAddress: string,
     amount: BN,
   ): Promise<boolean> {
-    this._initAllowances(tokenAddress, userAddress, spenderAddress)
+    this._initAllowances(userAddress, tokenAddress, spenderAddress)
     this._allowances[userAddress][tokenAddress][spenderAddress] = amount
 
     return true
   }
 
+  public async transfer(tokenAddress: string, fromAddress: string, toAddress: string, amount: BN): Promise<boolean> {
+    this._initBalances(fromAddress, tokenAddress)
+    this._initBalances(toAddress, tokenAddress)
+
+    const balance = this._balances[fromAddress][tokenAddress]
+    assert(balance.gte(amount), "The user doesn't have enough balance")
+
+    this._balances[fromAddress][tokenAddress] = balance.sub(amount)
+    this._balances[tokenAddress][tokenAddress] = this._balances[tokenAddress][tokenAddress].add(amount)
+    return true
+  }
+
   /********************************    private methods   ********************************/
-  private _initBalances(userAddress: string, tokenAddress: string, amount: BN = ZERO): BN {
+  private _initBalances(userAddress: string, tokenAddress: string): BN {
     let userBalances = this._balances[userAddress]
     if (!userBalances) {
       userBalances = {}
@@ -69,7 +82,7 @@ export class Erc20ApiMock implements Erc20Api {
 
     let tokenBalance = userBalances[tokenAddress]
     if (!tokenBalance) {
-      tokenBalance = amount
+      tokenBalance = ZERO
     }
 
     return tokenBalance
