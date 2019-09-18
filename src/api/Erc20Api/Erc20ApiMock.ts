@@ -88,7 +88,7 @@ export class Erc20ApiMock implements Erc20Api {
     return tokenBalance
   }
 
-  private _initAllowances(userAddress: string, tokenAddress: string, spenderAddress: string, amount: BN = ZERO): BN {
+  private _initAllowances(userAddress: string, tokenAddress: string, spenderAddress: string): BN {
     let userAllowances = this._allowances[userAddress]
     if (!userAllowances) {
       userAllowances = {}
