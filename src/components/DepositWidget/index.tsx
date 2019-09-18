@@ -3,8 +3,7 @@ import styled from 'styled-components'
 import BN from 'bn.js'
 
 import { Row } from './Row'
-import { tokenApi } from 'api'
-import { Network, TokenBalanceDetails } from 'types'
+import { useTokenBalances } from 'effects/useTokenBalances'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -41,20 +40,19 @@ const Wrapper = styled.section`
   }
 `
 
-function _getBalances(): TokenBalanceDetails[] {
-  const tokens = tokenApi.getTokens(Network.Rinkeby)
-  // Mock implementation
-  return tokens.map((token, index) => ({
-    ...token,
-    exchangeWallet: new BN(10.4),
-    pendingDeposits: new BN(1500),
-    pendingWithdraws: new BN(75),
-    enabled: index !== 3,
-  }))
-}
-
 const DepositWidget: React.FC = () => {
-  const tokenBalancesList = _getBalances()
+  const { balances, error } = useTokenBalances()
+
+  if (error) {
+    // TODO: Style error
+    return <div style={{ color: 'red' }}>Style error</div>
+  }
+
+  if (!balances) {
+    // TODO: Style loading?
+    return <div>Loading....</div>
+  }
+
   return (
     <Wrapper className="widget">
       <a href="https://etherscan.io" target="_blank" rel="noopener noreferrer" className="view-in-etherscan">
@@ -84,9 +82,8 @@ const DepositWidget: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {tokenBalancesList.map(tokenBalances => (
-            <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />
-          ))}
+          {balances &&
+            balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
         </tbody>
       </table>
     </Wrapper>
