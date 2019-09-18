@@ -2,7 +2,7 @@ import { Network, TokenApi, WalletApi, DepositApi } from 'types'
 import { WalletApiMock } from './WalletApi/WalletApiMock'
 import { TokenApiImpl } from './TokenApi/TokenApiImpl'
 import { DepositApiMock } from './ExchangeApi/mock/DepositApiMock'
-import { balanceStates } from '../../test/data'
+import balanceStates from '../../test/data/balanceStates'
 
 const isMock = process.env.MOCK === 'true'
 
