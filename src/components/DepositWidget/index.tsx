@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import BN from 'bn.js'
 
 import { Row } from './Row'
 import { useTokenBalances } from 'effects/useTokenBalances'
+import ErrorMsg from 'components/ErrorMsg'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -43,14 +43,9 @@ const Wrapper = styled.section`
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
 
-  if (error) {
-    // TODO: Style error
-    return <div style={{ color: 'red' }}>Style error</div>
-  }
-
   if (!balances) {
-    // TODO: Style loading?
-    return <div>Loading....</div>
+    // Loading: Do not show the widget
+    return <></>
   }
 
   return (
@@ -58,34 +53,38 @@ const DepositWidget: React.FC = () => {
       <a href="https://etherscan.io" target="_blank" rel="noopener noreferrer" className="view-in-etherscan">
         <small>View verified contract</small>
       </a>
-      <table>
-        <thead>
-          <tr>
-            <th colSpan={2}>Token</th>
-            <th>
-              Exchange
-              <br />
-              wallet
-            </th>
-            <th>
-              Pending
-              <br />
-              deposits
-            </th>
-            <th>
-              Pending
-              <br />
-              withdrawals
-            </th>
-            <th></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {balances &&
-            balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
-        </tbody>
-      </table>
+      {error ? (
+        <ErrorMsg title="oops..." message="Something happened while loading the balances" />
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th colSpan={2}>Token</th>
+              <th>
+                Exchange
+                <br />
+                wallet
+              </th>
+              <th>
+                Pending
+                <br />
+                deposits
+              </th>
+              <th>
+                Pending
+                <br />
+                withdrawals
+              </th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {balances &&
+              balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
+          </tbody>
+        </table>
+      )}
     </Wrapper>
   )
 }

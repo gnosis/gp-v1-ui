@@ -95,21 +95,23 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  .widget {
+  .widget,
+  .page {
     background-color: white;
-    padding: 2em;
     margin: -3rem auto 3rem auto;
+    box-shadow: 1px 1px #e8e8e8;    
+    min-height: 25rem;
+  }
+
+  .widget {
+    padding: 2em;
     border-radius: 10px;
-    box-shadow: 1px 1px #e8e8e8;
+    min-width: 40vw;
   }
 
   .page {
     padding: 2rem 10vw 2rem 10vw;
-    margin: -3rem auto 3rem auto;
-    background-color: white;
     width: 95vw;
-    min-height: 25rem;
-    box-shadow: 1px 1px #e8e8e8;
   }
 
 `
