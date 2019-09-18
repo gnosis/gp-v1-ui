@@ -61,3 +61,15 @@ export interface WalletApi {
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
 }
+
+/**
+ * Interfaces the access to ERC20 token
+ *
+ * Only the required methods are implemented.
+ * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
+ */
+export interface Erc20Api {
+  balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
+  approve(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<boolean>
+  allowance(tokenAddress: string, spenderAddress: string): Promise<boolean>
+}
