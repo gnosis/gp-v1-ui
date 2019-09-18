@@ -18,7 +18,7 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
     const tokenAddress = token.address
     const [exchangeWallet, pendingDeposits, pendingWithdraws] = await Promise.all([
       depositApi.getBalance(userAddress, tokenAddress),
-      depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
+      depositApi.getPendingDepositAmount(userAddress, tokenAddress),
       depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
     ])
 

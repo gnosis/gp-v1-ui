@@ -4,7 +4,7 @@ import BN from 'bn.js'
 import { ADDRESS } from '../../../test/data'
 
 /**
- * Basic implemtation of Wallet API
+ * Basic implementation of Wallet API
  */
 export class WalletApiMock implements WalletApi {
   private _connected = false
