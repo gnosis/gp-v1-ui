@@ -2,7 +2,7 @@ import BN from 'bn.js'
 import assert from 'assert'
 
 import { getEpoch } from 'utils'
-import { ZERO, BATCH_TIME } from 'constants/'
+import { ZERO, BATCH_TIME } from 'const'
 
 import { DepositApi, BalanceState } from 'types'
 

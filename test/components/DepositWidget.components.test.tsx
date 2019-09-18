@@ -1,5 +1,6 @@
 import React from 'react'
 import { render } from 'enzyme'
+import BN from 'bn.js'
 
 import { TokenBalanceDetails } from 'types'
 import { Row } from 'components/DepositWidget/Row'
@@ -7,9 +8,9 @@ import { Row } from 'components/DepositWidget/Row'
 describe('<Row /> not enabled', () => {
   const tokenBalanceDetails: TokenBalanceDetails = {
     address: '0x0',
-    exchangeWallet: 25,
-    pendingDeposits: 0,
-    pendingWithdraws: 11,
+    exchangeWallet: new BN(25),
+    pendingDeposits: new BN(0),
+    pendingWithdraws: new BN(11),
     enabled: false,
   }
 
@@ -32,9 +33,9 @@ describe('<Row /> not enabled', () => {
 describe('<Row /> with enable', () => {
   const tokenBalanceDetails: TokenBalanceDetails = {
     address: '0x0',
-    exchangeWallet: 25,
-    pendingDeposits: 0,
-    pendingWithdraws: 11,
+    exchangeWallet: new BN(25),
+    pendingDeposits: new BN(0),
+    pendingWithdraws: new BN(11),
     enabled: true,
   }
 
