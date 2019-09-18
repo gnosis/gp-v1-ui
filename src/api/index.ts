@@ -14,7 +14,8 @@ function createWalletApi(): WalletApi {
   if (isMock) {
     return new WalletApiMock()
   } else {
-    throw new Error('Only has been implemented')
+    // TODO: Add actual implementation
+    throw new Error('Not implemented yet. Only mock implementation available')
   }
 }
 
@@ -22,7 +23,8 @@ function createDepositApi(): DepositApi {
   if (isMock) {
     return new DepositApiMock({ balanceStates })
   } else {
-    throw new Error('Only has been implemented')
+    // TODO: Add actual implementation
+    throw new Error('Not implemented yet. Only mock implementation available')
   }
 }
 
