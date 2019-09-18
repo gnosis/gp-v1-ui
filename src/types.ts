@@ -70,6 +70,6 @@ export interface WalletApi {
  */
 export interface Erc20Api {
   balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
-  approve(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<boolean>
-  allowance(tokenAddress: string, spenderAddress: string): Promise<boolean>
+  approve(tokenAddress: string, userAddress: string, spenderAddress: string, amount: BN): Promise<boolean>
+  allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
 }
