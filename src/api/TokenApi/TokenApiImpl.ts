@@ -6,7 +6,7 @@ function _getImageUrl(tokenAddress: string): string {
 }
 
 /**
- * Basic implemtation of Token API
+ * Basic implementation of Token API
  *
  * Has a pre-define list of tokens.
  * Get's the images from https://github.com/trustwallet/tokens
