@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { TokenBalanceDetails } from 'types'
 import { tokenApi, walletApi, erc20Api, depositApi } from 'api'
+import { ALLOWANCE_VALUE } from 'const'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -13,14 +14,16 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
 
   const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
   const tokens = tokenApi.getTokens(networkId)
+  const contractAddress = depositApi.getContractAddress()
 
-  const balancePromises = tokens.map(async (token, index) => {
+  const balancePromises = tokens.map(async token => {
     const tokenAddress = token.address
-    const [exchangeBalance, depositingBalance, withdrawingBalance, walletBalance] = await Promise.all([
+    const [exchangeBalance, depositingBalance, withdrawingBalance, walletBalance, allowance] = await Promise.all([
       depositApi.getBalance(userAddress, tokenAddress),
       depositApi.getPendingDepositAmount(userAddress, tokenAddress),
       depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
       erc20Api.balanceOf(userAddress, tokenAddress),
+      erc20Api.allowance(tokenAddress, userAddress, contractAddress),
     ])
 
     return {
@@ -29,7 +32,7 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
       depositingBalance,
       withdrawingBalance,
       walletBalance,
-      enabled: index !== 3,
+      enabled: allowance.eq(ALLOWANCE_VALUE),
     }
   })
   return Promise.all(balancePromises)
