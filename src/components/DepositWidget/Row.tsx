@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { TokenBalanceDetails } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
 import { formatAmount } from 'utils'
-import { useEnableTokens } from 'effects/useEnableToken'
+import { useEnableTokens } from 'hooks/useEnableToken'
 
 const WrapperRow = styled.tr`
   img {
