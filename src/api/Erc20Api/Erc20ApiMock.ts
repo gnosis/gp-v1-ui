@@ -2,6 +2,7 @@ import { Erc20Api } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
+import { formatAmount, log } from 'utils'
 
 interface Balances {
   [userAddress: string]: { [tokenAddress: string]: BN }
@@ -56,6 +57,11 @@ export class Erc20ApiMock implements Erc20Api {
   ): Promise<boolean> {
     this._initAllowances(userAddress, tokenAddress, spenderAddress)
     this._allowances[userAddress][tokenAddress][spenderAddress] = amount
+    log(
+      `[Erc20ApiMock] Approved ${formatAmount(
+        amount,
+      )} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
+    )
 
     return true
   }
