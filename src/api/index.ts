@@ -3,7 +3,7 @@ import { WalletApiMock } from './WalletApi/WalletApiMock'
 import { TokenApiImpl } from './TokenApi/TokenApiImpl'
 import { Erc20ApiMock } from './Erc20Api/Erc20ApiMock'
 import { DepositApiMock } from './ExchangeApi/mock/DepositApiMock'
-import { balanceStates } from '../../test/data'
+import { exchangeBalanceStates } from '../../test/data'
 
 const isMock = process.env.MOCK === 'true'
 
@@ -26,7 +26,7 @@ function createErc20Api(): Erc20Api {
 
 function createDepositApi(): DepositApi {
   if (isMock) {
-    return new DepositApiMock({ balanceStates })
+    return new DepositApiMock({ balanceStates: exchangeBalanceStates })
   } else {
     // TODO: Add actual implementation
     throw new Error('Not implemented yet. Only mock implementation available')
