@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TokenBalanceDetails } from 'types'
-import { tokenApi, walletApi, depositApi } from 'api'
+import { tokenApi, walletApi, erc20Api, depositApi } from 'api'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -16,17 +16,19 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
 
   const balancePromises = tokens.map(async (token, index) => {
     const tokenAddress = token.address
-    const [exchangeWallet, pendingDeposits, pendingWithdraws] = await Promise.all([
+    const [exchangeBalance, depositingBalance, withdrawingBalance, walletBalance] = await Promise.all([
       depositApi.getBalance(userAddress, tokenAddress),
       depositApi.getPendingDepositAmount(userAddress, tokenAddress),
       depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
+      erc20Api.balanceOf(userAddress, tokenAddress),
     ])
 
     return {
       ...token,
-      exchangeWallet,
-      pendingDeposits,
-      pendingWithdraws,
+      exchangeBalance,
+      depositingBalance,
+      withdrawingBalance,
+      walletBalance,
       enabled: index !== 3,
     }
   })

@@ -17,9 +17,10 @@ export interface TokenDetails {
 }
 
 export interface TokenBalanceDetails extends TokenDetails {
-  exchangeWallet: BN
-  pendingDeposits: BN
-  pendingWithdraws: BN
+  exchangeBalance: BN
+  depositingBalance: BN
+  withdrawingBalance: BN
+  walletBalance: BN
   enabled: boolean
 }
 
@@ -60,4 +61,17 @@ export interface WalletApi {
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
+}
+
+/**
+ * Interfaces the access to ERC20 token
+ *
+ * Only the required methods are implemented.
+ * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
+ */
+export interface Erc20Api {
+  balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
+  approve(tokenAddress: string, userAddress: string, spenderAddress: string, amount: BN): Promise<boolean>
+  allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
+  transfer(tokenAddress: string, fromAddress: string, toAddress: string, amount: BN): Promise<boolean>
 }
