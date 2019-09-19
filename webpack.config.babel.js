@@ -48,7 +48,7 @@ module.exports = ({ stats = false } = {}) => ({
       },
       {
         test: /\.css$/,
-        use: ['css-loader'],
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
