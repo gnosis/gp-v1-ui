@@ -26,25 +26,36 @@ function formatBN(number: BN): string {
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
-  const tokenBalances = props.tokenBalances
+  const {
+    address,
+    addressMainnet,
+    name,
+    image,
+    symbol,
+    exchangeBalance,
+    depositingBalance,
+    withdrawingBalance,
+    walletBalance,
+    enabled,
+  } = props.tokenBalances
 
   return (
-    <WrapperRow data-address={tokenBalances.address} data-address-mainnet={tokenBalances.addressMainnet}>
+    <WrapperRow data-address={address} data-address-mainnet={addressMainnet}>
       <td>
-        <img src={tokenBalances.image} alt={tokenBalances.name} onError={loadFallbackTokenImage} />
+        <img src={image} alt={name} onError={loadFallbackTokenImage} />
       </td>
-      <td>{tokenBalances.name}</td>
-      <td>{formatBN(tokenBalances.exchangeBalance.add(tokenBalances.depositingBalance))}</td>
-      <td>{formatBN(tokenBalances.withdrawingBalance)}</td>
-      <td>{formatBN(tokenBalances.walletBalance)}</td>
+      <td>{name}</td>
+      <td>{formatBN(exchangeBalance.add(depositingBalance))}</td>
+      <td>{formatBN(withdrawingBalance)}</td>
+      <td>{formatBN(walletBalance)}</td>
       <td>
-        {tokenBalances.enabled ? (
+        {enabled ? (
           <>
             <button>+ Deposit</button>
             <button className="danger">- Withdraw</button>
           </>
         ) : (
-          <button className="success">✓ Enable {tokenBalances.symbol}</button>
+          <button className="success">✓ Enable {symbol}</button>
         )}
       </td>
     </WrapperRow>
