@@ -34,9 +34,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <img src={tokenBalances.image} alt={tokenBalances.name} onError={loadFallbackTokenImage} />
       </td>
       <td>{tokenBalances.name}</td>
-      <td>{formatBN(tokenBalances.exchangeBalance)}</td>
-      <td>{formatBN(tokenBalances.depositingBalance)}</td>
+      <td>{formatBN(tokenBalances.exchangeBalance.add(tokenBalances.depositingBalance))}</td>
       <td>{formatBN(tokenBalances.withdrawingBalance)}</td>
+      <td>{formatBN(tokenBalances.walletBalance)}</td>
       <td>
         {tokenBalances.enabled ? (
           <>
