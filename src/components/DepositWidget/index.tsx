@@ -8,6 +8,14 @@ import ErrorMsg from 'components/ErrorMsg'
 const Wrapper = styled.section`
   font-size: 0.85rem;
   padding-bottom: 4em;
+  // border-spacing: 0px;
+  table {
+    border-collapse: collapse;
+  }
+
+  tr {
+    transition: all 0.5s ease;
+  }
 
   td,
   th {
@@ -24,13 +32,21 @@ const Wrapper = styled.section`
     font-weight: 800;
   }
 
-  tr:last-child td {
-    border-bottom: none;
+  tr td:last-child {
+    width: 18em;
+    text-align: center;
   }
 
   td {
     padding: 1em 0.5em;
+  }
+
+  tr {
     border-bottom: 1px solid #f2f2f2;
+  }
+
+  tr:last-child {
+    border-bottom: none;
   }
 
   .view-in-etherscan {
