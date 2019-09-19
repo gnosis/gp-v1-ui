@@ -3,7 +3,7 @@ import { WalletApiMock } from './WalletApi/WalletApiMock'
 import { TokenApiImpl } from './TokenApi/TokenApiImpl'
 import { Erc20ApiMock } from './Erc20Api/Erc20ApiMock'
 import { DepositApiMock } from './ExchangeApi/mock/DepositApiMock'
-import { exchangeBalanceStates } from '../../test/data'
+import { exchangeBalanceStates, erc20Balances, erc20Allowances } from '../../test/data'
 
 const isMock = process.env.MOCK === 'true'
 
@@ -21,7 +21,7 @@ function createTokenApi(): TokenApi {
 }
 
 function createErc20Api(): Erc20Api {
-  return new Erc20ApiMock()
+  return new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
 }
 
 function createDepositApi(): DepositApi {
