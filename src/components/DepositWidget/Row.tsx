@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { erc20Api, depositApi, walletApi } from 'api'
@@ -23,7 +23,10 @@ function _loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void
   image.src = unknownTokenImg
 }
 
-async function _enableToken(tokenBalances: TokenBalanceDetails): Promise<void> {
+async function _enableToken(
+  tokenBalances: TokenBalanceDetails,
+  setEnabled: React.Dispatch<React.SetStateAction<boolean>>,
+): Promise<void> {
   try {
     // TODO: Review after implementing connect wallet.
     //   Probably some APIs should have an implicit user and it should be login aware
@@ -36,6 +39,7 @@ async function _enableToken(tokenBalances: TokenBalanceDetails): Promise<void> {
 
     // TODO: Use message library
     console.log(`The token ${symbol} has being enabled for trading`)
+    setEnabled(true)
   } catch (error) {
     console.log('Error enabling the token', error)
     // TODO: Use message library
@@ -53,8 +57,10 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
-    enabled,
+    enabled: enabledIntial,
   } = tokenBalances
+
+  const [enabled, setEnabled] = useState(enabledIntial)
 
   return (
     <WrapperRow data-address={address} data-address-mainnet={addressMainnet}>
@@ -72,7 +78,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
             <button className="danger">- Withdraw</button>
           </>
         ) : (
-          <button className="success" onClick={(): Promise<void> => _enableToken(tokenBalances)}>
+          <button className="success" onClick={(): Promise<void> => _enableToken(tokenBalances, setEnabled)}>
             ✓ Enable {symbol}
           </button>
         )}
