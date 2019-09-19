@@ -40,6 +40,7 @@ export interface BalanceState {
 }
 
 export interface DepositApi {
+  getContractAddress(): string
   getBatchTime(): Promise<number>
   getCurrentBatchNumber(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
@@ -58,6 +59,7 @@ export interface DepositApi {
 export interface WalletApi {
   isConnected(): boolean
   connect(): Promise<void>
+  disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
