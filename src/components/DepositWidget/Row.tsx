@@ -53,7 +53,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       // TODO: Use message library
       console.log(`The token ${symbol} has being enabled for trading`)
     } catch (error) {
-      console.log('Error enabling the token', error)
+      console.error('Error enabling the token', error)
       // TODO: Use message library
       alert('Error enabling the token')
     }
