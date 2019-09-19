@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { erc20Api, depositApi, walletApi } from 'api'
 import { TokenBalanceDetails } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
-import { ALLOWANCE_VALUE } from 'const'
 import { formatAmount } from 'utils'
+import { useEnableTokens } from 'effects/useEnableToken'
 
 const WrapperRow = styled.tr`
   img {
@@ -23,30 +22,6 @@ function _loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void
   image.src = unknownTokenImg
 }
 
-async function _enableToken(
-  tokenBalances: TokenBalanceDetails,
-  setEnabled: React.Dispatch<React.SetStateAction<boolean>>,
-): Promise<void> {
-  try {
-    // TODO: Review after implementing connect wallet.
-    //   Probably some APIs should have an implicit user and it should be login aware
-    walletApi.connect()
-
-    const { address: tokenAddress, symbol } = tokenBalances
-    const userAddress = await walletApi.getAddress()
-    const contractAddress = depositApi.getContractAddress()
-    await erc20Api.approve(tokenAddress, userAddress, contractAddress, ALLOWANCE_VALUE)
-
-    // TODO: Use message library
-    console.log(`The token ${symbol} has being enabled for trading`)
-    setEnabled(true)
-  } catch (error) {
-    console.log('Error enabling the token', error)
-    // TODO: Use message library
-    alert('Error enabling the token')
-  }
-}
-
 export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   const {
     address,
@@ -58,10 +33,20 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     depositingBalance,
     withdrawingBalance,
     walletBalance,
-    enabled: enabledIntial,
   } = tokenBalances
+  const { enabled, enabling, enableToken } = useEnableTokens(tokenBalances)
 
-  const [enabled, setEnabled] = useState(enabledIntial)
+  async function _enableToken(): Promise<void> {
+    try {
+      await enableToken()
+      // TODO: Use message library
+      console.log(`The token ${symbol} has being enabled for trading`)
+    } catch (error) {
+      console.log('Error enabling the token', error)
+      // TODO: Use message library
+      alert('Error enabling the token')
+    }
+  }
 
   return (
     <WrapperRow data-address={address} data-address-mainnet={addressMainnet}>
@@ -79,8 +64,8 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
             <button className="danger">- Withdraw</button>
           </>
         ) : (
-          <button className="success" onClick={(): Promise<void> => _enableToken(tokenBalances, setEnabled)}>
-            ✓ Enable {symbol}
+          <button className="success" onClick={_enableToken}>
+            {enabling ? `Enabling ${symbol}...` : `✓ Enable ${symbol}`}
           </button>
         )}
       </td>
