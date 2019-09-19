@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons'
 
 import { TokenBalanceDetails } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
@@ -64,8 +66,18 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
             <button className="danger">- Withdraw</button>
           </>
         ) : (
-          <button className="success" onClick={_enableToken}>
-            {enabling ? `Enabling ${symbol}...` : `✓ Enable ${symbol}`}
+          <button className="success" onClick={_enableToken} disabled={enabling}>
+            {enabling ? (
+              <>
+                <FontAwesomeIcon icon={faSpinner} spin />
+                &nbsp; Enabling {symbol}
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faCheck} />
+                &nbsp; Enable {symbol}
+              </>
+            )}
           </button>
         )}
       </td>

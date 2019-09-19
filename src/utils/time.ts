@@ -8,7 +8,7 @@ export function getEpoch(): number {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function noop(_milliseconds: number = 0): void {}
 
-export async function waitImpl(milliseconds: number = 3000): Promise<void> {
+export async function waitImpl(milliseconds: number = 2500): Promise<void> {
   return new Promise((resolve): void => {
     setTimeout((): void => {
       resolve()

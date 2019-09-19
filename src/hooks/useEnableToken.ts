@@ -11,7 +11,7 @@ interface UseEnableTokensResult {
 
 export const useEnableTokens = (tokenBalances: TokenBalanceDetails): UseEnableTokensResult => {
   const [enabled, setEnabled] = useState(tokenBalances.enabled)
-  const [enabling, setEnabling] = useState(true)
+  const [enabling, setEnabling] = useState(false)
 
   async function enableToken(): Promise<void> {
     setEnabling(true)
