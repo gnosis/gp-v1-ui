@@ -2,7 +2,7 @@ import { Erc20Api } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
-import { formatAmount, log } from 'utils'
+import { formatAmount, log, wait } from 'utils'
 
 interface Balances {
   [userAddress: string]: { [tokenAddress: string]: BN }
@@ -35,6 +35,7 @@ export class Erc20ApiMock implements Erc20Api {
   }
 
   public async allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN> {
+    await wait()
     const userAllowances = this._allowances[userAddress]
     if (!userAllowances) {
       return ZERO
@@ -55,6 +56,7 @@ export class Erc20ApiMock implements Erc20Api {
     spenderAddress: string,
     amount: BN,
   ): Promise<boolean> {
+    await wait()
     this._initAllowances(userAddress, tokenAddress, spenderAddress)
     this._allowances[userAddress][tokenAddress][spenderAddress] = amount
     log(
@@ -67,6 +69,7 @@ export class Erc20ApiMock implements Erc20Api {
   }
 
   public async transfer(tokenAddress: string, fromAddress: string, toAddress: string, amount: BN): Promise<boolean> {
+    await wait()
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
 
