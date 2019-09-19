@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { getEpoch, formatAmount, log } from 'utils'
+import { getEpoch, formatAmount, log, wait } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT } from '../../../../test/data'
 
@@ -35,6 +35,8 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
+    await wait()
+
     // Create the balance state if it's the first deposit
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
@@ -49,6 +51,8 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
+    await wait()
+
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
@@ -60,6 +64,8 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async withdraw(userAddress: string, tokenAddress: string): Promise<void> {
+    await wait()
+
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
