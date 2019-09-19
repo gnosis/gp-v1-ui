@@ -4,6 +4,8 @@ import React from 'react'
 import { hot } from 'react-hot-loader/root'
 import GlobalStyles from './components/layout/GlobalStyles'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.minimal.css'
 
 // Main layout
 import Layout from 'components/layout/'
@@ -14,6 +16,8 @@ import Deposit from 'pages/Deposit'
 import Trade from 'pages/Trade'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
+
+toast.configure({ position: toast.POSITION.TOP_CENTER })
 
 // App
 const App: React.FC = () => (
