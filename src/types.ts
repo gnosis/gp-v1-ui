@@ -40,7 +40,7 @@ export interface BalanceState {
 }
 
 export interface TxOptionalParams {
-  onSentTransaction: (receipt: Receipt) => void
+  onSentTransaction?: (receipt: Receipt) => void
 }
 
 export interface TxResult<T> {
