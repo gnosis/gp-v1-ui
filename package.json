@@ -47,7 +47,7 @@
     ],
     "moduleNameMapper": {
       "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
-      "\\.(css|less)$": "<rootDir>/mocks/fileMock.js"
+      "\\.(css|less)$": "<rootDir>/test/mocks/fileMock.js"
     }
   },
   "author": "",
@@ -57,6 +57,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@hot-loader/react-dom": "^16.8.6",
     "bn.js": "^5.0.0",
+    "modali": "^1.2.0",
     "polished": "^3.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",

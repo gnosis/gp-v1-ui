@@ -365,8 +365,9 @@ describe('Withdraw', () => {
     // GIVEN: An user with a non applicable withdraw request on TOKEN_5
     expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT)
-    expect(await instance.getCurrentBatchNumber())
-      .toBeGreaterThanOrEqual(await instance.getPendingDepositBatchNumber(USER_1, TOKEN_5))
+    expect(await instance.getCurrentBatchNumber()).toBeGreaterThanOrEqual(
+      await instance.getPendingDepositBatchNumber(USER_1, TOKEN_5),
+    )
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw(USER_1, TOKEN_5)
