@@ -1,5 +1,6 @@
 import { BATCH_TIME } from 'const'
 import BN from 'bn.js'
+import { Receipt } from 'types'
 
 export const DATE: Date = new Date('2017-04-23T08:30:15.500Z') // Epoch: 1492936215500 mills
 export const DATE_EPOCH = Math.floor(DATE.valueOf() / 1000) // 1492936215 sec
@@ -24,3 +25,7 @@ export const AMOUNT = new BN('1000000000000000000') // 1 Ether
 export const AMOUNT_SMALL = new BN('200000000000000000') // 0.2 Ether
 
 export const CONTRACT = '0x1000000000000000000000000000000000000000'
+export const TX_HASH = '0x29205e7bc98d650bd728be609bd9a8f8a77c55f66454ba1bc845a3ec6ba19d5f'
+export const RECEIPT: Receipt = {
+  transactionHash: TX_HASH,
+}
