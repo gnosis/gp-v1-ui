@@ -24,7 +24,7 @@ export interface TokenBalanceDetails extends TokenDetails {
   enabled: boolean
 }
 
-export interface TokenApi {
+export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
 }
 

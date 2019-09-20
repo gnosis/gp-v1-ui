@@ -1,4 +1,4 @@
-import { TokenApi, TokenDetails } from 'types'
+import { TokenList, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 
 function _getImageUrl(tokenAddress: string): string {
@@ -11,7 +11,7 @@ function _getImageUrl(tokenAddress: string): string {
  * Has a pre-define list of tokens.
  * Get's the images from https://github.com/trustwallet/tokens
  */
-export class TokenApiImpl implements TokenApi {
+export class TokenListApiImpl implements TokenList {
   public networkIds: number[]
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
 
@@ -39,4 +39,4 @@ export class TokenApiImpl implements TokenApi {
   }
 }
 
-export default TokenApiImpl
+export default TokenListApiImpl

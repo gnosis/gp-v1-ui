@@ -2,15 +2,15 @@ import { WalletApi, Network } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { log, wait } from 'utils'
-import { ADDRESS } from '../../../test/data'
+import { log, wait, toWei } from 'utils'
+import { USER_1 } from '../../../test/data'
 
 /**
  * Basic implementation of Wallet API
  */
 export class WalletApiMock implements WalletApi {
   private _connected = false
-  private _balance = new BN('2750000000000000000')
+  private _balance = toWei(new BN(2.75), 'ether')
 
   public isConnected(): boolean {
     return this._connected
@@ -32,7 +32,7 @@ export class WalletApiMock implements WalletApi {
   public async getAddress(): Promise<string> {
     assert(this._connected, 'The wallet is not connected')
 
-    return ADDRESS
+    return USER_1
   }
 
   public async getBalance(): Promise<BN> {
