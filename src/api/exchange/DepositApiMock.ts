@@ -3,18 +3,18 @@ import assert from 'assert'
 
 import { getEpoch, formatAmount, log, wait } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
-import { CONTRACT } from '../../../../test/data'
+import { CONTRACT } from '../../../test/data'
 
 import { DepositApi, BalanceState } from 'types'
 
-interface BalancesByUserAndToken {
+export interface BalancesByUserAndToken {
   [userAddress: string]: { [tokenAddress: string]: BalanceState }
 }
 
 export class DepositApiMock implements DepositApi {
   private _balanceStates: BalancesByUserAndToken
 
-  public constructor(balanceStates: BalancesByUserAndToken = {}) {
+  public constructor(balanceStates: BalancesByUserAndToken) {
     this._balanceStates = balanceStates
   }
 
@@ -32,6 +32,53 @@ export class DepositApiMock implements DepositApi {
 
   public async getSecondsRemainingInBatch(): Promise<number> {
     return BATCH_TIME - (getEpoch() % BATCH_TIME)
+  }
+
+  public async getBalance(userAddress: string, tokenAddress: string): Promise<BN> {
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return ZERO
+    }
+
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.balance : ZERO
+  }
+
+  public async getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN> {
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return ZERO
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+
+    return balanceState ? balanceState.pendingDeposits.amount : ZERO
+  }
+
+  public async getPendingDepositBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return 0
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.pendingDeposits.stateIndex : 0
+  }
+
+  public async getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN> {
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return ZERO
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.pendingWithdraws.amount : ZERO
+  }
+
+  public async getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return 0
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+    return balanceState ? balanceState.pendingWithdraws.stateIndex : 0
   }
 
   public async deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
@@ -81,52 +128,6 @@ export class DepositApiMock implements DepositApi {
     pendingWithdraws.amount = ZERO
     balanceState.balance = balanceState.balance.sub(amount)
     log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
-  }
-  public async getBalance(userAddress: string, tokenAddress: string): Promise<BN> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return ZERO
-    }
-
-    const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.balance : ZERO
-  }
-
-  public async getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return ZERO
-    }
-    const balanceState = userBalanceStates[tokenAddress]
-
-    return balanceState ? balanceState.pendingDeposits.amount : ZERO
-  }
-
-  public async getPendingDepositBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return 0
-    }
-    const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingDeposits.stateIndex : 0
-  }
-
-  public async getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return ZERO
-    }
-    const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingWithdraws.amount : ZERO
-  }
-
-  public async getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return 0
-    }
-    const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingWithdraws.stateIndex : 0
   }
 
   /********************************    private methods   ********************************/

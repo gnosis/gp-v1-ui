@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { TokenBalanceDetails } from 'types'
-import { tokenApi, walletApi, erc20Api, depositApi } from 'api'
+import { tokenListApi, walletApi, erc20Api, depositApi } from 'api'
 import { ALLOWANCE_VALUE } from 'const'
 
 interface UseTokenBalanceResult {
@@ -13,7 +13,7 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
   await walletApi.connect()
 
   const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
-  const tokens = tokenApi.getTokens(networkId)
+  const tokens = tokenListApi.getTokens(networkId)
   const contractAddress = depositApi.getContractAddress()
 
   const balancePromises = tokens.map(async token => {
@@ -22,7 +22,7 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
       depositApi.getBalance(userAddress, tokenAddress),
       depositApi.getPendingDepositAmount(userAddress, tokenAddress),
       depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
-      erc20Api.balanceOf(userAddress, tokenAddress),
+      erc20Api.balanceOf(tokenAddress, userAddress),
       erc20Api.allowance(tokenAddress, userAddress, contractAddress),
     ])
 

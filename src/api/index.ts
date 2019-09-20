@@ -1,9 +1,10 @@
-import { Network, TokenApi, WalletApi, DepositApi, Erc20Api } from 'types'
-import { WalletApiMock } from './WalletApi/WalletApiMock'
-import { TokenApiImpl } from './TokenApi/TokenApiImpl'
-import { Erc20ApiMock } from './Erc20Api/Erc20ApiMock'
-import { DepositApiMock } from './ExchangeApi/mock/DepositApiMock'
-import { exchangeBalanceStates, erc20Balances, erc20Allowances } from '../../test/data'
+import { Network, TokenList, WalletApi, DepositApi, Erc20Api } from 'types'
+import { WalletApiMock } from './wallet/WalletApiMock'
+import { TokenListApiImpl } from './tokenList/TokenListApiImpl'
+import { TokenListApiMock } from './tokenList/TokenListApiMock'
+import { Erc20ApiMock } from './erc20/Erc20ApiMock'
+import { DepositApiMock } from './exchange/DepositApiMock'
+import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances } from '../../test/data'
 
 const isMock = process.env.MOCK === 'true'
 
@@ -16,8 +17,12 @@ function createWalletApi(): WalletApi {
   }
 }
 
-function createTokenApi(): TokenApi {
-  return new TokenApiImpl([Network.Mainnet, Network.Rinkeby])
+function createTokenListApi(): TokenList {
+  if (isMock) {
+    return new TokenListApiMock(tokenList)
+  } else {
+    return new TokenListApiImpl([Network.Mainnet, Network.Rinkeby])
+  }
 }
 
 function createErc20Api(): Erc20Api {
@@ -26,7 +31,7 @@ function createErc20Api(): Erc20Api {
 
 function createDepositApi(): DepositApi {
   if (isMock) {
-    return new DepositApiMock({ balanceStates: exchangeBalanceStates })
+    return new DepositApiMock(exchangeBalanceStates)
   } else {
     // TODO: Add actual implementation
     throw new Error('Not implemented yet. Only mock implementation available')
@@ -35,6 +40,6 @@ function createDepositApi(): DepositApi {
 
 // Build APIs
 export const walletApi: WalletApi = createWalletApi()
-export const tokenApi: TokenApi = createTokenApi()
+export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api()
 export const depositApi: DepositApi = createDepositApi()
