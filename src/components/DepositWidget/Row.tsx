@@ -13,6 +13,16 @@ const WrapperRow = styled.tr`
     width: 30px;
     height: 30px;
   }
+
+  &.highlight {
+    background-color: #fdffc1;
+    border-bottom-color: #fbdf8f;
+  }
+
+  &.loading {
+    background-color: #f7f7f7;
+    border-bottom-color: #b9b9b9;
+  }
 `
 
 export interface RowProps {
@@ -36,7 +46,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     withdrawingBalance,
     walletBalance,
   } = tokenBalances
-  const { enabled, enabling, enableToken } = useEnableTokens(tokenBalances)
+  const { enabled, enabling, highlight, enableToken } = useEnableTokens(tokenBalances)
 
   async function _enableToken(): Promise<void> {
     try {
@@ -44,14 +54,18 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       // TODO: Use message library
       console.log(`The token ${symbol} has being enabled for trading`)
     } catch (error) {
-      console.log('Error enabling the token', error)
+      console.error('Error enabling the token', error)
       // TODO: Use message library
       alert('Error enabling the token')
     }
   }
 
   return (
-    <WrapperRow data-address={address} data-address-mainnet={addressMainnet}>
+    <WrapperRow
+      data-address={address}
+      className={highlight ? 'highlight' : enabling ? 'loading' : ''}
+      data-address-mainnet={addressMainnet}
+    >
       <td>
         <img src={image} alt={name} onError={_loadFallbackTokenImage} />
       </td>
