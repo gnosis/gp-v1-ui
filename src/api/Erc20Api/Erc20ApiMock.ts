@@ -35,6 +35,7 @@ export class Erc20ApiMock implements Erc20Api {
   }
 
   public async allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN> {
+    await wait()
     const userAllowances = this._allowances[userAddress]
     if (!userAllowances) {
       return ZERO
