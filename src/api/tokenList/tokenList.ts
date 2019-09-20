@@ -28,7 +28,7 @@ const tokens: TokenDetailsByNetwork[] = [
     decimals: 6,
     addressByNetwork: {
       [Network.Mainnet]: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      [Network.Rinkeby]: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
+      [Network.Rinkeby]: '0x8cCae6920d77A87c29A6BEeDa28ac8e087F6E440',
     },
   },
 
