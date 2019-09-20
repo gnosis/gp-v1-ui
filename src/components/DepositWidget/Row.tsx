@@ -46,7 +46,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     withdrawingBalance,
     walletBalance,
   } = tokenBalances
-  const { enabled, enabling, highlight, enableToken } = useEnableTokens(tokenBalances)
+  const { enabled, enabling, highlight, enableToken } = useEnableTokens({ tokenBalances })
 
   async function _enableToken(): Promise<void> {
     try {
