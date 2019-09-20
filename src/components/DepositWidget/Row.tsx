@@ -44,6 +44,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
+    walletBalance,
   } = tokenBalances
   const { enabled, enabling, highlight, enableToken } = useEnableTokens(tokenBalances)
 
@@ -69,9 +70,9 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
         <img src={image} alt={name} onError={_loadFallbackTokenImage} />
       </td>
       <td>{name}</td>
-      <td>{formatAmount(exchangeBalance)}</td>
-      <td>{formatAmount(depositingBalance)}</td>
+      <td>{formatAmount(exchangeBalance.add(depositingBalance))}</td>
       <td>{formatAmount(withdrawingBalance)}</td>
+      <td>{formatAmount(walletBalance)}</td>
       <td>
         {enabled ? (
           <>
