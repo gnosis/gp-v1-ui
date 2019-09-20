@@ -5,7 +5,7 @@ import { hot } from 'react-hot-loader/root'
 import GlobalStyles from './components/layout/GlobalStyles'
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.minimal.css'
+import 'react-toastify/dist/ReactToastify.min.css'
 
 // Main layout
 import Layout from 'components/layout/'

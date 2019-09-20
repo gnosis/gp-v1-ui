@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import BN from 'bn.js'
-import cogoToast from 'cogo-toast'
 import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails } from 'types'
@@ -43,7 +42,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         {tokenBalances.enabled ? (
           <>
             <button onClick={(): any => toast.info('Hello!!')}>+ Deposit</button>
-            <button onClick={(): any => cogoToast.info('Hello!!')} className="danger">
+            <button onClick={(): any => toast.error('Hello!!')} className="danger">
               - Withdraw
             </button>
           </>

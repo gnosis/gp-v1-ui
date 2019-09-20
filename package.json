@@ -57,7 +57,6 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@hot-loader/react-dom": "^16.8.6",
     "bn.js": "^5.0.0",
-    "cogo-toast": "^3.2.2",
     "polished": "^3.4.1",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
