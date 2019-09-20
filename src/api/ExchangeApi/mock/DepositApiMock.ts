@@ -1,8 +1,9 @@
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { getEpoch } from 'utils'
+import { getEpoch, formatAmount, log, wait } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
+import { CONTRACT } from '../../../../test/data'
 
 import { DepositApi, BalanceState } from 'types'
 
@@ -15,6 +16,10 @@ export class DepositApiMock implements DepositApi {
 
   public constructor(balanceStates: BalancesByUserAndToken = {}) {
     this._balanceStates = balanceStates
+  }
+
+  public getContractAddress(): string {
+    return CONTRACT
   }
 
   public async getBatchTime(): Promise<number> {
@@ -30,6 +35,8 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
+    await wait()
+
     // Create the balance state if it's the first deposit
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
@@ -40,9 +47,12 @@ export class DepositApiMock implements DepositApi {
     const pendingDeposits = balanceState.pendingDeposits
     pendingDeposits.amount = pendingDeposits.amount.add(amount)
     pendingDeposits.stateIndex = currentStateIndex
+    log(`[DepositApiMock] Deposited ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
   }
 
   public async requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void> {
+    await wait()
+
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
@@ -50,9 +60,12 @@ export class DepositApiMock implements DepositApi {
       amount,
       stateIndex: currentStateIndex,
     }
+    log(`[DepositApiMock] Requested withdraw of ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
   }
 
   public async withdraw(userAddress: string, tokenAddress: string): Promise<void> {
+    await wait()
+
     const currentStateIndex = await this.getCurrentBatchNumber()
     let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
 
@@ -67,6 +80,7 @@ export class DepositApiMock implements DepositApi {
     const amount = BN.min(pendingWithdraws.amount, balanceState.balance)
     pendingWithdraws.amount = ZERO
     balanceState.balance = balanceState.balance.sub(amount)
+    log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
   }
   public async getBalance(userAddress: string, tokenAddress: string): Promise<BN> {
     const userBalanceStates = this._balanceStates[userAddress]

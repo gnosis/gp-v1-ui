@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Row } from './Row'
-import { useTokenBalances } from 'effects/useTokenBalances'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
 
 const Wrapper = styled.section`
