@@ -2,7 +2,7 @@ import BN from 'bn.js'
 import { TEN } from 'const'
 
 const DEFAULT_DECIMALS = 4
-const DEFAULT_PRECISSION = 18
+const DEFAULT_PRECISION = 18
 
 function formatNumber(num: string): string {
   return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
@@ -10,13 +10,13 @@ function formatNumber(num: string): string {
 
 function decomposeBn(
   amount?: BN,
-  amountPrecission = DEFAULT_PRECISSION,
+  amountPrecision = DEFAULT_PRECISION,
   decimals = DEFAULT_DECIMALS,
 ): { integerPart: BN; decimalPart: BN } {
   // Discard the decimals we don't need
-  //  i.e. for WETH (precission=18, decimals=4) --> amount / 1e14
+  //  i.e. for WETH (precision=18, decimals=4) --> amount / 1e14
   //        16.5*1e18 ---> 165000
-  const amountRaw = amount.divRound(TEN.pow(new BN(amountPrecission - decimals)))
+  const amountRaw = amount.divRound(TEN.pow(new BN(amountPrecision - decimals)))
   const integerPart = amountRaw.div(TEN.pow(new BN(decimals))) // 165000 / 10000 = 16
   const decimalPart = amountRaw.mod(TEN.pow(new BN(decimals))) // 165000 % 10000 = 5000
 
@@ -25,14 +25,14 @@ function decomposeBn(
 
 export function formatAmount(
   amount?: BN,
-  amountPrecission = DEFAULT_PRECISSION,
+  amountPrecision = DEFAULT_PRECISION,
   decimals = DEFAULT_DECIMALS,
 ): string | null {
   if (!amount) {
     return null
   }
 
-  const { integerPart, decimalPart } = decomposeBn(amount, amountPrecission, decimals)
+  const { integerPart, decimalPart } = decomposeBn(amount, amountPrecision, decimals)
 
   if (decimalPart.isZero()) {
     // Return just the integer part
@@ -46,12 +46,12 @@ export function formatAmount(
   }
 }
 
-export function formatAmountFull(amount?: BN, amountPrecission = DEFAULT_PRECISSION): string | null {
+export function formatAmountFull(amount?: BN, amountPrecision = DEFAULT_PRECISION): string | null {
   if (!amount) {
     return null
   }
 
-  const { integerPart, decimalPart } = decomposeBn(amount, amountPrecission, amountPrecission)
+  const { integerPart, decimalPart } = decomposeBn(amount, amountPrecision, amountPrecision)
   if (decimalPart.isZero()) {
     // Return just the integer part
     return formatNumber(integerPart.toString())

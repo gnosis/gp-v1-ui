@@ -60,7 +60,7 @@ describe('Rounding amounts', () => {
   })
 })
 
-describe('Tokens with precission 6', () => {
+describe('Tokens with precision 6', () => {
   test('1 unit', async () => {
     const amount = new BN('1000000')
     expect(formatAmount(amount, 6)).toEqual('1')
