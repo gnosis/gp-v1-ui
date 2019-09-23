@@ -35,13 +35,14 @@ const tokens: TokenDetailsByNetwork[] = [
   // TrueUSD
   //  https://www.trusttoken.com/trueusd
   //  US Dollar backed stable coin which is totally fiat-collateralized
+  //  Rinkeby faucet: https://github.com/trusttoken/true-currencies#getting-testnet-tokens
   {
     name: 'TrueUSD',
     symbol: 'TUSD',
     decimals: 18,
     addressByNetwork: {
       [Network.Mainnet]: '0x0000000000085d4780B73119b644AE5ecd22b376',
-      [Network.Rinkeby]: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
+      [Network.Rinkeby]: '0x0000000000085d4780B73119b644AE5ecd22b376',
     },
   },
 
