@@ -50,13 +50,14 @@ const tokens: TokenDetailsByNetwork[] = [
   //  legitimate built on open standards
   //  using Grant Thornton for verifying Circle’s US dollar reserves
   //  launched by cryptocurrency finance firm circle Internet financial Ltd and the CENTRE open source consortium launched
+  //  Faucet available on Compound at https://app.compound.finance/asset/cUSDC
   {
     name: 'USD Coin',
     symbol: 'USDC',
     decimals: 6,
     addressByNetwork: {
       [Network.Mainnet]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-      [Network.Rinkeby]: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
+      [Network.Rinkeby]: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
     },
   },
 
