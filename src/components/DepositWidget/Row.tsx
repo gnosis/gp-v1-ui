@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails, Receipt } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
-import { formatAmount } from 'utils'
+import { formatAmount, formatAmountFull } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
 
 const WrapperRow = styled.tr`
@@ -42,6 +42,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     name,
     image,
     symbol,
+    decimals,
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
@@ -75,6 +76,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       toast.error('Error enabling the token')
     }
   }
+  const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   return (
     <WrapperRow
@@ -86,9 +88,9 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
         <img src={image} alt={name} onError={_loadFallbackTokenImage} />
       </td>
       <td>{name}</td>
-      <td>{formatAmount(exchangeBalance.add(depositingBalance))}</td>
-      <td>{formatAmount(withdrawingBalance)}</td>
-      <td>{formatAmount(walletBalance)}</td>
+      <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
+      <td title={formatAmountFull(withdrawingBalance, decimals)}>{formatAmount(withdrawingBalance, decimals)}</td>
+      <td title={formatAmountFull(walletBalance, decimals)}>{formatAmount(walletBalance, decimals)}</td>
       <td>
         {enabled ? (
           <>
