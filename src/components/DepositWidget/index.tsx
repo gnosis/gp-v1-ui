@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
+import { depositApi } from 'api'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -58,6 +59,7 @@ const Wrapper = styled.section`
 
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
+  const contractAddress = depositApi.getContractAddress()
 
   if (!balances) {
     // Loading: Do not show the widget
@@ -66,7 +68,12 @@ const DepositWidget: React.FC = () => {
 
   return (
     <Wrapper className="widget">
-      <a href="https://etherscan.io" target="_blank" rel="noopener noreferrer" className="view-in-etherscan">
+      <a
+        href={`https://etherscan.io/address/${contractAddress}#code`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="view-in-etherscan"
+      >
         <small>View verified contract</small>
       </a>
       {error ? (
