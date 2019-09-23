@@ -30,7 +30,7 @@ export interface TokenList {
 
 export interface PendingFlux {
   amount: BN
-  stateIndex: number
+  batchId: number
 }
 
 export interface BalanceState {
@@ -55,14 +55,14 @@ export interface Receipt {
 export interface DepositApi {
   getContractAddress(): string
   getBatchTime(): Promise<number>
-  getCurrentBatchNumber(): Promise<number>
+  getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
 
   getBalance(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingDepositBatchNumber(userAddress: string, tokenAddress: string): Promise<number>
+  getPendingDepositBatchId(userAddress: string, tokenAddress: string): Promise<number>
   getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number>
+  getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number>
 
   deposit(
     userAddress: string,

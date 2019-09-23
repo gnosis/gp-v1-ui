@@ -17,28 +17,28 @@ beforeEach(() => {
     [USER_1]: {
       [TOKEN_1]: {
         balance: ZERO,
-        pendingDeposits: { amount: ZERO, stateIndex: 0 },
-        pendingWithdraws: { amount: ZERO, stateIndex: 0 },
+        pendingDeposits: { amount: ZERO, batchId: 0 },
+        pendingWithdraws: { amount: ZERO, batchId: 0 },
       },
       [TOKEN_2]: {
         balance: AMOUNT,
-        pendingDeposits: { amount: ZERO, stateIndex: 0 },
-        pendingWithdraws: { amount: ZERO, stateIndex: 0 },
+        pendingDeposits: { amount: ZERO, batchId: 0 },
+        pendingWithdraws: { amount: ZERO, batchId: 0 },
       },
       [TOKEN_4]: {
         balance: ZERO,
-        pendingDeposits: { amount: AMOUNT, stateIndex: 1 },
-        pendingWithdraws: { amount: AMOUNT, stateIndex: 1 },
+        pendingDeposits: { amount: AMOUNT, batchId: 1 },
+        pendingWithdraws: { amount: AMOUNT, batchId: 1 },
       },
       [TOKEN_5]: {
         balance: AMOUNT,
-        pendingDeposits: { amount: AMOUNT, stateIndex: testHelpers.BATCH_NUMBER },
-        pendingWithdraws: { amount: AMOUNT, stateIndex: testHelpers.BATCH_NUMBER },
+        pendingDeposits: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
+        pendingWithdraws: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
       },
       [TOKEN_6]: {
         balance: AMOUNT,
-        pendingDeposits: { amount: AMOUNT_SMALL, stateIndex: 1 },
-        pendingWithdraws: { amount: AMOUNT_SMALL, stateIndex: 1 },
+        pendingDeposits: { amount: AMOUNT_SMALL, batchId: 1 },
+        pendingWithdraws: { amount: AMOUNT_SMALL, batchId: 1 },
       },
     },
   })
@@ -50,9 +50,9 @@ describe('Basic view functions', () => {
     expect(batchTime).toBe(BATCH_TIME)
   })
 
-  test('Get current batch number (state index)', async () => {
-    const batchNumber = await instance.getCurrentBatchNumber()
-    expect(batchNumber).toBe(testHelpers.BATCH_NUMBER)
+  test('Get current batch id (state index)', async () => {
+    const batchId = await instance.getCurrentBatchId()
+    expect(batchId).toBe(testHelpers.BATCH_ID)
   })
 
   test('Get seconds remaining in batch', async () => {
@@ -111,8 +111,8 @@ describe('Get pending deposit amounts', () => {
     // THEN: there's no pending deposits
     expect(await instance.getPendingDepositAmount(USER_2, TOKEN_1)).toEqual(ZERO)
 
-    // THEN: there's no batch number
-    expect(await instance.getPendingDepositBatchNumber(USER_2, TOKEN_1)).toEqual(0)
+    // THEN: there's no batch id
+    expect(await instance.getPendingDepositBatchId(USER_2, TOKEN_1)).toEqual(0)
   })
 
   test('Unknown token', async () => {
@@ -122,8 +122,8 @@ describe('Get pending deposit amounts', () => {
     // THEN: there's no pending deposits
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_3)).toEqual(ZERO)
 
-    // THEN: there's no batch number
-    expect(await instance.getPendingDepositBatchNumber(USER_1, TOKEN_3)).toEqual(0)
+    // THEN: there's no batch id
+    expect(await instance.getPendingDepositBatchId(USER_1, TOKEN_3)).toEqual(0)
   })
 
   test('No pending balance', async () => {
@@ -143,8 +143,8 @@ describe('Get pending withdraw amounts', () => {
     // THEN: there's no pending withdraws
     expect(await instance.getPendingWithdrawAmount(USER_2, TOKEN_1)).toEqual(ZERO)
 
-    // THEN: there's no batch number
-    expect(await instance.getPendingWithdrawBatchNumber(USER_2, TOKEN_1)).toEqual(0)
+    // THEN: there's no batch id
+    expect(await instance.getPendingWithdrawBatchId(USER_2, TOKEN_1)).toEqual(0)
   })
 
   test('Unknown token', async () => {
@@ -154,8 +154,8 @@ describe('Get pending withdraw amounts', () => {
     // THEN: there's no pending withdraws
     expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_3)).toEqual(ZERO)
 
-    // THEN: there's no batch number
-    expect(await instance.getPendingWithdrawBatchNumber(USER_1, TOKEN_3)).toEqual(0)
+    // THEN: there's no batch id
+    expect(await instance.getPendingWithdrawBatchId(USER_1, TOKEN_3)).toEqual(0)
   })
 
   test('No pending balance', async () => {
@@ -365,8 +365,8 @@ describe('Withdraw', () => {
     // GIVEN: An user with a non applicable withdraw request on TOKEN_5
     expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT)
-    expect(await instance.getCurrentBatchNumber())
-      .toBeGreaterThanOrEqual(await instance.getPendingDepositBatchNumber(USER_1, TOKEN_5))
+    expect(await instance.getCurrentBatchId())
+      .toBeGreaterThanOrEqual(await instance.getPendingDepositBatchId(USER_1, TOKEN_5))
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw(USER_1, TOKEN_5)
