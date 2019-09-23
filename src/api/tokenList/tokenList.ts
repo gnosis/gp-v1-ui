@@ -92,13 +92,14 @@ const tokens: TokenDetailsByNetwork[] = [
   // MakerDAO (DAI)
   //  https://makerdao.com/
   //  crypto-collateralized cryptocurrency: stable coin which is pegged to USD
+  //  Faucet available on Compound at https://app.compound.finance/asset/cDAI
   {
     name: 'DAI Stablecoin',
     symbol: 'DAI',
     decimals: 18,
     addressByNetwork: {
       [Network.Mainnet]: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-      [Network.Rinkeby]: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
+      [Network.Rinkeby]: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa',
     },
   },
 ]
