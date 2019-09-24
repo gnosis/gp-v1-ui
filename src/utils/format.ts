@@ -20,6 +20,10 @@ function _decomposeBn(
   const integerPart = amountRaw.div(TEN.pow(new BN(decimals))) // 165000 / 10000 = 16
   const decimalPart = amountRaw.mod(TEN.pow(new BN(decimals))) // 165000 % 10000 = 5000
 
+  // Discard the decimals we don't need
+  //  i.e. for WETH (precision=18, decimals=4) --> amount / 1e14
+  //        1, 18:  16.5*1e18 ---> 165000
+
   return { integerPart, decimalPart }
 }
 
@@ -38,11 +42,13 @@ export function formatAmount(
     // Return just the integer part
     return _formatNumber(integerPart.toString())
   } else {
-    // Format decimal (to get rid of right padding zeros)
-    const decimalFmt = (decimalPart.toNumber() / Math.pow(10, decimals)).toString()
+    const decimalFmt = decimalPart
+      .toString()
+      .padStart(decimals, '0') // Pad the decimal part with leading zeros
+      .replace(/0+$/, '') // Remove the right zeros
 
     // Return the formated integer plus the decimal
-    return _formatNumber(integerPart.toString()) + '.' + decimalFmt.substring(2, decimalFmt.length)
+    return _formatNumber(integerPart.toString()) + '.' + decimalFmt
   }
 }
 
@@ -51,12 +57,5 @@ export function formatAmountFull(amount?: BN, amountPrecision = DEFAULT_PRECISIO
     return null
   }
 
-  const { integerPart, decimalPart } = _decomposeBn(amount, amountPrecision, amountPrecision)
-  if (decimalPart.isZero()) {
-    // Return just the integer part
-    return _formatNumber(integerPart.toString())
-  } else {
-    // Return the formated integer plus the decimal
-    return _formatNumber(integerPart.toString()) + '.' + decimalPart.toString().replace(/0+$/, '')
-  }
+  return formatAmount(amount, amountPrecision, amountPrecision)
 }
