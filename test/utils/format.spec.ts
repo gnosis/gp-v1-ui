@@ -76,7 +76,7 @@ describe('Tokens with precision 6', () => {
     expect(formatAmount(amount, 6)).toEqual('4,567,890.1234')
   })
 
-  test('4,567,890.123555 units, round up', async () => {
+  test('4,567,890.123455 units, round up', async () => {
     const amount = new BN('4567890123455')
     expect(formatAmount(amount, 6)).toEqual('4,567,890.1235')
   })
@@ -93,12 +93,12 @@ describe('2 decimals', () => {
     expect(formatAmount(amount, 6, 2)).toEqual('1')
   })
 
-  test('4,567,890.12333 units, round down', async () => {
+  test('4,567,890.123333 units, round down', async () => {
     const amount = new BN('4567890123333')
     expect(formatAmount(amount, 6, 2)).toEqual('4,567,890.12')
   })
 
-  test('4,567,890.123555 units, round up', async () => {
+  test('4,567,890.125555 units, round up', async () => {
     const amount = new BN('4567890125555')
     expect(formatAmount(amount, 6, 2)).toEqual('4,567,890.13')
   })
