@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails, Receipt } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
@@ -50,9 +51,14 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     tokenBalances,
     txOptionalParams: {
       onSentTransaction: (receipt: Receipt): void => {
-        // TODO: Use message library
-        console.log(
-          `The transaction has been sent! Check https://etherscan.io/tx/${receipt.transactionHash} for the detail`,
+        toast.info(
+          <div>
+            The transaction has been sent! Check{' '}
+            <a href={`https://etherscan.io/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">
+              {receipt.transactionHash.slice(0, 10)}...
+            </a>{' '}
+            for details
+          </div>,
         )
       },
     },
@@ -61,14 +67,12 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   async function _enableToken(): Promise<void> {
     try {
       const result = await enableToken()
-
-      // TODO: Use message library
-      console.log(`The token ${symbol} has being enabled for trading`)
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      toast.success(`The token ${symbol} has been enabled for trading`)
     } catch (error) {
       console.error('Error enabling the token', error)
-      // TODO: Use message library
-      alert('Error enabling the token')
+      toast.error('Error enabling the token')
     }
   }
 

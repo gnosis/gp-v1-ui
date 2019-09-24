@@ -19,7 +19,7 @@ module.exports = ({ stats = false } = {}) => ({
     rules: [
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: ['file-loader']
+        use: ['file-loader'],
       },
       {
         test: /\.jsx?$/,
@@ -45,6 +45,10 @@ module.exports = ({ stats = false } = {}) => ({
             },
           },
         ],
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
