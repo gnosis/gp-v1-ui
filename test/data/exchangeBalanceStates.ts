@@ -6,7 +6,7 @@ import { BalancesByUserAndToken } from 'api/exchange/DepositApiMock'
 
 const FLUX_ZERO = {
   amount: ZERO,
-  stateIndex: 0,
+  batchId: 0,
 }
 
 const STATE_ZERO = {
@@ -22,7 +22,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
       balance: new BN('1750173903215790623569'), // 1,750.07
       pendingDeposits: {
         amount: new BN('850000000000000000'), // 0.85,
-        stateIndex: 1,
+        batchId: 1,
       },
       pendingWithdraws: FLUX_ZERO,
     },
@@ -31,7 +31,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
       pendingDeposits: FLUX_ZERO,
       pendingWithdraws: {
         amount: new BN('100000000000000000'), // 0.1,
-        stateIndex: 1,
+        batchId: 1,
       },
     },
     [TOKEN_4]: STATE_ZERO,
@@ -41,7 +41,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
       pendingDeposits: FLUX_ZERO,
       pendingWithdraws: {
         amount: new BN('101479327327532326732'), // 1,
-        stateIndex: Number.MAX_SAFE_INTEGER,
+        batchId: Number.MAX_SAFE_INTEGER,
       },
     },
   },

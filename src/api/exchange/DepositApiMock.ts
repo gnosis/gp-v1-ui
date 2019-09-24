@@ -27,7 +27,7 @@ export class DepositApiMock implements DepositApi {
     return BATCH_TIME
   }
 
-  public async getCurrentBatchNumber(): Promise<number> {
+  public async getCurrentBatchId(): Promise<number> {
     return Math.floor(getEpoch() / BATCH_TIME)
   }
 
@@ -55,13 +55,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingDeposits.amount : ZERO
   }
 
-  public async getPendingDepositBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
+  public async getPendingDepositBatchId(userAddress: string, tokenAddress: string): Promise<number> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return 0
     }
     const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingDeposits.stateIndex : 0
+    return balanceState ? balanceState.pendingDeposits.batchId : 0
   }
 
   public async getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN> {
@@ -73,13 +73,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingWithdraws.amount : ZERO
   }
 
-  public async getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number> {
+  public async getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return 0
     }
     const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingWithdraws.stateIndex : 0
+    return balanceState ? balanceState.pendingWithdraws.batchId : 0
   }
 
   public async deposit(
@@ -91,16 +91,15 @@ export class DepositApiMock implements DepositApi {
     await waitAndSendReceipt({ txOptionalParams })
 
     // Create the balance state if it's the first deposit
-    const currentStateIndex = await this.getCurrentBatchNumber()
-    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
+    const currentBatchId = await this.getCurrentBatchId()
+    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentBatchId)
 
     // Update any unapplied deposit
-    this._updateDepositsBalance(userAddress, tokenAddress, currentStateIndex)
+    this._updateDepositsBalance(userAddress, tokenAddress, currentBatchId)
 
     const pendingDeposits = balanceState.pendingDeposits
     pendingDeposits.amount = pendingDeposits.amount.add(amount)
-    pendingDeposits.stateIndex = currentStateIndex
-
+    pendingDeposits.batchId = currentBatchId
     log(`[DepositApiMock] Deposited ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
     return { data: undefined, receipt: RECEIPT }
   }
@@ -113,12 +112,12 @@ export class DepositApiMock implements DepositApi {
   ): Promise<TxResult<void>> {
     await waitAndSendReceipt({ txOptionalParams })
 
-    const currentStateIndex = await this.getCurrentBatchNumber()
-    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
+    const currentBatchId = await this.getCurrentBatchId()
+    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentBatchId)
 
     balanceState.pendingWithdraws = {
       amount,
-      stateIndex: currentStateIndex,
+      batchId: currentBatchId,
     }
 
     log(`[DepositApiMock] Requested withdraw of ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
@@ -132,8 +131,8 @@ export class DepositApiMock implements DepositApi {
   ): Promise<TxResult<void>> {
     await waitAndSendReceipt({ txOptionalParams })
 
-    const currentStateIndex = await this.getCurrentBatchNumber()
-    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentStateIndex)
+    const currentBatchId = await this.getCurrentBatchId()
+    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentBatchId)
 
     const pendingWithdraws = balanceState.pendingWithdraws
 
@@ -141,7 +140,7 @@ export class DepositApiMock implements DepositApi {
     //  The restrictions are stronger than in the smart contract
     assert(!pendingWithdraws.amount.isZero(), "There wasn't any previous pending withdraw")
     assert(!balanceState.balance.isZero(), "There user doesn't have any balance")
-    assert(pendingWithdraws.stateIndex < currentStateIndex, 'The withdraw request is not settled yet')
+    assert(pendingWithdraws.batchId < currentBatchId, 'The withdraw request is not settled yet')
 
     const amount = BN.min(pendingWithdraws.amount, balanceState.balance)
     pendingWithdraws.amount = ZERO
@@ -152,7 +151,7 @@ export class DepositApiMock implements DepositApi {
   }
 
   /********************************    private methods   ********************************/
-  private _initBalanceState(userAddress: string, tokenAddress: string, currentStateIndex: number): BalanceState {
+  private _initBalanceState(userAddress: string, tokenAddress: string, currentBatchId: number): BalanceState {
     let userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       userBalanceStates = {}
@@ -164,11 +163,11 @@ export class DepositApiMock implements DepositApi {
       balanceState = {
         balance: ZERO,
         pendingDeposits: {
-          stateIndex: currentStateIndex,
+          batchId: currentBatchId,
           amount: ZERO,
         },
         pendingWithdraws: {
-          stateIndex: currentStateIndex,
+          batchId: currentBatchId,
           amount: ZERO,
         },
       }
@@ -178,7 +177,7 @@ export class DepositApiMock implements DepositApi {
     return balanceState
   }
 
-  private _updateDepositsBalance(userAddress: string, tokenAddress: string, currentStateIndex: number): void {
+  private _updateDepositsBalance(userAddress: string, tokenAddress: string, currentBatchId: number): void {
     const balanceState = this._balanceStates[userAddress][tokenAddress]
     const pendingDeposits = balanceState.pendingDeposits
 
@@ -186,7 +185,7 @@ export class DepositApiMock implements DepositApi {
       // There's a pending deposit
       !pendingDeposits.amount.isZero() &&
       // ...and, the deposit is applicable
-      pendingDeposits.stateIndex < currentStateIndex
+      pendingDeposits.batchId < currentBatchId
     ) {
       balanceState.balance = balanceState.balance.add(pendingDeposits.amount)
       pendingDeposits.amount = ZERO
