@@ -4,11 +4,11 @@ import { TEN } from 'const'
 const DEFAULT_DECIMALS = 4
 const DEFAULT_PRECISION = 18
 
-function formatNumber(num: string): string {
+function _formatNumber(num: string): string {
   return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
 
-function decomposeBn(
+function _decomposeBn(
   amount?: BN,
   amountPrecision = DEFAULT_PRECISION,
   decimals = DEFAULT_DECIMALS,
@@ -32,17 +32,17 @@ export function formatAmount(
     return null
   }
 
-  const { integerPart, decimalPart } = decomposeBn(amount, amountPrecision, decimals)
+  const { integerPart, decimalPart } = _decomposeBn(amount, amountPrecision, decimals)
 
   if (decimalPart.isZero()) {
     // Return just the integer part
-    return formatNumber(integerPart.toString())
+    return _formatNumber(integerPart.toString())
   } else {
     // Format decimal (to get rid of right padding zeros)
     const decimalFmt = (decimalPart.toNumber() / Math.pow(10, decimals)).toString()
 
     // Return the formated integer plus the decimal
-    return formatNumber(integerPart.toString()) + '.' + decimalFmt.substring(2, decimalFmt.length)
+    return _formatNumber(integerPart.toString()) + '.' + decimalFmt.substring(2, decimalFmt.length)
   }
 }
 
@@ -51,12 +51,12 @@ export function formatAmountFull(amount?: BN, amountPrecision = DEFAULT_PRECISIO
     return null
   }
 
-  const { integerPart, decimalPart } = decomposeBn(amount, amountPrecision, amountPrecision)
+  const { integerPart, decimalPart } = _decomposeBn(amount, amountPrecision, amountPrecision)
   if (decimalPart.isZero()) {
     // Return just the integer part
-    return formatNumber(integerPart.toString())
+    return _formatNumber(integerPart.toString())
   } else {
     // Return the formated integer plus the decimal
-    return formatNumber(integerPart.toString()) + '.' + decimalPart.toString().replace(/0+$/, '')
+    return _formatNumber(integerPart.toString()) + '.' + decimalPart.toString().replace(/0+$/, '')
   }
 }
