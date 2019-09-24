@@ -9,7 +9,7 @@ function _formatNumber(num: string): string {
 }
 
 function _decomposeBn(
-  amount?: BN,
+  amount: BN,
   amountPrecision = DEFAULT_PRECISION,
   decimals = DEFAULT_DECIMALS,
 ): { integerPart: BN; decimalPart: BN } {
