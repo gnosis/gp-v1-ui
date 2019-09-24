@@ -20,7 +20,7 @@ export const useEnableTokens = (params: Params): Result => {
   const { enabled: enabledInitial, address: tokenAddress } = params.tokenBalances
   const [enabled, setEnabled] = useState(enabledInitial)
   const [enabling, setEnabling] = useState(false)
-  const [highlight, setHightlight] = useState(false)
+  const [highlight, setHighlight] = useState(false)
   let unmounted = false
 
   useEffect(() => {
@@ -54,10 +54,10 @@ export const useEnableTokens = (params: Params): Result => {
       setEnabling(false)
 
       // Highlight the token for some seconds
-      setHightlight(true)
+      setHighlight(true)
       setTimeout(() => {
         if (!unmounted) {
-          setHightlight(false)
+          setHighlight(false)
         }
       }, 5000)
     }

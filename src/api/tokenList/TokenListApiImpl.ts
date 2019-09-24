@@ -9,7 +9,7 @@ function _getImageUrl(tokenAddress: string): string {
  * Basic implementation of Token API
  *
  * Has a pre-define list of tokens.
- * Get's the images from https://github.com/trustwallet/tokens
+ * Gets the images from https://github.com/trustwallet/tokens
  */
 export class TokenListApiImpl implements TokenList {
   public networkIds: number[]
