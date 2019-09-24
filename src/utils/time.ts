@@ -6,7 +6,7 @@ export function getEpoch(): number {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-function noop(_milliseconds: number = 0): void {}
+async function noop(_milliseconds: number = 0): Promise<void> {}
 
 export async function waitImpl(milliseconds: number = 2500): Promise<void> {
   return new Promise((resolve): void => {

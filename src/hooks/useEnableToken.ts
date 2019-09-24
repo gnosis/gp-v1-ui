@@ -1,22 +1,28 @@
 import { useState } from 'react'
 import { erc20Api, depositApi, walletApi } from 'api'
-import { TokenBalanceDetails } from 'types'
+import { TokenBalanceDetails, TxOptionalParams, TxResult } from 'types'
 import { ALLOWANCE_VALUE } from 'const'
 import assert from 'assert'
 
-interface UseEnableTokensResult {
+interface Params {
+  tokenBalances: TokenBalanceDetails
+  txOptionalParams?: TxOptionalParams
+}
+
+interface Result {
   enabled: boolean
   enabling: boolean
   highlight: boolean
-  enableToken(): Promise<void>
+  enableToken(): Promise<TxResult<boolean>>
 }
 
-export const useEnableTokens = (tokenBalances: TokenBalanceDetails): UseEnableTokensResult => {
-  const [enabled, setEnabled] = useState(tokenBalances.enabled)
+export const useEnableTokens = (params: Params): Result => {
+  const { enabled: enabledInitial, address: tokenAddress } = params.tokenBalances
+  const [enabled, setEnabled] = useState(enabledInitial)
   const [enabling, setEnabling] = useState(false)
   const [highlight, setHightlight] = useState(false)
 
-  async function enableToken(): Promise<void> {
+  async function enableToken(): Promise<TxResult<boolean>> {
     assert(!enabled, 'The token was already enabled')
 
     setEnabling(true)
@@ -25,10 +31,15 @@ export const useEnableTokens = (tokenBalances: TokenBalanceDetails): UseEnableTo
     walletApi.connect()
 
     // Set the allowance
-    const tokenAddress = tokenBalances.address
     const userAddress = await walletApi.getAddress()
     const contractAddress = depositApi.getContractAddress()
-    await erc20Api.approve(tokenAddress, userAddress, contractAddress, ALLOWANCE_VALUE)
+    const result = await erc20Api.approve(
+      tokenAddress,
+      userAddress,
+      contractAddress,
+      ALLOWANCE_VALUE,
+      params.txOptionalParams,
+    )
 
     // Update the state
     setEnabled(true)
@@ -39,6 +50,8 @@ export const useEnableTokens = (tokenBalances: TokenBalanceDetails): UseEnableTo
     setTimeout(() => {
       setHightlight(false)
     }, 5000)
+
+    return result
   }
 
   return { enabled, enabling, highlight, enableToken }

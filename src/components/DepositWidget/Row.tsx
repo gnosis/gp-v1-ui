@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons'
 
-import { TokenBalanceDetails } from 'types'
+import { TokenBalanceDetails, Receipt } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
 import { formatAmount } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
@@ -46,13 +46,25 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     withdrawingBalance,
     walletBalance,
   } = tokenBalances
-  const { enabled, enabling, highlight, enableToken } = useEnableTokens(tokenBalances)
+  const { enabled, enabling, highlight, enableToken } = useEnableTokens({
+    tokenBalances,
+    txOptionalParams: {
+      onSentTransaction: (receipt: Receipt): void => {
+        // TODO: Use message library
+        console.log(
+          `The transaction has been sent! Check https://etherscan.io/tx/${receipt.transactionHash} for the detail`,
+        )
+      },
+    },
+  })
 
   async function _enableToken(): Promise<void> {
     try {
-      await enableToken()
+      const result = await enableToken()
+
       // TODO: Use message library
       console.log(`The token ${symbol} has being enabled for trading`)
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
     } catch (error) {
       console.error('Error enabling the token', error)
       // TODO: Use message library

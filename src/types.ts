@@ -39,6 +39,19 @@ export interface BalanceState {
   pendingWithdraws: PendingFlux
 }
 
+export interface TxOptionalParams {
+  onSentTransaction?: (receipt: Receipt) => void
+}
+
+export interface TxResult<T> {
+  data: T
+  receipt: Receipt
+}
+
+export interface Receipt {
+  transactionHash: string
+}
+
 export interface DepositApi {
   getContractAddress(): string
   getBatchTime(): Promise<number>
@@ -51,9 +64,21 @@ export interface DepositApi {
   getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingWithdrawBatchNumber(userAddress: string, tokenAddress: string): Promise<number>
 
-  deposit(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
-  requestWithdraw(userAddress: string, tokenAddress: string, amount: BN): Promise<void>
-  withdraw(userAddress: string, tokenAddress: string): Promise<void>
+  deposit(
+    userAddress: string,
+    tokenAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<void>>
+
+  requestWithdraw(
+    userAddress: string,
+    tokenAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<void>>
+
+  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
 }
 
 export interface WalletApi {
@@ -73,7 +98,21 @@ export interface WalletApi {
  */
 export interface Erc20Api {
   balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
-  approve(tokenAddress: string, userAddress: string, spenderAddress: string, amount: BN): Promise<boolean>
   allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
-  transfer(tokenAddress: string, fromAddress: string, toAddress: string, amount: BN): Promise<boolean>
+
+  approve(
+    tokenAddress: string,
+    userAddress: string,
+    spenderAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
+
+  transfer(
+    tokenAddress: string,
+    fromAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
 }

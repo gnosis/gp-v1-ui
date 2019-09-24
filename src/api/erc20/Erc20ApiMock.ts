@@ -1,8 +1,10 @@
-import { Erc20Api } from 'types'
+import { Erc20Api, TxOptionalParams, TxResult } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
-import { formatAmount, log, wait } from 'utils'
+import { RECEIPT } from '../../../test/data'
+import { formatAmount, log } from 'utils'
+import { waitAndSendReceipt } from 'utils/mock'
 
 interface Balances {
   [userAddress: string]: { [tokenAddress: string]: BN }
@@ -54,8 +56,10 @@ export class Erc20ApiMock implements Erc20Api {
     userAddress: string,
     spenderAddress: string,
     amount: BN,
-  ): Promise<boolean> {
-    await wait()
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>> {
+    await waitAndSendReceipt({ txOptionalParams })
+
     this._initAllowances(userAddress, tokenAddress, spenderAddress)
     this._allowances[userAddress][tokenAddress][spenderAddress] = amount
     log(
@@ -64,11 +68,17 @@ export class Erc20ApiMock implements Erc20Api {
       )} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
     )
 
-    return true
+    return { data: true, receipt: RECEIPT }
   }
 
-  public async transfer(tokenAddress: string, fromAddress: string, toAddress: string, amount: BN): Promise<boolean> {
-    await wait()
+  public async transfer(
+    tokenAddress: string,
+    fromAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>> {
+    await waitAndSendReceipt({ txOptionalParams })
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
 
@@ -77,7 +87,8 @@ export class Erc20ApiMock implements Erc20Api {
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[tokenAddress][tokenAddress] = this._balances[tokenAddress][tokenAddress].add(amount)
-    return true
+
+    return { data: true, receipt: RECEIPT }
   }
 
   /********************************    private methods   ********************************/
