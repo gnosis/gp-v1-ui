@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { erc20Api, depositApi, walletApi } from 'api'
 import { TokenBalanceDetails, TxOptionalParams, TxResult } from 'types'
 import { ALLOWANCE_VALUE } from 'const'
@@ -21,6 +21,13 @@ export const useEnableTokens = (params: Params): Result => {
   const [enabled, setEnabled] = useState(enabledInitial)
   const [enabling, setEnabling] = useState(false)
   const [highlight, setHightlight] = useState(false)
+  let unmounted = false
+
+  useEffect(() => {
+    return function cleanup(): void {
+      unmounted = true
+    }
+  }, [])
 
   async function enableToken(): Promise<TxResult<boolean>> {
     assert(!enabled, 'The token was already enabled')
@@ -41,15 +48,19 @@ export const useEnableTokens = (params: Params): Result => {
       params.txOptionalParams,
     )
 
-    // Update the state
-    setEnabled(true)
-    setEnabling(false)
+    if (!unmounted) {
+      // Update the state
+      setEnabled(true)
+      setEnabling(false)
 
-    // Highlight the token for some seconds
-    setHightlight(true)
-    setTimeout(() => {
-      setHightlight(false)
-    }, 5000)
+      // Highlight the token for some seconds
+      setHightlight(true)
+      setTimeout(() => {
+        if (!unmounted) {
+          setHightlight(false)
+        }
+      }, 5000)
+    }
 
     return result
   }
