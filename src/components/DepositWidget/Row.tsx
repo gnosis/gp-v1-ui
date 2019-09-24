@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons'
@@ -9,7 +9,7 @@ import unknownTokenImg from 'img/unknown-token.png'
 import { formatAmount, formatAmountFull } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
 
-const WrapperRow = styled.tr`
+const TokenTr = styled.tr`
   img {
     width: 30px;
     height: 30px;
@@ -24,6 +24,15 @@ const WrapperRow = styled.tr`
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
   }
+
+  &.selected {
+    background-color: #ecdcff;
+    // border-bottom-color: #b9b9b9;
+  }
+`
+
+const FormTr = styled.tr`
+  background-color: #f7f0ff;
 `
 
 export interface RowProps {
@@ -48,6 +57,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     withdrawingBalance,
     walletBalance,
   } = tokenBalances
+  const [visibleForm, showForm] = useState<'deposit' | 'withdraw'>(undefined)
   const { enabled, enabling, highlight, enableToken } = useEnableTokens({
     tokenBalances,
     txOptionalParams: {
@@ -78,42 +88,66 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   }
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
+  let className
+  if (highlight) {
+    className = 'highlight'
+  } else if (enabling) {
+    className = 'enabling'
+  } else if (visibleForm) {
+    className = 'selected'
+  }
+
+  const isDepositFormVisible = visibleForm == 'deposit'
+  const isWithdrawFormVisible = visibleForm == 'withdraw'
+
   return (
-    <WrapperRow
-      data-address={address}
-      className={highlight ? 'highlight' : enabling ? 'loading' : ''}
-      data-address-mainnet={addressMainnet}
-    >
-      <td>
-        <img src={image} alt={name} onError={_loadFallbackTokenImage} />
-      </td>
-      <td>{name}</td>
-      <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
-      <td title={formatAmountFull(withdrawingBalance, decimals)}>{formatAmount(withdrawingBalance, decimals)}</td>
-      <td title={formatAmountFull(walletBalance, decimals)}>{formatAmount(walletBalance, decimals)}</td>
-      <td>
-        {enabled ? (
-          <>
-            <button>+ Deposit</button>
-            <button className="danger">- Withdraw</button>
-          </>
-        ) : (
-          <button className="success" onClick={_enableToken} disabled={enabling}>
-            {enabling ? (
-              <>
-                <FontAwesomeIcon icon={faSpinner} spin />
-                &nbsp; Enabling {symbol}
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faCheck} />
-                &nbsp; Enable {symbol}
-              </>
-            )}
-          </button>
-        )}
-      </td>
-    </WrapperRow>
+    <>
+      <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
+        <td>
+          <img src={image} alt={name} onError={_loadFallbackTokenImage} />
+        </td>
+        <td>{name}</td>
+        <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
+        <td title={formatAmountFull(withdrawingBalance, decimals)}>{formatAmount(withdrawingBalance, decimals)}</td>
+        <td title={formatAmountFull(walletBalance, decimals)}>{formatAmount(walletBalance, decimals)}</td>
+        <td>
+          {enabled ? (
+            <>
+              <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
+                + Deposit
+              </button>
+              <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
+                - Withdraw
+              </button>
+            </>
+          ) : (
+            <button className="success" onClick={_enableToken} disabled={enabling}>
+              {enabling ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} spin />
+                  &nbsp; Enabling {symbol}
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faCheck} />
+                  &nbsp; Enable {symbol}
+                </>
+              )}
+            </button>
+          )}
+        </td>
+      </TokenTr>
+      {isDepositFormVisible && (
+        <FormTr>
+          <td colSpan={6}>Deposit form</td>
+        </FormTr>
+      )}
+      {isWithdrawFormVisible && (
+        <FormTr>
+          <td colSpan={6}>Withdraw form</td>
+        </FormTr>
+      )}
+    </>
   )
 }
 

@@ -68,6 +68,14 @@ const GlobalStyles = createGlobalStyle`
     margin: 0.5rem;
     border: 2px solid #8332bf;
     color: #8332bf;
+
+    &:disabled,
+    &[disabled]{
+      background-color: rgba(187, 187, 187, 0.3);
+      border-color: #696969 !important;
+      color: #696969 !important;
+      font-style: italic;
+    }
     
     :hover {
       border-color: #9201fd;
