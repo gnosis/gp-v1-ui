@@ -9,6 +9,7 @@ const tokens: TokenDetailsByNetwork[] = [
   // Wrapped Ether
   //  https://weth.io
   //  Wrapper of Ether to make it ERC-20 compliant
+  //  Rinkeby faucet: https://faucet.rinkeby.io/
   {
     name: 'Wrapped Ether',
     symbol: 'WETH',
@@ -22,13 +23,15 @@ const tokens: TokenDetailsByNetwork[] = [
   // Tether:
   //  https://tether.to/
   //  Fiat enabled collateralized stable coin, that is backed by the most popular fiat currency, USD (US Dollar) in a 1:1 ratio
+  //  Rinkeby faucet: contract created with Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712.
+  //    Use it to mint new tokens
   {
     name: 'Tether USD',
     symbol: 'USDT',
     decimals: 6,
     addressByNetwork: {
       [Network.Mainnet]: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-      [Network.Rinkeby]: '0x8cCae6920d77A87c29A6BEeDa28ac8e087F6E440',
+      [Network.Rinkeby]: '0xa9881E6459CA05d7D7C95374463928369cD7a90C',
     },
   },
 
@@ -51,7 +54,7 @@ const tokens: TokenDetailsByNetwork[] = [
   //  legitimate built on open standards
   //  using Grant Thornton for verifying Circle’s US dollar reserves
   //  launched by cryptocurrency finance firm circle Internet financial Ltd and the CENTRE open source consortium launched
-  //  Faucet available on Compound at https://app.compound.finance/asset/cUSDC
+  //  Rinkeby faucet: https://app.compound.finance/asset/cUSDC
   {
     name: 'USD Coin',
     symbol: 'USDC',
@@ -94,7 +97,7 @@ const tokens: TokenDetailsByNetwork[] = [
   // MakerDAO (DAI)
   //  https://makerdao.com/
   //  crypto-collateralized cryptocurrency: stable coin which is pegged to USD
-  //  Faucet available on Compound at https://app.compound.finance/asset/cDAI
+  //  Rinkeby faucet: https://app.compound.finance/asset/cDAI
   {
     name: 'DAI Stablecoin',
     symbol: 'DAI',
