@@ -88,9 +88,9 @@ describe('2 decimals', () => {
     expect(formatAmount(amount, 6, 2)).toEqual('1')
   })
 
-  test('12,345 units', async () => {
-    const amount = new BN('1000000')
-    expect(formatAmount(amount, 6, 2)).toEqual('1')
+  test('12,34 units', async () => {
+    const amount = new BN('12340000')
+    expect(formatAmount(amount, 6, 2)).toEqual('12.34')
   })
 
   test('4,567,890.123333 units, round down', async () => {
