@@ -51,9 +51,14 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     tokenBalances,
     txOptionalParams: {
       onSentTransaction: (receipt: Receipt): void => {
-        // TODO: Use message library
-        console.log(
-          `The transaction has been sent! Check https://etherscan.io/tx/${receipt.transactionHash} for the detail`,
+        toast.info(
+          <div>
+            The transaction has been sent! Check{' '}
+            <a href={`https://etherscan.io/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">
+              {receipt.transactionHash.slice(0, 10)}...
+            </a>{' '}
+            for details
+          </div>,
         )
       },
     },

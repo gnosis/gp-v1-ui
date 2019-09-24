@@ -19,7 +19,7 @@ import Trade from 'pages/Trade'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 
-toast.configure({ position: toast.POSITION.BOTTOM_RIGHT })
+toast.configure({ position: toast.POSITION.BOTTOM_RIGHT, closeOnClick: false })
 
 // App
 const App: React.FC = () => (
