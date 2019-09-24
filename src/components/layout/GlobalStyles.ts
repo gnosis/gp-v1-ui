@@ -32,8 +32,14 @@ const GlobalStyles = createGlobalStyle`
   }
 
   a {   
+    cursor: pointer;
+
     &, &:link, &:visited {
-      color: var(--color-text-primary);  
+      color: var(--color-text-primary);
+    }
+
+    :hover {
+      color: var(--color-text-secondary);
     }
   }
 

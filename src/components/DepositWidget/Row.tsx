@@ -33,6 +33,14 @@ const TokenTr = styled.tr`
 
 const FormTr = styled.tr`
   background-color: #f7f0ff;
+
+  .close-form {
+    margin-top: 3em;
+  }
+
+  a {
+    text-decoration: underline;
+  }
 `
 
 export interface RowProps {
@@ -139,7 +147,26 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       </TokenTr>
       {isDepositFormVisible && (
         <FormTr>
-          <td colSpan={6}>Deposit form</td>
+          <td colSpan={6}>
+            <h4>
+              Deposit {name} ({symbol}) into Exchange Wallet
+            </h4>
+            <ul>
+              <li>
+                <label>Wallet balance</label>
+                <div>
+                  12345 (<a onClick={(): void => alert('use MAX')}>MAX</a>)
+                </div>
+              </li>
+              <li>
+                <label>Deposit amount</label>
+                <input type="text" placeholder="Amount" />
+              </li>
+            </ul>
+            <div className="close-form">
+              (&nbsp;<a onClick={(): void => showForm(undefined)}>Close</a>&nbsp;)
+            </div>
+          </td>
         </FormTr>
       )}
       {isWithdrawFormVisible && (
