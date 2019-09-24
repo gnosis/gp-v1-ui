@@ -4,8 +4,18 @@ import { TEN } from 'const'
 const DEFAULT_DECIMALS = 4
 const DEFAULT_PRECISION = 18
 
+function _getLocaleSymbols(): { thousands: string; decimals: string } {
+  // Check number representation in default locale
+  const formattedNumber = new Intl.NumberFormat(undefined).format(1000.1)
+  return {
+    thousands: formattedNumber[1],
+    decimals: formattedNumber[5],
+  }
+}
+const { thousands: THOUSANDS_SYMBOL, decimals: DECIMALS_SYMBOL } = _getLocaleSymbols()
+
 function _formatNumber(num: string): string {
-  return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + THOUSANDS_SYMBOL)
 }
 
 function _decomposeBn(
@@ -48,7 +58,7 @@ export function formatAmount(
       .replace(/0+$/, '') // Remove the right zeros
 
     // Return the formated integer plus the decimal
-    return _formatNumber(integerPart.toString()) + '.' + decimalFmt
+    return _formatNumber(integerPart.toString()) + DECIMALS_SYMBOL + decimalFmt
   }
 }
 
