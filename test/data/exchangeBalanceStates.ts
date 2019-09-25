@@ -39,11 +39,11 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_4]: STATE_ZERO, // 0. USDC: decimals=6
     [TOKEN_5]: STATE_ZERO, // 0. PAX: decimals=18
     [TOKEN_6]: {
-      // 0. GUSD: decimals=6
-      balance: new BN('50048296532'), // 500,482.96
+      // 0. GUSD: decimals=2
+      balance: new BN('5004829'), // 5,0048.29
       pendingDeposits: FLUX_ZERO,
       pendingWithdraws: {
-        amount: new BN('101479327'), // 1,
+        amount: new BN('10147'), // 101.47
         batchId: Number.MAX_SAFE_INTEGER,
       },
     },

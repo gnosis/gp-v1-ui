@@ -20,7 +20,7 @@ export default {
       [CONTRACT]: new BN('1000000000000000000'), // 1, PAX: decimals=18
     },
     [TOKEN_6]: {
-      [CONTRACT]: ALLOWANCE_VALUE, // MAX, GUSD: decimals=6
+      [CONTRACT]: ALLOWANCE_VALUE, // MAX, GUSD: decimals=2
     },
     [TOKEN_7]: {
       [CONTRACT]: ZERO, // 0, DAI: decimals=18
