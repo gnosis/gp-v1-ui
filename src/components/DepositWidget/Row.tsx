@@ -34,12 +34,73 @@ const TokenTr = styled.tr`
 const FormTr = styled.tr`
   background-color: #f7f0ff;
 
-  .close-form {
-    margin-top: 3em;
+  td {
+    position: relative;
   }
 
-  a {
-    text-decoration: underline;
+  span.symbol {
+    color: #b02ace;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 1.3em;
+  }
+
+  ul {
+    align-items: center;
+    list-style: none;
+    text-align: left;
+
+    li {
+      display: block;
+      margin: 0 auto;
+      width: 25em;
+    }
+
+    li > label {
+      width: 8em;
+      color: #6c0084;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    div.wallet {
+      display: inline-block;
+      text-align: center;
+      position: relative;
+
+      a.max {
+        display: inline-block;
+        margin-left: 0.5em;
+        position: absolute;
+        top: 1.3em;
+        right: -3em;
+      }
+    }
+
+    li > label {
+      display: inline-block;
+      height: 100%;
+    }
+
+    .buttons {
+      text-align: center;
+      button {
+        width: 7em;
+        margin-left: 1.2em;
+      }
+    }
+  }
+
+  .times {
+    position: absolute;
+    top: 0;
+    right: 0;
+    text-decoration: none;
+    font-size: 2em;
+    display: inline-block;
+    padding: 0 0.5em 0 0;
   }
 `
 
@@ -66,6 +127,8 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     walletBalance,
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw'>(undefined)
+  const [depositAmount, setDepositAmount] = useState('')
+
   const { enabled, enabling, highlight, enableToken } = useEnableTokens({
     tokenBalances,
     txOptionalParams: {
@@ -107,6 +170,10 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
+  const cancelForm = (): void => {
+    showForm(undefined)
+    setDepositAmount('')
+  }
 
   return (
     <>
@@ -148,24 +215,37 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       {isDepositFormVisible && (
         <FormTr>
           <td colSpan={6}>
+            <a className="times" onClick={cancelForm}>
+              &times;
+            </a>
             <h4>
-              Deposit {name} ({symbol}) into Exchange Wallet
+              Deposit <span className="symbol">{symbol}</span> in Exchange Wallet
             </h4>
             <ul>
               <li>
                 <label>Wallet balance</label>
-                <div>
-                  12345 (<a onClick={(): void => alert('use MAX')}>MAX</a>)
+                <div className="wallet">
+                  <input type="text" value={formatAmountFull(walletBalance, decimals)} disabled />
+                  <br />
+                  <a
+                    className="max"
+                    onClick={(): void => setDepositAmount(formatAmountFull(walletBalance, decimals, false))}
+                  >
+                    <small>Use Max</small>
+                  </a>
                 </div>
               </li>
               <li>
                 <label>Deposit amount</label>
-                <input type="text" placeholder="Amount" />
+                <input type="text" value={depositAmount} placeholder={symbol + ' amount'} />
+              </li>
+              <li className="buttons">
+                <a onClick={cancelForm}>Cancel</a>
+                <button type="button" className="success">
+                  Deposit
+                </button>
               </li>
             </ul>
-            <div className="close-form">
-              (&nbsp;<a onClick={(): void => showForm(undefined)}>Close</a>&nbsp;)
-            </div>
           </td>
         </FormTr>
       )}
