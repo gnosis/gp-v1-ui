@@ -109,7 +109,7 @@ describe('Tokens with precision 2', () => {
     expect(formatAmount(amount, 2)).toEqual('1')
   })
 
-  test('12,34 units', async () => {
+  test('12.34 units', async () => {
     const amount = new BN('1234')
     expect(formatAmount(amount, 2)).toEqual('12.34')
   })
@@ -131,7 +131,7 @@ describe('2 decimals', () => {
     expect(formatAmount(amount, 6, 2)).toEqual('1')
   })
 
-  test('12,34 units', async () => {
+  test('12.34 units', async () => {
     const amount = new BN('12340000')
     expect(formatAmount(amount, 6, 2)).toEqual('12.34')
   })
@@ -153,7 +153,7 @@ describe('0 decimals', () => {
     expect(formatAmount(amount, 6, 0)).toEqual('1')
   })
 
-  test('12,34 units', async () => {
+  test('12.34 units', async () => {
     const amount = new BN('12340000')
     expect(formatAmount(amount, 6, 0)).toEqual('12')
   })
