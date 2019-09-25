@@ -18,14 +18,13 @@ function _formatNumber(num: string): string {
   return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + THOUSANDS_SYMBOL)
 }
 
-function _decomposeBn(
-  amount: BN,
-  amountPrecision = DEFAULT_PRECISION,
-  decimals = DEFAULT_DECIMALS,
-): { integerPart: BN; decimalPart: BN } {
+function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { integerPart: BN; decimalPart: BN } {
   // Discard the decimals we don't need
   //  i.e. for WETH (precision=18, decimals=4) --> amount / 1e14
   //        16.5*1e18 ---> 165000
+  if (decimals > amountPrecision) {
+    throw new Error('The decimals cannot be bigger than the precission')
+  }
   const amountRaw = amount.divRound(TEN.pow(new BN(amountPrecision - decimals)))
   const integerPart = amountRaw.div(TEN.pow(new BN(decimals))) // 165000 / 10000 = 16
   const decimalPart = amountRaw.mod(TEN.pow(new BN(decimals))) // 165000 % 10000 = 5000
@@ -46,8 +45,8 @@ export function formatAmount(
   if (!amount) {
     return null
   }
-
-  const { integerPart, decimalPart } = _decomposeBn(amount, amountPrecision, decimals)
+  const actualDecimals = Math.min(amountPrecision, decimals)
+  const { integerPart, decimalPart } = _decomposeBn(amount, amountPrecision, actualDecimals)
 
   const integerPartFmt = thousandSeparator ? _formatNumber(integerPart.toString()) : integerPart.toString()
 
@@ -57,7 +56,7 @@ export function formatAmount(
   } else {
     const decimalFmt = decimalPart
       .toString()
-      .padStart(decimals, '0') // Pad the decimal part with leading zeros
+      .padStart(actualDecimals, '0') // Pad the decimal part with leading zeros
       .replace(/0+$/, '') // Remove the right zeros
 
     // Return the formated integer plus the decimal
