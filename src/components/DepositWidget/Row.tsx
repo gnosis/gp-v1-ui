@@ -33,6 +33,7 @@ const TokenTr = styled.tr`
 
   div.success {
     color: #63ab52;
+    margin-top: -0.5rem;
   }
 `
 
