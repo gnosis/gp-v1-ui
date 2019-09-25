@@ -75,3 +75,23 @@ export function formatAmountFull(
 
   return formatAmount(amount, amountPrecision, amountPrecision, thousandSeparator)
 }
+
+export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
+  if (!amountFmt) {
+    return null
+  }
+
+  const groups = /^(\d+)(?:\.(\d+))?$/.exec(amountFmt)
+  if (groups) {
+    const [, integerPart, decimalPart = ''] = groups
+    if (decimalPart.length > amountPrecision) {
+      return null
+    }
+
+    const decimalBN = new BN(decimalPart.padEnd(amountPrecision, '0'))
+    const factor = TEN.pow(new BN(amountPrecision))
+    return new BN(integerPart).mul(factor).add(decimalBN)
+  } else {
+    return null
+  }
+}
