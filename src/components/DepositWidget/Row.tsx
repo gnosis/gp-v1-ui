@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react'
+import React, { useState, useEffect, ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
@@ -6,9 +6,8 @@ import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails, Receipt } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
-import { formatAmount, formatAmountFull, toBnOrNull } from 'utils'
+import { formatAmount, formatAmountFull, parseAmount } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
-import { TEN } from 'const'
 import BN from 'bn.js'
 
 const TokenTr = styled.tr`
@@ -131,14 +130,12 @@ function _validateDeposit(walletBalance: BN, depositAmount: string, decimals: nu
     return 'Required amount'
   }
 
-  const amount = toBnOrNull(depositAmount)
+  const amount = parseAmount(depositAmount, decimals)
   if (!amount) {
     return 'Invalid amount'
   }
 
-  const amountInWei = amount.mul(TEN.pow(new BN(decimals)))
-  console.log('amountInWei: amount vs wallet -->', amountInWei.toString(), walletBalance.toString())
-  if (amountInWei.gt(walletBalance)) {
+  if (amount.gt(walletBalance)) {
     return 'Insuficient balance'
   }
 
@@ -210,29 +207,21 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     setDepositAmount('')
   }
 
-  const validate = (newDepositAmount?: string): boolean => {
-    const errorMsg = _validateDeposit(walletBalance, newDepositAmount || depositAmount, decimals)
+  const submitDeposit = (): void => {
+    alert('TODO: Submit deposit')
+  }
+
+  useEffect(() => {
+    // Verify on every deposit change
+    const errorMsg = _validateDeposit(walletBalance, depositAmount, decimals)
     const newErrors = {
       ...errors,
       depositAmount: errorMsg,
     }
     setErrors(newErrors)
-
-    const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
-    return !hasErrors
-  }
-
-  const onChangeDeposit = (e: ChangeEvent<HTMLInputElement>): void => {
-    const newDepositAmount = e.target.value
-    setDepositAmount(newDepositAmount)
-    validate(newDepositAmount)
-  }
-
-  const submitDeposit = (): void => {
-    if (validate()) {
-      alert('TODO: Submit deposit')
-    }
-  }
+    // const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
+    // return !hasErrors
+  }, [depositAmount])
 
   return (
     <>
@@ -298,7 +287,12 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
               </li>
               <li>
                 <label>Deposit amount</label>
-                <input type="text" value={depositAmount} onChange={onChangeDeposit} placeholder={symbol + ' amount'} />
+                <input
+                  type="text"
+                  value={depositAmount}
+                  onChange={(e: ChangeEvent<HTMLInputElement>): void => setDepositAmount(e.target.value)}
+                  placeholder={symbol + ' amount'}
+                />
                 {errors.depositAmount && <p className="error">{errors.depositAmount}</p>}
               </li>
               <li className="buttons">
