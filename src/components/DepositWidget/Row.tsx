@@ -157,6 +157,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw'>(undefined)
   const [depositAmount, setDepositAmount] = useState('')
+  const [validatorActive, setValidatorActive] = useState(false)
   const [errors, setErrors] = useState<Errors>({
     depositAmount: null,
   })
@@ -208,20 +209,28 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   }
 
   const submitDeposit = (): void => {
-    alert('TODO: Submit deposit')
+    setValidatorActive(true)
+
+    // TODO: Improve. Do not do 2 times the validation
+    const error = _validateDeposit(walletBalance, depositAmount, decimals)
+    if (!error) {
+      alert('TODO: Submit deposit')
+    }
   }
 
   useEffect(() => {
-    // Verify on every deposit change
-    const errorMsg = _validateDeposit(walletBalance, depositAmount, decimals)
-    const newErrors = {
-      ...errors,
-      depositAmount: errorMsg,
+    if (validatorActive) {
+      // Verify on every deposit change
+      const errorMsg = _validateDeposit(walletBalance, depositAmount, decimals)
+      const newErrors = {
+        ...errors,
+        depositAmount: errorMsg,
+      }
+      setErrors(newErrors)
+      // const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
+      // return !hasErrors
     }
-    setErrors(newErrors)
-    // const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
-    // return !hasErrors
-  }, [depositAmount])
+  }, [depositAmount, validatorActive])
 
   return (
     <>
