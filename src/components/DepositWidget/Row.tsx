@@ -50,10 +50,10 @@ const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (receipt: Receipt): void => {
     toast.info(
       <div>
-        The transaction has been sent! Check
+        The transaction has been sent! Check{' '}
         <a href={`https://etherscan.io/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">
           {receipt.transactionHash.slice(0, 6)}...{receipt.transactionHash.slice(-4)}
-        </a>
+        </a>{' '}
         for details
       </div>,
     )
