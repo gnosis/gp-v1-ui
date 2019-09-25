@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faCheck, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails, Receipt } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, toBnOrNull } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
+import { TEN } from 'const'
+import BN from 'bn.js'
 
 const TokenTr = styled.tr`
   img {
@@ -65,6 +67,12 @@ const FormTr = styled.tr`
       text-align: right;
     }
 
+    p.error {
+      color: red;
+      padding: 0 0 0.5em 10em;
+      margin: 0;
+    }
+
     div.wallet {
       display: inline-block;
       text-align: center;
@@ -86,6 +94,7 @@ const FormTr = styled.tr`
 
     .buttons {
       text-align: center;
+      padding-top: 1em;
       button {
         width: 7em;
         margin-left: 1.2em;
@@ -108,9 +117,32 @@ export interface RowProps {
   tokenBalances: TokenBalanceDetails
 }
 
+interface Errors {
+  depositAmount: string
+}
+
 function _loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void {
   const image = event.target as HTMLImageElement
   image.src = unknownTokenImg
+}
+
+function _validateDeposit(walletBalance: BN, depositAmount: string, decimals: number): string {
+  if (!depositAmount) {
+    return 'Required amount'
+  }
+
+  const amount = toBnOrNull(depositAmount)
+  if (!amount) {
+    return 'Invalid amount'
+  }
+
+  const amountInWei = amount.mul(TEN.pow(new BN(decimals)))
+  console.log('amountInWei: amount vs wallet -->', amountInWei.toString(), walletBalance.toString())
+  if (amountInWei.gt(walletBalance)) {
+    return 'Insuficient balance'
+  }
+
+  return null // no error
 }
 
 export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
@@ -128,6 +160,9 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw'>(undefined)
   const [depositAmount, setDepositAmount] = useState('')
+  const [errors, setErrors] = useState<Errors>({
+    depositAmount: null,
+  })
 
   const { enabled, enabling, highlight, enableToken } = useEnableTokens({
     tokenBalances,
@@ -175,6 +210,30 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     setDepositAmount('')
   }
 
+  const validate = (newDepositAmount?: string): boolean => {
+    const errorMsg = _validateDeposit(walletBalance, newDepositAmount || depositAmount, decimals)
+    const newErrors = {
+      ...errors,
+      depositAmount: errorMsg,
+    }
+    setErrors(newErrors)
+
+    const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
+    return !hasErrors
+  }
+
+  const onChangeDeposit = (e: ChangeEvent<HTMLInputElement>): void => {
+    const newDepositAmount = e.target.value
+    setDepositAmount(newDepositAmount)
+    validate(newDepositAmount)
+  }
+
+  const submitDeposit = (): void => {
+    if (validate()) {
+      alert('TODO: Submit deposit')
+    }
+  }
+
   return (
     <>
       <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
@@ -189,10 +248,12 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
           {enabled ? (
             <>
               <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
-                + Deposit
+                <FontAwesomeIcon icon={faPlus} />
+                &nbsp; Deposit
               </button>
               <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
-                - Withdraw
+                <FontAwesomeIcon icon={faMinus} />
+                &nbsp; Withdraw
               </button>
             </>
           ) : (
@@ -237,12 +298,14 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
               </li>
               <li>
                 <label>Deposit amount</label>
-                <input type="text" value={depositAmount} placeholder={symbol + ' amount'} />
+                <input type="text" value={depositAmount} onChange={onChangeDeposit} placeholder={symbol + ' amount'} />
+                {errors.depositAmount && <p className="error">{errors.depositAmount}</p>}
               </li>
               <li className="buttons">
                 <a onClick={cancelForm}>Cancel</a>
-                <button type="button" className="success">
-                  Deposit
+                <button type="button" className="success" disabled={!!errors.depositAmount} onClick={submitDeposit}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  &nbsp; Deposit
                 </button>
               </li>
             </ul>
