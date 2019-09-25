@@ -32,6 +32,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   a {   
+    text-decoration: underline;
     cursor: pointer;
 
     &, &:link, &:visited {
@@ -106,6 +107,37 @@ const GlobalStyles = createGlobalStyle`
         border-color: #ea005f;
         color: #ea005f;
       }
+    }
+
+    &.secondary {
+      border-color: #696969;
+      color: #696969;
+
+      :hover {
+        border-color: black;
+        color: black;
+      }
+    }
+
+    &.big {
+      font-size: 1.2em;
+      padding: 0.65em 1em;
+    }
+
+    &.small {
+      font-size: 0.6em;
+      padding: 0.3em 0.5em;
+    }
+  }
+
+  input {
+    padding: 0.65em;
+    margin: 0.4em 0.85em;
+    font-size: 0.85rem;
+
+    :disabled {
+      background-color: #e0e0e0;
+      border-color: #ababab;
     }
   }
 
