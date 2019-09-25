@@ -20,7 +20,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_1]: STATE_ZERO, // 0. WETH: decimals=18
     [TOKEN_2]: {
       // 0. USDT: decimals=6
-      balance: new BN('1750173903'), // 1,750.07
+      balance: new BN('1750173903'), // 1,750.17
       pendingDeposits: {
         amount: new BN('850000'), // 0.85,
         batchId: 1,
@@ -28,7 +28,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
       pendingWithdraws: FLUX_ZERO,
     },
     [TOKEN_3]: {
-      // 0. TUSDC: decimals=18
+      // 0. TUSD: decimals=18
       balance: new BN('500000000000000000'), // 0.5
       pendingDeposits: FLUX_ZERO,
       pendingWithdraws: {
@@ -40,7 +40,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_5]: STATE_ZERO, // 0. PAX: decimals=18
     [TOKEN_6]: {
       // 0. GUSD: decimals=2
-      balance: new BN('5004829'), // 5,0048.29
+      balance: new BN('5004829'), // 50,048.29
       pendingDeposits: FLUX_ZERO,
       pendingWithdraws: {
         amount: new BN('10147'), // 101.47
