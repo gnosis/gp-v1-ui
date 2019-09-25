@@ -39,7 +39,7 @@ export const useWithdrawTokens = (params: Params): Result => {
       depositApi.getCurrentBatchId(),
     ])
 
-    return withdrawBatchId >= currentBatchId
+    return withdrawBatchId < currentBatchId
   }
 
   useEffect(() => {
