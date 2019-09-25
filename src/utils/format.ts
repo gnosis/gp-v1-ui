@@ -41,6 +41,7 @@ export function formatAmount(
   amount?: BN,
   amountPrecision = DEFAULT_PRECISION,
   decimals = DEFAULT_DECIMALS,
+  thousandSeparator: boolean = true,
 ): string | null {
   if (!amount) {
     return null
@@ -48,9 +49,11 @@ export function formatAmount(
 
   const { integerPart, decimalPart } = _decomposeBn(amount, amountPrecision, decimals)
 
+  const integerPartFmt = thousandSeparator ? _formatNumber(integerPart.toString()) : integerPart.toString()
+
   if (decimalPart.isZero()) {
     // Return just the integer part
-    return _formatNumber(integerPart.toString())
+    return integerPartFmt
   } else {
     const decimalFmt = decimalPart
       .toString()
@@ -58,14 +61,18 @@ export function formatAmount(
       .replace(/0+$/, '') // Remove the right zeros
 
     // Return the formated integer plus the decimal
-    return _formatNumber(integerPart.toString()) + DECIMALS_SYMBOL + decimalFmt
+    return integerPartFmt + DECIMALS_SYMBOL + decimalFmt
   }
 }
 
-export function formatAmountFull(amount?: BN, amountPrecision = DEFAULT_PRECISION): string | null {
+export function formatAmountFull(
+  amount?: BN,
+  amountPrecision = DEFAULT_PRECISION,
+  thousandSeparator: boolean = true,
+): string | null {
   if (!amount) {
     return null
   }
 
-  return formatAmount(amount, amountPrecision, amountPrecision)
+  return formatAmount(amount, amountPrecision, amountPrecision, thousandSeparator)
 }
