@@ -87,7 +87,7 @@ const tokens: TokenDetailsByNetwork[] = [
   //  regulated by the New York State Department of Financial Services
   //  launched same day as PAX by Gemini Trust Company. backed by USD
   {
-    name: 'Paxos Gemini',
+    name: 'Gemini',
     symbol: 'GUSD',
     decimals: 2,
     addressByNetwork: {
