@@ -100,15 +100,15 @@ export interface FormProps {
 }
 
 interface Errors {
-  depositAmount: string
+  amountInput: string
 }
 
-function _validateDeposit(totalAmount: BN, depositAmount: string, decimals: number): string {
-  if (!depositAmount) {
+function _validateForm(totalAmount: BN, amountInput: string, decimals: number): string {
+  if (!amountInput) {
     return 'Required amount'
   }
 
-  const amount = parseAmount(depositAmount, decimals)
+  const amount = parseAmount(amountInput, decimals)
 
   if (!amount || amount.isZero()) {
     return 'Invalid amount'
@@ -124,30 +124,30 @@ function _validateDeposit(totalAmount: BN, depositAmount: string, decimals: numb
 export const Form: React.FC<FormProps> = (props: FormProps) => {
   const { symbol, decimals } = props.tokenBalances
   const { title, totalAmount, totalAmountLabel, inputLabel, submitBtnLabel, submitBtnIcon } = props
-  const [depositAmount, setDepositAmount] = useState('')
+  const [amountInput, setAmountInput] = useState('')
   const [validatorActive, setValidatorActive] = useState(false)
   const [errors, setErrors] = useState<Errors>({
-    depositAmount: null,
+    amountInput: null,
   })
 
   const cancelForm = (): void => {
-    setDepositAmount('')
+    setAmountInput('')
     props.onClose()
   }
 
   useEffect(() => {
     if (validatorActive) {
-      // Verify on every deposit change
-      const errorMsg = _validateDeposit(totalAmount, depositAmount, decimals)
+      // Verify on every amount change
+      const errorMsg = _validateForm(totalAmount, amountInput, decimals)
       const newErrors = {
         ...errors,
-        depositAmount: errorMsg,
+        amountInput: errorMsg,
       }
       setErrors(newErrors)
       // const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
       // return !hasErrors
     }
-  }, [depositAmount, validatorActive])
+  }, [amountInput, validatorActive])
 
   return (
     <Wrapper>
@@ -162,7 +162,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <div className="wallet">
               <input type="text" value={formatAmountFull(totalAmount, decimals)} disabled />
               <br />
-              <a className="max" onClick={(): void => setDepositAmount(formatAmountFull(totalAmount, decimals, false))}>
+              <a className="max" onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false))}>
                 <small>Use Max</small>
               </a>
             </div>
@@ -171,22 +171,22 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <label>{inputLabel}</label>
             <input
               type="text"
-              value={depositAmount}
-              onChange={(e: ChangeEvent<HTMLInputElement>): void => setDepositAmount(e.target.value)}
+              value={amountInput}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
               placeholder={symbol + ' amount'}
             />
-            {errors.depositAmount && <p className="error">{errors.depositAmount}</p>}
+            {errors.amountInput && <p className="error">{errors.amountInput}</p>}
           </li>
           <li className="buttons">
             <a onClick={cancelForm}>Cancel</a>
             <button
               type="button"
               className="success"
-              disabled={!!errors.depositAmount}
+              disabled={!!errors.amountInput}
               onClick={(): void => {
                 setValidatorActive(true)
                 // TODO: Improve. Do not do 2 times the validation
-                const error = _validateDeposit(totalAmount, depositAmount, decimals)
+                const error = _validateForm(totalAmount, amountInput, decimals)
                 if (!error) {
                   props.onSubmit()
                 }
