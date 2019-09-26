@@ -24,32 +24,30 @@ export const useWithdrawTokens = (params: Params): Result => {
   const [withdrawing, setWithdrawing] = useState(false)
   const [error, setError] = useState(false)
 
-  async function _checkWithdrawable(): Promise<boolean> {
-    if (!withdrawingBalance.gt(ZERO)) {
-      return false
-    }
-    // TODO: Remove connect once login is done
-    await walletApi.connect()
-
-    // TODO: these two (useAddress and batchId) are constant for a given withdraw
-    //       probably could be cached?
-    const userAddress = await walletApi.getAddress()
-    const [withdrawBatchId, currentBatchId] = await Promise.all([
-      depositApi.getPendingWithdrawBatchId(userAddress, tokenAddress),
-      depositApi.getCurrentBatchId(),
-    ])
-
-    return withdrawBatchId < currentBatchId
-  }
-
   useEffect(() => {
-    _checkWithdrawable()
+    async function checkWithdrawable(): Promise<boolean> {
+      if (!withdrawingBalance.gt(ZERO)) {
+        return false
+      }
+      // TODO: Remove connect once login is done
+      await walletApi.connect()
+
+      const userAddress = await walletApi.getAddress()
+      const [withdrawBatchId, currentBatchId] = await Promise.all([
+        depositApi.getPendingWithdrawBatchId(userAddress, tokenAddress),
+        depositApi.getCurrentBatchId(),
+      ])
+
+      return withdrawBatchId < currentBatchId
+    }
+
+    checkWithdrawable()
       .then(withdrawable => setWithdrawable(withdrawable))
       .catch(error => {
-        console.error('Error checking withdraw state')
-        setError(error)
+        console.error('Error checking withdraw state', error)
+        setError(true)
       })
-  })
+  }, [tokenAddress, withdrawingBalance])
 
   async function withdraw(): Promise<TxResult<void>> {
     assert(enabled, 'Token not enabled')
