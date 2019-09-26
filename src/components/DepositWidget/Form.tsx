@@ -109,7 +109,8 @@ function _validateDeposit(totalAmount: BN, depositAmount: string, decimals: numb
   }
 
   const amount = parseAmount(depositAmount, decimals)
-  if (!amount) {
+
+  if (!amount || amount.isZero()) {
     return 'Invalid amount'
   }
 
