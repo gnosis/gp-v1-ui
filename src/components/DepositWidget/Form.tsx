@@ -35,7 +35,7 @@ const Wrapper = styled.tr`
     }
 
     li > label {
-      width: 8em;
+      width: 9em;
       color: #6c0084;
       font-weight: bold;
       text-align: right;
@@ -70,7 +70,7 @@ const Wrapper = styled.tr`
       text-align: center;
       padding-top: 1em;
       button {
-        width: 7em;
+        min-width: 7em;
         margin-left: 1.2em;
       }
     }
