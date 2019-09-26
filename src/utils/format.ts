@@ -95,3 +95,19 @@ export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISI
     return null
   }
 }
+
+export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
+  // abbreviate only if it makes sense, and make sure ellipsis fits into word
+  // 1. always add ellipsis
+  // 2. do not shorten words in case ellipsis will make the word longer
+  // 3. min prefix == 1
+  // 4. add suffix if requested
+  const ellipsis = '...'
+  const _prefixLength = Math.max(1, prefixLength)
+  if (inputString.length < _prefixLength + ellipsis.length + suffixLength) {
+    return inputString
+  }
+  const prefix = inputString.slice(0, _prefixLength)
+  const suffix = suffixLength > 0 ? inputString.slice(-suffixLength) : ''
+  return prefix + ellipsis + suffix
+}
