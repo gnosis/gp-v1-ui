@@ -97,7 +97,7 @@ describe('Tokens with precision 0', () => {
     expect(formatAmount(amount, 0)).toEqual('12,345')
   })
 
-  test('4,567,890 units, round down', async () => {
+  test('4,567,890 units', async () => {
     const amount = new BN('4567890')
     expect(formatAmount(amount, 0)).toEqual('4,567,890')
   })

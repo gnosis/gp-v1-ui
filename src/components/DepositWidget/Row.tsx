@@ -28,7 +28,6 @@ const TokenTr = styled.tr`
 
   &.selected {
     background-color: #ecdcff;
-    // border-bottom-color: #b9b9b9;
   }
 `
 
