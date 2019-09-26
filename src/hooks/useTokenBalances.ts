@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { tokenListApi, walletApi, erc20Api, depositApi } from 'api'
 import { ALLOWANCE_VALUE } from 'const'
@@ -52,6 +52,8 @@ async function _getBalances(tokenAddress?: string): Promise<TokenBalanceDetails[
 export const useTokenBalances = (tokenAddress?: string): UseTokenBalanceResult => {
   const [balances, setBalances] = useState<TokenBalanceDetails[] | undefined>(null)
   const [error, setError] = useState(false)
+  const mounted = useRef(true)
+
   console.info(`token address? ${tokenAddress}`)
 
   useEffect(() => {
@@ -61,10 +63,16 @@ export const useTokenBalances = (tokenAddress?: string): UseTokenBalanceResult =
         console.error('Error loading balances', error)
         setError(error)
       })
+
+    return function cleanUp(): void {
+      mounted.current = false
+    }
   }, [tokenAddress])
 
   const updateBalances = async (): Promise<void> => {
-    setBalances(await _getBalances(tokenAddress))
+    if (mounted.current) {
+      setBalances(await _getBalances(tokenAddress))
+    }
   }
 
   return { balances, updateBalances, error }
