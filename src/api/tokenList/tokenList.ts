@@ -70,13 +70,15 @@ const tokens: TokenDetailsByNetwork[] = [
   //  regulated stable coin. PAX is backed by US Dollar in equivalent 1:1.
   //  launched by Paxos Trust Company
   //  approved by the New York State Department of Financial Services
+  //  Rinkeby faucet: contract created with Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712.
+  //    Use it to mint new tokens
   {
     name: 'Paxos Standard',
     symbol: 'PAX',
     decimals: 18,
     addressByNetwork: {
       [Network.Mainnet]: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
-      [Network.Rinkeby]: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
+      [Network.Rinkeby]: '0xBD6A9921504fae42EaD2024F43305A8ED3890F6f',
     },
   },
 
