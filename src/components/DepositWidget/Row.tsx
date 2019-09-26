@@ -11,6 +11,7 @@ import { useEnableTokens } from 'hooks/useEnableToken'
 import Form from './Form'
 import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
 import { ZERO } from 'const'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 
 const TokenTr = styled.tr`
   img {
@@ -38,7 +39,7 @@ const TokenTr = styled.tr`
 `
 
 export interface RowProps {
-  tokenBalances: TokenBalanceDetails
+  initialTokenBalances: TokenBalanceDetails
 }
 
 function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
@@ -60,7 +61,9 @@ const txOptionalParams: TxOptionalParams = {
   },
 }
 
-export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
+export const Row: React.FC<RowProps> = (params: RowProps) => {
+  const { balances, updateBalances } = useTokenBalances(params.initialTokenBalances.address)
+  const tokenBalances = balances === null ? params.initialTokenBalances : balances[0]
   const {
     address,
     addressMainnet,
@@ -97,6 +100,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
 
       const result = await withdraw()
+      await updateBalances()
 
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 

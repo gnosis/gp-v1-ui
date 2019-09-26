@@ -16,17 +16,17 @@ describe('<Row /> not enabled', () => {
   }
 
   it('renders single <tr> element', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+    const wrapper = render(<Row initialTokenBalances={tokenBalanceDetails} />)
     expect(wrapper.is('tr')).toBe(true)
   })
 
   it('contains 6 <td> elements', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+    const wrapper = render(<Row initialTokenBalances={tokenBalanceDetails} />)
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
   it('contains 1 <button> elements', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+    const wrapper = render(<Row initialTokenBalances={tokenBalanceDetails} />)
     expect(wrapper.find('button')).toHaveLength(1)
   })
 })
@@ -42,17 +42,17 @@ describe('<Row /> with enable', () => {
   }
 
   it('renders single <tr> element', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+    const wrapper = render(<Row initialTokenBalances={tokenBalanceDetails} />)
     expect(wrapper.is('tr')).toBe(true)
   })
 
   it('contains 6 <td> elements', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+    const wrapper = render(<Row initialTokenBalances={tokenBalanceDetails} />)
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
   it('contains 2 <button> element', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+    const wrapper = render(<Row initialTokenBalances={tokenBalanceDetails} />)
 
     expect(wrapper.find('button')).toHaveLength(2)
   })
