@@ -61,7 +61,7 @@ export const useWithdrawTokens = (params: Params): Result => {
     await walletApi.connect()
 
     const userAddress = await walletApi.getAddress()
-    const result = depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
+    const result = await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
 
     setWithdrawing(false)
     console.debug(`Is withdrawing? ${withdrawing}`)
