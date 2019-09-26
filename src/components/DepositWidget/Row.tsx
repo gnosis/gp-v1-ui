@@ -61,9 +61,9 @@ const txOptionalParams: TxOptionalParams = {
   },
 }
 
-export const Row: React.FC<RowProps> = (params: RowProps) => {
-  const { balances, updateBalances } = useTokenBalances(params.initialTokenBalances.address)
-  const tokenBalances = balances === null ? params.initialTokenBalances : balances[0]
+export const Row: React.FC<RowProps> = (props: RowProps) => {
+  const { balances, updateBalances } = useTokenBalances(props.initialTokenBalances.address)
+  const tokenBalances = balances === null ? props.initialTokenBalances : balances[0]
   const {
     address,
     addressMainnet,
