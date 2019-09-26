@@ -95,7 +95,6 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
   async function _withdraw(): Promise<void> {
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
-      console.debug(`Is withdrawing? ${withdrawing}`)
 
       const result = await withdraw()
 

@@ -54,16 +54,19 @@ export const useWithdrawTokens = (params: Params): Result => {
     assert(withdrawable, 'Withdraw not ready')
 
     setWithdrawing(true)
-    console.debug(`Is withdrawing? ${withdrawing}`)
-    // TODO: Remove connect once login is done
-    await walletApi.connect()
 
-    const userAddress = await walletApi.getAddress()
-    const result = await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
+    try {
+      // TODO: Remove connect once login is done
+      await walletApi.connect()
 
-    setWithdrawing(false)
-    console.debug(`Is withdrawing? ${withdrawing}`)
-    return result
+      const userAddress = await walletApi.getAddress()
+      const result = await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
+
+      console.debug(`Is withdrawing? ${withdrawing}`)
+      return result
+    } finally {
+      setWithdrawing(false)
+    }
   }
 
   return { withdrawable, withdrawing, withdraw, error }
