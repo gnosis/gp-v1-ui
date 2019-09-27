@@ -5,7 +5,6 @@ import { ALLOWANCE_VALUE } from 'const'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
-  updateBalances(): Promise<void>
   error: boolean
 }
 
@@ -34,28 +33,25 @@ async function fetchBalancesForToken(
   }
 }
 
-async function _getBalances(tokenAddress?: string): Promise<TokenBalanceDetails[]> {
+async function _getBalances(): Promise<TokenBalanceDetails[]> {
   // TODO: Remove connect once login is done
   await walletApi.connect()
 
   const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
   const contractAddress = depositApi.getContractAddress()
-  let tokens = tokenListApi.getTokens(networkId)
-  if (tokenAddress) {
-    tokens = tokens.filter(({ address }) => address === tokenAddress)
-  }
+  const tokens = tokenListApi.getTokens(networkId)
 
   const balancePromises = tokens.map(async token => fetchBalancesForToken(token, userAddress, contractAddress))
   return Promise.all(balancePromises)
 }
 
-export const useTokenBalances = (tokenAddress?: string): UseTokenBalanceResult => {
+export const useTokenBalances = (): UseTokenBalanceResult => {
   const [balances, setBalances] = useState<TokenBalanceDetails[] | undefined>(null)
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
-    _getBalances(tokenAddress)
+    _getBalances()
       .then(balances => setBalances(balances))
       .catch(error => {
         console.error('Error loading balances', error)
@@ -65,13 +61,7 @@ export const useTokenBalances = (tokenAddress?: string): UseTokenBalanceResult =
     return function cleanUp(): void {
       mounted.current = false
     }
-  }, [tokenAddress])
+  }, [])
 
-  const updateBalances = async (): Promise<void> => {
-    if (mounted.current) {
-      setBalances(await _getBalances(tokenAddress))
-    }
-  }
-
-  return { balances, updateBalances, error }
+  return { balances, error }
 }
