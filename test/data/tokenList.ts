@@ -1,7 +1,7 @@
 import { TokenDetails } from 'types'
 import { TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7 } from './basic'
 
-// Ether, Tether, TrueUSD, USD Coin, Paxos Gemini, Dai
+// Ether, Tether, TrueUSD, USD Coin, Paxos, Gemini, Dai
 const tokens: TokenDetails[] = [
   // Wrapped Ether
   //  https://weth.io
@@ -67,12 +67,12 @@ const tokens: TokenDetails[] = [
     address: TOKEN_5,
   },
 
-  // Paxos Gemini
+  // Gemini dollar
   //  https://gemini.com/dollar/
   //  regulated by the New York State Department of Financial Services
   //  launched same day as PAX by Gemini Trust Company. backed by USD
   {
-    name: 'Paxos Gemini',
+    name: 'Gemini Dollar',
     symbol: 'GUSD',
     decimals: 2,
     addressMainnet: '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',

@@ -4,7 +4,7 @@ interface TokenDetailsByNetwork extends Omit<TokenDetails, 'address' | 'image'> 
   addressByNetwork: { [networkId: number]: string }
 }
 
-// Ether, Tether, TrueUSD, USD Coin, Paxos Gemini, Dai
+// Ether, Tether, TrueUSD, USD Coin, Paxos, Gemini, Dai
 const tokens: TokenDetailsByNetwork[] = [
   // Wrapped Ether
   //  https://weth.io
@@ -82,12 +82,12 @@ const tokens: TokenDetailsByNetwork[] = [
     },
   },
 
-  // Paxos Gemini
+  // Gemini dollar
   //  https://gemini.com/dollar/
   //  regulated by the New York State Department of Financial Services
   //  launched same day as PAX by Gemini Trust Company. backed by USD
   {
-    name: 'Gemini',
+    name: 'Gemini dollar',
     symbol: 'GUSD',
     decimals: 2,
     addressByNetwork: {
