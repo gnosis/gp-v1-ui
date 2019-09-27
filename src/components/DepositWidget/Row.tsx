@@ -11,7 +11,6 @@ import { useEnableTokens } from 'hooks/useEnableToken'
 import Form from './Form'
 import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
 import { ZERO } from 'const'
-import { useTokenBalances } from 'hooks/useTokenBalances'
 
 const TokenTr = styled.tr`
   img {
@@ -62,8 +61,7 @@ const txOptionalParams: TxOptionalParams = {
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
-  const { balances, updateBalances } = useTokenBalances(props.tokenBalances.address)
-  const tokenBalances = balances === null ? props.tokenBalances : balances[0]
+  const [tokenBalances, setTokenBalances] = useState<TokenBalanceDetails>(props.tokenBalances)
   const {
     address,
     addressMainnet,
@@ -100,11 +98,21 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
 
       const result = await withdraw()
-      await updateBalances()
+
+      setTokenBalances(
+        (current: TokenBalanceDetails): TokenBalanceDetails => {
+          return {
+            ...current,
+            exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
+            withdrawingBalance: ZERO,
+            walletBalance: current.walletBalance.add(withdrawingBalance),
+          }
+        },
+      )
 
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
-      toast.success(`Withdraw completed`)
+      toast.success(`Withdraw of ${withdrawingBalance} ${symbol} completed`)
     } catch (error) {
       console.error('Error executing the withdraw request', error)
       toast.error(`Error executing the withdraw request: ${error.message}`)
