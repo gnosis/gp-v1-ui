@@ -15,7 +15,7 @@ interface Allowances {
 }
 
 /**
- * Basic implemtation of Wallet API
+ * Basic implementation of Wallet API
  */
 export class Erc20ApiMock implements Erc20Api {
   private _balances: Balances
