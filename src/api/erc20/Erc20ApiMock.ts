@@ -86,7 +86,7 @@ export class Erc20ApiMock implements Erc20Api {
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
-    this._balances[tokenAddress][tokenAddress] = this._balances[tokenAddress][tokenAddress].add(amount)
+    this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
     return { data: true, receipt: RECEIPT }
   }
