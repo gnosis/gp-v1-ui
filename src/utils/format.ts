@@ -24,7 +24,7 @@ function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { 
   //  i.e. for WETH (precision=18, decimals=4) --> amount / 1e14
   //        16.5*1e18 ---> 165000
   if (decimals > amountPrecision) {
-    throw new Error('The decimals cannot be bigger than the precission')
+    throw new Error('The decimals cannot be bigger than the precision')
   }
   const amountRaw = amount.divRound(TEN.pow(new BN(amountPrecision - decimals)))
   const integerPart = amountRaw.div(TEN.pow(new BN(decimals))) // 165000 / 10000 = 16
