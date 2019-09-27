@@ -100,9 +100,7 @@ const DepositWidget: React.FC = () => {
           </thead>
           <tbody>
             {balances &&
-              balances.map(tokenBalances => (
-                <Row key={tokenBalances.addressMainnet} initialTokenBalances={tokenBalances} />
-              ))}
+              balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
           </tbody>
         </table>
       )}

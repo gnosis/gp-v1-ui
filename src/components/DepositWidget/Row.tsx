@@ -39,7 +39,7 @@ const TokenTr = styled.tr`
 `
 
 export interface RowProps {
-  initialTokenBalances: TokenBalanceDetails
+  tokenBalances: TokenBalanceDetails
 }
 
 function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
@@ -62,8 +62,8 @@ const txOptionalParams: TxOptionalParams = {
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
-  const { balances, updateBalances } = useTokenBalances(props.initialTokenBalances.address)
-  const tokenBalances = balances === null ? props.initialTokenBalances : balances[0]
+  const { balances, updateBalances } = useTokenBalances(props.tokenBalances.address)
+  const tokenBalances = balances === null ? props.tokenBalances : balances[0]
   const {
     address,
     addressMainnet,
