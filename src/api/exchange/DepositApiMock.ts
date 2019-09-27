@@ -148,6 +148,9 @@ export class DepositApiMock implements DepositApi {
     pendingWithdraws.amount = ZERO
     balanceState.balance = balanceState.balance.sub(amount)
 
+    // mock transfer tokens to user's mock `wallet`
+    await this._erc20Api.transfer(tokenAddress, this.getContractAddress(), userAddress, amount)
+
     log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
     return { data: undefined, receipt: RECEIPT }
   }
