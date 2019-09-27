@@ -3,6 +3,7 @@ import { TEN } from 'const'
 
 const DEFAULT_DECIMALS = 4
 const DEFAULT_PRECISION = 18
+const ELLIPSIS = '...'
 
 function _getLocaleSymbols(): { thousands: string; decimals: string } {
   // Check number representation in default locale
@@ -102,12 +103,11 @@ export function abbreviateString(inputString: string, prefixLength: number, suff
   // 2. do not shorten words in case ellipsis will make the word longer
   // 3. min prefix == 1
   // 4. add suffix if requested
-  const ellipsis = '...'
   const _prefixLength = Math.max(1, prefixLength)
-  if (inputString.length < _prefixLength + ellipsis.length + suffixLength) {
+  if (inputString.length < _prefixLength + ELLIPSIS.length + suffixLength) {
     return inputString
   }
   const prefix = inputString.slice(0, _prefixLength)
   const suffix = suffixLength > 0 ? inputString.slice(-suffixLength) : ''
-  return prefix + ellipsis + suffix
+  return prefix + ELLIPSIS + suffix
 }
