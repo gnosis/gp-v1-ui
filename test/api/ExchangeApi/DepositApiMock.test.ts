@@ -3,45 +3,51 @@ import { DepositApi } from 'types'
 import { BATCH_TIME, ZERO, TWO } from 'const'
 import { DepositApiMock } from 'api/exchange/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
+import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
+import { erc20Balances, erc20Allowances } from '../../data'
 
 const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, AMOUNT, AMOUNT_SMALL } = testHelpers
 
 let instance: DepositApi
+const mockErc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
 
 beforeAll(() => {
   testHelpers.mockTimes()
 })
 
 beforeEach(() => {
-  instance = new DepositApiMock({
-    [USER_1]: {
-      [TOKEN_1]: {
-        balance: ZERO,
-        pendingDeposits: { amount: ZERO, batchId: 0 },
-        pendingWithdraws: { amount: ZERO, batchId: 0 },
-      },
-      [TOKEN_2]: {
-        balance: AMOUNT,
-        pendingDeposits: { amount: ZERO, batchId: 0 },
-        pendingWithdraws: { amount: ZERO, batchId: 0 },
-      },
-      [TOKEN_4]: {
-        balance: ZERO,
-        pendingDeposits: { amount: AMOUNT, batchId: 1 },
-        pendingWithdraws: { amount: AMOUNT, batchId: 1 },
-      },
-      [TOKEN_5]: {
-        balance: AMOUNT,
-        pendingDeposits: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
-        pendingWithdraws: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
-      },
-      [TOKEN_6]: {
-        balance: AMOUNT,
-        pendingDeposits: { amount: AMOUNT_SMALL, batchId: 1 },
-        pendingWithdraws: { amount: AMOUNT_SMALL, batchId: 1 },
+  instance = new DepositApiMock(
+    {
+      [USER_1]: {
+        [TOKEN_1]: {
+          balance: ZERO,
+          pendingDeposits: { amount: ZERO, batchId: 0 },
+          pendingWithdraws: { amount: ZERO, batchId: 0 },
+        },
+        [TOKEN_2]: {
+          balance: AMOUNT,
+          pendingDeposits: { amount: ZERO, batchId: 0 },
+          pendingWithdraws: { amount: ZERO, batchId: 0 },
+        },
+        [TOKEN_4]: {
+          balance: ZERO,
+          pendingDeposits: { amount: AMOUNT, batchId: 1 },
+          pendingWithdraws: { amount: AMOUNT, batchId: 1 },
+        },
+        [TOKEN_5]: {
+          balance: AMOUNT,
+          pendingDeposits: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
+          pendingWithdraws: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
+        },
+        [TOKEN_6]: {
+          balance: AMOUNT,
+          pendingDeposits: { amount: AMOUNT_SMALL, batchId: 1 },
+          pendingWithdraws: { amount: AMOUNT_SMALL, batchId: 1 },
+        },
       },
     },
-  })
+    mockErc20Api,
+  )
 })
 
 describe('Basic view functions', () => {
@@ -365,8 +371,9 @@ describe('Withdraw', () => {
     // GIVEN: An user with a non applicable withdraw request on TOKEN_5
     expect(await instance.getBalance(USER_1, TOKEN_5)).toEqual(AMOUNT)
     expect(await instance.getPendingDepositAmount(USER_1, TOKEN_5)).toEqual(AMOUNT)
-    expect(await instance.getCurrentBatchId())
-      .toBeGreaterThanOrEqual(await instance.getPendingDepositBatchId(USER_1, TOKEN_5))
+    expect(await instance.getCurrentBatchId()).toBeGreaterThanOrEqual(
+      await instance.getPendingDepositBatchId(USER_1, TOKEN_5),
+    )
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw(USER_1, TOKEN_5)

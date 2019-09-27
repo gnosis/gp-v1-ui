@@ -29,9 +29,9 @@ function createErc20Api(): Erc20Api {
   return new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
 }
 
-function createDepositApi(): DepositApi {
+function createDepositApi(erc20Api: Erc20Api): DepositApi {
   if (isMock) {
-    return new DepositApiMock(exchangeBalanceStates)
+    return new DepositApiMock(exchangeBalanceStates, erc20Api)
   } else {
     // TODO: Add actual implementation
     throw new Error('Not implemented yet. Only mock implementation available')
@@ -42,4 +42,4 @@ function createDepositApi(): DepositApi {
 export const walletApi: WalletApi = createWalletApi()
 export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api()
-export const depositApi: DepositApi = createDepositApi()
+export const depositApi: DepositApi = createDepositApi(erc20Api)

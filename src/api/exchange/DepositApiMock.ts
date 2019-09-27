@@ -5,7 +5,7 @@ import { getEpoch, formatAmount, log } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT, RECEIPT } from '../../../test/data'
 
-import { DepositApi, BalanceState, TxResult, TxOptionalParams } from 'types'
+import { DepositApi, BalanceState, TxResult, TxOptionalParams, Erc20Api } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 
 export interface BalancesByUserAndToken {
@@ -14,9 +14,11 @@ export interface BalancesByUserAndToken {
 
 export class DepositApiMock implements DepositApi {
   private _balanceStates: BalancesByUserAndToken
+  private _erc20Api: Erc20Api
 
-  public constructor(balanceStates: BalancesByUserAndToken) {
+  public constructor(balanceStates: BalancesByUserAndToken, erc20Api: Erc20Api) {
     this._balanceStates = balanceStates
+    this._erc20Api = erc20Api
   }
 
   public getContractAddress(): string {
