@@ -30,10 +30,22 @@ const TokenTr = styled.tr`
 
   &.selected {
     background-color: #ecdcff;
+`
 
-  div.success {
+const WithdrawableButton = styled.button`
+  margin-bottom: 0;
+`
+
+const WithdrawableLink = styled.a`
+  text-decoration: none;
+
+  &.success {
     color: #63ab52;
-    margin-top: -0.5rem;
+  }
+  &.disabled {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 `
 
@@ -152,12 +164,21 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <td title={formatAmountFull(withdrawingBalance, decimals)}>
           {withdrawable ? (
             <>
-              <button className="success" onClick={_withdraw} disabled={withdrawing}>
+              <WithdrawableButton className="success" onClick={_withdraw} disabled={withdrawing}>
                 {withdrawing && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
-              </button>
-              <div className="success">
-                <small>Withdrawable</small>
+              </WithdrawableButton>
+              <div>
+                <WithdrawableLink
+                  className={withdrawing ? 'disabled' : 'success'}
+                  onClick={(): void => {
+                    if (!withdrawing) {
+                      _withdraw()
+                    }
+                  }}
+                >
+                  <small>Withdrawable</small>
+                </WithdrawableLink>
               </div>
             </>
           ) : withdrawingBalance.gt(ZERO) ? (
