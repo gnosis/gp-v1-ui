@@ -54,8 +54,6 @@ export const useTokenBalances = (tokenAddress?: string): UseTokenBalanceResult =
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 
-  console.info(`token address? ${tokenAddress}`)
-
   useEffect(() => {
     _getBalances(tokenAddress)
       .then(balances => setBalances(balances))
