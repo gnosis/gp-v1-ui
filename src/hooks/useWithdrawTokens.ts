@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { TxResult, TokenBalanceDetails, TxOptionalParams } from 'types'
 import assert from 'assert'
 import { depositApi, walletApi } from 'api'
-import { ZERO } from 'const'
 
 interface Params {
   tokenBalances: TokenBalanceDetails
@@ -27,7 +26,7 @@ export const useWithdrawTokens = (params: Params): Result => {
 
   useEffect(() => {
     async function checkWithdrawable(): Promise<boolean> {
-      if (!withdrawingBalance.gt(ZERO)) {
+      if (withdrawingBalance.isZero()) {
         return false
       }
       // TODO: Remove connect once login is done
