@@ -3,6 +3,10 @@ import { formatAmount, toWei } from 'utils'
 import BN from 'bn.js'
 
 describe('Integer amounts', () => {
+  test('0 wei', async () => {
+    expect(formatAmount(new BN('0'))).toEqual('0')
+  })
+
   test('1 Ether', async () => {
     expect(formatAmount(new BN(toWei(new BN('1'), 'ether')))).toEqual('1')
   })
@@ -82,13 +86,52 @@ describe('Tokens with precision 6', () => {
   })
 })
 
+describe('Tokens with precision 0', () => {
+  test('1 unit', async () => {
+    const amount = new BN('1')
+    expect(formatAmount(amount, 0)).toEqual('1')
+  })
+
+  test('12,345 units', async () => {
+    const amount = new BN('12345')
+    expect(formatAmount(amount, 0)).toEqual('12,345')
+  })
+
+  test('4,567,890 units', async () => {
+    const amount = new BN('4567890')
+    expect(formatAmount(amount, 0)).toEqual('4,567,890')
+  })
+})
+
+describe('Tokens with precision 2', () => {
+  test('1 unit', async () => {
+    const amount = new BN('100')
+    expect(formatAmount(amount, 2)).toEqual('1')
+  })
+
+  test('12.34 units', async () => {
+    const amount = new BN('1234')
+    expect(formatAmount(amount, 2)).toEqual('12.34')
+  })
+
+  test('1,234,567.89 units', async () => {
+    const amount = new BN('123456789')
+    expect(formatAmount(amount, 2)).toEqual('1,234,567.89')
+  })
+
+  test('1,234,567.8 units', async () => {
+    const amount = new BN('123456780')
+    expect(formatAmount(amount, 2)).toEqual('1,234,567.8')
+  })
+})
+
 describe('2 decimals', () => {
   test('1 unit', async () => {
     const amount = new BN('1000000')
     expect(formatAmount(amount, 6, 2)).toEqual('1')
   })
 
-  test('12,34 units', async () => {
+  test('12.34 units', async () => {
     const amount = new BN('12340000')
     expect(formatAmount(amount, 6, 2)).toEqual('12.34')
   })
@@ -104,6 +147,28 @@ describe('2 decimals', () => {
   })
 })
 
+describe('0 decimals', () => {
+  test('1 unit', async () => {
+    const amount = new BN('1000000')
+    expect(formatAmount(amount, 6, 0)).toEqual('1')
+  })
+
+  test('12.34 units', async () => {
+    const amount = new BN('12340000')
+    expect(formatAmount(amount, 6, 0)).toEqual('12')
+  })
+
+  test('4,567,890.123333 units, round down', async () => {
+    const amount = new BN('4567890123333')
+    expect(formatAmount(amount, 6, 0)).toEqual('4,567,890')
+  })
+
+  test('4,567,890.125555 units, round up', async () => {
+    const amount = new BN('4567890125555')
+    expect(formatAmount(amount, 6, 0)).toEqual('4,567,890')
+  })
+})
+
 describe('Big amounts', () => {
   // TODO: Considering showing K,M,B,...
   test('1B Ether', async () => {
@@ -114,5 +179,12 @@ describe('Big amounts', () => {
   test('uint max value', async () => {
     const expected = '115,792,089,237,316,195,423,570,985,008,687,907,853,269,984,665,640,564,039,457.584'
     expect(formatAmount(new BN(new BN(ALLOWANCE_VALUE)))).toEqual(expected)
+  })
+})
+
+describe('Edge cases', () => {
+  test('12,345.67 - More decimals, than precission', async () => {
+    const amount = new BN('1234567')
+    expect(formatAmount(amount, 2, 4)).toEqual('12,345.67')
   })
 })

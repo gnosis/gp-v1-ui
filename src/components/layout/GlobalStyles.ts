@@ -32,8 +32,15 @@ const GlobalStyles = createGlobalStyle`
   }
 
   a {   
+    text-decoration: underline;
+    cursor: pointer;
+
     &, &:link, &:visited {
-      color: var(--color-text-primary);  
+      color: var(--color-text-primary);
+    }
+
+    :hover {
+      color: var(--color-text-secondary);
     }
   }
 
@@ -68,6 +75,14 @@ const GlobalStyles = createGlobalStyle`
     margin: 0.5rem;
     border: 2px solid #8332bf;
     color: #8332bf;
+
+    &:disabled,
+    &[disabled]{
+      background-color: rgba(187, 187, 187, 0.3);
+      border-color: #696969 !important;
+      color: #696969 !important;
+      font-style: italic;
+    }
     
     :hover {
       border-color: #9201fd;
@@ -92,6 +107,37 @@ const GlobalStyles = createGlobalStyle`
         border-color: #ea005f;
         color: #ea005f;
       }
+    }
+
+    &.secondary {
+      border-color: #696969;
+      color: #696969;
+
+      :hover {
+        border-color: black;
+        color: black;
+      }
+    }
+
+    &.big {
+      font-size: 1.2em;
+      padding: 0.65em 1em;
+    }
+
+    &.small {
+      font-size: 0.6em;
+      padding: 0.3em 0.5em;
+    }
+  }
+
+  input {
+    padding: 0.65em;
+    margin: 0.4em 0.85em;
+    font-size: 0.85rem;
+
+    :disabled {
+      background-color: #e0e0e0;
+      border-color: #ababab;
     }
   }
 
