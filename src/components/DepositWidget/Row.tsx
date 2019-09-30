@@ -84,6 +84,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
+    withdrawable,
     walletBalance,
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
@@ -91,7 +92,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     tokenBalances,
     txOptionalParams,
   })
-  const { withdrawable, withdrawing, highlighWithdraw, withdraw } = useWithdrawTokens({
+  const { withdrawing, highlighWithdraw, withdraw } = useWithdrawTokens({
     tokenBalances,
     txOptionalParams,
   })
@@ -128,6 +129,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               ...current,
               exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
               withdrawingBalance: ZERO,
+              withdrawable: false,
               walletBalance: current.walletBalance.add(withdrawingBalance),
             }
           },

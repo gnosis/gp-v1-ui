@@ -15,10 +15,20 @@ async function fetchBalancesForToken(
   contractAddress: string,
 ): Promise<TokenBalanceDetails> {
   const tokenAddress = token.address
-  const [exchangeBalance, depositingBalance, withdrawingBalance, walletBalance, allowance] = await Promise.all([
+  const [
+    exchangeBalance,
+    depositingBalance,
+    withdrawingBalance,
+    withdrawBatchId,
+    currentBachId,
+    walletBalance,
+    allowance,
+  ] = await Promise.all([
     depositApi.getBalance(userAddress, tokenAddress),
     depositApi.getPendingDepositAmount(userAddress, tokenAddress),
     depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
+    depositApi.getPendingWithdrawBatchId(userAddress, tokenAddress),
+    depositApi.getCurrentBatchId(),
     erc20Api.balanceOf(tokenAddress, userAddress),
     erc20Api.allowance(tokenAddress, userAddress, contractAddress),
   ])
@@ -28,6 +38,7 @@ async function fetchBalancesForToken(
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
+    withdrawable: withdrawingBalance.isZero() ? false : withdrawBatchId < currentBachId,
     walletBalance,
     enabled: allowance.eq(ALLOWANCE_VALUE),
   }

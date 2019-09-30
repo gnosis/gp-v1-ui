@@ -9,47 +9,18 @@ interface Params {
 }
 
 interface Result {
-  withdrawable: boolean
   withdrawing: boolean
   highlighWithdraw: boolean
   withdraw(): Promise<TxResult<void>>
-  error: boolean
 }
 
 export const useWithdrawTokens = (params: Params): Result => {
   const {
-    tokenBalances: { enabled, address: tokenAddress, withdrawingBalance },
+    tokenBalances: { enabled, address: tokenAddress, withdrawable },
   } = params
-  const [withdrawable, setWithdrawable] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
   const [highlighWithdraw, setHighlighWithdraw] = useState(false)
-  const [error, setError] = useState(false)
   const mounted = useRef(true)
-
-  useEffect(() => {
-    async function checkWithdrawable(): Promise<boolean> {
-      if (withdrawingBalance.isZero()) {
-        return false
-      }
-      // TODO: Remove connect once login is done
-      await walletApi.connect()
-
-      const userAddress = await walletApi.getAddress()
-      const [withdrawBatchId, currentBatchId] = await Promise.all([
-        depositApi.getPendingWithdrawBatchId(userAddress, tokenAddress),
-        depositApi.getCurrentBatchId(),
-      ])
-
-      return withdrawBatchId < currentBatchId
-    }
-
-    checkWithdrawable()
-      .then(withdrawable => setWithdrawable(withdrawable))
-      .catch(error => {
-        console.error('Error checking withdraw state', error)
-        setError(true)
-      })
-  }, [tokenAddress, withdrawingBalance])
 
   useEffect(() => {
     return function cleanUp(): void {
@@ -83,5 +54,5 @@ export const useWithdrawTokens = (params: Params): Result => {
     }
   }
 
-  return { withdrawable, withdrawing, highlighWithdraw, withdraw, error }
+  return { withdrawing, highlighWithdraw, withdraw }
 }
