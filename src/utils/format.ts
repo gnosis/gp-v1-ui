@@ -15,7 +15,7 @@ function _getLocaleSymbols(): { thousands: string; decimals: string } {
 const { thousands: THOUSANDS_SYMBOL, decimals: DECIMALS_SYMBOL } = _getLocaleSymbols()
 
 function _formatNumber(num: string): string {
-  return num.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1' + THOUSANDS_SYMBOL)
+  return num.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1' + THOUSANDS_SYMBOL)
 }
 
 function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { integerPart: BN; decimalPart: BN } {
