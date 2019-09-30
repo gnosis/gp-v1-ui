@@ -53,7 +53,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     withdrawingBalance,
     walletBalance,
   } = tokenBalances
-  const [visibleForm, showForm] = useState<'deposit' | 'withdraw'>(undefined)
+  const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   const { enabled, enabling, highlight, enableToken } = useEnableTokens({
     tokenBalances,
     txOptionalParams: {
@@ -157,7 +157,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
           submitBtnLabel="Deposit"
           submitBtnIcon={faPlus}
           onSubmit={submitDeposit}
-          onClose={(): void => showForm(undefined)}
+          onClose={(): void => showForm()}
         />
       )}
       {isWithdrawFormVisible && (
@@ -174,7 +174,7 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
           submitBtnLabel="Withdraw"
           submitBtnIcon={faMinus}
           onSubmit={submitWithdraw}
-          onClose={(): void => showForm(undefined)}
+          onClose={(): void => showForm()}
         />
       )}
     </>
