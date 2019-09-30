@@ -60,8 +60,7 @@ const Wrapper = styled.section`
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
   const contractAddress = depositApi.getContractAddress()
-
-  if (!balances) {
+  if (balances === undefined) {
     // Loading: Do not show the widget
     return <></>
   }
