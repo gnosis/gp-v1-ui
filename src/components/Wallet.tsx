@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { walletApi } from 'api'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const Wrapper = styled.a`
   padding: 1rem;
@@ -17,13 +18,12 @@ const Wrapper = styled.a`
 `
 
 const Wallet: React.FC = () => {
-  const [connected, setIsConnected] = useState(walletApi.isConnected())
+  const { walletInfo } = useWalletConnection()
 
   const connectWallet = async (): Promise<void> => {
     try {
       console.log('[Wallet] Connect')
       await walletApi.connect()
-      setIsConnected(true)
     } catch (error) {
       // TODO: Handle error
       console.log('Connect Wallet error', error)
@@ -34,16 +34,15 @@ const Wallet: React.FC = () => {
     try {
       console.log('[Wallet] Disconnect')
       await walletApi.disconnect()
-      setIsConnected(false)
     } catch (error) {
       // TODO: Handle error
       console.log('Disconnect Wallet error', error)
     }
   }
 
-  return connected ? (
+  return walletInfo.isConnected ? (
     <Wrapper onClick={disconnectWallet}>
-      Connected!&nbsp;<small>(disconnect)</small>
+      {walletInfo.userAddress}!&nbsp;<small>(disconnect)</small>
     </Wrapper>
   ) : (
     <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
