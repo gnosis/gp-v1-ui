@@ -19,6 +19,7 @@ module.exports = {
         "@typescript-eslint/explicit-function-return-type": ["error", {
             "allowTypedFunctionExpressions": true
           }],
+          "react/prop-types": [1, { "skipUndeclared": true }]
     },
     settings: {
         react: {
