@@ -10,6 +10,8 @@ import { USER_1 } from '../../../test/data'
  */
 export class WalletApiMock implements WalletApi {
   private _connected = false
+  private _user = USER_1
+  private _networkId = Network.Rinkeby
   private _balance = toWei(new BN(2.75), 'ether')
   private _listeners: ((walletInfo: WalletInfo) => void)[] = []
 
@@ -18,14 +20,14 @@ export class WalletApiMock implements WalletApi {
   }
 
   public async connect(): Promise<void> {
-    await wait(500)
+    await wait(1000)
     this._connected = true
     log('[WalletApiMock] Connected')
     await this._notifyListeners()
   }
 
   public async disconnect(): Promise<void> {
-    await wait(500)
+    await wait(1000)
     this._connected = false
     log('[WalletApiMock] Disconnected')
     await this._notifyListeners()
@@ -34,7 +36,7 @@ export class WalletApiMock implements WalletApi {
   public async getAddress(): Promise<string> {
     assert(this._connected, 'The wallet is not connected')
 
-    return USER_1
+    return this._user
   }
 
   public async getBalance(): Promise<BN> {
@@ -46,23 +48,31 @@ export class WalletApiMock implements WalletApi {
   public async getNetworkId(): Promise<number> {
     assert(this._connected, 'The wallet is not connected')
 
-    return Network.Rinkeby
+    return this._networkId
   }
 
-  public addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void {
+  public addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): void {
     this._listeners.push(callback)
+    if (trigger) {
+      callback(this._getWalletInfo())
+    }
   }
 
   public removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void {
     this._listeners = this._listeners.filter(c => c !== callback)
+    console.log('removeOnChangeWalletInfo', this._listeners.length)
+  }
+
+  private _getWalletInfo(): WalletInfo {
+    return {
+      isConnected: this._connected,
+      userAddress: this._connected ? this._user : undefined,
+      networkId: this._connected ? this._networkId : undefined,
+    }
   }
 
   private async _notifyListeners(): Promise<void> {
-    const walletInfo: WalletInfo = {
-      isConnected: this._connected,
-      userAddress: this._connected ? await this.getAddress() : undefined,
-      networkId: this._connected ? await this.getNetworkId() : undefined,
-    }
+    const walletInfo: WalletInfo = this._getWalletInfo()
     this._listeners.forEach(listener => listener(walletInfo))
   }
 }

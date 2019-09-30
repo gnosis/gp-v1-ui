@@ -1,5 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { toast } from 'react-toastify'
+
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
@@ -9,6 +13,9 @@ const Wrapper = styled.a`
   border: 2px solid #ff5097;
   color: #ff5097;
   vertical-align: middle;
+  text-decoration: none;
+  min-width: 16em;
+  text-align: center;
 
   &:hover {
     color: white;
@@ -18,35 +25,49 @@ const Wrapper = styled.a`
 `
 
 const Wallet: React.FC = () => {
-  const { walletInfo } = useWalletConnection()
+  const { isConnected, userAddress } = useWalletConnection()
+  const [loadingLabel, setLoadingLabel] = useState()
 
   const connectWallet = async (): Promise<void> => {
     try {
-      console.log('[Wallet] Connect')
+      setLoadingLabel('Connecting...')
       await walletApi.connect()
+      toast.success('Wallet connected')
     } catch (error) {
-      // TODO: Handle error
-      console.log('Connect Wallet error', error)
+      toast.error('Error connecting wallet')
+    } finally {
+      setLoadingLabel(undefined)
     }
   }
 
   const disconnectWallet = async (): Promise<void> => {
     try {
-      console.log('[Wallet] Disconnect')
+      setLoadingLabel('Disconnecting...')
       await walletApi.disconnect()
+      toast.info('Wallet disconnected')
     } catch (error) {
-      // TODO: Handle error
-      console.log('Disconnect Wallet error', error)
+      toast.error('Error disconnecting wallet')
+    } finally {
+      setLoadingLabel(undefined)
     }
   }
 
-  return walletInfo.isConnected ? (
-    <Wrapper onClick={disconnectWallet}>
-      {walletInfo.userAddress}!&nbsp;<small>(disconnect)</small>
-    </Wrapper>
-  ) : (
-    <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
-  )
+  if (loadingLabel) {
+    return (
+      <Wrapper>
+        <FontAwesomeIcon icon={faSpinner} />
+        {' ' + loadingLabel}
+      </Wrapper>
+    )
+  } else {
+    return isConnected ? (
+      <Wrapper onClick={disconnectWallet}>
+        {userAddress.substr(0, 9)}...{userAddress.substr(35, userAddress.length)} &nbsp;<small>(disconnect)</small>
+      </Wrapper>
+    ) : (
+      <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
+    )
+  }
 }
 
 export default Wallet

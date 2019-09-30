@@ -95,7 +95,7 @@ export interface WalletApi {
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
-  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): void
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
 }
 
