@@ -11,6 +11,7 @@ interface Params {
 interface Result {
   withdrawable: boolean
   withdrawing: boolean
+  highlighWithdraw: boolean
   withdraw(): Promise<TxResult<void>>
   error: boolean
 }
@@ -21,6 +22,7 @@ export const useWithdrawTokens = (params: Params): Result => {
   } = params
   const [withdrawable, setWithdrawable] = useState(false)
   const [withdrawing, setWithdrawing] = useState(false)
+  const [highlighWithdraw, setHighlighWithdraw] = useState(false)
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 
@@ -47,11 +49,13 @@ export const useWithdrawTokens = (params: Params): Result => {
         console.error('Error checking withdraw state', error)
         setError(true)
       })
+  }, [tokenAddress, withdrawingBalance])
 
+  useEffect(() => {
     return function cleanUp(): void {
       mounted.current = false
     }
-  }, [tokenAddress, withdrawingBalance])
+  }, [])
 
   async function withdraw(): Promise<TxResult<void>> {
     assert(enabled, 'Token not enabled')
@@ -68,9 +72,16 @@ export const useWithdrawTokens = (params: Params): Result => {
     } finally {
       if (mounted.current) {
         setWithdrawing(false)
+
+        setHighlighWithdraw(true)
+        setTimeout(() => {
+          if (mounted.current) {
+            setHighlighWithdraw(false)
+          }
+        }, 5000)
       }
     }
   }
 
-  return { withdrawable, withdrawing, withdraw, error }
+  return { withdrawable, withdrawing, highlighWithdraw, withdraw, error }
 }

@@ -91,7 +91,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     tokenBalances,
     txOptionalParams,
   })
-  const { withdrawable, withdrawing, withdraw } = useWithdrawTokens({ tokenBalances, txOptionalParams })
+  const { withdrawable, withdrawing, highlighWithdraw, withdraw } = useWithdrawTokens({
+    tokenBalances,
+    txOptionalParams,
+  })
 
   async function _enableToken(): Promise<void> {
     try {
@@ -134,7 +137,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   let className
-  if (highlight) {
+  if (highlight || highlighWithdraw) {
     className = 'highlight'
   } else if (enabling) {
     className = 'enabling'
