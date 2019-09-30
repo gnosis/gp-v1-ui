@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
@@ -95,6 +95,13 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     tokenBalances,
     txOptionalParams,
   })
+  const mounted = useRef(true)
+
+  useEffect(() => {
+    return function cleanUp(): void {
+      mounted.current = false
+    }
+  }, [])
 
   async function _enableToken(): Promise<void> {
     try {
@@ -114,16 +121,18 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
       const result = await withdraw()
 
-      setTokenBalances(
-        (current: TokenBalanceDetails): TokenBalanceDetails => {
-          return {
-            ...current,
-            exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
-            withdrawingBalance: ZERO,
-            walletBalance: current.walletBalance.add(withdrawingBalance),
-          }
-        },
-      )
+      if (mounted.current) {
+        setTokenBalances(
+          (current: TokenBalanceDetails): TokenBalanceDetails => {
+            return {
+              ...current,
+              exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
+              withdrawingBalance: ZERO,
+              walletBalance: current.walletBalance.add(withdrawingBalance),
+            }
+          },
+        )
+      }
 
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
