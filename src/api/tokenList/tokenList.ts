@@ -86,13 +86,23 @@ const tokens: TokenDetailsByNetwork[] = [
   //  https://gemini.com/dollar/
   //  regulated by the New York State Department of Financial Services
   //  launched same day as PAX by Gemini Trust Company. backed by USD
+  //  Rinkeby faucet: contract created with Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712.
+  //    Use it to mint new tokens.
+  //  Deployed contracts:
+  //  - ERC20Store: 0xa0B87D97782E6767Eb6862208bc9c1283b8d79f6
+  //  - ERC20Impl: 0x8d54C3af182A5ef4f74e7eCC07aB6182153797bB
+  //  - ERC20Proxy (main interface): 0x784B46A4331f5c7C495F296AE700652265ab2fC6
+  //  To mint new tokens:
+  //  - Using ERC20Impl contract, call `requestPrint(address, amount)`
+  //  - On same contract, use the `lockId` returned from previous call and execute `confirmPrint(lockId)`
+
   {
     name: 'Gemini dollar',
     symbol: 'GUSD',
     decimals: 2,
     addressByNetwork: {
       [Network.Mainnet]: '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
-      [Network.Rinkeby]: '0x0000000000000000000000000000000000000000', // TODO: Find/Deploy and update?
+      [Network.Rinkeby]: '0x784B46A4331f5c7C495F296AE700652265ab2fC6',
     },
   },
 
