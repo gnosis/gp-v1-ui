@@ -35,8 +35,8 @@ export interface RowProps {
   tokenBalances: TokenBalanceDetails
 }
 
-function _loadFallbackTokenImage(event: React.FormEvent<HTMLImageElement>): void {
-  const image = event.target as HTMLImageElement
+function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
+  const image = event.currentTarget
   image.src = unknownTokenImg
 }
 
