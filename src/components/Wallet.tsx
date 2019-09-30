@@ -1,5 +1,6 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
+import { walletApi } from 'api'
 
 const Wrapper = styled.a`
   padding: 1rem;
@@ -14,14 +15,21 @@ const Wrapper = styled.a`
     cursor: pointer;
   }
 `
-function connectWallet(): void {
-  alert('TODO: Connect to Wallet')
-}
 
-const Wallet: React.FC = () => (
-  <Wrapper className="connect-wallet" onClick={connectWallet}>
-    Connect to Wallet
-  </Wrapper>
-)
+const Wallet: React.FC = () => {
+  const [connected, setIsConnected] = useState(walletApi.isConnected())
+
+  const connectWallet = async (): Promise<void> => {
+    try {
+      console.log('[Wallet] Connect')
+      await walletApi.connect()
+      setIsConnected(true)
+    } catch (error) {
+      console.log('Login error', error)
+    }
+  }
+
+  return connected ? <span>Connected!</span> : <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
+}
 
 export default Wallet
