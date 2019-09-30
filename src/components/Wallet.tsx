@@ -25,11 +25,29 @@ const Wallet: React.FC = () => {
       await walletApi.connect()
       setIsConnected(true)
     } catch (error) {
-      console.log('Login error', error)
+      // TODO: Handle error
+      console.log('Connect Wallet error', error)
     }
   }
 
-  return connected ? <span>Connected!</span> : <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
+  const disconnectWallet = async (): Promise<void> => {
+    try {
+      console.log('[Wallet] Disconnect')
+      await walletApi.disconnect()
+      setIsConnected(false)
+    } catch (error) {
+      // TODO: Handle error
+      console.log('Disconnect Wallet error', error)
+    }
+  }
+
+  return connected ? (
+    <Wrapper onClick={disconnectWallet}>
+      Connected!&nbsp;<small>(disconnect)</small>
+    </Wrapper>
+  ) : (
+    <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
+  )
 }
 
 export default Wallet
