@@ -11,6 +11,7 @@ describe('<Row /> not enabled', () => {
     exchangeBalance: new BN(25),
     depositingBalance: new BN(0),
     withdrawingBalance: new BN(11),
+    withdrawable: true,
     walletBalance: new BN(2),
     enabled: false,
   }
@@ -25,9 +26,9 @@ describe('<Row /> not enabled', () => {
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
-  it('contains 1 <button> elements', () => {
+  it('contains 2 <button> elements', () => {
     const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.find('button')).toHaveLength(1)
+    expect(wrapper.find('button')).toHaveLength(2)
   })
 })
 
@@ -37,6 +38,7 @@ describe('<Row /> with enable', () => {
     exchangeBalance: new BN(25),
     depositingBalance: new BN(0),
     withdrawingBalance: new BN(11),
+    withdrawable: true,
     walletBalance: new BN(2),
     enabled: true,
   }
@@ -51,9 +53,9 @@ describe('<Row /> with enable', () => {
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
-  it('contains 2 <button> element', () => {
+  it('contains 3 <button> element', () => {
     const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
 
-    expect(wrapper.find('button')).toHaveLength(2)
+    expect(wrapper.find('button')).toHaveLength(3)
   })
 })

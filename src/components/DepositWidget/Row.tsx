@@ -1,14 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faCheck, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
-import { TokenBalanceDetails, Receipt } from 'types'
+import { TokenBalanceDetails, Receipt, TxOptionalParams } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, abbreviateString } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
 import Form from './Form'
+import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
+import { ZERO } from 'const'
 
 const TokenTr = styled.tr`
   img {
@@ -28,6 +30,22 @@ const TokenTr = styled.tr`
 
   &.selected {
     background-color: #ecdcff;
+`
+
+const WithdrawableButton = styled.button`
+  margin-bottom: 0;
+`
+
+const WithdrawableLink = styled.a`
+  text-decoration: none;
+
+  &.success {
+    color: #63ab52;
+  }
+  &.disabled {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 `
 
@@ -40,7 +58,22 @@ function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>):
   image.src = unknownTokenImg
 }
 
-export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
+const txOptionalParams: TxOptionalParams = {
+  onSentTransaction: (receipt: Receipt): void => {
+    toast.info(
+      <div>
+        The transaction has been sent! Check{' '}
+        <a href={`https://etherscan.io/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">
+          {abbreviateString(receipt.transactionHash, 6, 4)}
+        </a>{' '}
+        for details
+      </div>,
+    )
+  },
+}
+
+export const Row: React.FC<RowProps> = (props: RowProps) => {
+  const [tokenBalances, setTokenBalances] = useState<TokenBalanceDetails>(props.tokenBalances)
   const {
     address,
     addressMainnet,
@@ -51,25 +84,25 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
+    withdrawable,
     walletBalance,
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
-  const { enabled, enabling, highlight, enableToken } = useEnableTokens({
+  const { enabled, enabling, highlight: highlightEnabled, enableToken } = useEnableTokens({
     tokenBalances,
-    txOptionalParams: {
-      onSentTransaction: (receipt: Receipt): void => {
-        toast.info(
-          <div>
-            The transaction has been sent! Check{' '}
-            <a href={`https://etherscan.io/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">
-              {receipt.transactionHash.slice(0, 10)}...
-            </a>{' '}
-            for details
-          </div>,
-        )
-      },
-    },
+    txOptionalParams,
   })
+  const { withdrawing, highlight: highlighWithdrawn, withdraw } = useWithdrawTokens({
+    tokenBalances,
+    txOptionalParams,
+  })
+  const mounted = useRef(true)
+
+  useEffect(() => {
+    return function cleanUp(): void {
+      mounted.current = false
+    }
+  }, [])
 
   async function _enableToken(): Promise<void> {
     try {
@@ -82,10 +115,40 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
       toast.error('Error enabling the token')
     }
   }
+
+  async function _withdraw(): Promise<void> {
+    try {
+      console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
+
+      const result = await withdraw()
+
+      if (mounted.current) {
+        setTokenBalances(
+          (current: TokenBalanceDetails): TokenBalanceDetails => {
+            return {
+              ...current,
+              exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
+              withdrawingBalance: ZERO,
+              withdrawable: false,
+              walletBalance: current.walletBalance.add(withdrawingBalance),
+            }
+          },
+        )
+      }
+
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      toast.success(`Withdraw of ${withdrawingBalance} ${symbol} completed`)
+    } catch (error) {
+      console.error('Error executing the withdraw request', error)
+      toast.error(`Error executing the withdraw request: ${error.message}`)
+    }
+  }
+
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   let className
-  if (highlight) {
+  if (highlightEnabled || highlighWithdrawn) {
     className = 'highlight'
   } else if (enabling) {
     className = 'enabling'
@@ -112,7 +175,35 @@ export const Row: React.FC<RowProps> = ({ tokenBalances }: RowProps) => {
         </td>
         <td>{name}</td>
         <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
-        <td title={formatAmountFull(withdrawingBalance, decimals)}>{formatAmount(withdrawingBalance, decimals)}</td>
+        <td title={formatAmountFull(withdrawingBalance, decimals)}>
+          {withdrawable ? (
+            <>
+              <WithdrawableButton className="success" onClick={_withdraw} disabled={withdrawing}>
+                {withdrawing && <FontAwesomeIcon icon={faSpinner} spin />}
+                &nbsp; {formatAmount(withdrawingBalance, decimals)}
+              </WithdrawableButton>
+              <div>
+                <WithdrawableLink
+                  className={withdrawing ? 'disabled' : 'success'}
+                  onClick={(): void => {
+                    if (!withdrawing) {
+                      _withdraw()
+                    }
+                  }}
+                >
+                  <small>Withdrawable</small>
+                </WithdrawableLink>
+              </div>
+            </>
+          ) : withdrawingBalance.gt(ZERO) ? (
+            <>
+              <FontAwesomeIcon icon={faClock} />
+              &nbsp; {formatAmount(withdrawingBalance, decimals)}
+            </>
+          ) : (
+            0
+          )}
+        </td>
         <td title={formatAmountFull(walletBalance, decimals)}>{formatAmount(walletBalance, decimals)}</td>
         <td>
           {enabled ? (

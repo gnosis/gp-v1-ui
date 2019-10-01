@@ -20,6 +20,7 @@ export interface TokenBalanceDetails extends TokenDetails {
   exchangeBalance: BN
   depositingBalance: BN
   withdrawingBalance: BN
+  withdrawable: boolean
   walletBalance: BN
   enabled: boolean
 }

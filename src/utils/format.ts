@@ -3,6 +3,7 @@ import { TEN } from 'const'
 
 const DEFAULT_DECIMALS = 4
 const DEFAULT_PRECISION = 18
+const ELLIPSIS = '...'
 
 function _getLocaleSymbols(): { thousands: string; decimals: string } {
   // Check number representation in default locale
@@ -23,7 +24,7 @@ function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { 
   //  i.e. for WETH (precision=18, decimals=4) --> amount / 1e14
   //        16.5*1e18 ---> 165000
   if (decimals > amountPrecision) {
-    throw new Error('The decimals cannot be bigger than the precission')
+    throw new Error('The decimals cannot be bigger than the precision')
   }
   const amountRaw = amount.divRound(TEN.pow(new BN(amountPrecision - decimals)))
   const integerPart = amountRaw.div(TEN.pow(new BN(decimals))) // 165000 / 10000 = 16
@@ -94,4 +95,19 @@ export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISI
   } else {
     return null
   }
+}
+
+export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
+  // abbreviate only if it makes sense, and make sure ellipsis fits into word
+  // 1. always add ellipsis
+  // 2. do not shorten words in case ellipsis will make the word longer
+  // 3. min prefix == 1
+  // 4. add suffix if requested
+  const _prefixLength = Math.max(1, prefixLength)
+  if (inputString.length < _prefixLength + ELLIPSIS.length + suffixLength) {
+    return inputString
+  }
+  const prefix = inputString.slice(0, _prefixLength)
+  const suffix = suffixLength > 0 ? inputString.slice(-suffixLength) : ''
+  return prefix + ELLIPSIS + suffix
 }
