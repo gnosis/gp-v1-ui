@@ -10,7 +10,7 @@ interface Params {
 
 interface Result {
   withdrawing: boolean
-  highlighWithdraw: boolean
+  highlight: boolean
   withdraw(): Promise<TxResult<void>>
 }
 
@@ -19,7 +19,7 @@ export const useWithdrawTokens = (params: Params): Result => {
     tokenBalances: { enabled, address: tokenAddress, withdrawable },
   } = params
   const [withdrawing, setWithdrawing] = useState(false)
-  const [highlighWithdraw, setHighlighWithdraw] = useState(false)
+  const [highlight, setHighlight] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -44,15 +44,15 @@ export const useWithdrawTokens = (params: Params): Result => {
       if (mounted.current) {
         setWithdrawing(false)
 
-        setHighlighWithdraw(true)
+        setHighlight(true)
         setTimeout(() => {
           if (mounted.current) {
-            setHighlighWithdraw(false)
+            setHighlight(false)
           }
         }, 5000)
       }
     }
   }
 
-  return { withdrawing, highlighWithdraw, withdraw }
+  return { withdrawing, highlight, withdraw }
 }
