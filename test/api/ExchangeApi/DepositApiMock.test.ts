@@ -1,21 +1,23 @@
-import { DepositApi } from 'types'
+import { DepositApi, Erc20Api } from 'types'
 
 import { BATCH_TIME, ZERO, TWO } from 'const'
 import { DepositApiMock } from 'api/exchange/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
-import { erc20Balances, erc20Allowances } from '../../data'
 
 const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, AMOUNT, AMOUNT_SMALL } = testHelpers
 
+jest.mock('api/erc20/Erc20ApiMock')
+
 let instance: DepositApi
-const mockErc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
+let mockErc20Api: Erc20Api
 
 beforeAll(() => {
   testHelpers.mockTimes()
 })
 
 beforeEach(() => {
+  mockErc20Api = new Erc20ApiMock()
   instance = new DepositApiMock(
     {
       [USER_1]: {
