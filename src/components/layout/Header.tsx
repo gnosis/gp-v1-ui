@@ -62,6 +62,15 @@ const Wrapper = styled.header`
     margin-top: 0;
     color: #e0aacf;
   }
+
+  a${Wallet} {
+    &:hover {
+      color: white;
+      border-color: white;
+      cursor: pointer;
+      background-color: inherit;
+    }
+  }
 `
 
 const Header: React.FC = () => (

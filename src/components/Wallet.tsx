@@ -6,25 +6,13 @@ import { toast } from 'react-toastify'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { withRouter, RouteComponentProps } from 'react-router'
 
-const Wrapper = styled.a`
-  padding: 1rem;
-  margin: 1rem;
-  border: 2px solid #ff5097;
-  color: #ff5097;
-  vertical-align: middle;
-  text-decoration: none;
-  min-width: 16em;
-  text-align: center;
+interface WalletProps extends RouteComponentProps {
+  className: string
+}
 
-  &:hover {
-    color: white;
-    border-color: white;
-    cursor: pointer;
-  }
-`
-
-const Wallet: React.FC = () => {
+const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const { isConnected, userAddress } = useWalletConnection()
   const [loadingLabel, setLoadingLabel] = useState()
 
@@ -49,25 +37,52 @@ const Wallet: React.FC = () => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(undefined)
+      props.history.push('/')
     }
   }
 
+  let onClick, content
   if (loadingLabel) {
-    return (
-      <Wrapper>
+    content = (
+      <>
         <FontAwesomeIcon icon={faSpinner} />
         {' ' + loadingLabel}
-      </Wrapper>
+      </>
+    )
+  } else if (isConnected) {
+    onClick = disconnectWallet
+    content = (
+      <>
+        {userAddress.substr(0, 9)}...{userAddress.substr(35, userAddress.length)} &nbsp;<small>(disconnect)</small>
+      </>
     )
   } else {
-    return isConnected ? (
-      <Wrapper onClick={disconnectWallet}>
-        {userAddress.substr(0, 9)}...{userAddress.substr(35, userAddress.length)} &nbsp;<small>(disconnect)</small>
-      </Wrapper>
-    ) : (
-      <Wrapper onClick={connectWallet}>Connect to Wallet</Wrapper>
-    )
+    onClick = connectWallet
+    content = <>Connect to Wallet</>
   }
+
+  return (
+    <a onClick={onClick} className={props.className}>
+      {content}
+    </a>
+  )
 }
 
-export default Wallet
+export default styled(withRouter(Wallet))`
+  padding: 1rem;
+  margin: 1rem;
+  border: 2px solid #ff5097;
+  color: #ff5097;
+  vertical-align: middle;
+  text-decoration: none;
+  min-width: 16em;
+  text-align: center;
+
+  &:hover {
+    color: #ff5097;
+  }
+
+  &:hover {
+    background-color: #ffe3ee;
+  }
+`
