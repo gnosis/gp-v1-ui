@@ -115,7 +115,7 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
   }
 
   if (amount.gt(totalAmount)) {
-    return 'Insuficient balance'
+    return 'Insufficient balance'
   }
 
   return null // no error
