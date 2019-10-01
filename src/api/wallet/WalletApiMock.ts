@@ -60,7 +60,6 @@ export class WalletApiMock implements WalletApi {
 
   public removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void {
     this._listeners = this._listeners.filter(c => c !== callback)
-    console.log('removeOnChangeWalletInfo', this._listeners.length)
   }
 
   private _getWalletInfo(): WalletInfo {
