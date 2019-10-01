@@ -11,9 +11,6 @@ const Wrapper = styled.footer`
   ul {
     margin: 0;
     padding: 0;
-    margin-block-end: 0;
-    margin-block-start: 0;
-    padding-inline-start: 0;
     display: flex;
     list-style-type: none;
     justify-content: center;

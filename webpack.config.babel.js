@@ -74,10 +74,9 @@ module.exports = ({ stats = false } = {}) => ({
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     isProduction && new DashboardPlugin(),
+    // define inside one plugin instance
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
-    }),
-    new webpack.DefinePlugin({
       'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
     }),
   ].filter(Boolean),

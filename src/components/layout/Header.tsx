@@ -7,7 +7,6 @@ const Wrapper = styled.header`
   color: #ffffff;
   background-color: #3340a9;
   min-height: ${rem('325px')};
-  font-size: 1.5am;
   //position: relative;
 
   nav {

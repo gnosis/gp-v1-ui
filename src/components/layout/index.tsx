@@ -15,11 +15,7 @@ const Wrapper = styled.div`
   }
 `
 
-interface LayoutProps {
-  children: React.ReactNode
-}
-
-const Layout: React.FC<LayoutProps> = ({ children }: LayoutProps) => (
+const Layout: React.FC = ({ children }) => (
   <Wrapper>
     <Header />
     <main>{children}</main>

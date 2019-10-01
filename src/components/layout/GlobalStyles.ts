@@ -12,7 +12,6 @@ const GlobalStyles = createGlobalStyle`
   ${variables}
 
   html {
-    overflow-y: scroll;
     font-size: 16px;
     box-sizing: border-box;
   }
