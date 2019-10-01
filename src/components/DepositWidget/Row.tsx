@@ -11,6 +11,8 @@ import { useEnableTokens } from 'hooks/useEnableToken'
 import Form from './Form'
 import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
 import { ZERO } from 'const'
+import BN from 'bn.js'
+import { walletApi, depositApi } from 'api'
 
 const TokenTr = styled.tr`
   img {
@@ -145,6 +147,36 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     }
   }
 
+  async function submitDeposit(amount: BN): Promise<void> {
+    try {
+      const userAddress = await walletApi.getAddress()
+      console.log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+
+      const result = await depositApi.deposit(userAddress, address, amount)
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      if (mounted.current) {
+        setTokenBalances(
+          (current: TokenBalanceDetails): TokenBalanceDetails => {
+            return {
+              ...current,
+              exchangeBalance: current.depositingBalance.add(amount),
+              walletBalance: current.walletBalance.sub(amount),
+            }
+          },
+        )
+      }
+
+      toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
+    } catch (error) {
+      console.error('Error depositing', error)
+      toast.error(`Error depositing: ${error.message}`)
+    }
+  }
+
+  async function submitWithdraw(): Promise<void> {
+    alert('TODO: Submit Withdraw')
+  }
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   let className
@@ -158,14 +190,6 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
-
-  async function submitDeposit(): Promise<void> {
-    alert('TODO: Submit deposit')
-  }
-
-  async function submitWithdraw(): Promise<void> {
-    alert('TODO: Submit Withdraw')
-  }
 
   return (
     <>
