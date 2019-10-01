@@ -152,7 +152,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       const userAddress = await walletApi.getAddress()
       console.log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
 
-      const result = await depositApi.deposit(userAddress, address, amount)
+      const result = await depositApi.deposit(userAddress, address, amount, txOptionalParams)
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       if (mounted.current) {
@@ -174,8 +174,31 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     }
   }
 
-  async function submitWithdraw(): Promise<void> {
-    alert('TODO: Submit Withdraw')
+  async function submitWithdraw(amount: BN): Promise<void> {
+    try {
+      const userAddress = await walletApi.getAddress()
+      console.log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+
+      const result = await depositApi.requestWithdraw(userAddress, address, amount, txOptionalParams)
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      if (mounted.current) {
+        setTokenBalances(
+          (current: TokenBalanceDetails): TokenBalanceDetails => {
+            return {
+              ...current,
+              withdrawingBalance: amount,
+              withdrawable: false,
+            }
+          },
+        )
+      }
+
+      toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+    } catch (error) {
+      console.error('Error requesting withdraw', error)
+      toast.error(`Error requesting withdraw: ${error.message}`)
+    }
   }
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
