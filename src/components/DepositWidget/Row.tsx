@@ -13,6 +13,7 @@ import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
 import { ZERO } from 'const'
 import BN from 'bn.js'
 import { walletApi, depositApi } from 'api'
+import { useHighlight } from 'hooks/useHighlight'
 
 const TokenTr = styled.tr`
   img {
@@ -98,19 +99,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     tokenBalances,
     txOptionalParams,
   })
-  const [highlight, setHighligh] = useState(false)
+  const { highlight, triggerHighlight } = useHighlight()
   const mounted = useRef(true)
-
-  function highlighRow(): void {
-    if (mounted.current) {
-      setHighligh(true)
-      setInterval(() => {
-        if (mounted.current) {
-          setHighligh(false)
-        }
-      }, 5000)
-    }
-  }
 
   useEffect(() => {
     return function cleanUp(): void {
@@ -123,7 +113,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       const result = await enableToken()
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
-      highlighRow()
+      triggerHighlight()
 
       toast.success(`The token ${symbol} has been enabled for trading`)
     } catch (error) {
@@ -152,7 +142,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         )
       }
 
-      highlighRow()
+      triggerHighlight()
 
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
@@ -182,7 +172,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           },
         )
       }
-      highlighRow()
+      triggerHighlight()
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -210,7 +200,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           },
         )
       }
-      highlighRow()
+      triggerHighlight()
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
