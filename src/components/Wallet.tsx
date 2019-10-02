@@ -7,6 +7,7 @@ import { toast } from 'react-toastify'
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { withRouter, RouteComponentProps } from 'react-router'
+import { abbreviateString } from 'utils'
 
 interface WalletProps extends RouteComponentProps {
   className: string
@@ -53,7 +54,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     onClick = disconnectWallet
     content = (
       <>
-        {userAddress.substr(0, 9)}...{userAddress.substr(35, userAddress.length)} &nbsp;<small>(disconnect)</small>
+        {abbreviateString(userAddress, 10, 5)} &nbsp;<small>(disconnect)</small>
       </>
     )
   } else {
