@@ -58,7 +58,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     )
   } else {
     onClick = connectWallet
-    content = <>Connect to Wallet</>
+    content = 'Connect to Wallet'
   }
 
   return (
