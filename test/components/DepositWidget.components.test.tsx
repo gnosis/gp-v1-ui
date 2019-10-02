@@ -11,7 +11,7 @@ describe('<Row /> not enabled', () => {
     exchangeBalance: new BN(25),
     depositingBalance: new BN(0),
     withdrawingBalance: new BN(11),
-    withdrawable: true,
+    claimable: true,
     walletBalance: new BN(2),
     enabled: false,
   }
@@ -38,7 +38,7 @@ describe('<Row /> with enable', () => {
     exchangeBalance: new BN(25),
     depositingBalance: new BN(0),
     withdrawingBalance: new BN(11),
-    withdrawable: true,
+    claimable: true,
     walletBalance: new BN(2),
     enabled: true,
   }

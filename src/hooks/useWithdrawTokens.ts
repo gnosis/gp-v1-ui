@@ -16,7 +16,7 @@ interface Result {
 
 export const useWithdrawTokens = (params: Params): Result => {
   const {
-    tokenBalances: { enabled, address: tokenAddress, withdrawable },
+    tokenBalances: { enabled, address: tokenAddress, claimable },
   } = params
   const [withdrawing, setWithdrawing] = useState(false)
   const [highlight, setHighlight] = useState(false)
@@ -30,7 +30,7 @@ export const useWithdrawTokens = (params: Params): Result => {
 
   async function withdraw(): Promise<TxResult<void>> {
     assert(enabled, 'Token not enabled')
-    assert(withdrawable, 'Withdraw not ready')
+    assert(claimable, 'Withdraw not ready')
 
     setWithdrawing(true)
 
