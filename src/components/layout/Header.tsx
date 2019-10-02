@@ -63,7 +63,7 @@ const Wrapper = styled.header`
     color: #e0aacf;
   }
 
-  a${Wallet} {
+  ${Wallet} {
     &:hover {
       color: white;
       border-color: white;
