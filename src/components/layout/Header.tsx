@@ -36,16 +36,13 @@ const Wrapper = styled.header`
     border: 2px solid #ff5097;
     color: #ff5097;
     vertical-align: middle;
+    font-size: 1.2em;
 
     &:hover {
       color: white;
       border-color: white;
       cursor: pointer;
     }
-  }
-
-  .logo {
-    font-size: 1.2em;
   }
 
   .header-title {
