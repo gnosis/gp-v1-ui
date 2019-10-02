@@ -12,7 +12,6 @@ interface Params {
 interface Result {
   enabled: boolean
   enabling: boolean
-  highlight: boolean
   enableToken(): Promise<TxResult<boolean>>
 }
 
@@ -20,7 +19,6 @@ export const useEnableTokens = (params: Params): Result => {
   const { enabled: enabledInitial, address: tokenAddress } = params.tokenBalances
   const [enabled, setEnabled] = useState(enabledInitial)
   const [enabling, setEnabling] = useState(false)
-  const [highlight, setHighlight] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -53,18 +51,10 @@ export const useEnableTokens = (params: Params): Result => {
       // Update the state
       setEnabled(true)
       setEnabling(false)
-
-      // Highlight the token for some seconds
-      setHighlight(true)
-      setTimeout(() => {
-        if (mounted.current) {
-          setHighlight(false)
-        }
-      }, 5000)
     }
 
     return result
   }
 
-  return { enabled, enabling, highlight, enableToken }
+  return { enabled, enabling, enableToken }
 }

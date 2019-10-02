@@ -3,16 +3,18 @@ import { ZERO } from 'const'
 
 import { USER_1, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7 } from './basic'
 import { BalancesByUserAndToken } from 'api/exchange/DepositApiMock'
+import { PendingFlux } from 'types'
 
-const FLUX_ZERO = {
-  amount: ZERO,
-  batchId: 0,
+// Using a function to build flux objects because if we use the same
+// object everywhere, anytime it's updated, it'll reflect everywhere
+const createFlux = (): PendingFlux => {
+  return { amount: ZERO, batchId: 0 }
 }
 
 const STATE_ZERO = {
   balance: ZERO,
-  pendingDeposits: FLUX_ZERO,
-  pendingWithdraws: FLUX_ZERO,
+  pendingDeposits: createFlux(),
+  pendingWithdraws: createFlux(),
 }
 
 const exchangeBalanceStates: BalancesByUserAndToken = {
@@ -25,12 +27,12 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
         amount: new BN('850000'), // 0.85,
         batchId: 1,
       },
-      pendingWithdraws: FLUX_ZERO,
+      pendingWithdraws: createFlux(),
     },
     [TOKEN_3]: {
       // 0. TUSD: decimals=18
       balance: new BN('500000000000000000'), // 0.5
-      pendingDeposits: FLUX_ZERO,
+      pendingDeposits: createFlux(),
       pendingWithdraws: {
         amount: new BN('100000000000000000'), // 0.1,
         batchId: 1,
@@ -41,7 +43,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_6]: {
       // 0. GUSD: decimals=2
       balance: new BN('5004829'), // 50,048.29
-      pendingDeposits: FLUX_ZERO,
+      pendingDeposits: createFlux(),
       pendingWithdraws: {
         amount: new BN('10147'), // 101.47
         batchId: Number.MAX_SAFE_INTEGER,

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, ChangeEvent, ReactNode } from 'react'
+import React, { useState, useEffect, ChangeEvent, ReactNode, useRef } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
@@ -95,7 +95,7 @@ export interface FormProps {
   inputLabel: string
   submitBtnLabel: string
   submitBtnIcon: IconDefinition
-  onSubmit: () => Promise<void>
+  onSubmit: (amount: BN) => Promise<void>
   onClose: () => void
 }
 
@@ -115,7 +115,7 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
   }
 
   if (amount.gt(totalAmount)) {
-    return 'Insuficient balance'
+    return 'Insufficient balance'
   }
 
   return null // no error
@@ -126,9 +126,11 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
   const { title, totalAmount, totalAmountLabel, inputLabel, submitBtnLabel, submitBtnIcon } = props
   const [amountInput, setAmountInput] = useState('')
   const [validatorActive, setValidatorActive] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Errors>({
     amountInput: null,
   })
+  const mounted = useRef(true)
 
   const cancelForm = (): void => {
     setAmountInput('')
@@ -147,7 +149,31 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
       // const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
       // return !hasErrors
     }
-  }, [amountInput, validatorActive])
+  }, [amountInput, decimals, errors, totalAmount, validatorActive])
+
+  // Separated useEffect only for the cleanUp when the component unmounts
+  // Note the empty list as the last argument
+  useEffect(() => {
+    return function cleanUp(): void {
+      mounted.current = false
+    }
+  }, [])
+
+  const _onClick = (): void => {
+    setValidatorActive(true)
+    // TODO: Improve. Do not do 2 times the validation
+    const error = _validateForm(totalAmount, amountInput, decimals)
+    if (!error) {
+      setLoading(true)
+      props.onSubmit(parseAmount(amountInput, decimals)).then(() => {
+        if (mounted.current) {
+          setLoading(false)
+          setValidatorActive(false)
+          cancelForm()
+        }
+      })
+    }
+  }
 
   return (
     <Wrapper>
@@ -179,20 +205,8 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
           </li>
           <li className="buttons">
             <a onClick={cancelForm}>Cancel</a>
-            <button
-              type="button"
-              className="success"
-              disabled={!!errors.amountInput}
-              onClick={(): void => {
-                setValidatorActive(true)
-                // TODO: Improve. Do not do 2 times the validation
-                const error = _validateForm(totalAmount, amountInput, decimals)
-                if (!error) {
-                  props.onSubmit()
-                }
-              }}
-            >
-              <FontAwesomeIcon icon={submitBtnIcon} />
+            <button type="button" className="success" disabled={!!errors.amountInput || loading} onClick={_onClick}>
+              <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
               &nbsp; {submitBtnLabel}
             </button>
           </li>
