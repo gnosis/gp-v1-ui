@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -16,6 +16,13 @@ interface WalletProps extends RouteComponentProps {
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const { isConnected, userAddress } = useWalletConnection()
   const [loadingLabel, setLoadingLabel] = useState()
+  const mounted = useRef(true)
+
+  useEffect(() => {
+    return function cleanUp(): void {
+      mounted.current = false
+    }
+  }, [])
 
   const connectWallet = async (): Promise<void> => {
     try {
@@ -25,7 +32,9 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     } catch (error) {
       toast.error('Error connecting wallet')
     } finally {
-      setLoadingLabel(undefined)
+      if (mounted.current) {
+        setLoadingLabel(undefined)
+      }
     }
   }
 
@@ -46,7 +55,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   if (loadingLabel) {
     content = (
       <>
-        <FontAwesomeIcon icon={faSpinner} />
+        <FontAwesomeIcon icon={faSpinner} spin />
         {' ' + loadingLabel}
       </>
     )
