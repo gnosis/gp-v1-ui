@@ -82,16 +82,47 @@ export class Erc20ApiMock implements Erc20Api {
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
 
+    // Since we don't have a msg.sender, we mimic it by using the optional field
+    const { senderAddress: spenderAddress } = txOptionalParams
+    assert(spenderAddress, 'TxOptionalParams.senderAddress is required for this mock work')
+    this._initAllowances(fromAddress, tokenAddress, spenderAddress)
+
     const balance = this._balances[fromAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
+    assert(
+      this._checkAndUpdateAllowance(spenderAddress, fromAddress, tokenAddress, amount),
+      'Not allowed to perform this transfer',
+    )
+
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
+
+    log(
+      `[Erc20ApiMock] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${spenderAddress}`,
+    )
 
     return { data: true, receipt: RECEIPT }
   }
 
   /********************************    private methods   ********************************/
+  private _checkAndUpdateAllowance(
+    spenderAddress: string,
+    fromAddress: string,
+    tokenAddress: string,
+    amount: BN,
+  ): boolean {
+    if (spenderAddress === fromAddress) {
+      return true
+    }
+    const allowance = this._allowances[fromAddress][tokenAddress][spenderAddress]
+    if (!allowance.gte(amount)) {
+      return false
+    }
+    this._allowances[fromAddress][tokenAddress][spenderAddress] = allowance.sub(amount)
+    return true
+  }
+
   private _initBalances(userAddress: string, tokenAddress: string): BN {
     let userBalances = this._balances[userAddress]
     if (!userBalances) {
