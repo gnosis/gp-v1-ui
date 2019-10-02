@@ -126,7 +126,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
   const { title, totalAmount, totalAmountLabel, inputLabel, submitBtnLabel, submitBtnIcon } = props
   const [amountInput, setAmountInput] = useState('')
   const [validatorActive, setValidatorActive] = useState(false)
-  const [clicked, setClicked] = useState(false)
+  const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Errors>({
     amountInput: null,
   })
@@ -164,10 +164,10 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     // TODO: Improve. Do not do 2 times the validation
     const error = _validateForm(totalAmount, amountInput, decimals)
     if (!error) {
-      setClicked(true)
+      setLoading(true)
       props.onSubmit(parseAmount(amountInput, decimals)).then(() => {
         if (mounted.current) {
-          setClicked(false)
+          setLoading(false)
           setValidatorActive(false)
           setAmountInput('')
         }
@@ -205,8 +205,8 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
           </li>
           <li className="buttons">
             <a onClick={cancelForm}>Cancel</a>
-            <button type="button" className="success" disabled={!!errors.amountInput || clicked} onClick={_onClick}>
-              <FontAwesomeIcon icon={clicked ? faSpinner : submitBtnIcon} spin={clicked} />
+            <button type="button" className="success" disabled={!!errors.amountInput || loading} onClick={_onClick}>
+              <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
               &nbsp; {submitBtnLabel}
             </button>
           </li>
