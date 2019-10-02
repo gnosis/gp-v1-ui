@@ -55,7 +55,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   if (loadingLabel) {
     content = (
       <>
-        <FontAwesomeIcon icon={faSpinner} spin={!!loadingLabel} />
+        <FontAwesomeIcon icon={faSpinner} spin />
         {' ' + loadingLabel}
       </>
     )
