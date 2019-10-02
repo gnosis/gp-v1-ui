@@ -90,15 +90,27 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     walletBalance,
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
-  const { enabled, enabling, highlight: highlightEnabled, enableToken } = useEnableTokens({
+  const { enabled, enabling, enableToken } = useEnableTokens({
     tokenBalances,
     txOptionalParams,
   })
-  const { withdrawing, highlight: highlighWithdrawn, withdraw } = useWithdrawTokens({
+  const { withdrawing, withdraw } = useWithdrawTokens({
     tokenBalances,
     txOptionalParams,
   })
+  const [highlight, setHighligh] = useState(false)
   const mounted = useRef(true)
+
+  function highlighRow(): void {
+    if (mounted.current) {
+      setHighligh(true)
+      setInterval(() => {
+        if (mounted.current) {
+          setHighligh(false)
+        }
+      }, 5000)
+    }
+  }
 
   useEffect(() => {
     return function cleanUp(): void {
@@ -110,6 +122,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     try {
       const result = await enableToken()
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      highlighRow()
 
       toast.success(`The token ${symbol} has been enabled for trading`)
     } catch (error) {
@@ -137,6 +151,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           },
         )
       }
+
+      highlighRow()
 
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
@@ -166,6 +182,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           },
         )
       }
+      highlighRow()
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -193,6 +210,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           },
         )
       }
+      highlighRow()
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -203,7 +221,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   let className
-  if (highlightEnabled || highlighWithdrawn) {
+  if (highlight) {
     className = 'highlight'
   } else if (enabling) {
     className = 'enabling'

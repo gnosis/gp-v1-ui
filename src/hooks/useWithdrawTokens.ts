@@ -10,7 +10,6 @@ interface Params {
 
 interface Result {
   withdrawing: boolean
-  highlight: boolean
   withdraw(): Promise<TxResult<void>>
 }
 
@@ -19,7 +18,6 @@ export const useWithdrawTokens = (params: Params): Result => {
     tokenBalances: { enabled, address: tokenAddress, withdrawable },
   } = params
   const [withdrawing, setWithdrawing] = useState(false)
-  const [highlight, setHighlight] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -43,16 +41,9 @@ export const useWithdrawTokens = (params: Params): Result => {
     } finally {
       if (mounted.current) {
         setWithdrawing(false)
-
-        setHighlight(true)
-        setTimeout(() => {
-          if (mounted.current) {
-            setHighlight(false)
-          }
-        }, 5000)
       }
     }
   }
 
-  return { withdrawing, highlight, withdraw }
+  return { withdrawing, withdraw }
 }
