@@ -70,7 +70,7 @@ export class WalletApiMock implements WalletApi {
     }
   }
 
-  private async _notifyListeners(): Promise<void> {
+  private _notifyListeners(): void {
     const walletInfo: WalletInfo = this._getWalletInfo()
     this._listeners.forEach(listener => listener(walletInfo))
   }
