@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { ZERO, ALLOWANCE_VALUE } from 'const'
+import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { USER_1, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7, CONTRACT } from './basic'
 
 export default {
@@ -14,12 +14,12 @@ export default {
   },
   [CONTRACT]: {
     // Set contract tokens to max for performing mock withdraws
-    [TOKEN_1]: ALLOWANCE_VALUE,
-    [TOKEN_2]: ALLOWANCE_VALUE,
-    [TOKEN_3]: ALLOWANCE_VALUE,
-    [TOKEN_4]: ALLOWANCE_VALUE,
-    [TOKEN_5]: ALLOWANCE_VALUE,
-    [TOKEN_6]: ALLOWANCE_VALUE,
-    [TOKEN_7]: ALLOWANCE_VALUE,
+    [TOKEN_1]: ALLOWANCE_MAX_VALUE,
+    [TOKEN_2]: ALLOWANCE_MAX_VALUE,
+    [TOKEN_3]: ALLOWANCE_MAX_VALUE,
+    [TOKEN_4]: ALLOWANCE_MAX_VALUE,
+    [TOKEN_5]: ALLOWANCE_MAX_VALUE,
+    [TOKEN_6]: ALLOWANCE_MAX_VALUE,
+    [TOKEN_7]: ALLOWANCE_MAX_VALUE,
   },
 }

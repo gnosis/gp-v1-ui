@@ -1,4 +1,4 @@
-import { ZERO, ONE, ALLOWANCE_VALUE } from 'const'
+import { ZERO, ONE, ALLOWANCE_MAX_VALUE } from 'const'
 import { formatAmount, toWei } from 'utils'
 import BN from 'bn.js'
 
@@ -178,7 +178,7 @@ describe('Big amounts', () => {
   // TODO: Define what for arbitrarily big amounts
   test('uint max value', async () => {
     const expected = '115,792,089,237,316,195,423,570,985,008,687,907,853,269,984,665,640,564,039,457.584'
-    expect(formatAmount(new BN(new BN(ALLOWANCE_VALUE)))).toEqual(expected)
+    expect(formatAmount(new BN(new BN(ALLOWANCE_MAX_VALUE)))).toEqual(expected)
   })
 })
 
