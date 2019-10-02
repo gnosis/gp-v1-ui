@@ -2,6 +2,8 @@ import BN from 'bn.js'
 
 import 'global'
 
+export type Command = () => void
+
 export enum Network {
   Mainnet = 1,
   Rinkeby = 4,
@@ -95,7 +97,7 @@ export interface WalletApi {
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
-  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): void
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
 }
 
@@ -125,5 +127,3 @@ export interface Erc20Api {
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<boolean>>
 }
-
-export type Command = (x: void) => void

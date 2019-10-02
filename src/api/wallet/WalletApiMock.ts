@@ -1,9 +1,11 @@
-import { WalletApi, Network, WalletInfo } from 'types'
+import { WalletApi, Network, WalletInfo, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 
 import { log, wait, toWei } from 'utils'
 import { USER_1 } from '../../../test/data'
+
+type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
 /**
  * Basic implementation of Wallet API
@@ -51,14 +53,16 @@ export class WalletApiMock implements WalletApi {
     return this._networkId
   }
 
-  public addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): void {
+  public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
     this._listeners.push(callback)
     if (trigger) {
       callback(this._getWalletInfo())
     }
+
+    return (): void => this.removeOnChangeWalletInfo(callback)
   }
 
-  public removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void {
+  public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
     this._listeners = this._listeners.filter(c => c !== callback)
   }
 
