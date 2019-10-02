@@ -18,7 +18,7 @@ export const useHighlight = (): Result => {
   const triggerHighlight = (): void => {
     if (mounted.current) {
       setHighlight(true)
-      setInterval(() => {
+      setTimeout(() => {
         if (mounted.current) {
           setHighlight(false)
         }
