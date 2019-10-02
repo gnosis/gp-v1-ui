@@ -166,7 +166,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           (current: TokenBalanceDetails): TokenBalanceDetails => {
             return {
               ...current,
-              exchangeBalance: current.depositingBalance.add(amount),
+              depositingBalance: current.depositingBalance.add(amount),
               walletBalance: current.walletBalance.sub(amount),
             }
           },
