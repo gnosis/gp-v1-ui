@@ -125,3 +125,5 @@ export interface Erc20Api {
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<boolean>>
 }
+
+export type Command = (x: void) => void
