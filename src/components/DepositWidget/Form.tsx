@@ -169,7 +169,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
         if (mounted.current) {
           setLoading(false)
           setValidatorActive(false)
-          setAmountInput('')
+          cancelForm()
         }
       })
     }
