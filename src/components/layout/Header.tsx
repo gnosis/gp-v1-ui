@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { rem } from 'polished'
 import { Link } from 'react-router-dom'
+import Wallet from 'components/Wallet'
 
 const Wrapper = styled.header`
   color: #ffffff;
@@ -29,23 +30,19 @@ const Wrapper = styled.header`
     }
   }
 
-  .logo,
-  .connect-wallet {
+  .logo {
     padding: 1rem;
     margin: 1rem;
     border: 2px solid #ff5097;
     color: #ff5097;
     vertical-align: middle;
+    font-size: 1.2em;
 
     &:hover {
       color: white;
       border-color: white;
       cursor: pointer;
     }
-  }
-
-  .logo {
-    font-size: 1.2em;
   }
 
   .header-title {
@@ -62,11 +59,16 @@ const Wrapper = styled.header`
     margin-top: 0;
     color: #e0aacf;
   }
-`
 
-function connectWallet(): void {
-  alert('TODO: Connect to Wallet')
-}
+  ${Wallet} {
+    &:hover {
+      color: white;
+      border-color: white;
+      cursor: pointer;
+      background-color: inherit;
+    }
+  }
+`
 
 const Header: React.FC = () => (
   <Wrapper>
@@ -82,9 +84,7 @@ const Header: React.FC = () => (
           <Link to="/deposit">Deposit</Link>
         </li>
       </ul>
-      <a className="connect-wallet" onClick={connectWallet}>
-        Connect to Wallet
-      </a>
+      <Wallet />
     </nav>
     <div className="header-title">
       <h1>Swap stable coins</h1>

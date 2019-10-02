@@ -2,6 +2,8 @@ import BN from 'bn.js'
 
 import 'global'
 
+export type Command = () => void
+
 export enum Network {
   Mainnet = 1,
   Rinkeby = 4,
@@ -82,6 +84,12 @@ export interface DepositApi {
   withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
 }
 
+export interface WalletInfo {
+  isConnected: boolean
+  userAddress?: string
+  networkId?: number
+}
+
 export interface WalletApi {
   isConnected(): boolean
   connect(): Promise<void>
@@ -89,6 +97,8 @@ export interface WalletApi {
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
+  removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
 }
 
 /**

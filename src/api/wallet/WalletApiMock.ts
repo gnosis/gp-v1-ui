@@ -1,38 +1,44 @@
-import { WalletApi, Network } from 'types'
+import { WalletApi, Network, WalletInfo, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 
 import { log, wait, toWei } from 'utils'
 import { USER_1 } from '../../../test/data'
 
+type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
+
 /**
  * Basic implementation of Wallet API
  */
 export class WalletApiMock implements WalletApi {
   private _connected = false
+  private _user = USER_1
+  private _networkId = Network.Rinkeby
   private _balance = toWei(new BN(2.75), 'ether')
+  private _listeners: ((walletInfo: WalletInfo) => void)[] = []
 
   public isConnected(): boolean {
     return this._connected
   }
 
   public async connect(): Promise<void> {
-    // TODO: Uncomment after doing login
-    // await wait()
+    await wait(1000)
     this._connected = true
     log('[WalletApiMock] Connected')
+    await this._notifyListeners()
   }
 
   public async disconnect(): Promise<void> {
-    await wait()
+    await wait(1000)
     this._connected = false
     log('[WalletApiMock] Disconnected')
+    await this._notifyListeners()
   }
 
   public async getAddress(): Promise<string> {
     assert(this._connected, 'The wallet is not connected')
 
-    return USER_1
+    return this._user
   }
 
   public async getBalance(): Promise<BN> {
@@ -44,7 +50,33 @@ export class WalletApiMock implements WalletApi {
   public async getNetworkId(): Promise<number> {
     assert(this._connected, 'The wallet is not connected')
 
-    return Network.Rinkeby
+    return this._networkId
+  }
+
+  public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
+    this._listeners.push(callback)
+    if (trigger) {
+      callback(this._getWalletInfo())
+    }
+
+    return (): void => this.removeOnChangeWalletInfo(callback)
+  }
+
+  public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
+    this._listeners = this._listeners.filter(c => c !== callback)
+  }
+
+  private _getWalletInfo(): WalletInfo {
+    return {
+      isConnected: this._connected,
+      userAddress: this._connected ? this._user : undefined,
+      networkId: this._connected ? this._networkId : undefined,
+    }
+  }
+
+  private _notifyListeners(): void {
+    const walletInfo: WalletInfo = this._getWalletInfo()
+    this._listeners.forEach(listener => listener(walletInfo))
   }
 }
 

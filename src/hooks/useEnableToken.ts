@@ -33,9 +33,10 @@ export const useEnableTokens = (params: Params): Result => {
     assert(!enabled, 'The token was already enabled')
 
     setEnabling(true)
+
     // TODO: Review after implementing connect wallet.
     //   Probably some APIs should have an implicit user and it should be login aware
-    walletApi.connect()
+    // walletApi.connect()
 
     // Set the allowance
     const userAddress = await walletApi.getAddress()

@@ -3,7 +3,7 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import GlobalStyles from './components/layout/GlobalStyles'
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
 
 // Toast notifications
 import { toast } from 'react-toastify'
@@ -18,6 +18,31 @@ import Deposit from 'pages/Deposit'
 import Trade from 'pages/Trade'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
+import ConnectWallet from 'pages/ConnectWallet'
+import { walletApi } from 'api'
+
+const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
+  const isConnected = walletApi.isConnected()
+
+  const { component: Component, ...rest } = props
+  return (
+    <Route
+      {...rest}
+      render={(props: any): React.ReactNode =>
+        isConnected ? (
+          <Component {...props} />
+        ) : (
+          <Redirect
+            to={{
+              pathname: '/connect-wallet',
+              state: { from: props.location },
+            }}
+          />
+        )
+      }
+    />
+  )
+}
 
 toast.configure({ position: toast.POSITION.BOTTOM_RIGHT, closeOnClick: false })
 
@@ -30,8 +55,9 @@ const App: React.FC = () => (
         <Switch>
           <Route path="/" exact component={Trade} />
           <Route path="/about" exact component={About} />
-          <Route path="/deposit" exact component={Deposit} />
+          <PrivateRoute path="/deposit" exact component={Deposit} />
           <Route path="/source-code" exact component={SourceCode} />
+          <Route path="/connect-wallet" exact component={ConnectWallet} />
           <Route component={NotFound} />
         </Switch>
       </Layout>

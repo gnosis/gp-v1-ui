@@ -46,7 +46,7 @@ async function fetchBalancesForToken(
 
 async function _getBalances(): Promise<TokenBalanceDetails[]> {
   // TODO: Remove connect once login is done
-  await walletApi.connect()
+  // await walletApi.connect()
 
   const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
   const contractAddress = depositApi.getContractAddress()
@@ -66,7 +66,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
       .then(balances => setBalances(balances))
       .catch(error => {
         console.error('Error loading balances', error)
-        setError(error)
+        setError(true)
       })
 
     return function cleanUp(): void {
