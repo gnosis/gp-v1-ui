@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
 import { RECEIPT } from '../../../test/data'
-import { formatAmount, log } from 'utils'
+import { log } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 
 interface Balances {
@@ -63,9 +63,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._initAllowances(userAddress, tokenAddress, spenderAddress)
     this._allowances[userAddress][tokenAddress][spenderAddress] = amount
     log(
-      `[Erc20ApiMock] Approved ${formatAmount(
-        amount,
-      )} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
+      `[Erc20ApiMock] Approved ${amount} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
     )
 
     return { data: true, receipt: RECEIPT }
