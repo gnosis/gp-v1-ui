@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { TxResult, TokenBalanceDetails, TxOptionalParams } from 'types'
 import assert from 'assert'
-import { depositApi, walletApi } from 'api'
+import { depositApi } from 'api'
+import { useWalletConnection } from './useWalletConnection'
 
 interface Params {
   tokenBalances: TokenBalanceDetails
@@ -14,6 +15,7 @@ interface Result {
 }
 
 export const useWithdrawTokens = (params: Params): Result => {
+  const { userAddress, isConnected } = useWalletConnection()
   const {
     tokenBalances: { enabled, address: tokenAddress, claimable },
   } = params
@@ -29,14 +31,11 @@ export const useWithdrawTokens = (params: Params): Result => {
   async function withdraw(): Promise<TxResult<void>> {
     assert(enabled, 'Token not enabled')
     assert(claimable, 'Withdraw not ready')
+    assert(isConnected, "There's no connected wallet")
 
     setWithdrawing(true)
 
     try {
-      // TODO: Remove connect once login is done
-      await walletApi.connect()
-
-      const userAddress = await walletApi.getAddress()
       return await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
     } finally {
       if (mounted.current) {
