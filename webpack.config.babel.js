@@ -3,6 +3,10 @@ import webpack from 'webpack'
 import DashboardPlugin from 'webpack-dashboard/plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
+import dotenv from 'dotenv'
+
+// Setup env vars
+dotenv.config()
 
 const isProduction = process.env.NODE_ENV == 'production'
 const baseUrl = '/'
@@ -77,7 +81,12 @@ module.exports = ({ stats = false } = {}) => ({
     // define inside one plugin instance
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
+
+      // MOCK: Use mock or real API implementation
       'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
+
+      // AUTOCONNECT: only applies for mock implementation
+      'process.env.AUTOCONNECT': JSON.stringify(process.env.AUTOCONNECT || 'true'),
     }),
   ].filter(Boolean),
   optimization: {
