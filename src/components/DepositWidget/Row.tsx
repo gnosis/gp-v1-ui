@@ -35,11 +35,11 @@ const TokenTr = styled.tr`
     background-color: #ecdcff;
 `
 
-const WithdrawableButton = styled.button`
+const ClaimButton = styled.button`
   margin-bottom: 0;
 `
 
-const WithdrawableLink = styled.a`
+const ClaimLink = styled.a`
   text-decoration: none;
 
   &.success {
@@ -87,7 +87,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
-    withdrawable,
+    claimable,
     walletBalance,
   } = tokenBalances
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
@@ -135,7 +135,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               ...current,
               exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
               withdrawingBalance: ZERO,
-              withdrawable: false,
+              claimable: false,
               walletBalance: current.walletBalance.add(withdrawingBalance),
             }
           },
@@ -231,14 +231,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <td>{name}</td>
         <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
         <td title={formatAmountFull(withdrawingBalance, decimals)}>
-          {withdrawable ? (
+          {claimable ? (
             <>
-              <WithdrawableButton className="success" onClick={_withdraw} disabled={withdrawing}>
+              <ClaimButton className="success" onClick={_withdraw} disabled={withdrawing}>
                 {withdrawing && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
-              </WithdrawableButton>
+              </ClaimButton>
               <div>
-                <WithdrawableLink
+                <ClaimLink
                   className={withdrawing ? 'disabled' : 'success'}
                   onClick={(): void => {
                     if (!withdrawing) {
@@ -246,8 +246,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                     }
                   }}
                 >
-                  <small>Withdrawable</small>
-                </WithdrawableLink>
+                  <small>Claim</small>
+                </ClaimLink>
               </div>
             </>
           ) : withdrawingBalance.gt(ZERO) ? (

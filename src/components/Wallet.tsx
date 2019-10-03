@@ -90,9 +90,6 @@ export default styled(withRouter(Wallet))`
 
   &:hover {
     color: #ff5097;
-  }
-
-  &:hover {
     background-color: #ffe3ee;
   }
 `

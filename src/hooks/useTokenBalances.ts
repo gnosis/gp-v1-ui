@@ -38,7 +38,7 @@ async function fetchBalancesForToken(
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
-    withdrawable: withdrawingBalance.isZero() ? false : withdrawBatchId < currentBachId,
+    claimable: withdrawingBalance.isZero() ? false : withdrawBatchId < currentBachId,
     walletBalance,
     enabled: allowance.eq(ALLOWANCE_VALUE),
   }
