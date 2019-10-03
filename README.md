@@ -1,4 +1,6 @@
 # dFusion DEX: PoC Web App
+<img align="right" width="350" src="./docs/screenshot.png">
+
 Web app for [dFusion DEX](https://github.com/gnosis/dex-contracts) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
 
 This app will allow to:
