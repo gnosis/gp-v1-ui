@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { erc20Api, depositApi, walletApi } from 'api'
+import { erc20Api, depositApi } from 'api'
 import { TokenBalanceDetails, TxOptionalParams, TxResult } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
 import assert from 'assert'
+import { useWalletConnection } from './useWalletConnection'
 
 interface Params {
   tokenBalances: TokenBalanceDetails
@@ -16,6 +17,7 @@ interface Result {
 }
 
 export const useEnableTokens = (params: Params): Result => {
+  const { userAddress, isConnected } = useWalletConnection()
   const { enabled: enabledInitial, address: tokenAddress } = params.tokenBalances
   const [enabled, setEnabled] = useState(enabledInitial)
   const [enabling, setEnabling] = useState(false)
@@ -29,15 +31,11 @@ export const useEnableTokens = (params: Params): Result => {
 
   async function enableToken(): Promise<TxResult<boolean>> {
     assert(!enabled, 'The token was already enabled')
+    assert(isConnected, "There's no connected wallet")
 
     setEnabling(true)
 
-    // TODO: Review after implementing connect wallet.
-    //   Probably some APIs should have an implicit user and it should be login aware
-    // walletApi.connect()
-
     // Set the allowance
-    const userAddress = await walletApi.getAddress()
     const contractAddress = depositApi.getContractAddress()
     const result = await erc20Api.approve(
       tokenAddress,
