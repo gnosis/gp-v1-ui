@@ -9,7 +9,6 @@ interface UseTokenBalanceResult {
   error: boolean
 }
 
-// TODO: move to utils? Pretty independent function at this point
 async function fetchBalancesForToken(
   token: TokenDetails,
   userAddress: string,
