@@ -6,17 +6,29 @@ import { TX_HASH } from '../data'
 import { abbreviateString } from 'utils'
 import { Network, WalletInfo } from 'types'
 
-let networkId: Network = undefined
+let isConnected: boolean
+let networkId: Network
 
 jest.mock('hooks/useWalletConnection', () => {
   return {
     useWalletConnection: (): WalletInfo => {
-      return { isConnected: true, networkId }
+      return { isConnected, networkId }
     },
   }
 })
 
 describe('<TxNotification />', () => {
+  beforeEach(() => {
+    isConnected = true
+  })
+
+  it("doesn't change when isConnected == false", () => {
+    isConnected = false
+    networkId = Network.Mainnet
+    const wrapper = render(<TxNotification txHash={TX_HASH} />)
+    expect(wrapper.find('a').prop('href')).toMatch(`https://etherscan.io/tx/${TX_HASH}`)
+  })
+
   it('renders the abbreviated tx hash inside a link', () => {
     networkId = Network.Mainnet
     const wrapper = render(<TxNotification txHash={TX_HASH} />)
