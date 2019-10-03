@@ -195,7 +195,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             return {
               ...current,
               withdrawingBalance: amount,
-              withdrawable: false,
+              claimable: false,
             }
           },
         )
