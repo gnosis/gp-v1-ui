@@ -8,6 +8,11 @@ interface TxNotificationProps {
 
 export const TxNotification: React.FC<TxNotificationProps> = ({ txHash }: TxNotificationProps) => {
   const { networkId } = useWalletConnection()
+
+  if (!networkId) {
+    return null
+  }
+
   const href = `https://${getEtherscanDomainPrefix(networkId)}etherscan.io/tx/${txHash}`
 
   return (

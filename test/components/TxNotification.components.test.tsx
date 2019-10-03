@@ -18,6 +18,7 @@ jest.mock('hooks/useWalletConnection', () => {
 
 describe('<TxNotification />', () => {
   it('renders the abbreviated tx hash inside a link', () => {
+    networkId = Network.Mainnet
     const wrapper = render(<TxNotification txHash={TX_HASH} />)
     const abbreviatedTxHash = abbreviateString(TX_HASH, 6, 4)
 
@@ -25,12 +26,13 @@ describe('<TxNotification />', () => {
     expect(wrapper.find('a').text()).toEqual(abbreviatedTxHash)
   })
 
-  it('renders link to mainnet when empty', () => {
+  it('does not render when networkId is missing', () => {
+    networkId = undefined
     const wrapper = render(<TxNotification txHash={TX_HASH} />)
-    expect(wrapper.find('a').prop('href')).toMatch(`https://etherscan.io/tx/${TX_HASH}`)
+    expect(wrapper.html()).toBeNull()
   })
 
-  it('renders link to mainnet when set explicitly', () => {
+  it('renders link to mainnet', () => {
     networkId = Network.Mainnet
     const wrapper = render(<TxNotification txHash={TX_HASH} />)
     expect(wrapper.find('a').prop('href')).toMatch(`https://etherscan.io/tx/${TX_HASH}`)

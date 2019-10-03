@@ -64,7 +64,12 @@ function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>):
 
 const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (receipt: Receipt): void => {
-    toast.info(<TxNotification txHash={receipt.transactionHash} />)
+    const notification = <TxNotification txHash={receipt.transactionHash} />
+    if (notification) {
+      toast.info(notification)
+    } else {
+      console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
+    }
   },
 }
 
