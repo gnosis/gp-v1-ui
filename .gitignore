@@ -6,3 +6,4 @@ stats.json
 dist
 *.log
 coverage
+.env

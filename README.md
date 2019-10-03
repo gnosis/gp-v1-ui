@@ -1,9 +1,8 @@
-[![npm version](https://img.shields.io/npm/v/@gnosis.pm/dex-react.svg?style=flat)](https://npmjs.org/package/@gnosis.pm/dex-react "View this project on npm")
+[![npm version](https://img.shields.io/npm/v/@gnosis.pm/dex-react.svg?style=flat)](https://npmjs.org/package/@gnosis.pm/dex-react 'View this project on npm')
 &nbsp;
 [![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=develop)](https://travis-ci.org/gnosis/dex-react)
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=master)](https://coveralls.io/github/gnosis/dex-react?branch=master)
-
 
 Develop:
 &nbsp;
@@ -12,17 +11,20 @@ Develop:
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=master)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
 # dFusion DEX: PoC Web App
+
 <img align="right" width="350" src="./docs/screenshot.png">
 
 Web app for [dFusion DEX](https://github.com/gnosis/dex-contracts) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
 
 This app will allow to:
-* See the balances for any token: Both in your wallet and the exchange
-* Deposit/Withdraw tokens from the exchange
-* Submit sell orders to the Exchange
+
+- See the balances for any token: Both in your wallet and the exchange
+- Deposit/Withdraw tokens from the exchange
+- Submit sell orders to the Exchange
 
 ## Running locally
-```
+
+```bash
 # Install dependencies
 npm install
 
@@ -32,21 +34,54 @@ npm start
 
 Open http://localhost:8080 in any browser.
 
-## Build app
+## Mock mode (default)
+
+The app will run by default in **mock mode**, that means that all service implementation will be replaced by one mocked one with some fake data. This is useful for development, however it's also useful to run it with the actual implementation:
+
+```bash
+# Disable mock mode
+MOCK=false npm start
 ```
+
+Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
+
+## Autoconnect for mock mode (default)
+
+When running in **mock mode**, the wallet will be connected automatically, to change this behaviour run the app:
+
+```bash
+# Disable autoconnect, for mock mode
+AUTOCONNECT=false npm start
+```
+
+Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
+
+## Build app
+
+```bash
 npm run build
 ```
 
 # Develop
+
 ## Run tests
-```
+
+```bash
 npm test
 ```
 
-## Automatically Fixing Code in VS Code
-To run `eslint --fix` on save add to the settings.json file:
+## Automatically fixing code
 
+Manually, by running:
+
+```bash
+npm run lint:fix
 ```
+
+If you use Visual Studio Code, it's recommended to install [Prettier - Code formatter
+](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and add the following to your `settings.json`
+
+```json
 "eslint.autoFixOnSave":  true,
 "eslint.validate":  [
   "javascript",
