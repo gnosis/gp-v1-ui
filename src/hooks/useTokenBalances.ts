@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { TokenBalanceDetails, TokenDetails } from 'types'
-import { tokenListApi, walletApi, erc20Api, depositApi } from 'api'
+import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
+import { tokenListApi, erc20Api, depositApi } from 'api'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
+import { useWalletConnection } from './useWalletConnection'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -44,11 +45,12 @@ async function fetchBalancesForToken(
   }
 }
 
-async function _getBalances(): Promise<TokenBalanceDetails[]> {
-  // TODO: Remove connect once login is done
-  // await walletApi.connect()
+async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[]> {
+  const { userAddress, networkId } = walletInfo
+  if (!userAddress || !networkId) {
+    return null
+  }
 
-  const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
   const contractAddress = depositApi.getContractAddress()
   const tokens = tokenListApi.getTokens(networkId)
 
@@ -57,12 +59,13 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
 }
 
 export const useTokenBalances = (): UseTokenBalanceResult => {
+  const walletInfo = useWalletConnection()
   const [balances, setBalances] = useState<TokenBalanceDetails[] | undefined>(null)
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
-    _getBalances()
+    _getBalances(walletInfo)
       .then(balances => setBalances(balances))
       .catch(error => {
         console.error('Error loading balances', error)
@@ -72,7 +75,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
     return function cleanUp(): void {
       mounted.current = false
     }
-  }, [])
+  }, [walletInfo])
 
   return { balances, error }
 }
