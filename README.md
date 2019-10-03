@@ -36,22 +36,11 @@ Open http://localhost:8080 in any browser.
 
 ## Mock mode (default)
 
-The app will run by default in **mock mode**, that means that all service implementation will be replaced by a mocked one with some fake data. This is useful for development, however it's also useful to run it with the actual implementation:
+The app will run by default in **mock mode**, that means that all service implementations will be replaced by a mocked one with some fake data. This is useful for development, however it's also useful to run it with the actual implementation:
 
 ```bash
 # Disable mock mode
 MOCK=false npm start
-The app will run by default with all services mocked. This is useful for development, however it's also useful to run it with the actual implementation:
-
-```
-
-# Run app with the real service implement
-
-MOCK=false npm start
-
-```
-
-## Build app
 ```
 
 Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
@@ -72,6 +61,8 @@ Alternatively, if you want to modify always this behaviour, add the env var into
 ```bash
 npm run build
 ```
+
+The static files will be generated in `./dist` dir.
 
 ## Run tests
 
