@@ -1,27 +1,16 @@
 import React from 'react'
-import { abbreviateString, getEtherscanDomainPrefix } from 'utils'
-import { useWalletConnection } from 'hooks/useWalletConnection'
+import { EtherscanLink, EtherscanLinkType } from './EtherscanLink'
 
 interface TxNotificationProps {
   txHash: string
 }
 
 export const TxNotification: React.FC<TxNotificationProps> = ({ txHash }: TxNotificationProps) => {
-  const { networkId } = useWalletConnection()
+  const link = <EtherscanLink type={EtherscanLinkType.tx} identifier={txHash} />
 
-  if (!networkId) {
+  if (link) {
+    return <div>The transaction has been sent! Check {link} for details</div>
+  } else {
     return null
   }
-
-  const href = `https://${getEtherscanDomainPrefix(networkId)}etherscan.io/tx/${txHash}`
-
-  return (
-    <div>
-      The transaction has been sent! Check{' '}
-      <a href={href} target="_blank" rel="noopener noreferrer">
-        {abbreviateString(txHash, 6, 4)}
-      </a>{' '}
-      for details
-    </div>
-  )
 }
