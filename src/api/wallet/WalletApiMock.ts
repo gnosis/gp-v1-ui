@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import assert from 'assert'
 
 import { log, wait, toWei } from 'utils'
-import { USER_1 } from '../../../test/data'
+import { USER_1, USER_2 } from '../../../test/data'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -65,6 +65,21 @@ export class WalletApiMock implements WalletApi {
   public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
     this._listeners = this._listeners.filter(c => c !== callback)
   }
+
+  /* ****************      Test functions      **************** */
+  // Functions created just for simulate some cases
+
+  public changeUser(): void {
+    this._user = this._user === USER_1 ? USER_2 : USER_1
+    this._notifyListeners()
+  }
+
+  public changeNetwork(): void {
+    this._networkId = this._networkId === Network.Rinkeby ? Network.Mainnet : Network.Rinkeby
+    this._notifyListeners()
+  }
+
+  /* ****************      Private Functions      **************** */
 
   private _getWalletInfo(): WalletInfo {
     return {
