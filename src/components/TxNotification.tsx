@@ -1,19 +1,14 @@
 import React from 'react'
-import { abbreviateString } from 'utils'
-import { Network } from 'types'
+import { abbreviateString, getEtherscanDomainPrefix } from 'utils'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 interface TxNotificationProps {
   txHash: string
 }
 
-function getDomainPrefix(networkId: Network): string {
-  return !networkId || networkId === Network.Mainnet ? '' : Network[networkId].toLowerCase() + '.'
-}
-
 export const TxNotification: React.FC<TxNotificationProps> = ({ txHash }: TxNotificationProps) => {
   const { networkId } = useWalletConnection()
-  const href = `https://${getDomainPrefix(networkId)}etherscan.io/tx/${txHash}`
+  const href = `https://${getEtherscanDomainPrefix(networkId)}etherscan.io/tx/${txHash}`
 
   return (
     <div>
