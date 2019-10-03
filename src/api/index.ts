@@ -9,33 +9,50 @@ import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances } from
 const isMock = process.env.MOCK === 'true'
 
 function createWalletApi(): WalletApi {
+  let walletApi
   if (isMock) {
-    return new WalletApiMock()
+    walletApi = new WalletApiMock()
+    window['walletApi'] = walletApi // register for convenience
   } else {
     // TODO: Add actual implementation
     throw new Error('Not implemented yet. Only mock implementation available')
   }
+  return walletApi
 }
 
 function createTokenListApi(): TokenList {
+  let tokenListApi
   if (isMock) {
-    return new TokenListApiMock(tokenList)
+    tokenListApi = new TokenListApiMock(tokenList)
+    window['tokenListApi'] = tokenListApi // register for convenience
   } else {
-    return new TokenListApiImpl([Network.Mainnet, Network.Rinkeby])
+    tokenListApi = new TokenListApiImpl([Network.Mainnet, Network.Rinkeby])
   }
+  return tokenListApi
 }
 
 function createErc20Api(): Erc20Api {
-  return new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
-}
-
-function createDepositApi(erc20Api: Erc20Api): DepositApi {
+  let erc20Api
   if (isMock) {
-    return new DepositApiMock(exchangeBalanceStates, erc20Api)
+    erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
+    window['erc20Api'] = erc20Api // register for convenience
   } else {
     // TODO: Add actual implementation
     throw new Error('Not implemented yet. Only mock implementation available')
   }
+  return erc20Api
+}
+
+function createDepositApi(erc20Api: Erc20Api): DepositApi {
+  let depositApi
+  if (isMock) {
+    depositApi = new DepositApiMock(exchangeBalanceStates, erc20Api)
+    window['depositApi'] = depositApi // register for convenience
+  } else {
+    // TODO: Add actual implementation
+    throw new Error('Not implemented yet. Only mock implementation available')
+  }
+  return depositApi
 }
 
 // Build APIs
