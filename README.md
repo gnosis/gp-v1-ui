@@ -1,5 +1,9 @@
-[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=develop)](https://travis-ci.org/gnosis/dex-react)&nbsp;<small>(master)</small>&nbsp;&nbsp;&nbsp;
-[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=master)](https://travis-ci.org/gnosis/dex-react) &nbsp;<small>(develop)</small>
+
+[![npm version](https://img.shields.io/npm/v/@gnosis.pm/dex-react.svg?style=flat)](https://npmjs.org/package/@gnosis.pm/dex-react "View this project on npm")
+&nbsp;&nbsp;&nbsp;
+[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=develop)](https://travis-ci.org/gnosis/dex-react)
+&nbsp;&nbsp;&nbsp;
+[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=master)](https://travis-ci.org/gnosis/dex-react) &nbsp;<small>(develop)</small>&nbsp;&nbsp;&nbsp;
 
 # dFusion DEX: PoC Web App
 <img align="right" width="350" src="./docs/screenshot.png">
