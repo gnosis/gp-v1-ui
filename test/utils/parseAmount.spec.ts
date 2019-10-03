@@ -1,6 +1,6 @@
 import { toWei, parseAmount } from 'utils'
 import BN from 'bn.js'
-import { ONE, ZERO, ALLOWANCE_VALUE } from 'const'
+import { ONE, ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 
 describe('Integer amounts', () => {
   test('0 wei', async () => {
@@ -93,6 +93,6 @@ describe('Big amounts', () => {
   // TODO: Define what for arbitrarily big amounts
   test('uint max value', async () => {
     const input = '115792089237316195423570985008687907853269984665640564039457.584007913129639935'
-    expect(parseAmount(input)).toEqual(new BN(new BN(ALLOWANCE_VALUE)))
+    expect(parseAmount(input)).toEqual(new BN(new BN(ALLOWANCE_MAX_VALUE)))
   })
 })

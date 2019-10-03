@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { erc20Api, depositApi, walletApi } from 'api'
 import { TokenBalanceDetails, TxOptionalParams, TxResult } from 'types'
-import { ALLOWANCE_VALUE } from 'const'
+import { ALLOWANCE_MAX_VALUE } from 'const'
 import assert from 'assert'
 
 interface Params {
@@ -43,7 +43,7 @@ export const useEnableTokens = (params: Params): Result => {
       tokenAddress,
       userAddress,
       contractAddress,
-      ALLOWANCE_VALUE,
+      ALLOWANCE_MAX_VALUE,
       params.txOptionalParams,
     )
 

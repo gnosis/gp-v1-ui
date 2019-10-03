@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { tokenListApi, walletApi, erc20Api, depositApi } from 'api'
-import { ALLOWANCE_VALUE } from 'const'
+import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -40,7 +40,7 @@ async function fetchBalancesForToken(
     withdrawingBalance,
     claimable: withdrawingBalance.isZero() ? false : withdrawBatchId < currentBachId,
     walletBalance,
-    enabled: allowance.eq(ALLOWANCE_VALUE),
+    enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
   }
 }
 
