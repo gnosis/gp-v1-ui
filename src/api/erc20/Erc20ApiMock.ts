@@ -2,7 +2,7 @@ import { Erc20Api, TxOptionalParams, TxResult } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
-import { RECEIPT } from '../../../test/data'
+import { RECEIPT, CONTRACT } from '../../../test/data'
 import { log } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 
@@ -20,10 +20,12 @@ interface Allowances {
 export class Erc20ApiMock implements Erc20Api {
   private _balances: Balances
   private _allowances: Allowances
+  private _sender: string
 
-  public constructor({ balances = {}, allowances = {} } = {}) {
+  public constructor({ balances = {}, allowances = {}, sender = CONTRACT } = {}) {
     this._balances = balances
     this._allowances = allowances
+    this._sender = sender
   }
 
   public async balanceOf(tokenAddress: string, userAddress: string): Promise<BN> {
@@ -80,27 +82,21 @@ export class Erc20ApiMock implements Erc20Api {
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
 
-    // Since we don't have a msg.sender, we mimic it by using the optional field
-    const { senderAddress: spenderAddress } = txOptionalParams
-    assert(spenderAddress, 'TxOptionalParams.senderAddress is required for this mock work')
-    this._initAllowances(fromAddress, tokenAddress, spenderAddress)
+    this._initAllowances(fromAddress, tokenAddress, this._sender)
 
     const balance = this._balances[fromAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
-    assert(
-      this._hasAllowance(spenderAddress, fromAddress, tokenAddress, amount),
-      'Not allowed to perform this transfer',
-    )
-    this._allowances[fromAddress][tokenAddress][spenderAddress] = this._allowances[fromAddress][tokenAddress][
-      spenderAddress
+    assert(this._hasAllowance(this._sender, fromAddress, tokenAddress, amount), 'Not allowed to perform this transfer')
+    this._allowances[fromAddress][tokenAddress][this._sender] = this._allowances[fromAddress][tokenAddress][
+      this._sender
     ].sub(amount)
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
     log(
-      `[Erc20ApiMock] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${spenderAddress}`,
+      `[Erc20ApiMock] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${this._sender}`,
     )
 
     return { data: true, receipt: RECEIPT }

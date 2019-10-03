@@ -44,7 +44,6 @@ export interface BalanceState {
 
 export interface TxOptionalParams {
   onSentTransaction?: (receipt: Receipt) => void
-  senderAddress?: string
 }
 
 export interface TxResult<T> {
