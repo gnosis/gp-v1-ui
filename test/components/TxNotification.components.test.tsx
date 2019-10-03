@@ -11,7 +11,7 @@ let networkId: Network = undefined
 jest.mock('hooks/useWalletConnection', () => {
   return {
     useWalletConnection: (): WalletInfo => {
-      return { isConnected: true, networkId: networkId }
+      return { isConnected: true, networkId }
     },
   }
 })
