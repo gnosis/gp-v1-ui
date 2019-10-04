@@ -121,6 +121,13 @@ export interface Erc20Api {
 
   transfer(
     tokenAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
+
+  transferFrom(
+    tokenAddress: string,
     fromAddress: string,
     toAddress: string,
     amount: BN,

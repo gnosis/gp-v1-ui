@@ -25,7 +25,7 @@ export class Erc20ApiMock implements Erc20Api {
   public constructor({ balances = {}, allowances = {}, sender = CONTRACT } = {}) {
     this._balances = balances
     this._allowances = allowances
-    this._sender = sender
+    this._sender = sender /* For this mock, the sender will always be the contract */
   }
 
   public async balanceOf(tokenAddress: string, userAddress: string): Promise<BN> {
@@ -71,7 +71,47 @@ export class Erc20ApiMock implements Erc20Api {
     return { data: true, receipt: RECEIPT }
   }
 
+  /**
+   * Transfers from `this._sender`. No allowance required.
+   *
+   * @param tokenAddress The token being transferred
+   * @param toAddress The recipient's address
+   * @param amount The amount transferred
+   * @param txOptionalParams Optional params
+   */
   public async transfer(
+    tokenAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>> {
+    await waitAndSendReceipt({ txOptionalParams })
+    this._initBalances(this._sender, tokenAddress)
+    this._initBalances(toAddress, tokenAddress)
+
+    const balance = this._balances[this._sender][tokenAddress]
+    assert(balance.gte(amount), "The user doesn't have enough balance")
+
+    this._balances[this._sender][tokenAddress] = balance.sub(amount)
+    this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
+
+    log(
+      `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${this._sender} to ${toAddress}`,
+    )
+
+    return { data: true, receipt: RECEIPT }
+  }
+
+  /**
+   * Transfers on behalf of `fromAddress` if `this._sender` has allowance
+   *
+   * @param tokenAddress The token being transferred
+   * @param fromAddress The source of the tokens
+   * @param toAddress The recipient's address
+   * @param amount The amount transferred
+   * @param txOptionalParams Optional params
+   */
+  public async transferFrom(
     tokenAddress: string,
     fromAddress: string,
     toAddress: string,
@@ -87,7 +127,7 @@ export class Erc20ApiMock implements Erc20Api {
     const balance = this._balances[fromAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
-    assert(this._hasAllowance(this._sender, fromAddress, tokenAddress, amount), 'Not allowed to perform this transfer')
+    assert(this._hasAllowance(fromAddress, tokenAddress, this._sender, amount), 'Not allowed to perform this transfer')
     this._allowances[fromAddress][tokenAddress][this._sender] = this._allowances[fromAddress][tokenAddress][
       this._sender
     ].sub(amount)
@@ -96,14 +136,14 @@ export class Erc20ApiMock implements Erc20Api {
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
     log(
-      `[Erc20ApiMock] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${this._sender}`,
+      `[Erc20ApiMock:transferFrom] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${this._sender}`,
     )
 
     return { data: true, receipt: RECEIPT }
   }
 
   /********************************    private methods   ********************************/
-  private _hasAllowance(spenderAddress: string, fromAddress: string, tokenAddress: string, amount: BN): boolean {
+  private _hasAllowance(fromAddress: string, tokenAddress: string, spenderAddress: string, amount: BN): boolean {
     const allowance = this._allowances[fromAddress][tokenAddress][spenderAddress]
     return spenderAddress === fromAddress || allowance.gte(amount)
   }
