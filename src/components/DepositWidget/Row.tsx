@@ -12,9 +12,10 @@ import Form from './Form'
 import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
 import { ZERO } from 'const'
 import BN from 'bn.js'
-import { walletApi, depositApi } from 'api'
+import { depositApi } from 'api'
 import { useHighlight } from 'hooks/useHighlight'
 import { TxNotification } from 'components/TxNotification'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const TokenTr = styled.tr`
   img {
@@ -74,6 +75,7 @@ const txOptionalParams: TxOptionalParams = {
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
+  const { userAddress } = useWalletConnection()
   const [tokenBalances, setTokenBalances] = useState<TokenBalanceDetails>(props.tokenBalances)
   const {
     address,
@@ -88,6 +90,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     claimable,
     walletBalance,
   } = tokenBalances
+  console.log('[DepositWidgetRow] %s: %s', symbol, formatAmount(exchangeBalance, decimals))
+
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   const { enabled, enabling, enableToken } = useEnableTokens({
     tokenBalances,
@@ -151,11 +155,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     }
   }
 
-  async function submitDeposit(amount: BN): Promise<void> {
+  async function submitDeposit(userAddress: string, amount: BN): Promise<void> {
     try {
-      const userAddress = await walletApi.getAddress()
       console.log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-
       const result = await depositApi.deposit(userAddress, address, amount, txOptionalParams)
       console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
@@ -179,9 +181,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     }
   }
 
-  async function submitWithdraw(amount: BN): Promise<void> {
+  async function submitWithdraw(userAddress: string, amount: BN): Promise<void> {
     try {
-      const userAddress = await walletApi.getAddress()
       console.log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
       const result = await depositApi.requestWithdraw(userAddress, address, amount, txOptionalParams)
@@ -300,7 +301,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           tokenBalances={tokenBalances}
           submitBtnLabel="Deposit"
           submitBtnIcon={faPlus}
-          onSubmit={submitDeposit}
+          onSubmit={(amount): Promise<void> => submitDeposit(userAddress, amount)}
           onClose={(): void => showForm()}
         />
       )}
@@ -317,7 +318,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           tokenBalances={tokenBalances}
           submitBtnLabel="Withdraw"
           submitBtnIcon={faMinus}
-          onSubmit={submitWithdraw}
+          onSubmit={(amount): Promise<void> => submitWithdraw(userAddress, amount)}
           onClose={(): void => showForm()}
         />
       )}

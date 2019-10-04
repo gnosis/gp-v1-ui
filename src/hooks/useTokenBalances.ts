@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
-import { TokenBalanceDetails, TokenDetails } from 'types'
-import { tokenListApi, walletApi, erc20Api, depositApi } from 'api'
+import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
+import { tokenListApi, erc20Api, depositApi } from 'api'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
+import { useWalletConnection } from './useWalletConnection'
+import { formatAmount } from 'utils'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
   error: boolean
 }
 
-// TODO: move to utils? Pretty independent function at this point
 async function fetchBalancesForToken(
   token: TokenDetails,
   userAddress: string,
@@ -44,11 +45,13 @@ async function fetchBalancesForToken(
   }
 }
 
-async function _getBalances(): Promise<TokenBalanceDetails[]> {
-  // TODO: Remove connect once login is done
-  // await walletApi.connect()
+async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[] | null> {
+  const { userAddress, networkId } = walletInfo
+  console.log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
+  if (!userAddress || !networkId) {
+    return null
+  }
 
-  const [userAddress, networkId] = await Promise.all([walletApi.getAddress(), walletApi.getNetworkId()])
   const contractAddress = depositApi.getContractAddress()
   const tokens = tokenListApi.getTokens(networkId)
 
@@ -57,13 +60,20 @@ async function _getBalances(): Promise<TokenBalanceDetails[]> {
 }
 
 export const useTokenBalances = (): UseTokenBalanceResult => {
-  const [balances, setBalances] = useState<TokenBalanceDetails[] | undefined>(null)
+  const walletInfo = useWalletConnection()
+  const [balances, setBalances] = useState<TokenBalanceDetails[] | null>(null)
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
-    _getBalances()
-      .then(balances => setBalances(balances))
+    _getBalances(walletInfo)
+      .then(balances => {
+        console.log(
+          '[useTokenBalances] Wallet balances',
+          balances ? balances.map(b => formatAmount(b.walletBalance)) : null,
+        )
+        setBalances(balances)
+      })
       .catch(error => {
         console.error('Error loading balances', error)
         setError(true)
@@ -72,7 +82,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
     return function cleanUp(): void {
       mounted.current = false
     }
-  }, [])
+  }, [walletInfo])
 
   return { balances, error }
 }
