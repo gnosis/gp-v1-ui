@@ -11,8 +11,6 @@ const isMock = process.env.MOCK === 'true'
 function createWalletApi(): WalletApi {
   let walletApi
   if (isMock) {
-    const autoconnect = process.env.AUTOCONNECT === 'true'
-    console.log('autoconnect', autoconnect)
     walletApi = new WalletApiMock()
     window['walletApi'] = walletApi // register for convenience
   } else {
