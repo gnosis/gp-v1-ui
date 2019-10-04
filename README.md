@@ -6,9 +6,9 @@
 
 Develop:
 &nbsp;
-[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=master)](https://travis-ci.org/gnosis/dex-react)
+[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=develop)](https://travis-ci.org/gnosis/dex-react)
 &nbsp;
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=master)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
 # dFusion DEX: PoC Web App
 
