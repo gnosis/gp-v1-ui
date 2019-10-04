@@ -5,7 +5,7 @@ import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
 import { depositApi } from 'api'
-import { EtherscanLink, EtherscanLinkType } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/EtherscanLink'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -69,11 +69,7 @@ const DepositWidget: React.FC = () => {
     return <></>
   }
   const contractLink = (
-    <EtherscanLink
-      type={EtherscanLinkType.contract}
-      identifier={contractAddress}
-      label={<small>View verified contract</small>}
-    />
+    <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
   )
 
   return (
