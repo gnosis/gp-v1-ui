@@ -72,6 +72,7 @@ export class Erc20ApiMock implements Erc20Api {
   /**
    * Transfers from `senderAddress`. No allowance required.
    *
+   * @param senderAddress The sender of the tx
    * @param tokenAddress The token being transferred
    * @param toAddress The recipient's address
    * @param amount The amount transferred
@@ -104,6 +105,7 @@ export class Erc20ApiMock implements Erc20Api {
   /**
    * Transfers on behalf of `fromAddress` if `senderAddress` has allowance
    *
+   * @param senderAddress The sender of the tx
    * @param tokenAddress The token being transferred
    * @param fromAddress The source of the tokens
    * @param toAddress The recipient's address
@@ -121,7 +123,6 @@ export class Erc20ApiMock implements Erc20Api {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
-
     this._initAllowances(fromAddress, tokenAddress, senderAddress)
 
     const balance = this._balances[fromAddress][tokenAddress]
