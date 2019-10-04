@@ -68,7 +68,6 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   useEffect(() => {
     _getBalances(walletInfo)
       .then(balances => {
-        // TODO: Remove after testing!
         console.log(
           '[useTokenBalances] Wallet balances',
           balances ? balances.map(b => formatAmount(b.walletBalance)) : null,
