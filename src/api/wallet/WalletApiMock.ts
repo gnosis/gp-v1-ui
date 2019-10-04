@@ -7,15 +7,25 @@ import { USER_1, USER_2 } from '../../../test/data'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
+const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
+
 /**
  * Basic implementation of Wallet API
  */
 export class WalletApiMock implements WalletApi {
-  private _connected = false
-  private _user = USER_1
-  private _networkId = Network.Rinkeby
-  private _balance = toWei(new BN(2.75), 'ether')
-  private _listeners: ((walletInfo: WalletInfo) => void)[] = []
+  private _connected: boolean
+  private _user: string
+  private _networkId: number
+  private _balance: BN
+  private _listeners: ((walletInfo: WalletInfo) => void)[]
+
+  public constructor() {
+    this._connected = AUTOCONNECT
+    this._user = USER_1
+    this._networkId = Network.Rinkeby
+    this._balance = toWei(new BN(2.75), 'ether')
+    this._listeners = []
+  }
 
   public isConnected(): boolean {
     return this._connected
