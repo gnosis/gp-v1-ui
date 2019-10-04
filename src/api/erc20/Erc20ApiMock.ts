@@ -145,7 +145,7 @@ export class Erc20ApiMock implements Erc20Api {
   /********************************    private methods   ********************************/
   private _hasAllowance(fromAddress: string, tokenAddress: string, spenderAddress: string, amount: BN): boolean {
     const allowance = this._allowances[fromAddress][tokenAddress][spenderAddress]
-    return spenderAddress === fromAddress || allowance.gte(amount)
+    return allowance.gte(amount)
   }
 
   private _initBalances(userAddress: string, tokenAddress: string): BN {
