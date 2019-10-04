@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 
 import { Row } from './Row'
@@ -6,6 +6,12 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
 import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
+import { toast } from 'react-toastify'
+import BN from 'bn.js'
+import { TxOptionalParams, Receipt, TokenBalanceDetails } from 'types'
+import { TxNotification } from 'components/TxNotification'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import { formatAmount, formatAmountFull } from 'utils'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -60,9 +66,28 @@ const LinkWrapper = styled.div`
   }
 `
 
+const txOptionalParams: TxOptionalParams = {
+  onSentTransaction: (receipt: Receipt): void => {
+    const notification = <TxNotification txHash={receipt.transactionHash} />
+    if (notification) {
+      toast.info(notification)
+    } else {
+      console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
+    }
+  },
+}
+
 const DepositWidget: React.FC = () => {
+  const { userAddress } = useWalletConnection()
   const { balances, error } = useTokenBalances()
+
   const contractAddress = depositApi.getContractAddress()
+  const mounted = useRef(true)
+  useEffect(() => {
+    return function cleanUp(): void {
+      mounted.current = false
+    }
+  }, [])
 
   if (balances === undefined) {
     // Loading: Do not show the widget
@@ -71,6 +96,121 @@ const DepositWidget: React.FC = () => {
   const contractLink = (
     <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
   )
+
+  async function _deposit(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
+    const { address: tokenAddress, symbol, decimals } = tokenBalances
+    try {
+      console.log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+      const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      if (mounted.current) {
+        // TODO:
+        console.log('_deposit', formatAmount(amount, decimals), tokenBalances)
+        // setTokenBalances(
+        //   (current: TokenBalanceDetails): TokenBalanceDetails => {
+        //     return {
+        //       ...current,
+        //       depositingBalance: current.depositingBalance.add(amount),
+        //       walletBalance: current.walletBalance.sub(amount),
+        //     }
+        //   },
+        // )
+      }
+
+      // TODO: Trigger hightlight
+      // triggerHighlight()
+
+      toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
+    } catch (error) {
+      console.error('Error depositing', error)
+      toast.error(`Error depositing: ${error.message}`)
+    }
+  }
+
+  async function _requestWithdraw(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
+    const { address: tokenAddress, symbol, decimals } = tokenBalances
+    try {
+      console.log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+
+      const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      if (mounted.current) {
+        // TODO:
+        console.log('_requestWithdraw', formatAmount(amount, decimals), tokenBalances)
+        // setTokenBalances(
+        //   (current: TokenBalanceDetails): TokenBalanceDetails => {
+        //     return {
+        //       ...current,
+        //       withdrawingBalance: amount,
+        //       claimable: false,
+        //     }
+        //   },
+        // )
+      }
+      // TODO: Trigger hightlight
+      // triggerHighlight()
+
+      toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+    } catch (error) {
+      console.error('Error requesting withdraw', error)
+      toast.error(`Error requesting withdraw: ${error.message}`)
+    }
+  }
+
+  async function _claim(tokenBalances: TokenBalanceDetails): Promise<void> {
+    const { withdrawingBalance, symbol, decimals } = tokenBalances
+    try {
+      console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
+
+      // const result = await withdraw()
+
+      if (mounted.current) {
+        // TODO:
+        console.log('_claim', formatAmount(withdrawingBalance, decimals), tokenBalances)
+        // setTokenBalances(
+        //   (current: TokenBalanceDetails): TokenBalanceDetails => {
+        //     return {
+        //       ...current,
+        //       exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
+        //       withdrawingBalance: ZERO,
+        //       claimable: false,
+        //       walletBalance: current.walletBalance.add(withdrawingBalance),
+        //     }
+        //   },
+        // )
+      }
+
+      // TODO: Trigger hightlight
+      // triggerHighlight()
+
+      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      toast.success(`Withdraw of ${withdrawingBalance} ${symbol} completed`)
+    } catch (error) {
+      console.error('Error executing the withdraw request', error)
+      toast.error(`Error executing the withdraw request: ${error.message}`)
+    }
+  }
+
+  async function _enableToken(tokenBalances: TokenBalanceDetails): Promise<void> {
+    const { withdrawingBalance, symbol, decimals } = tokenBalances
+    try {
+      // TODO
+      // const result = await enableToken()
+      // console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      console.log('_enableToken', tokenBalances)
+
+      // TODO: Trigger hightlight
+      // triggerHighlight()
+
+      toast.success(`The token ${symbol} has been enabled for trading`)
+    } catch (error) {
+      console.error('Error enabling the token', error)
+      toast.error('Error enabling the token')
+    }
+  }
 
   return (
     <Wrapper className="widget">
@@ -99,7 +239,16 @@ const DepositWidget: React.FC = () => {
           </thead>
           <tbody>
             {balances &&
-              balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
+              balances.map(tokenBalances => (
+                <Row
+                  key={tokenBalances.addressMainnet}
+                  tokenBalances={tokenBalances}
+                  onEnableToken={(): Promise<void> => _enableToken(tokenBalances)}
+                  onSubmitDeposit={(balance): Promise<void> => _deposit(balance, tokenBalances)}
+                  onSubmitWithdraw={(balance): Promise<void> => _requestWithdraw(balance, tokenBalances)}
+                  onClaim={(): Promise<void> => _claim(tokenBalances)}
+                />
+              ))}
           </tbody>
         </table>
       )}
