@@ -3,12 +3,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { abbreviateString } from 'utils'
 import { Network } from 'types'
 
-export enum EtherscanLinkType {
-  tx,
-  address,
-  contract,
-  token,
-}
+type EtherscanLinkType = 'tx' | 'address' | 'contract' | 'token'
 
 export interface EtherscanLinkProps {
   type: EtherscanLinkType
@@ -22,13 +17,13 @@ function getEtherscanDomainPrefix(networkId: Network): string {
 
 function getEtherscanDomainSuffix(type: EtherscanLinkType, identifier: string): string {
   switch (type) {
-    case EtherscanLinkType.tx:
+    case 'tx':
       return `tx/${identifier}`
-    case EtherscanLinkType.address:
+    case 'address':
       return `address/${identifier}`
-    case EtherscanLinkType.contract:
+    case 'contract':
       return `address/${identifier}#code`
-    case EtherscanLinkType.token:
+    case 'token':
       return `token/${identifier}`
   }
 }
