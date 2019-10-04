@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails, Receipt, TxOptionalParams } from 'types'
 import unknownTokenImg from 'img/unknown-token.png'
-import { formatAmount, formatAmountFull, abbreviateString } from 'utils'
+import { formatAmount, formatAmountFull } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
 import Form from './Form'
 import { useWithdrawTokens } from 'hooks/useWithdrawTokens'
@@ -14,6 +14,7 @@ import { ZERO } from 'const'
 import BN from 'bn.js'
 import { walletApi, depositApi } from 'api'
 import { useHighlight } from 'hooks/useHighlight'
+import { TxNotification } from 'components/TxNotification'
 
 const TokenTr = styled.tr`
   img {
@@ -63,15 +64,12 @@ function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>):
 
 const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (receipt: Receipt): void => {
-    toast.info(
-      <div>
-        The transaction has been sent! Check{' '}
-        <a href={`https://etherscan.io/tx/${receipt.transactionHash}`} target="_blank" rel="noopener noreferrer">
-          {abbreviateString(receipt.transactionHash, 6, 4)}
-        </a>{' '}
-        for details
-      </div>,
-    )
+    const notification = <TxNotification txHash={receipt.transactionHash} />
+    if (notification) {
+      toast.info(notification)
+    } else {
+      console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
+    }
   },
 }
 

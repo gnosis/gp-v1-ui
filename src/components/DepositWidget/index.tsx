@@ -5,6 +5,7 @@ import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
 import { depositApi } from 'api'
+import { EtherscanLink } from 'components/EtherscanLink'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -49,8 +50,10 @@ const Wrapper = styled.section`
   tr:last-child {
     border-bottom: none;
   }
+`
 
-  .view-in-etherscan {
+const LinkWrapper = styled.div`
+  a {
     text-align: right;
     margin-bottom: 3em;
     display: block;
@@ -60,21 +63,18 @@ const Wrapper = styled.section`
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
   const contractAddress = depositApi.getContractAddress()
+
   if (balances === undefined) {
     // Loading: Do not show the widget
     return <></>
   }
+  const contractLink = (
+    <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
+  )
 
   return (
     <Wrapper className="widget">
-      <a
-        href={`https://etherscan.io/address/${contractAddress}#code`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="view-in-etherscan"
-      >
-        <small>View verified contract</small>
-      </a>
+      {contractLink && <LinkWrapper>{contractLink}</LinkWrapper>}
       {error ? (
         <ErrorMsg title="oops..." message="Something happened while loading the balances" />
       ) : (
