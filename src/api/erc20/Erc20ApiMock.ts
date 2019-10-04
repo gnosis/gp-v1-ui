@@ -128,9 +128,13 @@ export class Erc20ApiMock implements Erc20Api {
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
     assert(this._hasAllowance(fromAddress, tokenAddress, this._sender, amount), 'Not allowed to perform this transfer')
-    this._allowances[fromAddress][tokenAddress][this._sender] = this._allowances[fromAddress][tokenAddress][
-      this._sender
-    ].sub(amount)
+    const allowance = this._allowances[fromAddress][tokenAddress][this._sender]
+    this._allowances[fromAddress][tokenAddress][this._sender] = allowance.sub(amount)
+    log(
+      `[Erc20ApiMock:transferFrom] Updated allowance: ${allowance} => ${
+        this._allowances[fromAddress][tokenAddress][this._sender]
+      }`,
+    )
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
