@@ -180,7 +180,7 @@ export class Erc20ApiMock implements Erc20Api {
     }
 
     let spenderAllowance = userTokenAllowances[spenderAddress]
-    if (!userTokenAllowances) {
+    if (!spenderAllowance) {
       spenderAllowance = ZERO
       userTokenAllowances[spenderAddress] = spenderAllowance
     }
