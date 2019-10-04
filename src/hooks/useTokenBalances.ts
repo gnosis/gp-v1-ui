@@ -45,7 +45,7 @@ async function fetchBalancesForToken(
   }
 }
 
-async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[]> {
+async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[] | null> {
   const { userAddress, networkId } = walletInfo
   console.log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
   if (!userAddress || !networkId) {
@@ -61,7 +61,7 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
 
 export const useTokenBalances = (): UseTokenBalanceResult => {
   const walletInfo = useWalletConnection()
-  const [balances, setBalances] = useState<TokenBalanceDetails[] | undefined>(null)
+  const [balances, setBalances] = useState<TokenBalanceDetails[] | null>(null)
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 
