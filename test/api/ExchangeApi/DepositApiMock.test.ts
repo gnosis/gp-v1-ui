@@ -350,7 +350,7 @@ describe('Withdraw', () => {
     // THEN: There's still no balance
     expect(await instance.getBalance(USER_1, TOKEN_4)).toEqual(ZERO)
 
-    // THEN: There's still a withdraw requestx
+    // THEN: There's still a withdraw request
     expect(await instance.getPendingWithdrawAmount(USER_1, TOKEN_4)).toEqual(AMOUNT)
   })
 
@@ -362,7 +362,7 @@ describe('Withdraw', () => {
     // WHEN: Withdraw AMOUNT_SMALL
     await instance.withdraw(USER_1, TOKEN_6)
 
-    // THEN: There remining balance is AMOUNT - AMOUNT_SMALL
+    // THEN: There remaining balance is AMOUNT - AMOUNT_SMALL
     expect(await instance.getBalance(USER_1, TOKEN_6)).toEqual(AMOUNT.sub(AMOUNT_SMALL))
 
     // THEN: There's no pending withdraw anymore
