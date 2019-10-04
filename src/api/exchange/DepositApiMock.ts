@@ -104,7 +104,7 @@ export class DepositApiMock implements DepositApi {
     pendingDeposits.batchId = currentBatchId
 
     // mock transfer tokens from user's mock `wallet`
-    await this._erc20Api.transfer(tokenAddress, userAddress, this.getContractAddress(), amount)
+    await this._erc20Api.transferFrom(tokenAddress, userAddress, this.getContractAddress(), amount)
 
     log(`[DepositApiMock] Deposited ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
     return { data: undefined, receipt: RECEIPT }
@@ -153,7 +153,7 @@ export class DepositApiMock implements DepositApi {
     balanceState.balance = balanceState.balance.sub(amount)
 
     // mock transfer tokens to user's mock `wallet`
-    await this._erc20Api.transfer(tokenAddress, this.getContractAddress(), userAddress, amount)
+    await this._erc20Api.transfer(tokenAddress, userAddress, amount)
 
     log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
     return { data: undefined, receipt: RECEIPT }
