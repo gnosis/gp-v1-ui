@@ -2,7 +2,7 @@ import { Erc20Api, TxOptionalParams, TxResult } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
-import { RECEIPT, CONTRACT } from '../../../test/data'
+import { RECEIPT } from '../../../test/data'
 import { log } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 
@@ -20,12 +20,10 @@ interface Allowances {
 export class Erc20ApiMock implements Erc20Api {
   private _balances: Balances
   private _allowances: Allowances
-  private _sender: string
 
-  public constructor({ balances = {}, allowances = {}, sender = CONTRACT } = {}) {
+  public constructor({ balances = {}, allowances = {} } = {}) {
     this._balances = balances
     this._allowances = allowances
-    this._sender = sender /* For this mock, the sender will always be the contract */
   }
 
   public async balanceOf(tokenAddress: string, userAddress: string): Promise<BN> {
