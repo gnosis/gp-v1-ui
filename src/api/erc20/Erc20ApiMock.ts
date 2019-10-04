@@ -160,6 +160,7 @@ export class Erc20ApiMock implements Erc20Api {
     let tokenBalance = userBalances[tokenAddress]
     if (!tokenBalance) {
       tokenBalance = ZERO
+      userBalances[tokenAddress] = tokenBalance
     }
 
     return tokenBalance
