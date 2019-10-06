@@ -20,7 +20,7 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}): React.ReactEleme
     enabled: false,
     highlighted: false,
     enabling: false,
-    withdrawing: false,
+    claiming: false,
     // override with partial params
     ...params,
   }

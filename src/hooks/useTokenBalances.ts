@@ -45,7 +45,7 @@ async function fetchBalancesForToken(
     enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
     highlighted: false,
     enabling: false,
-    withdrawing: false,
+    claiming: false,
   }
 }
 

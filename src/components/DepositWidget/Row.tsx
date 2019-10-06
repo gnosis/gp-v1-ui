@@ -78,21 +78,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     enabled,
     highlighted,
     enabling,
-    withdrawing,
+    claiming,
   } = tokenBalances
   log('[DepositWidgetRow] %s: %s', symbol, formatAmount(exchangeBalance, decimals))
-
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
-  // const { enabled, enabling, enableToken } = useEnableTokens({
-  //   tokenBalances,
-  //   txOptionalParams,
-  // })
-  // const { withdrawing, withdraw } = useWithdrawTokens({
-  //   tokenBalances,
-  //   txOptionalParams,
-  // })
-  // const { highlight, triggerHighlight } = useHighlight()
-
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   let className
@@ -118,15 +107,15 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <td title={formatAmountFull(withdrawingBalance, decimals)}>
           {claimable ? (
             <>
-              <ClaimButton className="success" onClick={onClaim} disabled={withdrawing}>
-                {withdrawing && <FontAwesomeIcon icon={faSpinner} spin />}
+              <ClaimButton className="success" onClick={onClaim} disabled={claiming}>
+                {claiming && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
               </ClaimButton>
               <div>
                 <ClaimLink
-                  className={withdrawing ? 'disabled' : 'success'}
+                  className={claiming ? 'disabled' : 'success'}
                   onClick={(): void => {
-                    if (!withdrawing) {
+                    if (!claiming) {
                       onClaim()
                     }
                   }}

@@ -179,17 +179,23 @@ const DepositWidget: React.FC = () => {
     const { withdrawingBalance, symbol, decimals } = _getToken(tokenAddress)
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          claiming: true,
+        }
+      })
       const result = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
 
       if (mounted.current) {
         _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
           return {
             ...otherParams,
+            claiming: false,
             exchangeBalance: exchangeBalance.sub(withdrawingBalance),
             withdrawingBalance: ZERO,
             claimable: false,
             walletBalance: walletBalance.add(withdrawingBalance),
-            withdrawing: true,
             highlighted: true,
           }
         })
