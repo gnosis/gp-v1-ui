@@ -91,3 +91,34 @@ describe('<Row /> claimable token', () => {
     expect(wrapper.find('button')).toHaveLength(3)
   })
 })
+
+describe('<Row /> style', () => {
+  it.only('is highlighted', () => {
+    const wrapper = render(
+      _createRow({
+        highlighted: true,
+      }),
+    )
+    expect(wrapper.attr('class')).toMatch(/highlight/)
+  })
+
+  it.only('is enabling', () => {
+    const wrapper = render(
+      _createRow({
+        enabling: true,
+      }),
+    )
+    expect(wrapper.attr('class')).toMatch(/enabling/)
+  })
+
+  // TODO: Click the enable button to have the row selected
+  // it.only('is selected', () => {
+  //   const wrapper = render(
+  //     _createRow({
+  //       enabled: true,
+  //     }),
+  //   )
+  //   wrapper.find('button')[0]
+  //   expect(wrapper.attr('class')).toMatch(/selected/)
+  // })
+})
