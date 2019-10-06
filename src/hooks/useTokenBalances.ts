@@ -3,7 +3,7 @@ import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
 import { tokenListApi, erc20Api, depositApi } from 'api'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { useWalletConnection } from './useWalletConnection'
-import { formatAmount } from 'utils'
+import { formatAmount, log } from 'utils'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -51,7 +51,7 @@ async function fetchBalancesForToken(
 
 async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[] | null> {
   const { userAddress, networkId } = walletInfo
-  console.log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
+  log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
   if (!userAddress || !networkId) {
     return null
   }
@@ -72,10 +72,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   useEffect(() => {
     _getBalances(walletInfo)
       .then(balances => {
-        console.log(
-          '[useTokenBalances] Wallet balances',
-          balances ? balances.map(b => formatAmount(b.walletBalance)) : null,
-        )
+        log('[useTokenBalances] Wallet balances', balances ? balances.map(b => formatAmount(b.walletBalance)) : null)
         setBalances(balances)
       })
       .catch(error => {

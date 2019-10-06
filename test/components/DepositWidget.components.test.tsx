@@ -110,15 +110,4 @@ describe('<Row /> style', () => {
     )
     expect(wrapper.attr('class')).toMatch(/enabling/)
   })
-
-  // TODO: Click the enable button to have the row selected
-  // it.only('is selected', () => {
-  //   const wrapper = render(
-  //     _createRow({
-  //       enabled: true,
-  //     }),
-  //   )
-  //   wrapper.find('button')[0]
-  //   expect(wrapper.attr('class')).toMatch(/selected/)
-  // })
 })

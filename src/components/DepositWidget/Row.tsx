@@ -88,7 +88,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   if (highlighted) {
     className = 'highlight'
   } else if (enabling) {
-    className = 'enabling' // TODO: Rename to loading
+    className = 'enabling'
   } else if (visibleForm) {
     className = 'selected'
   }

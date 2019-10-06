@@ -82,7 +82,6 @@ const txOptionalParams: TxOptionalParams = {
 const DepositWidget: React.FC = () => {
   const { userAddress } = useWalletConnection()
   const { balances, setBalances, error } = useTokenBalances()
-  // const { highlight, triggerHighlight } = useHighlight()
 
   const contractAddress = depositApi.getContractAddress()
   const mounted = useRef(true)
