@@ -13,6 +13,7 @@ import { TxNotification } from 'components/TxNotification'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull } from 'utils'
 import { log } from 'utils'
+import { HIGHLIGHT_TIME } from 'const'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -99,8 +100,11 @@ const DepositWidget: React.FC = () => {
     <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
   )
 
-  function _updateToken(tokenBalances: TokenBalanceDetails, updateBalances: Mutation<TokenBalanceDetails>): void {
-    const { address: tokenAddress, symbol, decimals } = tokenBalances
+  function _getToken(tokenAddress: string): TokenBalanceDetails {
+    return balances.find(({ address }) => address === tokenAddress)
+  }
+
+  function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
         const { address: tokenAddressAux } = tokenBalancesAux
@@ -109,24 +113,24 @@ const DepositWidget: React.FC = () => {
     )
   }
 
-  async function _clearHighlight(tokenBalances: TokenBalanceDetails): void {
+  function _clearHighlight(tokenAddress: string): void {
     setTimeout(() => {
-      _updateToken(tokenBalances, tokenBalancesAux => ({
+      _updateToken(tokenAddress, tokenBalancesAux => ({
         ...tokenBalancesAux,
         highlighted: false,
       }))
-    }, 5000)
+    }, HIGHLIGHT_TIME)
   }
 
-  async function _deposit(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
+  async function _deposit(amount: BN, tokenAddress: string): Promise<void> {
     try {
-      const { address: tokenAddress, symbol, decimals } = tokenBalances
+      const { symbol, decimals } = _getToken(tokenAddress)
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       if (mounted.current) {
-        _updateToken(tokenBalances, ({ depositingBalance, walletBalance, ...otherParams }) => {
+        _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
           return {
             ...otherParams,
             depositingBalance: depositingBalance.add(amount),
@@ -134,7 +138,7 @@ const DepositWidget: React.FC = () => {
             highlighted: true,
           }
         })
-        _clearHighlight(tokenBalances)
+        _clearHighlight(tokenAddress)
       }
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
