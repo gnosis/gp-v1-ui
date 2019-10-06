@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
-import { depositApi } from 'api'
+import { depositApi, erc20Api } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
@@ -13,7 +13,7 @@ import { TxNotification } from 'components/TxNotification'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull } from 'utils'
 import { log } from 'utils'
-import { HIGHLIGHT_TIME } from 'const'
+import { HIGHLIGHT_TIME, ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -148,8 +148,8 @@ const DepositWidget: React.FC = () => {
     }
   }
 
-  async function _requestWithdraw(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
-    const { address: tokenAddress, symbol, decimals } = tokenBalances
+  async function _requestWithdraw(amount: BN, tokenAddress: string): Promise<void> {
+    const { symbol, decimals } = _getToken(tokenAddress)
     try {
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
@@ -157,20 +157,16 @@ const DepositWidget: React.FC = () => {
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       if (mounted.current) {
-        // TODO:
-        log('_requestWithdraw', formatAmount(amount, decimals), tokenBalances)
-        // setTokenBalances(
-        //   (current: TokenBalanceDetails): TokenBalanceDetails => {
-        //     return {
-        //       ...current,
-        //       withdrawingBalance: amount,
-        //       claimable: false,
-        //     }
-        //   },
-        // )
+        _updateToken(tokenAddress, otherParams => {
+          return {
+            ...otherParams,
+            withdrawingBalance: amount,
+            claimable: false,
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenAddress)
       }
-      // TODO: Trigger hightlight
-      // triggerHighlight()
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -179,34 +175,28 @@ const DepositWidget: React.FC = () => {
     }
   }
 
-  async function _claim(tokenBalances: TokenBalanceDetails): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = tokenBalances
+  async function _claim(tokenAddress: string): Promise<void> {
+    const { withdrawingBalance, symbol, decimals } = _getToken(tokenAddress)
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
-
-      // const result = await withdraw()
+      const result = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
 
       if (mounted.current) {
-        // TODO:
-        log('_claim', formatAmount(withdrawingBalance, decimals), tokenBalances)
-        // setTokenBalances(
-        //   (current: TokenBalanceDetails): TokenBalanceDetails => {
-        //     return {
-        //       ...current,
-        //       exchangeBalance: current.exchangeBalance.sub(withdrawingBalance),
-        //       withdrawingBalance: ZERO,
-        //       claimable: false,
-        //       walletBalance: current.walletBalance.add(withdrawingBalance),
-        //     }
-        //   },
-        // )
+        _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
+          return {
+            ...otherParams,
+            exchangeBalance: exchangeBalance.sub(withdrawingBalance),
+            withdrawingBalance: ZERO,
+            claimable: false,
+            walletBalance: walletBalance.add(withdrawingBalance),
+            withdrawing: true,
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenAddress)
       }
 
-      // TODO: Trigger hightlight
-      triggerHighlight()
-
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-
       toast.success(`Withdraw of ${withdrawingBalance} ${symbol} completed`)
     } catch (error) {
       console.error('Error executing the withdraw request', error)
@@ -214,16 +204,28 @@ const DepositWidget: React.FC = () => {
     }
   }
 
-  async function _enableToken(tokenBalances: TokenBalanceDetails): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = tokenBalances
+  async function _enableToken(tokenAddress: string): Promise<void> {
+    const { symbol } = _getToken(tokenAddress)
     try {
-      // TODO
-      // const result = await enableToken()
-      // log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-      log('_enableToken', tokenBalances)
+      const result = await erc20Api.approve(
+        tokenAddress,
+        userAddress,
+        contractAddress,
+        ALLOWANCE_MAX_VALUE,
+        txOptionalParams,
+      )
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
-      // TODO: Trigger hightlight
-      // triggerHighlight()
+      if (mounted.current) {
+        _updateToken(tokenAddress, otherParams => {
+          return {
+            ...otherParams,
+            enabled: true,
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenAddress)
+      }
 
       toast.success(`The token ${symbol} has been enabled for trading`)
     } catch (error) {
@@ -263,10 +265,10 @@ const DepositWidget: React.FC = () => {
                 <Row
                   key={tokenBalances.addressMainnet}
                   tokenBalances={tokenBalances}
-                  onEnableToken={(): Promise<void> => _enableToken(tokenBalances)}
-                  onSubmitDeposit={(balance): Promise<void> => _deposit(balance, tokenBalances)}
-                  onSubmitWithdraw={(balance): Promise<void> => _requestWithdraw(balance, tokenBalances)}
-                  onClaim={(): Promise<void> => _claim(tokenBalances)}
+                  onEnableToken={(): Promise<void> => _enableToken(tokenBalances.address)}
+                  onSubmitDeposit={(balance): Promise<void> => _deposit(balance, tokenBalances.address)}
+                  onSubmitWithdraw={(balance): Promise<void> => _requestWithdraw(balance, tokenBalances.address)}
+                  onClaim={(): Promise<void> => _claim(tokenBalances.address)}
                 />
               ))}
           </tbody>
