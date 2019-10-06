@@ -12,6 +12,7 @@ import { TxOptionalParams, Receipt, TokenBalanceDetails } from 'types'
 import { TxNotification } from 'components/TxNotification'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull } from 'utils'
+import { log } from 'utils'
 
 const Wrapper = styled.section`
   font-size: 0.85rem;
@@ -79,7 +80,7 @@ const txOptionalParams: TxOptionalParams = {
 
 const DepositWidget: React.FC = () => {
   const { userAddress } = useWalletConnection()
-  const { balances, error } = useTokenBalances()
+  const { balances, setBalances, error } = useTokenBalances()
 
   const contractAddress = depositApi.getContractAddress()
   const mounted = useRef(true)
@@ -98,24 +99,27 @@ const DepositWidget: React.FC = () => {
   )
 
   async function _deposit(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
-    const { address: tokenAddress, symbol, decimals } = tokenBalances
     try {
-      console.log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+      const { address: tokenAddress, symbol, decimals } = tokenBalances
+      log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       if (mounted.current) {
-        // TODO:
-        console.log('_deposit', formatAmount(amount, decimals), tokenBalances)
-        // setTokenBalances(
-        //   (current: TokenBalanceDetails): TokenBalanceDetails => {
-        //     return {
-        //       ...current,
-        //       depositingBalance: current.depositingBalance.add(amount),
-        //       walletBalance: current.walletBalance.sub(amount),
-        //     }
-        //   },
-        // )
+        setBalances(balances =>
+          balances.map(tokenBalancesAux => {
+            const { address: tokenAddressAux, depositingBalance, walletBalance } = tokenBalancesAux
+            if (tokenAddressAux === tokenAddress) {
+              return {
+                ...tokenBalances,
+                depositingBalance: depositingBalance.add(amount),
+                walletBalance: walletBalance.sub(amount),
+              }
+            } else {
+              return tokenBalancesAux
+            }
+          }),
+        )
       }
 
       // TODO: Trigger hightlight
@@ -131,14 +135,14 @@ const DepositWidget: React.FC = () => {
   async function _requestWithdraw(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
     const { address: tokenAddress, symbol, decimals } = tokenBalances
     try {
-      console.log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
       const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       if (mounted.current) {
         // TODO:
-        console.log('_requestWithdraw', formatAmount(amount, decimals), tokenBalances)
+        log('_requestWithdraw', formatAmount(amount, decimals), tokenBalances)
         // setTokenBalances(
         //   (current: TokenBalanceDetails): TokenBalanceDetails => {
         //     return {
@@ -168,7 +172,7 @@ const DepositWidget: React.FC = () => {
 
       if (mounted.current) {
         // TODO:
-        console.log('_claim', formatAmount(withdrawingBalance, decimals), tokenBalances)
+        log('_claim', formatAmount(withdrawingBalance, decimals), tokenBalances)
         // setTokenBalances(
         //   (current: TokenBalanceDetails): TokenBalanceDetails => {
         //     return {
@@ -185,7 +189,7 @@ const DepositWidget: React.FC = () => {
       // TODO: Trigger hightlight
       // triggerHighlight()
 
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       toast.success(`Withdraw of ${withdrawingBalance} ${symbol} completed`)
     } catch (error) {
@@ -199,8 +203,8 @@ const DepositWidget: React.FC = () => {
     try {
       // TODO
       // const result = await enableToken()
-      // console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-      console.log('_enableToken', tokenBalances)
+      // log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      log('_enableToken', tokenBalances)
 
       // TODO: Trigger hightlight
       // triggerHighlight()

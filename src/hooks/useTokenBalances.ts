@@ -8,6 +8,7 @@ import { formatAmount } from 'utils'
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
   error: boolean
+  setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[] | null>>
 }
 
 async function fetchBalancesForToken(
@@ -87,5 +88,5 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
     }
   }, [walletInfo])
 
-  return { balances, error }
+  return { balances, error, setBalances }
 }
