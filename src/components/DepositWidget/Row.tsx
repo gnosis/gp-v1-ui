@@ -9,6 +9,7 @@ import { formatAmount, formatAmountFull } from 'utils'
 import Form from './Form'
 import { ZERO } from 'const'
 import BN from 'bn.js'
+import { log } from 'utils'
 
 const TokenTr = styled.tr`
   img {
@@ -79,7 +80,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     enabling,
     withdrawing,
   } = tokenBalances
-  console.log('[DepositWidgetRow] %s: %s', symbol, formatAmount(exchangeBalance, decimals))
+  log('[DepositWidgetRow] %s: %s', symbol, formatAmount(exchangeBalance, decimals))
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   // const { enabled, enabling, enableToken } = useEnableTokens({
