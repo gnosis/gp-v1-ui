@@ -8,7 +8,7 @@ import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
-import { TxOptionalParams, Receipt, TokenBalanceDetails } from 'types'
+import { TxOptionalParams, Receipt, TokenBalanceDetails, Mutation } from 'types'
 import { TxNotification } from 'components/TxNotification'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull } from 'utils'
@@ -81,6 +81,7 @@ const txOptionalParams: TxOptionalParams = {
 const DepositWidget: React.FC = () => {
   const { userAddress } = useWalletConnection()
   const { balances, setBalances, error } = useTokenBalances()
+  // const { highlight, triggerHighlight } = useHighlight()
 
   const contractAddress = depositApi.getContractAddress()
   const mounted = useRef(true)
@@ -98,6 +99,25 @@ const DepositWidget: React.FC = () => {
     <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
   )
 
+  function _updateToken(tokenBalances: TokenBalanceDetails, updateBalances: Mutation<TokenBalanceDetails>): void {
+    const { address: tokenAddress, symbol, decimals } = tokenBalances
+    setBalances(balances =>
+      balances.map(tokenBalancesAux => {
+        const { address: tokenAddressAux } = tokenBalancesAux
+        return tokenAddressAux === tokenAddress ? updateBalances(tokenBalancesAux) : tokenBalancesAux
+      }),
+    )
+  }
+
+  async function _clearHighlight(tokenBalances: TokenBalanceDetails): void {
+    setTimeout(() => {
+      _updateToken(tokenBalances, tokenBalancesAux => ({
+        ...tokenBalancesAux,
+        highlighted: false,
+      }))
+    }, 5000)
+  }
+
   async function _deposit(amount: BN, tokenBalances: TokenBalanceDetails): Promise<void> {
     try {
       const { address: tokenAddress, symbol, decimals } = tokenBalances
@@ -106,24 +126,16 @@ const DepositWidget: React.FC = () => {
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       if (mounted.current) {
-        setBalances(balances =>
-          balances.map(tokenBalancesAux => {
-            const { address: tokenAddressAux, depositingBalance, walletBalance } = tokenBalancesAux
-            if (tokenAddressAux === tokenAddress) {
-              return {
-                ...tokenBalances,
-                depositingBalance: depositingBalance.add(amount),
-                walletBalance: walletBalance.sub(amount),
-              }
-            } else {
-              return tokenBalancesAux
-            }
-          }),
-        )
+        _updateToken(tokenBalances, ({ depositingBalance, walletBalance, ...otherParams }) => {
+          return {
+            ...otherParams,
+            depositingBalance: depositingBalance.add(amount),
+            walletBalance: walletBalance.sub(amount),
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenBalances)
       }
-
-      // TODO: Trigger hightlight
-      // triggerHighlight()
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -187,7 +199,7 @@ const DepositWidget: React.FC = () => {
       }
 
       // TODO: Trigger hightlight
-      // triggerHighlight()
+      triggerHighlight()
 
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 

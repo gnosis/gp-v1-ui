@@ -3,6 +3,7 @@ import BN from 'bn.js'
 import 'global'
 
 export type Command = () => void
+export type Mutation<T> = (original: T) => T
 
 export enum Network {
   Mainnet = 1,
