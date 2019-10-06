@@ -213,6 +213,12 @@ const DepositWidget: React.FC = () => {
   async function _enableToken(tokenAddress: string): Promise<void> {
     const { symbol } = _getToken(tokenAddress)
     try {
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          enabling: true,
+        }
+      })
       const result = await erc20Api.approve(
         tokenAddress,
         userAddress,
