@@ -4,9 +4,9 @@ import BN from 'bn.js'
 
 import { TokenBalanceDetails } from 'types'
 import { Row, RowProps } from 'components/DepositWidget/Row'
-import { ZERO } from 'const'
+import { ZERO, ONE } from 'const'
 
-function _createRow(params: Partial<TokenBalanceDetails>): React.ReactElement<RowProps> {
+function _createRow(params: Partial<TokenBalanceDetails> = {}): React.ReactElement<RowProps> {
   const tokenBalanceDetails: TokenBalanceDetails = {
     name: 'Test token',
     symbol: 'TTT',
@@ -40,37 +40,26 @@ function _createRow(params: Partial<TokenBalanceDetails>): React.ReactElement<Ro
   )
 }
 
-describe('<Row /> not enabled', () => {
-  const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
-    exchangeBalance: new BN(25),
-    withdrawingBalance: new BN(11),
-    claimable: true,
-    walletBalance: new BN(2),
-  }
-
+describe('<Row /> not enabled token', () => {
   it('renders single <tr> element', () => {
-    // FIX ME: ...callbacks didn't work, review wht
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow())
+    wrapper.hasClass
     expect(wrapper.is('tr')).toBe(true)
   })
 
   it('contains 6 <td> elements', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow())
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
-  it('contains 2 <button> elements', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
-    expect(wrapper.find('button')).toHaveLength(2)
+  it('contains 1 <button> (enable)', () => {
+    const wrapper = render(_createRow())
+    expect(wrapper.find('button')).toHaveLength(1)
   })
 })
 
-describe('<Row /> with enable', () => {
+describe('<Row /> enabled token', () => {
   const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
-    exchangeBalance: new BN(25),
-    withdrawingBalance: new BN(11),
-    claimable: true,
-    walletBalance: new BN(2),
     enabled: true,
   }
 
@@ -84,9 +73,21 @@ describe('<Row /> with enable', () => {
     expect(wrapper.find('td')).toHaveLength(6)
   })
 
-  it('contains 3 <button> element', () => {
+  it('contains 2 <button> elements (deposit and withdraw)', () => {
     const wrapper = render(_createRow(tokenBalanceDetails))
+    expect(wrapper.find('button')).toHaveLength(2)
+  })
+})
 
+describe('<Row /> claimable token', () => {
+  const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
+    enabled: true,
+    claimable: true,
+    withdrawingBalance: ONE,
+  }
+
+  it('contains 2 <button> elements (claim, deposit, withdraw)', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
     expect(wrapper.find('button')).toHaveLength(3)
   })
 })
