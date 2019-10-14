@@ -141,15 +141,12 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     if (validatorActive) {
       // Verify on every amount change
       const errorMsg = _validateForm(totalAmount, amountInput, decimals)
-      const newErrors = {
-        ...errors,
+      setErrors(oldErrors => ({
+        ...oldErrors,
         amountInput: errorMsg,
-      }
-      setErrors(newErrors)
-      // const hasErrors = Object.keys(newErrors).some(key => !!newErrors[key])
-      // return !hasErrors
+      }))
     }
-  }, [amountInput, decimals, errors, totalAmount, validatorActive])
+  }, [amountInput, decimals, totalAmount, validatorActive])
 
   // Separated useEffect only for the cleanUp when the component unmounts
   // Note the empty list as the last argument
