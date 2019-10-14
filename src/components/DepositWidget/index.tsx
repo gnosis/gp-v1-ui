@@ -8,6 +8,7 @@ import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 const Wrapper = styled.section`
+  overflow-x: auto;
   font-size: 0.85rem;
   padding-bottom: 4em;
   // border-spacing: 0px;
