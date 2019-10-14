@@ -5,13 +5,21 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+  width: 100%;
+
+  display: grid;
+  grid-template-rows: auto;
+  // display: flex;
+  // flex-direction: column;
 
   main {
     flex: 1;
     margin: auto;
+    min-width: 40vw;
+
+    @media (max-width: 768px) {
+      width: 95%;
+    }
   }
 `
 
