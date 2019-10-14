@@ -11,19 +11,19 @@ const variables = css`
 const GlobalStyles = createGlobalStyle`
   ${variables}
 
-  html {
-    font-size: 16px;
-    box-sizing: border-box;
-  }
-
-  body {    
+  html, body {  
     min-height: 100vh;
     margin: 0;
+
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
+    
     line-height: 1.5;
+    
     background-color: #f7f7f7;
     color: var(--color-text-primary);
+
+    box-sizing: border-box;
   }
 
   *, *:before, *:after {
@@ -146,6 +146,10 @@ const GlobalStyles = createGlobalStyle`
     margin: -3rem auto 3rem auto;
     box-shadow: 1px 1px #e8e8e8;    
     min-height: 25rem;
+
+    @media (max-width: 768px) {
+      margin: auto;
+    }
   }
 
   .widget {

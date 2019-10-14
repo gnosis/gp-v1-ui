@@ -8,15 +8,20 @@ const Wrapper = styled.header`
   color: #ffffff;
   background-color: #3340a9;
   min-height: ${rem('325px')};
-  //position: relative;
 
   nav {
     display: flex;
     align-items: center;
+    flex-flow: row wrap;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
   }
 
   .nav-links {
     flex: 1;
+    order: 2;
     display: flex;
     justify-content: flex-end;
 
@@ -27,6 +32,13 @@ const Wrapper = styled.header`
     a {
       color: white;
       padding: 0.8em;
+    }
+
+    @media (max-width: 768px) {
+      justify-content: center;
+      margin: auto;
+      padding: 0;
+      width: 100%;
     }
   }
 
@@ -46,9 +58,10 @@ const Wrapper = styled.header`
   }
 
   .header-title {
-    width: 30rem;
     margin: 0 auto;
     line-height: 1.15;
+    text-align: center;
+    width: 95%;
   }
 
   h1 {
@@ -66,6 +79,13 @@ const Wrapper = styled.header`
       border-color: white;
       cursor: pointer;
       background-color: inherit;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .logo,
+    .nav-links {
+      order: 1;
     }
   }
 `
