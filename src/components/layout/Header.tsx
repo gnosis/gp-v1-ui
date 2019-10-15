@@ -20,13 +20,11 @@ const Wrapper = styled.header`
   }
 
   .nav-links {
-    flex: 1;
-    order: 2;
     display: flex;
-    justify-content: flex-end;
-
+    flex: 1;
+    justify-content: center;
+    padding: 0;
     list-style-type: none;
-    margin-right: 3rem;
     white-space: nowrap;
 
     a {
@@ -35,26 +33,29 @@ const Wrapper = styled.header`
     }
 
     @media (max-width: 768px) {
-      justify-content: center;
-      margin: auto;
-      padding: 0;
-      width: 100%;
+      flex: 1 1 100%;
+      order: 3;
     }
   }
 
   .logo {
-    padding: 1rem;
-    margin: 1rem;
+    flex: 0 1 16rem;
     border: 2px solid #ff5097;
     color: #ff5097;
+    text-align: center;
     vertical-align: middle;
-    font-size: 1.2em;
 
     &:hover {
       color: white;
       border-color: white;
       cursor: pointer;
     }
+  }
+
+  .nav-links,
+  .logo {
+    padding: 1rem;
+    margin: 1rem;
   }
 
   .header-title {
@@ -67,8 +68,8 @@ const Wrapper = styled.header`
   h1 {
     margin-bottom: 0;
   }
-  h2 {
-    font-size: 1.6rem;
+  h3 {
+    // font-size: 1.6rem;
     margin-top: 0;
     color: #e0aacf;
   }
@@ -85,7 +86,6 @@ const Wrapper = styled.header`
   @media (max-width: 768px) {
     .logo,
     .nav-links {
-      order: 1;
     }
   }
 `
@@ -108,7 +108,7 @@ const Header: React.FC = () => (
     </nav>
     <div className="header-title">
       <h1>Swap stable coins</h1>
-      <h2>Fair, Efficient prices, Onchain</h2>
+      <h3>Fair, Efficient prices, Onchain</h3>
     </div>
   </Wrapper>
 )
