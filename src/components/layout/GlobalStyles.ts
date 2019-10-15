@@ -49,11 +49,17 @@ const GlobalStyles = createGlobalStyle`
   }
 
   h1 {
-    font-size: 3rem;    
+    font-size: 3rem;
+    @media (max-width: 480px) {
+      font-size: 2.4rem;
+    }    
   }
 
   h2 {
     font-size: 2rem;
+    @media (max-width: 480px) {
+      font-size: 1.4rem;
+    }
   }
 
   // cleaning default browser styles
@@ -155,7 +161,7 @@ const GlobalStyles = createGlobalStyle`
   .widget {
     padding: 2em;
     border-radius: 10px;
-    min-width: 40vw;
+    min-width: 58vw;
   }
 
   .page {
