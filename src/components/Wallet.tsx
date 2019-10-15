@@ -79,13 +79,13 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
 }
 
 export default styled(withRouter(Wallet))`
+  flex: 0 1 16em;
   padding: 1rem;
   margin: 1rem;
   border: 2px solid #ff5097;
   color: #ff5097;
   vertical-align: middle;
   text-decoration: none;
-  min-width: 16em;
   text-align: center;
 
   &:hover {
