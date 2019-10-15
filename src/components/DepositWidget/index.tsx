@@ -13,6 +13,7 @@ const Wrapper = styled.section`
   padding-bottom: 4em;
   // border-spacing: 0px;
   table {
+    width: 100%;
     border-collapse: collapse;
   }
 
@@ -36,7 +37,8 @@ const Wrapper = styled.section`
   }
 
   tr td:last-child {
-    width: 18em;
+    display: flex;
+    flex-flow: column wrap;
     text-align: center;
   }
 
@@ -45,7 +47,12 @@ const Wrapper = styled.section`
   }
 
   tr {
-    border-bottom: 1px solid #f2f2f2;
+    // border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid #00000026;
+
+    @media (max-width: 768px) {
+      border-bottom: 2px solid #00000026;
+    }
   }
 
   tr:last-child {
@@ -94,8 +101,7 @@ const DepositWidget: React.FC = () => {
                 withdrawals
               </th>
               <th>Wallet</th>
-              <th></th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
