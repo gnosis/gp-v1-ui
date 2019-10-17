@@ -18,6 +18,5 @@ export const BATCH_TIME = 300
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
   POC_URL: '/',
-  TEXT: '',
   TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
 }
