@@ -17,6 +17,9 @@ const Wrapper = styled.section`
   margin: -3rem auto 3rem auto;
   box-shadow: 1px 1px #e8e8e8;
   min-height: 25rem;
+
+  display: flex;
+  flex-direction: column;
 `
 
 const LinkWrapper = styled.div`
