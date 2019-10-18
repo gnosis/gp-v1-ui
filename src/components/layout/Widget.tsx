@@ -7,6 +7,16 @@ const Wrapper = styled.section`
   overflow-x: auto;
   font-size: 0.85rem;
   padding-bottom: 4em;
+  padding: 2em;
+  border-radius: 10px;
+  min-width: 58vw;
+
+  //TODO: 4 lines bellow duplicated from "page" css.
+  //extract into a common "section" component
+  background-color: white;
+  margin: -3rem auto 3rem auto;
+  box-shadow: 1px 1px #e8e8e8;
+  min-height: 25rem;
 `
 
 const LinkWrapper = styled.div`
@@ -25,7 +35,7 @@ const Widget: React.FC = ({ children }) => {
   )
 
   return (
-    <Wrapper className="widget">
+    <Wrapper>
       {contractLink && <LinkWrapper>{contractLink}</LinkWrapper>}
       {children}
     </Wrapper>
