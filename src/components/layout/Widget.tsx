@@ -22,24 +22,22 @@ const Wrapper = styled.section`
   flex-direction: column;
 `
 
-const LinkWrapper = styled.div`
-  a {
-    text-align: right;
-    margin-bottom: 3em;
-    display: block;
-  }
+const LinkWrapper = styled(EtherscanLink)`
+  text-align: right;
+  margin-bottom: 3em;
+  display: block;
 `
 
 const Widget: React.FC = ({ children }) => {
   const contractAddress = depositApi.getContractAddress()
 
   const contractLink = (
-    <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
+    <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
   )
 
   return (
     <Wrapper>
-      {contractLink && <LinkWrapper>{contractLink}</LinkWrapper>}
+      {contractLink && contractLink}
       {children}
     </Wrapper>
   )
