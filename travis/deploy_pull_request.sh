@@ -38,6 +38,7 @@ function publish_pull_request_urls_in_github {
   else
     echo "PRaul not detected, commenting URL to repo"
     curl -H "Authorization: token ${GITHUB_GNOSIS_INFO_API_TOKEN}" --request POST ${GITHUB_PR_COMMENTS} --data '{"body":"Travis automatic deployment:\r\n '${REVIEW_FEATURE_URL}'"}'
+  fi
 }
 
 # Only:
