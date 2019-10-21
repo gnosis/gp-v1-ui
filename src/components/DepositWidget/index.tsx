@@ -81,7 +81,12 @@ const DepositWidget: React.FC = () => {
   const { userAddress } = useWalletConnection()
   const { balances, setBalances, error } = useTokenBalances()
 
-  const withdrawRequest = useRef({ amount: null, tokenAddress: null, pendingAmount: null, symbol: null })
+  const [withdrawRequest, setWithdrawRequest] = useState({
+    amount: null,
+    tokenAddress: null,
+    pendingAmount: null,
+    symbol: null,
+  })
   const [withdrawConfirmationModal, toggleWithdrawConfirmationModal] = useModali({
     centered: true,
     animated: true,
@@ -89,9 +94,8 @@ const DepositWidget: React.FC = () => {
     message: (
       <>
         <p>
-          There is already a pending withdrawal of {withdrawRequest.current.pendingAmount}{' '}
-          {withdrawRequest.current.symbol}. If you create a new request, it will delete the previous request and create
-          a new one.
+          There is already a pending withdrawal of {withdrawRequest.pendingAmount} {withdrawRequest.symbol}. If you
+          create a new request, it will delete the previous request and create a new one.
         </p>
         <p>
           No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
@@ -109,7 +113,7 @@ const DepositWidget: React.FC = () => {
         onClick={async (): Promise<void> => {
           toggleWithdrawConfirmationModal()
           // eslint-disable-next-line @typescript-eslint/no-use-before-define
-          await _requestWithdraw(withdrawRequest.current.amount, withdrawRequest.current.tokenAddress, true)
+          await _requestWithdraw(withdrawRequest.amount, withdrawRequest.tokenAddress, true)
         }}
       />,
     ],
@@ -180,10 +184,12 @@ const DepositWidget: React.FC = () => {
     try {
       if (!(withdrawingBalance.isZero() || overwriteWithdraw)) {
         // Storing current values before displaying modal
-        withdrawRequest.current.amount = amount
-        withdrawRequest.current.tokenAddress = tokenAddress
-        withdrawRequest.current.pendingAmount = formatAmount(withdrawingBalance, decimals)
-        withdrawRequest.current.symbol = symbol
+        setWithdrawRequest({
+          amount,
+          tokenAddress,
+          pendingAmount: formatAmount(withdrawingBalance, decimals),
+          symbol,
+        })
 
         toggleWithdrawConfirmationModal()
       } else {
