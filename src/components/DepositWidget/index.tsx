@@ -8,10 +8,11 @@ import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 const Wrapper = styled.section`
+  overflow-x: auto;
   font-size: 0.85rem;
   padding-bottom: 4em;
-  // border-spacing: 0px;
   table {
+    width: 100%;
     border-collapse: collapse;
   }
 
@@ -35,8 +36,12 @@ const Wrapper = styled.section`
   }
 
   tr td:last-child {
-    width: 18em;
+    max-width: 8rem;
     text-align: center;
+    > button {
+      font-size: 0.75rem;
+      min-width: 6rem;
+    }
   }
 
   td {
@@ -44,7 +49,11 @@ const Wrapper = styled.section`
   }
 
   tr {
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid #00000026;
+
+    @media (max-width: 768px) {
+      border-bottom: 2px solid #00000026;
+    }
   }
 
   tr:last-child {
@@ -93,8 +102,7 @@ const DepositWidget: React.FC = () => {
                 withdrawals
               </th>
               <th>Wallet</th>
-              <th></th>
-              <th></th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>

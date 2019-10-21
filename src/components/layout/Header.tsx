@@ -8,35 +8,42 @@ const Wrapper = styled.header`
   color: #ffffff;
   background-color: #3340a9;
   min-height: ${rem('325px')};
-  //position: relative;
 
   nav {
     display: flex;
     align-items: center;
+    flex-flow: row wrap;
+
+    @media (max-width: 768px) {
+      justify-content: center;
+    }
   }
 
   .nav-links {
-    flex: 1;
     display: flex;
-    justify-content: flex-end;
-
+    flex: 1;
+    justify-content: center;
+    padding: 0;
     list-style-type: none;
-    margin-right: 3rem;
     white-space: nowrap;
 
     a {
       color: white;
       padding: 0.8em;
     }
+
+    @media (max-width: 768px) {
+      flex: 1 1 100%;
+      order: 3;
+    }
   }
 
   .logo {
-    padding: 1rem;
-    margin: 1rem;
+    flex: 0 1 16rem;
     border: 2px solid #ff5097;
     color: #ff5097;
+    text-align: center;
     vertical-align: middle;
-    font-size: 1.2em;
 
     &:hover {
       color: white;
@@ -45,17 +52,24 @@ const Wrapper = styled.header`
     }
   }
 
+  .nav-links,
+  .logo {
+    padding: 1rem;
+    margin: 1rem;
+  }
+
   .header-title {
-    width: 30rem;
     margin: 0 auto;
     line-height: 1.15;
+    text-align: center;
+    width: 95%;
   }
 
   h1 {
     margin-bottom: 0;
   }
-  h2 {
-    font-size: 1.6rem;
+  h3 {
+    // font-size: 1.6rem;
     margin-top: 0;
     color: #e0aacf;
   }
@@ -66,6 +80,12 @@ const Wrapper = styled.header`
       border-color: white;
       cursor: pointer;
       background-color: inherit;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .logo,
+    .nav-links {
     }
   }
 `
@@ -88,7 +108,7 @@ const Header: React.FC = () => (
     </nav>
     <div className="header-title">
       <h1>Swap stable coins</h1>
-      <h2>Fair, Efficient prices, Onchain</h2>
+      <h3>Fair, Efficient prices, Onchain</h3>
     </div>
   </Wrapper>
 )
