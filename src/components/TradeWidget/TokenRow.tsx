@@ -54,7 +54,7 @@ interface Props {
 }
 
 const TokenRow: React.FC<Props> = ({ selectLabel, tokenDetails: { name, image } }: Props) => {
-  const selectId = selectLabel.replace(/[^a-zA-Z]+/g, '')
+  const selectId = selectLabel.replace(/[^a-zA-Z]/g, '')
 
   return (
     <Wrapper>
