@@ -62,7 +62,7 @@ const DepositWidget: React.FC = () => {
 
   if (balances === undefined) {
     // Loading: Do not show the widget
-    return <></>
+    return null
   }
   return (
     <Widget>
