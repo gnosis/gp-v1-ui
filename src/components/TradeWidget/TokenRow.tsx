@@ -58,7 +58,7 @@ const TokenRow: React.FC<Props> = ({ selectLabel, tokenDetails: { name, image } 
 
   return (
     <Wrapper>
-      <TokenImgWrapper name={name} image={image} />
+      <TokenImgWrapper alt={name} src={image} />
       <SelectBox>
         <label htmlFor={selectId}>{selectLabel}</label>
         <select name="tokenSelector" id={selectId}>

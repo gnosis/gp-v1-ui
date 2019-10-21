@@ -216,7 +216,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td>
-          <TokenImg image={image} name={name} />
+          <TokenImg src={image} alt={name} />
         </td>
         <td>{name}</td>
         <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
