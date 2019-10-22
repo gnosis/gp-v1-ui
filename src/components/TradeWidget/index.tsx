@@ -11,10 +11,7 @@ import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
 function _getTokenDetails(symbol: string, networkId: number): TokenDetails {
   const _networkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
-  return tokenListApi
-    .getTokens(_networkId)
-    .filter(tokenDetails => tokenDetails.symbol == symbol)
-    .reduce((_, tokenDetails) => tokenDetails)
+  return tokenListApi.getTokens(_networkId).find(tokenDetails => tokenDetails.symbol == symbol)
 }
 
 const IconWrapper = styled.a`
