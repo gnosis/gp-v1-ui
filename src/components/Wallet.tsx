@@ -16,6 +16,8 @@ import {
   faChevronCircleUp,
 } from '@fortawesome/free-solid-svg-icons'
 
+import { EtherscanLink } from './EtherscanLink'
+
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { abbreviateString } from 'utils'
@@ -226,9 +228,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
           {
             <WalletItem>
               {/* TODO: add network specific */}
-              <a href={`https://etherscan.com/address/${userAddress}`} target="_blank" rel="noopener noreferrer">
-                View on Etherscan
-              </a>
+              <EtherscanLink type="address" identifier={userAddress} label="View on Etherscan" />
             </WalletItem>
           }
           {/* Log In/Out Button */}
