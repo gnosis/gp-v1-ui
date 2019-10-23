@@ -37,7 +37,7 @@ const TradeWidget: React.FC = () => {
       </IconWrapper>
       <TokenRow tokenDetails={USDC} selectLabel="receive" />
       <SubmitButton>
-        <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit offer
+        <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
       </SubmitButton>
     </Widget>
   )
