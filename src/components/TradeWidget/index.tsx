@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
 
 import Widget from 'components/layout/Widget'
@@ -9,9 +9,8 @@ import TokenRow from './TokenRow'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
-function _getTokenDetails(symbol: string, networkId: number): TokenDetails {
-  const _networkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
-  return tokenListApi.getTokens(_networkId).find(tokenDetails => tokenDetails.symbol == symbol)
+function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
+  return tokens.find(token => token.symbol == symbol)
 }
 
 const IconWrapper = styled.a`
@@ -26,16 +25,46 @@ const SubmitButton = styled.button`
 
 const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
-  const DAI = _getTokenDetails('DAI', networkId)
-  const USDC = _getTokenDetails('USDC', networkId)
+  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
+  const [payWithToken, setPayWithToken] = useState(_getToken('DAI', tokens))
+  const [receiveToken, setReceiveToken] = useState(_getToken('USDC', tokens))
+
+  const swapTokens = (): void => {
+    setPayWithToken(receiveToken)
+    setReceiveToken(payWithToken)
+  }
+
+  const onSelectChangeFactory = (
+    setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
+    oppositeToken: TokenDetails,
+  ): ((selected: TokenDetails) => void) => {
+    return (selected: TokenDetails): void => {
+      if (selected.symbol === oppositeToken.symbol) {
+        swapTokens()
+      } else {
+        setToken(selected)
+      }
+    }
+  }
 
   return (
-    <Widget>
-      <TokenRow tokenDetails={DAI} selectLabel="pay with" />
-      <IconWrapper>
+    <WrappedWidget>
+      <TokenRow
+        token={payWithToken}
+        tokens={tokens}
+        selectLabel="pay with"
+        onSelectChange={onSelectChangeFactory(setPayWithToken, receiveToken)}
+      />
+      <IconWrapper onClick={swapTokens}>
         <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
       </IconWrapper>
-      <TokenRow tokenDetails={USDC} selectLabel="receive" />
+      <TokenRow
+        token={receiveToken}
+        tokens={tokens}
+        selectLabel="receive"
+        onSelectChange={onSelectChangeFactory(setReceiveToken, payWithToken)}
+      />
       <SubmitButton>
         <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
       </SubmitButton>
