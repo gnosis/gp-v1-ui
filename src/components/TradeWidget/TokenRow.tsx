@@ -70,7 +70,7 @@ function renderOptionLabel(token: TokenDetails): React.ReactNode {
         src={token.image}
         alt={token.name}
         style={{
-          margin: '1em 2em 1em 1em',
+          margin: '0.25em 2em 0.25em 1em',
         }}
       />
       <div
