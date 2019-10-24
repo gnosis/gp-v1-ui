@@ -58,6 +58,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@hot-loader/react-dom": "^16.8.6",
+    "@types/react-select": "^3.0.5",
     "bn.js": "^5.0.0",
     "modali": "^1.2.0",
     "polished": "^3.4.1",
@@ -67,6 +68,7 @@
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.12.10",
     "react-router-dom": "^5.0.1",
+    "react-select": "^3.0.8",
     "react-toastify": "^5.4.0",
     "styled-components": "^4.3.2",
     "web3": "^2.0.0-alpha"
