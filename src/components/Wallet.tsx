@@ -1,13 +1,59 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { withRouter, RouteComponentProps } from 'react-router'
+import { toast } from 'react-toastify'
+// @ts-ignore
+import { CopyToClipboard } from 'react-copy-to-clipboard'
+import QRCode from 'qrcode.react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { toast } from 'react-toastify'
+import {
+  faSpinner,
+  faSignOutAlt,
+  faSignInAlt,
+  faCopy,
+  faCheck,
+  faChevronCircleDown,
+  faChevronCircleUp,
+} from '@fortawesome/free-solid-svg-icons'
+
+import { EtherscanLink } from './EtherscanLink'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { withRouter, RouteComponentProps } from 'react-router'
 import { abbreviateString } from 'utils'
+
+import WalletImg from 'img/unknown-token.png'
+
+const Wrapper = styled.div`
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  margin: 1rem;
+  width: 20rem;
+
+  background: ghostwhite;
+
+  text-align: center;
+`
+
+const WalletItem = styled.div`
+  color: #000;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  margin: 0.3rem auto;
+  padding: 1rem;
+  width: 92%;
+`
+
+const CopyDiv = styled.div`
+  background: #90ee90ad;
+  border-radius: 50px;
+  font-size: 75%;
+  width: 80%;
+`
 
 interface WalletProps extends RouteComponentProps {
   className: string
@@ -15,7 +61,11 @@ interface WalletProps extends RouteComponentProps {
 
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const { isConnected, userAddress } = useWalletConnection()
+
   const [loadingLabel, setLoadingLabel] = useState()
+  const [copiedToClipboard, setCopiedToClipboard] = useState(false)
+  const [showWallet, setShowWallet] = useState(false)
+
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -23,6 +73,9 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       mounted.current = false
     }
   }, [])
+
+  /***************************** */
+  // EVENT HANDLERS
 
   const connectWallet = async (): Promise<void> => {
     try {
@@ -51,45 +104,139 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     }
   }
 
-  let onClick, content
-  if (loadingLabel) {
-    content = (
-      <>
-        <FontAwesomeIcon icon={faSpinner} spin />
-        {' ' + loadingLabel}
-      </>
+  const handleCopyToClipBoard = (): NodeJS.Timeout => {
+    setCopiedToClipboard(true)
+    return setTimeout((): void => setCopiedToClipboard(false), 5000)
+  }
+
+  /***************************** */
+  // RENDER FUNCTIONS
+
+  const renderLogInOutButton = (): JSX.Element => {
+    let onClick, content
+    if (loadingLabel) {
+      content = (
+        <>
+          <FontAwesomeIcon icon={faSpinner} spin />
+          {' ' + loadingLabel}
+        </>
+      )
+    } else if (isConnected) {
+      onClick = disconnectWallet
+      content = (
+        <>
+          <FontAwesomeIcon icon={faSignOutAlt} />
+          <strong> Log Out</strong>
+        </>
+      )
+    } else {
+      onClick = connectWallet
+      content = (
+        <>
+          <FontAwesomeIcon icon={faSignInAlt} />
+          <strong> Connect Wallet</strong>
+        </>
+      )
+    }
+
+    return (
+      <WalletItem>
+        <a onClick={onClick} className={props.className}>
+          {content}
+        </a>
+      </WalletItem>
     )
-  } else if (isConnected) {
-    onClick = disconnectWallet
-    content = (
-      <>
-        {abbreviateString(userAddress, 10, 5)} &nbsp;<small>(disconnect)</small>
-      </>
-    )
-  } else {
-    onClick = connectWallet
-    content = 'Connect to Wallet'
   }
 
   return (
-    <a onClick={onClick} className={props.className}>
-      {content}
-    </a>
+    <Wrapper>
+      {userAddress ? (
+        <>
+          {/* Network */}
+          {/* TODO: add dynamic network as prop */}
+          <WalletItem
+            style={{
+              color: '#283baf',
+              fontWeight: 800,
+              fontFamily: 'monospace',
+              textTransform: 'uppercase',
+              margin: '5px auto',
+              padding: '2px 0',
+            }}
+          >
+            Rinkeby
+          </WalletItem>
+          {/* Wallet logo + address + chevron */}
+          <WalletItem
+            style={{
+              cursor: 'pointer',
+              borderTop: '2px solid #00000029',
+              padding: 6,
+            }}
+            onClick={(): void => setShowWallet(!showWallet)}
+          >
+            <img src={WalletImg} style={{ maxWidth: '15%' }} />
+            <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
+            <FontAwesomeIcon
+              icon={showWallet ? faChevronCircleUp : faChevronCircleDown}
+              style={{ cursor: 'pointer' }}
+            />
+          </WalletItem>
+        </>
+      ) : (
+        renderLogInOutButton()
+      )}
+      {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
+      {userAddress && showWallet && (
+        <div
+          style={{
+            position: 'absolute',
+            background: 'inherit',
+            width: '100%',
+            top: '100%',
+            boxShadow: '5px 19px 16px #00000033',
+            borderRadius: '0 0 20px 20px',
+          }}
+        >
+          <WalletItem>
+            <QRCode size={100} value={userAddress} />
+          </WalletItem>
+          <WalletItem>
+            {/* Copy Confirmation */}
+            {copiedToClipboard ? (
+              <CopyDiv>
+                <FontAwesomeIcon color="#ff5097" icon={faCheck} /> <span>Copied!</span>
+              </CopyDiv>
+            ) : (
+              // Address and copy button
+              <>
+                <span style={{ fontFamily: 'monospace', fontSize: '85%', margin: '0 10px', wordBreak: 'break-all' }}>
+                  {userAddress}{' '}
+                </span>
+                <CopyToClipboard text={userAddress} onCopy={handleCopyToClipBoard}>
+                  <FontAwesomeIcon
+                    color="#ff5097"
+                    icon={faCopy}
+                    style={{ cursor: 'pointer' }}
+                    title="Copy address to clipboard"
+                  />
+                </CopyToClipboard>
+              </>
+            )}
+          </WalletItem>
+          {/* Etherscan Link */}
+          {
+            <WalletItem>
+              {/* TODO: add network specific */}
+              <EtherscanLink type="address" identifier={userAddress} label="View on Etherscan" />
+            </WalletItem>
+          }
+          {/* Log In/Out Button */}
+          {renderLogInOutButton()}
+        </div>
+      )}
+    </Wrapper>
   )
 }
 
-export default styled(withRouter(Wallet))`
-  flex: 0 1 16em;
-  padding: 1rem;
-  margin: 1rem;
-  border: 2px solid #ff5097;
-  color: #ff5097;
-  vertical-align: middle;
-  text-decoration: none;
-  text-align: center;
-
-  &:hover {
-    color: #ff5097;
-    background-color: #ffe3ee;
-  }
-`
+export default withRouter(Wallet)

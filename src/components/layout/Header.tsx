@@ -73,14 +73,6 @@ const Wrapper = styled.header`
     margin-top: 0;
     color: #e0aacf;
   }
-
-  ${Wallet} {
-    &:hover {
-      color: white;
-      border-color: white;
-      cursor: pointer;
-      background-color: inherit;
-    }
   }
 
   @media (max-width: 768px) {
