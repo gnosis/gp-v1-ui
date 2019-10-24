@@ -13,6 +13,11 @@ function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
   return tokens.find(token => token.symbol == symbol)
 }
 
+const WrappedWidget = styled(Widget)`
+  overflow-x: visible;
+  min-width: 0;
+`
+
 const IconWrapper = styled.a`
   margin: -1em 0 1.5em 0.75em;
   width: 2em;
@@ -68,7 +73,7 @@ const TradeWidget: React.FC = () => {
       <SubmitButton>
         <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
       </SubmitButton>
-    </Widget>
+    </WrappedWidget>
   )
 }
 
