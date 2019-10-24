@@ -11,4 +11,7 @@ function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>):
 export default styled.img.attrs(() => ({ onError: _loadFallbackTokenImage }))`
   width: 30px;
   height: 30px;
+
+  border-radius: 50%;
+  object-fit: cover;
 `
