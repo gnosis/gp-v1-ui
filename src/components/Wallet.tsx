@@ -59,8 +59,16 @@ interface WalletProps extends RouteComponentProps {
   className: string
 }
 
+const id2Network = {
+  1: 'Mainnet',
+  3: 'Ropsten',
+  4: 'Rinkeby',
+  5: 'Goerli',
+  42: 'Kovan',
+}
+
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
-  const { isConnected, userAddress } = useWalletConnection()
+  const { isConnected, userAddress, networkId } = useWalletConnection()
 
   const [loadingLabel, setLoadingLabel] = useState()
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
@@ -165,7 +173,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
               padding: '2px 0',
             }}
           >
-            Rinkeby
+            {id2Network[networkId] || 'Unknown Network'}
           </WalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletItem
