@@ -146,27 +146,18 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  .widget,
+  //TODO: extract into a Page component
   .page {
     background-color: white;
     margin: -3rem auto 3rem auto;
-    box-shadow: 1px 1px #e8e8e8;    
+    box-shadow: 1px 1px #e8e8e8;
     min-height: 25rem;
+    padding: 2rem 10vw 2rem 10vw;
+    width: 95vw;
 
     @media (max-width: 768px) {
       margin: auto;
     }
-  }
-
-  .widget {
-    padding: 2em;
-    border-radius: 10px;
-    min-width: 58vw;
-  }
-
-  .page {
-    padding: 2rem 10vw 2rem 10vw;
-    width: 95vw;
   }
 
 `
