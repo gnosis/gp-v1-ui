@@ -47,6 +47,7 @@ const InputBox = styled.div`
 
   input {
     margin: 0 0 0.5em 0;
+    width: 100%;
   }
 `
 
