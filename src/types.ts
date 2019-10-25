@@ -7,6 +7,9 @@ export type Command = () => void
 export enum Network {
   Mainnet = 1,
   Rinkeby = 4,
+  Ropsten = 3,
+  Goerli = 5,
+  Kovan = 42,
 }
 
 export interface TokenDetails {
