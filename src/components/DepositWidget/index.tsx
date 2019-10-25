@@ -4,13 +4,9 @@ import styled from 'styled-components'
 import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
-import { depositApi } from 'api'
-import { EtherscanLink } from 'components/EtherscanLink'
+import Widget from 'components/layout/Widget'
 
 const Wrapper = styled.section`
-  overflow-x: auto;
-  font-size: 0.85rem;
-  padding-bottom: 4em;
   table {
     width: 100%;
     border-collapse: collapse;
@@ -61,57 +57,45 @@ const Wrapper = styled.section`
   }
 `
 
-const LinkWrapper = styled.div`
-  a {
-    text-align: right;
-    margin-bottom: 3em;
-    display: block;
-  }
-`
-
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
-  const contractAddress = depositApi.getContractAddress()
 
   if (balances === undefined) {
     // Loading: Do not show the widget
-    return <></>
+    return null
   }
-  const contractLink = (
-    <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
-  )
-
   return (
-    <Wrapper className="widget">
-      {contractLink && <LinkWrapper>{contractLink}</LinkWrapper>}
-      {error ? (
-        <ErrorMsg title="oops..." message="Something happened while loading the balances" />
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th colSpan={2}>Token</th>
-              <th>
-                Exchange
-                <br />
-                wallet
-              </th>
-              <th>
-                Pending
-                <br />
-                withdrawals
-              </th>
-              <th>Wallet</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {balances &&
-              balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
-          </tbody>
-        </table>
-      )}
-    </Wrapper>
+    <Widget>
+      <Wrapper>
+        {error ? (
+          <ErrorMsg title="oops..." message="Something happened while loading the balances" />
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th colSpan={2}>Token</th>
+                <th>
+                  Exchange
+                  <br />
+                  wallet
+                </th>
+                <th>
+                  Pending
+                  <br />
+                  withdrawals
+                </th>
+                <th>Wallet</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {balances &&
+                balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
+            </tbody>
+          </table>
+        )}
+      </Wrapper>
+    </Widget>
   )
 }
 

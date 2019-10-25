@@ -5,7 +5,6 @@ import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-
 import { toast } from 'react-toastify'
 
 import { TokenBalanceDetails, Receipt, TxOptionalParams } from 'types'
-import unknownTokenImg from 'img/unknown-token.png'
 import { formatAmount, formatAmountFull } from 'utils'
 import { useEnableTokens } from 'hooks/useEnableToken'
 import Form from './Form'
@@ -16,12 +15,9 @@ import { depositApi } from 'api'
 import { useHighlight } from 'hooks/useHighlight'
 import { TxNotification } from 'components/TxNotification'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import TokenImg from 'components/TokenImg'
 
 const TokenTr = styled.tr`
-  img {
-    width: 30px;
-    height: 30px;
-  }
 
   &.highlight {
     background-color: #fdffc1;
@@ -56,11 +52,6 @@ const ClaimLink = styled.a`
 
 export interface RowProps {
   tokenBalances: TokenBalanceDetails
-}
-
-function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
-  const image = event.currentTarget
-  image.src = unknownTokenImg
 }
 
 const txOptionalParams: TxOptionalParams = {
@@ -225,7 +216,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td>
-          <img src={image} alt={name} onError={_loadFallbackTokenImage} />
+          <TokenImg src={image} alt={name} />
         </td>
         <td>{name}</td>
         <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
