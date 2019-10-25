@@ -83,6 +83,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       await walletApi.connect()
       toast.success('Wallet connected')
     } catch (error) {
+      console.error('error', error)
       toast.error('Error connecting wallet')
     } finally {
       if (mounted.current) {
