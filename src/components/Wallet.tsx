@@ -24,7 +24,7 @@ import { abbreviateString } from 'utils'
 
 import WalletImg from 'img/unknown-token.png'
 
-const Wrapper = styled.div`
+const Wrapper = styled.div<{ walletOpen: boolean }>`
   position: relative;
   display: flex;
   flex-flow: column nowrap;
@@ -33,6 +33,7 @@ const Wrapper = styled.div`
   width: 20rem;
 
   background: ghostwhite;
+  border-radius: ${(props): string => (props.walletOpen ? '10px 10px 0 0' : '10px')};
 
   text-align: center;
 `
@@ -48,11 +49,43 @@ const WalletItem = styled.div`
   width: 92%;
 `
 
+const ThinWalletItem = styled(WalletItem)`
+  margin: 5px auto;
+  padding: 2px 0;
+`
+
+const WalletToggler = styled(WalletItem)`
+  cursor: pointer;
+  border-top: 2px solid #00000029;
+  padding: 6px;
+`
+
 const CopyDiv = styled.div`
   background: #90ee90ad;
   border-radius: 50px;
   font-size: 75%;
   width: 80%;
+`
+
+const WalletSlideWrapper = styled.div`
+  position: absolute;
+  background: inherit;
+  width: 100%;
+  top: 100%;
+  box-shadow: 5px 19px 16px #00000033;
+  border-radius: 0 0 10px 10px;
+`
+
+const MonospaceText = styled.div<{ color?: string }>`
+  color: ${(props): string => props.color || '#283baf'};
+  font-weight: 800;
+  font-family: monospace;
+`
+
+const MonospaceAddress = styled(MonospaceText)`
+  font-size: 85%;
+  margin: 0 10px;
+  word-break: break-all;
 `
 
 interface WalletProps extends RouteComponentProps {
@@ -158,55 +191,29 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   }
 
   return (
-    <Wrapper>
+    <Wrapper walletOpen={showWallet}>
       {userAddress ? (
         <>
           {/* Network */}
-          {/* TODO: add dynamic network as prop */}
-          <WalletItem
-            style={{
-              color: '#283baf',
-              fontWeight: 800,
-              fontFamily: 'monospace',
-              textTransform: 'uppercase',
-              margin: '5px auto',
-              padding: '2px 0',
-            }}
-          >
-            {id2Network[networkId] || 'Unknown Network'}
-          </WalletItem>
+          <ThinWalletItem>
+            <MonospaceText>{id2Network[networkId] || 'Unknown Network'}</MonospaceText>
+          </ThinWalletItem>
           {/* Wallet logo + address + chevron */}
-          <WalletItem
-            style={{
-              cursor: 'pointer',
-              borderTop: '2px solid #00000029',
-              padding: 6,
-            }}
-            onClick={(): void => setShowWallet(!showWallet)}
-          >
+          <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
             <img src={WalletImg} style={{ maxWidth: '15%' }} />
             <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
             <FontAwesomeIcon
               icon={showWallet ? faChevronCircleUp : faChevronCircleDown}
               style={{ cursor: 'pointer' }}
             />
-          </WalletItem>
+          </WalletToggler>
         </>
       ) : (
         renderLogInOutButton()
       )}
       {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
       {userAddress && showWallet && (
-        <div
-          style={{
-            position: 'absolute',
-            background: 'inherit',
-            width: '100%',
-            top: '100%',
-            boxShadow: '5px 19px 16px #00000033',
-            borderRadius: '0 0 20px 20px',
-          }}
-        >
+        <WalletSlideWrapper>
           <WalletItem>
             <QRCode size={100} value={userAddress} />
           </WalletItem>
@@ -219,9 +226,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
             ) : (
               // Address and copy button
               <>
-                <span style={{ fontFamily: 'monospace', fontSize: '85%', margin: '0 10px', wordBreak: 'break-all' }}>
-                  {userAddress}{' '}
-                </span>
+                <MonospaceAddress color="#000">{userAddress} </MonospaceAddress>
                 <CopyToClipboard text={userAddress} onCopy={handleCopyToClipBoard}>
                   <FontAwesomeIcon
                     color="#ff5097"
@@ -242,7 +247,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
           }
           {/* Log In/Out Button */}
           {renderLogInOutButton()}
-        </div>
+        </WalletSlideWrapper>
       )}
     </Wrapper>
   )
