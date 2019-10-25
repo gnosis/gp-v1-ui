@@ -1,5 +1,6 @@
 import { Network, TokenList, WalletApi, DepositApi, Erc20Api } from 'types'
-import { WalletApiMock } from './wallet/WalletApiMock'
+// import { WalletApiMock } from './wallet/WalletApiMock'
+import WalletApiReal from './wallet/WalletApi'
 import { TokenListApiImpl } from './tokenList/TokenListApiImpl'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
@@ -10,13 +11,15 @@ const isMock = process.env.MOCK === 'true'
 
 function createWalletApi(): WalletApi {
   let walletApi
-  if (isMock) {
-    walletApi = new WalletApiMock()
-    window['walletApi'] = walletApi // register for convenience
-  } else {
-    // TODO: Add actual implementation
-    throw new Error('Not implemented yet. Only mock implementation available')
-  }
+  // if (isMock) {
+  //   walletApi = new WalletApiMock()
+  //   window['walletApi'] = walletApi // register for convenience
+  // } else {
+  // TODO: Add actual implementation
+  // throw new Error('Not implemented yet. Only mock implementation available')
+  walletApi = new WalletApiReal()
+  window['walletApi'] = walletApi // register for convenience
+  // }
   return walletApi
 }
 
