@@ -72,15 +72,18 @@ const subscribeToBlockchainUpdate = ({
   return (callback: (changedChainData: BlockchainUpdatePrompt) => void) => {
     const unsubNetwork = networkUpdate(chainId => {
       blockchainPrompt = { ...blockchainPrompt, chainId }
+      log('chainId changed:', chainId)
       callback(blockchainPrompt)
     })
     const unsubAccounts = accountsUpdate(([account]) => {
       blockchainPrompt = { ...blockchainPrompt, account }
+      log('accounts changed:', account)
       callback(blockchainPrompt)
     })
 
     const blockSub = blockUpdate(blockHeader => {
       blockchainPrompt = { ...blockchainPrompt, blockHeader }
+      log('block changed:', blockHeader.number)
       callback(blockchainPrompt)
     })
     const unsubBlock = () => blockSub.unsubscribe()
@@ -206,6 +209,7 @@ export class WalletApiImpl implements WalletApi {
 
   private _notifyListeners(): void {
     const walletInfo: WalletInfo = this._getWalletInfo()
+    console.table(walletInfo)
     this._listeners.forEach(listener => listener(walletInfo))
   }
 
