@@ -31,10 +31,10 @@ const SubmitButton = styled.button`
 const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = useMemo(() => (networkId ? networkId : Network.Mainnet), [networkId])
+  const fallBackNetworkId = networkId ? networkId : Network.Mainnet
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
-  const [payWithToken, setPayWithToken] = useState(_getToken('DAI', tokens))
-  const [receiveToken, setReceiveToken] = useState(_getToken('USDC', tokens))
+  const [payWithToken, setPayWithToken] = useState(() => _getToken('DAI', tokens))
+  const [receiveToken, setReceiveToken] = useState(() => _getToken('USDC', tokens))
 
   const swapTokens = (): void => {
     setPayWithToken(receiveToken)
