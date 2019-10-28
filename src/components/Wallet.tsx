@@ -113,7 +113,11 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const connectWallet = async (): Promise<void> => {
     try {
       setLoadingLabel('Connecting...')
-      await walletApi.connect()
+      const success = await walletApi.connect()
+
+      // user closed Provider selection modal
+      if (!success) return
+
       toast.success('Wallet connected')
     } catch (error) {
       console.error('error', error)

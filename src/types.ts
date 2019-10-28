@@ -95,7 +95,7 @@ export interface WalletInfo {
 
 export interface WalletApi {
   isConnected(): boolean
-  connect(): Promise<void>
+  connect(): Promise<boolean>
   disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>

@@ -132,10 +132,10 @@ export class WalletApiImpl implements WalletApi {
     return this._connected
   }
 
-  public async connect(): Promise<void> {
+  public async connect(): Promise<boolean> {
     const provider = await getProvider(wcOptions)
-    // maybe throw
-    if (!provider) return
+
+    if (!provider) return false
 
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
 
@@ -169,6 +169,8 @@ export class WalletApiImpl implements WalletApi {
       unsubscribeUpdates()
       unsubscribeDisconnect()
     }
+
+    return true
   }
 
   public async disconnect(): Promise<void> {
