@@ -37,6 +37,8 @@ interface BlockchainUpdatePrompt {
   blockHeader: BlockHeader | null
 }
 
+type BlockchainUpdatePromptCallback = (callback: (changedChainData: BlockchainUpdatePrompt) => void) => Command
+
 // provides subscription to blockhain updates for account/network/block
 const subscribeToBlockchainUpdate = ({
   provider,
@@ -46,17 +48,22 @@ const subscribeToBlockchainUpdate = ({
   provider: Provider
   subscriptions?: Subscriptions
   web3: Web3
-}) => {
+}): BlockchainUpdatePromptCallback => {
   const subs = subscriptions || createSubscriptions(provider)
 
-  let networkUpdate: (callback: (chainId: number) => void) => () => void
+  let networkUpdate: (callback: (chainId: number) => void) => Command
 
-  if (isMetamaskSubscriptions(subs)) networkUpdate = cb => subs.onNetworkChanged(networkId => cb(+networkId))
+  if (isMetamaskSubscriptions(subs)) networkUpdate = (cb): Command => subs.onNetworkChanged(networkId => cb(+networkId))
   if (isWalletConnectSubscriptions(subs)) networkUpdate = subs.onChainChanged
 
   const accountsUpdate = subs.onAccountsChanged
 
-  const blockUpdate = (cb: (blockHeader: BlockHeader) => void) => web3.eth.subscribe('newBlockHeaders').on('data', cb)
+  const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
+    const blockSub = web3.eth.subscribe('newBlockHeaders').on('data', cb)
+    return (): void => {
+      blockSub.unsubscribe()
+    }
+  }
 
   const {
     accounts: [account],
@@ -69,7 +76,7 @@ const subscribeToBlockchainUpdate = ({
     blockHeader: null,
   }
 
-  return (callback: (changedChainData: BlockchainUpdatePrompt) => void) => {
+  const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
     const unsubNetwork = networkUpdate(chainId => {
       blockchainPrompt = { ...blockchainPrompt, chainId }
       log('chainId changed:', chainId)
@@ -81,12 +88,11 @@ const subscribeToBlockchainUpdate = ({
       callback(blockchainPrompt)
     })
 
-    const blockSub = blockUpdate(blockHeader => {
+    const unsubBlock = blockUpdate(blockHeader => {
       blockchainPrompt = { ...blockchainPrompt, blockHeader }
       log('block changed:', blockHeader.number)
       callback(blockchainPrompt)
     })
-    const unsubBlock = () => blockSub.unsubscribe()
 
     return (): void => {
       unsubNetwork()
@@ -94,6 +100,8 @@ const subscribeToBlockchainUpdate = ({
       unsubBlock()
     }
   }
+
+  return subscriptionHOC
 }
 
 // const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
@@ -114,7 +122,7 @@ export class WalletApiImpl implements WalletApi {
   private _provider: Provider | null
   private _web3: Web3 | null
 
-  private _unsubscribe = () => {}
+  private _unsubscribe: Command = () => {}
 
   public constructor() {
     this._listeners = []
@@ -145,7 +153,7 @@ export class WalletApiImpl implements WalletApi {
       this._notifyListeners.bind(this),
     )
 
-    let unsubscribeDisconnect: () => void
+    let unsubscribeDisconnect: Command = () => {}
     if (isWalletConnectSubscriptions(subscriptions)) {
       unsubscribeDisconnect = subscriptions.onStop(this.disconnect.bind(this))
     } else if (isMetamaskSubscriptions(subscriptions)) {
@@ -157,9 +165,9 @@ export class WalletApiImpl implements WalletApi {
       })
     }
 
-    this._unsubscribe = () => {
+    this._unsubscribe = (): void => {
       unsubscribeUpdates()
-      unsubscribeDisconnect && unsubscribeDisconnect()
+      unsubscribeDisconnect()
     }
   }
 

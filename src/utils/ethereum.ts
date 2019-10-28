@@ -22,4 +22,4 @@ const id2Network = {
   42: 'Kovan',
 }
 
-export const getNetworkFromId = (networkId: number) => id2Network[networkId] || 'Unknown Network'
+export const getNetworkFromId = (networkId: number): string => id2Network[networkId] || 'Unknown Network'
