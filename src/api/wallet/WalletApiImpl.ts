@@ -226,7 +226,7 @@ export class WalletApiImpl implements WalletApi {
   }
   private get _networkId(): Network {
     const { chainId = 0 } = getProviderState(this._provider) || {}
-    return +chainId
+    return chainId
   }
 }
 
