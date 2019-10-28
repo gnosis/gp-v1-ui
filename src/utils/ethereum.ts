@@ -13,3 +13,13 @@ export function toBnOrNull(value: string | number): BN | null {
     return null
   }
 }
+
+const id2Network = {
+  1: 'Mainnet',
+  3: 'Ropsten',
+  4: 'Rinkeby',
+  5: 'Goerli',
+  42: 'Kovan',
+}
+
+export const getNetworkFromId = (networkId: number) => id2Network[networkId] || 'Unknown Network'

@@ -20,7 +20,7 @@ import { EtherscanLink } from './EtherscanLink'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { abbreviateString } from 'utils'
+import { abbreviateString, getNetworkFromId } from 'utils'
 
 import WalletImg from 'img/unknown-token.png'
 
@@ -90,14 +90,6 @@ const MonospaceAddress = styled(MonospaceText)`
 
 interface WalletProps extends RouteComponentProps {
   className: string
-}
-
-const id2Network = {
-  1: 'Mainnet',
-  3: 'Ropsten',
-  4: 'Rinkeby',
-  5: 'Goerli',
-  42: 'Kovan',
 }
 
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
@@ -196,7 +188,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
         <>
           {/* Network */}
           <ThinWalletItem>
-            <MonospaceText>{id2Network[networkId] || 'Unknown Network'}</MonospaceText>
+            <MonospaceText>{getNetworkFromId(networkId)}</MonospaceText>
           </ThinWalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
