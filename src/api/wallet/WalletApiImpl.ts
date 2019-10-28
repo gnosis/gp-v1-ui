@@ -101,6 +101,7 @@ const subscribeToBlockchainUpdate = ({
 const wcOptions: WalletConnectInits = {
   package: WalletConnectProvider,
   options: {
+    // TODO get infuraId from .env
     infuraId: '8b4d9b4306294d2e92e0775ff1075066',
   },
 }
