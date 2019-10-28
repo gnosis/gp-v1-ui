@@ -6,8 +6,8 @@ export type Command = () => void
 
 export enum Network {
   Mainnet = 1,
-  Rinkeby = 4,
   Ropsten = 3,
+  Rinkeby = 4,
   Goerli = 5,
   Kovan = 42,
 }
