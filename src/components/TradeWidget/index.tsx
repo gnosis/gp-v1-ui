@@ -33,12 +33,12 @@ const TradeWidget: React.FC = () => {
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
-  const [payWithToken, setPayWithToken] = useState(() => _getToken('DAI', tokens))
+  const [sellToken, setSellToken] = useState(() => _getToken('DAI', tokens))
   const [receiveToken, setReceiveToken] = useState(() => _getToken('USDC', tokens))
 
   const swapTokens = (): void => {
-    setPayWithToken(receiveToken)
-    setReceiveToken(payWithToken)
+    setSellToken(receiveToken)
+    setReceiveToken(sellToken)
   }
 
   const onSelectChangeFactory = (
@@ -57,10 +57,10 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget>
       <TokenRow
-        token={payWithToken}
+        token={sellToken}
         tokens={tokens}
-        selectLabel="pay with"
-        onSelectChange={onSelectChangeFactory(setPayWithToken, receiveToken)}
+        selectLabel="sell"
+        onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
       />
       <IconWrapper onClick={swapTokens}>
         <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
@@ -69,7 +69,7 @@ const TradeWidget: React.FC = () => {
         token={receiveToken}
         tokens={tokens}
         selectLabel="receive"
-        onSelectChange={onSelectChangeFactory(setReceiveToken, payWithToken)}
+        onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
       />
       <SubmitButton>
         <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
