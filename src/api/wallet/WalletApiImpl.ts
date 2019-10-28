@@ -145,8 +145,17 @@ export class WalletApiImpl implements WalletApi {
       this._notifyListeners.bind(this),
     )
 
-    const unsubscribeDisconnect =
-      isWalletConnectSubscriptions(subscriptions) && subscriptions.onStop(this.disconnect.bind(this))
+    let unsubscribeDisconnect: () => void
+    if (isWalletConnectSubscriptions(subscriptions)) {
+      unsubscribeDisconnect = subscriptions.onStop(this.disconnect.bind(this))
+    } else if (isMetamaskSubscriptions(subscriptions)) {
+      unsubscribeDisconnect = subscriptions.onAccountsChanged(accounts => {
+        if (accounts.length > 0) return
+        // accounts  = [] when user locks Metamask
+
+        this.disconnect()
+      })
+    }
 
     this._unsubscribe = () => {
       unsubscribeUpdates()
