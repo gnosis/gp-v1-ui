@@ -96,13 +96,7 @@ function formatOptionLabel(
 ): React.ReactNode {
   const { token } = options
   const { context } = labelMeta
-  return context === 'value' ? (
-    <div>
-      <strong>{token.symbol}</strong>
-    </div>
-  ) : (
-    renderOptionLabel(token)
-  )
+  return context === 'value' ? <strong>{token.symbol}</strong> : renderOptionLabel(token)
 }
 
 const customSelectStyles = {
