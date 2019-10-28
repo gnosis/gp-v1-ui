@@ -19,7 +19,7 @@ const WrappedWidget = styled(Widget)`
 `
 
 const IconWrapper = styled.a`
-  margin: -1em 0 1.5em 0.75em;
+  margin: -0.5em 0 1.5em 1em;
   width: 2em;
 `
 

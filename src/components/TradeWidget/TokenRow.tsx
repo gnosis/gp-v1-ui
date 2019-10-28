@@ -11,11 +11,12 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  height: 6em;
 `
 
 const TokenImgWrapper = styled(TokenImg)`
-  width: 50px;
-  height: 50px;
+  width: 4em;
+  height: 4em;
 
   margin-right: 1em;
 `
