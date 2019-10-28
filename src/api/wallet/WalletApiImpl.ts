@@ -58,7 +58,6 @@ const subscribeToBlockchainUpdate = ({
 
   const blockUpdate = (cb: (blockHeader: BlockHeader) => void) => web3.eth.subscribe('newBlockHeaders').on('data', cb)
 
-  console.log('getProviderState(provider)', getProviderState(provider))
   const {
     accounts: [account],
     chainId,
@@ -106,7 +105,7 @@ const wcOptions: WalletConnectInits = {
 /**
  * Basic implementation of Wallet API
  */
-export class WalletApiReal implements WalletApi {
+export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
   private _web3: Web3 | null
@@ -227,4 +226,4 @@ export class WalletApiReal implements WalletApi {
   }
 }
 
-export default WalletApiReal
+export default WalletApiImpl
