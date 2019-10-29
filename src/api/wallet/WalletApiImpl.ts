@@ -124,8 +124,9 @@ export class WalletApiImpl implements WalletApi {
 
   private _unsubscribe: Command = () => {}
 
-  public constructor() {
+  public constructor(web3: Web3) {
     this._listeners = []
+    this._web3 = web3
   }
 
   public isConnected(): boolean {
@@ -142,8 +143,9 @@ export class WalletApiImpl implements WalletApi {
     this._provider = provider
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._web3 = new Web3(provider as any)
+    this._web3.setProvider(provider as any)
     log('[WalletApi] Connected')
+    ;(window as any).web3 = this._web3
 
     await this._notifyListeners()
 
