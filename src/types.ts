@@ -1,7 +1,5 @@
 import BN from 'bn.js'
 
-import 'global'
-
 export type Command = () => void
 
 export enum Network {
@@ -49,14 +47,7 @@ export interface TxOptionalParams {
   onSentTransaction?: (receipt: Receipt) => void
 }
 
-export interface TxResult<T> {
-  data: T
-  receipt: Receipt
-}
-
-export interface Receipt {
-  transactionHash: string
-}
+export type Receipt = TransactionReceipt
 
 export interface DepositApi {
   getContractAddress(): string
@@ -70,21 +61,16 @@ export interface DepositApi {
   getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number>
 
-  deposit(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>>
+  deposit(userAddress: string, tokenAddress: string, amount: BN, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 
   requestWithdraw(
     userAddress: string,
     tokenAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>>
+  ): Promise<Receipt>
 
-  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 export interface WalletInfo {
