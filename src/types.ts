@@ -112,14 +112,23 @@ export interface Erc20Api {
   allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
 
   approve(
+    senderAddress: string,
     tokenAddress: string,
-    userAddress: string,
     spenderAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<boolean>>
 
   transfer(
+    senderAddress: string,
+    tokenAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
+
+  transferFrom(
+    senderAddress: string,
     tokenAddress: string,
     fromAddress: string,
     toAddress: string,
