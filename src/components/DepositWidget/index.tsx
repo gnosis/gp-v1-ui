@@ -69,9 +69,8 @@ const Wrapper = styled.section`
 
 const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (receipt: Receipt): void => {
-    const notification = <TxNotification txHash={receipt.transactionHash} />
-    if (notification) {
-      toast.info(notification)
+    if (receipt.transactionHash) {
+      toast.info(<TxNotification txHash={receipt.transactionHash} />)
     } else {
       console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
     }
