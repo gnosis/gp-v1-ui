@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react'
+import React, { CSSProperties, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Select from 'react-select'
@@ -47,6 +47,7 @@ const InputBox = styled.div`
 
   input {
     margin: 0 0 0.5em 0;
+    width: 100%;
   }
 `
 
@@ -117,7 +118,7 @@ interface Props {
 }
 
 const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange }: Props) => {
-  const options = tokens.map(token => ({ token, value: token.symbol, label: token.name }))
+  const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
   return (
     <Wrapper>
