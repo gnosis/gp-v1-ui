@@ -14,12 +14,11 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull } from 'utils'
 import { log } from 'utils'
 import { HIGHLIGHT_TIME, ZERO, ALLOWANCE_MAX_VALUE } from 'const'
+import Widget from 'components/layout/Widget'
 
 const Wrapper = styled.section`
-  font-size: 0.85rem;
-  padding-bottom: 4em;
-  // border-spacing: 0px;
   table {
+    width: 100%;
     border-collapse: collapse;
   }
 
@@ -43,8 +42,12 @@ const Wrapper = styled.section`
   }
 
   tr td:last-child {
-    width: 18em;
+    max-width: 8rem;
     text-align: center;
+    > button {
+      font-size: 0.75rem;
+      min-width: 6rem;
+    }
   }
 
   td {
@@ -52,19 +55,15 @@ const Wrapper = styled.section`
   }
 
   tr {
-    border-bottom: 1px solid #f2f2f2;
+    border-bottom: 1px solid #00000026;
+
+    @media (max-width: 768px) {
+      border-bottom: 2px solid #00000026;
+    }
   }
 
   tr:last-child {
     border-bottom: none;
-  }
-`
-
-const LinkWrapper = styled.div`
-  a {
-    text-align: right;
-    margin-bottom: 3em;
-    display: block;
   }
 `
 
@@ -93,11 +92,8 @@ const DepositWidget: React.FC = () => {
 
   if (balances === undefined) {
     // Loading: Do not show the widget
-    return <></>
+    return null
   }
-  const contractLink = (
-    <EtherscanLink type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
-  )
 
   function _getToken(tokenAddress: string): TokenBalanceDetails {
     return balances.find(({ address }) => address === tokenAddress)
@@ -246,45 +242,46 @@ const DepositWidget: React.FC = () => {
   }
 
   return (
-    <Wrapper className="widget">
-      {contractLink && <LinkWrapper>{contractLink}</LinkWrapper>}
-      {error ? (
-        <ErrorMsg title="oops..." message="Something happened while loading the balances" />
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th colSpan={2}>Token</th>
-              <th>
-                Exchange
-                <br />
-                wallet
-              </th>
-              <th>
-                Pending
-                <br />
-                withdrawals
-              </th>
-              <th>Wallet</th>
-              <th></th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {balances &&
-              balances.map(tokenBalances => (
-                <Row
-                  key={tokenBalances.addressMainnet}
-                  tokenBalances={tokenBalances}
-                  onEnableToken={(): Promise<void> => _enableToken(tokenBalances.address)}
-                  onSubmitDeposit={(balance): Promise<void> => _deposit(balance, tokenBalances.address)}
-                  onSubmitWithdraw={(balance): Promise<void> => _requestWithdraw(balance, tokenBalances.address)}
-                  onClaim={(): Promise<void> => _claim(tokenBalances.address)}
-                />
-              ))}
-          </tbody>
-        </table>
-      )}
+    <Wrapper>
+      <Widget>
+        {error ? (
+          <ErrorMsg title="oops..." message="Something happened while loading the balances" />
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th colSpan={2}>Token</th>
+                <th>
+                  Exchange
+                  <br />
+                  wallet
+                </th>
+                <th>
+                  Pending
+                  <br />
+                  withdrawals
+                </th>
+                <th>Wallet</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {balances &&
+                balances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.addressMainnet}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => _enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance): Promise<void> => _deposit(balance, tokenBalances.address)}
+                    onSubmitWithdraw={(balance): Promise<void> => _requestWithdraw(balance, tokenBalances.address)}
+                    onClaim={(): Promise<void> => _claim(tokenBalances.address)}
+                  />
+                ))}
+            </tbody>
+          </table>
+        )}
+      </Widget>
     </Wrapper>
   )
 }

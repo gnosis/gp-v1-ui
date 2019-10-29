@@ -3,19 +3,21 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 const Wrapper = styled.footer`
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  padding 1.3em;
   text-align: center;
   position: relative;
   color: var(--color-text-secondary);
   font-size: 0.85rem;
 
   ul {
-    margin: 0;
-    padding: 0;
     display: flex;
     list-style-type: none;
     justify-content: center;
     white-space: nowrap;
-    margin-bottom: 2rem;
   }
 
   li {
@@ -25,11 +27,11 @@ const Wrapper = styled.footer`
     }
   }
 
+  ul, .version {
+    margin-left: auto;
+  }
+
   .version {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin-right: 3em;
     font-size: 0.85em;
   }
 `

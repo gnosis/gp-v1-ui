@@ -11,19 +11,19 @@ const variables = css`
 const GlobalStyles = createGlobalStyle`
   ${variables}
 
-  html {
-    font-size: 16px;
-    box-sizing: border-box;
-  }
-
-  body {    
+  html, body {  
     min-height: 100vh;
     margin: 0;
+
     font-size: 16px;
     font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
+    
     line-height: 1.5;
+    
     background-color: #f7f7f7;
     color: var(--color-text-primary);
+
+    box-sizing: border-box;
   }
 
   *, *:before, *:after {
@@ -49,11 +49,17 @@ const GlobalStyles = createGlobalStyle`
   }
 
   h1 {
-    font-size: 3rem;    
+    font-size: 3rem;
+    @media (max-width: 480px) {
+      font-size: 2.4rem;
+    }    
   }
 
   h2 {
     font-size: 2rem;
+    @media (max-width: 480px) {
+      font-size: 1.4rem;
+    }
   }
 
   // cleaning default browser styles
@@ -140,23 +146,18 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
-  .widget,
+  //TODO: extract into a Page component
   .page {
     background-color: white;
     margin: -3rem auto 3rem auto;
-    box-shadow: 1px 1px #e8e8e8;    
+    box-shadow: 1px 1px #e8e8e8;
     min-height: 25rem;
-  }
-
-  .widget {
-    padding: 2em;
-    border-radius: 10px;
-    min-width: 40vw;
-  }
-
-  .page {
     padding: 2rem 10vw 2rem 10vw;
     width: 95vw;
+
+    @media (max-width: 768px) {
+      margin: auto;
+    }
   }
 
 `

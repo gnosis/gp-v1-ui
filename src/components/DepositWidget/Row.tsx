@@ -4,18 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 
 import { TokenBalanceDetails, Command } from 'types'
-import unknownTokenImg from 'img/unknown-token.png'
 import { formatAmount, formatAmountFull } from 'utils'
 import Form from './Form'
 import { ZERO } from 'const'
 import BN from 'bn.js'
 import { log } from 'utils'
+import TokenImg from 'components/TokenImg'
 
 const TokenTr = styled.tr`
-  img {
-    width: 30px;
-    height: 30px;
-  }
 
   &.highlight {
     background-color: #fdffc1;
@@ -54,11 +50,6 @@ export interface RowProps {
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
-}
-
-function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
-  const image = event.currentTarget
-  image.src = unknownTokenImg
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
@@ -100,7 +91,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td>
-          <img src={image} alt={name} onError={_loadFallbackTokenImage} />
+          <TokenImg src={image} alt={name} />
         </td>
         <td>{name}</td>
         <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>

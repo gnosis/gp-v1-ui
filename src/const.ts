@@ -17,3 +17,9 @@ export const BATCH_TIME = 300
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000
+
+export const LEGALDOCUMENT = {
+  CONTACT_ADDRESS: '[INSERT ADDRESS]',
+  POC_URL: '/',
+  TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
+}
