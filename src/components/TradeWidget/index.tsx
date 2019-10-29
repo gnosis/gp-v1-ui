@@ -1,17 +1,17 @@
 import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
-
-import Widget from 'components/layout/Widget'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-import { Network, TokenDetails } from 'types'
-import { tokenListApi } from 'api'
-import TokenRow from './TokenRow'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
-function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
-  return tokens.find(token => token.symbol == symbol)
-}
+import TokenRow from './TokenRow'
+import Widget from 'components/layout/Widget'
+
+import useURLParams, { useLocation } from 'hooks/useURLParams'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+
+import { tokenListApi } from 'api'
+
+import { Network, TokenDetails } from 'types'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -23,18 +23,42 @@ const IconWrapper = styled.a`
   width: 2em;
 `
 
+const WarningLabel = styled.code`
+  background: #ffa8a8;
+  border-radius: 25;
+  font-weight: 800;
+  margin: 0 auto 15px;
+  padding: 6;
+  text-align: center;
+  width: 75%;
+`
+
 const SubmitButton = styled.button`
   margin: 2em 0 0 0;
   line-height: 2;
 `
 
+function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
+  return tokens.find(token => token.symbol == symbol)
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet
+  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
-  const [sellToken, setSellToken] = useState(() => _getToken('DAI', tokens))
-  const [receiveToken, setReceiveToken] = useState(() => _getToken('USDC', tokens))
+
+  // Listen on manual changes to URL search query
+  const urlSeachQuery = useLocation()
+
+  const [sellToken, setSellToken] = useState(_getToken(urlSeachQuery.get('sell'), tokens) || _getToken('WETH', tokens))
+  const [receiveToken, setReceiveToken] = useState(
+    _getToken(urlSeachQuery.get('receive'), tokens) || _getToken('USDC', tokens),
+  )
+
+  // Change URL on internal token change
+  useURLParams(`sell=${sellToken.symbol}&receive=${receiveToken.symbol}`)
 
   const swapTokens = (): void => {
     setSellToken(receiveToken)
@@ -54,8 +78,11 @@ const TradeWidget: React.FC = () => {
     }
   }
 
+  let sameToken = sellToken === receiveToken
+
   return (
     <WrappedWidget>
+      {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
       <TokenRow
         token={sellToken}
         tokens={tokens}
@@ -71,8 +98,9 @@ const TradeWidget: React.FC = () => {
         selectLabel="receive"
         onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
       />
-      <SubmitButton>
-        <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
+      <SubmitButton disabled={sameToken} style={{ cursor: sameToken ? 'default' : 'pointer' }}>
+        <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
+        {sameToken ? 'Please select different tokens' : 'Send limit order'}
       </SubmitButton>
     </WrappedWidget>
   )
