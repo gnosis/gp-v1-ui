@@ -77,13 +77,37 @@ export class Erc20ApiMock implements Erc20Api {
     toAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
 
     const balance = this._balances[fromAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
+
+    this._balances[fromAddress][tokenAddress] = balance.sub(amount)
+    this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
+
+    return RECEIPT
+  }
+
+  public async transferFrom(
+    senderAddress: string,
+    tokenAddress: string,
+    fromAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt> {
+    await waitAndSendReceipt({ txOptionalParams })
+    this._initBalances(fromAddress, tokenAddress)
+    this._initBalances(toAddress, tokenAddress)
+
+    const balance = this._balances[fromAddress][tokenAddress]
+    assert(balance.gte(amount), "The user doesn't have enough balance")
+
+    const allowance = this._allowances[fromAddress][tokenAddress][senderAddress]
+    this._allowances[fromAddress][tokenAddress][senderAddress] = allowance.sub(amount)
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
