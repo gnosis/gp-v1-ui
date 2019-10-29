@@ -1,4 +1,4 @@
-import { Erc20Api, TxOptionalParams, TxResult } from 'types'
+import { Erc20Api, TxOptionalParams, Receipt } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
@@ -57,7 +57,7 @@ export class Erc20ApiMock implements Erc20Api {
     spenderAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initAllowances(userAddress, tokenAddress, spenderAddress)
@@ -68,7 +68,7 @@ export class Erc20ApiMock implements Erc20Api {
       )} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
     )
 
-    return { data: true, receipt: RECEIPT }
+    return RECEIPT
   }
 
   public async transfer(
@@ -88,7 +88,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
-    return { data: true, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /********************************    private methods   ********************************/

@@ -112,8 +112,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   async function _enableToken(): Promise<void> {
     try {
-      const result = await enableToken()
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      const receipt = await enableToken()
+      console.log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       triggerHighlight()
 
@@ -128,7 +128,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
 
-      const result = await withdraw()
+      const receipt = await withdraw()
 
       if (mounted.current) {
         setTokenBalances(
@@ -146,7 +146,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
       triggerHighlight()
 
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      console.log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Withdraw of ${withdrawingBalance} ${symbol} completed`)
     } catch (error) {
@@ -158,8 +158,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   async function submitDeposit(userAddress: string, amount: BN): Promise<void> {
     try {
       console.log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-      const result = await depositApi.deposit(userAddress, address, amount, txOptionalParams)
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      const receipt = await depositApi.deposit(userAddress, address, amount, txOptionalParams)
+      console.log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       if (mounted.current) {
         setTokenBalances(
@@ -185,8 +185,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     try {
       console.log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      const result = await depositApi.requestWithdraw(userAddress, address, amount, txOptionalParams)
-      console.log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      const receipt = await depositApi.requestWithdraw(userAddress, address, amount, txOptionalParams)
+      console.log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       if (mounted.current) {
         setTokenBalances(

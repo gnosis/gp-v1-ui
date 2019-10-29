@@ -26,6 +26,8 @@ export const AMOUNT_SMALL = new BN('200000000000000000') // 0.2 Ether
 
 export const CONTRACT = '0x6810e776880c02933d47db1b9fc05908e5386b96'
 export const TX_HASH = '0x29205e7bc98d650bd728be609bd9a8f8a77c55f66454ba1bc845a3ec6ba19d5f'
-export const RECEIPT: Receipt = {
+// eslint-disable-next-line @typescript-eslint/no-object-literal-type-assertion
+export const RECEIPT = {
   transactionHash: TX_HASH,
-}
+} as Receipt
+// ok to cast for test data

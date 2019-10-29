@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { erc20Api, depositApi } from 'api'
-import { TokenBalanceDetails, TxOptionalParams, TxResult } from 'types'
+import { TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
 import assert from 'assert'
 import { useWalletConnection } from './useWalletConnection'
@@ -13,7 +13,7 @@ interface Params {
 interface Result {
   enabled: boolean
   enabling: boolean
-  enableToken(): Promise<TxResult<boolean>>
+  enableToken(): Promise<Receipt>
 }
 
 export const useEnableTokens = (params: Params): Result => {
@@ -29,7 +29,7 @@ export const useEnableTokens = (params: Params): Result => {
     }
   }, [])
 
-  async function enableToken(): Promise<TxResult<boolean>> {
+  async function enableToken(): Promise<Receipt> {
     assert(!enabled, 'The token was already enabled')
     assert(isConnected, "There's no connected wallet")
 
@@ -37,7 +37,7 @@ export const useEnableTokens = (params: Params): Result => {
 
     // Set the allowance
     const contractAddress = depositApi.getContractAddress()
-    const result = await erc20Api.approve(
+    const receipt = await erc20Api.approve(
       tokenAddress,
       userAddress,
       contractAddress,
@@ -51,7 +51,7 @@ export const useEnableTokens = (params: Params): Result => {
       setEnabling(false)
     }
 
-    return result
+    return receipt
   }
 
   return { enabled, enabling, enableToken }
