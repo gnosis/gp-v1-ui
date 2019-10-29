@@ -4,9 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_ENV=development MOCK=true webpack-dev-server --mode development --hot",
+    "start": "NODE_ENV=development MOCK=true MOCK_WALLET=false webpack-dev-server --mode development --hot",
     "mock": "NODE_ENV=development MOCK=true webpack-dashboard -- webpack-dev-server --mode development --hot",
-    "build": "rimraf ./dist && NODE_ENV=production MOCK=true webpack --mode production",
+    "build": "rimraf ./dist && NODE_ENV=production MOCK=true MOCK_WALLET=false webpack --mode production",
     "lint": "eslint src --ext .ts,.tsx,.js",
     "lint:fix": "eslint --fix . --ext .ts,.tsx,.js",
     "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
