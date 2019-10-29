@@ -72,7 +72,10 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   useEffect(() => {
     _getBalances(walletInfo)
       .then(balances => {
-        log('[useTokenBalances] Wallet balances', balances ? balances.map(b => formatAmount(b.walletBalance)) : null)
+        log(
+          '[useTokenBalances] Wallet balances',
+          balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
+        )
         setBalances(balances)
       })
       .catch(error => {

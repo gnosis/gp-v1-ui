@@ -93,7 +93,7 @@ describe('<Row /> claimable token', () => {
 })
 
 describe('<Row /> style', () => {
-  it.only('is highlighted', () => {
+  it('is highlighted', () => {
     const wrapper = render(
       _createRow({
         highlighted: true,
@@ -102,7 +102,7 @@ describe('<Row /> style', () => {
     expect(wrapper.attr('class')).toMatch(/highlight/)
   })
 
-  it.only('is enabling', () => {
+  it('is enabling', () => {
     const wrapper = render(
       _createRow({
         enabling: true,

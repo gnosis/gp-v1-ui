@@ -198,7 +198,7 @@ const DepositWidget: React.FC = () => {
       }
 
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-      toast.success(`Withdraw of ${formatAmount(withdrawingBalance)} ${symbol} completed`)
+      toast.success(`Withdraw of ${formatAmount(withdrawingBalance, decimals)} ${symbol} completed`)
     } catch (error) {
       console.error('Error executing the withdraw request', error)
       toast.error(`Error executing the withdraw request: ${error.message}`)
