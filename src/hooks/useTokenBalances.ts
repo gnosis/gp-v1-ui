@@ -73,6 +73,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           balances ? balances.map(b => formatAmount(b.walletBalance)) : null,
         )
         setBalances(balances)
+        setError(false)
       })
       .catch(error => {
         console.error('Error loading balances', error)
