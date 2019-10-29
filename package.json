@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_ENV=development MOCK=true MOCK_WALLET=false webpack-dev-server --mode development --hot",
+    "start": "NODE_ENV=development MOCK=true MOCK_WALLET=false MOCK_ERC20=false MOCK_TOKEN_LIST=false webpack-dev-server --mode development --hot",
     "mock": "NODE_ENV=development MOCK=true webpack-dashboard -- webpack-dev-server --mode development --hot",
     "build": "rimraf ./dist && NODE_ENV=production MOCK=true MOCK_WALLET=false webpack --mode production",
     "lint": "eslint src --ext .ts,.tsx,.js",
