@@ -6,6 +6,7 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
 import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const Wrapper = styled.section`
   overflow-x: auto;
@@ -71,7 +72,8 @@ const LinkWrapper = styled.div`
 
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
-  const contractAddress = depositApi.getContractAddress()
+  const { networkId } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress(networkId)
 
   if (balances === undefined) {
     // Loading: Do not show the widget

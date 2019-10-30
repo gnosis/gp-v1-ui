@@ -17,7 +17,7 @@ interface Result {
 }
 
 export const useEnableTokens = (params: Params): Result => {
-  const { userAddress, isConnected } = useWalletConnection()
+  const { userAddress, isConnected, networkId } = useWalletConnection()
   const { enabled: enabledInitial, address: tokenAddress } = params.tokenBalances
   const [enabled, setEnabled] = useState(enabledInitial)
   const [enabling, setEnabling] = useState(false)
@@ -36,7 +36,7 @@ export const useEnableTokens = (params: Params): Result => {
     setEnabling(true)
 
     // Set the allowance
-    const contractAddress = depositApi.getContractAddress()
+    const contractAddress = depositApi.getContractAddress(networkId)
     const receipt = await erc20Api.approve(
       tokenAddress,
       userAddress,

@@ -50,7 +50,7 @@ export interface TxOptionalParams {
 export type Receipt = TransactionReceipt
 
 export interface DepositApi {
-  getContractAddress(): string
+  getContractAddress(networkId: number): string
   getBatchTime(): Promise<number>
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
