@@ -145,7 +145,7 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(provider as any)
     log('[WalletApi] Connected')
-    ;(window as any).web3 = this._web3
+    ;(window as any).web3c = this._web3
 
     await this._notifyListeners()
 
