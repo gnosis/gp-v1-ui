@@ -330,6 +330,7 @@ const DepositWidget: React.FC = () => {
           </table>
         )}
       </Widget>
+      <Modali.Modal {...withdrawConfirmationModal} />
     </Wrapper>
   )
 }
