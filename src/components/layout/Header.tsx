@@ -14,7 +14,7 @@ const Wrapper = styled.header`
     align-items: center;
     flex-flow: row wrap;
 
-    @media (max-width: 768px) {
+    @media (max-width: 866px) {
       justify-content: center;
     }
   }
@@ -32,7 +32,7 @@ const Wrapper = styled.header`
       padding: 0.8em;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 866px) {
       flex: 1 1 100%;
       order: 3;
     }
@@ -74,12 +74,6 @@ const Wrapper = styled.header`
     color: #e0aacf;
   }
   }
-
-  @media (max-width: 768px) {
-    .logo,
-    .nav-links {
-    }
-  }
 `
 
 const Header: React.FC = () => (
@@ -99,8 +93,8 @@ const Header: React.FC = () => (
       <Wallet />
     </nav>
     <div className="header-title">
-      <h1>Swap stable coins</h1>
-      <h3>Fair, Efficient prices, Onchain</h3>
+      <h1>Swap Stable Coins</h1>
+      <h3>Fair, Efficient Prices, Onchain</h3>
     </div>
   </Wrapper>
 )
