@@ -11,7 +11,27 @@ import BN from 'bn.js'
 import { log } from 'utils'
 import TokenImg from 'components/TokenImg'
 
-const TokenTr = styled.tr`
+const TokenDiv = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: 2px solid #0000000f;
+  border-radius: 20px;
+  margin: 1rem 0;
+
+  > div {
+    margin: 0.1rem;
+    padding: 0.7rem;
+    text-align: center;
+    transition: all 0.5s ease;
+
+    &:last-child {
+      display: flex;
+      flex-flow: column;
+    }
+  }
 
   &.highlight {
     background-color: #fdffc1;
@@ -25,6 +45,59 @@ const TokenTr = styled.tr`
 
   &.selected {
     background-color: #ecdcff;
+  }
+
+  &:nth-child(odd) {
+    background: #8080801c;
+  }
+
+  @media screen and (max-width: 500px) {
+    grid-template-columns: none;
+    grid-template-rows: auto;
+
+    align-items: center;
+    justify-content: stretch;
+    padding: 0 0.7rem;
+
+    box-shadow: 1px 6px 7px 0px #0000002e;
+
+    > div {
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      border-bottom: 1px solid #00000024;
+
+      > * {
+        margin-left: 10px;
+      }
+
+      &:last-child {
+        border: none;
+        flex-flow: row nowrap;
+        padding: 0.7rem 0 0.7rem 0.7rem;
+
+        > button {
+          margin: 0.2rem;
+        }
+
+        > button:last-child {
+          border-radius: 0 20px 20px;
+        }
+      }
+
+      &::before {
+        /*
+        * aria-label has no advantage, it won't be read inside a table
+        content: attr(aria-label);
+        */
+        content: attr(data-label);
+        margin-right: auto;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+    }
+  }
 `
 
 const ClaimButton = styled.button`
@@ -89,13 +162,15 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   return (
     <>
-      <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
-        <td>
+      <TokenDiv data-address={address} className={className} data-address-mainnet={addressMainnet}>
+        <div data-label="Token">
           <TokenImg src={image} alt={name} />
-        </td>
-        <td>{name}</td>
-        <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
-        <td title={formatAmountFull(withdrawingBalance, decimals)}>
+          <div>{name}</div>
+        </div>
+        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals)}>
+          {formatAmount(exchangeBalanceTotal, decimals)}
+        </div>
+        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals)}>
           {claimable ? (
             <>
               <ClaimButton className="success" onClick={onClaim} disabled={claiming}>
@@ -123,9 +198,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           ) : (
             0
           )}
-        </td>
-        <td title={formatAmountFull(walletBalance, decimals)}>{formatAmount(walletBalance, decimals)}</td>
-        <td>
+        </div>
+        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals)}>
+          {formatAmount(walletBalance, decimals)}
+        </div>
+        <div data-label="Actions">
           {enabled ? (
             <>
               <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
@@ -152,8 +229,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               )}
             </button>
           )}
-        </td>
-      </TokenTr>
+        </div>
+      </TokenDiv>
       {isDepositFormVisible && (
         <Form
           title={
