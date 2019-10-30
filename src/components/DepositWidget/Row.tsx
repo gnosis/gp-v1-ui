@@ -21,8 +21,10 @@ const TokenDiv = styled.div`
   border-radius: 20px;
   margin: 0.3rem 0;
 
+  transition: background 0.1s ease-in-out;
+
   &:hover {
-    background: #65f96b17 !important;
+    background: #0000000f !important;
   }
 
   > div {
@@ -61,9 +63,9 @@ const TokenDiv = styled.div`
     background-color: #ecdcff;
   }
 
-  &:nth-child(odd) {
-    background: #8080801c;
-  }
+  // &:nth-child(odd) {
+  //   background: #8080801c;
+  // }
 
   @media screen and (max-width: 500px) {
     grid-template-columns: none;
