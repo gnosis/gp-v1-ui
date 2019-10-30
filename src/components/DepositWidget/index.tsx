@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import Modali, { useModali } from 'modali'
 
 import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
@@ -66,6 +67,37 @@ const Wrapper = styled.section`
   }
 `
 
+const ModalBodyWrapper = styled.div`
+  div > p {
+    padding: 0 1em;
+    color: #828282;
+    font-size: 0.85em;
+  }
+`
+
+interface ModalBodyProps {
+  pendingAmount: string
+  symbol: string
+}
+
+const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
+  return (
+    <ModalBodyWrapper>
+      <div>
+        <p>
+          There is already a pending withdrawal of {pendingAmount} {symbol}. If you create a new request, it will delete
+          the previous request and create a new one.
+        </p>
+        <p>
+          No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
+          consolidated.
+        </p>
+      </div>
+      <p>Do you wish to create a new withdrawal request that replaces the previous one?</p>
+    </ModalBodyWrapper>
+  )
+}
+
 const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (receipt: Receipt): void => {
     if (receipt.transactionHash) {
@@ -80,6 +112,31 @@ const DepositWidget: React.FC = () => {
   const { userAddress } = useWalletConnection()
   const { balances, setBalances, error } = useTokenBalances()
 
+  const [withdrawRequest, setWithdrawRequest] = useState({
+    amount: null,
+    tokenAddress: null,
+    pendingAmount: null,
+    symbol: null,
+  })
+  const [withdrawConfirmationModal, toggleWithdrawConfirmationModal] = useModali({
+    centered: true,
+    animated: true,
+    title: 'Confirm withdraw overwrite',
+    message: <ModalBody pendingAmount={withdrawRequest.pendingAmount} symbol={withdrawRequest.symbol} />,
+    buttons: [
+      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWithdrawConfirmationModal()} />,
+      <Modali.Button
+        label="Accept"
+        key="yes"
+        isStyleDefault
+        onClick={async (): Promise<void> => {
+          toggleWithdrawConfirmationModal()
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          await _requestWithdraw(withdrawRequest.amount, withdrawRequest.tokenAddress, true)
+        }}
+      />,
+    ],
+  })
   const contractAddress = depositApi.getContractAddress()
   const mounted = useRef(true)
   useEffect(() => {
@@ -141,27 +198,39 @@ const DepositWidget: React.FC = () => {
     }
   }
 
-  async function _requestWithdraw(amount: BN, tokenAddress: string): Promise<void> {
-    const { symbol, decimals } = _getToken(tokenAddress)
+  async function _requestWithdraw(amount: BN, tokenAddress: string, overwriteWithdraw: boolean = false): Promise<void> {
+    const { symbol, decimals, withdrawingBalance } = _getToken(tokenAddress)
     try {
-      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
-
-      const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
-      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-
-      if (mounted.current) {
-        _updateToken(tokenAddress, otherParams => {
-          return {
-            ...otherParams,
-            withdrawingBalance: amount,
-            claimable: false,
-            highlighted: true,
-          }
+      if (!(withdrawingBalance.isZero() || overwriteWithdraw)) {
+        // Storing current values before displaying modal
+        setWithdrawRequest({
+          amount,
+          tokenAddress,
+          pendingAmount: formatAmount(withdrawingBalance, decimals),
+          symbol,
         })
-        _clearHighlight(tokenAddress)
-      }
 
-      toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+        toggleWithdrawConfirmationModal()
+      } else {
+        log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+
+        const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
+        log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+        if (mounted.current) {
+          _updateToken(tokenAddress, otherParams => {
+            return {
+              ...otherParams,
+              withdrawingBalance: amount,
+              claimable: false,
+              highlighted: true,
+            }
+          })
+          _clearHighlight(tokenAddress)
+        }
+
+        toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+      }
     } catch (error) {
       console.error('Error requesting withdraw', error)
       toast.error(`Error requesting withdraw: ${error.message}`)
@@ -280,6 +349,7 @@ const DepositWidget: React.FC = () => {
           </table>
         )}
       </Widget>
+      <Modali.Modal {...withdrawConfirmationModal} />
     </Wrapper>
   )
 }

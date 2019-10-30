@@ -59,6 +59,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@hot-loader/react-dom": "^16.8.6",
     "bn.js": "^5.0.0",
+    "modali": "^1.2.0",
     "polished": "^3.4.1",
     "qrcode.react": "^0.9.3",
     "react": "^16.8.6",
