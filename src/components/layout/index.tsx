@@ -20,7 +20,7 @@ const Wrapper = styled.div`
     min-width: 40vw;
 
     @media (max-width: 768px) {
-      width: 95%;
+      width: 100%;
     }
   }
 `
