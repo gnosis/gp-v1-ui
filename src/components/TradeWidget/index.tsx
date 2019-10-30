@@ -53,7 +53,7 @@ const TradeWidget: React.FC = () => {
   const urlSeachQuery = useLocation()
 
   const [sellToken, setSellToken] = useState(
-    () => _getToken(urlSeachQuery.get('sell'), tokens) || _getToken('WETH', tokens),
+    () => _getToken(urlSeachQuery.get('sell'), tokens) || _getToken('DAI', tokens),
   )
   const [receiveToken, setReceiveToken] = useState(
     () => _getToken(urlSeachQuery.get('receive'), tokens) || _getToken('USDC', tokens),
