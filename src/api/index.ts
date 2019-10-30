@@ -61,9 +61,8 @@ function createDepositApi(erc20Api: Erc20Api): DepositApi {
 }
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
-const InfuraEndpoint = 'rinkeby.infura.io/v3/8b4d9b4306294d2e92e0775ff1075066'
-// breaks when try to connect to wss://
-const web3 = new Web3('https://' + InfuraEndpoint)
+const InfuraEndpoint = 'rinkeby.infura.io/ws/v3/8b4d9b4306294d2e92e0775ff1075066'
+const web3 = new Web3('wss://' + InfuraEndpoint)
 
 // Build APIs
 export const walletApi: WalletApi = createWalletApi(web3)
