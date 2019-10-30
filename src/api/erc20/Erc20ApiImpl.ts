@@ -7,7 +7,7 @@ import Erc20ABI from './Erc20ABI'
 import Web3 from 'web3'
 
 /**
- * Basic implementation of Wallet API
+ * Basic implementation of ERC20 API
  */
 export class Erc20ApiImpl implements Erc20Api {
   private _ReferenceERC20: ERC20
