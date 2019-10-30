@@ -13,7 +13,6 @@ export function useLocation(): URLSearchParams {
   const [search, setSearch] = useState(location.search)
 
   useMemo(() => {
-    search ? console.debug('SEARCH: ', search) : console.debug('No search params')
     setSearch(search)
   }, [search])
 

@@ -52,12 +52,10 @@ const TradeWidget: React.FC = () => {
   // Listen on manual changes to URL search query
   const urlSeachQuery = useLocation()
 
-  const [sellToken, setSellToken] = useState(
-    () => _getToken(urlSeachQuery.get('sell'), tokens) || _getToken('DAI', tokens),
-  )
-  const [receiveToken, setReceiveToken] = useState(
-    () => _getToken(urlSeachQuery.get('receive'), tokens) || _getToken('USDC', tokens),
-  )
+  const sellTokenSymbol = urlSeachQuery.get('sell') || 'DAI'
+  const receiveTokenSymbol = urlSeachQuery.get('receive') || 'USDC'
+  const [sellToken, setSellToken] = useState(() => _getToken(sellTokenSymbol, tokens))
+  const [receiveToken, setReceiveToken] = useState(() => _getToken(receiveTokenSymbol, tokens))
 
   // Change URL on internal token change
   useURLParams(`sell=${sellToken.symbol}&receive=${receiveToken.symbol}`)
