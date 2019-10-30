@@ -12,7 +12,7 @@ import Web3 from 'web3'
 export class Erc20ApiImpl implements Erc20Api {
   private _ReferenceERC20: ERC20
 
-  private static _address2ERC20cache: { [K: string]: ERC20 } = {}
+  private static _contractsCache: { [K: string]: ERC20 } = {}
 
   public constructor(web3: Web3) {
     this._ReferenceERC20 = new web3.eth.Contract(Erc20ABI)
@@ -105,14 +105,14 @@ export class Erc20ApiImpl implements Erc20Api {
   /********************************    private methods   ********************************/
 
   private _getERC20AtAddress(address: string): ERC20 {
-    const erc20 = Erc20ApiImpl._address2ERC20cache[address]
+    const erc20 = Erc20ApiImpl._contractsCache[address]
 
     if (erc20) return erc20
 
     const newERC20 = this._ReferenceERC20.clone()
     newERC20.options.address = address
 
-    return (Erc20ApiImpl._address2ERC20cache[address] = newERC20)
+    return (Erc20ApiImpl._contractsCache[address] = newERC20)
   }
 }
 
