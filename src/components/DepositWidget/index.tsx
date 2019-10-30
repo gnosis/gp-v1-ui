@@ -67,6 +67,37 @@ const Wrapper = styled.section`
   }
 `
 
+const ModalBodyWrapper = styled.div`
+  div > p {
+    padding: 0 1em;
+    color: #828282;
+    font-size: 0.85em;
+  }
+`
+
+interface ModalBodyProps {
+  pendingAmount: string
+  symbol: string
+}
+
+const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
+  return (
+    <ModalBodyWrapper>
+      <div>
+        <p>
+          There is already a pending withdrawal of {pendingAmount} {symbol}. If you create a new request, it will delete
+          the previous request and create a new one.
+        </p>
+        <p>
+          No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
+          consolidated.
+        </p>
+      </div>
+      <p>Do you wish to create a new withdrawal request that replaces the previous one?</p>
+    </ModalBodyWrapper>
+  )
+}
+
 const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (receipt: Receipt): void => {
     if (receipt.transactionHash) {
@@ -91,19 +122,7 @@ const DepositWidget: React.FC = () => {
     centered: true,
     animated: true,
     title: 'Confirm withdraw overwrite',
-    message: (
-      <>
-        <p>
-          There is already a pending withdrawal of {withdrawRequest.pendingAmount} {withdrawRequest.symbol}. If you
-          create a new request, it will delete the previous request and create a new one.
-        </p>
-        <p>
-          No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
-          consolidated.
-        </p>
-        <p>Do you wish to create a new withdrawal request that replaces the previous one?</p>
-      </>
-    ),
+    message: <ModalBody pendingAmount={withdrawRequest.pendingAmount} symbol={withdrawRequest.symbol} />,
     buttons: [
       <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWithdrawConfirmationModal()} />,
       <Modali.Button
