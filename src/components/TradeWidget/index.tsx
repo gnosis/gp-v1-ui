@@ -39,7 +39,7 @@ const SubmitButton = styled.button`
 `
 
 function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
-  return tokens.find(token => token.symbol == symbol)
+  return tokens.find(token => token.symbol === symbol.toUpperCase())
 }
 
 const TradeWidget: React.FC = () => {
