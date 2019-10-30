@@ -16,7 +16,7 @@ const Wrapper = styled.section`
     display: inherit;
     justify-content: center;
     align-items: center;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: 1.1fr repeat(4, 1fr);
 
     > div {
       color: #000000;

@@ -13,19 +13,33 @@ import TokenImg from 'components/TokenImg'
 
 const TokenDiv = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 1.1fr repeat(4, 1fr);
   align-items: center;
   justify-content: center;
 
   border-bottom: 2px solid #0000000f;
   border-radius: 20px;
-  margin: 1rem 0;
+  margin: 0.3rem 0;
+
+  &:hover {
+    background: #65f96b17 !important;
+  }
 
   > div {
     margin: 0.1rem;
     padding: 0.7rem;
     text-align: center;
     transition: all 0.5s ease;
+
+    &:first-child {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-evenly;
+      align-items: center;
+      > * {
+        margin: 5px;
+      }
+    }
 
     &:last-child {
       display: flex;
@@ -70,7 +84,12 @@ const TokenDiv = styled.div`
       > * {
         margin-left: 10px;
       }
-
+      &:first-child {
+        > img {
+          order: 2;
+          margin-right: -8px;
+        }
+      }
       &:last-child {
         border: none;
         flex-flow: row nowrap;
