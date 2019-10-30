@@ -22,14 +22,11 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async balanceOf(tokenAddress: string, userAddress: string): Promise<BN> {
-    console.log('userAddress', userAddress)
-    console.log('tokenAddress', tokenAddress)
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const result = await erc20.methods.balanceOf(userAddress).call()
-    console.log('balance result for token', tokenAddress, 'user', userAddress, '=', result) // this is string
 
     return toBN(result)
   }
@@ -40,7 +37,6 @@ export class Erc20ApiImpl implements Erc20Api {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const result = await erc20.methods.allowance(userAddress, spenderAddress).call()
-    console.log('allowance result', result)
 
     return toBN(result)
   }
