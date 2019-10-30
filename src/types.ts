@@ -3,6 +3,7 @@ import BN from 'bn.js'
 import 'global'
 
 export type Command = () => void
+export type Mutation<T> = (original: T) => T
 
 export enum Network {
   Mainnet = 1,
@@ -25,6 +26,9 @@ export interface TokenBalanceDetails extends TokenDetails {
   claimable: boolean
   walletBalance: BN
   enabled: boolean
+  highlighted: boolean
+  enabling: boolean
+  claiming: boolean
 }
 
 export interface TokenList {

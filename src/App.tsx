@@ -28,7 +28,7 @@ const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
   return (
     <Route
       {...rest}
-      render={(props: any): React.ReactNode =>
+      render={(props): React.ReactNode =>
         isConnected ? (
           <Component {...props} />
         ) : (
