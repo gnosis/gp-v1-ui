@@ -114,6 +114,18 @@ const wcOptions: WalletConnectInits = {
   },
 }
 
+// needed if Web3 was pre-instantiated with wss | WebsocketProvider
+const closeOpenWebSocketConnection = (web3: Web3): void => {
+  if (
+    typeof web3.currentProvider === 'object' &&
+    web3.currentProvider.connected &&
+    'disconnect' in web3.currentProvider
+  ) {
+    // code=1000 - Normal Closure
+    web3.currentProvider.disconnect(1000, 'Switching provider')
+  }
+}
+
 /**
  * Basic implementation of Wallet API
  */
@@ -141,6 +153,8 @@ export class WalletApiImpl implements WalletApi {
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
 
     this._provider = provider
+
+    closeOpenWebSocketConnection(this._web3)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(provider as any)
