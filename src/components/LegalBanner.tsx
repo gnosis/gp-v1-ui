@@ -11,6 +11,8 @@ const Wrapper = styled.div`
 
   background-color: lightyellow;
   cursor: pointer;
+
+  font-size: 80%;
 `
 
 const Text = styled.p`
