@@ -39,7 +39,7 @@ const SubmitButton = styled.button`
 `
 
 function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
-  return tokens.find(token => token.symbol === symbol.toUpperCase())
+  return tokens.find(token => token.symbol === (symbol && symbol.toUpperCase()))
 }
 
 const TradeWidget: React.FC = () => {
@@ -52,9 +52,11 @@ const TradeWidget: React.FC = () => {
   // Listen on manual changes to URL search query
   const urlSeachQuery = useLocation()
 
-  const [sellToken, setSellToken] = useState(_getToken(urlSeachQuery.get('sell'), tokens) || _getToken('WETH', tokens))
+  const [sellToken, setSellToken] = useState(
+    () => _getToken(urlSeachQuery.get('sell'), tokens) || _getToken('WETH', tokens),
+  )
   const [receiveToken, setReceiveToken] = useState(
-    _getToken(urlSeachQuery.get('receive'), tokens) || _getToken('USDC', tokens),
+    () => _getToken(urlSeachQuery.get('receive'), tokens) || _getToken('USDC', tokens),
   )
 
   // Change URL on internal token change
