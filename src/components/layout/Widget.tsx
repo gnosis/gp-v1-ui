@@ -23,6 +23,7 @@ const Wrapper = styled.section`
 
   @media (max-width: 866px) {
     margin: 0 auto 3rem;
+    padding: 1em;
   }
 `
 

@@ -24,7 +24,7 @@ const TokenDiv = styled.div`
   transition: background 0.1s ease-in-out;
 
   &:hover {
-    background: #0000000f !important;
+    background: #0000000a !important;
   }
 
   > div {
