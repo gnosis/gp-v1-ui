@@ -7,11 +7,14 @@ import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
 import BN from 'bn.js'
 
-const Wrapper = styled.tr`
+const Wrapper = styled.div`
+  position: relative;
   background-color: #f7f0ff;
+  border-bottom: 2px solid #0000000f;
+  border-radius: 20px;
 
-  td {
-    position: relative;
+  > div {
+    margin-top: 2rem;
   }
 
   span.symbol {
@@ -19,19 +22,26 @@ const Wrapper = styled.tr`
   }
 
   h4 {
-    margin: 0;
+    margin: 3rem 1rem 1rem;
     font-size: 1.3em;
+    text-align: center;
   }
 
   ul {
     align-items: center;
     list-style: none;
     text-align: left;
+    margin: auto;
+    padding: 1rem 0 1rem 3rem;
+    max-width: 364px;
+
+    @media screen and (max-width: 420px) {
+      padding: 1rem 0;
+    }
 
     li {
       display: block;
       margin: 0 auto;
-      width: 25em;
     }
 
     li > label {
@@ -174,10 +184,10 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
 
   return (
     <Wrapper>
-      <td colSpan={6}>
-        <a className="times" onClick={cancelForm}>
-          &times;
-        </a>
+      <a className="times" onClick={cancelForm}>
+        &times;
+      </a>
+      <div>
         <h4>{title}</h4>
         <ul>
           <li>
@@ -208,7 +218,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             </button>
           </li>
         </ul>
-      </td>
+      </div>
     </Wrapper>
   )
 }
