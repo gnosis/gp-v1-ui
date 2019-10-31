@@ -51,6 +51,10 @@ const InputBox = styled.div`
   input {
     margin: 0 0 0.5em 0;
     width: 100%;
+
+    &.error {
+      box-shadow: 0 0 3px #cc0000;
+    }
   }
 `
 
@@ -59,6 +63,12 @@ const WalletDetail = styled.div`
 
   .success {
     color: green;
+    text-decoration: none;
+  }
+
+  &.error {
+    text-align: right;
+    color: red;
   }
 `
 
