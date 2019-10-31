@@ -8,10 +8,7 @@ import { tokenListApi } from 'api'
 import TokenRow from './TokenRow'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-
-function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
-  return tokens.find(token => token.symbol == symbol)
-}
+import { getToken } from 'utils'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -33,8 +30,8 @@ const TradeWidget: React.FC = () => {
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
-  const [sellToken, setSellToken] = useState(() => _getToken('DAI', tokens))
-  const [receiveToken, setReceiveToken] = useState(() => _getToken('USDC', tokens))
+  const [sellToken, setSellToken] = useState(() => getToken('symbol', 'DAI', tokens))
+  const [receiveToken, setReceiveToken] = useState(() => getToken('symbol', 'USDC', tokens))
 
   const swapTokens = (): void => {
     setSellToken(receiveToken)
