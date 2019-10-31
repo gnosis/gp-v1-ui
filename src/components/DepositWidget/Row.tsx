@@ -1,15 +1,15 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 
-import { TokenBalanceDetails, Command } from 'types'
-import { formatAmount, formatAmountFull } from 'utils'
 import Form from './Form'
-import { ZERO } from 'const'
-import BN from 'bn.js'
-import { log } from 'utils'
 import TokenImg from 'components/TokenImg'
+
+import { ZERO } from 'const'
+import { formatAmount, formatAmountFull, log } from 'utils'
+import { TokenBalanceDetails, Command } from 'types'
 
 const TokenDiv = styled.div`
   display: grid;
@@ -63,10 +63,6 @@ const TokenDiv = styled.div`
     background-color: #ecdcff;
   }
 
-  // &:nth-child(odd) {
-  //   background: #8080801c;
-  // }
-
   @media screen and (max-width: 500px) {
     grid-template-columns: none;
     grid-template-rows: auto;
@@ -107,10 +103,6 @@ const TokenDiv = styled.div`
       }
 
       &::before {
-        /*
-        * aria-label has no advantage, it won't be read inside a table
-        content: attr(aria-label);
-        */
         content: attr(data-label);
         margin-right: auto;
         font-weight: bold;
