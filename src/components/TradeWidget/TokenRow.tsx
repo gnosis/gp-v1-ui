@@ -1,8 +1,9 @@
-import React, { CSSProperties, useMemo } from 'react'
+import React, { CSSProperties, useMemo, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Select from 'react-select'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
+import { useFormContext } from 'react-hook-form'
 
 import TokenImg from 'components/TokenImg'
 import { TokenDetails, TokenBalanceDetails } from 'types'
@@ -113,16 +114,46 @@ function displayBalance(balance: TokenBalanceDetails | undefined | null, key: st
   return formatAmount(balance[key], balance.decimals) || '0'
 }
 
+function getMax(balance: TokenBalanceDetails | null, token: TokenDetails): string {
+  return formatAmount((balance || {}).exchangeBalance, token.decimals, 4, false) || '0'
+}
+
+// TODO: move into a validators file?
+function validatePositive(value: string): true | string {
+  return Number(value) > 0 || 'Invalid amount'
+}
+
+function validateMax(value: string, validateMaxAmount: boolean, max: string): true | string {
+  return validateMaxAmount ? Number(value) <= Number(max) || 'Insufficient funds' : true
+}
+
 interface Props {
   token: TokenDetails
   tokens: TokenDetails[]
   balance: TokenBalanceDetails
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
+  inputId: string
+  validateMaxAmount?: true
 }
 
-const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange, balance }) => {
+const TokenRow: React.FC<Props> = ({
+  token,
+  tokens,
+  selectLabel,
+  onSelectChange,
+  balance,
+  inputId,
+  validateMaxAmount,
+}) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
+
+  const { register, errors } = useFormContext()
+
+  const maxRef = useRef(getMax(balance, token))
+  useEffect(() => {
+    maxRef.current = getMax(balance, token)
+  }, [balance, token])
 
   return (
     <Wrapper>
@@ -144,7 +175,19 @@ const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange,
         />
       </SelectBox>
       <InputBox>
-        <input type="text" placeholder="0" />
+        <input
+          className={errors[inputId] && 'error'}
+          placeholder="0"
+          name={inputId}
+          type="text"
+          required
+          ref={register({
+            validate: {
+              positive: (value: string): true | string => validatePositive(value),
+              max: (value: string): true | string => validateMax(value, validateMaxAmount, maxRef.current),
+            },
+          })}
+        />
         <WalletDetail>
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
@@ -154,6 +197,7 @@ const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange,
         <WalletDetail>
           <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
         </WalletDetail>
+        {errors[inputId] && <WalletDetail className="error">{errors[inputId].message}</WalletDetail>}
       </InputBox>
     </Wrapper>
   )

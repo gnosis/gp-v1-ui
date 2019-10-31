@@ -1,19 +1,25 @@
 import React, { useState, useMemo } from 'react'
+import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components'
+import useForm, { FormContext } from 'react-hook-form'
 
-import Widget from 'components/layout/Widget'
-import { useWalletConnection } from 'hooks/useWalletConnection'
 import { Network, TokenDetails } from 'types'
 import { tokenListApi } from 'api'
-import TokenRow from './TokenRow'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { getToken } from 'utils'
 import { useTokenBalances } from 'hooks/useTokenBalances'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import TokenRow from './TokenRow'
+import Widget from 'components/layout/Widget'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
+`
+
+const WrapperForm = styled.form`
+  display: flex;
+  flex-direction: column;
 `
 
 const IconWrapper = styled.a`
@@ -42,6 +48,10 @@ const TradeWidget: React.FC = () => {
     receiveToken.symbol,
   ])
 
+  const methods = useForm({ mode: 'onBlur' })
+  const sellTokenId = 'sellToken'
+  const receiveTokenId = 'receiveToken'
+
   const swapTokens = (): void => {
     setSellToken(receiveToken)
     setReceiveToken(sellToken)
@@ -62,26 +72,33 @@ const TradeWidget: React.FC = () => {
 
   return (
     <WrappedWidget>
-      <TokenRow
-        token={sellToken}
-        tokens={tokens}
-        balance={sellTokenBalance}
-        selectLabel="sell"
-        onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
-      />
-      <IconWrapper onClick={swapTokens}>
-        <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
-      </IconWrapper>
-      <TokenRow
-        token={receiveToken}
-        tokens={tokens}
-        balance={receiveTokenBalance}
-        selectLabel="receive"
-        onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
-      />
-      <SubmitButton>
-        <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
-      </SubmitButton>
+      <FormContext {...methods}>
+        <WrapperForm onSubmit={methods.handleSubmit(data => console.log('data', data))} noValidate>
+          <TokenRow
+            token={sellToken}
+            tokens={tokens}
+            balance={sellTokenBalance}
+            selectLabel="sell"
+            onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
+            inputId={sellTokenId}
+            validateMaxAmount
+          />
+          <IconWrapper onClick={swapTokens}>
+            <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
+          </IconWrapper>
+          <TokenRow
+            token={receiveToken}
+            tokens={tokens}
+            balance={receiveTokenBalance}
+            selectLabel="receive"
+            onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
+            inputId={receiveTokenId}
+          />
+          <SubmitButton type="submit">
+            <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
+          </SubmitButton>
+        </WrapperForm>
+      </FormContext>
     </WrappedWidget>
   )
 }
