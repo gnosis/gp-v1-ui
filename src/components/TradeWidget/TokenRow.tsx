@@ -148,7 +148,7 @@ const TokenRow: React.FC<Props> = ({
 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
-  const { register, errors } = useFormContext()
+  const { register, errors, setValue } = useFormContext()
 
   const maxRef = useRef(getMax(balance, token))
   useEffect(() => {
@@ -192,7 +192,9 @@ const TokenRow: React.FC<Props> = ({
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
           </strong>{' '}
-          <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
+          <a className="success" onClick={(): void => setValue(inputId, maxRef.current)}>
+            {displayBalance(balance, 'exchangeBalance')}
+          </a>
         </WalletDetail>
         <WalletDetail>
           <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
