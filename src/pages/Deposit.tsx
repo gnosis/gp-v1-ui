@@ -1,1 +1,1 @@
-export { default } from 'components/DepositWidget/grid'
+export { default } from 'components/DepositWidget'
