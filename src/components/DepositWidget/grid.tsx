@@ -44,25 +44,6 @@ const Wrapper = styled.section`
   }
 `
 
-/* const useResponsive = (): void | number => {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-
-  function handleResize(): void | number {
-    // check that client can handle this sexiness
-    const innerWidth = typeof window !== 'object' ? null : window.innerWidth
-
-    return setWindowWidth(innerWidth)
-  }
-
-  useEffect(() => {
-    window.addEventListener('resize', handleResize)
-
-    return (): void => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  return windowWidth
-} */
-
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
 
