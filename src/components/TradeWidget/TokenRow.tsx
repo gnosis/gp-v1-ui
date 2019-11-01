@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo, useRef, useEffect } from 'react'
+import React, { CSSProperties, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Select from 'react-select'
@@ -55,6 +55,10 @@ const InputBox = styled.div`
     &.error {
       box-shadow: 0 0 3px #cc0000;
     }
+
+    &.warning {
+      box-shadow: 0 0 3px #ff7500;
+    }
   }
 `
 
@@ -66,9 +70,15 @@ const WalletDetail = styled.div`
     text-decoration: none;
   }
 
-  &.error {
+  &.error,
+  &.warning {
     text-align: right;
+  }
+  &.error {
     color: red;
+  }
+  &.warning {
+    color: orange;
   }
 `
 
@@ -133,10 +143,6 @@ function validatePositive(value: string): true | string {
   return Number(value) > 0 || 'Invalid amount'
 }
 
-function validateMax(value: string, validateMaxAmount: boolean, max: string): true | string {
-  return validateMaxAmount ? Number(value) <= Number(max) || 'Insufficient funds' : true
-}
-
 interface Props {
   token: TokenDetails
   tokens: TokenDetails[]
@@ -158,12 +164,24 @@ const TokenRow: React.FC<Props> = ({
 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
-  const { register, errors, setValue } = useFormContext()
+  const { register, errors, setValue, watch } = useFormContext()
+  const error = errors[inputId]
 
-  const maxRef = useRef(getMax(balance, token))
-  useEffect(() => {
-    maxRef.current = getMax(balance, token)
-  }, [balance, token])
+  const max = Number(getMax(balance, token))
+  const inputValue = Number(watch(inputId)) || 0
+  const overMax = validateMaxAmount && inputValue > max ? inputValue - max : 0
+
+  const className = error ? 'error' : !!overMax ? 'warning' : ''
+
+  const errorOrWarning = error ? (
+    <WalletDetail className="error">{error.message}</WalletDetail>
+  ) : (
+    !!overMax && (
+      <WalletDetail className="warning">
+        Selling {overMax.toFixed(4)} {token.symbol} over your current balance
+      </WalletDetail>
+    )
+  )
 
   return (
     <Wrapper>
@@ -186,7 +204,7 @@ const TokenRow: React.FC<Props> = ({
       </SelectBox>
       <InputBox>
         <input
-          className={errors[inputId] && 'error'}
+          className={className}
           placeholder="0"
           name={inputId}
           type="text"
@@ -194,7 +212,6 @@ const TokenRow: React.FC<Props> = ({
           ref={register({
             validate: {
               positive: (value: string): true | string => validatePositive(value),
-              max: (value: string): true | string => validateMax(value, validateMaxAmount, maxRef.current),
             },
           })}
         />
@@ -202,14 +219,14 @@ const TokenRow: React.FC<Props> = ({
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
           </strong>{' '}
-          <a className="success" onClick={(): void => setValue(inputId, maxRef.current)}>
+          <a className="success" onClick={(): void => setValue(inputId, max.toFixed(4))}>
             {displayBalance(balance, 'exchangeBalance')}
           </a>
         </WalletDetail>
         <WalletDetail>
           <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
         </WalletDetail>
-        {errors[inputId] && <WalletDetail className="error">{errors[inputId].message}</WalletDetail>}
+        {errorOrWarning}
       </InputBox>
     </Wrapper>
   )
