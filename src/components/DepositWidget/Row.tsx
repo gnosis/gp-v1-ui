@@ -63,7 +63,7 @@ const TokenDiv = styled.div`
     background-color: #ecdcff;
   }
 
-  @media screen and (max-width: 500px) {
+  @media only screen and (max-width: 500px) {
     grid-template-columns: none;
     grid-template-rows: auto;
 

@@ -19,7 +19,7 @@ const Wrapper = styled.div`
     margin: auto;
     min-width: 40vw;
 
-    @media (max-width: 768px) {
+    @media only screen and (max-width: 768px) {
       width: 100%;
     }
   }

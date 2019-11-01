@@ -35,7 +35,7 @@ const Wrapper = styled.div`
     padding: 1rem 0 1rem 3rem;
     max-width: 364px;
 
-    @media screen and (max-width: 420px) {
+    @media only screen and (max-width: 420px) {
       padding: 1rem 0;
     }
 
@@ -72,7 +72,7 @@ const Wrapper = styled.div`
     }
 
     li > label {
-      display: inline-block;
+      display: block;
       height: 100%;
     }
 

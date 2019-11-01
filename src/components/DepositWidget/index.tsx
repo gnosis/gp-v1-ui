@@ -33,7 +33,7 @@ const Wrapper = styled.section`
       font-weight: 800;
     }
 
-    @media screen and (max-width: 500px) {
+    @media only screen and (max-width: 500px) {
       display: none;
     }
   }

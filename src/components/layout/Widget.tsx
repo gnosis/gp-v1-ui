@@ -21,7 +21,7 @@ const Wrapper = styled.section`
   display: flex;
   flex-direction: column;
 
-  @media (max-width: 866px) {
+  @media only screen and (max-width: 866px) {
     margin: 0 auto 3rem;
     padding: 1em;
   }
