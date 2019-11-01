@@ -72,8 +72,9 @@ const WalletDetail = styled.div`
 
   &.error,
   &.warning {
-    text-align: right;
+    margin: 0 0 1em 0;
   }
+
   &.error {
     color: red;
   }
@@ -215,6 +216,7 @@ const TokenRow: React.FC<Props> = ({
             },
           })}
         />
+        {errorOrWarning}
         <WalletDetail>
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
@@ -226,7 +228,6 @@ const TokenRow: React.FC<Props> = ({
         <WalletDetail>
           <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
         </WalletDetail>
-        {errorOrWarning}
       </InputBox>
     </Wrapper>
   )
