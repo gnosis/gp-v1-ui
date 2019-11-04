@@ -160,6 +160,10 @@ const GlobalStyles = createGlobalStyle`
     }
   }
 
+  .noScroll {
+    overflow: hidden;
+  }
+
 `
 
 export default GlobalStyles
