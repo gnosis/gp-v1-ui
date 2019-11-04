@@ -5,7 +5,8 @@ import Select from 'react-select'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
 import TokenImg from 'components/TokenImg'
-import { TokenDetails } from 'types'
+import { TokenDetails, TokenBalanceDetails } from 'types'
+import { formatAmount } from 'utils'
 
 const Wrapper = styled.div`
   display: flex;
@@ -105,14 +106,22 @@ const customSelectStyles = {
   valueContainer: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '4.5em' }),
 }
 
+function displayBalance(balance: TokenBalanceDetails | undefined | null, key: string): string {
+  if (!balance) {
+    return '0'
+  }
+  return formatAmount(balance[key], balance.decimals) || '0'
+}
+
 interface Props {
   token: TokenDetails
   tokens: TokenDetails[]
+  balance: TokenBalanceDetails
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
 }
 
-const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange }: Props) => {
+const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange, balance }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
   return (
@@ -140,10 +149,10 @@ const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange 
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
           </strong>{' '}
-          <span className="success">312312.33</span>
+          <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
         </WalletDetail>
         <WalletDetail>
-          <strong>Wallet:</strong> 444.33
+          <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
         </WalletDetail>
       </InputBox>
     </Wrapper>

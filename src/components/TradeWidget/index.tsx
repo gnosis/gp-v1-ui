@@ -9,6 +9,7 @@ import TokenRow from './TokenRow'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { getToken } from 'utils'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -29,9 +30,17 @@ const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet
+
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
   const [sellToken, setSellToken] = useState(() => getToken('symbol', 'DAI', tokens))
   const [receiveToken, setReceiveToken] = useState(() => getToken('symbol', 'USDC', tokens))
+
+  const { balances } = useTokenBalances()
+  const sellTokenBalance = useMemo(() => getToken('symbol', sellToken.symbol, balances), [balances, sellToken.symbol])
+  const receiveTokenBalance = useMemo(() => getToken('symbol', receiveToken.symbol, balances), [
+    balances,
+    receiveToken.symbol,
+  ])
 
   const swapTokens = (): void => {
     setSellToken(receiveToken)
@@ -56,6 +65,7 @@ const TradeWidget: React.FC = () => {
       <TokenRow
         token={sellToken}
         tokens={tokens}
+        balance={sellTokenBalance}
         selectLabel="sell"
         onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
       />
@@ -65,6 +75,7 @@ const TradeWidget: React.FC = () => {
       <TokenRow
         token={receiveToken}
         tokens={tokens}
+        balance={receiveTokenBalance}
         selectLabel="receive"
         onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
       />
