@@ -106,8 +106,8 @@ const customSelectStyles = {
   valueContainer: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '4.5em' }),
 }
 
-function displayBalance(balance: TokenBalanceDetails | undefined, key: string): string {
-  if (balance === undefined) {
+function displayBalance(balance: TokenBalanceDetails | undefined | null, key: string): string {
+  if (!balance) {
     return '0'
   }
   return formatAmount(balance[key], balance.decimals) || '0'
