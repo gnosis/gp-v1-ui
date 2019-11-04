@@ -7,11 +7,27 @@ import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
 import BN from 'bn.js'
 
-const Wrapper = styled.div`
+const DynamicWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.fixedContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: #000000b5;
+  }
+`
+
+const InnerWrapper = styled.div`
   position: relative;
   background-color: #f7f0ff;
   border-bottom: 2px solid #0000000f;
   border-radius: 20px;
+  width: 96%;
 
   > div {
     margin-top: 2rem;
@@ -103,6 +119,7 @@ export interface FormProps {
   totalAmountLabel: string
   totalAmount: BN
   inputLabel: string
+  responsive?: boolean
   submitBtnLabel: string
   submitBtnIcon: IconDefinition
   onSubmit: (amount: BN) => Promise<void>
@@ -133,7 +150,7 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
 
 export const Form: React.FC<FormProps> = (props: FormProps) => {
   const { symbol, decimals } = props.tokenBalances
-  const { title, totalAmount, totalAmountLabel, inputLabel, submitBtnLabel, submitBtnIcon } = props
+  const { title, totalAmount, totalAmountLabel, inputLabel, responsive, submitBtnLabel, submitBtnIcon } = props
   const [amountInput, setAmountInput] = useState('')
   const [validatorActive, setValidatorActive] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -183,43 +200,45 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
   }
 
   return (
-    <Wrapper>
-      <a className="times" onClick={cancelForm}>
-        &times;
-      </a>
-      <div>
-        <h4>{title}</h4>
-        <ul>
-          <li>
-            <label>{totalAmountLabel}</label>
-            <div className="wallet">
-              <input type="text" value={formatAmountFull(totalAmount, decimals)} disabled />
-              <br />
-              <a className="max" onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false))}>
-                <small>Use Max</small>
-              </a>
-            </div>
-          </li>
-          <li>
-            <label>{inputLabel}</label>
-            <input
-              type="text"
-              value={amountInput}
-              onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
-              placeholder={symbol + ' amount'}
-            />
-            {errors.amountInput && <p className="error">{errors.amountInput}</p>}
-          </li>
-          <li className="buttons">
-            <a onClick={cancelForm}>Cancel</a>
-            <button type="button" className="success" disabled={!!errors.amountInput || loading} onClick={_onClick}>
-              <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
-              &nbsp; {submitBtnLabel}
-            </button>
-          </li>
-        </ul>
-      </div>
-    </Wrapper>
+    <DynamicWrapper className={responsive && 'fixedContainer'}>
+      <InnerWrapper>
+        <a className="times" onClick={cancelForm}>
+          &times;
+        </a>
+        <div>
+          <h4>{title}</h4>
+          <ul>
+            <li>
+              <label>{totalAmountLabel}</label>
+              <div className="wallet">
+                <input type="text" value={formatAmountFull(totalAmount, decimals)} disabled />
+                <br />
+                <a className="max" onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false))}>
+                  <small>Use Max</small>
+                </a>
+              </div>
+            </li>
+            <li>
+              <label>{inputLabel}</label>
+              <input
+                type="text"
+                value={amountInput}
+                onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
+                placeholder={symbol + ' amount'}
+              />
+              {errors.amountInput && <p className="error">{errors.amountInput}</p>}
+            </li>
+            <li className="buttons">
+              <a onClick={cancelForm}>Cancel</a>
+              <button type="button" className="success" disabled={!!errors.amountInput || loading} onClick={_onClick}>
+                <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
+                &nbsp; {submitBtnLabel}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </InnerWrapper>
+    </DynamicWrapper>
   )
 }
 
