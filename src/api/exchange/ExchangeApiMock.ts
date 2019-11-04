@@ -5,7 +5,7 @@ import { DepositApiMock } from './DepositApiMock'
 import { ExchangeApi, Order, AddOrderParams } from 'types'
 
 /**
- * Basic implemtation of Stable Coin Converter API
+ * Basic implementation of Stable Coin Converter API
  *
  * Trivial JS implementation for testing or development
  */
