@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import useForm, { FormContext } from 'react-hook-form'
 
 import TokenRow from './TokenRow'
+import OrderDetails from './OrderDetails'
 import Widget from 'components/layout/Widget'
 
 import { useParams } from 'react-router'
@@ -17,13 +18,6 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken } from 'utils'
-
-import { FEE_PERCENTAGE } from 'const'
-
-// TODO: move to utils?
-function calculatePrice(sellAmount: number, receiveAmount: number): number {
-  return sellAmount > 0 ? receiveAmount / sellAmount : 0
-}
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -59,25 +53,6 @@ const SubmitButton = styled.button`
   }
 `
 
-const OrderDetails = styled.dl`
-  margin: 2em 0 0 0;
-  font-size: 0.8em;
-`
-
-const Dd = styled.dd`
-  font-weight: bold;
-  margin: 0;
-`
-
-const Dt = styled.dt`
-  margin-left: 4em;
-`
-
-const Highlight = styled.span`
-  font-weight: bold;
-  color: #367be0;
-`
-
 const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -107,7 +82,7 @@ const TradeWidget: React.FC = () => {
   ])
 
   const methods = useForm({ mode: 'onBlur' })
-  const { watch, handleSubmit } = methods
+  const { handleSubmit } = methods
   const sellTokenId = 'sellToken'
   const receiveTokenId = 'receiveToken'
 
@@ -130,19 +105,6 @@ const TradeWidget: React.FC = () => {
   }
 
   let sameToken = sellToken === receiveToken
-  /**
-   * Regardless of the validation, check the current input values
-   * Returns true if both are valid numbers > 0
-   */
-  function showOrderDetails(): boolean {
-    return Number(watch(sellTokenId)) > 0 && Number(watch(receiveTokenId)) > 0
-  }
-
-  function _calculatePrice(): string {
-    const sellAmount = Number(watch(sellTokenId))
-    const receiveAmount = Number(watch(receiveTokenId))
-    return calculatePrice(sellAmount, receiveAmount).toFixed(2)
-  }
 
   return (
     <WrappedWidget>
@@ -169,33 +131,12 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveTokenId}
           />
-          {showOrderDetails() && (
-            <OrderDetails>
-              <Dd>Order details:</Dd>
-              <Dt>
-                Sell up to{' '}
-                <Highlight>
-                  {watch(sellTokenId)} {sellToken.symbol}
-                </Highlight>{' '}
-                at a price{' '}
-                <Highlight>
-                  1 {sellToken.symbol} = {_calculatePrice()} {receiveToken.symbol}
-                </Highlight>{' '}
-                or better. <br />
-                Your order might be partially filled.
-              </Dt>
-
-              <Dd>Fee:</Dd>
-              <Dt>
-                <Highlight>{FEE_PERCENTAGE}%</Highlight>, included already in your limit price.
-              </Dt>
-
-              <Dd>Expiration date:</Dd>
-              <Dt>
-                <Highlight>30 min</Highlight>
-              </Dt>
-            </OrderDetails>
-          )}
+          <OrderDetails
+            sellTokenId={sellTokenId}
+            sellToken={sellToken}
+            receiveTokenId={receiveTokenId}
+            receiveToken={receiveToken}
+          />
           <SubmitButton type="submit" disabled={!methods.formState.isValid}>
             <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
