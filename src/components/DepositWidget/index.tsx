@@ -11,7 +11,7 @@ import BN from 'bn.js'
 import { TxOptionalParams, Receipt, TokenBalanceDetails, Mutation } from 'types'
 import { TxNotification } from 'components/TxNotification'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, getToken } from 'utils'
 import { log } from 'utils'
 import { HIGHLIGHT_TIME, ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import Widget from 'components/layout/Widget'
@@ -150,10 +150,6 @@ const DepositWidget: React.FC = () => {
     return null
   }
 
-  function _getToken(tokenAddress: string): TokenBalanceDetails {
-    return balances.find(({ address }) => address === tokenAddress)
-  }
-
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
@@ -174,7 +170,7 @@ const DepositWidget: React.FC = () => {
 
   async function _deposit(amount: BN, tokenAddress: string): Promise<void> {
     try {
-      const { symbol, decimals } = _getToken(tokenAddress)
+      const { symbol, decimals } = getToken('address', tokenAddress, balances)
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
@@ -199,7 +195,7 @@ const DepositWidget: React.FC = () => {
   }
 
   async function _requestWithdraw(amount: BN, tokenAddress: string, overwriteWithdraw: boolean = false): Promise<void> {
-    const { symbol, decimals, withdrawingBalance } = _getToken(tokenAddress)
+    const { symbol, decimals, withdrawingBalance } = getToken('address', tokenAddress, balances)
     try {
       if (!(withdrawingBalance.isZero() || overwriteWithdraw)) {
         // Storing current values before displaying modal
@@ -238,7 +234,7 @@ const DepositWidget: React.FC = () => {
   }
 
   async function _claim(tokenAddress: string): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = _getToken(tokenAddress)
+    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
       _updateToken(tokenAddress, otherParams => {
@@ -273,7 +269,7 @@ const DepositWidget: React.FC = () => {
   }
 
   async function _enableToken(tokenAddress: string): Promise<void> {
-    const { symbol } = _getToken(tokenAddress)
+    const { symbol } = getToken('address', tokenAddress, balances)
     try {
       _updateToken(tokenAddress, otherParams => {
         return {
