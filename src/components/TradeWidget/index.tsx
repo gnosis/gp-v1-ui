@@ -24,7 +24,7 @@ const WrappedWidget = styled(Widget)`
   min-width: 0;
 `
 
-const WrapperForm = styled.form`
+const WrappedForm = styled.form`
   display: flex;
   flex-direction: column;
 `
@@ -109,7 +109,7 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget>
       <FormContext {...methods}>
-        <WrapperForm onSubmit={handleSubmit(data => console.log('data', data))}>
+        <WrappedForm onSubmit={handleSubmit(data => console.log('data', data))}>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             token={sellToken}
@@ -141,7 +141,7 @@ const TradeWidget: React.FC = () => {
             <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
-        </WrapperForm>
+        </WrappedForm>
       </FormContext>
     </WrappedWidget>
   )
