@@ -106,6 +106,13 @@ const customSelectStyles = {
   valueContainer: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '4.5em' }),
 }
 
+function displayBalance(balance: TokenBalanceDetails | undefined, key: string): string {
+  if (balance === undefined) {
+    return '0'
+  }
+  return formatAmount(balance[key], balance.decimals) || '0'
+}
+
 interface Props {
   token: TokenDetails
   tokens: TokenDetails[]
@@ -142,10 +149,10 @@ const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange,
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
           </strong>{' '}
-          <span className="success">{balance ? formatAmount(balance.exchangeBalance, balance.decimals) : 0}</span>
+          <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
         </WalletDetail>
         <WalletDetail>
-          <strong>Wallet:</strong> {balance ? formatAmount(balance.walletBalance, balance.decimals) : 0}
+          <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
         </WalletDetail>
       </InputBox>
     </Wrapper>
