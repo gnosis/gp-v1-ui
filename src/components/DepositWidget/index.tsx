@@ -1,15 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
+import BN from 'bn.js'
 import styled from 'styled-components'
 import Modali, { useModali } from 'modali'
 
 import { Row } from './Row'
-import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
-import BN from 'bn.js'
-import { formatAmount, getToken } from 'utils'
 import Widget from 'components/layout/Widget'
+
+import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
-import { log } from 'util'
+import useWindowSpecs from 'hooks/useWindowSpecs'
+
+import { log, formatAmount, getToken } from 'utils'
 
 const Wrapper = styled.section`
   .gridContainer {
@@ -83,6 +85,7 @@ const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
 const DepositWidget: React.FC = () => {
   const { balances, setBalances, error } = useTokenBalances()
   const { enableToken, deposit, requestWithdraw, claim } = useRowActions({ balances, setBalances })
+  const windowSpecs = useWindowSpecs()
 
   const [withdrawRequest, setWithdrawRequest] = useState({
     amount: null,
@@ -157,16 +160,17 @@ const DepositWidget: React.FC = () => {
             </div>
             <div className="rowContainer">
               {balances &&
-                balances.map(tokenBalances => <Row
-                  key={tokenBalances.addressMainnet}
-                  tokenBalances={tokenBalances}
-                  onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                  onSubmitDeposit={(balance): Promise<void> => deposit(balance, tokenBalances.address)}
-                  onSubmitWithdraw={(balance): Promise<void> => {
-                    return requestWithdrawConfirmation(balance, tokenBalances.address)
-                  }}
-                  onClaim={(): Promise<void> => claim(tokenBalances.address)}
-                />)}
+                balances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.addressMainnet}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance): Promise<void> => deposit(balance, tokenBalances.address)}
+                    onSubmitWithdraw={(balance): Promise<void> => requestWithdraw(balance, tokenBalances.address)}
+                    onClaim={(): Promise<void> => claim(tokenBalances.address)}
+                    {...windowSpecs}
+                  />
+                ))}
             </div>
           </div>
         )}
