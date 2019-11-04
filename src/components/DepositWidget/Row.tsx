@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -140,6 +140,7 @@ export interface RowProps {
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const { tokenBalances, onSubmitDeposit, onSubmitWithdraw, onClaim, onEnableToken } = props
+
   const {
     address,
     addressMainnet,
@@ -161,6 +162,20 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
+  // Checks innerWidth
+  let showResponsive = innerWidth < 500
+
+  useMemo((): void => {
+    const bodyClassList: string[] | DOMTokenList = (window && window.document.body.classList) || []
+    const noScrollActive = Array.from(bodyClassList).find((className: string): boolean => className === 'noScroll')
+    // if innerWidth > 500 && body has noScroll active - REMOVE it
+    if (noScrollActive && !visibleForm && !showResponsive) {
+      ;(bodyClassList as DOMTokenList).remove('noScroll')
+    } else if (!noScrollActive && visibleForm && showResponsive) {
+      ;(bodyClassList as DOMTokenList).add('noScroll')
+    }
+  }, [showResponsive, visibleForm])
+
   let className
   if (highlighted) {
     className = 'highlight'
@@ -172,6 +187,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
+
+  const _showHideForm = (type?: 'deposit' | 'withdraw' | null): void => {
+    if (window && window.document && innerWidth < 500) {
+      type ? window.document.body.classList.add('noScroll') : window.document.body.classList.remove('noScroll')
+    }
+
+    showForm(type)
+  }
 
   return (
     <>
@@ -218,11 +241,15 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <div data-label="Actions">
           {enabled ? (
             <>
-              <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
+              <button onClick={(): void => _showHideForm('deposit')} disabled={isDepositFormVisible}>
                 <FontAwesomeIcon icon={faPlus} />
                 &nbsp; Deposit
               </button>
-              <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
+              <button
+                onClick={(): void => _showHideForm('withdraw')}
+                disabled={isWithdrawFormVisible}
+                className="danger"
+              >
                 <FontAwesomeIcon icon={faMinus} />
                 &nbsp; Withdraw
               </button>
@@ -258,7 +285,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           submitBtnLabel="Deposit"
           submitBtnIcon={faPlus}
           onSubmit={onSubmitDeposit}
-          onClose={(): void => showForm()}
+          onClose={(): void => _showHideForm()}
+          responsive={showResponsive}
         />
       )}
       {isWithdrawFormVisible && (
@@ -275,7 +303,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           submitBtnLabel="Withdraw"
           submitBtnIcon={faMinus}
           onSubmit={onSubmitWithdraw}
-          onClose={(): void => showForm()}
+          onClose={(): void => _showHideForm()}
+          responsive={showResponsive}
         />
       )}
     </>
