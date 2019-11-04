@@ -7,7 +7,7 @@ import Wallet, { WalletWrapper } from 'components/Wallet'
 const Wrapper = styled.header`
   color: #ffffff;
   background-color: #3340a9;
-  min-height: ${rem('270px')};
+  min-height: ${rem('325px')};
 
   nav {
     display: flex;

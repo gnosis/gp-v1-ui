@@ -30,7 +30,7 @@ export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
   flex-flow: column nowrap;
   justify-content: center;
   margin: 1rem;
-  width: 20rem;
+  flex: 0 1 16rem;
 
   background: ghostwhite;
   border-radius: ${(props): string => (props.walletOpen ? '10px 10px 0 0' : '10px')};
