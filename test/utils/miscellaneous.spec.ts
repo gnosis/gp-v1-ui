@@ -13,6 +13,9 @@ describe('getToken', () => {
     it('returns `undefined` on `undefined` tokens list', () => {
       expect(getToken('symbol', 'any', undefined)).toBeUndefined()
     })
+    it('returns `undefined` on `null` tokens list', () => {
+      expect(getToken('symbol', 'any', null)).toBeUndefined()
+    })
     it('returns `undefined` when value not in tokens list', () => {
       expect(getToken('symbol', 'any', tokenList)).toBeUndefined()
     })

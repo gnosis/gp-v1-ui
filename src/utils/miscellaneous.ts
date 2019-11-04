@@ -8,7 +8,7 @@ export const log = process.env.NODE_ENV === 'test' ? noop : console.log
 export function getToken<T extends TokenDetails>(
   key: string,
   value: string | undefined = '',
-  tokens: T[] | undefined = [],
+  tokens: T[] | undefined | null,
 ): T | undefined {
-  return tokens.find(token => token[key] === value.toUpperCase())
+  return (tokens || []).find(token => token[key] === value.toUpperCase())
 }
