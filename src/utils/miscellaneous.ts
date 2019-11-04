@@ -10,5 +10,5 @@ export function getToken<T extends TokenDetails>(
   value: string | undefined = '',
   tokens: T[] | undefined = [],
 ): T | undefined {
-  return tokens.find(token => token[key] == value.toUpperCase())
+  return tokens.find(token => token[key] === value.toUpperCase())
 }
