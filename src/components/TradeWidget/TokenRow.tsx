@@ -11,11 +11,12 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  height: 6em;
 `
 
 const TokenImgWrapper = styled(TokenImg)`
-  width: 50px;
-  height: 50px;
+  width: 4em;
+  height: 4em;
 
   margin-right: 1em;
 `
@@ -95,13 +96,7 @@ function formatOptionLabel(
 ): React.ReactNode {
   const { token } = options
   const { context } = labelMeta
-  return context === 'value' ? (
-    <div>
-      <strong>{token.symbol}</strong>
-    </div>
-  ) : (
-    renderOptionLabel(token)
-  )
+  return context === 'value' ? <strong>{token.symbol}</strong> : renderOptionLabel(token)
 }
 
 const customSelectStyles = {
