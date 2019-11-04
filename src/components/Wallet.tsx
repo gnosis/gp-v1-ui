@@ -83,6 +83,7 @@ const WalletSlideWrapper = styled.div`
   background: inherit;
   width: 100%;
   top: 100%;
+  left: 0;
   box-shadow: 5px 19px 16px #00000033;
   border-radius: 0 0 10px 10px;
 `
