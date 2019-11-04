@@ -30,6 +30,10 @@ const IconWrapper = styled.a`
 const SubmitButton = styled.button`
   margin: 2em 0 0 0;
   line-height: 2;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 `
 
 const TradeWidget: React.FC = () => {
@@ -94,7 +98,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveTokenId}
           />
-          <SubmitButton type="submit">
+          <SubmitButton type="submit" disabled={!methods.formState.isValid}>
             <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
           </SubmitButton>
         </WrapperForm>
