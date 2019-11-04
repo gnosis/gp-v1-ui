@@ -17,8 +17,8 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken } from 'utils'
-// TODO: get from config
-const feeAmount = 0.1
+
+import { FEE_PERCENTAGE } from 'const'
 
 // TODO: move to utils?
 function calculatePrice(sellAmount: number, receiveAmount: number): number {
@@ -187,7 +187,7 @@ const TradeWidget: React.FC = () => {
 
               <Dd>Fee:</Dd>
               <Dt>
-                <Highlight>{feeAmount}%</Highlight>, included already in your limit price.
+                <Highlight>{FEE_PERCENTAGE}%</Highlight>, included already in your limit price.
               </Dt>
 
               <Dd>Expiration date:</Dd>
