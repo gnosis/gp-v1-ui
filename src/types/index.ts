@@ -93,20 +93,18 @@ export interface Order {
   sellTokenId: number
   validFrom: number
   validUntil: number
-  isSellOrder: boolean
   priceNumerator: BN
   priceDenominator: BN
   remainingAmount: BN
 }
 
-export interface AddOrderParams {
+export interface PlaceOrderParams {
   userAddress: string
   buyTokenId: number
   sellTokenId: number
-  isSellOrder: boolean
   validUntil: number
-  sellAmount: BN
   buyAmount: BN
+  sellAmount: BN
 }
 
 export interface ExchangeApi extends DepositApi {
@@ -114,10 +112,10 @@ export interface ExchangeApi extends DepositApi {
   getNumTokens(): Promise<number>
   getFeeDenominator(): Promise<number>
   addToken(tokenAddress: string): Promise<void>
-  placeOrder(orderParams: AddOrderParams): Promise<number>
+  placeOrder(orderParams: PlaceOrderParams): Promise<number>
   cancelOrder(orderId: number): Promise<void>
-  getUserAddress(userId: number): Promise<string> // tokenAddressToIdMap
-  getUserId(userAddress: string): Promise<number>
+  getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
+  getTokenIdByAddress(tokenAddress: string): Promise<number>
   getCurrentPrice(tokenId: number): Promise<BN>
 }
 

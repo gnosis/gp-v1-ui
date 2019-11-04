@@ -2,7 +2,7 @@
 import BN from 'bn.js'
 
 import { DepositApiMock } from './DepositApiMock'
-import { ExchangeApi, Order, AddOrderParams } from 'types'
+import { ExchangeApi, Order, PlaceOrderParams } from 'types'
 
 /**
  * Basic implementation of Stable Coin Converter API
@@ -34,7 +34,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     throw new Error('Not implemented yet')
   }
 
-  public async placeOrder(_orderParams: AddOrderParams): Promise<number> {
+  public async placeOrder(_orderParams: PlaceOrderParams): Promise<number> {
     throw new Error('Not implemented yet')
   }
 
@@ -42,11 +42,11 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     throw new Error('Not implemented yet')
   }
 
-  public async getUserAddress(_userId: number): Promise<string> {
+  public async getTokenAddressById(_tokenId: number): Promise<string> {
     throw new Error('Not implemented yet')
   }
 
-  public async getUserId(_userAddress: string): Promise<number> {
+  public async getTokenIdByAddress(_tokenAddress: string): Promise<number> {
     throw new Error('Not implemented yet')
   }
 
