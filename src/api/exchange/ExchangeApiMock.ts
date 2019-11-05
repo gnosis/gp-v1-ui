@@ -38,7 +38,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     throw new Error('Not implemented yet')
   }
 
-  public async cancelOrder(_orderId: number): Promise<void> {
+  public async cancelOrder(_senderAddress: string, _orderId: number): Promise<void> {
     throw new Error('Not implemented yet')
   }
 
