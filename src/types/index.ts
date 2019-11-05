@@ -3,6 +3,7 @@ import BN from 'bn.js'
 import 'global'
 
 export type Command = () => void
+export type Mutation<T> = (original: T) => T
 
 export enum Network {
   Mainnet = 1,
@@ -25,6 +26,9 @@ export interface TokenBalanceDetails extends TokenDetails {
   claimable: boolean
   walletBalance: BN
   enabled: boolean
+  highlighted: boolean
+  enabling: boolean
+  claiming: boolean
 }
 
 export interface TokenList {
@@ -112,14 +116,23 @@ export interface Erc20Api {
   allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
 
   approve(
+    senderAddress: string,
     tokenAddress: string,
-    userAddress: string,
     spenderAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<boolean>>
 
   transfer(
+    senderAddress: string,
+    tokenAddress: string,
+    toAddress: string,
+    amount: BN,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
+
+  transferFrom(
+    senderAddress: string,
     tokenAddress: string,
     fromAddress: string,
     toAddress: string,

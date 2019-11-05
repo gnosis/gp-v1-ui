@@ -7,11 +7,14 @@ import TokenRow from './TokenRow'
 import Widget from 'components/layout/Widget'
 
 import useURLParams, { useLocation } from 'hooks/useURLParams'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
+
+import { getToken } from 'utils'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -19,7 +22,7 @@ const WrappedWidget = styled(Widget)`
 `
 
 const IconWrapper = styled.a`
-  margin: -1em 0 1.5em 0.75em;
+  margin: -0.5em 0 1.5em 1em;
   width: 2em;
 `
 
@@ -38,10 +41,6 @@ const SubmitButton = styled.button`
   line-height: 2;
 `
 
-function _getToken(symbol: string, tokens: TokenDetails[]): TokenDetails {
-  return tokens.find(token => token.symbol === (symbol && symbol.toUpperCase()))
-}
-
 const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -54,11 +53,19 @@ const TradeWidget: React.FC = () => {
 
   const sellTokenSymbol = urlSeachQuery.get('sell') || 'DAI'
   const receiveTokenSymbol = urlSeachQuery.get('receive') || 'USDC'
-  const [sellToken, setSellToken] = useState(() => _getToken(sellTokenSymbol, tokens))
-  const [receiveToken, setReceiveToken] = useState(() => _getToken(receiveTokenSymbol, tokens))
+
+  const [sellToken, setSellToken] = useState(() => getToken('symbol', sellTokenSymbol, tokens))
+  const [receiveToken, setReceiveToken] = useState(() => getToken('symbol', receiveTokenSymbol, tokens))
 
   // Change URL on internal token change
   useURLParams(`sell=${sellToken.symbol}&receive=${receiveToken.symbol}`)
+
+  const { balances } = useTokenBalances()
+  const sellTokenBalance = useMemo(() => getToken('symbol', sellToken.symbol, balances), [balances, sellToken.symbol])
+  const receiveTokenBalance = useMemo(() => getToken('symbol', receiveToken.symbol, balances), [
+    balances,
+    receiveToken.symbol,
+  ])
 
   const swapTokens = (): void => {
     setSellToken(receiveToken)
@@ -86,6 +93,7 @@ const TradeWidget: React.FC = () => {
       <TokenRow
         token={sellToken}
         tokens={tokens}
+        balance={sellTokenBalance}
         selectLabel="sell"
         onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
       />
@@ -95,6 +103,7 @@ const TradeWidget: React.FC = () => {
       <TokenRow
         token={receiveToken}
         tokens={tokens}
+        balance={receiveTokenBalance}
         selectLabel="receive"
         onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
       />

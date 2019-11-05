@@ -5,17 +5,19 @@ import Select from 'react-select'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
 import TokenImg from 'components/TokenImg'
-import { TokenDetails } from 'types'
+import { TokenDetails, TokenBalanceDetails } from 'types'
+import { formatAmount } from 'utils'
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  height: 6em;
 `
 
 const TokenImgWrapper = styled(TokenImg)`
-  width: 50px;
-  height: 50px;
+  width: 4em;
+  height: 4em;
 
   margin-right: 1em;
 `
@@ -95,13 +97,7 @@ function formatOptionLabel(
 ): React.ReactNode {
   const { token } = options
   const { context } = labelMeta
-  return context === 'value' ? (
-    <div>
-      <strong>{token.symbol}</strong>
-    </div>
-  ) : (
-    renderOptionLabel(token)
-  )
+  return context === 'value' ? <strong>{token.symbol}</strong> : renderOptionLabel(token)
 }
 
 const customSelectStyles = {
@@ -110,14 +106,22 @@ const customSelectStyles = {
   valueContainer: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '4.5em' }),
 }
 
+function displayBalance(balance: TokenBalanceDetails | undefined | null, key: string): string {
+  if (!balance) {
+    return '0'
+  }
+  return formatAmount(balance[key], balance.decimals) || '0'
+}
+
 interface Props {
   token: TokenDetails
   tokens: TokenDetails[]
+  balance: TokenBalanceDetails
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
 }
 
-const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange }: Props) => {
+const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange, balance }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
   return (
@@ -145,10 +149,10 @@ const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange 
           <strong>
             <Link to="/deposit">Exchange wallet:</Link>
           </strong>{' '}
-          <span className="success">312312.33</span>
+          <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
         </WalletDetail>
         <WalletDetail>
-          <strong>Wallet:</strong> 444.33
+          <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
         </WalletDetail>
       </InputBox>
     </Wrapper>

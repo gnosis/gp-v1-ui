@@ -1,9 +1,19 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
+import Modali, { useModali } from 'modali'
 
 import { Row } from './Row'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import ErrorMsg from 'components/ErrorMsg'
+import { depositApi, erc20Api } from 'api'
+import { toast } from 'react-toastify'
+import BN from 'bn.js'
+import { TxOptionalParams, Receipt, TokenBalanceDetails, Mutation } from 'types'
+import { TxNotification } from 'components/TxNotification'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import { formatAmount, formatAmountFull, getToken } from 'utils'
+import { log } from 'utils'
+import { HIGHLIGHT_TIME, ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import Widget from 'components/layout/Widget'
 
 const Wrapper = styled.section`
@@ -57,16 +67,246 @@ const Wrapper = styled.section`
   }
 `
 
+const ModalBodyWrapper = styled.div`
+  div > p {
+    padding: 0 1em;
+    color: #828282;
+    font-size: 0.85em;
+  }
+`
+
+interface ModalBodyProps {
+  pendingAmount: string
+  symbol: string
+}
+
+const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
+  return (
+    <ModalBodyWrapper>
+      <div>
+        <p>
+          There is already a pending withdrawal of {pendingAmount} {symbol}. If you create a new request, it will delete
+          the previous request and create a new one.
+        </p>
+        <p>
+          No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
+          consolidated.
+        </p>
+      </div>
+      <p>Do you wish to create a new withdrawal request that replaces the previous one?</p>
+    </ModalBodyWrapper>
+  )
+}
+
+const txOptionalParams: TxOptionalParams = {
+  onSentTransaction: (receipt: Receipt): void => {
+    if (receipt.transactionHash) {
+      toast.info(<TxNotification txHash={receipt.transactionHash} />)
+    } else {
+      console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
+    }
+  },
+}
+
 const DepositWidget: React.FC = () => {
-  const { balances, error } = useTokenBalances()
+  const { userAddress } = useWalletConnection()
+  const { balances, setBalances, error } = useTokenBalances()
+
+  const [withdrawRequest, setWithdrawRequest] = useState({
+    amount: null,
+    tokenAddress: null,
+    pendingAmount: null,
+    symbol: null,
+  })
+  const [withdrawConfirmationModal, toggleWithdrawConfirmationModal] = useModali({
+    centered: true,
+    animated: true,
+    title: 'Confirm withdraw overwrite',
+    message: <ModalBody pendingAmount={withdrawRequest.pendingAmount} symbol={withdrawRequest.symbol} />,
+    buttons: [
+      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWithdrawConfirmationModal()} />,
+      <Modali.Button
+        label="Accept"
+        key="yes"
+        isStyleDefault
+        onClick={async (): Promise<void> => {
+          toggleWithdrawConfirmationModal()
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          await _requestWithdraw(withdrawRequest.amount, withdrawRequest.tokenAddress, true)
+        }}
+      />,
+    ],
+  })
+  const contractAddress = depositApi.getContractAddress()
+  const mounted = useRef(true)
+  useEffect(() => {
+    return function cleanUp(): void {
+      mounted.current = false
+    }
+  }, [])
 
   if (balances === undefined) {
     // Loading: Do not show the widget
     return null
   }
+
+  function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
+    setBalances(balances =>
+      balances.map(tokenBalancesAux => {
+        const { address: tokenAddressAux } = tokenBalancesAux
+        return tokenAddressAux === tokenAddress ? updateBalances(tokenBalancesAux) : tokenBalancesAux
+      }),
+    )
+  }
+
+  function _clearHighlight(tokenAddress: string): void {
+    setTimeout(() => {
+      _updateToken(tokenAddress, tokenBalancesAux => ({
+        ...tokenBalancesAux,
+        highlighted: false,
+      }))
+    }, HIGHLIGHT_TIME)
+  }
+
+  async function _deposit(amount: BN, tokenAddress: string): Promise<void> {
+    try {
+      const { symbol, decimals } = getToken('address', tokenAddress, balances)
+      log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+      const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      if (mounted.current) {
+        _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
+          return {
+            ...otherParams,
+            depositingBalance: depositingBalance.add(amount),
+            walletBalance: walletBalance.sub(amount),
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenAddress)
+      }
+
+      toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
+    } catch (error) {
+      console.error('Error depositing', error)
+      toast.error(`Error depositing: ${error.message}`)
+    }
+  }
+
+  async function _requestWithdraw(amount: BN, tokenAddress: string, overwriteWithdraw: boolean = false): Promise<void> {
+    const { symbol, decimals, withdrawingBalance } = getToken('address', tokenAddress, balances)
+    try {
+      if (!(withdrawingBalance.isZero() || overwriteWithdraw)) {
+        // Storing current values before displaying modal
+        setWithdrawRequest({
+          amount,
+          tokenAddress,
+          pendingAmount: formatAmount(withdrawingBalance, decimals),
+          symbol,
+        })
+
+        toggleWithdrawConfirmationModal()
+      } else {
+        log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+
+        const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
+        log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+        if (mounted.current) {
+          _updateToken(tokenAddress, otherParams => {
+            return {
+              ...otherParams,
+              withdrawingBalance: amount,
+              claimable: false,
+              highlighted: true,
+            }
+          })
+          _clearHighlight(tokenAddress)
+        }
+
+        toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+      }
+    } catch (error) {
+      console.error('Error requesting withdraw', error)
+      toast.error(`Error requesting withdraw: ${error.message}`)
+    }
+  }
+
+  async function _claim(tokenAddress: string): Promise<void> {
+    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
+    try {
+      console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          claiming: true,
+        }
+      })
+      const result = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
+
+      if (mounted.current) {
+        _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
+          return {
+            ...otherParams,
+            claiming: false,
+            exchangeBalance: exchangeBalance.sub(withdrawingBalance),
+            withdrawingBalance: ZERO,
+            claimable: false,
+            walletBalance: walletBalance.add(withdrawingBalance),
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenAddress)
+      }
+
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      toast.success(`Withdraw of ${formatAmount(withdrawingBalance, decimals)} ${symbol} completed`)
+    } catch (error) {
+      console.error('Error executing the withdraw request', error)
+      toast.error(`Error executing the withdraw request: ${error.message}`)
+    }
+  }
+
+  async function _enableToken(tokenAddress: string): Promise<void> {
+    const { symbol } = getToken('address', tokenAddress, balances)
+    try {
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          enabling: true,
+        }
+      })
+      const result = await erc20Api.approve(
+        tokenAddress,
+        userAddress,
+        contractAddress,
+        ALLOWANCE_MAX_VALUE,
+        txOptionalParams,
+      )
+      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+      if (mounted.current) {
+        _updateToken(tokenAddress, otherParams => {
+          return {
+            ...otherParams,
+            enabled: true,
+            highlighted: true,
+          }
+        })
+        _clearHighlight(tokenAddress)
+      }
+
+      toast.success(`The token ${symbol} has been enabled for trading`)
+    } catch (error) {
+      console.error('Error enabling the token', error)
+      toast.error('Error enabling the token')
+    }
+  }
+
   return (
-    <Widget>
-      <Wrapper>
+    <Wrapper>
+      <Widget>
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
         ) : (
@@ -85,17 +325,28 @@ const DepositWidget: React.FC = () => {
                   withdrawals
                 </th>
                 <th>Wallet</th>
-                <th>Actions</th>
+                <th></th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               {balances &&
-                balances.map(tokenBalances => <Row key={tokenBalances.addressMainnet} tokenBalances={tokenBalances} />)}
+                balances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.addressMainnet}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => _enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance): Promise<void> => _deposit(balance, tokenBalances.address)}
+                    onSubmitWithdraw={(balance): Promise<void> => _requestWithdraw(balance, tokenBalances.address)}
+                    onClaim={(): Promise<void> => _claim(tokenBalances.address)}
+                  />
+                ))}
             </tbody>
           </table>
         )}
-      </Wrapper>
-    </Widget>
+      </Widget>
+      <Modali.Modal {...withdrawConfirmationModal} />
+    </Wrapper>
   )
 }
 
