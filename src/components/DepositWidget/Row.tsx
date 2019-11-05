@@ -190,8 +190,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const isWithdrawFormVisible = visibleForm == 'withdraw'
 
   const _showHideForm = (type?: 'deposit' | 'withdraw' | null): void => {
-    if (window && window.document && innerWidth < 500) {
-      type ? window.document.body.classList.add('noScroll') : window.document.body.classList.remove('noScroll')
+    if (document && innerWidth < 500) {
+      document.body.classList.toggle('noScroll', !!type)
     }
 
     showForm(type)

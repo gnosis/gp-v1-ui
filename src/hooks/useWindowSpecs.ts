@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react'
 
 const useWindowSpecs = (): { innerWidth: number; innerHeight: number } => {
-  const [innerWindowSpecs, setInnerWindowSpecs] = useState({
-    innerWidth: window.innerWidth,
-    innerHeight: window.innerHeight,
-  })
+  const isClient = typeof window === 'object'
+
+  function getSize(): { innerWidth: number | undefined; innerHeight: number | undefined } {
+    return {
+      innerWidth: isClient ? window.innerWidth : undefined,
+      innerHeight: isClient ? window.innerHeight : undefined,
+    }
+  }
+
+  const [innerWindowSpecs, setInnerWindowSpecs] = useState(getSize)
   function handleResize(): void | number {
     // check that client can handle this sexiness
     const innerWidth = typeof window !== 'object' ? null : window.innerWidth
