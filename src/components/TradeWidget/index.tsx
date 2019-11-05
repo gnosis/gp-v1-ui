@@ -77,7 +77,7 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget>
       <FormContext {...methods}>
-        <WrapperForm onSubmit={methods.handleSubmit(data => console.log('data', data))} noValidate>
+        <WrapperForm onSubmit={methods.handleSubmit(data => console.log('data', data))}>
           <TokenRow
             token={sellToken}
             tokens={tokens}
