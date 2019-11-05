@@ -54,13 +54,18 @@ const TradeWidget: React.FC = () => {
   const sellTokenSymbol = urlSeachQuery.get('sell') || 'DAI'
   const receiveTokenSymbol = urlSeachQuery.get('receive') || 'USDC'
 
-  const [sellToken, setSellToken] = useState(() => getToken('symbol', sellTokenSymbol, tokens))
-  const [receiveToken, setReceiveToken] = useState(() => getToken('symbol', receiveTokenSymbol, tokens))
+  const [sellToken, setSellToken] = useState(
+    () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
+  )
+  const [receiveToken, setReceiveToken] = useState(
+    () => getToken('symbol', receiveTokenSymbol, tokens) || getToken('symbol', 'USDC', tokens),
+  )
 
   // Change URL on internal token change
   useURLParams(`sell=${sellToken.symbol}&receive=${receiveToken.symbol}`)
 
   const { balances } = useTokenBalances()
+
   const sellTokenBalance = useMemo(() => getToken('symbol', sellToken.symbol, balances), [balances, sellToken.symbol])
   const receiveTokenBalance = useMemo(() => getToken('symbol', receiveToken.symbol, balances), [
     balances,
