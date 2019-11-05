@@ -136,10 +136,11 @@ export interface RowProps {
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
+  innerWidth: number | null
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
-  const { tokenBalances, onSubmitDeposit, onSubmitWithdraw, onClaim, onEnableToken } = props
+  const { tokenBalances, onSubmitDeposit, onSubmitWithdraw, onClaim, onEnableToken, innerWidth } = props
 
   const {
     address,
