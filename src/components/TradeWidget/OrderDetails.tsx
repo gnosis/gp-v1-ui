@@ -16,7 +16,7 @@ const Dd = styled.dd`
 `
 
 const Dt = styled.dt`
-  margin-left: 4em;
+  margin: 0 0 0.25em 4em;
 `
 
 const Highlight = styled.span`
