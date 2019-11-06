@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react'
-import styled from 'styled-components'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import styled from 'styled-components'
+import useForm, { FormContext } from 'react-hook-form'
 
 import TokenRow from './TokenRow'
 import Widget from 'components/layout/Widget'
@@ -23,6 +23,11 @@ const WrappedWidget = styled(Widget)`
   min-width: 0;
 `
 
+const WrapperForm = styled.form`
+  display: flex;
+  flex-direction: column;
+`
+
 const IconWrapper = styled.a`
   margin: -0.5em 0 1.5em 1em;
   width: 2em;
@@ -41,6 +46,10 @@ const WarningLabel = styled.code`
 const SubmitButton = styled.button`
   margin: 2em 0 0 0;
   line-height: 2;
+
+  &:disabled {
+    cursor: not-allowed;
+  }
 `
 
 const TradeWidget: React.FC = () => {
@@ -71,6 +80,10 @@ const TradeWidget: React.FC = () => {
     receiveToken.symbol,
   ])
 
+  const methods = useForm({ mode: 'onBlur' })
+  const sellTokenId = 'sellToken'
+  const receiveTokenId = 'receiveToken'
+
   const swapTokens = (): void => {
     setSellToken(receiveToken)
     setReceiveToken(sellToken)
@@ -93,28 +106,35 @@ const TradeWidget: React.FC = () => {
 
   return (
     <WrappedWidget>
-      {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
-      <TokenRow
-        token={sellToken}
-        tokens={tokens}
-        balance={sellTokenBalance}
-        selectLabel="sell"
-        onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
-      />
-      <IconWrapper onClick={swapTokens}>
-        <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
-      </IconWrapper>
-      <TokenRow
-        token={receiveToken}
-        tokens={tokens}
-        balance={receiveTokenBalance}
-        selectLabel="receive"
-        onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
-      />
-      <SubmitButton disabled={sameToken} style={{ cursor: sameToken ? 'default' : 'pointer' }}>
-        <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
-        {sameToken ? 'Please select different tokens' : 'Send limit order'}
-      </SubmitButton>
+      <FormContext {...methods}>
+        <WrapperForm onSubmit={methods.handleSubmit(console.log)}>
+          {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
+          <TokenRow
+            token={sellToken}
+            tokens={tokens}
+            balance={sellTokenBalance}
+            selectLabel="sell"
+            onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
+            inputId={sellTokenId}
+            validateMaxAmount
+          />
+          <IconWrapper onClick={swapTokens}>
+            <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
+          </IconWrapper>
+          <TokenRow
+            token={receiveToken}
+            tokens={tokens}
+            balance={receiveTokenBalance}
+            selectLabel="receive"
+            onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
+            inputId={receiveTokenId}
+          />
+          <SubmitButton type="submit" disabled={!methods.formState.isValid}>
+            <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
+            {sameToken ? 'Please select different tokens' : 'Send limit order'}
+          </SubmitButton>
+        </WrapperForm>
+      </FormContext>
     </WrappedWidget>
   )
 }
