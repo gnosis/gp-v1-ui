@@ -39,18 +39,25 @@ describe('getToken', () => {
       expect(actual).toBeUndefined()
     })
 
-    it.only("it's case insensitive by default", () => {
+    it("it's case insensitive", () => {
       const expected = tokenList[0]
-      const actual = getToken('address', expected.address, tokenList)
+      const actual = getToken('symbol', expected.symbol.toLowerCase(), tokenList)
       expect(actual).not.toBeUndefined()
       expect(actual).toBe(expected)
     })
   })
 
   describe('TokenDetails', () => {
-    it('finds item in TokenDetails[]', () => {
+    it('finds a token by symbol', () => {
       const expected = tokenList[0]
       const actual = getToken('symbol', expected.symbol, tokenList)
+      expect(actual).not.toBeUndefined()
+      expect(actual).toBe(expected)
+    })
+
+    it('finds a token by address', () => {
+      const expected = tokenList[0]
+      const actual = getToken('address', expected.address, tokenList)
       expect(actual).not.toBeUndefined()
       expect(actual).toBe(expected)
     })
