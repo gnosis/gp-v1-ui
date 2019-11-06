@@ -1,63 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react'
-import BN from 'bn.js'
-import styled from 'styled-components'
 import Modali, { useModali } from 'modali'
 
 import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/layout/Widget'
+import { ModalBodyWrapper, DepositWidgetWrapper } from './Styled'
 
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
 import useWindowSpecs from 'hooks/useWindowSpecs'
 
 import { log, formatAmount, getToken } from 'utils'
-
-const Wrapper = styled.section`
-  .gridContainer {
-    display: grid;
-    width: 100%;
-  }
-
-  .headerContainer {
-    display: inherit;
-    justify-content: center;
-    align-items: center;
-    grid-template-columns: 1.1fr repeat(4, 1fr);
-
-    > div {
-      color: #000000;
-      line-height: 1.5;
-      font-size: 0.8em;
-      text-transform: uppercase;
-      overflow-wrap: break-word;
-      padding: 0.5em;
-      font-weight: 800;
-    }
-
-    @media only screen and (max-width: 500px) {
-      display: none;
-    }
-  }
-
-  .rowContainer {
-    display: inherit;
-    grid-template-rows: auto;
-  }
-
-  .row {
-    text-align: center;
-    transition: all 0.5s ease;
-  }
-`
-
-const ModalBodyWrapper = styled.div`
-  div > p {
-    padding: 0 1em;
-    color: #828282;
-    font-size: 0.85em;
-  }
-`
+import BN from 'bn.js'
 
 interface ModalBodyProps {
   pendingAmount: string
@@ -145,7 +99,7 @@ const DepositWidget: React.FC = () => {
   }
 
   return (
-    <Wrapper>
+    <DepositWidgetWrapper>
       <Widget>
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
@@ -176,7 +130,7 @@ const DepositWidget: React.FC = () => {
         )}
       </Widget>
       <Modali.Modal {...withdrawConfirmationModal} />
-    </Wrapper>
+    </DepositWidgetWrapper>
   )
 }
 

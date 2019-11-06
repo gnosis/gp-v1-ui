@@ -1,136 +1,17 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
+import { RowTokenDiv, RowClaimButton, RowClaimLink } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
 import { ZERO } from 'const'
 import { formatAmount, formatAmountFull, log } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
-
-const TokenDiv = styled.div`
-  display: grid;
-  grid-template-columns: 1.1fr repeat(4, 1fr);
-  align-items: center;
-  justify-content: center;
-
-  border-bottom: 2px solid #0000000f;
-  border-radius: 20px;
-  margin: 0.3rem 0;
-
-  transition: background 0.1s ease-in-out;
-
-  &:hover {
-    background: #0000000a !important;
-  }
-
-  > div {
-    margin: 0.1rem;
-    padding: 0.7rem;
-    text-align: center;
-    transition: all 0.5s ease;
-
-    &:first-child {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: space-evenly;
-      align-items: center;
-      > * {
-        margin: 5px;
-      }
-    }
-
-    &:last-child {
-      display: flex;
-      flex-flow: column;
-    }
-  }
-
-  &.highlight {
-    background-color: #fdffc1;
-    border-bottom-color: #fbdf8f;
-  }
-
-  &.loading {
-    background-color: #f7f7f7;
-    border-bottom-color: #b9b9b9;
-  }
-
-  &.selected {
-    background-color: #ecdcff;
-  }
-
-  @media only screen and (max-width: 500px) {
-    grid-template-columns: none;
-    grid-template-rows: auto;
-
-    align-items: center;
-    justify-content: stretch;
-    padding: 0 0.7rem;
-
-    box-shadow: 1px 6px 7px 0px #0000002e;
-
-    > div {
-      display: flex;
-      flex-flow: row;
-      align-items: center;
-      border-bottom: 1px solid #00000024;
-
-      > * {
-        margin-left: 10px;
-      }
-      &:first-child {
-        > img {
-          order: 2;
-          margin-right: -8px;
-        }
-      }
-      &:last-child {
-        border: none;
-        flex-flow: row nowrap;
-        padding: 0.7rem 0 0.7rem 0.7rem;
-
-        > button {
-          margin: 0.2rem;
-        }
-
-        > button:last-child {
-          border-radius: 0 20px 20px;
-        }
-      }
-
-      &::before {
-        content: attr(data-label);
-        margin-right: auto;
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-      }
-    }
-  }
-`
-
-const ClaimButton = styled.button`
-  margin-bottom: 0;
-`
-
-const ClaimLink = styled.a`
-  text-decoration: none;
-
-  &.success {
-    color: #63ab52;
-  }
-  &.disabled {
-    color: currentColor;
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`
 
 export interface RowProps {
   tokenBalances: TokenBalanceDetails
@@ -191,7 +72,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   return (
     <>
-      <TokenDiv data-address={address} className={className} data-address-mainnet={addressMainnet}>
+      <RowTokenDiv data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <div data-label="Token">
           <TokenImg src={image} alt={name} />
           <div>{name}</div>
@@ -202,12 +83,12 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals)}>
           {claimable ? (
             <>
-              <ClaimButton className="success" onClick={onClaim} disabled={claiming}>
+              <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
                 {claiming && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
-              </ClaimButton>
+              </RowClaimButton>
               <div>
-                <ClaimLink
+                <RowClaimLink
                   className={claiming ? 'disabled' : 'success'}
                   onClick={(): void => {
                     if (!claiming) {
@@ -216,7 +97,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                   }}
                 >
                   <small>Claim</small>
-                </ClaimLink>
+                </RowClaimLink>
               </div>
             </>
           ) : withdrawingBalance.gt(ZERO) ? (
@@ -263,7 +144,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </button>
           )}
         </div>
-      </TokenDiv>
+      </RowTokenDiv>
       {isDepositFormVisible && (
         <Form
           title={

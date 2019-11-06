@@ -107,3 +107,168 @@ export const InnerWrapper = styled.div`
     padding: 0 0.5em 0 0;
   }
 `
+
+export const DepositWidgetWrapper = styled.section`
+  .gridContainer {
+    display: grid;
+    width: 100%;
+  }
+
+  .headerContainer {
+    display: inherit;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: 1.1fr repeat(4, 1fr);
+
+    > div {
+      color: #000000;
+      line-height: 1.5;
+      font-size: 0.8em;
+      text-transform: uppercase;
+      overflow-wrap: break-word;
+      padding: 0.5em;
+      font-weight: 800;
+    }
+
+    @media only screen and (max-width: 500px) {
+      display: none;
+    }
+  }
+
+  .rowContainer {
+    display: inherit;
+    grid-template-rows: auto;
+  }
+
+  .row {
+    text-align: center;
+    transition: all 0.5s ease;
+  }
+`
+
+export const ModalBodyWrapper = styled.div`
+  div > p {
+    padding: 0 1em;
+    color: #828282;
+    font-size: 0.85em;
+  }
+`
+
+export const RowTokenDiv = styled.div`
+  display: grid;
+  grid-template-columns: 1.1fr repeat(4, 1fr);
+  align-items: center;
+  justify-content: center;
+
+  border-bottom: 2px solid #0000000f;
+  border-radius: 20px;
+  margin: 0.3rem 0;
+
+  transition: background 0.1s ease-in-out;
+
+  &:hover {
+    background: #0000000a !important;
+  }
+
+  > div {
+    margin: 0.1rem;
+    padding: 0.7rem;
+    text-align: center;
+    transition: all 0.5s ease;
+
+    &:first-child {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: space-evenly;
+      align-items: center;
+      > * {
+        margin: 5px;
+      }
+    }
+
+    &:last-child {
+      display: flex;
+      flex-flow: column;
+    }
+  }
+
+  &.highlight {
+    background-color: #fdffc1;
+    border-bottom-color: #fbdf8f;
+  }
+
+  &.loading {
+    background-color: #f7f7f7;
+    border-bottom-color: #b9b9b9;
+  }
+
+  &.selected {
+    background-color: #ecdcff;
+  }
+
+  @media only screen and (max-width: 500px) {
+    grid-template-columns: none;
+    grid-template-rows: auto;
+
+    align-items: center;
+    justify-content: stretch;
+    padding: 0 0.7rem;
+
+    box-shadow: 1px 6px 7px 0px #0000002e;
+
+    > div {
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      border-bottom: 1px solid #00000024;
+
+      > * {
+        margin-left: 10px;
+      }
+      &:first-child {
+        > img {
+          order: 2;
+          margin-right: -8px;
+        }
+      }
+      &:last-child {
+        border: none;
+        flex-flow: row nowrap;
+        padding: 0.7rem 0 0.7rem 0.7rem;
+
+        > button {
+          margin: 0.2rem;
+        }
+
+        > button:last-child {
+          border-radius: 0 20px 20px;
+        }
+      }
+
+      &::before {
+        content: attr(data-label);
+        margin-right: auto;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+    }
+  }
+`
+
+export const RowClaimButton = styled.button`
+  margin-bottom: 0;
+`
+
+export const RowClaimLink = styled.a`
+  text-decoration: none;
+
+  &.success {
+    color: #63ab52;
+  }
+  &.disabled {
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+`
