@@ -38,6 +38,13 @@ describe('getToken', () => {
       const actual = getToken('Symbol', expected.symbol, tokenList)
       expect(actual).toBeUndefined()
     })
+
+    it.only("it's case insensitive by default", () => {
+      const expected = tokenList[0]
+      const actual = getToken('address', expected.address, tokenList)
+      expect(actual).not.toBeUndefined()
+      expect(actual).toBe(expected)
+    })
   })
 
   describe('TokenDetails', () => {
