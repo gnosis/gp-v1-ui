@@ -2,13 +2,12 @@ import React, { useEffect, useRef, SetStateAction, Dispatch } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
-import { log } from 'utils'
 import { depositApi, erc20Api } from 'api'
 import { Mutation, TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
 import { HIGHLIGHT_TIME, ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { TxNotification } from 'components/TxNotification'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, log, getToken } from 'utils'
 
 interface Params {
   balances: TokenBalanceDetails[]
@@ -43,10 +42,6 @@ export const useRowActions = (params: Params): Result => {
     }
   }, [])
 
-  function _getToken(tokenAddress: string): TokenBalanceDetails {
-    return balances.find(({ address }) => address === tokenAddress)
-  }
-
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
@@ -66,7 +61,7 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function enableToken(tokenAddress: string): Promise<void> {
-    const { symbol } = _getToken(tokenAddress)
+    const { symbol } = getToken('address', tokenAddress, balances)
     try {
       _updateToken(tokenAddress, otherParams => {
         return {
@@ -103,7 +98,7 @@ export const useRowActions = (params: Params): Result => {
 
   async function deposit(amount: BN, tokenAddress: string): Promise<void> {
     try {
-      const { symbol, decimals } = _getToken(tokenAddress)
+      const { symbol, decimals } = getToken('address', tokenAddress, balances)
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
@@ -128,7 +123,7 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function requestWithdraw(amount: BN, tokenAddress: string): Promise<void> {
-    const { symbol, decimals } = _getToken(tokenAddress)
+    const { symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
@@ -155,7 +150,7 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function claim(tokenAddress: string): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = _getToken(tokenAddress)
+    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
       _updateToken(tokenAddress, otherParams => {

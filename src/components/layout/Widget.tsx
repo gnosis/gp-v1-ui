@@ -28,11 +28,16 @@ const LinkWrapper = styled(EtherscanLink)`
   display: block;
 `
 
-const Widget: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode
+  className?: string
+}
+
+const Widget: React.FC<Props> = ({ children, className }) => {
   const contractAddress = depositApi.getContractAddress()
 
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
       {children}
     </Wrapper>
