@@ -17,7 +17,7 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken } from 'utils'
+import { getToken, safeTokenName } from 'utils'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -82,7 +82,7 @@ const TradeWidget: React.FC = () => {
   ])
 
   const methods = useForm({ mode: 'onBlur' })
-  const { handleSubmit } = methods
+  const { handleSubmit, watch } = methods
   const sellTokenId = 'sellToken'
   const receiveTokenId = 'receiveToken'
 
@@ -132,10 +132,10 @@ const TradeWidget: React.FC = () => {
             inputId={receiveTokenId}
           />
           <OrderDetails
-            sellTokenId={sellTokenId}
-            sellToken={sellToken}
-            receiveTokenId={receiveTokenId}
-            receiveToken={receiveToken}
+            sellAmount={watch(sellTokenId)}
+            sellTokenName={safeTokenName(sellToken)}
+            receiveAmount={watch(receiveTokenId)}
+            receiveTokenName={safeTokenName(receiveToken)}
           />
           <SubmitButton type="submit" disabled={!methods.formState.isValid}>
             <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}

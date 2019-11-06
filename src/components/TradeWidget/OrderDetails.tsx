@@ -1,8 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useFormContext } from 'react-hook-form'
 
-import { TokenDetails } from 'types'
 import { FEE_PERCENTAGE } from 'const'
 
 const Wrapper = styled.dl`
@@ -30,24 +28,22 @@ function calculatePrice(sellAmount: number, receiveAmount: number): number {
 }
 
 interface Props {
-  sellTokenId: string
-  sellToken: TokenDetails
-  receiveTokenId: string
-  receiveToken: TokenDetails
+  sellAmount: string
+  sellTokenName: string
+  receiveAmount: string
+  receiveTokenName: string
 }
 
-const OrderDetails: React.FC<Props> = ({ sellTokenId, sellToken, receiveTokenId, receiveToken }) => {
-  const { watch } = useFormContext()
+const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmount, receiveTokenName }) => {
+  const sellAmountNumber = Number(sellAmount)
+  const receiveAmountNumber = Number(receiveAmount)
 
-  const sellAmount = Number(watch(sellTokenId))
-  const receiveAmount = Number(watch(receiveTokenId))
-
-  if (!(sellAmount > 0 && receiveAmount > 0)) {
+  if (!(sellAmountNumber > 0 && receiveAmountNumber > 0)) {
     return null
   }
 
   function _calculatePrice(): string {
-    return calculatePrice(sellAmount, receiveAmount).toFixed(2)
+    return calculatePrice(sellAmountNumber, receiveAmountNumber).toFixed(2)
   }
 
   return (
@@ -56,11 +52,11 @@ const OrderDetails: React.FC<Props> = ({ sellTokenId, sellToken, receiveTokenId,
       <Dt>
         Sell up to{' '}
         <Highlight>
-          {watch(sellTokenId)} {sellToken.symbol}
+          {sellAmount} {sellTokenName}
         </Highlight>{' '}
         at a price{' '}
         <Highlight>
-          1 {sellToken.symbol} = {_calculatePrice()} {receiveToken.symbol}
+          1 {sellTokenName} = {_calculatePrice()} {receiveTokenName}
         </Highlight>{' '}
         or better. <br />
         Your order might be partially filled.
