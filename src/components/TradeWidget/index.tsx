@@ -112,7 +112,7 @@ const TradeWidget: React.FC = () => {
         <WrappedForm onSubmit={handleSubmit(data => console.log('data', data))}>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
-            token={sellToken}
+            selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="sell"
@@ -124,7 +124,7 @@ const TradeWidget: React.FC = () => {
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
           </IconWrapper>
           <TokenRow
-            token={receiveToken}
+            selectedToken={receiveToken}
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="receive"
