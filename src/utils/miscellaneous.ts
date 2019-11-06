@@ -10,5 +10,13 @@ export function getToken<T extends TokenDetails>(
   value: string | undefined = '',
   tokens: T[] | undefined | null,
 ): T | undefined {
-  return (tokens || []).find(token => token[key] === value.toUpperCase())
+  const valueUppercase = value.toUpperCase()
+  return (tokens || []).find(token => {
+    const value = token[key]
+    if (value) {
+      return value.toString().toUpperCase() === valueUppercase
+    } else {
+      return false
+    }
+  })
 }
