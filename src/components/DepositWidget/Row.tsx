@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -6,6 +6,8 @@ import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
+
+import useNoScroll from 'hooks/useNoScroll'
 
 import { ZERO } from 'const'
 import { formatAmount, formatAmountFull, log } from 'utils'
@@ -165,17 +167,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   // Checks innerWidth
   let showResponsive = innerWidth < 500
-
-  useMemo((): void => {
-    const bodyClassList: string[] | DOMTokenList = (window && window.document.body.classList) || []
-    const noScrollActive = Array.from(bodyClassList).find((className: string): boolean => className === 'noScroll')
-    // if innerWidth > 500 && body has noScroll active - REMOVE it
-    if (noScrollActive && !visibleForm && !showResponsive) {
-      ;(bodyClassList as DOMTokenList).remove('noScroll')
-    } else if (!noScrollActive && visibleForm && showResponsive) {
-      ;(bodyClassList as DOMTokenList).add('noScroll')
-    }
-  }, [showResponsive, visibleForm])
+  useNoScroll(visibleForm && showResponsive)
 
   let className
   if (highlighted) {
