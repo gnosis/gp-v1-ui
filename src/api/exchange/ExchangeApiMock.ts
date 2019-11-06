@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import BN from 'bn.js'
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
@@ -61,10 +59,6 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   public async getTokenIdByAddress(tokenAddress: string): Promise<number> {
     assert(typeof this.tokenAddressToId[tokenAddress] === 'number', 'Must have Address to get ID')
     return this.tokenAddressToId[tokenAddress]
-  }
-
-  public async getCurrentPrice(_tokenId: number): Promise<BN> {
-    throw new Error('Not implemented yet')
   }
 
   public async addToken(tokenAddress: string): Promise<void> {

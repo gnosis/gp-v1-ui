@@ -116,7 +116,6 @@ export interface ExchangeApi extends DepositApi {
   cancelOrder(senderAddress: string, orderId: number): Promise<void>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(tokenAddress: string): Promise<number>
-  getCurrentPrice(tokenId: number): Promise<BN>
 }
 
 export interface WalletInfo {
