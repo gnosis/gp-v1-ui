@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 
 import TokenRow from './TokenRow'
 import Widget from 'components/layout/Widget'
 
-import useURLParams, { useLocation } from 'hooks/useURLParams'
+import { useParams } from 'react-router-dom'
+import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
@@ -49,10 +51,7 @@ const TradeWidget: React.FC = () => {
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
 
   // Listen on manual changes to URL search query
-  const urlSeachQuery = useLocation()
-
-  const sellTokenSymbol = urlSeachQuery.get('sell') || 'DAI'
-  const receiveTokenSymbol = urlSeachQuery.get('receive') || 'USDC'
+  const { sell: sellTokenSymbol, receive: receiveTokenSymbol } = useParams()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
@@ -62,7 +61,7 @@ const TradeWidget: React.FC = () => {
   )
 
   // Change URL on internal token change
-  useURLParams(`sell=${sellToken.symbol}&receive=${receiveToken.symbol}`)
+  useURLParams(`sell=${sellToken.symbol}-0&receive=${receiveToken.symbol}-20`)
 
   const { balances } = useTokenBalances()
 
