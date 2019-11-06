@@ -151,6 +151,10 @@ const DepositWidget: React.FC = () => {
   }
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
+    if (!mounted.current) {
+      return
+    }
+
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
         const { address: tokenAddressAux } = tokenBalancesAux
