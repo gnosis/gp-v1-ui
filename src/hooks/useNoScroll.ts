@@ -2,13 +2,14 @@ import { useEffect } from 'react'
 
 const useNoScroll = (scrollCondition: boolean): void => {
   useEffect((): void => {
-    const bodyClassList: string[] | DOMTokenList = (typeof window !== 'undefined' && document.body.classList) || []
+    if (typeof document === 'undefined') return
+
     const noScrollActive = document.body.classList.contains('noScroll')
 
     if (noScrollActive && !scrollCondition) {
-      ;(bodyClassList as DOMTokenList).remove('noScroll')
+      document.body.classList.remove('noScroll')
     } else if (!noScrollActive && scrollCondition) {
-      ;(bodyClassList as DOMTokenList).add('noScroll')
+      document.body.classList.add('noScroll')
     }
   }, [scrollCondition])
 }
