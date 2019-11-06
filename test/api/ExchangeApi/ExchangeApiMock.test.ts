@@ -138,7 +138,8 @@ describe('placeOrder', () => {
     const ordersCount = (await instance.getOrders(USER_1)).length
 
     params.userAddress = USER_1
-    expect(await instance.placeOrder(params)).toBe(ordersCount)
+    const response = await instance.placeOrder(params)
+    expect(response.data).toBe(ordersCount)
     const actual = (await instance.getOrders(USER_1)).pop()
     expect(actual).toEqual(expected)
   })
@@ -147,7 +148,8 @@ describe('placeOrder', () => {
     expect((await instance.getOrders(USER_3)).length).toBe(0)
     params.userAddress = USER_2
 
-    expect(await instance.placeOrder(params)).toBe(0)
+    const response = await instance.placeOrder(params)
+    expect(response.data).toBe(0)
     const actual = (await instance.getOrders(USER_2)).pop()
     expect(actual).toEqual(expected)
   })

@@ -111,11 +111,11 @@ export interface ExchangeApi extends DepositApi {
   getOrders(userAddress: string): Promise<Order[]>
   getNumTokens(): Promise<number>
   getFeeDenominator(): Promise<number>
-  addToken(tokenAddress: string): Promise<void>
-  placeOrder(orderParams: PlaceOrderParams): Promise<number>
-  cancelOrder(senderAddress: string, orderId: number): Promise<void>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(tokenAddress: string): Promise<number>
+  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<TxResult<number>>
+  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
 }
 
 export interface WalletInfo {

@@ -1,8 +1,10 @@
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
-import { ExchangeApi, Order, PlaceOrderParams, Erc20Api } from 'types'
+import { ExchangeApi, Order, PlaceOrderParams, Erc20Api, TxResult, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR } from 'const'
+import { waitAndSendReceipt } from 'utils/mock'
+import { RECEIPT } from '../../../test/data'
 
 export interface OrdersByUser {
   [userAddress: string]: Order[]
@@ -61,14 +63,23 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return this.tokenAddressToId[tokenAddress]
   }
 
-  public async addToken(tokenAddress: string): Promise<void> {
+  public async addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>> {
+    await waitAndSendReceipt({ txOptionalParams })
+
     assert(typeof this.tokenAddressToId[tokenAddress] !== 'number', 'Token already registered')
     assert(this.registeredTokens.length < this.maxTokens, 'Max tokens reached')
     this.registeredTokens.push(tokenAddress)
     this.tokenAddressToId[tokenAddress] = this.registeredTokens.length - 1
+
+    return { data: undefined, receipt: RECEIPT }
   }
 
-  public async placeOrder(orderParams: PlaceOrderParams): Promise<number> {
+  public async placeOrder(
+    orderParams: PlaceOrderParams,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<number>> {
+    await waitAndSendReceipt({ txOptionalParams })
+
     this._initOrders(orderParams.userAddress)
 
     this.orders[orderParams.userAddress].push({
@@ -80,14 +91,24 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       priceDenominator: orderParams.sellAmount,
       remainingAmount: orderParams.sellAmount,
     })
-    return this.orders[orderParams.userAddress].length - 1
+    const orderId = this.orders[orderParams.userAddress].length - 1
+
+    return { data: orderId, receipt: RECEIPT }
   }
 
-  public async cancelOrder(senderAddress: string, orderId: number): Promise<void> {
+  public async cancelOrder(
+    senderAddress: string,
+    orderId: number,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<void>> {
+    await waitAndSendReceipt({ txOptionalParams })
+
     this._initOrders(senderAddress)
     if (this.orders[senderAddress][orderId]) {
       this.orders[senderAddress][orderId].validUntil = (await this.getCurrentBatchId()) - 1
     }
+
+    return { data: undefined, receipt: RECEIPT }
   }
 
   /********************************    private methods   ********************************/
