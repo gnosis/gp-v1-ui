@@ -6,15 +6,15 @@ import { FEE_PERCENTAGE } from 'const'
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
   font-size: 0.8em;
-`
 
-const Dd = styled.dd`
-  font-weight: bold;
-  margin: 0;
-`
+  dd {
+    font-weight: bold;
+    margin: 0;
+  }
 
-const Dt = styled.dt`
-  margin: 0 0 0.25em 4em;
+  dt {
+    margin: 0 0 0.25em 4em;
+  }
 `
 
 const Highlight = styled.span`
@@ -48,8 +48,8 @@ const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmoun
 
   return (
     <Wrapper>
-      <Dd>Order details:</Dd>
-      <Dt>
+      <dd>Order details:</dd>
+      <dt>
         Sell up to{' '}
         <Highlight>
           {sellAmount} {sellTokenName}
@@ -60,17 +60,17 @@ const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmoun
         </Highlight>{' '}
         or better. <br />
         Your order might be partially filled.
-      </Dt>
+      </dt>
 
-      <Dd>Fee:</Dd>
-      <Dt>
+      <dd>Fee:</dd>
+      <dt>
         <Highlight>{FEE_PERCENTAGE}%</Highlight>, included already in your limit price.
-      </Dt>
+      </dt>
 
-      <Dd>Expiration date:</Dd>
-      <Dt>
+      <dd>Expiration date:</dd>
+      <dt>
         <Highlight>30 min</Highlight>
-      </Dt>
+      </dt>
     </Wrapper>
   )
 }
