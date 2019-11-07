@@ -130,10 +130,13 @@ const TradeWidget: React.FC = () => {
     )
 
     try {
-      const sellTokenId = await exchangeApi.getTokenIdByAddress(sellToken.address)
-      const buyTokenId = await exchangeApi.getTokenIdByAddress(buyToken.address)
+      const [sellTokenId, buyTokenId, batchId] = await Promise.all([
+        exchangeApi.getTokenIdByAddress(sellToken.address),
+        exchangeApi.getTokenIdByAddress(buyToken.address),
+        exchangeApi.getCurrentBatchId(),
+      ])
       // TODO: get this value from a config, no magic numbers
-      const validUntil = (await exchangeApi.getCurrentBatchId()) + 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
+      const validUntil = batchId + 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
 
       const params: PlaceOrderParams = {
         userAddress,
