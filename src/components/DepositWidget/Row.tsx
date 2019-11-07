@@ -9,7 +9,7 @@ import { RowTokenDiv, RowClaimButton, RowClaimLink } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
-import { ZERO } from 'const'
+import { ZERO, RESPONSIVE_SIZES } from 'const'
 import { formatAmount, formatAmountFull, log } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 
@@ -47,7 +47,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
-  let showResponsive = innerWidth < 500
+  let showResponsive = innerWidth < RESPONSIVE_SIZES.MOBILE
   useNoScroll(visibleForm && showResponsive)
 
   let className
