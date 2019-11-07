@@ -1,11 +1,9 @@
 import React, { useState, useMemo } from 'react'
-import BN from 'bn.js'
 import styled from 'styled-components'
 import useForm, { FormContext } from 'react-hook-form'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { toast } from 'react-toastify'
 import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
@@ -16,16 +14,13 @@ import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { usePlaceOrder } from 'hooks/usePlaceOrder'
 
-import { tokenListApi, exchangeApi } from 'api'
+import { tokenListApi } from 'api'
 
-import { Network, TokenDetails, PlaceOrderParams } from 'types'
+import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
-
-import { txOptionalParams } from 'utils/transaction'
-
-import { log } from 'utils/miscellaneous'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -61,62 +56,8 @@ const SubmitButton = styled.button`
   }
 `
 
-interface Params {
-  userAddress: string
-  buyAmount: BN
-  buyToken: TokenDetails
-  sellAmount: BN
-  sellToken: TokenDetails
-  resetForm: () => void
-  setSubmitting: React.Dispatch<React.SetStateAction<boolean>>
-}
-
-async function placeOrder({
-  userAddress,
-  buyAmount,
-  buyToken,
-  sellAmount,
-  sellToken,
-  resetForm,
-  setSubmitting,
-}: Params): Promise<void> {
-  setSubmitting(true)
-  log(`Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${sellToken.symbol}`)
-
-  try {
-    const [sellTokenId, buyTokenId, batchId] = await Promise.all([
-      exchangeApi.getTokenIdByAddress(sellToken.address),
-      exchangeApi.getTokenIdByAddress(buyToken.address),
-      exchangeApi.getCurrentBatchId(),
-    ])
-    // TODO: get this value from a config, no magic numbers
-    const validUntil = batchId + 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
-
-    const params: PlaceOrderParams = {
-      userAddress,
-      buyTokenId,
-      sellTokenId,
-      validUntil,
-      buyAmount,
-      sellAmount,
-    }
-    const result = await exchangeApi.placeOrder(params, txOptionalParams)
-    log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-
-    toast.success(`Placed order id=${result.data} valid for 30min`)
-
-    resetForm()
-  } catch (e) {
-    log(`Error placing order`, e)
-    toast.error(`Error placing order: ${e.message}`)
-  } finally {
-    //TODO: use mounted hook thingy when available
-    setSubmitting(false)
-  }
-}
-
 const TradeWidget: React.FC = () => {
-  const { networkId, isConnected, userAddress } = useWalletConnection()
+  const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
@@ -149,9 +90,8 @@ const TradeWidget: React.FC = () => {
   const sellInputId = 'sellToken'
   const receiveInputId = 'receiveToken'
 
+  const { isSubmitting, placeOrder } = usePlaceOrder({ callback: reset })
   const history = useHistory()
-
-  const [submitting, setSubmitting] = useState(false)
 
   const swapTokens = (): void => {
     setSellToken(receiveToken)
@@ -176,13 +116,10 @@ const TradeWidget: React.FC = () => {
   function onSubmit(data: FieldValues): void {
     if (isConnected) {
       placeOrder({
-        userAddress,
         buyAmount: parseAmount(data[receiveInputId], receiveToken.decimals),
         buyToken: receiveToken,
         sellAmount: parseAmount(data[sellInputId], sellToken.decimals),
         sellToken,
-        resetForm: reset,
-        setSubmitting,
       })
     } else {
       history.push('/connect-wallet')
@@ -229,8 +166,8 @@ const TradeWidget: React.FC = () => {
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
           />
-          <SubmitButton type="submit" disabled={!methods.formState.isValid || submitting}>
-            <FontAwesomeIcon icon={submitting ? faSpinner : faPaperPlane} size="lg" spin={submitting} />{' '}
+          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting}>
+            <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
         </WrappedForm>
