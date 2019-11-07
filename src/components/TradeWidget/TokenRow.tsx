@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
+import BN from 'bn.js'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -6,7 +7,8 @@ import { useFormContext } from 'react-hook-form'
 import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, parseAmount } from 'utils'
+import { ZERO } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -78,13 +80,19 @@ function displayBalance(balance: TokenBalanceDetails | undefined | null, key: st
   return formatAmount(balance[key], balance.decimals) || '0'
 }
 
-function getMax(balance: TokenBalanceDetails | null, token: TokenDetails): string {
-  return formatAmountFull((balance || {}).exchangeBalance, token.decimals, false) || '0'
+function adjustPrecision(value: string | undefined | null, precision: number): string {
+  const match = (value || '').match(/(^\d+\.)(\d+)$/)
+  if (match && match[2].length > precision) {
+    let [, intPart, decimalPart] = match
+    decimalPart = decimalPart.slice(0, precision)
+    return intPart + decimalPart
+  }
+  return value
 }
 
 // TODO: move into a validators file?
-function validatePositive(value: string): true | string {
-  return Number(value) > 0 || 'Invalid amount'
+function validatePositive(value: string, precision: number): true | string {
+  return new BN(parseAmount(value, precision) || '0').gt(ZERO) || 'Invalid amount'
 }
 
 interface Props {
@@ -110,19 +118,23 @@ const TokenRow: React.FC<Props> = ({
 }) => {
   const { register, errors, setValue, watch } = useFormContext()
   const error = errors[inputId]
+  const inputValue = watch(inputId)
 
-  const max = Number(getMax(balance, selectedToken))
-  const inputValue = Number(watch(inputId)) || 0
-  const overMax = validateMaxAmount && inputValue > max ? inputValue - max : 0
+  let overMax = ZERO
+  if (balance && validateMaxAmount) {
+    const max = balance.exchangeBalance
+    const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
+    overMax = value.gt(max) ? value.sub(max) : ZERO
+  }
 
-  const className = error ? 'error' : !!overMax ? 'warning' : ''
+  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
   const errorOrWarning = error ? (
     <WalletDetail className="error">{error.message}</WalletDetail>
   ) : (
-    !!overMax && (
+    overMax.gt(ZERO) && (
       <WalletDetail className="warning">
-        Selling {overMax.toFixed(4)} {selectedToken.symbol} over your current balance
+        Selling {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol} over your current balance
       </WalletDetail>
     )
   )
@@ -130,6 +142,17 @@ const TokenRow: React.FC<Props> = ({
   function useMax(): void {
     setValue(inputId, formatAmountFull(balance.exchangeBalance, balance.decimals, false))
   }
+
+  const enforcePrecision = useCallback(() => {
+    const newValue = adjustPrecision(inputValue, selectedToken.decimals)
+    if (inputValue !== newValue) {
+      setValue(inputId, newValue, true)
+    }
+  }, [inputValue, selectedToken.decimals, setValue, inputId])
+
+  useEffect(() => {
+    enforcePrecision()
+  }, [enforcePrecision])
 
   return (
     <Wrapper>
@@ -151,9 +174,10 @@ const TokenRow: React.FC<Props> = ({
           required
           ref={register({
             validate: {
-              positive: (value: string): true | string => validatePositive(value),
+              positive: (value: string): true | string => validatePositive(value, selectedToken.decimals),
             },
           })}
+          onChange={enforcePrecision}
         />
         {errorOrWarning}
         <WalletDetail>
