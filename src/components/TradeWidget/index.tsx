@@ -147,6 +147,7 @@ const TradeWidget: React.FC = () => {
             selectLabel="sell"
             onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
             inputId={sellInputId}
+            isDisabled={isSubmitting}
             validateMaxAmount
           />
           <IconWrapper onClick={swapTokens}>
@@ -159,6 +160,7 @@ const TradeWidget: React.FC = () => {
             selectLabel="receive"
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveInputId}
+            isDisabled={isSubmitting}
           />
           <OrderDetails
             sellAmount={watch(sellInputId)}
