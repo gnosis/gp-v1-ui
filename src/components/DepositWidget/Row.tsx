@@ -62,14 +62,6 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
 
-  const _showHideForm = (type?: 'deposit' | 'withdraw' | null): void => {
-    if (document && innerWidth < 500) {
-      document.body.classList.toggle('noScroll', !!type)
-    }
-
-    showForm(type)
-  }
-
   return (
     <>
       <RowTokenDiv data-address={address} className={className} data-address-mainnet={addressMainnet}>
@@ -115,12 +107,12 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <div data-label="Actions">
           {enabled ? (
             <>
-              <button onClick={(): void => _showHideForm('deposit')} disabled={isDepositFormVisible}>
+              <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
                 <FontAwesomeIcon icon={faPlus} />
                 &nbsp; Deposit
               </button>
               <button
-                onClick={(): void => _showHideForm('withdraw')}
+                onClick={(): void => showForm('withdraw')}
                 disabled={isWithdrawFormVisible}
                 className="danger"
               >
@@ -159,7 +151,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           submitBtnLabel="Deposit"
           submitBtnIcon={faPlus}
           onSubmit={onSubmitDeposit}
-          onClose={(): void => _showHideForm()}
+          onClose={(): void => showForm()}
           responsive={showResponsive}
         />
       )}
@@ -177,7 +169,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           submitBtnLabel="Withdraw"
           submitBtnIcon={faMinus}
           onSubmit={onSubmitWithdraw}
-          onClose={(): void => _showHideForm()}
+          onClose={(): void => showForm()}
           responsive={showResponsive}
         />
       )}
