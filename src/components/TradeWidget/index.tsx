@@ -158,7 +158,7 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  async function onSubmit(data: FieldValues): Promise<void> {
+  function onSubmit(data: FieldValues): void {
     if (isConnected) {
       placeOrder(
         parseAmount(data[receiveInputId], receiveToken.decimals),
