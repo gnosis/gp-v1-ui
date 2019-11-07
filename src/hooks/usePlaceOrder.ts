@@ -7,6 +7,7 @@ import { exchangeApi } from 'api'
 import { log } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
+import { DEFAULT_ORDER_DURATION } from 'const'
 
 interface Params {
   callback: () => void
@@ -45,8 +46,8 @@ export const usePlaceOrder = ({ callback }: Params): Result => {
         exchangeApi.getTokenIdByAddress(buyToken.address),
         exchangeApi.getCurrentBatchId(),
       ])
-      // TODO: get this value from a config, no magic numbers
-      const validUntil = batchId + 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
+
+      const validUntil = batchId + DEFAULT_ORDER_DURATION
 
       const params: ExchangeApiPlaceOrderParams = {
         userAddress,
