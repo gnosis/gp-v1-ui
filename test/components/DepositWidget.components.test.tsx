@@ -36,20 +36,15 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}): React.ReactEleme
       onClaim={onClaim}
       onSubmitDeposit={onSubmitDeposit}
       onSubmitWithdraw={onSubmitWithdraw}
+      innerWidth={500}
     />
   )
 }
 
 describe('<Row /> not enabled token', () => {
-  it('renders single <tr> element', () => {
+  it('contains 6 <div> elements', () => {
     const wrapper = render(_createRow())
-    wrapper.hasClass
-    expect(wrapper.is('tr')).toBe(true)
-  })
-
-  it('contains 7 <div> elements', () => {
-    const wrapper = render(_createRow())
-    expect(wrapper.find('div')).toHaveLength(7)
+    expect(wrapper.find('div')).toHaveLength(6)
   })
 
   it('contains 1 <button> (enable)', () => {
@@ -63,9 +58,9 @@ describe('<Row /> enabled token', () => {
     enabled: true,
   }
 
-  it('contains 7 <div> elements', () => {
-    const wrapper = render(_createRow())
-    expect(wrapper.find('div')).toHaveLength(7)
+  it('contains 6 <div> elements', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
+    expect(wrapper.find('div')).toHaveLength(6)
   })
 
   it('contains 2 <button> elements (deposit and withdraw)', () => {

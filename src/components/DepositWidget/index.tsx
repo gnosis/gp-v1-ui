@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Modali, { useModali } from 'modali'
+import BN from 'bn.js'
 
 import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
@@ -11,7 +12,6 @@ import { useRowActions } from './useRowActions'
 import useWindowSpecs from 'hooks/useWindowSpecs'
 
 import { log, formatAmount, getToken } from 'utils'
-import BN from 'bn.js'
 
 interface ModalBodyProps {
   pendingAmount: string
@@ -120,7 +120,9 @@ const DepositWidget: React.FC = () => {
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance): Promise<void> => deposit(balance, tokenBalances.address)}
-                    onSubmitWithdraw={(balance): Promise<void> => requestWithdraw(balance, tokenBalances.address)}
+                    onSubmitWithdraw={(balance): Promise<void> => {
+                      return requestWithdrawConfirmation(balance, tokenBalances.address)
+                    }}
                     onClaim={(): Promise<void> => claim(tokenBalances.address)}
                     {...windowSpecs}
                   />
