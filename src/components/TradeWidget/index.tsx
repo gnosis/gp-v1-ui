@@ -61,6 +61,60 @@ const SubmitButton = styled.button`
   }
 `
 
+interface Params {
+  userAddress: string
+  buyAmount: BN
+  buyToken: TokenDetails
+  sellAmount: BN
+  sellToken: TokenDetails
+  resetForm: () => void
+  setSubmitting: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+async function placeOrder({
+  userAddress,
+  buyAmount,
+  buyToken,
+  sellAmount,
+  sellToken,
+  resetForm,
+  setSubmitting,
+}: Params): Promise<void> {
+  setSubmitting(true)
+  log(`Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${sellToken.symbol}`)
+
+  try {
+    const [sellTokenId, buyTokenId, batchId] = await Promise.all([
+      exchangeApi.getTokenIdByAddress(sellToken.address),
+      exchangeApi.getTokenIdByAddress(buyToken.address),
+      exchangeApi.getCurrentBatchId(),
+    ])
+    // TODO: get this value from a config, no magic numbers
+    const validUntil = batchId + 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
+
+    const params: PlaceOrderParams = {
+      userAddress,
+      buyTokenId,
+      sellTokenId,
+      validUntil,
+      buyAmount,
+      sellAmount,
+    }
+    const result = await exchangeApi.placeOrder(params, txOptionalParams)
+    log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+
+    toast.success(`Placed order id=${result.data} valid for 30min`)
+
+    resetForm()
+  } catch (e) {
+    log(`Error placing order`, e)
+    toast.error(`Error placing order: ${e.message}`)
+  } finally {
+    //TODO: use mounted hook thingy when available
+    setSubmitting(false)
+  }
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -118,57 +172,18 @@ const TradeWidget: React.FC = () => {
   }
 
   let sameToken = sellToken === receiveToken
-  async function placeOrder(
-    buyAmount: BN,
-    buyToken: TokenDetails,
-    sellAmount: BN,
-    sellToken: TokenDetails,
-  ): Promise<void> {
-    setSubmitting(true)
-    log(
-      `Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${sellToken.symbol}`,
-    )
-
-    try {
-      const [sellTokenId, buyTokenId, batchId] = await Promise.all([
-        exchangeApi.getTokenIdByAddress(sellToken.address),
-        exchangeApi.getTokenIdByAddress(buyToken.address),
-        exchangeApi.getCurrentBatchId(),
-      ])
-      // TODO: get this value from a config, no magic numbers
-      const validUntil = batchId + 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
-
-      const params: PlaceOrderParams = {
-        userAddress,
-        buyTokenId,
-        sellTokenId,
-        validUntil,
-        buyAmount,
-        sellAmount,
-      }
-      const result = await exchangeApi.placeOrder(params, txOptionalParams)
-      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
-
-      toast.success(`Placed order id=${result.data} valid for 30min`)
-
-      reset() // the form
-    } catch (e) {
-      log(`Error placing order`, e)
-      toast.error(`Error placing order: ${e.message}`)
-    } finally {
-      //TODO: use mounted hook thingy when available
-      setSubmitting(false)
-    }
-  }
 
   function onSubmit(data: FieldValues): void {
     if (isConnected) {
-      placeOrder(
-        parseAmount(data[receiveInputId], receiveToken.decimals),
-        receiveToken,
-        parseAmount(data[sellInputId], sellToken.decimals),
+      placeOrder({
+        userAddress,
+        buyAmount: parseAmount(data[receiveInputId], receiveToken.decimals),
+        buyToken: receiveToken,
+        sellAmount: parseAmount(data[sellInputId], sellToken.decimals),
         sellToken,
-      )
+        resetForm: reset,
+        setSubmitting,
+      })
     } else {
       history.push('/connect-wallet')
       // TODO: connect wallet then come back, ideally with the data pre-filled
