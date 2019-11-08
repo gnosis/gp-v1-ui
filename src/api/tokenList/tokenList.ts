@@ -1,16 +1,13 @@
 import { TokenDetails, Network } from 'types'
+import tokens from './tokenList.json'
 
 interface TokenDetailsByNetwork extends Omit<TokenDetails, 'address' | 'image'> {
   addressByNetwork: { [networkId: number]: string }
 }
 
-// Ether, Tether, TrueUSD, USD Coin, Paxos, Gemini, Dai
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const tokens: TokenDetailsByNetwork[] = require('./tokenList.json')
-
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
   // Return token details
-  const tokenDetails: (TokenDetails | null)[] = tokens.map(token => {
+  const tokenDetails: (TokenDetails | null)[] = tokens.map((token: TokenDetailsByNetwork) => {
     const address = token.addressByNetwork[networkId]
     if (address) {
       // There's an address for the current network
