@@ -43,6 +43,10 @@ export const useRowActions = (params: Params): Result => {
   }, [])
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
+    if (!mounted.current) {
+      return
+    }
+
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
         const { address: tokenAddressAux } = tokenBalancesAux
@@ -78,16 +82,14 @@ export const useRowActions = (params: Params): Result => {
       )
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
-      if (mounted.current) {
-        _updateToken(tokenAddress, otherParams => {
-          return {
-            ...otherParams,
-            enabled: true,
-            highlighted: true,
-          }
-        })
-        _clearHighlight(tokenAddress)
-      }
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          enabled: true,
+          highlighted: true,
+        }
+      })
+      _clearHighlight(tokenAddress)
 
       toast.success(`The token ${symbol} has been enabled for trading`)
     } catch (error) {
@@ -103,17 +105,15 @@ export const useRowActions = (params: Params): Result => {
       const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
-      if (mounted.current) {
-        _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
-          return {
-            ...otherParams,
-            depositingBalance: depositingBalance.add(amount),
-            walletBalance: walletBalance.sub(amount),
-            highlighted: true,
-          }
-        })
-        _clearHighlight(tokenAddress)
-      }
+      _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
+        return {
+          ...otherParams,
+          depositingBalance: depositingBalance.add(amount),
+          walletBalance: walletBalance.sub(amount),
+          highlighted: true,
+        }
+      })
+      _clearHighlight(tokenAddress)
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -130,17 +130,15 @@ export const useRowActions = (params: Params): Result => {
       const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
-      if (mounted.current) {
-        _updateToken(tokenAddress, otherParams => {
-          return {
-            ...otherParams,
-            withdrawingBalance: amount,
-            claimable: false,
-            highlighted: true,
-          }
-        })
-        _clearHighlight(tokenAddress)
-      }
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          withdrawingBalance: amount,
+          claimable: false,
+          highlighted: true,
+        }
+      })
+      _clearHighlight(tokenAddress)
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -161,20 +159,18 @@ export const useRowActions = (params: Params): Result => {
       })
       const result = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
 
-      if (mounted.current) {
-        _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
-          return {
-            ...otherParams,
-            claiming: false,
-            exchangeBalance: exchangeBalance.sub(withdrawingBalance),
-            withdrawingBalance: ZERO,
-            claimable: false,
-            walletBalance: walletBalance.add(withdrawingBalance),
-            highlighted: true,
-          }
-        })
-        _clearHighlight(tokenAddress)
-      }
+      _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
+        return {
+          ...otherParams,
+          claiming: false,
+          exchangeBalance: exchangeBalance.sub(withdrawingBalance),
+          withdrawingBalance: ZERO,
+          claimable: false,
+          walletBalance: walletBalance.add(withdrawingBalance),
+          highlighted: true,
+        }
+      })
+      _clearHighlight(tokenAddress)
 
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
       toast.success(`Withdraw of ${formatAmount(withdrawingBalance, decimals)} ${symbol} completed`)
