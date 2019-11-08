@@ -50,14 +50,14 @@ const GlobalStyles = createGlobalStyle`
 
   h1 {
     font-size: 3rem;
-    @media (max-width: 480px) {
+    @media  only screen and (max-width: 480px) {
       font-size: 2.4rem;
     }    
   }
 
   h2 {
     font-size: 2rem;
-    @media (max-width: 480px) {
+    @media  only screen and (max-width: 480px) {
       font-size: 1.4rem;
     }
   }
@@ -155,9 +155,13 @@ const GlobalStyles = createGlobalStyle`
     padding: 2rem 10vw 2rem 10vw;
     width: 95vw;
 
-    @media (max-width: 768px) {
+    @media  only screen and (max-width: 768px) {
       margin: auto;
     }
+  }
+
+  .noScroll {
+    overflow: hidden;
   }
 
 `

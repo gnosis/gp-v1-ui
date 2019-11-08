@@ -1,48 +1,17 @@
 import React, { useState } from 'react'
-import styled from 'styled-components'
+import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 
-import { TokenBalanceDetails, Command } from 'types'
-import { formatAmount, formatAmountFull } from 'utils'
 import Form from './Form'
-import { ZERO } from 'const'
-import BN from 'bn.js'
-import { log } from 'utils'
 import TokenImg from 'components/TokenImg'
+import { RowTokenDiv, RowClaimButton, RowClaimLink } from './Styled'
 
-const TokenTr = styled.tr`
+import useNoScroll from 'hooks/useNoScroll'
 
-  &.highlight {
-    background-color: #fdffc1;
-    border-bottom-color: #fbdf8f;
-  }
-
-  &.loading {
-    background-color: #f7f7f7;
-    border-bottom-color: #b9b9b9;
-  }
-
-  &.selected {
-    background-color: #ecdcff;
-`
-
-const ClaimButton = styled.button`
-  margin-bottom: 0;
-`
-
-const ClaimLink = styled.a`
-  text-decoration: none;
-
-  &.success {
-    color: #63ab52;
-  }
-  &.disabled {
-    color: currentColor;
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-`
+import { ZERO, RESPONSIVE_SIZES } from 'const'
+import { formatAmount, formatAmountFull, log } from 'utils'
+import { TokenBalanceDetails, Command } from 'types'
 
 export interface RowProps {
   tokenBalances: TokenBalanceDetails
@@ -50,10 +19,12 @@ export interface RowProps {
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
+  innerWidth: number | null
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
-  const { tokenBalances, onSubmitDeposit, onSubmitWithdraw, onClaim, onEnableToken } = props
+  const { tokenBalances, onSubmitDeposit, onSubmitWithdraw, onClaim, onEnableToken, innerWidth } = props
+
   const {
     address,
     addressMainnet,
@@ -75,6 +46,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
+  // Checks innerWidth
+  let showResponsive = innerWidth < RESPONSIVE_SIZES.MOBILE
+  useNoScroll(visibleForm && showResponsive)
+
   let className
   if (highlighted) {
     className = 'highlight'
@@ -89,21 +64,23 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   return (
     <>
-      <TokenTr data-address={address} className={className} data-address-mainnet={addressMainnet}>
-        <td>
+      <RowTokenDiv data-address={address} className={className} data-address-mainnet={addressMainnet}>
+        <div data-label="Token">
           <TokenImg src={image} alt={name} />
-        </td>
-        <td>{name}</td>
-        <td title={formatAmountFull(exchangeBalanceTotal, decimals)}>{formatAmount(exchangeBalanceTotal, decimals)}</td>
-        <td title={formatAmountFull(withdrawingBalance, decimals)}>
+          <div>{name}</div>
+        </div>
+        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals)}>
+          {formatAmount(exchangeBalanceTotal, decimals)}
+        </div>
+        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals)}>
           {claimable ? (
             <>
-              <ClaimButton className="success" onClick={onClaim} disabled={claiming}>
+              <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
                 {claiming && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
-              </ClaimButton>
+              </RowClaimButton>
               <div>
-                <ClaimLink
+                <RowClaimLink
                   className={claiming ? 'disabled' : 'success'}
                   onClick={(): void => {
                     if (!claiming) {
@@ -112,7 +89,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                   }}
                 >
                   <small>Claim</small>
-                </ClaimLink>
+                </RowClaimLink>
               </div>
             </>
           ) : withdrawingBalance.gt(ZERO) ? (
@@ -123,16 +100,22 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           ) : (
             0
           )}
-        </td>
-        <td title={formatAmountFull(walletBalance, decimals)}>{formatAmount(walletBalance, decimals)}</td>
-        <td>
+        </div>
+        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals)}>
+          {formatAmount(walletBalance, decimals)}
+        </div>
+        <div data-label="Actions">
           {enabled ? (
             <>
               <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
                 <FontAwesomeIcon icon={faPlus} />
                 &nbsp; Deposit
               </button>
-              <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
+              <button
+                onClick={(): void => showForm('withdraw')}
+                disabled={isWithdrawFormVisible}
+                className="danger"
+              >
                 <FontAwesomeIcon icon={faMinus} />
                 &nbsp; Withdraw
               </button>
@@ -152,8 +135,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               )}
             </button>
           )}
-        </td>
-      </TokenTr>
+        </div>
+      </RowTokenDiv>
       {isDepositFormVisible && (
         <Form
           title={
@@ -169,6 +152,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           submitBtnIcon={faPlus}
           onSubmit={onSubmitDeposit}
           onClose={(): void => showForm()}
+          responsive={showResponsive}
         />
       )}
       {isWithdrawFormVisible && (
@@ -186,6 +170,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           submitBtnIcon={faMinus}
           onSubmit={onSubmitWithdraw}
           onClose={(): void => showForm()}
+          responsive={showResponsive}
         />
       )}
     </>
