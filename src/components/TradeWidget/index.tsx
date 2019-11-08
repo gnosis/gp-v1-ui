@@ -125,16 +125,7 @@ const TradeWidget: React.FC = () => {
         reset()
       }
     } else {
-      history.push('/connect-wallet')
-      // TODO: connect wallet then come back, ideally with the data pre-filled
-      // might require David changes to be merged first
-      // when redirect back we need:
-      // 1. fill the form
-      // 2. trigger validation
-      // 3. call submit again
-      // OR... bypass all that and call this function with given parameters?
-      // we'll potentially need a flag from the redirect to indicate whether we are now connected
-      //   and should proceed from where we left off
+      history.push('/connect-wallet', { from: history.location.pathname })
     }
   }
 

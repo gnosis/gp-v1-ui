@@ -141,7 +141,12 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(undefined)
-      props.history.push('/')
+
+      // If on trade page already, keep pre-selected values when logging out
+      const pathname = props.location.pathname
+      const redirectTo = typeof pathname === 'string' && pathname.match(/^\/trade/) ? pathname : '/'
+
+      props.history.push(redirectTo)
     }
   }
 
