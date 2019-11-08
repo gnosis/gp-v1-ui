@@ -14,7 +14,7 @@ const useWindowSizes = (): { innerWidth: number; innerHeight: number } => {
   function handleResize(): void | number {
     // check that client can handle this sexiness
     const { innerWidth, innerHeight } = getSize()
-    
+
     return setInnerWindowSpecs({ innerWidth, innerHeight })
   }
 
@@ -22,7 +22,7 @@ const useWindowSizes = (): { innerWidth: number; innerHeight: number } => {
     window.addEventListener('resize', handleResize)
     return (): void => window.removeEventListener('resize', handleResize)
   }, [])
-  
+
   return innerWindowSpecs
 }
 
