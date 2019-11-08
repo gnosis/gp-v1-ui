@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { rem } from 'polished'
 import { Link } from 'react-router-dom'
+import { useLocation } from 'react-router'
+import { rem } from 'polished'
+
 import Wallet, { WalletWrapper } from 'components/Wallet'
 
 const Wrapper = styled.header`
@@ -104,27 +106,33 @@ const Wrapper = styled.header`
   }
 `
 
-const Header: React.FC = () => (
-  <Wrapper>
-    <nav>
-      <Link className="logo" to="/">
-        dFusion PoC
-      </Link>
-      <ul className="nav-links">
-        <li>
-          <Link to="/">Trade</Link>
-        </li>
-        <li>
-          <Link to="/deposit">Deposit</Link>
-        </li>
-      </ul>
-      <Wallet />
-    </nav>
-    <div className="header-title">
-      <h1>Swap Stable Coins</h1>
-      <h3>Fair, Efficient Prices, Onchain</h3>
-    </div>
-  </Wrapper>
-)
+const Header: React.FC = () => {
+  const location = useLocation()
+
+  const { from } = location.state || { from: { pathname: '/' } }
+
+  return (
+    <Wrapper>
+      <nav>
+        <Link className="logo" to="/">
+          dFusion PoC
+        </Link>
+        <ul className="nav-links">
+          <li>
+            <Link to={from.pathname}>Trade</Link>
+          </li>
+          <li>
+            <Link to={{ pathname: '/deposit', state: { from: location } }}>Deposit</Link>
+          </li>
+        </ul>
+        <Wallet />
+      </nav>
+      <div className="header-title">
+        <h1>Swap stable coins</h1>
+        <h3>Fair, Efficient prices, Onchain</h3>
+      </div>
+    </Wrapper>
+  )
+}
 
 export default Header
