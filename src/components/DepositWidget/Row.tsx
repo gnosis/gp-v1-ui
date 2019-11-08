@@ -111,11 +111,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                 <FontAwesomeIcon icon={faPlus} />
                 &nbsp; Deposit
               </button>
-              <button
-                onClick={(): void => showForm('withdraw')}
-                disabled={isWithdrawFormVisible}
-                className="danger"
-              >
+              <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
                 <FontAwesomeIcon icon={faMinus} />
                 &nbsp; Withdraw
               </button>
