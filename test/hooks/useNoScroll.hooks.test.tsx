@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom'
 import { act } from 'react-dom/test-utils'
 
 import useNoScroll from 'hooks/useNoScroll'
-import useWindowSpecs from 'hooks/useWindowSpecs'
+import useWindowSizes from 'hooks/useWindowSizes'
 
 const TestScrollComponent = () => {
-  const { innerWidth } = useWindowSpecs()
+  const { innerWidth } = useWindowSizes()
   let activateNoScroll = innerWidth < 500
 
   useNoScroll(activateNoScroll)

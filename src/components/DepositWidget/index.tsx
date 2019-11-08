@@ -9,7 +9,7 @@ import { ModalBodyWrapper, DepositWidgetWrapper } from './Styled'
 
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
-import useWindowSpecs from 'hooks/useWindowSpecs'
+import useWindowSizes from 'hooks/useWindowSizes'
 
 import { log, formatAmount, getToken } from 'utils'
 
@@ -39,7 +39,7 @@ const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
 const DepositWidget: React.FC = () => {
   const { balances, setBalances, error } = useTokenBalances()
   const { enableToken, deposit, requestWithdraw, claim } = useRowActions({ balances, setBalances })
-  const windowSpecs = useWindowSpecs()
+  const windowSpecs = useWindowSizes()
 
   const [withdrawRequest, setWithdrawRequest] = useState({
     amount: null,

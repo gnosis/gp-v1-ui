@@ -8,7 +8,7 @@ function getSize(): { innerWidth: number | undefined; innerHeight: number | unde
   }
 }
 
-const useWindowSpecs = (): { innerWidth: number; innerHeight: number } => {
+const useWindowSizes = (): { innerWidth: number; innerHeight: number } => {
   const [innerWindowSpecs, setInnerWindowSpecs] = useState(getSize)
 
   function handleResize(): void | number {
@@ -26,4 +26,4 @@ const useWindowSpecs = (): { innerWidth: number; innerHeight: number } => {
   return innerWindowSpecs
 }
 
-export default useWindowSpecs
+export default useWindowSizes
