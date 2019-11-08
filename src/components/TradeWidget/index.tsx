@@ -4,13 +4,19 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components'
 import useForm, { FormContext } from 'react-hook-form'
 
-import { Network, TokenDetails } from 'types'
-import { tokenListApi } from 'api'
-import { getToken } from 'utils'
-import { useTokenBalances } from 'hooks/useTokenBalances'
-import { useWalletConnection } from 'hooks/useWalletConnection'
 import TokenRow from './TokenRow'
 import Widget from 'components/layout/Widget'
+
+import { useParams } from 'react-router'
+import useURLParams from 'hooks/useURLParams'
+import { useTokenBalances } from 'hooks/useTokenBalances'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+
+import { tokenListApi } from 'api'
+
+import { Network, TokenDetails } from 'types'
+
+import { getToken } from 'utils'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -27,6 +33,16 @@ const IconWrapper = styled.a`
   width: 2em;
 `
 
+const WarningLabel = styled.code`
+  background: #ffa8a8;
+  border-radius: 25;
+  font-weight: 800;
+  margin: 0 auto 15px;
+  padding: 6;
+  text-align: center;
+  width: 75%;
+`
+
 const SubmitButton = styled.button`
   margin: 2em 0 0 0;
   line-height: 2;
@@ -39,13 +55,25 @@ const SubmitButton = styled.button`
 const TradeWidget: React.FC = () => {
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet
+  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
-  const [sellToken, setSellToken] = useState(() => getToken('symbol', 'DAI', tokens))
-  const [receiveToken, setReceiveToken] = useState(() => getToken('symbol', 'USDC', tokens))
+
+  // Listen on manual changes to URL search query
+  const { sell: sellTokenSymbol, receive: receiveTokenSymbol } = useParams()
+
+  const [sellToken, setSellToken] = useState(
+    () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
+  )
+  const [receiveToken, setReceiveToken] = useState(
+    () => getToken('symbol', receiveTokenSymbol, tokens) || getToken('symbol', 'USDC', tokens),
+  )
+
+  // Change URL on internal token change
+  useURLParams(`sell=${sellToken.symbol}-0&receive=${receiveToken.symbol}-20`)
 
   const { balances } = useTokenBalances()
+
   const sellTokenBalance = useMemo(() => getToken('symbol', sellToken.symbol, balances), [balances, sellToken.symbol])
   const receiveTokenBalance = useMemo(() => getToken('symbol', receiveToken.symbol, balances), [
     balances,
@@ -74,10 +102,13 @@ const TradeWidget: React.FC = () => {
     }
   }
 
+  let sameToken = sellToken === receiveToken
+
   return (
     <WrappedWidget>
       <FormContext {...methods}>
-        <WrapperForm onSubmit={methods.handleSubmit(data => console.log('data', data))}>
+        <WrapperForm onSubmit={methods.handleSubmit(console.log)}>
+          {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             token={sellToken}
             tokens={tokens}
@@ -99,7 +130,8 @@ const TradeWidget: React.FC = () => {
             inputId={receiveTokenId}
           />
           <SubmitButton type="submit" disabled={!methods.formState.isValid}>
-            <FontAwesomeIcon icon={faPaperPlane} size="lg" /> Send limit order
+            <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
+            {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
         </WrapperForm>
       </FormContext>
