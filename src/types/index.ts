@@ -88,6 +88,36 @@ export interface DepositApi {
   withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
 }
 
+export interface Order {
+  buyTokenId: number
+  sellTokenId: number
+  validFrom: number
+  validUntil: number
+  priceNumerator: BN
+  priceDenominator: BN
+  remainingAmount: BN
+}
+
+export interface PlaceOrderParams {
+  userAddress: string
+  buyTokenId: number
+  sellTokenId: number
+  validUntil: number
+  buyAmount: BN
+  sellAmount: BN
+}
+
+export interface ExchangeApi extends DepositApi {
+  getOrders(userAddress: string): Promise<Order[]>
+  getNumTokens(): Promise<number>
+  getFeeDenominator(): Promise<number>
+  getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
+  getTokenIdByAddress(tokenAddress: string): Promise<number>
+  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<TxResult<number>>
+  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+}
+
 export interface WalletInfo {
   isConnected: boolean
   userAddress?: string
