@@ -7,7 +7,7 @@ import useForm, { FormContext } from 'react-hook-form'
 import TokenRow from './TokenRow'
 import Widget from 'components/layout/Widget'
 
-import { useParams } from 'react-router-dom'
+import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
