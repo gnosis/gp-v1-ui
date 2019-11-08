@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import Select from 'react-select'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
+import { useFormContext } from 'react-hook-form'
 
 import TokenImg from 'components/TokenImg'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount } from 'utils'
+import { formatAmount, formatAmountFull } from 'utils'
 
 const Wrapper = styled.div`
   display: flex;
@@ -50,14 +51,37 @@ const InputBox = styled.div`
   input {
     margin: 0 0 0.5em 0;
     width: 100%;
+
+    &.error {
+      box-shadow: 0 0 3px #cc0000;
+    }
+
+    &.warning {
+      box-shadow: 0 0 3px #ff7500;
+    }
   }
 `
 
 const WalletDetail = styled.div`
+  display: flex;
+  justify-content: space-between;
   font-size: 0.75em;
 
   .success {
     color: green;
+    text-decoration: none;
+  }
+
+  &.error,
+  &.warning {
+    margin: 0 0 1em 0;
+  }
+
+  &.error {
+    color: red;
+  }
+  &.warning {
+    color: orange;
   }
 `
 
@@ -113,16 +137,58 @@ function displayBalance(balance: TokenBalanceDetails | undefined | null, key: st
   return formatAmount(balance[key], balance.decimals) || '0'
 }
 
+function getMax(balance: TokenBalanceDetails | null, token: TokenDetails): string {
+  return formatAmountFull((balance || {}).exchangeBalance, token.decimals, false) || '0'
+}
+
+// TODO: move into a validators file?
+function validatePositive(value: string): true | string {
+  return Number(value) > 0 || 'Invalid amount'
+}
+
 interface Props {
   token: TokenDetails
   tokens: TokenDetails[]
   balance: TokenBalanceDetails
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
+  inputId: string
+  validateMaxAmount?: true
 }
 
-const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange, balance }) => {
+const TokenRow: React.FC<Props> = ({
+  token,
+  tokens,
+  selectLabel,
+  onSelectChange,
+  balance,
+  inputId,
+  validateMaxAmount,
+}) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
+
+  const { register, errors, setValue, watch } = useFormContext()
+  const error = errors[inputId]
+
+  const max = Number(getMax(balance, token))
+  const inputValue = Number(watch(inputId)) || 0
+  const overMax = validateMaxAmount && inputValue > max ? inputValue - max : 0
+
+  const className = error ? 'error' : !!overMax ? 'warning' : ''
+
+  const errorOrWarning = error ? (
+    <WalletDetail className="error">{error.message}</WalletDetail>
+  ) : (
+    !!overMax && (
+      <WalletDetail className="warning">
+        Selling {overMax.toFixed(4)} {token.symbol} over your current balance
+      </WalletDetail>
+    )
+  )
+
+  function useMax(): void {
+    setValue(inputId, formatAmountFull(balance.exchangeBalance, balance.decimals, false))
+  }
 
   return (
     <Wrapper>
@@ -144,15 +210,32 @@ const TokenRow: React.FC<Props> = ({ token, tokens, selectLabel, onSelectChange,
         />
       </SelectBox>
       <InputBox>
-        <input type="text" placeholder="0" />
+        <input
+          className={className}
+          placeholder="0"
+          name={inputId}
+          type="text"
+          required
+          ref={register({
+            validate: {
+              positive: (value: string): true | string => validatePositive(value),
+            },
+          })}
+        />
+        {errorOrWarning}
         <WalletDetail>
-          <strong>
-            <Link to="/deposit">Exchange wallet:</Link>
-          </strong>{' '}
-          <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
+          <div>
+            <strong>
+              <Link to="/deposit">Exchange wallet:</Link>
+            </strong>{' '}
+            <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
+          </div>
+          {validateMaxAmount && <a onClick={useMax}>use max</a>}
         </WalletDetail>
         <WalletDetail>
-          <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
+          <div>
+            <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
+          </div>
         </WalletDetail>
       </InputBox>
     </Wrapper>
