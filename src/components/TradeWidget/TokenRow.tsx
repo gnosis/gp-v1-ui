@@ -147,7 +147,7 @@ function validatePositive(value: string): true | string {
 }
 
 interface Props {
-  token: TokenDetails
+  selectedToken: TokenDetails
   tokens: TokenDetails[]
   balance: TokenBalanceDetails
   selectLabel: string
@@ -157,7 +157,7 @@ interface Props {
 }
 
 const TokenRow: React.FC<Props> = ({
-  token,
+  selectedToken,
   tokens,
   selectLabel,
   onSelectChange,
@@ -170,7 +170,7 @@ const TokenRow: React.FC<Props> = ({
   const { register, errors, setValue, watch } = useFormContext()
   const error = errors[inputId]
 
-  const max = Number(getMax(balance, token))
+  const max = Number(getMax(balance, selectedToken))
   const inputValue = Number(watch(inputId)) || 0
   const overMax = validateMaxAmount && inputValue > max ? inputValue - max : 0
 
@@ -181,7 +181,7 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     !!overMax && (
       <WalletDetail className="warning">
-        Selling {overMax.toFixed(4)} {token.symbol} over your current balance
+        Selling {overMax.toFixed(4)} {selectedToken.symbol} over your current balance
       </WalletDetail>
     )
   )
@@ -192,7 +192,7 @@ const TokenRow: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <TokenImgWrapper alt={token.name} src={token.image} />
+      <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
       <SelectBox>
         <label>{selectLabel}</label>
         <Select
@@ -201,7 +201,7 @@ const TokenRow: React.FC<Props> = ({
           noOptionsMessage={(): string => 'No results'}
           formatOptionLabel={formatOptionLabel}
           options={options}
-          value={{ token }}
+          value={{ token: selectedToken }}
           onChange={(selected, { action }): void => {
             if (action === 'select-option' && 'token' in selected) {
               onSelectChange(selected.token)

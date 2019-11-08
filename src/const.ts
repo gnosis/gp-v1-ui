@@ -17,6 +17,7 @@ export const BATCH_TIME = 300
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000
+export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntatic sugar for displaying purposes
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',

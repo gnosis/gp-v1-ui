@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import useForm, { FormContext } from 'react-hook-form'
 
 import TokenRow from './TokenRow'
+import OrderDetails from './OrderDetails'
 import Widget from 'components/layout/Widget'
 
 import { useParams } from 'react-router'
@@ -16,14 +17,14 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken } from 'utils'
+import { getToken, safeTokenName } from 'utils'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
 `
 
-const WrapperForm = styled.form`
+const WrappedForm = styled.form`
   display: flex;
   flex-direction: column;
 `
@@ -81,6 +82,7 @@ const TradeWidget: React.FC = () => {
   ])
 
   const methods = useForm({ mode: 'onBlur' })
+  const { handleSubmit, watch } = methods
   const sellTokenId = 'sellToken'
   const receiveTokenId = 'receiveToken'
 
@@ -107,10 +109,10 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget>
       <FormContext {...methods}>
-        <WrapperForm onSubmit={methods.handleSubmit(console.log)}>
+        <WrappedForm onSubmit={handleSubmit(data => console.log('data', data))}>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
-            token={sellToken}
+            selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="sell"
@@ -122,18 +124,24 @@ const TradeWidget: React.FC = () => {
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
           </IconWrapper>
           <TokenRow
-            token={receiveToken}
+            selectedToken={receiveToken}
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="receive"
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveTokenId}
           />
+          <OrderDetails
+            sellAmount={watch(sellTokenId)}
+            sellTokenName={safeTokenName(sellToken)}
+            receiveAmount={watch(receiveTokenId)}
+            receiveTokenName={safeTokenName(receiveToken)}
+          />
           <SubmitButton type="submit" disabled={!methods.formState.isValid}>
             <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
-        </WrapperForm>
+        </WrappedForm>
       </FormContext>
     </WrappedWidget>
   )
