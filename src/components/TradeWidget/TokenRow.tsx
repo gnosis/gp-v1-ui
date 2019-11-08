@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form'
 
 import TokenImg from 'components/TokenImg'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount } from 'utils'
+import { formatAmount, formatAmountFull } from 'utils'
 
 const Wrapper = styled.div`
   display: flex;
@@ -63,6 +63,8 @@ const InputBox = styled.div`
 `
 
 const WalletDetail = styled.div`
+  display: flex;
+  justify-content: space-between;
   font-size: 0.75em;
 
   .success {
@@ -136,7 +138,7 @@ function displayBalance(balance: TokenBalanceDetails | undefined | null, key: st
 }
 
 function getMax(balance: TokenBalanceDetails | null, token: TokenDetails): string {
-  return formatAmount((balance || {}).exchangeBalance, token.decimals, 4, false) || '0'
+  return formatAmountFull((balance || {}).exchangeBalance, token.decimals, false) || '0'
 }
 
 // TODO: move into a validators file?
@@ -184,6 +186,10 @@ const TokenRow: React.FC<Props> = ({
     )
   )
 
+  function useMax(): void {
+    setValue(inputId, formatAmountFull(balance.exchangeBalance, balance.decimals, false))
+  }
+
   return (
     <Wrapper>
       <TokenImgWrapper alt={token.name} src={token.image} />
@@ -218,15 +224,18 @@ const TokenRow: React.FC<Props> = ({
         />
         {errorOrWarning}
         <WalletDetail>
-          <strong>
-            <Link to="/deposit">Exchange wallet:</Link>
-          </strong>{' '}
-          <a className="success" onClick={(): void => setValue(inputId, max.toFixed(4))}>
-            {displayBalance(balance, 'exchangeBalance')}
-          </a>
+          <div>
+            <strong>
+              <Link to="/deposit">Exchange wallet:</Link>
+            </strong>{' '}
+            <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
+          </div>
+          {validateMaxAmount && <a onClick={useMax}>use max</a>}
         </WalletDetail>
         <WalletDetail>
-          <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
+          <div>
+            <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
+          </div>
         </WalletDetail>
       </InputBox>
     </Wrapper>

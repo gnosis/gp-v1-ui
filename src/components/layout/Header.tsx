@@ -1,8 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import { useLocation } from 'react-router'
 import { rem } from 'polished'
-import Wallet from 'components/Wallet'
+
+import Wallet, { WalletWrapper } from 'components/Wallet'
 
 const Wrapper = styled.header`
   color: #ffffff;
@@ -14,7 +16,7 @@ const Wrapper = styled.header`
     align-items: center;
     flex-flow: row wrap;
 
-    @media (max-width: 768px) {
+    @media only screen and (max-width: 866px) {
       justify-content: center;
     }
   }
@@ -32,9 +34,9 @@ const Wrapper = styled.header`
       padding: 0.8em;
     }
 
-    @media (max-width: 768px) {
+    @media only screen and (max-width: 866px) {
       flex: 1 1 100%;
-      order: 3;
+      order: 2;
     }
   }
 
@@ -69,15 +71,37 @@ const Wrapper = styled.header`
     margin-bottom: 0;
   }
   h3 {
-    // font-size: 1.6rem;
     margin-top: 0;
     color: #e0aacf;
   }
-  }
 
-  @media (max-width: 768px) {
+  @media only screen and (max-width: 500px) {
     .logo,
+    .nav-links,
+    ${WalletWrapper} {
+      padding: 0.25rem;
+    }
+
     .nav-links {
+      margin: 0 auto;
+    }
+
+    ${WalletWrapper} {
+      font-size: 80%;
+      order: 3;
+      &::last-child {
+        border-top: 0.7px solid #00000029 !important;
+      }
+    }
+
+    .header-title {
+      margin-bottom: 2rem;
+      h1 {
+        font-size: 1.8rem;
+      }
+      h3 {
+        font-size: 1rem;
+      }
     }
   }
 `

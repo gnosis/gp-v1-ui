@@ -23,3 +23,7 @@ export const LEGALDOCUMENT = {
   POC_URL: '/',
   TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
 }
+
+export const RESPONSIVE_SIZES = {
+  MOBILE: 500,
+}
