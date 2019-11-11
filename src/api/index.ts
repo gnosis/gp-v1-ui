@@ -8,6 +8,7 @@ import { DepositApiMock } from './exchange/DepositApiMock'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances, FEE_TOKEN } from '../../test/data'
 
+const isMock = process.env.MOCK === 'true'
 const isWalletMock = process.env.MOCK_WALLET === 'true'
 const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
 const isErc20Mock = process.env.MOCK_ERC20 === 'true'
@@ -18,7 +19,7 @@ function createWalletApi(): WalletApi {
   if (isWalletMock) {
     walletApi = new WalletApiMock()
   } else {
-  walletApi = new WalletApiImpl()
+    walletApi = new WalletApiImpl()
   }
   window['walletApi'] = walletApi // register for convenience
   return walletApi
