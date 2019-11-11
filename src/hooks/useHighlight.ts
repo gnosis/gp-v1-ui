@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { HIGHLIGHT_TIME } from 'const'
 
 interface Result {
   highlight: boolean
@@ -22,7 +23,7 @@ export const useHighlight = (): Result => {
         if (mounted.current) {
           setHighlight(false)
         }
-      }, 5000)
+      }, HIGHLIGHT_TIME)
     }
   }
 
