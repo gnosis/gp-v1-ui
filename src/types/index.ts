@@ -7,7 +7,10 @@ export type Mutation<T> = (original: T) => T
 
 export enum Network {
   Mainnet = 1,
+  Ropsten = 3,
   Rinkeby = 4,
+  Goerli = 5,
+  Kovan = 42,
 }
 
 export interface TokenDetails {
@@ -126,7 +129,7 @@ export interface WalletInfo {
 
 export interface WalletApi {
   isConnected(): boolean
-  connect(): Promise<void>
+  connect(): Promise<boolean>
   disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>

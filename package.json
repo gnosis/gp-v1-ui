@@ -4,9 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "NODE_ENV=development MOCK=true webpack-dev-server --mode development --hot",
+    "start": "NODE_ENV=development MOCK=true MOCK_WALLET=false webpack-dev-server --mode development --hot",
     "mock": "NODE_ENV=development MOCK=true webpack-dashboard -- webpack-dev-server --mode development --hot",
-    "build": "rimraf ./dist && NODE_ENV=production MOCK=true webpack --mode production",
+    "build": "rimraf ./dist && NODE_ENV=production MOCK=true MOCK_WALLET=false webpack --mode production",
     "lint": "eslint src --ext .ts,.tsx,.js",
     "lint:fix": "eslint --fix . --ext .ts,.tsx,.js",
     "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
@@ -49,7 +49,8 @@
     "moduleNameMapper": {
       "\\.(jpg|ico|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/test/mocks/fileMock.js",
       "\\.(css|less)$": "<rootDir>/mocks/fileMock.js"
-    }
+    },
+    "globalSetup": "<rootDir>/test/globalSetup.ts"
   },
   "author": "",
   "dependencies": {
@@ -57,7 +58,9 @@
     "@fortawesome/free-regular-svg-icons": "^5.11.2",
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
+    "@gnosis.pm/dapp-ui": "^0.5.3",
     "@hot-loader/react-dom": "^16.8.6",
+    "@walletconnect/web3-provider": "^1.0.0-beta.38",
     "@types/react-select": "^3.0.5",
     "bn.js": "^5.0.0",
     "modali": "^1.2.0",
@@ -72,7 +75,7 @@
     "react-select": "^3.0.8",
     "react-toastify": "^5.4.0",
     "styled-components": "^4.3.2",
-    "web3": "^2.0.0-alpha"
+    "web3": "^1.2.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",

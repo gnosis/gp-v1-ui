@@ -31,11 +31,13 @@ export class WalletApiMock implements WalletApi {
     return this._connected
   }
 
-  public async connect(): Promise<void> {
+  public async connect(): Promise<boolean> {
     await wait(1000)
     this._connected = true
     log('[WalletApiMock] Connected')
     await this._notifyListeners()
+
+    return true
   }
 
   public async disconnect(): Promise<void> {

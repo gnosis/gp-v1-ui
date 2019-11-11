@@ -13,7 +13,7 @@ export interface EtherscanLinkProps {
 }
 
 function getEtherscanDomainPrefix(networkId: Network): string {
-  return !networkId || networkId === Network.Mainnet ? '' : Network[networkId].toLowerCase() + '.'
+  return !networkId || networkId === Network.Mainnet ? '' : (Network[networkId] || '').toLowerCase() + '.'
 }
 
 function getEtherscanDomainSuffix(type: EtherscanLinkType, identifier: string): string {

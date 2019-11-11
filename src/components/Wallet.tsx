@@ -20,7 +20,7 @@ import { EtherscanLink } from './EtherscanLink'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { abbreviateString } from 'utils'
+import { abbreviateString, getNetworkFromId } from 'utils'
 
 import WalletImg from 'img/unknown-token.png'
 
@@ -105,7 +105,7 @@ interface WalletProps extends RouteComponentProps {
 }
 
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
-  const { isConnected, userAddress } = useWalletConnection()
+  const { isConnected, userAddress, networkId } = useWalletConnection()
 
   const [loadingLabel, setLoadingLabel] = useState()
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
@@ -125,9 +125,14 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const connectWallet = async (): Promise<void> => {
     try {
       setLoadingLabel('Connecting...')
-      await walletApi.connect()
+      const success = await walletApi.connect()
+
+      // user closed Provider selection modal
+      if (!success) return
+
       toast.success('Wallet connected')
     } catch (error) {
+      console.error('error', error)
       toast.error('Error connecting wallet')
     } finally {
       if (mounted.current) {
@@ -198,9 +203,8 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       {userAddress ? (
         <>
           {/* Network */}
-          {/* TODO: add dynamic network as prop */}
           <ThinWalletItem>
-            <MonospaceText>Rinkeby</MonospaceText>
+            <MonospaceText>{getNetworkFromId(networkId)}</MonospaceText>
           </ThinWalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
