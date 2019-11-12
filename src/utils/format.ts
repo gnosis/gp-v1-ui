@@ -85,9 +85,11 @@ export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISI
 
   const groups = /^(\d+)(?:\.(\d+))?$/.exec(amountFmt)
   if (groups) {
-    const [, integerPart, decimalPart = ''] = groups
+    const integerPart = groups[1]
+    let decimalPart = groups[2] || ''
     if (decimalPart.length > amountPrecision) {
-      return null
+      // truncate whatever is over precision
+      decimalPart = decimalPart.slice(0, amountPrecision)
     }
 
     const decimalBN = new BN(decimalPart.padEnd(amountPrecision, '0'))

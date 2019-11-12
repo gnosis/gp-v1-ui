@@ -96,3 +96,13 @@ describe('Big amounts', () => {
     expect(parseAmount(input)).toEqual(new BN(new BN(ALLOWANCE_MAX_VALUE)))
   })
 })
+
+describe('Over precision', () => {
+  test('truncates at precision', () => {
+    expect(parseAmount('1.23', 1)).toEqual(new BN('12'))
+  })
+
+  test('0 padding', () => {
+    expect(parseAmount('10.000', 1)).toEqual(new BN('100'))
+  })
+})
