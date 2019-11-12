@@ -102,9 +102,9 @@ export interface ExchangeApi extends DepositApi {
   getFeeDenominator(): Promise<number>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(tokenAddress: string): Promise<number>
-  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
-  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<TxResult<number>>
-  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 export interface WalletInfo {
@@ -148,7 +148,7 @@ export interface Erc20Api {
     toAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  ): Promise<Receipt>
 
   transferFrom(
     senderAddress: string,
