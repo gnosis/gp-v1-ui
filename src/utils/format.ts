@@ -100,6 +100,30 @@ export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISI
   }
 }
 
+/**
+ * Adjust the decimal precision of the given decimal value, without converting to/from BN or Number
+ * Takes in a string and returns a string
+ *
+ * E.g.:
+ * adjustPrecision('1.2657', 3) === '1.265'
+ *
+ * @param value The decimal value to be adjusted as a string
+ * @param precision How many decimals should be kept
+ */
+export function adjustPrecision(value: string | undefined | null, precision: number): string {
+  if (!value) {
+    return ''
+  }
+
+  const match = value.match(/(^\d+\.)(\d+)$/)
+  if (match && match[2].length > precision) {
+    let [, intPart, decimalPart] = match
+    decimalPart = decimalPart.slice(0, precision)
+    return intPart + decimalPart
+  }
+  return value
+}
+
 export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
   // abbreviate only if it makes sense, and make sure ellipsis fits into word
   // 1. always add ellipsis

@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form'
 import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount } from 'utils'
+import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
 import { ZERO } from 'const'
 
 const Wrapper = styled.div`
@@ -78,16 +78,6 @@ function displayBalance(balance: TokenBalanceDetails | undefined | null, key: st
     return '0'
   }
   return formatAmount(balance[key], balance.decimals) || '0'
-}
-
-function adjustPrecision(value: string | undefined | null, precision: number): string {
-  const match = (value || '').match(/(^\d+\.)(\d+)$/)
-  if (match && match[2].length > precision) {
-    let [, intPart, decimalPart] = match
-    decimalPart = decimalPart.slice(0, precision)
-    return intPart + decimalPart
-  }
-  return value
 }
 
 // TODO: move into a validators file?
