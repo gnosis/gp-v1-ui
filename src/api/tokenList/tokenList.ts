@@ -1,13 +1,9 @@
 import { TokenDetails, Network } from 'types'
 import tokens from './tokenList.json'
 
-interface TokenDetailsByNetwork extends Omit<TokenDetails, 'address' | 'image'> {
-  addressByNetwork: { [networkId: number]: string }
-}
-
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
   // Return token details
-  const tokenDetails: (TokenDetails | null)[] = tokens.map((token: TokenDetailsByNetwork) => {
+  const tokenDetails: (TokenDetails | null)[] = tokens.map(token => {
     const address = token.addressByNetwork[networkId]
     if (address) {
       // There's an address for the current network
