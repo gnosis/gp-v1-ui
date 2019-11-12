@@ -33,8 +33,8 @@ const txOptionalParams: TxOptionalParams = {
 
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
-  const { userAddress, networkId } = useWalletConnection()
-  const contractAddress = depositApi.getContractAddress(networkId)
+  const { userAddress } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress()
   const mounted = useRef(true)
   useEffect(() => {
     return function cleanUp(): void {
