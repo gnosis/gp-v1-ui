@@ -36,6 +36,9 @@ export const useWithdrawTokens = (params: Params): Result => {
     setWithdrawing(true)
 
     try {
+      if (!userAddress) {
+        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+      }
       return await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
     } finally {
       if (mounted.current) {

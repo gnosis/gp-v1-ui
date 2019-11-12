@@ -6,9 +6,9 @@ import { useWalletConnection } from './useWalletConnection'
 import { formatAmount, log } from 'utils'
 
 interface UseTokenBalanceResult {
-  balances: TokenBalanceDetails[] | null
+  balances: TokenBalanceDetails[]
   error: boolean
-  setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[] | null>>
+  setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[]>>
 }
 
 async function fetchBalancesForToken(
@@ -37,6 +37,7 @@ async function fetchBalancesForToken(
 
   return {
     ...token,
+    decimals: token.decimals || 18,
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
@@ -49,11 +50,11 @@ async function fetchBalancesForToken(
   }
 }
 
-async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[] | null> {
+async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[]> {
   const { userAddress, networkId } = walletInfo
   log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
   if (!userAddress || !networkId) {
-    return null
+    return []
   }
 
   const contractAddress = depositApi.getContractAddress()
@@ -65,7 +66,7 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
 
 export const useTokenBalances = (): UseTokenBalanceResult => {
   const walletInfo = useWalletConnection()
-  const [balances, setBalances] = useState<TokenBalanceDetails[] | null>(null)
+  const [balances, setBalances] = useState<TokenBalanceDetails[]>([])
   const [error, setError] = useState(false)
   const mounted = useRef(true)
 

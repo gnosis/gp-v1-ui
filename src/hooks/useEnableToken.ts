@@ -13,7 +13,7 @@ interface Params {
 interface Result {
   enabled: boolean
   enabling: boolean
-  enableToken(): Promise<TxResult<boolean>>
+  enableToken(): Promise<TxResult<boolean> | boolean>
 }
 
 export const useEnableTokens = (params: Params): Result => {
@@ -29,29 +29,40 @@ export const useEnableTokens = (params: Params): Result => {
     }
   }, [])
 
-  async function enableToken(): Promise<TxResult<boolean>> {
+  async function enableToken(): Promise<TxResult<boolean> | boolean> {
     assert(!enabled, 'The token was already enabled')
     assert(isConnected, "There's no connected wallet")
 
-    setEnabling(true)
+    try {
+      if (!userAddress) {
+        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+      }
 
-    // Set the allowance
-    const contractAddress = depositApi.getContractAddress()
-    const result = await erc20Api.approve(
-      userAddress,
-      tokenAddress,
-      contractAddress,
-      ALLOWANCE_MAX_VALUE,
-      params.txOptionalParams,
-    )
+      setEnabling(true)
 
-    if (mounted.current) {
-      // Update the state
-      setEnabled(true)
-      setEnabling(false)
+      // Set the allowance
+      const contractAddress = depositApi.getContractAddress()
+
+      const result = await erc20Api.approve(
+        userAddress,
+        tokenAddress,
+        contractAddress,
+        ALLOWANCE_MAX_VALUE,
+        params.txOptionalParams,
+      )
+
+      if (mounted.current) {
+        // Update the state
+        setEnabled(true)
+        setEnabling(false)
+      }
+
+      return result
+    } catch (error) {
+      console.error(error)
+
+      return false
     }
-
-    return result
   }
 
   return { enabled, enabling, enableToken }
