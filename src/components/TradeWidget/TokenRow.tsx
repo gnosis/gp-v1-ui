@@ -61,7 +61,7 @@ const InputBox = styled.div`
     }
 
     &:disabled {
-      box-shadow: 0 0;
+      box-shadow: none;
     }
   }
 `
