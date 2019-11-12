@@ -1,4 +1,5 @@
 import { TokenDetails, Network } from 'types'
+import { DEFAULT_PRECISION } from 'const'
 
 interface TokenDetailsByNetwork extends Omit<TokenDetails, 'address' | 'image'> {
   addressByNetwork: { [networkId: number]: string }
@@ -127,7 +128,7 @@ export function getTokensByNetwork(networkId: number): TokenDetails[] {
     const address = token.addressByNetwork[networkId]
     if (address) {
       // There's an address for the current network
-      const { name, symbol, decimals } = token
+      const { name, symbol, decimals = DEFAULT_PRECISION } = token
       const addressMainnet = token.addressByNetwork[Network.Mainnet]
 
       return [...acc, { name, symbol, decimals, address, addressMainnet }]
