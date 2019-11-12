@@ -32,7 +32,7 @@ function getEtherscanDomainSuffix(type: EtherscanLinkType, identifier: string): 
 export const EtherscanLink: React.FC<EtherscanLinkProps> = ({ type, identifier, label, className }) => {
   const { networkId } = useWalletConnection()
 
-  if (!networkId) {
+  if (!networkId || !identifier) {
     return null
   }
 
