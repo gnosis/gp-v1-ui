@@ -28,3 +28,7 @@ export const LEGALDOCUMENT = {
 export const RESPONSIVE_SIZES = {
   MOBILE: 500,
 }
+
+export const DEFAULT_DECIMALS = 4
+export const DEFAULT_PRECISION = 18
+export const ELLIPSIS = '...'
