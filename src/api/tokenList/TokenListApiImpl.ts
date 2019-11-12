@@ -1,7 +1,9 @@
 import { TokenList, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 
-function _getImageUrl(tokenAddress: string): string {
+function _getImageUrl(tokenAddress?: string): string {
+  if (!tokenAddress) return ''
+
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
 }
 
@@ -26,7 +28,7 @@ export class TokenListApiImpl implements TokenList {
         // Add image to the tokens
         return {
           ...token,
-          image: _getImageUrl(token.addressMainnet),
+          image: _getImageUrl(token && token.addressMainnet),
         }
       })
 
