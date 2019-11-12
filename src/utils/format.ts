@@ -1,10 +1,6 @@
 import BN from 'bn.js'
-import { TEN } from 'const'
+import { TEN, DEFAULT_PRECISION, DEFAULT_DECIMALS, ELLIPSIS } from 'const'
 import { TokenDetails } from 'types'
-
-const DEFAULT_DECIMALS = 4
-const DEFAULT_PRECISION = 18
-const ELLIPSIS = '...'
 
 function _getLocaleSymbols(): { thousands: string; decimals: string } {
   // Check number representation in default locale
