@@ -9,6 +9,7 @@ export interface EtherscanLinkProps {
   type: EtherscanLinkType
   identifier: string
   label?: string | ReactElement | void
+  className?: string // to allow subclassing styles with styled-components
 }
 
 function getEtherscanDomainPrefix(networkId: Network): string {
@@ -28,7 +29,7 @@ function getEtherscanDomainSuffix(type: EtherscanLinkType, identifier: string): 
   }
 }
 
-export const EtherscanLink: React.FC<EtherscanLinkProps> = ({ type, identifier, label }) => {
+export const EtherscanLink: React.FC<EtherscanLinkProps> = ({ type, identifier, label, className }) => {
   const { networkId } = useWalletConnection()
 
   if (!networkId) {
@@ -40,7 +41,7 @@ export const EtherscanLink: React.FC<EtherscanLinkProps> = ({ type, identifier, 
     identifier,
   )}`
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer">
+    <a href={href} target="_blank" rel="noopener noreferrer" className={className}>
       {label ? label : abbreviateString(identifier, 6, 4)}
     </a>
   )

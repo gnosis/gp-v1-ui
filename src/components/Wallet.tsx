@@ -24,13 +24,13 @@ import { abbreviateString, getNetworkFromId } from 'utils'
 
 import WalletImg from 'img/unknown-token.png'
 
-const Wrapper = styled.div<{ walletOpen: boolean }>`
+export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
   position: relative;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   margin: 1rem;
-  width: 20rem;
+  flex: 0 1 16rem;
 
   background: ghostwhite;
   border-radius: ${(props): string => (props.walletOpen ? '10px 10px 0 0' : '10px')};
@@ -56,8 +56,19 @@ const ThinWalletItem = styled(WalletItem)`
 
 const WalletToggler = styled(WalletItem)`
   cursor: pointer;
-  border-top: 2px solid #00000029;
+  border-top: 1.6px solid #00000029;
   padding: 6px;
+
+  @media only screen and (max-width: 500px) {
+    border-top: 0.75px solid #00000029;
+  }
+`
+const EtherImage = styled.img<{ src: string }>`
+  src: ${(props): string => props.src};
+  max-width: 15%;
+  @media only screen and (max-width: 500px) {
+    max-width: 10%;
+  }
 `
 
 const CopyDiv = styled.div`
@@ -72,6 +83,7 @@ const WalletSlideWrapper = styled.div`
   background: inherit;
   width: 100%;
   top: 100%;
+  left: 0;
   box-shadow: 5px 19px 16px #00000033;
   border-radius: 0 0 10px 10px;
 `
@@ -187,7 +199,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   }
 
   return (
-    <Wrapper walletOpen={showWallet}>
+    <WalletWrapper walletOpen={showWallet}>
       {userAddress ? (
         <>
           {/* Network */}
@@ -196,7 +208,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
           </ThinWalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
-            <img src={WalletImg} style={{ maxWidth: '15%' }} />
+            <EtherImage src={WalletImg} />
             <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
             <FontAwesomeIcon
               icon={showWallet ? faChevronCircleUp : faChevronCircleDown}
@@ -245,7 +257,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
           {renderLogInOutButton()}
         </WalletSlideWrapper>
       )}
-    </Wrapper>
+    </WalletWrapper>
   )
 }
 

@@ -3,59 +3,101 @@ import { render } from 'enzyme'
 import BN from 'bn.js'
 
 import { TokenBalanceDetails } from 'types'
-import { Row } from 'components/DepositWidget/Row'
+import { Row, RowProps } from 'components/DepositWidget/Row'
+import { ZERO, ONE } from 'const'
 
-describe('<Row /> not enabled', () => {
+function _createRow(params: Partial<TokenBalanceDetails> = {}): React.ReactElement<RowProps> {
   const tokenBalanceDetails: TokenBalanceDetails = {
+    name: 'Test token',
+    symbol: 'TTT',
+    decimals: 18,
     address: '0x0',
-    exchangeBalance: new BN(25),
-    depositingBalance: new BN(0),
-    withdrawingBalance: new BN(11),
-    claimable: true,
-    walletBalance: new BN(2),
+    exchangeBalance: ZERO,
+    depositingBalance: ZERO,
+    withdrawingBalance: ZERO,
+    claimable: false,
+    walletBalance: ZERO,
     enabled: false,
+    highlighted: false,
+    enabling: false,
+    claiming: false,
+    // override with partial params
+    ...params,
   }
 
-  it('renders single <tr> element', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.is('tr')).toBe(true)
+  const onSubmitDeposit = jest.fn<Promise<void>, BN[]>()
+  const onClaim = jest.fn<Promise<void>, void[]>()
+  const onEnableToken = jest.fn<Promise<void>, void[]>()
+  const onSubmitWithdraw = jest.fn<Promise<void>, BN[]>()
+  return (
+    <Row
+      tokenBalances={tokenBalanceDetails}
+      onEnableToken={onEnableToken}
+      onClaim={onClaim}
+      onSubmitDeposit={onSubmitDeposit}
+      onSubmitWithdraw={onSubmitWithdraw}
+      innerWidth={500}
+    />
+  )
+}
+
+describe('<Row /> not enabled token', () => {
+  it('contains 6 <div> elements', () => {
+    const wrapper = render(_createRow())
+    expect(wrapper.find('div')).toHaveLength(6)
   })
 
-  it('contains 6 <td> elements', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.find('td')).toHaveLength(6)
+  it('contains 1 <button> (enable)', () => {
+    const wrapper = render(_createRow())
+    expect(wrapper.find('button')).toHaveLength(1)
+  })
+})
+
+describe('<Row /> enabled token', () => {
+  const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
+    enabled: true,
+  }
+
+  it('contains 6 <div> elements', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
+    expect(wrapper.find('div')).toHaveLength(6)
   })
 
-  it('contains 2 <button> elements', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
+  it('contains 2 <button> elements (deposit and withdraw)', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
     expect(wrapper.find('button')).toHaveLength(2)
   })
 })
 
-describe('<Row /> with enable', () => {
-  const tokenBalanceDetails: TokenBalanceDetails = {
-    address: '0x0',
-    exchangeBalance: new BN(25),
-    depositingBalance: new BN(0),
-    withdrawingBalance: new BN(11),
-    claimable: true,
-    walletBalance: new BN(2),
+describe('<Row /> claimable token', () => {
+  const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
     enabled: true,
+    claimable: true,
+    withdrawingBalance: ONE,
   }
 
-  it('renders single <tr> element', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.is('tr')).toBe(true)
-  })
-
-  it('contains 6 <td> elements', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-    expect(wrapper.find('td')).toHaveLength(6)
-  })
-
-  it('contains 3 <button> element', () => {
-    const wrapper = render(<Row tokenBalances={tokenBalanceDetails} />)
-
+  it('contains 2 <button> elements (claim, deposit, withdraw)', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
     expect(wrapper.find('button')).toHaveLength(3)
+  })
+})
+
+describe('<Row /> style', () => {
+  it('is highlighted', () => {
+    const wrapper = render(
+      _createRow({
+        highlighted: true,
+      }),
+    )
+    expect(wrapper.attr('class')).toMatch(/highlight/)
+  })
+
+  it('is enabling', () => {
+    const wrapper = render(
+      _createRow({
+        enabling: true,
+      }),
+    )
+    expect(wrapper.attr('class')).toMatch(/enabling/)
   })
 })

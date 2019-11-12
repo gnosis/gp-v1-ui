@@ -1,4 +1,4 @@
-import { Network, TokenList, WalletApi, DepositApi, Erc20Api } from 'types'
+import { Network, TokenList, WalletApi, DepositApi, Erc20Api, ExchangeApi } from 'types'
 import { WalletApiMock } from './wallet/WalletApiMock'
 import WalletApiImpl from './wallet/WalletApiImpl'
 import { TokenListApiImpl } from './tokenList/TokenListApiImpl'
@@ -6,9 +6,11 @@ import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiImpl } from './erc20/Erc20ApiImpl'
 import { DepositApiMock } from './exchange/DepositApiMock'
-import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances } from '../../test/data'
+import { ExchangeApiMock } from './exchange/ExchangeApiMock'
+import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances, FEE_TOKEN } from '../../test/data'
 import Web3 from 'web3'
 
+const isMock = process.env.MOCK === 'true'
 const isWalletMock = process.env.MOCK_WALLET === 'true'
 const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
 const isErc20Mock = process.env.MOCK_ERC20 === 'true'
@@ -60,6 +62,18 @@ function createDepositApi(erc20Api: Erc20Api): DepositApi {
   return depositApi
 }
 
+function createExchangeApi(erc20Api: Erc20Api): ExchangeApi {
+  if (isMock) {
+    const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address)]
+    const exchangeApi = new ExchangeApiMock(exchangeBalanceStates, erc20Api, tokens)
+    window['exchangeApi'] = exchangeApi
+    return exchangeApi
+  } else {
+    // TODO: Add actual implementation
+    throw new Error('Not implemented yet. Only mock implementation available')
+  }
+}
+
 // TODO connect to mainnet if we need AUTOCONNECT at all
 const InfuraEndpoint = 'rinkeby.infura.io/ws/v3/8b4d9b4306294d2e92e0775ff1075066'
 const web3 = new Web3(process.env.NODE_ENV === 'test' ? null : 'wss://' + InfuraEndpoint)
@@ -69,3 +83,4 @@ export const walletApi: WalletApi = createWalletApi(web3)
 export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api(web3)
 export const depositApi: DepositApi = createDepositApi(erc20Api)
+export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api)
