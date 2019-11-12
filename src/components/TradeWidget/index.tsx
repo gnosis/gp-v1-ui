@@ -18,6 +18,7 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName } from 'utils'
+import { ZERO } from 'const'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -64,22 +65,40 @@ const TradeWidget: React.FC = () => {
   const { sell: sellTokenSymbol, receive: receiveTokenSymbol } = useParams()
 
   const [sellToken, setSellToken] = useState(
-    () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
+    () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
   const [receiveToken, setReceiveToken] = useState(
-    () => getToken('symbol', receiveTokenSymbol, tokens) || getToken('symbol', 'USDC', tokens),
+    () =>
+      getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
 
   // Change URL on internal token change
   useURLParams(`sell=${sellToken.symbol}-0&receive=${receiveToken.symbol}-20`)
 
+  // TESTING
+  const NULL_BALANCE_TOKEN = {
+    exchangeBalance: ZERO,
+    depositingBalance: ZERO,
+    withdrawingBalance: ZERO,
+    walletBalance: ZERO,
+    claimable: false,
+    enabled: false,
+    highlighted: false,
+    enabling: false,
+    claiming: false,
+  }
+
   const { balances } = useTokenBalances()
 
-  const sellTokenBalance = useMemo(() => getToken('symbol', sellToken.symbol, balances), [balances, sellToken.symbol])
-  const receiveTokenBalance = useMemo(() => getToken('symbol', receiveToken.symbol, balances), [
-    balances,
-    receiveToken.symbol,
-  ])
+  const sellTokenBalance = useMemo(
+    () => getToken('symbol', sellToken.symbol, balances) || { ...sellToken, ...NULL_BALANCE_TOKEN },
+    [NULL_BALANCE_TOKEN, balances, sellToken],
+  )
+
+  const receiveTokenBalance = useMemo(
+    () => getToken('symbol', receiveToken.symbol, balances) || { ...receiveToken, ...NULL_BALANCE_TOKEN },
+    [NULL_BALANCE_TOKEN, balances, receiveToken],
+  )
 
   const methods = useForm({ mode: 'onBlur' })
   const { handleSubmit, watch } = methods
