@@ -28,23 +28,24 @@ const Wrapper = styled.div`
   input {
     margin-left: 0; // to fix extra space on Select search box
   }
+
+  .optionItem {
+    display: flex;
+    align-items: center;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      margin-left: 1em;
+    }
+  }
 `
 
 function renderOptionLabel(token: TokenDetails): React.ReactNode {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
+    <div className="optionItem">
       <TokenImgWrapper src={token.image} alt={token.name} />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+      <div>
         <div>
           <strong>{token.symbol}</strong>
         </div>
