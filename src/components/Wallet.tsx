@@ -204,7 +204,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
         <>
           {/* Network */}
           <ThinWalletItem>
-            <MonospaceText>{getNetworkFromId(networkId)}</MonospaceText>
+            <MonospaceText>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</MonospaceText>
           </ThinWalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
