@@ -6,7 +6,7 @@ import { useWalletConnection } from './useWalletConnection'
 import { formatAmount, log } from 'utils'
 
 interface UseTokenBalanceResult {
-  balances: TokenBalanceDetails[] | undefined
+  balances: TokenBalanceDetails[] | null
   error: boolean
   setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[] | null>>
 }
@@ -70,6 +70,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   const mounted = useRef(true)
 
   useEffect(() => {
+    // can return NULL (if no address or network)
     _getBalances(walletInfo)
       .then(balances => {
         log(
