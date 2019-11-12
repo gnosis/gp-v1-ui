@@ -3,6 +3,7 @@ import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { ZERO, ONE, FEE_DENOMINATOR } from 'const'
 import { ExchangeApi, Erc20Api } from 'types'
 import * as testHelpers from '../../testHelpers'
+import { RECEIPT } from '../../data'
 
 const { USER_1, USER_2, USER_3, FEE_TOKEN, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, BATCH_ID } = testHelpers
 
@@ -135,11 +136,9 @@ describe('placeOrder', () => {
   }
 
   test('place order not first', async () => {
-    const ordersCount = (await instance.getOrders(USER_1)).length
-
     params.userAddress = USER_1
     const response = await instance.placeOrder(params)
-    expect(response.data).toBe(ordersCount)
+    expect(response).toBe(RECEIPT)
     const actual = (await instance.getOrders(USER_1)).pop()
     expect(actual).toEqual(expected)
   })
@@ -149,7 +148,7 @@ describe('placeOrder', () => {
     params.userAddress = USER_2
 
     const response = await instance.placeOrder(params)
-    expect(response.data).toBe(0)
+    expect(response).toBe(RECEIPT)
     const actual = (await instance.getOrders(USER_2)).pop()
     expect(actual).toEqual(expected)
   })
