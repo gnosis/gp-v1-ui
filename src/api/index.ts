@@ -10,11 +10,11 @@ import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances, FEE_TOKEN } from '../../test/data'
 import Web3 from 'web3'
 
-const isMock = process.env.MOCK === 'true'
 const isWalletMock = process.env.MOCK_WALLET === 'true'
 const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
 const isErc20Mock = process.env.MOCK_ERC20 === 'true'
 const isDepositMock = process.env.MOCK_DEPOSIT === 'true'
+const isExchangeMock = process.env.MOCK_EXCHANGE === 'true'
 
 function createWalletApi(web3: Web3): WalletApi {
   let walletApi
@@ -63,7 +63,7 @@ function createDepositApi(erc20Api: Erc20Api): DepositApi {
 }
 
 function createExchangeApi(erc20Api: Erc20Api): ExchangeApi {
-  if (isMock) {
+  if (isExchangeMock) {
     const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address)]
     const exchangeApi = new ExchangeApiMock(exchangeBalanceStates, erc20Api, tokens)
     window['exchangeApi'] = exchangeApi
