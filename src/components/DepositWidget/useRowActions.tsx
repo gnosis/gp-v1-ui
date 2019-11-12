@@ -34,6 +34,7 @@ const txOptionalParams: TxOptionalParams = {
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
   const { userAddress } = useWalletConnection()
+
   const contractAddress = depositApi.getContractAddress()
   const mounted = useRef(true)
   useEffect(() => {
@@ -65,8 +66,13 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function enableToken(tokenAddress: string): Promise<void> {
-    const { symbol } = getToken('address', tokenAddress, balances)
+    const { symbol } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
+
     try {
+      if (!userAddress) {
+        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+      }
+
       _updateToken(tokenAddress, otherParams => {
         return {
           ...otherParams,
@@ -100,7 +106,11 @@ export const useRowActions = (params: Params): Result => {
 
   async function deposit(amount: BN, tokenAddress: string): Promise<void> {
     try {
-      const { symbol, decimals } = getToken('address', tokenAddress, balances)
+      if (!userAddress) {
+        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+      }
+
+      const { symbol, decimals } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
@@ -123,8 +133,12 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function requestWithdraw(amount: BN, tokenAddress: string): Promise<void> {
-    const { symbol, decimals } = getToken('address', tokenAddress, balances)
+    const { symbol, decimals } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
     try {
+      if (!userAddress) {
+        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+      }
+
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
       const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
@@ -148,8 +162,14 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function claim(tokenAddress: string): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
+    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances) as Required<
+      TokenBalanceDetails
+    >
     try {
+      if (!userAddress) {
+        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+      }
+
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
       _updateToken(tokenAddress, otherParams => {
         return {

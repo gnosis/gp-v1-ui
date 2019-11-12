@@ -25,7 +25,7 @@ interface Errors {
   amountInput: string
 }
 
-function _validateForm(totalAmount: BN, amountInput: string, decimals: number): string {
+function _validateForm(totalAmount: BN, amountInput: string, decimals: number): string | null {
   if (!amountInput) {
     return 'Required amount'
   }
@@ -46,11 +46,12 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
 export const Form: React.FC<FormProps> = (props: FormProps) => {
   const { symbol, decimals } = props.tokenBalances
   const { title, totalAmount, totalAmountLabel, inputLabel, responsive, submitBtnLabel, submitBtnIcon } = props
+
   const [amountInput, setAmountInput] = useState('')
   const [validatorActive, setValidatorActive] = useState(false)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Errors>({
-    amountInput: null,
+    amountInput: '',
   })
   const mounted = useRef(true)
 
@@ -65,7 +66,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
       const errorMsg = _validateForm(totalAmount, amountInput, decimals)
       setErrors(oldErrors => ({
         ...oldErrors,
-        amountInput: errorMsg,
+        amountInput: errorMsg || '',
       }))
     }
   }, [amountInput, decimals, totalAmount, validatorActive])
@@ -84,18 +85,20 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     const error = _validateForm(totalAmount, amountInput, decimals)
     if (!error) {
       setLoading(true)
-      props.onSubmit(parseAmount(amountInput, decimals)).then(() => {
-        if (mounted.current) {
-          setLoading(false)
-          setValidatorActive(false)
-          cancelForm()
-        }
-      })
+      const parsedAmt = parseAmount(amountInput, decimals)
+      parsedAmt &&
+        props.onSubmit(parsedAmt).then(() => {
+          if (mounted.current) {
+            setLoading(false)
+            setValidatorActive(false)
+            cancelForm()
+          }
+        })
     }
   }
 
   return (
-    <DynamicWrapper responsive={responsive}>
+    <DynamicWrapper responsive={!!responsive}>
       <InnerWrapper>
         <a className="times" onClick={cancelForm}>
           &times;
@@ -106,9 +109,12 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <li>
               <label>{totalAmountLabel}</label>
               <div className="wallet">
-                <input type="text" value={formatAmountFull(totalAmount, decimals)} disabled />
+                <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
                 <br />
-                <a className="max" onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false))}>
+                <a
+                  className="max"
+                  onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}
+                >
                   <small>Use Max</small>
                 </a>
               </div>

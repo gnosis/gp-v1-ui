@@ -12,6 +12,8 @@ import { useRowActions } from './useRowActions'
 import useWindowSizes from 'hooks/useWindowSizes'
 
 import { log, formatAmount, getToken } from 'utils'
+import { ZERO } from 'const'
+import { TokenBalanceDetails } from 'types'
 
 interface ModalBodyProps {
   pendingAmount: string
@@ -42,10 +44,10 @@ const DepositWidget: React.FC = () => {
   const windowSpecs = useWindowSizes()
 
   const [withdrawRequest, setWithdrawRequest] = useState({
-    amount: null,
-    tokenAddress: null,
-    pendingAmount: null,
-    symbol: null,
+    amount: ZERO,
+    tokenAddress: '',
+    pendingAmount: '',
+    symbol: '',
   })
 
   const [withdrawConfirmationModal, toggleWithdrawConfirmationModal] = useModali({
@@ -68,14 +70,16 @@ const DepositWidget: React.FC = () => {
     ],
   })
   const requestWithdrawConfirmation = async (amount: BN, tokenAddress: string): Promise<void> => {
-    const { withdrawingBalance, decimals, symbol } = getToken('address', tokenAddress, balances)
+    const { withdrawingBalance, decimals, symbol } = getToken('address', tokenAddress, balances) as Required<
+      TokenBalanceDetails
+    >
     log(`Confirm withdrawal for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
     if (!withdrawingBalance.isZero()) {
       // Storing current values before displaying modal
       setWithdrawRequest({
         amount,
         tokenAddress,
-        pendingAmount: formatAmount(withdrawingBalance, decimals),
+        pendingAmount: formatAmount(withdrawingBalance, decimals) || '',
         symbol,
       })
 
