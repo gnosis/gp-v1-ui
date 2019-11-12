@@ -29,7 +29,7 @@ const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
     <Route
       {...rest}
       render={(props): React.ReactNode =>
-        isConnected ? (
+        isConnected && Component ? (
           <Component {...props} />
         ) : (
           <Redirect
