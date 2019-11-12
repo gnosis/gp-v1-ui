@@ -15,8 +15,8 @@ export enum Network {
 
 export interface TokenDetails {
   name?: string
-  symbol?: string
-  decimals?: number
+  symbol: string
+  decimals: number
   address: string
   addressMainnet?: string
   image?: string
