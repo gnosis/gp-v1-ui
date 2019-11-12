@@ -30,6 +30,7 @@ describe('<EtherscanLink /> general', () => {
   })
 
   it('does not render when networkId is missing', () => {
+    // @ts-ignore
     networkId = undefined
     const wrapper = render(<EtherscanLink type="tx" identifier={TX_HASH} />)
     expect(wrapper.html()).toBeNull()
