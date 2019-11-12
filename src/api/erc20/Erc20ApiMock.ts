@@ -84,7 +84,7 @@ export class Erc20ApiMock implements Erc20Api {
     toAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances(senderAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
@@ -99,7 +99,7 @@ export class Erc20ApiMock implements Erc20Api {
       `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${senderAddress} to ${toAddress}`,
     )
 
-    return { data: true, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /**
