@@ -203,7 +203,7 @@ const TokenRow: React.FC<Props> = ({
           options={options}
           value={{ token: selectedToken }}
           onChange={(selected, { action }): void => {
-            if (action === 'select-option' && 'token' in selected) {
+            if (selected && (action === 'select-option' && 'token' in selected)) {
               onSelectChange(selected.token)
             }
           }}
