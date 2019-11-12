@@ -15,8 +15,16 @@ export const ALLOWANCE_FOR_ENABLED_TOKEN = new BN(2).pow(new BN(128)) // 3402823
 export const FEE_DENOMINATOR = 1000 // Fee is 1/fee_denominator i.e. 1/1000 = 0.1%
 export const BATCH_TIME = 300
 
+// UI constants
+export const HIGHLIGHT_TIME = 5000
+export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntatic sugar for displaying purposes
+
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
   POC_URL: '/',
   TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
+}
+
+export const RESPONSIVE_SIZES = {
+  MOBILE: 500,
 }

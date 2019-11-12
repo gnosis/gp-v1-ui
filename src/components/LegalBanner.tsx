@@ -11,6 +11,12 @@ const Wrapper = styled.div`
 
   background-color: lightyellow;
   cursor: pointer;
+
+  font-size: 80%;
+
+  @media only screen and (max-width: 500px) {
+    padding: 0.2rem 2rem;
+  }
 `
 
 const Text = styled.p`

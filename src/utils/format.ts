@@ -1,5 +1,6 @@
 import BN from 'bn.js'
 import { TEN } from 'const'
+import { TokenDetails } from 'types'
 
 const DEFAULT_DECIMALS = 4
 const DEFAULT_PRECISION = 18
@@ -110,4 +111,8 @@ export function abbreviateString(inputString: string, prefixLength: number, suff
   const prefix = inputString.slice(0, _prefixLength)
   const suffix = suffixLength > 0 ? inputString.slice(-suffixLength) : ''
   return prefix + ELLIPSIS + suffix
+}
+
+export function safeTokenName(token: TokenDetails): string {
+  return token.symbol || token.name || abbreviateString(token.address, 6, 4)
 }

@@ -10,7 +10,7 @@ interface Params {
 }
 
 interface Result {
-  withdrawing: boolean
+  claiming: boolean
   withdraw(): Promise<Receipt>
 }
 
@@ -19,7 +19,7 @@ export const useWithdrawTokens = (params: Params): Result => {
   const {
     tokenBalances: { enabled, address: tokenAddress, claimable },
   } = params
-  const [withdrawing, setWithdrawing] = useState(false)
+  const [claiming, setWithdrawing] = useState(false)
   const mounted = useRef(true)
 
   useEffect(() => {
@@ -44,5 +44,5 @@ export const useWithdrawTokens = (params: Params): Result => {
     }
   }
 
-  return { withdrawing, withdraw }
+  return { claiming, withdraw }
 }
