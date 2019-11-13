@@ -6,6 +6,6 @@ const Network2Epoch = {
   [Network.Mainnet]: '',
 }
 
-export const getEpochAddressForNetwork = (networkId: Network): string => Network2Epoch[networkId] || null
+export const getEpochAddressForNetwork = (networkId: Network): string | null => Network2Epoch[networkId] || null
 
 export default Network2Epoch
