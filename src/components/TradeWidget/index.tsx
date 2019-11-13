@@ -82,7 +82,13 @@ const TradeWidget: React.FC = () => {
   const { handleSubmit, watch, reset } = methods
 
   // Change URL on internal token change
-  useURLParams(`sell=${sellToken.symbol}-${watch(sellInputId)}&receive=${receiveToken.symbol}-${watch(receiveInputId)}`)
+  const url = new URLSearchParams({
+    sell: sellToken.symbol,
+    'sell-amount': watch(sellInputId),
+    buy: receiveToken.symbol,
+    'buy-amount': watch(receiveInputId),
+  })
+  useURLParams(url.toString())
 
   const { balances } = useTokenBalances()
 

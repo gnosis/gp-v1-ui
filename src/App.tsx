@@ -53,12 +53,15 @@ const App: React.FC = () => (
     <Router basename={process.env.BASE_URL}>
       <Layout>
         <Switch>
-          <Route path="/trade/sell=:sell-:sellAmount&receive=:receive-:receiveAmount" component={Trade} />
+          <Route
+            path="/trade/sell=:sell&sell-amount=:sellAmount&buy=:receive&buy-amount=:receiveAmount"
+            component={Trade}
+          />
           <Route path="/about" exact component={About} />
           <PrivateRoute path="/deposit" exact component={Deposit} />
           <Route path="/source-code" exact component={SourceCode} />
           <Route path="/connect-wallet" exact component={ConnectWallet} />
-          <Redirect from="/" to="/trade/sell=DAI-0&receive=USDC-0" />
+          <Redirect from="/" to="/trade/sell=DAI&sell-amount=0&buy=USDC&buy-amount=0" />
           <Route component={NotFound} />
         </Switch>
       </Layout>
