@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps, useRouteMatch } from 'react-router'
 import { toast } from 'react-toastify'
 // @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -112,6 +112,8 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
 
+  const tradePageMatch = useRouteMatch('/trade/')
+
   /***************************** */
   // EVENT HANDLERS
 
@@ -144,9 +146,11 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
 
       // If on trade page already, keep pre-selected values when logging out
       const { pathname } = props.location
-      const redirectTo = typeof pathname === 'string' && pathname.match(/^\/trade/) ? pathname : '/'
+      const redirectTo = tradePageMatch ? pathname : '/'
 
-      props.history.push(redirectTo)
+      if (redirectTo !== pathname) {
+        props.history.push(redirectTo)
+      }
     }
   }
 
