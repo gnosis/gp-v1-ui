@@ -42,8 +42,8 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async approve(
-    tokenAddress: string,
     userAddress: string,
+    tokenAddress: string,
     spenderAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
@@ -62,8 +62,8 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async transfer(
-    tokenAddress: string,
     fromAddress: string,
+    tokenAddress: string,
     toAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
