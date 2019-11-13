@@ -143,7 +143,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       setLoadingLabel(undefined)
 
       // If on trade page already, keep pre-selected values when logging out
-      const pathname = props.location.pathname
+      const { pathname } = props.location
       const redirectTo = typeof pathname === 'string' && pathname.match(/^\/trade/) ? pathname : '/'
 
       props.history.push(redirectTo)
