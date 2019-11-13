@@ -9,10 +9,6 @@ import { txOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { DEFAULT_ORDER_DURATION } from 'const'
 
-interface Params {
-  callback: () => void
-}
-
 interface PlaceOrderParams {
   buyAmount: BN
   buyToken: TokenDetails
@@ -21,19 +17,19 @@ interface PlaceOrderParams {
 }
 
 interface Result {
-  placeOrder: (params: PlaceOrderParams) => Promise<void>
+  placeOrder: (params: PlaceOrderParams) => Promise<boolean>
   isSubmitting: boolean
 }
 
-export const usePlaceOrder = ({ callback }: Params): Result => {
+export const usePlaceOrder = (): Result => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { userAddress } = useWalletConnection()
 
-  const placeOrder = useMemo((): ((params: PlaceOrderParams) => Promise<void>) => {
-    return async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<void> => {
+  const placeOrder = useMemo((): ((params: PlaceOrderParams) => Promise<boolean>) => {
+    return async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
       if (!userAddress) {
         toast.error('Wallet is not connected!')
-        return
+        return false
       }
 
       setIsSubmitting(true)
@@ -65,16 +61,18 @@ export const usePlaceOrder = ({ callback }: Params): Result => {
 
         toast.success(`Placed order id=${result.data} valid for 30min`)
 
-        callback()
+        return true
       } catch (e) {
         log(`Error placing order`, e)
         toast.error(`Error placing order: ${e.message}`)
+
+        return false
       } finally {
         //TODO: use mounted hook thingy when available
         setIsSubmitting(false)
       }
     }
-  }, [callback, userAddress])
+  }, [userAddress])
 
   return { placeOrder, isSubmitting }
 }
