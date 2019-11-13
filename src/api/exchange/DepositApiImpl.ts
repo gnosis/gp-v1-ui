@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { formatAmount, log, toBN } from 'utils'
+import { log, toBN } from 'utils'
 import { ZERO } from 'const'
 import { getEpochAddressForNetwork } from './epochList'
 
