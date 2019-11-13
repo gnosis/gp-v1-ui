@@ -158,15 +158,6 @@ export interface Erc20Api {
     amount: BN,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
-
-  transferFrom(
-    senderAddress: string,
-    tokenAddress: string,
-    fromAddress: string,
-    toAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
 }
 
 import { Contract } from 'web3-eth-contract'
