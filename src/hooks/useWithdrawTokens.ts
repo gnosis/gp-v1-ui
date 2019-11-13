@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
 import { TxResult, TokenBalanceDetails, TxOptionalParams } from 'types'
 import assert from 'assert'
 import { depositApi } from 'api'
 import { useWalletConnection } from './useWalletConnection'
+import useSafeState from './useSafeState'
 
 interface Params {
   tokenBalances: TokenBalanceDetails
@@ -19,14 +19,7 @@ export const useWithdrawTokens = (params: Params): Result => {
   const {
     tokenBalances: { enabled, address: tokenAddress, claimable },
   } = params
-  const [claiming, setWithdrawing] = useState(false)
-  const mounted = useRef(true)
-
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
+  const [claiming, setWithdrawing] = useSafeState(false)
 
   async function withdraw(): Promise<TxResult<void>> {
     assert(enabled, 'Token not enabled')
@@ -36,11 +29,10 @@ export const useWithdrawTokens = (params: Params): Result => {
     setWithdrawing(true)
 
     try {
-      return await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
+      const receipt = await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
+      return receipt
     } finally {
-      if (mounted.current) {
-        setWithdrawing(false)
-      }
+      setWithdrawing(false)
     }
   }
 
