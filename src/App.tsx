@@ -53,7 +53,7 @@ const App: React.FC = () => (
     <Router basename={process.env.BASE_URL}>
       <Layout>
         <Switch>
-          <Route path="/trade/sell=:sell-:sellAmt&receive=:receive-:receiveAmt" component={Trade} />
+          <Route path="/trade/sell=:sell-:sellAmount&receive=:receive-:receiveAmount" component={Trade} />
           <Route path="/about" exact component={About} />
           <PrivateRoute path="/deposit" exact component={Deposit} />
           <Route path="/source-code" exact component={SourceCode} />

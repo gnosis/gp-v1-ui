@@ -64,7 +64,7 @@ const TradeWidget: React.FC = () => {
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, sellAmt, receive: receiveTokenSymbol, receiveAmt } = useParams()
+  const { sell: sellTokenSymbol, sellAmount, receive: receiveTokenSymbol, receiveAmount } = useParams()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
@@ -75,7 +75,10 @@ const TradeWidget: React.FC = () => {
   const sellInputId = 'sellToken'
   const receiveInputId = 'receiveToken'
 
-  const methods = useForm({ mode: 'onBlur', defaultValues: { [sellInputId]: sellAmt, [receiveInputId]: receiveAmt } })
+  const methods = useForm({
+    mode: 'onBlur',
+    defaultValues: { [sellInputId]: sellAmount, [receiveInputId]: receiveAmount },
+  })
   const { handleSubmit, watch, reset } = methods
 
   // Change URL on internal token change
