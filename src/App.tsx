@@ -20,6 +20,7 @@ import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
 import { walletApi } from 'api'
+import { TestComponent } from '../test/hooks/useSafeState.hooks.test'
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
   const isConnected = walletApi.isConnected()
@@ -53,6 +54,7 @@ const App: React.FC = () => (
     <Router basename={process.env.BASE_URL}>
       <Layout>
         <Switch>
+          <Route path="/TEST" render={() => <TestComponent safeUpdate />} />
           <Route path="/trade/sell=:sell-:sellAmt&receive=:receive-:receiveAmt" component={Trade} />
           <Route path="/about" exact component={About} />
           <PrivateRoute path="/deposit" exact component={Deposit} />
