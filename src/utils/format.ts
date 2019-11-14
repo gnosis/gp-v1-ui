@@ -115,13 +115,8 @@ export function adjustPrecision(value: string | undefined | null, precision: num
     return ''
   }
 
-  const match = value.match(/(^\d+\.)(\d+)$/)
-  if (match && match[2].length > precision) {
-    let [, intPart, decimalPart] = match
-    decimalPart = decimalPart.slice(0, precision)
-    return intPart + decimalPart
-  }
-  return value
+  const regexp = new RegExp(`(\\.\\d{${precision}})\\d+$`)
+  return value.replace(regexp, '$1')
 }
 
 export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
