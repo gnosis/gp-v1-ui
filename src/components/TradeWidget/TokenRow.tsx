@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import BN from 'bn.js'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -83,9 +83,14 @@ function displayBalance<K extends keyof TokenBalanceDetails>(
   return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
-// TODO: move into a validators file?
-function validatePositive(value: string, precision: number): true | string {
-  return new BN(parseAmount(value, precision) || '0').gt(ZERO) || 'Invalid amount'
+const validInputPattern = new RegExp(/^\d+(\.(\d+)?)?$/) // allows leading and trailing zeros
+const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
+const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
+
+function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
+  if (!validInputPattern.test(event.currentTarget.value + event.key)) {
+    event.preventDefault()
+  }
 }
 
 interface Props {
@@ -147,6 +152,25 @@ const TokenRow: React.FC<Props> = ({
     enforcePrecision()
   }, [enforcePrecision])
 
+  const removeExcessZeros = useMemo(
+    () => (event: React.SyntheticEvent<HTMLInputElement>): void => {
+      // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
+      // A: Because on those functions we still want the user to be able to input partial values. E.g.:
+      //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
+      //    When losing focus though, we remove everything that's redundant, such as leading zeros, trailing dots and/or zeros
+      // Q: Why not use formatAmount/parseAmount that already take care of this?
+      // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
+
+      const { value } = event.currentTarget
+      const newValue = value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
+
+      if (value != newValue) {
+        setValue(inputId, newValue, true)
+      }
+    },
+    [inputId, setValue],
+  )
+
   return (
     <Wrapper>
       <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
@@ -166,11 +190,11 @@ const TokenRow: React.FC<Props> = ({
           disabled={isDisabled}
           required
           ref={register({
-            validate: {
-              positive: (value: string): true | string => validatePositive(value, selectedToken.decimals),
-            },
+            pattern: { value: validInputPattern, message: 'Invalid amount' },
           })}
+          onKeyPress={preventInvalidChars}
           onChange={enforcePrecision}
+          onBlur={removeExcessZeros}
         />
         {errorOrWarning}
         <WalletDetail>
