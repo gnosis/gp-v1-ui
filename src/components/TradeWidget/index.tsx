@@ -90,7 +90,7 @@ const TradeWidget: React.FC = () => {
   const sellInputId = 'sellToken'
   const receiveInputId = 'receiveToken'
 
-  const { isSubmitting, placeOrder } = usePlaceOrder()
+  const { isSubmitting, placeOrder } = usePlaceOrder({ callback: reset })
   const history = useHistory()
 
   const swapTokens = (): void => {
@@ -113,18 +113,14 @@ const TradeWidget: React.FC = () => {
 
   let sameToken = sellToken === receiveToken
 
-  async function onSubmit(data: FieldValues): Promise<void> {
+  function onSubmit(data: FieldValues): void {
     if (isConnected) {
-      const success = await placeOrder({
+      placeOrder({
         buyAmount: parseAmount(data[receiveInputId], receiveToken.decimals),
         buyToken: receiveToken,
         sellAmount: parseAmount(data[sellInputId], sellToken.decimals),
         sellToken,
       })
-      if (success) {
-        // reset form on successful order placing
-        reset()
-      }
     } else {
       history.push('/connect-wallet')
       // TODO: connect wallet then come back, ideally with the data pre-filled
