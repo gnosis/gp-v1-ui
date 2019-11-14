@@ -78,28 +78,6 @@ export function formatAmountFull(
   return formatAmount(amount, amountPrecision, amountPrecision, thousandSeparator)
 }
 
-export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
-  if (!amountFmt) {
-    return null
-  }
-
-  const groups = /^(\d+)(?:\.(\d+))?$/.exec(amountFmt)
-  if (groups) {
-    const integerPart = groups[1]
-    let decimalPart = groups[2] || ''
-    if (decimalPart.length > amountPrecision) {
-      // truncate whatever is over precision
-      decimalPart = decimalPart.slice(0, amountPrecision)
-    }
-
-    const decimalBN = new BN(decimalPart.padEnd(amountPrecision, '0'))
-    const factor = TEN.pow(new BN(amountPrecision))
-    return new BN(integerPart).mul(factor).add(decimalBN)
-  } else {
-    return null
-  }
-}
-
 /**
  * Adjust the decimal precision of the given decimal value, without converting to/from BN or Number
  * Takes in a string and returns a string
@@ -117,6 +95,24 @@ export function adjustPrecision(value: string | undefined | null, precision: num
 
   const regexp = new RegExp(`(\\.\\d{${precision}})\\d+$`)
   return value.replace(regexp, '$1')
+}
+
+export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
+  if (!amountFmt) {
+    return null
+  }
+
+  const adjustedAmount = adjustPrecision(amountFmt, amountPrecision)
+  const groups = /^(\d+)(?:\.(\d+))?$/.exec(adjustedAmount)
+  if (groups) {
+    const [, integerPart, decimalPart = ''] = groups
+
+    const decimalBN = new BN(decimalPart.padEnd(amountPrecision, '0'))
+    const factor = TEN.pow(new BN(amountPrecision))
+    return new BN(integerPart).mul(factor).add(decimalBN)
+  } else {
+    return null
+  }
 }
 
 export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
