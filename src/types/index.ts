@@ -68,27 +68,60 @@ export interface DepositApi {
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
 
-  getBalance(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingDepositBatchId(userAddress: string, tokenAddress: string): Promise<number>
-  getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number>
+  getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingDepositAmount({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingDepositBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number>
+  getPendingWithdrawAmount({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingWithdrawBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number>
 
   deposit(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<void>>
 
   requestWithdraw(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<void>>
 
-  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  withdraw(
+    {
+      userAddress,
+      tokenAddress,
+    }: {
+      userAddress: string
+      tokenAddress: string
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<void>>
 }
 
 export interface Order {
@@ -156,47 +189,50 @@ export interface Erc20Api {
     spenderAddress: string
   }): Promise<BN>
 
-  approve({
-    senderAddress,
-    tokenAddress,
-    spenderAddress,
-    amount,
-    txOptionalParams,
-  }: {
-    senderAddress: string
-    tokenAddress: string
-    spenderAddress: string
-    amount: BN
-    txOptionalParams?: TxOptionalParams
-  }): Promise<TxResult<boolean>>
+  approve(
+    {
+      senderAddress,
+      tokenAddress,
+      spenderAddress,
+      amount,
+    }: {
+      senderAddress: string
+      tokenAddress: string
+      spenderAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
 
-  transfer({
-    senderAddress,
-    tokenAddress,
-    toAddress,
-    amount,
-    txOptionalParams,
-  }: {
-    senderAddress: string
-    tokenAddress: string
-    toAddress: string
-    amount: BN
-    txOptionalParams?: TxOptionalParams
-  }): Promise<TxResult<boolean>>
+  transfer(
+    {
+      senderAddress,
+      tokenAddress,
+      toAddress,
+      amount,
+    }: {
+      senderAddress: string
+      tokenAddress: string
+      toAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
 
-  transferFrom({
-    senderAddress,
-    tokenAddress,
-    fromAddress,
-    toAddress,
-    amount,
-    txOptionalParams,
-  }: {
-    senderAddress: string
-    tokenAddress: string
-    fromAddress: string
-    toAddress: string
-    amount: BN
-    txOptionalParams?: TxOptionalParams
-  }): Promise<TxResult<boolean>>
+  transferFrom(
+    {
+      senderAddress,
+      tokenAddress,
+      fromAddress,
+      toAddress,
+      amount,
+    }: {
+      senderAddress: string
+      tokenAddress: string
+      fromAddress: string
+      toAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<boolean>>
 }
