@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, SetStateAction, Dispatch } from 'react'
+import { useEffect, useRef, SetStateAction, Dispatch } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
 import { depositApi, erc20Api } from 'api'
-import { Mutation, TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
+import { Mutation, TokenBalanceDetails } from 'types'
 import { HIGHLIGHT_TIME, ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { TxNotification } from 'components/TxNotification'
 import { formatAmount, formatAmountFull, log, getToken } from 'utils'
+import { txOptionalParams } from 'utils/transaction'
 
 interface Params {
   balances: TokenBalanceDetails[]
@@ -19,16 +19,6 @@ interface Result {
   deposit: (amount: BN, tokenAddress: string) => Promise<void>
   requestWithdraw: (amount: BN, tokenAddress: string) => Promise<void>
   claim: (tokenAddress: string) => Promise<void>
-}
-
-const txOptionalParams: TxOptionalParams = {
-  onSentTransaction: (receipt: Receipt): void => {
-    if (receipt.transactionHash) {
-      toast.info(<TxNotification txHash={receipt.transactionHash} />)
-    } else {
-      console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
-    }
-  },
 }
 
 export const useRowActions = (params: Params): Result => {

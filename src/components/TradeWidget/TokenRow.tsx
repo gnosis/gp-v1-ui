@@ -59,6 +59,10 @@ const InputBox = styled.div`
     &.warning {
       box-shadow: 0 0 3px #ff7500;
     }
+
+    &:disabled {
+      box-shadow: none;
+    }
   }
 `
 
@@ -153,6 +157,7 @@ interface Props {
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
   inputId: string
+  isDisabled: boolean
   validateMaxAmount?: true
 }
 
@@ -163,6 +168,7 @@ const TokenRow: React.FC<Props> = ({
   onSelectChange,
   balance,
   inputId,
+  isDisabled,
   validateMaxAmount,
 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
@@ -197,6 +203,7 @@ const TokenRow: React.FC<Props> = ({
         <label>{selectLabel}</label>
         <Select
           isSearchable
+          isDisabled={isDisabled}
           styles={customSelectStyles}
           noOptionsMessage={(): string => 'No results'}
           formatOptionLabel={formatOptionLabel}
@@ -215,6 +222,7 @@ const TokenRow: React.FC<Props> = ({
           placeholder="0"
           name={inputId}
           type="text"
+          disabled={isDisabled}
           required
           ref={register({
             validate: {
