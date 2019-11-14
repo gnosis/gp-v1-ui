@@ -26,7 +26,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._allowances = allowances
   }
 
-  public async balanceOf(tokenAddress: string, userAddress: string): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
     const userBalances = this._balances[userAddress]
     if (!userBalances) {
       return ZERO
@@ -36,7 +36,15 @@ export class Erc20ApiMock implements Erc20Api {
     return balance ? balance : ZERO
   }
 
-  public async allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN> {
+  public async allowance({
+    tokenAddress,
+    userAddress,
+    spenderAddress,
+  }: {
+    tokenAddress: string
+    userAddress: string
+    spenderAddress: string
+  }): Promise<BN> {
     const userAllowances = this._allowances[userAddress]
     if (!userAllowances) {
       return ZERO
@@ -51,13 +59,19 @@ export class Erc20ApiMock implements Erc20Api {
     return allowance ? allowance : ZERO
   }
 
-  public async approve(
-    senderAddress: string,
-    tokenAddress: string,
-    spenderAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  public async approve({
+    senderAddress,
+    tokenAddress,
+    spenderAddress,
+    amount,
+    txOptionalParams,
+  }: {
+    senderAddress: string
+    tokenAddress: string
+    spenderAddress: string
+    amount: BN
+    txOptionalParams?: TxOptionalParams
+  }): Promise<TxResult<boolean>> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initAllowances(senderAddress, tokenAddress, spenderAddress)
@@ -78,13 +92,19 @@ export class Erc20ApiMock implements Erc20Api {
    * @param amount The amount transferred
    * @param txOptionalParams Optional params
    */
-  public async transfer(
-    senderAddress: string,
-    tokenAddress: string,
-    toAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  public async transfer({
+    senderAddress,
+    tokenAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: {
+    senderAddress: string
+    tokenAddress: string
+    toAddress: string
+    amount: BN
+    txOptionalParams?: TxOptionalParams
+  }): Promise<TxResult<boolean>> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances(senderAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)
@@ -112,14 +132,21 @@ export class Erc20ApiMock implements Erc20Api {
    * @param amount The amount transferred
    * @param txOptionalParams Optional params
    */
-  public async transferFrom(
-    senderAddress: string,
-    tokenAddress: string,
-    fromAddress: string,
-    toAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  public async transferFrom({
+    senderAddress,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: {
+    senderAddress: string
+    tokenAddress: string
+    fromAddress: string
+    toAddress: string
+    amount: BN
+    txOptionalParams?: TxOptionalParams
+  }): Promise<TxResult<boolean>> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances(fromAddress, tokenAddress)
     this._initBalances(toAddress, tokenAddress)

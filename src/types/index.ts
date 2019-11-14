@@ -145,31 +145,58 @@ export interface WalletApi {
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface Erc20Api {
-  balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
-  allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
+  balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
+  allowance({
+    tokenAddress,
+    userAddress,
+    spenderAddress,
+  }: {
+    tokenAddress: string
+    userAddress: string
+    spenderAddress: string
+  }): Promise<BN>
 
-  approve(
-    senderAddress: string,
-    tokenAddress: string,
-    spenderAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  approve({
+    senderAddress,
+    tokenAddress,
+    spenderAddress,
+    amount,
+    txOptionalParams,
+  }: {
+    senderAddress: string
+    tokenAddress: string
+    spenderAddress: string
+    amount: BN
+    txOptionalParams?: TxOptionalParams
+  }): Promise<TxResult<boolean>>
 
-  transfer(
-    senderAddress: string,
-    tokenAddress: string,
-    toAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  transfer({
+    senderAddress,
+    tokenAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: {
+    senderAddress: string
+    tokenAddress: string
+    toAddress: string
+    amount: BN
+    txOptionalParams?: TxOptionalParams
+  }): Promise<TxResult<boolean>>
 
-  transferFrom(
-    senderAddress: string,
-    tokenAddress: string,
-    fromAddress: string,
-    toAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  transferFrom({
+    senderAddress,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: {
+    senderAddress: string
+    tokenAddress: string
+    fromAddress: string
+    toAddress: string
+    amount: BN
+    txOptionalParams?: TxOptionalParams
+  }): Promise<TxResult<boolean>>
 }
