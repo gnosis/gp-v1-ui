@@ -73,11 +73,14 @@ const WalletDetail = styled.div`
   }
 `
 
-function displayBalance(balance: TokenBalanceDetails | undefined | null, key: string): string {
+function displayBalance<K extends keyof TokenBalanceDetails>(
+  balance: TokenBalanceDetails | undefined | null,
+  key: K,
+): string {
   if (!balance) {
     return '0'
   }
-  return formatAmount(balance[key], balance.decimals) || '0'
+  return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
 // TODO: move into a validators file?
