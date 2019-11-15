@@ -4,7 +4,7 @@ import useForm, { FormContext } from 'react-hook-form'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useHistory } from 'react-router'
+import { useHistory, useRouteMatch, useLocation } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
@@ -69,6 +69,10 @@ function sanitizeInputAmount(value: string, precision: number): string {
   return formatAmountFull(number, precision, false)
 }
 
+function useQuery(): URLSearchParams {
+  return new URLSearchParams(useLocation().search)
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -77,7 +81,10 @@ const TradeWidget: React.FC = () => {
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, sellAmount, buy: receiveTokenSymbol, buyAmount: receiveAmount } = useParams()
+  const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
+  const query = useQuery()
+  const sellAmount = query.get('sell')
+  const receiveAmount = query.get('buy')
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
@@ -103,7 +110,7 @@ const TradeWidget: React.FC = () => {
   const { handleSubmit, watch, reset } = methods
 
   const urlParams = new URLSearchParams({ sell: watch(sellInputId), buy: watch(receiveInputId) })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}/${urlParams.toString()}`
+  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${urlParams.toString()}`
   useURLParams(url)
 
   const { balances } = useTokenBalances()
