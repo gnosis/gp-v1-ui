@@ -93,6 +93,10 @@ function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void
   }
 }
 
+function validatePositive(value: string): true | string {
+  return Number(value) > 0 || 'Invalid amount'
+}
+
 interface Props {
   selectedToken: TokenDetails
   tokens: TokenDetails[]
@@ -192,6 +196,7 @@ const TokenRow: React.FC<Props> = ({
           required
           ref={register({
             pattern: { value: validInputPattern, message: 'Invalid amount' },
+            validate: { positive: validatePositive },
           })}
           onKeyPress={preventInvalidChars}
           onChange={enforcePrecision}
