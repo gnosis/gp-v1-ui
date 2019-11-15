@@ -64,10 +64,7 @@ export const useRowActions = (params: Params): Result => {
         }
       })
       const result = await erc20Api.approve(
-        userAddress,
-        tokenAddress,
-        contractAddress,
-        ALLOWANCE_MAX_VALUE,
+        { senderAddress: userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
         txOptionalParams,
       )
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
@@ -92,7 +89,7 @@ export const useRowActions = (params: Params): Result => {
     try {
       const { symbol, decimals } = getToken('address', tokenAddress, balances)
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-      const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
+      const result = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
@@ -117,7 +114,7 @@ export const useRowActions = (params: Params): Result => {
     try {
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
+      const result = await depositApi.requestWithdraw({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${result.receipt.transactionHash}`)
 
       _updateToken(tokenAddress, otherParams => {
@@ -147,7 +144,7 @@ export const useRowActions = (params: Params): Result => {
           claiming: true,
         }
       })
-      const result = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
+      const result = await depositApi.withdraw({ userAddress, tokenAddress }, txOptionalParams)
 
       _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
         return {
