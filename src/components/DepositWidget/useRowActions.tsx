@@ -9,6 +9,8 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { TxNotification } from 'components/TxNotification'
 import { formatAmount, formatAmountFull, log, getToken } from 'utils'
 
+const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
+
 interface Params {
   balances: TokenBalanceDetails[]
   setBalances: Dispatch<SetStateAction<TokenBalanceDetails[]>>
@@ -70,7 +72,7 @@ export const useRowActions = (params: Params): Result => {
 
     try {
       if (!userAddress) {
-        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+        throw new Error(ON_ERROR_MESSAGE)
       }
 
       _updateToken(tokenAddress, otherParams => {
@@ -107,7 +109,7 @@ export const useRowActions = (params: Params): Result => {
   async function deposit(amount: BN, tokenAddress: string): Promise<void> {
     try {
       if (!userAddress) {
-        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+        throw new Error(ON_ERROR_MESSAGE)
       }
 
       const { symbol, decimals } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
@@ -136,7 +138,7 @@ export const useRowActions = (params: Params): Result => {
     const { symbol, decimals } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
     try {
       if (!userAddress) {
-        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+        throw new Error(ON_ERROR_MESSAGE)
       }
 
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
@@ -167,7 +169,7 @@ export const useRowActions = (params: Params): Result => {
     >
     try {
       if (!userAddress) {
-        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
+        throw new Error(ON_ERROR_MESSAGE)
       }
 
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
