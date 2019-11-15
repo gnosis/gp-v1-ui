@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
-// import { act } from 'react-dom/test-utils'
+import { act } from 'react-dom/test-utils'
 
 import useSafeState from 'hooks/useSafeState'
-// import { shallow } from 'enzyme'
 
 interface TestComponentI {
   safeUpdate?: boolean
@@ -12,7 +11,6 @@ interface TestComponentI {
 // const intervals: NodeJS.Timeout[] = []
 
 export const TestComponent: React.FC<TestComponentI> = ({ safeUpdate }) => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [withoutSafe, setWithoutSafe] = useState(undefined)
   const [withSafe, setWithSafe] = useSafeState(undefined)
 
@@ -24,37 +22,93 @@ export const TestComponent: React.FC<TestComponentI> = ({ safeUpdate }) => {
     })
 
     // Fake promise
-    // await new Promise((accept): NodeJS.Timeout => setTimeout((): void => accept('done'), 2000))
+    await new Promise((accept): NodeJS.Timeout => setTimeout((): void => accept('done'), 200))
 
-    safeUpdate ? setWithSafe('SAFE') : setWithoutSafe('UNSAFE')
+    return safeUpdate ? setWithSafe('SAFE') : setWithoutSafe('UNSAFE')
   }
 
   return (
-    <>
-      <button onClick={_handleClick}></button>
+    <div>
+      <button id="buttonTest" onClick={_handleClick}></button>
       <h1>{withoutSafe || withSafe}</h1>
-    </>
+    </div>
   )
 }
 
-// let container: HTMLDivElement
+let container: HTMLDivElement
 
-// beforeEach(() => {
-//   container = document.createElement('div')
-//   document.body.appendChild(container)
-// })
+beforeEach(() => {
+  container = document.createElement('div')
+  document.body.appendChild(container)
+})
 
-// afterEach(() => {
-//   document.body.removeChild(container)
-//   container = null
-// })
+afterEach(() => {
+  document.body.removeChild(container)
+  container = null
+})
 
-// it('can render and show proper text', () => {
-//   act(() => {
-//     // ReactDOM.render(<TestComponent />, container)
-//     const safeComp = shallow(<TestComponent safeUpdate />)
-//     safeComp.find('button').simulate('click')
+describe('Tests button click state change', () => {
+  it('Renders and SafeState works to change state', async () => {
+    act(() => {
+      ReactDOM.render(<TestComponent safeUpdate />, container)
+    })
 
-//     expect(safeComp.find('h1').text()).toBe('SAFE')
-//   })
-// })
+    const button = container.querySelector('#buttonTest')
+    const h1 = container.querySelector('h1')
+
+    // click button
+    act(() => {
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    })
+
+    // await state change
+    await act(() => new Promise((accept): NodeJS.Timeout => setTimeout((): void => accept('done'), 300)))
+
+    expect(h1.textContent).toBe('SAFE')
+  })
+
+  xit('useSafeState on unmount is NOT called, thus not changing state', async () => {
+    act(() => {
+      ReactDOM.render(<TestComponent safeUpdate />, container)
+    })
+
+    const button = container.querySelector('#buttonTest')
+    const h1 = container.querySelector('h1')
+
+    // click button
+    act(() => {
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      // immediately unmount component
+      ReactDOM.unmountComponentAtNode(container)
+    })
+
+    // await promise time
+    await act(() => new Promise((accept): NodeJS.Timeout => setTimeout((): void => accept('done'), 300)))
+
+    // Should be no state change
+    expect(h1.textContent).toBe('')
+  })
+
+  xit('normal useState on unmount IS called, thus changing state', async () => {
+    act(() => {
+      // mount normal state changing component
+      ReactDOM.render(<TestComponent />, container)
+    })
+
+    const button = container.querySelector('#buttonTest')
+    const h1 = container.querySelector('h1')
+
+    // click button
+    act(() => {
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      // immediately unmount component
+      ReactDOM.unmountComponentAtNode(container)
+    })
+
+    // await promise time
+    await act(() => new Promise((accept): NodeJS.Timeout => setTimeout((): void => accept('done'), 300)))
+
+    // Should be no state change
+    expect(h1.textContent).toBe('UNSAFE')
+  })
+})
