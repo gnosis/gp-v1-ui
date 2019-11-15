@@ -4,7 +4,7 @@ import useForm, { FormContext } from 'react-hook-form'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useHistory, useRouteMatch, useLocation } from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
