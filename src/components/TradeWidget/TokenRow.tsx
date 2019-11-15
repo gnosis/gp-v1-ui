@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import BN from 'bn.js'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -83,7 +83,7 @@ function displayBalance<K extends keyof TokenBalanceDetails>(
   return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
-const validInputPattern = new RegExp(/^\d+(\.(\d+)?)?$/) // allows leading and trailing zeros
+const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
 const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
 const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
 
@@ -152,12 +152,13 @@ const TokenRow: React.FC<Props> = ({
     enforcePrecision()
   }, [enforcePrecision])
 
-  const removeExcessZeros = useMemo(
+  const removeExcessZeros = useCallback(
     () => (event: React.SyntheticEvent<HTMLInputElement>): void => {
       // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
       // A: Because on those functions we still want the user to be able to input partial values. E.g.:
       //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
-      //    When losing focus though, we remove everything that's redundant, such as leading zeros, trailing dots and/or zeros
+      //    When losing focus though (`onBlur`), we remove everything that's redundant, such as leading zeros,
+      //    trailing dots and/or zeros
       // Q: Why not use formatAmount/parseAmount that already take care of this?
       // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
 
