@@ -36,7 +36,7 @@ export const useWithdrawTokens = (params: Params): Result => {
     setWithdrawing(true)
 
     try {
-      return await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
+      return await depositApi.withdraw({ userAddress, tokenAddress }, params.txOptionalParams)
     } finally {
       if (mounted.current) {
         setWithdrawing(false)
