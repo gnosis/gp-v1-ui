@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import BN from 'bn.js'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -156,7 +156,7 @@ const TokenRow: React.FC<Props> = ({
     enforcePrecision()
   }, [enforcePrecision])
 
-  const removeExcessZeros = useCallback(
+  const removeExcessZeros = useMemo(
     () => (event: React.SyntheticEvent<HTMLInputElement>): void => {
       // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
       // A: Because on those functions we still want the user to be able to input partial values. E.g.:
