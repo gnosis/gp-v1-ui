@@ -38,10 +38,12 @@ export const useEnableTokens = (params: Params): Result => {
     // Set the allowance
     const contractAddress = depositApi.getContractAddress()
     const result = await erc20Api.approve(
-      userAddress,
-      tokenAddress,
-      contractAddress,
-      ALLOWANCE_MAX_VALUE,
+      {
+        senderAddress: userAddress,
+        tokenAddress,
+        spenderAddress: contractAddress,
+        amount: ALLOWANCE_MAX_VALUE,
+      },
       params.txOptionalParams,
     )
 
