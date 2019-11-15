@@ -136,7 +136,8 @@ const TradeWidget: React.FC = () => {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
 
-    if (!buyAmount || !sellAmount) throw new Error('Invalid sell or buy amounts.')
+    // Do not let potential null values through
+    if (!buyAmount || !sellAmount) return
 
     if (isConnected) {
       placeOrder({
