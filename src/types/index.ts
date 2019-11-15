@@ -151,7 +151,10 @@ export interface ExchangeApi extends DepositApi {
   getTokenIdByAddress(tokenAddress: string): Promise<number>
   addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
   placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<TxResult<number>>
-  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  cancelOrder(
+    { senderAddress, orderId }: { senderAddress: string; orderId: number },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<TxResult<void>>
 }
 
 export interface WalletInfo {

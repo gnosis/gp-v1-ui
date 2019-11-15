@@ -97,8 +97,13 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   }
 
   public async cancelOrder(
-    senderAddress: string,
-    orderId: number,
+    {
+      senderAddress,
+      orderId,
+    }: {
+      senderAddress: string
+      orderId: number
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<TxResult<void>> {
     await waitAndSendReceipt({ txOptionalParams })
