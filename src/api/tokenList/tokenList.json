@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Wrapped Ether",
+    "symbol": "WETH",
+    "decimals": 18,
+    "addressByNetwork": {
+      "1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      "4": "0xc778417e063141139fce010982780140aa0cd5ab"
+    },
+    "website": "https://weth.io",
+    "description": "Wrapper of Ether to make it ERC-20 compliant",
+    "rinkeby_faucet": "https://faucet.rinkeby.io/"
+  },
+  {
+    "name": "Tether USD",
+    "symbol": "USDT",
+    "decimals": 6,
+    "addressByNetwork": {
+      "1": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "4": "0xa9881E6459CA05d7D7C95374463928369cD7a90C"
+    },
+    "website": "https://tether.to/",
+    "description": "Fiat enabled collateralized stable coin, that is backed by the most popular fiat currency, USD (US Dollar) in a 1:1 ratio",
+    "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712"
+  },
+  {
+    "name": "TrueUSD",
+    "symbol": "TUSD",
+    "decimals": 18,
+    "addressByNetwork": {
+      "1": "0x0000000000085d4780B73119b644AE5ecd22b376",
+      "4": "0x0000000000085d4780B73119b644AE5ecd22b376"
+    },
+    "website": "https://www.trusttoken.com/trueusd",
+    "description": "US Dollar backed stable coin which is totally fiat-collateralized",
+    "rinkeby_faucet": "https://github.com/trusttoken/true-currencies#getting-testnet-tokens"
+  },
+  {
+    "name": "USD Coin",
+    "symbol": "USDC",
+    "decimals": 6,
+    "addressByNetwork": {
+      "1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "4": "0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b"
+    },
+    "website": "https://www.circle.com/en/usdc",
+    "description": "legitimate built on open standards using Grant Thornton for verifying Circle’s US dollar reserves launched by cryptocurrency finance firm circle Internet financial Ltd and the CENTRE open source consortium launched ",
+    "rinkeby_faucet": "https://app.compound.finance/asset/cUSDC"
+  },
+  {
+    "name": "Paxos Standard",
+    "symbol": "PAX",
+    "decimals": 18,
+    "addressByNetwork": {
+      "1": "0x8e870d67f660d95d5be530380d0ec0bd388289e1",
+      "4": "0xBD6A9921504fae42EaD2024F43305A8ED3890F6f"
+    },
+    "website": "https://www.paxos.com/standard",
+    "description": "Regulated stable coin. PAX is backed by US Dollar in equivalent 1:1. Launched by Paxos Trust Company. Approved by the New York State Department of Financial Services",
+    "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712"
+  },
+  {
+    "name": "Gemini dollar",
+    "symbol": "GUSD",
+    "decimals": 2,
+    "addressByNetwork": {
+      "1": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
+      "4": "0x784B46A4331f5c7C495F296AE700652265ab2fC6"
+    },
+    "website": "https://gemini.com/dollar/",
+    "description": "Regulated by the New York State Department of Financial Services launched same day as PAX by Gemini Trust Company. backed by USD",
+    "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712. Using ERC20Impl (0x8d54C3af182A5ef4f74e7eCC07aB6182153797bB) contract, call `requestPrint(address, amount). On same contract, use the `lockId` returned from previous call and execute `confirmPrint(lockId)`."
+  },
+  {
+    "name": "DAI Stablecoin",
+    "symbol": "DAI",
+    "decimals": 18,
+    "addressByNetwork": {
+      "1": "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
+      "4": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa"
+    },
+    "website": "https://makerdao.com/",
+    "description": "crypto-collateralized cryptocurrency: stable coin which is pegged to USD",
+    "rinkeby_faucet": "https://app.compound.finance/asset/cDAI"
+  }
+]
