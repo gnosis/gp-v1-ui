@@ -157,7 +157,8 @@ const TradeWidget: React.FC = () => {
         reset()
       }
     } else {
-      history.push('/connect-wallet', { from: history.location.pathname })
+      const from = history.location.pathname + history.location.search
+      history.push('/connect-wallet', { from })
     }
   }
 
