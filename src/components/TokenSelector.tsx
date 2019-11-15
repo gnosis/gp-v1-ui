@@ -93,7 +93,7 @@ const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, o
         options={options}
         value={{ token: selected }}
         onChange={(selected, { action }): void => {
-          if (action === 'select-option' && 'token' in selected) {
+          if (selected && action === 'select-option' && 'token' in selected) {
             onChange(selected.token)
           }
         }}
