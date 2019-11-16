@@ -4,7 +4,7 @@ import useForm, { FormContext } from 'react-hook-form'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useHistory, useLocation } from 'react-router'
+import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
@@ -20,7 +20,8 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, safeTokenName, parseAmount, formatAmountFull } from 'utils'
+import { getToken, safeTokenName, parseAmount } from 'utils'
+import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -56,23 +57,6 @@ const SubmitButton = styled.button`
   }
 `
 
-// This is sort of a duplication from the validation done on TokenRow.
-// Still, required because the initial value comes from the URL params,
-//   and we have no control over what the user inserts there.
-// Thus, we make it a nicely formated value, or 0 if we can't
-// And only on first render. Subsequent validation is taken care by TokenRow.
-function sanitizeInputAmount(value: string, precision: number): string {
-  const number = parseAmount(value, precision)
-  if (!number) {
-    return '0'
-  }
-  return formatAmountFull(number, precision, false)
-}
-
-function useQuery(): URLSearchParams {
-  return new URLSearchParams(useLocation().search)
-}
-
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -82,9 +66,7 @@ const TradeWidget: React.FC = () => {
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const query = useQuery()
-  const sellAmount = query.get('sell')
-  const receiveAmount = query.get('buy')
+  const { sellAmount, buyAmount: receiveAmount } = useQuery()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
@@ -95,22 +77,17 @@ const TradeWidget: React.FC = () => {
   const sellInputId = 'sellToken'
   const receiveInputId = 'receiveToken'
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sanitizedSellAmount = useMemo(() => sanitizeInputAmount(sellAmount, sellToken.decimals), [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sanitizedReceiveAmount = useMemo(() => sanitizeInputAmount(receiveAmount, receiveToken.decimals), [])
-
   const methods = useForm({
     mode: 'onBlur',
     defaultValues: {
-      [sellInputId]: sanitizedSellAmount,
-      [receiveInputId]: sanitizedReceiveAmount,
+      [sellInputId]: sellAmount,
+      [receiveInputId]: receiveAmount,
     },
   })
   const { handleSubmit, watch, reset } = methods
 
-  const urlParams = new URLSearchParams({ sell: watch(sellInputId), buy: watch(receiveInputId) })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${urlParams.toString()}`
+  const searchQuery = buildSearchQuery({ sell: watch(sellInputId), buy: watch(receiveInputId) })
+  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url)
 
   const { balances } = useTokenBalances()
