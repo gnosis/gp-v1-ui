@@ -54,7 +54,7 @@ export interface TxOptionalParams {
 export type Receipt = TransactionReceipt
 
 export interface DepositApi {
-  getContractAddress(): string
+  getContractAddress(networkId: number): string
   getBatchTime(): Promise<number>
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
@@ -75,6 +75,38 @@ export interface DepositApi {
   ): Promise<Receipt>
 
   withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+}
+
+export interface EpochTokenLocker extends Contract {
+  clone(): EpochTokenLocker
+
+  methods: {
+    hasCreditedBalance(user: string, token: string, batchId: number | string | BN): TransactionObject<boolean>
+
+    BATCH_TIME(): TransactionObject<string>
+
+    deposit(token: string, amount: number | string | BN): TransactionObject<void>
+
+    requestWithdraw(token: string, amount: number | string | BN): TransactionObject<void>
+
+    withdraw(token: string, owner: string): TransactionObject<void>
+
+    getPendingDepositAmount(user: string, token: string): TransactionObject<string>
+
+    getPendingDepositBatchNumber(user: string, token: string): TransactionObject<string>
+
+    getPendingWithdrawAmount(user: string, token: string): TransactionObject<string>
+
+    getPendingWithdrawBatchNumber(user: string, token: string): TransactionObject<string>
+
+    getCurrentBatchId(): TransactionObject<string>
+
+    getSecondsRemainingInBatch(): TransactionObject<string>
+
+    getBalance(user: string, token: string): TransactionObject<string>
+
+    hasValidWithdrawRequest(user: string, token: string): TransactionObject<boolean>
+  }
 }
 
 export interface Order {

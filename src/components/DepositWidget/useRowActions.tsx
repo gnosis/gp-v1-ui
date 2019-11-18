@@ -23,8 +23,8 @@ interface Result {
 
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
-  const { userAddress } = useWalletConnection()
-  const contractAddress = depositApi.getContractAddress()
+  const { userAddress, networkId } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress(networkId)
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>

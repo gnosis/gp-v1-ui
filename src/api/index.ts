@@ -6,6 +6,7 @@ import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiImpl } from './erc20/Erc20ApiImpl'
 import { DepositApiMock } from './exchange/DepositApiMock'
+import { DepositApiImpl } from './exchange/DepositApiImpl'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances, FEE_TOKEN } from '../../test/data'
 import Web3 from 'web3'
@@ -51,15 +52,14 @@ function createErc20Api(web3: Web3): Erc20Api {
   return erc20Api
 }
 
-function createDepositApi(erc20Api: Erc20Api): DepositApi {
+function createDepositApi(erc20Api: Erc20Api, web3: Web3): DepositApi {
   let depositApi
   if (isDepositMock) {
     depositApi = new DepositApiMock(exchangeBalanceStates, erc20Api)
-    window['depositApi'] = depositApi // register for convenience
   } else {
-    // TODO: Add actual implementation
-    throw new Error('Not implemented yet. Only mock implementation available')
+    depositApi = new DepositApiImpl(web3)
   }
+  window['depositApi'] = depositApi // register for convenience
   return depositApi
 }
 
@@ -84,5 +84,5 @@ const web3 = new Web3(getDefaultProvider())
 export const walletApi: WalletApi = createWalletApi(web3)
 export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api(web3)
-export const depositApi: DepositApi = createDepositApi(erc20Api)
+export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api)

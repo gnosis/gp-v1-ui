@@ -59,7 +59,7 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
     return null
   }
 
-  const contractAddress = depositApi.getContractAddress()
+  const contractAddress = depositApi.getContractAddress(networkId)
   const tokens = tokenListApi.getTokens(networkId)
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(async token =>
