@@ -14,6 +14,7 @@ export const ALLOWANCE_FOR_ENABLED_TOKEN = new BN(2).pow(new BN(128)) // 3402823
 // Model constants
 export const FEE_DENOMINATOR = 1000 // Fee is 1/fee_denominator i.e. 1/1000 = 0.1%
 export const BATCH_TIME = 300
+export const DEFAULT_ORDER_DURATION = 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000

@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from 'react'
-import { faExchangeAlt, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import styled from 'styled-components'
 import useForm, { FormContext } from 'react-hook-form'
+import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { FieldValues } from 'react-hook-form/dist/types'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
@@ -12,12 +14,13 @@ import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { usePlaceOrder } from 'hooks/usePlaceOrder'
 
 import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, safeTokenName } from 'utils'
+import { getToken, safeTokenName, parseAmount } from 'utils'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -54,7 +57,7 @@ const SubmitButton = styled.button`
 `
 
 const TradeWidget: React.FC = () => {
-  const { networkId } = useWalletConnection()
+  const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
@@ -82,9 +85,13 @@ const TradeWidget: React.FC = () => {
   ])
 
   const methods = useForm({ mode: 'onBlur' })
-  const { handleSubmit, watch } = methods
-  const sellTokenId = 'sellToken'
-  const receiveTokenId = 'receiveToken'
+  const { handleSubmit, watch, reset } = methods
+
+  const sellInputId = 'sellToken'
+  const receiveInputId = 'receiveToken'
+
+  const { isSubmitting, placeOrder } = usePlaceOrder()
+  const history = useHistory()
 
   const swapTokens = (): void => {
     setSellToken(receiveToken)
@@ -106,10 +113,36 @@ const TradeWidget: React.FC = () => {
 
   let sameToken = sellToken === receiveToken
 
+  async function onSubmit(data: FieldValues): Promise<void> {
+    if (isConnected) {
+      const success = await placeOrder({
+        buyAmount: parseAmount(data[receiveInputId], receiveToken.decimals),
+        buyToken: receiveToken,
+        sellAmount: parseAmount(data[sellInputId], sellToken.decimals),
+        sellToken,
+      })
+      if (success) {
+        // reset form on successful order placing
+        reset()
+      }
+    } else {
+      history.push('/connect-wallet')
+      // TODO: connect wallet then come back, ideally with the data pre-filled
+      // might require David changes to be merged first
+      // when redirect back we need:
+      // 1. fill the form
+      // 2. trigger validation
+      // 3. call submit again
+      // OR... bypass all that and call this function with given parameters?
+      // we'll potentially need a flag from the redirect to indicate whether we are now connected
+      //   and should proceed from where we left off
+    }
+  }
+
   return (
     <WrappedWidget>
       <FormContext {...methods}>
-        <WrappedForm onSubmit={handleSubmit(data => console.log('data', data))}>
+        <WrappedForm onSubmit={handleSubmit(onSubmit)}>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             selectedToken={sellToken}
@@ -117,7 +150,8 @@ const TradeWidget: React.FC = () => {
             balance={sellTokenBalance}
             selectLabel="sell"
             onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
-            inputId={sellTokenId}
+            inputId={sellInputId}
+            isDisabled={isSubmitting}
             validateMaxAmount
           />
           <IconWrapper onClick={swapTokens}>
@@ -129,16 +163,17 @@ const TradeWidget: React.FC = () => {
             balance={receiveTokenBalance}
             selectLabel="receive"
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
-            inputId={receiveTokenId}
+            inputId={receiveInputId}
+            isDisabled={isSubmitting}
           />
           <OrderDetails
-            sellAmount={watch(sellTokenId)}
+            sellAmount={watch(sellInputId)}
             sellTokenName={safeTokenName(sellToken)}
-            receiveAmount={watch(receiveTokenId)}
+            receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
           />
-          <SubmitButton type="submit" disabled={!methods.formState.isValid}>
-            <FontAwesomeIcon icon={faPaperPlane} size="lg" />{' '}
+          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting}>
+            <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
         </WrappedForm>
