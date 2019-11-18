@@ -1,6 +1,7 @@
 import { WalletApi, Network, WalletInfo, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
+import { getDefaultProvider } from '../'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
