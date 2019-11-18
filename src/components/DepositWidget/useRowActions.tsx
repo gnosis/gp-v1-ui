@@ -1,4 +1,4 @@
-import { useEffect, useRef, SetStateAction, Dispatch } from 'react'
+import { SetStateAction, Dispatch } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
@@ -25,21 +25,10 @@ interface Result {
 
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
-  const { userAddress } = useWalletConnection()
-
-  const contractAddress = depositApi.getContractAddress()
-  const mounted = useRef(true)
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
+  const { userAddress, networkId } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress(networkId)
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
-    if (!mounted.current) {
-      return
-    }
-
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
         const { address: tokenAddressAux } = tokenBalancesAux
@@ -71,14 +60,14 @@ export const useRowActions = (params: Params): Result => {
           enabling: true,
         }
       })
-      const result = await erc20Api.approve(
+      const receipt = await erc20Api.approve(
         userAddress,
         tokenAddress,
         contractAddress,
         ALLOWANCE_MAX_VALUE,
         txOptionalParams,
       )
-      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       _updateToken(tokenAddress, otherParams => {
         return {
@@ -104,8 +93,8 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol, decimals } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-      const result = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
-      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      const receipt = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
+      log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
         return {
@@ -133,8 +122,8 @@ export const useRowActions = (params: Params): Result => {
 
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      const result = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
-      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      const receipt = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
+      log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       _updateToken(tokenAddress, otherParams => {
         return {
@@ -169,7 +158,7 @@ export const useRowActions = (params: Params): Result => {
           claiming: true,
         }
       })
-      const result = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
+      const receipt = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
 
       _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
         return {
@@ -184,7 +173,7 @@ export const useRowActions = (params: Params): Result => {
       })
       _clearHighlight(tokenAddress)
 
-      log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+      log(`The transaction has been mined: ${receipt.transactionHash}`)
       toast.success(`Withdraw of ${formatAmount(withdrawingBalance, decimals)} ${symbol} completed`)
     } catch (error) {
       console.error('Error executing the withdraw request', error)

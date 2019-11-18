@@ -56,10 +56,11 @@ export const usePlaceOrder = (): Result => {
           buyAmount,
           sellAmount,
         }
-        const result = await exchangeApi.placeOrder(params, txOptionalParams)
-        log(`The transaction has been mined: ${result.receipt.transactionHash}`)
+        const receipt = await exchangeApi.placeOrder(params, txOptionalParams)
+        log(`The transaction has been mined: ${receipt.transactionHash}`)
 
-        toast.success(`Placed order id=${result.data} valid for 30min`)
+        // TODO: get order id in a separate call
+        // toast.success(`Placed order id=${receipt.data} valid for 30min`)
 
         return true
       } catch (e) {

@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef } from 'react'
-import { erc20Api, depositApi } from 'api'
-import { TokenBalanceDetails, TxOptionalParams, TxResult } from 'types'
-import { ALLOWANCE_MAX_VALUE } from 'const'
+import { TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
 import assert from 'assert'
+import { erc20Api, depositApi } from 'api'
+
+import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
+
+import { ALLOWANCE_MAX_VALUE } from 'const'
 
 interface Params {
   tokenBalances: TokenBalanceDetails
@@ -13,56 +15,36 @@ interface Params {
 interface Result {
   enabled: boolean
   enabling: boolean
-  enableToken(): Promise<TxResult<boolean> | boolean>
+  enableToken(): Promise<Receipt>
 }
 
 export const useEnableTokens = (params: Params): Result => {
-  const { userAddress, isConnected } = useWalletConnection()
+  const { userAddress, isConnected, networkId } = useWalletConnection()
   const { enabled: enabledInitial, address: tokenAddress } = params.tokenBalances
-  const [enabled, setEnabled] = useState(enabledInitial)
-  const [enabling, setEnabling] = useState(false)
-  const mounted = useRef(true)
+  const [enabled, setEnabled] = useSafeState(enabledInitial)
+  const [enabling, setEnabling] = useSafeState(false)
 
-  useEffect(() => {
-    return function cleanup(): void {
-      mounted.current = false
-    }
-  }, [])
-
-  async function enableToken(): Promise<TxResult<boolean> | boolean> {
+  async function enableToken(): Promise<Receipt> {
     assert(!enabled, 'The token was already enabled')
     assert(isConnected, "There's no connected wallet")
 
-    try {
-      if (!userAddress) {
-        throw new Error('No logged in user found. Please check wallet connectivity status and try again.')
-      }
+    setEnabling(true)
 
-      setEnabling(true)
+    // Set the allowance
+    const contractAddress = depositApi.getContractAddress(networkId)
+    const receipt = await erc20Api.approve(
+      userAddress,
+      tokenAddress,
+      contractAddress,
+      ALLOWANCE_MAX_VALUE,
+      params.txOptionalParams,
+    )
 
-      // Set the allowance
-      const contractAddress = depositApi.getContractAddress()
+    // Update the state
+    setEnabled(true)
+    setEnabling(false)
 
-      const result = await erc20Api.approve(
-        userAddress,
-        tokenAddress,
-        contractAddress,
-        ALLOWANCE_MAX_VALUE,
-        params.txOptionalParams,
-      )
-
-      if (mounted.current) {
-        // Update the state
-        setEnabled(true)
-        setEnabling(false)
-      }
-
-      return result
-    } catch (error) {
-      console.error(error)
-
-      return false
-    }
+    return receipt
   }
 
   return { enabled, enabling, enableToken }

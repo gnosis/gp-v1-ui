@@ -1,6 +1,7 @@
 import { WalletApi, Network, WalletInfo, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
+import { getDefaultProvider } from '../'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
@@ -114,6 +115,19 @@ const wcOptions: WalletConnectInits = {
   },
 }
 
+// needed if Web3 was pre-instantiated with wss | WebsocketProvider
+const closeOpenWebSocketConnection = (web3: Web3): void => {
+  if (
+    web3 &&
+    typeof web3.currentProvider === 'object' &&
+    web3.currentProvider.connected &&
+    'disconnect' in web3.currentProvider
+  ) {
+    // code=1000 - Normal Closure
+    web3.currentProvider.disconnect(1000, 'Switching provider')
+  }
+}
+
 /**
  * Basic implementation of Wallet API
  */
@@ -124,8 +138,9 @@ export class WalletApiImpl implements WalletApi {
 
   private _unsubscribe: Command = () => {}
 
-  public constructor() {
+  public constructor(web3: Web3) {
     this._listeners = []
+    this._web3 = web3
   }
 
   public isConnected(): boolean {
@@ -141,9 +156,12 @@ export class WalletApiImpl implements WalletApi {
 
     this._provider = provider
 
+    closeOpenWebSocketConnection(this._web3)
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._web3 = new Web3(provider as any)
+    this._web3.setProvider(provider as any)
     log('[WalletApi] Connected')
+    ;(window as any).web3c = this._web3
 
     await this._notifyListeners()
 
@@ -179,7 +197,7 @@ export class WalletApiImpl implements WalletApi {
     this._unsubscribe()
 
     this._provider = null
-    this._web3 = null
+    this._web3.setProvider(getDefaultProvider())
 
     log('[WalletApi] Disconnected')
     await this._notifyListeners()

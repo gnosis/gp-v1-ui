@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { toast } from 'react-toastify'
 // @ts-ignore
@@ -20,8 +20,9 @@ import { EtherscanLink } from './EtherscanLink'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { abbreviateString, getNetworkFromId } from 'utils'
+import useSafeState from 'hooks/useSafeState'
 
+import { abbreviateString, getNetworkFromId } from 'utils'
 import WalletImg from 'img/unknown-token.png'
 
 export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
@@ -107,17 +108,9 @@ interface WalletProps extends RouteComponentProps {
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const { isConnected, userAddress, networkId } = useWalletConnection()
 
-  const [loadingLabel, setLoadingLabel] = useState()
-  const [copiedToClipboard, setCopiedToClipboard] = useState(false)
-  const [showWallet, setShowWallet] = useState(false)
-
-  const mounted = useRef(true)
-
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
+  const [loadingLabel, setLoadingLabel] = useSafeState()
+  const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
+  const [showWallet, setShowWallet] = useSafeState(false)
 
   /***************************** */
   // EVENT HANDLERS
@@ -135,9 +128,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       console.error('error', error)
       toast.error('Error connecting wallet')
     } finally {
-      if (mounted.current) {
-        setLoadingLabel(undefined)
-      }
+      setLoadingLabel(undefined)
     }
   }
 

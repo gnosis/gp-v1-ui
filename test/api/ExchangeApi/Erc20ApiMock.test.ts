@@ -59,8 +59,7 @@ describe('Write functions', () => {
       const result = await instance.approve(USER_1, TOKEN_1, USER_2, amount, optionalParams)
 
       expect(await instance.allowance(TOKEN_1, USER_1, USER_2)).toBe(amount)
-      expect(result.data).toBe(true)
-      expect(result.receipt).toBe(RECEIPT)
+      expect(result).toBe(RECEIPT)
     })
 
     it('calls optional callback', async () => {
@@ -79,8 +78,7 @@ describe('Write functions', () => {
 
       expect(await instance.balanceOf(TOKEN_1, CONTRACT)).toEqual(contractBalance.sub(amount))
       expect(await instance.balanceOf(TOKEN_1, USER_2)).toEqual(userBalance.add(amount))
-      expect(result.data).toBe(true)
-      expect(result.receipt).toBe(RECEIPT)
+      expect(result).toBe(RECEIPT)
     })
 
     it('does not transfer when balance is insufficient', async () => {
@@ -112,8 +110,7 @@ describe('Write functions', () => {
       expect(await instance.balanceOf(TOKEN_1, USER_1)).toEqual(expectedUser1Balance)
       expect(await instance.balanceOf(TOKEN_1, USER_2)).toEqual(expectedUser2Balance)
       expect((await instance.allowance(TOKEN_1, USER_1, USER_3)).toString()).toEqual(ZERO.toString())
-      expect(result.data).toBe(true)
-      expect(result.receipt).toBe(RECEIPT)
+      expect(result).toBe(RECEIPT)
     })
 
     it('does not transfer when balance is insufficient', async () => {
