@@ -117,6 +117,7 @@ const wcOptions: WalletConnectInits = {
 // needed if Web3 was pre-instantiated with wss | WebsocketProvider
 const closeOpenWebSocketConnection = (web3: Web3): void => {
   if (
+    web3 &&
     typeof web3.currentProvider === 'object' &&
     web3.currentProvider.connected &&
     'disconnect' in web3.currentProvider
@@ -195,7 +196,7 @@ export class WalletApiImpl implements WalletApi {
     this._unsubscribe()
 
     this._provider = null
-    this._web3 = null
+    this._web3.setProvider(getDefaultProvider())
 
     log('[WalletApi] Disconnected')
     await this._notifyListeners()
