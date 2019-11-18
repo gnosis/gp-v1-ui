@@ -74,8 +74,8 @@ export const useRowActions = (params: Params): Result => {
         }
       })
       const receipt = await erc20Api.approve(
-        tokenAddress,
         userAddress,
+        tokenAddress,
         contractAddress,
         ALLOWANCE_MAX_VALUE,
         txOptionalParams,
