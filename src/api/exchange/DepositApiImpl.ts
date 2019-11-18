@@ -155,12 +155,13 @@ export class DepositApiImpl implements DepositApi {
 
   /********************************    private methods   ********************************/
 
-  private async _getContract(): Promise<EpochTokenLocker> {
+  protected async _getNetworkId(): Promise<number> {
     let networkId = getNetworkIdFromWeb3(this._web3)
 
-    if (networkId === null) {
-      networkId = await this._web3.eth.net.getId()
+    return networkId === null ? this._web3.eth.net.getId() : networkId
     }
+
+    const networkId = await this._getNetworkId()
 
     return this._getContractForNetwork(networkId)
   }
