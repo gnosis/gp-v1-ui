@@ -1,4 +1,4 @@
-import { useEffect, useRef, SetStateAction, Dispatch } from 'react'
+import { SetStateAction, Dispatch } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
@@ -25,18 +25,8 @@ export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
   const { userAddress } = useWalletConnection()
   const contractAddress = depositApi.getContractAddress()
-  const mounted = useRef(true)
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
-    if (!mounted.current) {
-      return
-    }
-
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
         const { address: tokenAddressAux } = tokenBalancesAux
