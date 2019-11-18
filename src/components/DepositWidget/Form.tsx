@@ -1,9 +1,11 @@
-import React, { useState, useEffect, ChangeEvent, ReactNode, useRef } from 'react'
+import React, { useEffect, ChangeEvent, ReactNode } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconDefinition, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 import { DynamicWrapper, InnerWrapper } from './Styled'
+
+import useSafeState from 'hooks/useSafeState'
 
 import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
@@ -46,13 +48,12 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
 export const Form: React.FC<FormProps> = (props: FormProps) => {
   const { symbol, decimals } = props.tokenBalances
   const { title, totalAmount, totalAmountLabel, inputLabel, responsive, submitBtnLabel, submitBtnIcon } = props
-  const [amountInput, setAmountInput] = useState('')
-  const [validatorActive, setValidatorActive] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [errors, setErrors] = useState<Errors>({
+  const [amountInput, setAmountInput] = useSafeState('')
+  const [validatorActive, setValidatorActive] = useSafeState(false)
+  const [loading, setLoading] = useSafeState(false)
+  const [errors, setErrors] = useSafeState<Errors>({
     amountInput: null,
   })
-  const mounted = useRef(true)
 
   const cancelForm = (): void => {
     setAmountInput('')
@@ -68,15 +69,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
         amountInput: errorMsg,
       }))
     }
-  }, [amountInput, decimals, totalAmount, validatorActive])
-
-  // Separated useEffect only for the cleanUp when the component unmounts
-  // Note the empty list as the last argument
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
+  }, [amountInput, decimals, setErrors, totalAmount, validatorActive])
 
   const _onClick = (): void => {
     setValidatorActive(true)
@@ -85,11 +78,9 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     if (!error) {
       setLoading(true)
       props.onSubmit(parseAmount(amountInput, decimals)).then(() => {
-        if (mounted.current) {
-          setLoading(false)
-          setValidatorActive(false)
-          cancelForm()
-        }
+        setLoading(false)
+        setValidatorActive(false)
+        cancelForm()
       })
     }
   }

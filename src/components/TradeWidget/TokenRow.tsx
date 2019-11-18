@@ -1,13 +1,14 @@
-import React, { CSSProperties, useMemo } from 'react'
+import React, { useEffect, useCallback } from 'react'
+import BN from 'bn.js'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import Select from 'react-select'
-import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { useFormContext } from 'react-hook-form'
 
 import TokenImg from 'components/TokenImg'
+import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
+import { ZERO } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,23 +22,6 @@ const TokenImgWrapper = styled(TokenImg)`
   height: 4em;
 
   margin-right: 1em;
-`
-
-const SelectBox = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-
-  margin: 0em 1em;
-
-  label {
-    text-transform: uppercase;
-    padding-left: 8px; // to align with Select input padding
-  }
-
-  input {
-    margin-left: 0; // to fix extra space on Select search box
-  }
 `
 
 const InputBox = styled.div`
@@ -58,6 +42,10 @@ const InputBox = styled.div`
 
     &.warning {
       box-shadow: 0 0 3px #ff7500;
+    }
+
+    &:disabled {
+      box-shadow: none;
     }
   }
 `
@@ -85,63 +73,26 @@ const WalletDetail = styled.div`
   }
 `
 
-function renderOptionLabel(token: TokenDetails): React.ReactNode {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-      }}
-    >
-      <TokenImgWrapper
-        src={token.image}
-        alt={token.name}
-        style={{
-          margin: '0.25em 2em 0.25em 1em',
-        }}
-      />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <div>
-          <strong>{token.symbol}</strong>
-        </div>
-        <div>{token.name}</div>
-      </div>
-    </div>
-  )
-}
-
-function formatOptionLabel(
-  options: { token: TokenDetails },
-  labelMeta: { context: FormatOptionLabelContext },
-): React.ReactNode {
-  const { token } = options
-  const { context } = labelMeta
-  return context === 'value' ? <strong>{token.symbol}</strong> : renderOptionLabel(token)
-}
-
-const customSelectStyles = {
-  control: (provided: CSSProperties): CSSProperties => ({ ...provided, border: 'none' }),
-  menu: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '300px' }),
-  valueContainer: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '4.5em' }),
-}
-
-function displayBalance(balance: TokenBalanceDetails | undefined | null, key: string): string {
+function displayBalance<K extends keyof TokenBalanceDetails>(
+  balance: TokenBalanceDetails | undefined | null,
+  key: K,
+): string {
   if (!balance) {
     return '0'
   }
-  return formatAmount(balance[key], balance.decimals) || '0'
+  return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
-function getMax(balance: TokenBalanceDetails | null, token: TokenDetails): string {
-  return formatAmountFull((balance || {}).exchangeBalance, token.decimals, false) || '0'
+const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
+const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
+const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
+
+function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
+  if (!validInputPattern.test(event.currentTarget.value + event.key)) {
+    event.preventDefault()
+  }
 }
 
-// TODO: move into a validators file?
 function validatePositive(value: string): true | string {
   return Number(value) > 0 || 'Invalid amount'
 }
@@ -153,6 +104,7 @@ interface Props {
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
   inputId: string
+  isDisabled: boolean
   validateMaxAmount?: true
 }
 
@@ -163,25 +115,28 @@ const TokenRow: React.FC<Props> = ({
   onSelectChange,
   balance,
   inputId,
+  isDisabled,
   validateMaxAmount,
 }) => {
-  const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
-
   const { register, errors, setValue, watch } = useFormContext()
   const error = errors[inputId]
+  const inputValue = watch(inputId)
 
-  const max = Number(getMax(balance, selectedToken))
-  const inputValue = Number(watch(inputId)) || 0
-  const overMax = validateMaxAmount && inputValue > max ? inputValue - max : 0
+  let overMax = ZERO
+  if (balance && validateMaxAmount) {
+    const max = balance.exchangeBalance
+    const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
+    overMax = value.gt(max) ? value.sub(max) : ZERO
+  }
 
-  const className = error ? 'error' : !!overMax ? 'warning' : ''
+  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
   const errorOrWarning = error ? (
     <WalletDetail className="error">{error.message}</WalletDetail>
   ) : (
-    !!overMax && (
+    overMax.gt(ZERO) && (
       <WalletDetail className="warning">
-        Selling {overMax.toFixed(4)} {selectedToken.symbol} over your current balance
+        Selling {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol} over your current balance
       </WalletDetail>
     )
   )
@@ -190,37 +145,62 @@ const TokenRow: React.FC<Props> = ({
     setValue(inputId, formatAmountFull(balance.exchangeBalance, balance.decimals, false))
   }
 
+  const enforcePrecision = useCallback(() => {
+    const newValue = adjustPrecision(inputValue, selectedToken.decimals)
+    if (inputValue !== newValue) {
+      setValue(inputId, newValue, true)
+    }
+  }, [inputValue, selectedToken.decimals, setValue, inputId])
+
+  useEffect(() => {
+    enforcePrecision()
+  }, [enforcePrecision])
+
+  const removeExcessZeros = useCallback(
+    () => (event: React.SyntheticEvent<HTMLInputElement>): void => {
+      // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
+      // A: Because on those functions we still want the user to be able to input partial values. E.g.:
+      //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
+      //    When losing focus though (`onBlur`), we remove everything that's redundant, such as leading zeros,
+      //    trailing dots and/or zeros
+      // Q: Why not use formatAmount/parseAmount that already take care of this?
+      // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
+
+      const { value } = event.currentTarget
+      const newValue = value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
+
+      if (value != newValue) {
+        setValue(inputId, newValue, true)
+      }
+    },
+    [inputId, setValue],
+  )
+
   return (
     <Wrapper>
       <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
-      <SelectBox>
-        <label>{selectLabel}</label>
-        <Select
-          isSearchable
-          styles={customSelectStyles}
-          noOptionsMessage={(): string => 'No results'}
-          formatOptionLabel={formatOptionLabel}
-          options={options}
-          value={{ token: selectedToken }}
-          onChange={(selected, { action }): void => {
-            if (action === 'select-option' && 'token' in selected) {
-              onSelectChange(selected.token)
-            }
-          }}
-        />
-      </SelectBox>
+      <TokenSelector
+        label={selectLabel}
+        isDisabled={isDisabled}
+        tokens={tokens}
+        selected={selectedToken}
+        onChange={onSelectChange}
+      />
       <InputBox>
         <input
           className={className}
           placeholder="0"
           name={inputId}
           type="text"
+          disabled={isDisabled}
           required
           ref={register({
-            validate: {
-              positive: (value: string): true | string => validatePositive(value),
-            },
+            pattern: { value: validInputPattern, message: 'Invalid amount' },
+            validate: { positive: validatePositive },
           })}
+          onKeyPress={preventInvalidChars}
+          onChange={enforcePrecision}
+          onBlur={removeExcessZeros}
         />
         {errorOrWarning}
         <WalletDetail>

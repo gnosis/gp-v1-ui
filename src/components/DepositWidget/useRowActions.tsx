@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, SetStateAction, Dispatch } from 'react'
+import { SetStateAction, Dispatch } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
 import { depositApi, erc20Api } from 'api'
-import { Mutation, TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
+import { Mutation, TokenBalanceDetails } from 'types'
 import { HIGHLIGHT_TIME, ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { TxNotification } from 'components/TxNotification'
 import { formatAmount, formatAmountFull, log, getToken } from 'utils'
+import { txOptionalParams } from 'utils/transaction'
 
 interface Params {
   balances: TokenBalanceDetails[]
@@ -21,32 +21,12 @@ interface Result {
   claim: (tokenAddress: string) => Promise<void>
 }
 
-const txOptionalParams: TxOptionalParams = {
-  onSentTransaction: (receipt: Receipt): void => {
-    if (receipt.transactionHash) {
-      toast.info(<TxNotification txHash={receipt.transactionHash} />)
-    } else {
-      console.error(`Failed to get notification for tx ${receipt.transactionHash}`)
-    }
-  },
-}
-
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
   const { userAddress, networkId } = useWalletConnection()
   const contractAddress = depositApi.getContractAddress(networkId)
-  const mounted = useRef(true)
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
-    if (!mounted.current) {
-      return
-    }
-
     setBalances(balances =>
       balances.map(tokenBalancesAux => {
         const { address: tokenAddressAux } = tokenBalancesAux
@@ -74,8 +54,8 @@ export const useRowActions = (params: Params): Result => {
         }
       })
       const receipt = await erc20Api.approve(
-        tokenAddress,
         userAddress,
+        tokenAddress,
         contractAddress,
         ALLOWANCE_MAX_VALUE,
         txOptionalParams,
