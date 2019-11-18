@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect, useCallback } from 'react'
+import BN from 'bn.js'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -6,7 +7,8 @@ import { useFormContext } from 'react-hook-form'
 import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
+import { ZERO } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -71,18 +73,26 @@ const WalletDetail = styled.div`
   }
 `
 
-function displayBalance(balance: TokenBalanceDetails | undefined | null, key: string): string {
+function displayBalance<K extends keyof TokenBalanceDetails>(
+  balance: TokenBalanceDetails | undefined | null,
+  key: K,
+): string {
   if (!balance) {
     return '0'
   }
-  return formatAmount(balance[key], balance.decimals) || '0'
+  return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
-function getMax(balance: TokenBalanceDetails | null, token: TokenDetails): string {
-  return formatAmountFull((balance || {}).exchangeBalance, token.decimals, false) || '0'
+const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
+const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
+const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
+
+function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
+  if (!validInputPattern.test(event.currentTarget.value + event.key)) {
+    event.preventDefault()
+  }
 }
 
-// TODO: move into a validators file?
 function validatePositive(value: string): true | string {
   return Number(value) > 0 || 'Invalid amount'
 }
@@ -110,19 +120,23 @@ const TokenRow: React.FC<Props> = ({
 }) => {
   const { register, errors, setValue, watch } = useFormContext()
   const error = errors[inputId]
+  const inputValue = watch(inputId)
 
-  const max = Number(getMax(balance, selectedToken))
-  const inputValue = Number(watch(inputId)) || 0
-  const overMax = validateMaxAmount && inputValue > max ? inputValue - max : 0
+  let overMax = ZERO
+  if (balance && validateMaxAmount) {
+    const max = balance.exchangeBalance
+    const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
+    overMax = value.gt(max) ? value.sub(max) : ZERO
+  }
 
-  const className = error ? 'error' : !!overMax ? 'warning' : ''
+  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
   const errorOrWarning = error ? (
     <WalletDetail className="error">{error.message}</WalletDetail>
   ) : (
-    !!overMax && (
+    overMax.gt(ZERO) && (
       <WalletDetail className="warning">
-        Selling {overMax.toFixed(4)} {selectedToken.symbol} over your current balance
+        Selling {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol} over your current balance
       </WalletDetail>
     )
   )
@@ -130,6 +144,37 @@ const TokenRow: React.FC<Props> = ({
   function useMax(): void {
     setValue(inputId, formatAmountFull(balance.exchangeBalance, balance.decimals, false))
   }
+
+  const enforcePrecision = useCallback(() => {
+    const newValue = adjustPrecision(inputValue, selectedToken.decimals)
+    if (inputValue !== newValue) {
+      setValue(inputId, newValue, true)
+    }
+  }, [inputValue, selectedToken.decimals, setValue, inputId])
+
+  useEffect(() => {
+    enforcePrecision()
+  }, [enforcePrecision])
+
+  const removeExcessZeros = useCallback(
+    () => (event: React.SyntheticEvent<HTMLInputElement>): void => {
+      // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
+      // A: Because on those functions we still want the user to be able to input partial values. E.g.:
+      //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
+      //    When losing focus though (`onBlur`), we remove everything that's redundant, such as leading zeros,
+      //    trailing dots and/or zeros
+      // Q: Why not use formatAmount/parseAmount that already take care of this?
+      // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
+
+      const { value } = event.currentTarget
+      const newValue = value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
+
+      if (value != newValue) {
+        setValue(inputId, newValue, true)
+      }
+    },
+    [inputId, setValue],
+  )
 
   return (
     <Wrapper>
@@ -150,10 +195,12 @@ const TokenRow: React.FC<Props> = ({
           disabled={isDisabled}
           required
           ref={register({
-            validate: {
-              positive: (value: string): true | string => validatePositive(value),
-            },
+            pattern: { value: validInputPattern, message: 'Invalid amount' },
+            validate: { positive: validatePositive },
           })}
+          onKeyPress={preventInvalidChars}
+          onChange={enforcePrecision}
+          onBlur={removeExcessZeros}
         />
         {errorOrWarning}
         <WalletDetail>
