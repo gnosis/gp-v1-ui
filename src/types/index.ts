@@ -1,7 +1,5 @@
 import BN from 'bn.js'
 
-import 'global'
-
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
 
@@ -53,14 +51,7 @@ export interface TxOptionalParams {
   onSentTransaction?: (receipt: Receipt) => void
 }
 
-export interface TxResult<T> {
-  data: T
-  receipt: Receipt
-}
-
-export interface Receipt {
-  transactionHash: string
-}
+export type Receipt = TransactionReceipt
 
 export interface DepositApi {
   getContractAddress(): string
@@ -74,21 +65,16 @@ export interface DepositApi {
   getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
   getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number>
 
-  deposit(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>>
+  deposit(userAddress: string, tokenAddress: string, amount: BN, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 
   requestWithdraw(
     userAddress: string,
     tokenAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>>
+  ): Promise<Receipt>
 
-  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 export interface Order {
@@ -116,9 +102,9 @@ export interface ExchangeApi extends DepositApi {
   getFeeDenominator(): Promise<number>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(tokenAddress: string): Promise<number>
-  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
-  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<TxResult<number>>
-  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>>
+  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 export interface WalletInfo {
@@ -154,7 +140,7 @@ export interface Erc20Api {
     spenderAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  ): Promise<Receipt>
 
   transfer(
     senderAddress: string,
@@ -162,7 +148,7 @@ export interface Erc20Api {
     toAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  ): Promise<Receipt>
 
   transferFrom(
     senderAddress: string,
@@ -171,5 +157,57 @@ export interface Erc20Api {
     toAddress: string,
     amount: BN,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>>
+  ): Promise<Receipt>
+}
+
+import { Contract } from 'web3-eth-contract'
+import { PromiEvent, TransactionConfig, TransactionReceipt } from 'web3-core'
+
+type CallTxOptions = Pick<TransactionConfig, 'from' | 'gas' | 'gasPrice'>
+type SendTxOptions = Pick<TransactionConfig, 'from' | 'gas' | 'gasPrice' | 'value'>
+type EstimateGasTxOptions = Pick<TransactionConfig, 'from' | 'gas' | 'value'>
+
+type CallTxCallback = <T>(error: Error | null, result: T) => void
+type SendTxCallback = (error: Error | null, transactionHash: string) => void
+type EstimateGasTxCallback = (error: Error | null, gasAmount: number) => void
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface TransactionObject<T, U extends any[] = []> {
+  arguments: U
+
+  call(callback: CallTxCallback): Promise<T>
+  call(tx?: CallTxOptions, callback?: CallTxCallback): Promise<T>
+
+  send(callback: SendTxCallback): PromiEvent<TransactionReceipt>
+  send(tx?: SendTxOptions, callback?: SendTxCallback): PromiEvent<TransactionReceipt>
+
+  estimateGas(callback: EstimateGasTxCallback): Promise<number>
+  estimateGas(tx?: EstimateGasTxOptions, callback?: EstimateGasTxCallback): Promise<number>
+
+  encodeABI(): string
+}
+
+export interface ERC20 extends Contract {
+  clone(): ERC20
+
+  methods: {
+    totalSupply(): TransactionObject<string>
+    decimals(): TransactionObject<string>
+    symbol(): TransactionObject<string>
+    name(): TransactionObject<string>
+
+    balanceOf(owner: string): TransactionObject<string, [string]>
+
+    allowance(owner: string, spender: string): TransactionObject<string, [string, string]>
+
+    approve(spender: string, value: number | string | BN): TransactionObject<boolean, [string, string | number | BN]>
+
+    transfer(to: string, value: number | string | BN): TransactionObject<boolean, [string, string | number | BN]>
+
+    transferFrom(
+      from: string,
+      to: string,
+      value: number | string | BN,
+    ): TransactionObject<boolean, [string, string, string | number | BN]>
+  }
 }

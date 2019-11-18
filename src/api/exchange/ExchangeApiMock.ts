@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
-import { ExchangeApi, Order, PlaceOrderParams, Erc20Api, TxResult, TxOptionalParams } from 'types'
+import { ExchangeApi, Order, PlaceOrderParams, Erc20Api, Receipt, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
@@ -63,7 +63,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return this.tokenAddressToId[tokenAddress]
   }
 
-  public async addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<TxResult<void>> {
+  public async addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     assert(typeof this.tokenAddressToId[tokenAddress] !== 'number', 'Token already registered')
@@ -71,13 +71,10 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     this.registeredTokens.push(tokenAddress)
     this.tokenAddressToId[tokenAddress] = this.registeredTokens.length - 1
 
-    return { data: undefined, receipt: RECEIPT }
+    return RECEIPT
   }
 
-  public async placeOrder(
-    orderParams: PlaceOrderParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<number>> {
+  public async placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initOrders(orderParams.userAddress)
@@ -91,16 +88,15 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       priceDenominator: orderParams.sellAmount,
       remainingAmount: orderParams.sellAmount,
     })
-    const orderId = this.orders[orderParams.userAddress].length - 1
 
-    return { data: orderId, receipt: RECEIPT }
+    return RECEIPT
   }
 
   public async cancelOrder(
     senderAddress: string,
     orderId: number,
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initOrders(senderAddress)
@@ -108,7 +104,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       this.orders[senderAddress][orderId].validUntil = (await this.getCurrentBatchId()) - 1
     }
 
-    return { data: undefined, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /********************************    private methods   ********************************/

@@ -1,4 +1,4 @@
-import { TxResult, TokenBalanceDetails, TxOptionalParams } from 'types'
+import { TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
 import assert from 'assert'
 import { depositApi } from 'api'
 import { useWalletConnection } from './useWalletConnection'
@@ -11,7 +11,7 @@ interface Params {
 
 interface Result {
   claiming: boolean
-  withdraw(): Promise<TxResult<void>>
+  withdraw(): Promise<Receipt>
 }
 
 export const useWithdrawTokens = (params: Params): Result => {
@@ -21,7 +21,7 @@ export const useWithdrawTokens = (params: Params): Result => {
   } = params
   const [claiming, setWithdrawing] = useSafeState(false)
 
-  async function withdraw(): Promise<TxResult<void>> {
+  async function withdraw(): Promise<Receipt> {
     assert(enabled, 'Token not enabled')
     assert(claimable, 'Withdraw not ready')
     assert(isConnected, "There's no connected wallet")

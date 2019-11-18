@@ -62,8 +62,15 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
   const contractAddress = depositApi.getContractAddress()
   const tokens = tokenListApi.getTokens(networkId)
 
-  const balancePromises = tokens.map(async token => fetchBalancesForToken(token, userAddress, contractAddress))
-  return Promise.all(balancePromises)
+  const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(async token =>
+    fetchBalancesForToken(token, userAddress, contractAddress).catch(e => {
+      log('Error for', token, userAddress, contractAddress)
+      log(e)
+      return null
+    }),
+  )
+  const balances = await Promise.all(balancePromises)
+  return balances.filter(Boolean)
 }
 
 export const useTokenBalances = (): UseTokenBalanceResult => {
@@ -79,6 +86,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
         )
         setBalances(balances)
+        setError(false)
       })
       .catch(error => {
         console.error('Error loading balances', error)

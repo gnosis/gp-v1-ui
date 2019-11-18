@@ -88,6 +88,7 @@ module.exports = ({ stats = false } = {}) => ({
       'process.env.MOCK_TOKEN_LIST': JSON.stringify(process.env.MOCK_TOKEN_LIST || process.env.MOCK || 'false'),
       'process.env.MOCK_ERC20': JSON.stringify(process.env.MOCK_ERC20 || process.env.MOCK || 'false'),
       'process.env.MOCK_DEPOSIT': JSON.stringify(process.env.MOCK_MOCK_DEPOSIT || process.env.MOCK || 'false'),
+      'process.env.MOCK_EXCHANGE': JSON.stringify(process.env.MOCK_EXCHANGE || process.env.MOCK || 'false'),
 
       // AUTOCONNECT: only applies for mock implementation
       'process.env.AUTOCONNECT': JSON.stringify(process.env.AUTOCONNECT || 'true'),
