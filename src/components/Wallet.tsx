@@ -1,8 +1,7 @@
 import React from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { toast } from 'react-toastify'
-// @ts-ignore
-import { CopyToClipboard } from 'react-copy-to-clipboard'
+import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -108,7 +107,7 @@ interface WalletProps extends RouteComponentProps {
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const { isConnected, userAddress, networkId } = useWalletConnection()
 
-  const [loadingLabel, setLoadingLabel] = useSafeState()
+  const [loadingLabel, setLoadingLabel] = useSafeState<string | null>(null)
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
 
@@ -128,7 +127,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       console.error('error', error)
       toast.error('Error connecting wallet')
     } finally {
-      setLoadingLabel(undefined)
+      setLoadingLabel(null)
     }
   }
 
@@ -140,7 +139,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     } catch (error) {
       toast.error('Error disconnecting wallet')
     } finally {
-      setLoadingLabel(undefined)
+      setLoadingLabel(null)
       props.history.push('/')
     }
   }
@@ -190,7 +189,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   }
 
   return (
-    <WalletWrapper walletOpen={showWallet}>
+    <WalletWrapper walletOpen={!!showWallet}>
       {userAddress ? (
         <>
           {/* Network */}
