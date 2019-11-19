@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { FEE_PERCENTAGE } from 'const'
+import Highlight from 'components/Highlight'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
@@ -15,11 +16,6 @@ const Wrapper = styled.dl`
   dt {
     margin: 0 0 0.25em 4em;
   }
-`
-
-const Highlight = styled.span`
-  font-weight: bold;
-  color: #367be0;
 `
 
 // TODO: move to utils?
