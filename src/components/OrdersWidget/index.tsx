@@ -5,10 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Widget from 'components/layout/Widget'
 import Highlight from 'components/Highlight'
-import TokenImg from 'components/TokenImg'
 import { tokenListApi } from 'api'
-import { getToken, safeTokenName } from 'utils'
+import { getToken } from 'utils'
 import { Network } from 'types'
+import OrderRow from './OrderRow'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -22,13 +22,6 @@ const OrdersWrapper = styled(Widget)`
       margin-bottom: 0.25em;
     }
   }
-`
-
-const TokenImgWrapper = styled(TokenImg)`
-  height: 1.25em;
-  width: 1.25em;
-
-  vertical-align: middle;
 `
 
 const ButtonWithIcon = styled.button`
@@ -143,54 +136,33 @@ const OrdersWidget: React.FC = () => {
               <div className="cell">Matched</div>
               <div className="cell">Expires</div>
             </div>
-
-            <div className="rowContainer">
-              <input type="checkbox" />
-              <div className="cell">1</div>
-              <div className="cell">
-                Sell <Highlight>1</Highlight> <TokenImgWrapper src={DAI.image} /> <strong>{safeTokenName(DAI)}</strong>{' '}
-                for <strong>at least</strong> <Highlight>1.05</Highlight> <TokenImgWrapper src={TUSD.image} />{' '}
-                <strong>{safeTokenName(TUSD)}</strong>
-              </div>
-              <div className="cell">
-                1500 <TokenImgWrapper src={DAI.image} /> <strong>{safeTokenName(DAI)}</strong>
-              </div>
-              <div className="cell">500</div>
-              <div className="cell">In 3 min</div>
-            </div>
-
-            <div className="rowContainer">
-              <input type="checkbox" />
-              <div className="cell">154</div>
-              <div className="cell">
-                Sell <Highlight>1</Highlight> <TokenImgWrapper src={TUSD.image} />{' '}
-                <strong>{safeTokenName(TUSD)}</strong> for <strong>at least</strong> <Highlight>1.03</Highlight>{' '}
-                <TokenImgWrapper src={USDC.image} /> <strong>{safeTokenName(USDC)}</strong>
-              </div>
-              <div className="cell">
-                <Highlight>unlimited</Highlight> <TokenImgWrapper src={TUSD.image} />{' '}
-                <strong>{safeTokenName(TUSD)}</strong>
-              </div>
-              <div className="cell">5,876.8429</div>
-              <div className="cell">
-                <Highlight>Never</Highlight>
-              </div>
-            </div>
-
-            <div className="rowContainer">
-              <input type="checkbox" />
-              <div className="cell">1732</div>
-              <div className="cell">
-                Sell <Highlight>1</Highlight> <TokenImgWrapper src={PAX.image} /> <strong>{safeTokenName(PAX)}</strong>{' '}
-                for <strong>at least</strong> <Highlight>1.10</Highlight> <TokenImgWrapper src={DAI.image} />{' '}
-                <strong>{safeTokenName(DAI)}</strong>
-              </div>
-              <div className="cell">
-                350 <TokenImgWrapper src={PAX.image} /> <strong>{safeTokenName(PAX)}</strong>
-              </div>
-              <div className="cell">0</div>
-              <div className="cell">In 2 days</div>
-            </div>
+            <OrderRow
+              id="1"
+              sellToken={DAI}
+              buyToken={TUSD}
+              price="1.05"
+              sellTotal="1,500"
+              matched="500"
+              expiresOn="In 3 min"
+            />
+            <OrderRow
+              id="543"
+              sellToken={TUSD}
+              buyToken={USDC}
+              price="1.03"
+              sellTotal={<Highlight>unlimited</Highlight>}
+              matched="5,876.8429"
+              expiresOn={<Highlight>Never</Highlight>}
+            />
+            <OrderRow
+              id="1257"
+              sellToken={PAX}
+              buyToken={DAI}
+              price="1.10"
+              sellTotal="350"
+              matched="0"
+              expiresOn="In 2 days"
+            />
           </div>
 
           <div className="deleteContainer">
