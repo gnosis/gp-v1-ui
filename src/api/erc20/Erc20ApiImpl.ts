@@ -54,7 +54,7 @@ export class Erc20ApiImpl implements Erc20Api {
       from: userAddress,
     })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('receipt', txOptionalParams.onSentTransaction)
     }
 
@@ -74,7 +74,7 @@ export class Erc20ApiImpl implements Erc20Api {
       from: fromAddress,
     })
 
-    if (txOptionalParams) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('receipt', txOptionalParams.onSentTransaction)
     }
 
@@ -95,7 +95,7 @@ export class Erc20ApiImpl implements Erc20Api {
       from: fromAddress,
     })
 
-    if (txOptionalParams) {
+    if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('receipt', txOptionalParams.onSentTransaction)
     }
 

@@ -1,6 +1,5 @@
 import BN from 'bn.js'
 import assert from 'assert'
-
 import { log, toBN } from 'utils'
 import { ZERO } from 'const'
 import { getEpochAddressForNetwork } from './epochList'
@@ -170,7 +169,8 @@ export class DepositApiImpl implements DepositApi {
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
 
-    return this._getContractAtAddress(address)
+    // as string as assert is not detected by TS
+    return this._getContractAtAddress(address as string)
   }
 
   private _getContractAtAddress(address: string): EpochTokenLocker {
