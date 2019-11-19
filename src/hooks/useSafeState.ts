@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState, useEffect, useCallback } from 'react'
 
 interface UseSafeState {
-  <S>(initialState?: S | (() => S)): [S | undefined, Dispatch<SetStateAction<S | undefined>>]
+  <S = undefined>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>]
 }
 
 const useSafeState: UseSafeState = initialState => {
