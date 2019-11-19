@@ -47,7 +47,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
-  let showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE
+  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
