@@ -6,7 +6,7 @@ import { depositApi, erc20Api } from 'api'
 import { Mutation, TokenBalanceDetails } from 'types'
 import { HIGHLIGHT_TIME, ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { formatAmount, formatAmountFull, log, getToken } from 'utils'
+import { formatAmount, formatAmountFull, log, getToken, assert } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
@@ -26,7 +26,7 @@ interface Result {
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
   const { userAddress, networkId } = useWalletConnection()
-  const contractAddress = depositApi.getContractAddress(networkId)
+  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>
@@ -50,9 +50,8 @@ export const useRowActions = (params: Params): Result => {
     const { symbol } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
 
     try {
-      if (!userAddress) {
-        throw new Error(ON_ERROR_MESSAGE)
-      }
+      assert(contractAddress, 'Contract address missing. Aborting.')
+      assert(userAddress, 'User address missing. Aborting.')
 
       _updateToken(tokenAddress, otherParams => {
         return {
