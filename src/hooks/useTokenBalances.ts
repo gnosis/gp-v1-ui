@@ -4,7 +4,7 @@ import { tokenListApi, erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, log } from 'utils'
+import { formatAmount, log, assert } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
 
@@ -56,11 +56,14 @@ async function fetchBalancesForToken(
 async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[]> {
   const { userAddress, networkId } = walletInfo
   log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
+
   if (!userAddress || !networkId) {
     return []
   }
 
   const contractAddress = depositApi.getContractAddress(networkId)
+  assert(contractAddress, 'No valid contract address found. Stopping.')
+
   const tokens = tokenListApi.getTokens(networkId)
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
