@@ -18,6 +18,7 @@ import Layout from 'components/layout/'
 import About from 'pages/About'
 import Deposit from 'pages/Deposit'
 import Trade from 'pages/Trade'
+import Orders from 'pages/Orders'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
@@ -59,9 +60,10 @@ const App: React.FC = () => (
     <Router basename={process.env.BASE_URL}>
       <Layout>
         <Switch>
+          <PrivateRoute path="/deposit" exact component={Deposit} />
+          <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/trade/:sell-:buy" component={Trade} />
           <Route path="/about" exact component={About} />
-          <PrivateRoute path="/deposit" exact component={Deposit} />
           <Route path="/source-code" exact component={SourceCode} />
           <Route path="/connect-wallet" exact component={ConnectWallet} />
           <Redirect from="/" to="/trade/DAI-USDC?sell=0&buy=0" />
