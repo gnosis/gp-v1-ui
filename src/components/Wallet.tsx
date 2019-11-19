@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps, useRouteMatch } from 'react-router'
 import { toast } from 'react-toastify'
 // @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -112,6 +112,8 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
 
+  const tradePageMatch = useRouteMatch('/trade/')
+
   /***************************** */
   // EVENT HANDLERS
 
@@ -141,7 +143,10 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(undefined)
-      props.history.push('/')
+
+      if (!tradePageMatch) {
+        props.history.push('/')
+      }
     }
   }
 
