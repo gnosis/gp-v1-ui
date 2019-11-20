@@ -1,8 +1,8 @@
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
-import { ExchangeApi, Order, PlaceOrderParams, Erc20Api, Receipt, TxOptionalParams } from 'types'
-import { FEE_DENOMINATOR } from 'const'
+import { ExchangeApi, AuctionElement, PlaceOrderParams, Erc20Api, Receipt, TxOptionalParams, Order } from 'types'
+import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
 
@@ -36,9 +36,9 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     this.orders = ordersByUser
   }
 
-  public async getOrders(userAddress: string): Promise<Order[]> {
+  public async getOrders(userAddress: string): Promise<AuctionElement[]> {
     this._initOrders(userAddress)
-    return this.orders[userAddress]
+    return this.orders[userAddress].map(order => ({ ...order, user: userAddress, sellTokenBalance: ONE }))
   }
 
   public async getNumTokens(): Promise<number> {
