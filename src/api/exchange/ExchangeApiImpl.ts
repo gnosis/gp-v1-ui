@@ -156,7 +156,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract()
 
     const tx = contract.methods
-      .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount, sellAmount)
+      .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
       .send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {

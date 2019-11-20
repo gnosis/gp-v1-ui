@@ -110,7 +110,7 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.deposit(tokenAddress, amount).send({ from: userAddress })
+    const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('receipt', txOptionalParams.onSentTransaction)
@@ -127,7 +127,7 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.requestWithdraw(tokenAddress, amount).send({ from: userAddress })
+    const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('receipt', txOptionalParams.onSentTransaction)

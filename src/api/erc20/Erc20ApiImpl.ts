@@ -50,7 +50,7 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.approve(spenderAddress, amount).send({
+    const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
     })
 
@@ -70,7 +70,7 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.transfer(toAddress, amount).send({
+    const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: fromAddress,
     })
 
