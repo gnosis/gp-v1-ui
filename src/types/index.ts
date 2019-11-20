@@ -154,6 +154,8 @@ export interface EpochTokenLocker extends Contract {
 }
 
 export interface Order {
+  user: string
+  sellTokenBalance: BN
   buyTokenId: number
   sellTokenId: number
   validFrom: number
