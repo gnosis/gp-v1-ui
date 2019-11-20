@@ -110,8 +110,6 @@ export interface EpochTokenLocker extends Contract {
 }
 
 export interface Order {
-  user: string
-  sellTokenBalance: BN
   buyTokenId: number
   sellTokenId: number
   validFrom: number
@@ -119,6 +117,11 @@ export interface Order {
   priceNumerator: BN
   priceDenominator: BN
   remainingAmount: BN
+}
+
+export interface AuctionElement extends Order {
+  user: string
+  sellTokenBalance: BN
 }
 
 export interface PlaceOrderParams {
@@ -131,7 +134,7 @@ export interface PlaceOrderParams {
 }
 
 export interface ExchangeApi extends DepositApi {
-  getOrders(userAddress: string): Promise<Order[]>
+  getOrders(userAddress: string): Promise<AuctionElement[]>
   getNumTokens(): Promise<number>
   getFeeDenominator(): Promise<number>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
