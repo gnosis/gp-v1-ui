@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'react-toastify'
 
@@ -26,8 +26,8 @@ export const usePlaceOrder = (): Result => {
   const [isSubmitting, setIsSubmitting] = useSafeState(false)
   const { userAddress } = useWalletConnection()
 
-  const placeOrder = useMemo((): ((params: PlaceOrderParams) => Promise<boolean>) => {
-    return async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
+  const placeOrder = useCallback(
+    () => async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
       if (!userAddress) {
         toast.error('Wallet is not connected!')
         return false
@@ -72,8 +72,9 @@ export const usePlaceOrder = (): Result => {
       } finally {
         setIsSubmitting(false)
       }
-    }
-  }, [setIsSubmitting, userAddress])
+    },
+    [setIsSubmitting, userAddress],
+  )
 
-  return { placeOrder, isSubmitting }
+  return { placeOrder: placeOrder(), isSubmitting }
 }
