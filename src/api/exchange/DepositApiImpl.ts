@@ -156,7 +156,7 @@ export class DepositApiImpl implements DepositApi {
   /********************************    private methods   ********************************/
 
   protected async _getNetworkId(): Promise<number> {
-    let networkId = getNetworkIdFromWeb3(this._web3)
+    const networkId = getNetworkIdFromWeb3(this._web3)
 
     return networkId === null ? this._web3.eth.net.getId() : networkId
   }
