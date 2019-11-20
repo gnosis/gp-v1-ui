@@ -1,7 +1,7 @@
 import assert from 'assert'
 
 import { DepositApiImpl } from './DepositApiImpl'
-import { ExchangeApi, Order, PlaceOrderParams, Receipt, TxOptionalParams, StablecoinConverter } from 'types'
+import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, StablecoinConverter, AuctionElement } from 'types'
 import StablecoinConvertedAbi from './StablecoinConverterAbi'
 import { log } from 'utils'
 
@@ -30,9 +30,9 @@ const orderPattern = `(?<user>${hn(ADDRESS_WIDTH)})(?<sellTokenBalance>${hn(UINT
 
 // decodes Orders for a userAddress if passed one
 // otherwise decodes all Orders for all users
-const decodeAuctionElements = (bytes: string, userAddress?: string): Order[] => {
+const decodeAuctionElements = (bytes: string, userAddress?: string): AuctionElement[] => {
   const userAddressLC = userAddress && userAddress.toLowerCase()
-  const result: Order[] = []
+  const result: AuctionElement[] = []
   const oneOrder = new RegExp(orderPattern, 'g')
   let order
   while ((order = oneOrder.exec(bytes))) {
@@ -98,7 +98,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     ;(window as any).exchange = this._ReferenceExchangeContract
   }
 
-  public async getOrders(userAddress: string): Promise<Order[]> {
+  public async getOrders(userAddress: string): Promise<AuctionElement[]> {
     const contract = await this._getContract()
     log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
