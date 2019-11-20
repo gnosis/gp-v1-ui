@@ -248,7 +248,6 @@ export class WalletApiImpl implements WalletApi {
   private async _notifyListeners(): Promise<void> {
     await Promise.resolve()
     const walletInfo: WalletInfo = this._getWalletInfo()
-    console.table(walletInfo)
     this._listeners.forEach(listener => listener(walletInfo))
   }
 

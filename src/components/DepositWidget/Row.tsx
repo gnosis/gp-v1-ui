@@ -10,7 +10,7 @@ import { RowTokenDiv, RowClaimButton, RowClaimLink } from './Styled'
 import useNoScroll from 'hooks/useNoScroll'
 
 import { ZERO, RESPONSIVE_SIZES } from 'const'
-import { formatAmount, formatAmountFull, log } from 'utils'
+import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 
 export interface RowProps {
@@ -42,7 +42,6 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     enabling,
     claiming,
   } = tokenBalances
-  log('[DepositWidgetRow] %s: %s', symbol, formatAmount(exchangeBalance, decimals))
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
