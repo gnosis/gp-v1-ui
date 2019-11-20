@@ -138,7 +138,7 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Deposited ${amount} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiImpl] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
@@ -153,7 +153,7 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Requested withdraw of ${amount} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiImpl] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
