@@ -5,8 +5,82 @@ import { ExchangeApi, Order, PlaceOrderParams, Receipt, TxOptionalParams, Stable
 import StablecoinConvertedAbi from './StablecoinConverterAbi'
 import { log } from 'utils'
 
+import BN from 'bn.js'
+
 import Web3 from 'web3'
 
+const ADDRESS_WIDTH = 20 * 2
+const UINT256_WIDTH = 32 * 2
+const UINT16_WIDTH = 2 * 2
+const UINT32_WIDTH = 4 * 2
+const UINT128_WIDTH = 16 * 2
+
+const hexPattern = '[0-9a-fA-F]'
+
+const hn = (n: number): string => hexPattern + `{${n}}`
+
+// /(address)(sellTokenBalance)(buyTokenId)(sellTokenId)(validFrom)(validUntil)(priceNumerator)(priceDenominator)(remainingAmount)/g
+const orderPattern = `(?<user>${hn(ADDRESS_WIDTH)})(?<sellTokenBalance>${hn(UINT256_WIDTH)})(?<buyTokenId>${hn(
+  UINT16_WIDTH,
+)})(?<sellTokenId>${hn(UINT16_WIDTH)})(?<validFrom>${hn(UINT32_WIDTH)})(?<validUntil>${hn(
+  UINT32_WIDTH,
+)})(?<priceNumerator>${hn(UINT128_WIDTH)})(?<priceDenominator>${hn(UINT128_WIDTH)})(?<remainingAmount>${hn(
+  UINT128_WIDTH,
+)})`
+
+// decodes Orders for a userAddress if passed one
+// otherwise decodes all Orders for all users
+const decodeAuctionElements = (bytes: string, userAddress?: string): Order[] => {
+  const userAddressLC = userAddress && userAddress.toLowerCase()
+  const result: Order[] = []
+  const oneOrder = new RegExp(orderPattern, 'g')
+  let order
+  while ((order = oneOrder.exec(bytes))) {
+    const {
+      user,
+      sellTokenBalance,
+      buyTokenId,
+      sellTokenId,
+      validFrom,
+      validUntil,
+      priceNumerator,
+      priceDenominator,
+      remainingAmount,
+    } = order.groups
+
+    const user0x = '0x' + user
+
+    // consider user matching if userAddress wasn't given (we match all users)
+    // or userAdrres is Order.user
+    const userMatch = !userAddressLC || userAddressLC === user0x.toLowerCase()
+
+    // if passed userAddress and now encounters a different user (so !userMatch)
+    // and have already found some orders for that address
+    // can stop decoding,
+    // because StablecoinConverter.getEncodedAuctionElements fills in orders by user
+    // [orders[users[0]][0],orders[users[0]][1],orders[users[1]][0],orders[users[1]][1],...]
+    // so a specific user's orders are always contiguous
+    if (!userMatch && result.length > 0) break
+    // userMatch always true when no userAdress given, so never breaks the loop
+
+    // if not passed a userAddress OR if passed one and it matches Order.user
+    // add Order to results
+    if (userMatch) {
+      result.push({
+        user: user0x,
+        sellTokenBalance: new BN(sellTokenBalance, 16),
+        buyTokenId: parseInt(buyTokenId, 16),
+        sellTokenId: parseInt(sellTokenId, 16),
+        validFrom: parseInt(validFrom, 16),
+        validUntil: parseInt(validUntil, 16),
+        priceNumerator: new BN(priceNumerator, 16),
+        priceDenominator: new BN(priceDenominator, 16),
+        remainingAmount: new BN(remainingAmount, 16),
+      })
+    }
+  }
+  return result
+}
 /**
  * Basic implementation of Stable Coin Converter API
  */
@@ -25,14 +99,15 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }
 
   public async getOrders(userAddress: string): Promise<Order[]> {
-    // TODO different API
-    // can't return a dynamic array from a contract
-    // const contract = await this._getContract()
-    // return contract.methods.orders(userAddress).call()
-
+    const contract = await this._getContract()
     log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
-    return []
+    const encodedOrders = await contract.methods.getEncodedAuctionElements().call()
+
+    // is null if Contract returns empty bytes
+    if (!encodedOrders) return []
+
+    return decodeAuctionElements(encodedOrders, userAddress)
   }
 
   public async getNumTokens(): Promise<number> {
