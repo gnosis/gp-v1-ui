@@ -164,7 +164,7 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.withdraw(tokenAddress, userAddress).send({ from: userAddress })
+    const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
