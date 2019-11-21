@@ -55,7 +55,7 @@ export class Erc20ApiImpl implements Erc20Api {
     })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
-      tx.once('receipt', txOptionalParams.onSentTransaction)
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
     return tx
@@ -75,7 +75,7 @@ export class Erc20ApiImpl implements Erc20Api {
     })
 
     if (txOptionalParams) {
-      tx.once('receipt', txOptionalParams.onSentTransaction)
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
     return tx
@@ -96,7 +96,7 @@ export class Erc20ApiImpl implements Erc20Api {
     })
 
     if (txOptionalParams) {
-      tx.once('receipt', txOptionalParams.onSentTransaction)
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
     return tx

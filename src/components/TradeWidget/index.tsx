@@ -21,6 +21,7 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
+import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -64,7 +65,8 @@ const TradeWidget: React.FC = () => {
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, receive: receiveTokenSymbol } = useParams()
+  const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
+  const { sellAmount, buyAmount: receiveAmount } = useQuery()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
@@ -72,9 +74,21 @@ const TradeWidget: React.FC = () => {
   const [receiveToken, setReceiveToken] = useState(
     () => getToken('symbol', receiveTokenSymbol, tokens) || getToken('symbol', 'USDC', tokens),
   )
+  const sellInputId = 'sellToken'
+  const receiveInputId = 'receiveToken'
 
-  // Change URL on internal token change
-  useURLParams(`sell=${sellToken.symbol}-0&receive=${receiveToken.symbol}-20`)
+  const methods = useForm({
+    mode: 'onBlur',
+    defaultValues: {
+      [sellInputId]: sellAmount,
+      [receiveInputId]: receiveAmount,
+    },
+  })
+  const { handleSubmit, watch, reset } = methods
+
+  const searchQuery = buildSearchQuery({ sell: watch(sellInputId), buy: watch(receiveInputId) })
+  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
+  useURLParams(url)
 
   const { balances } = useTokenBalances()
 
@@ -83,12 +97,6 @@ const TradeWidget: React.FC = () => {
     balances,
     receiveToken.symbol,
   ])
-
-  const methods = useForm({ mode: 'onBlur' })
-  const { handleSubmit, watch, reset } = methods
-
-  const sellInputId = 'sellToken'
-  const receiveInputId = 'receiveToken'
 
   const { isSubmitting, placeOrder } = usePlaceOrder()
   const history = useHistory()
@@ -126,16 +134,8 @@ const TradeWidget: React.FC = () => {
         reset()
       }
     } else {
-      history.push('/connect-wallet')
-      // TODO: connect wallet then come back, ideally with the data pre-filled
-      // might require David changes to be merged first
-      // when redirect back we need:
-      // 1. fill the form
-      // 2. trigger validation
-      // 3. call submit again
-      // OR... bypass all that and call this function with given parameters?
-      // we'll potentially need a flag from the redirect to indicate whether we are now connected
-      //   and should proceed from where we left off
+      const from = history.location.pathname + history.location.search
+      history.push('/connect-wallet', { from })
     }
   }
 
