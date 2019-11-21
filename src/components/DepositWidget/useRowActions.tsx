@@ -64,10 +64,7 @@ export const useRowActions = (params: Params): Result => {
         }
       })
       const receipt = await erc20Api.approve(
-        userAddress,
-        tokenAddress,
-        contractAddress,
-        ALLOWANCE_MAX_VALUE,
+        { userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
         txOptionalParams,
       )
       log(`The transaction has been mined: ${receipt.transactionHash}`)
@@ -98,7 +95,7 @@ export const useRowActions = (params: Params): Result => {
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-      const receipt = await depositApi.deposit(userAddress, tokenAddress, amount, txOptionalParams)
+      const receipt = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
@@ -129,7 +126,7 @@ export const useRowActions = (params: Params): Result => {
 
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      const receipt = await depositApi.requestWithdraw(userAddress, tokenAddress, amount, txOptionalParams)
+      const receipt = await depositApi.requestWithdraw({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       _updateToken(tokenAddress, otherParams => {
@@ -165,7 +162,7 @@ export const useRowActions = (params: Params): Result => {
           claiming: true,
         }
       })
-      const receipt = await depositApi.withdraw(userAddress, tokenAddress, txOptionalParams)
+      const receipt = await depositApi.withdraw({ userAddress, tokenAddress }, txOptionalParams)
 
       _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
         return {

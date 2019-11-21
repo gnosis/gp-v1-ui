@@ -56,7 +56,7 @@ export class DepositApiImpl implements DepositApi {
     return +secondsRemainingInBatch
   }
 
-  public async getBalance(userAddress: string, tokenAddress: string): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
@@ -65,7 +65,13 @@ export class DepositApiImpl implements DepositApi {
     return toBN(balance)
   }
 
-  public async getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN> {
+  public async getPendingDepositAmount({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
@@ -74,7 +80,13 @@ export class DepositApiImpl implements DepositApi {
     return toBN(depositAmount)
   }
 
-  public async getPendingDepositBatchId(userAddress: string, tokenAddress: string): Promise<number> {
+  public async getPendingDepositBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number> {
     if (!userAddress || !tokenAddress) return 0
 
     const contract = await this._getContract()
@@ -83,7 +95,13 @@ export class DepositApiImpl implements DepositApi {
     return +depositBatchId
   }
 
-  public async getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN> {
+  public async getPendingWithdrawAmount({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
@@ -92,7 +110,13 @@ export class DepositApiImpl implements DepositApi {
     return toBN(withdrawAmount)
   }
 
-  public async getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number> {
+  public async getPendingWithdrawBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number> {
     if (!userAddress || !tokenAddress) return 0
 
     const contract = await this._getContract()
@@ -102,9 +126,7 @@ export class DepositApiImpl implements DepositApi {
   }
 
   public async deposit(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+    { userAddress, tokenAddress, amount }: { userAddress: string; tokenAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
@@ -119,9 +141,7 @@ export class DepositApiImpl implements DepositApi {
   }
 
   public async requestWithdraw(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+    { userAddress, tokenAddress, amount }: { userAddress: string; tokenAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
@@ -136,8 +156,7 @@ export class DepositApiImpl implements DepositApi {
   }
 
   public async withdraw(
-    userAddress: string,
-    tokenAddress: string,
+    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()

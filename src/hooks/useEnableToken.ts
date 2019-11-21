@@ -35,10 +35,12 @@ export const useEnableTokens = (params: Params): Result => {
     assert(contractAddress, 'Contract address not found. Please check wallet.')
 
     const receipt = await erc20Api.approve(
-      userAddress,
-      tokenAddress,
-      contractAddress,
-      ALLOWANCE_MAX_VALUE,
+      {
+        userAddress,
+        tokenAddress,
+        spenderAddress: contractAddress,
+        amount: ALLOWANCE_MAX_VALUE,
+      },
       params.txOptionalParams,
     )
 

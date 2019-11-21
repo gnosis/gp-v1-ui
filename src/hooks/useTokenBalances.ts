@@ -29,13 +29,13 @@ async function fetchBalancesForToken(
     walletBalance,
     allowance,
   ] = await Promise.all([
-    depositApi.getBalance(userAddress, tokenAddress),
-    depositApi.getPendingDepositAmount(userAddress, tokenAddress),
-    depositApi.getPendingWithdrawAmount(userAddress, tokenAddress),
-    depositApi.getPendingWithdrawBatchId(userAddress, tokenAddress),
+    depositApi.getBalance({ userAddress, tokenAddress }),
+    depositApi.getPendingDepositAmount({ userAddress, tokenAddress }),
+    depositApi.getPendingWithdrawAmount({ userAddress, tokenAddress }),
+    depositApi.getPendingWithdrawBatchId({ userAddress, tokenAddress }),
     depositApi.getCurrentBatchId(),
-    erc20Api.balanceOf(tokenAddress, userAddress),
-    erc20Api.allowance(tokenAddress, userAddress, contractAddress),
+    erc20Api.balanceOf({ userAddress, tokenAddress }),
+    erc20Api.allowance({ userAddress, tokenAddress, spenderAddress: contractAddress }),
   ])
 
   return {
