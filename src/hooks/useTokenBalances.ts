@@ -40,7 +40,7 @@ async function fetchBalancesForToken(
 
   return {
     ...token,
-    decimals: token.decimals || 18,
+    decimals: token.decimals,
     exchangeBalance,
     depositingBalance,
     withdrawingBalance,
