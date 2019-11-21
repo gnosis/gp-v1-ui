@@ -27,7 +27,7 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
   return (tokens || []).find((token: T): boolean => {
     const tokenKeyValue = token[key]
     if (tokenKeyValue) {
-      return typeof tokenKeyValue === 'string' && tokenKeyValue.toString().toUpperCase() === valueUppercase
+      return tokenKeyValue?.['toString']().toUpperCase() === valueUppercase
     } else {
       return false
     }
