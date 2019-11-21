@@ -23,7 +23,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     balanceStates: BalancesByUserAndToken,
     erc20Api: Erc20Api,
     registeredTokens: string[] = [],
-    maxTokens: number = 10000,
+    maxTokens = 10000,
     ordersByUser: OrdersByUser = {},
   ) {
     super(balanceStates, erc20Api)

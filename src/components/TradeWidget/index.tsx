@@ -130,7 +130,7 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  let sameToken = sellToken === receiveToken
+  const sameToken = sellToken === receiveToken
 
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)

@@ -38,7 +38,7 @@ export function formatAmount(
   amount?: BN,
   amountPrecision = DEFAULT_PRECISION,
   decimals = DEFAULT_DECIMALS,
-  thousandSeparator: boolean = true,
+  thousandSeparator = true,
 ): string | null {
   if (!amount) {
     return null
@@ -65,7 +65,7 @@ export function formatAmount(
 export function formatAmountFull(
   amount?: BN,
   amountPrecision = DEFAULT_PRECISION,
-  thousandSeparator: boolean = true,
+  thousandSeparator = true,
 ): string | null {
   if (!amount) {
     return null
@@ -111,7 +111,7 @@ export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISI
   }
 }
 
-export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
+export function abbreviateString(inputString: string, prefixLength: number, suffixLength = 0): string {
   // abbreviate only if it makes sense, and make sure ellipsis fits into word
   // 1. always add ellipsis
   // 2. do not shorten words in case ellipsis will make the word longer
