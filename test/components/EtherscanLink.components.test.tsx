@@ -7,7 +7,7 @@ import { abbreviateString } from 'utils'
 import { Network, WalletInfo } from 'types'
 
 let isConnected: boolean
-let networkId: Network
+let networkId: Network | undefined
 
 jest.mock('hooks/useWalletConnection', () => {
   return {
@@ -30,7 +30,6 @@ describe('<EtherscanLink /> general', () => {
   })
 
   it('does not render when networkId is missing', () => {
-    // @ts-ignore
     networkId = undefined
     const wrapper = render(<EtherscanLink type="tx" identifier={TX_HASH} />)
     expect(wrapper.html()).toBeNull()
