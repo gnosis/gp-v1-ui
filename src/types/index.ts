@@ -103,7 +103,10 @@ export interface DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
-  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  withdraw(
+    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
 }
 
 export interface EpochTokenLocker extends Contract {
