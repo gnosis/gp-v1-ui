@@ -27,7 +27,7 @@ export const usePlaceOrder = (): Result => {
   const { userAddress } = useWalletConnection()
 
   const placeOrder = useCallback(
-    () => async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
+    async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
       if (!userAddress) {
         toast.error('Wallet is not connected!')
         return false
@@ -76,5 +76,5 @@ export const usePlaceOrder = (): Result => {
     [setIsSubmitting, userAddress],
   )
 
-  return { placeOrder: placeOrder(), isSubmitting }
+  return { placeOrder, isSubmitting }
 }
