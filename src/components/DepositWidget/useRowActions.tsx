@@ -54,7 +54,7 @@ export const useRowActions = (params: Params): Result => {
         }
       })
       const receipt = await erc20Api.approve(
-        { senderAddress: userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
+        { userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
         txOptionalParams,
       )
       log(`The transaction has been mined: ${receipt.transactionHash}`)
