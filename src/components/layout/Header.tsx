@@ -5,6 +5,7 @@ import { useLocation } from 'react-router'
 import { rem } from 'polished'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
+import LinkToDepositPage from 'components/LinkToDepositPage'
 
 const Wrapper = styled.header`
   color: #ffffff;
@@ -119,10 +120,10 @@ const Header: React.FC = () => {
         </Link>
         <ul className="nav-links">
           <li>
-            <Link to={from.pathname}>Trade</Link>
+            <Link to={from}>Trade</Link>
           </li>
           <li>
-            <Link to={{ pathname: '/deposit', state: { from: location } }}>Deposit</Link>
+            <LinkToDepositPage />
           </li>
         </ul>
         <Wallet />
