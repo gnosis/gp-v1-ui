@@ -159,7 +159,7 @@ export class WalletApiImpl implements WalletApi {
     closeOpenWebSocketConnection(this._web3)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._web3?.setProvider(provider as any)
+    this._web3.setProvider(provider as any)
     log('[WalletApi] Connected')
     ;(window as any).web3c = this._web3
 
