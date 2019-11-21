@@ -129,3 +129,13 @@ export function abbreviateString(inputString: string, prefixLength: number, suff
 export function safeTokenName(token: TokenDetails): string {
   return token.symbol || token.name || abbreviateString(token.address, 6, 4)
 }
+
+export function safeFilledToken<T extends TokenDetails>(token: T): T {
+  // if (!token) return null
+
+  return {
+    ...token,
+    name: token.name || token.symbol || abbreviateString(token.address, 6, 4),
+    symbol: token.symbol || token.name || abbreviateString(token.address, 6, 4),
+  }
+}
