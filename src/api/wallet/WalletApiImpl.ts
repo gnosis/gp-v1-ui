@@ -134,7 +134,7 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
 export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
-  private _web3: Web3 | null
+  private _web3: Web3
 
   private _unsubscribe: Command = () => {}
 
@@ -150,7 +150,7 @@ export class WalletApiImpl implements WalletApi {
   public async connect(): Promise<boolean> {
     const provider = await getProvider(wcOptions)
 
-    if (!provider || !this._web3) return false
+    if (!provider) return false
 
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
 
