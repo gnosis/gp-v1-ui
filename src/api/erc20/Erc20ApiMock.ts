@@ -61,24 +61,19 @@ export class Erc20ApiMock implements Erc20Api {
 
   public async approve(
     {
-      senderAddress,
+      userAddress,
       tokenAddress,
       spenderAddress,
       amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      spenderAddress: string
-      amount: BN
-    },
+    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
-    this._initAllowances({ userAddress: senderAddress, tokenAddress, spenderAddress })
-    this._allowances[senderAddress][tokenAddress][spenderAddress] = amount
+    this._initAllowances({ userAddress, tokenAddress, spenderAddress })
+    this._allowances[userAddress][tokenAddress][spenderAddress] = amount
     log(
-      `[Erc20ApiMock] Approved ${amount} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${senderAddress}`,
+      `[Erc20ApiMock] Approved ${amount} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
     )
 
     return RECEIPT
@@ -95,30 +90,25 @@ export class Erc20ApiMock implements Erc20Api {
    */
   public async transfer(
     {
-      senderAddress,
+      fromAddress,
       tokenAddress,
       toAddress,
       amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      toAddress: string
-      amount: BN
-    },
+    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
-    this._initBalances({ userAddress: senderAddress, tokenAddress })
+    this._initBalances({ userAddress: fromAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })
 
-    const balance = this._balances[senderAddress][tokenAddress]
+    const balance = this._balances[fromAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
-    this._balances[senderAddress][tokenAddress] = balance.sub(amount)
+    this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
     log(
-      `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${senderAddress} to ${toAddress}`,
+      `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress}`,
     )
 
     return RECEIPT
