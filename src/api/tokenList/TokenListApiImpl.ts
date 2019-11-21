@@ -35,7 +35,7 @@ export class TokenListApiImpl implements TokenList {
   }
 
   public getTokens(networkId: number): TokenDetails[] {
-    return this._tokensByNetwork[networkId]
+    return this._tokensByNetwork[networkId] || []
   }
 }
 

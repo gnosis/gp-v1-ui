@@ -29,3 +29,6 @@ export const LEGALDOCUMENT = {
 export const RESPONSIVE_SIZES = {
   MOBILE: 500,
 }
+
+// TODO change infuraID for production
+export const INITIAL_INFURA_ENDPOINT = 'wss://rinkeby.infura.io/ws/v3/8b4d9b4306294d2e92e0775ff1075066'

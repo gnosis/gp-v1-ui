@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { withRouter, RouteComponentProps } from 'react-router'
+import React from 'react'
+import { withRouter, RouteComponentProps, useRouteMatch } from 'react-router'
 import { toast } from 'react-toastify'
 // @ts-ignore
 import { CopyToClipboard } from 'react-copy-to-clipboard'
@@ -20,8 +20,9 @@ import { EtherscanLink } from './EtherscanLink'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { abbreviateString, getNetworkFromId } from 'utils'
+import useSafeState from 'hooks/useSafeState'
 
+import { abbreviateString, getNetworkFromId } from 'utils'
 import WalletImg from 'img/unknown-token.png'
 
 export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
@@ -107,17 +108,11 @@ interface WalletProps extends RouteComponentProps {
 const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const { isConnected, userAddress, networkId } = useWalletConnection()
 
-  const [loadingLabel, setLoadingLabel] = useState()
-  const [copiedToClipboard, setCopiedToClipboard] = useState(false)
-  const [showWallet, setShowWallet] = useState(false)
+  const [loadingLabel, setLoadingLabel] = useSafeState()
+  const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
+  const [showWallet, setShowWallet] = useSafeState(false)
 
-  const mounted = useRef(true)
-
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
+  const tradePageMatch = useRouteMatch('/trade/')
 
   /***************************** */
   // EVENT HANDLERS
@@ -135,9 +130,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       console.error('error', error)
       toast.error('Error connecting wallet')
     } finally {
-      if (mounted.current) {
-        setLoadingLabel(undefined)
-      }
+      setLoadingLabel(undefined)
     }
   }
 
@@ -150,7 +143,10 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(undefined)
-      props.history.push('/')
+
+      if (!tradePageMatch) {
+        props.history.push('/')
+      }
     }
   }
 

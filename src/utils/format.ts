@@ -78,17 +78,34 @@ export function formatAmountFull(
   return formatAmount(amount, amountPrecision, amountPrecision, thousandSeparator)
 }
 
+/**
+ * Adjust the decimal precision of the given decimal value, without converting to/from BN or Number
+ * Takes in a string and returns a string
+ *
+ * E.g.:
+ * adjustPrecision('1.2657', 3) === '1.265'
+ *
+ * @param value The decimal value to be adjusted as a string
+ * @param precision How many decimals should be kept
+ */
+export function adjustPrecision(value: string | undefined | null, precision: number): string {
+  if (!value) {
+    return ''
+  }
+
+  const regexp = new RegExp(`(\\.\\d{${precision}})\\d+$`)
+  return value.replace(regexp, '$1')
+}
+
 export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
   if (!amountFmt) {
     return null
   }
 
-  const groups = /^(\d+)(?:\.(\d+))?$/.exec(amountFmt)
+  const adjustedAmount = adjustPrecision(amountFmt, amountPrecision)
+  const groups = /^(\d+)(?:\.(\d+))?$/.exec(adjustedAmount)
   if (groups) {
     const [, integerPart, decimalPart = ''] = groups
-    if (decimalPart.length > amountPrecision) {
-      return null
-    }
 
     const decimalBN = new BN(decimalPart.padEnd(amountPrecision, '0'))
     const factor = TEN.pow(new BN(amountPrecision))

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import Modali, { useModali } from 'modali'
 import BN from 'bn.js'
 
@@ -9,6 +9,7 @@ import { ModalBodyWrapper, DepositWidgetWrapper } from './Styled'
 
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
+import useSafeState from 'hooks/useSafeState'
 import useWindowSizes from 'hooks/useWindowSizes'
 
 import { log, formatAmount, getToken } from 'utils'
@@ -41,7 +42,7 @@ const DepositWidget: React.FC = () => {
   const { enableToken, deposit, requestWithdraw, claim } = useRowActions({ balances, setBalances })
   const windowSpecs = useWindowSizes()
 
-  const [withdrawRequest, setWithdrawRequest] = useState({
+  const [withdrawRequest, setWithdrawRequest] = useSafeState({
     amount: null,
     tokenAddress: null,
     pendingAmount: null,
@@ -86,12 +87,6 @@ const DepositWidget: React.FC = () => {
       await requestWithdraw(amount, tokenAddress)
     }
   }
-  const mounted = useRef(true)
-  useEffect(() => {
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [])
 
   if (balances === undefined) {
     // Loading: Do not show the widget

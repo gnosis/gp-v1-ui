@@ -5,7 +5,7 @@ import { getEpoch, formatAmount, log } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT, RECEIPT } from '../../../test/data'
 
-import { DepositApi, BalanceState, TxResult, TxOptionalParams, Erc20Api } from 'types'
+import { DepositApi, BalanceState, Receipt, TxOptionalParams, Erc20Api } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 
 export interface BalancesByUserAndToken {
@@ -119,7 +119,7 @@ export class DepositApiMock implements DepositApi {
       amount: BN
     },
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     // Create the balance state if it's the first deposit
@@ -143,7 +143,7 @@ export class DepositApiMock implements DepositApi {
     })
 
     log(`[DepositApiMock] Deposited ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
-    return { data: undefined, receipt: RECEIPT }
+    return RECEIPT
   }
 
   public async requestWithdraw(
@@ -157,7 +157,7 @@ export class DepositApiMock implements DepositApi {
       amount: BN
     },
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
@@ -169,7 +169,7 @@ export class DepositApiMock implements DepositApi {
     }
 
     log(`[DepositApiMock] Requested withdraw of ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
-    return { data: undefined, receipt: RECEIPT }
+    return RECEIPT
   }
 
   public async withdraw(
@@ -181,7 +181,7 @@ export class DepositApiMock implements DepositApi {
       tokenAddress: string
     },
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<void>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
@@ -208,7 +208,7 @@ export class DepositApiMock implements DepositApi {
     })
 
     log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
-    return { data: undefined, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /********************************    private methods   ********************************/

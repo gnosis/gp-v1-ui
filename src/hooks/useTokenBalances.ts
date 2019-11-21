@@ -1,9 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
-import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
+import { useEffect } from 'react'
 import { tokenListApi, erc20Api, depositApi } from 'api'
-import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
+
+import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
+
 import { formatAmount, log } from 'utils'
+import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
+import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[] | undefined
@@ -56,18 +59,24 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
     return null
   }
 
-  const contractAddress = depositApi.getContractAddress()
+  const contractAddress = depositApi.getContractAddress(networkId)
   const tokens = tokenListApi.getTokens(networkId)
 
-  const balancePromises = tokens.map(async token => fetchBalancesForToken(token, userAddress, contractAddress))
-  return Promise.all(balancePromises)
+  const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(async token =>
+    fetchBalancesForToken(token, userAddress, contractAddress).catch(e => {
+      log('Error for', token, userAddress, contractAddress)
+      log(e)
+      return null
+    }),
+  )
+  const balances = await Promise.all(balancePromises)
+  return balances.filter(Boolean)
 }
 
 export const useTokenBalances = (): UseTokenBalanceResult => {
   const walletInfo = useWalletConnection()
-  const [balances, setBalances] = useState<TokenBalanceDetails[] | null>(null)
-  const [error, setError] = useState(false)
-  const mounted = useRef(true)
+  const [balances, setBalances] = useSafeState<TokenBalanceDetails[] | null>(null)
+  const [error, setError] = useSafeState(false)
 
   useEffect(() => {
     _getBalances(walletInfo)
@@ -77,16 +86,13 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
         )
         setBalances(balances)
+        setError(false)
       })
       .catch(error => {
         console.error('Error loading balances', error)
         setError(true)
       })
-
-    return function cleanUp(): void {
-      mounted.current = false
-    }
-  }, [walletInfo])
+  }, [setBalances, setError, walletInfo])
 
   return { balances, error, setBalances }
 }

@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const Wrapper = styled.section`
   overflow-x: auto;
@@ -39,7 +40,8 @@ interface Props {
 }
 
 const Widget: React.FC<Props> = ({ children, className }) => {
-  const contractAddress = depositApi.getContractAddress()
+  const { networkId } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress(networkId)
 
   return (
     <Wrapper className={className}>

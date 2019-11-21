@@ -1,4 +1,4 @@
-import { Erc20Api, TxOptionalParams, TxResult } from 'types'
+import { Erc20Api, TxOptionalParams, Receipt } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { ZERO } from 'const'
@@ -72,7 +72,7 @@ export class Erc20ApiMock implements Erc20Api {
       amount: BN
     },
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initAllowances({ userAddress: senderAddress, tokenAddress, spenderAddress })
@@ -81,7 +81,7 @@ export class Erc20ApiMock implements Erc20Api {
       `[Erc20ApiMock] Approved ${amount} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${senderAddress}`,
     )
 
-    return { data: true, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /**
@@ -106,7 +106,7 @@ export class Erc20ApiMock implements Erc20Api {
       amount: BN
     },
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances({ userAddress: senderAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })
@@ -121,7 +121,7 @@ export class Erc20ApiMock implements Erc20Api {
       `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${senderAddress} to ${toAddress}`,
     )
 
-    return { data: true, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /**
@@ -149,7 +149,7 @@ export class Erc20ApiMock implements Erc20Api {
       amount: BN
     },
     txOptionalParams?: TxOptionalParams,
-  ): Promise<TxResult<boolean>> {
+  ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances({ userAddress: fromAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })
@@ -175,7 +175,7 @@ export class Erc20ApiMock implements Erc20Api {
       `[Erc20ApiMock:transferFrom] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${senderAddress}`,
     )
 
-    return { data: true, receipt: RECEIPT }
+    return RECEIPT
   }
 
   /********************************    private methods   ********************************/
