@@ -19,7 +19,8 @@ export interface RowProps {
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
-  innerWidth: number | undefined
+  innerWidth?: number
+  innerHeight?: number
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
