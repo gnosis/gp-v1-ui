@@ -223,31 +223,21 @@ export interface Erc20Api {
 
   approve(
     {
-      senderAddress,
+      userAddress,
       tokenAddress,
       spenderAddress,
       amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      spenderAddress: string
-      amount: BN
-    },
+    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
   transfer(
     {
-      senderAddress,
+      fromAddress,
       tokenAddress,
       toAddress,
       amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      toAddress: string
-      amount: BN
-    },
+    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
