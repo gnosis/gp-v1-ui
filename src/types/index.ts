@@ -48,7 +48,7 @@ export interface BalanceState {
 }
 
 export interface TxOptionalParams {
-  onSentTransaction?: (receipt: Receipt) => void
+  onSentTransaction?: (transactionHash: string) => void
 }
 
 export type Receipt = TransactionReceipt

@@ -111,7 +111,7 @@ export class DepositApiImpl implements DepositApi {
     const tx = contract.methods.deposit(tokenAddress, amount).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
-      tx.once('receipt', txOptionalParams.onSentTransaction)
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
     log(`[DepositApiImpl] Deposited ${amount} for token ${tokenAddress}. User ${userAddress}`)
@@ -128,7 +128,7 @@ export class DepositApiImpl implements DepositApi {
     const tx = contract.methods.requestWithdraw(tokenAddress, amount).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
-      tx.once('receipt', txOptionalParams.onSentTransaction)
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
     log(`[DepositApiImpl] Requested withdraw of ${amount} for token ${tokenAddress}. User ${userAddress}`)
@@ -144,7 +144,7 @@ export class DepositApiImpl implements DepositApi {
     const tx = contract.methods.withdraw(tokenAddress, userAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
-      tx.once('receipt', txOptionalParams.onSentTransaction)
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
     log(`[DepositApiImpl] Withdraw for token ${tokenAddress}. User ${userAddress}`)

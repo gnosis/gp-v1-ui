@@ -1,5 +1,5 @@
 import React from 'react'
-import { withRouter, RouteComponentProps } from 'react-router'
+import { withRouter, RouteComponentProps, useRouteMatch } from 'react-router'
 import { toast } from 'react-toastify'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
@@ -111,6 +111,8 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
 
+  const tradePageMatch = useRouteMatch('/trade/')
+
   /***************************** */
   // EVENT HANDLERS
 
@@ -140,7 +142,9 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(null)
-      props.history.push('/')
+      if (!tradePageMatch) {
+        props.history.push('/')
+      }
     }
   }
 
