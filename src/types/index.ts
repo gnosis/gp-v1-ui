@@ -59,22 +59,54 @@ export interface DepositApi {
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
 
-  getBalance(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingDepositBatchId(userAddress: string, tokenAddress: string): Promise<number>
-  getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN>
-  getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number>
+  getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingDepositAmount({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingDepositBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number>
+  getPendingWithdrawAmount({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingWithdrawBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number>
 
-  deposit(userAddress: string, tokenAddress: string, amount: BN, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-
-  requestWithdraw(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+  deposit(
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
-  withdraw(userAddress: string, tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  requestWithdraw(
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+
+  withdraw(
+    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
 }
 
 export interface EpochTokenLocker extends Contract {
@@ -98,6 +130,18 @@ export interface EpochTokenLocker extends Contract {
     getPendingWithdrawAmount(user: string, token: string): TransactionObject<string>
 
     getPendingWithdrawBatchNumber(user: string, token: string): TransactionObject<string>
+
+    // eslint-disable-next-line @typescript-eslint/adjacent-overload-signatures
+    withdraw(
+      {
+        userAddress,
+        tokenAddress,
+      }: {
+        userAddress: string
+        tokenAddress: string
+      },
+      txOptionalParams?: TxOptionalParams,
+    ): Promise<Receipt>
 
     getCurrentBatchId(): TransactionObject<string>
 
@@ -136,7 +180,10 @@ export interface ExchangeApi extends DepositApi {
   getTokenIdByAddress(tokenAddress: string): Promise<number>
   addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  cancelOrder(senderAddress: string, orderId: number, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  cancelOrder(
+    { senderAddress, orderId }: { senderAddress: string; orderId: number },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
 }
 
 export interface WalletInfo {
@@ -163,31 +210,51 @@ export interface WalletApi {
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface Erc20Api {
-  balanceOf(tokenAddress: string, userAddress: string): Promise<BN>
-  allowance(tokenAddress: string, userAddress: string, spenderAddress: string): Promise<BN>
+  balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
+  allowance({
+    tokenAddress,
+    userAddress,
+    spenderAddress,
+  }: {
+    tokenAddress: string
+    userAddress: string
+    spenderAddress: string
+  }): Promise<BN>
 
   approve(
-    senderAddress: string,
-    tokenAddress: string,
-    spenderAddress: string,
-    amount: BN,
+    {
+      userAddress,
+      tokenAddress,
+      spenderAddress,
+      amount,
+    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
   transfer(
-    senderAddress: string,
-    tokenAddress: string,
-    toAddress: string,
-    amount: BN,
+    {
+      fromAddress,
+      tokenAddress,
+      toAddress,
+      amount,
+    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
   transferFrom(
-    senderAddress: string,
-    tokenAddress: string,
-    fromAddress: string,
-    toAddress: string,
-    amount: BN,
+    {
+      senderAddress,
+      tokenAddress,
+      fromAddress,
+      toAddress,
+      amount,
+    }: {
+      senderAddress: string
+      tokenAddress: string
+      fromAddress: string
+      toAddress: string
+      amount: BN
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 }

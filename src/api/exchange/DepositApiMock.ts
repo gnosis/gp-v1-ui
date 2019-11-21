@@ -37,7 +37,7 @@ export class DepositApiMock implements DepositApi {
     return BATCH_TIME - (getEpoch() % BATCH_TIME)
   }
 
-  public async getBalance(userAddress: string, tokenAddress: string): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return ZERO
@@ -47,7 +47,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.balance : ZERO
   }
 
-  public async getPendingDepositAmount(userAddress: string, tokenAddress: string): Promise<BN> {
+  public async getPendingDepositAmount({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<BN> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return ZERO
@@ -57,7 +63,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingDeposits.amount : ZERO
   }
 
-  public async getPendingDepositBatchId(userAddress: string, tokenAddress: string): Promise<number> {
+  public async getPendingDepositBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return 0
@@ -66,7 +78,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingDeposits.batchId : 0
   }
 
-  public async getPendingWithdrawAmount(userAddress: string, tokenAddress: string): Promise<BN> {
+  public async getPendingWithdrawAmount({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<BN> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return ZERO
@@ -75,7 +93,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingWithdraws.amount : ZERO
   }
 
-  public async getPendingWithdrawBatchId(userAddress: string, tokenAddress: string): Promise<number> {
+  public async getPendingWithdrawBatchId({
+    userAddress,
+    tokenAddress,
+  }: {
+    userAddress: string
+    tokenAddress: string
+  }): Promise<number> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return 0
@@ -85,47 +109,59 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async deposit(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     // Create the balance state if it's the first deposit
     const currentBatchId = await this.getCurrentBatchId()
-    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentBatchId)
+    const balanceState = this._initBalanceState({ userAddress, tokenAddress, currentBatchId })
 
     // Update any unapplied deposit
-    this._updateDepositsBalance(userAddress, tokenAddress, currentBatchId)
+    this._updateDepositsBalance({ userAddress, tokenAddress, currentBatchId })
 
     const pendingDeposits = balanceState.pendingDeposits
     pendingDeposits.amount = pendingDeposits.amount.add(amount)
     pendingDeposits.batchId = currentBatchId
 
     // mock transfer tokens from user's mock `wallet`
-    await this._erc20Api.transferFrom(
-      this.getContractAddress(),
+    await this._erc20Api.transferFrom({
+      senderAddress: this.getContractAddress(),
       tokenAddress,
-      userAddress,
-      this.getContractAddress(),
+      fromAddress: userAddress,
+      toAddress: this.getContractAddress(),
       amount,
-    )
+    })
 
     log(`[DepositApiMock] Deposited ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 
   public async requestWithdraw(
-    userAddress: string,
-    tokenAddress: string,
-    amount: BN,
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
-    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentBatchId)
+    const balanceState = this._initBalanceState({ userAddress, tokenAddress, currentBatchId })
 
     balanceState.pendingWithdraws = {
       amount,
@@ -137,14 +173,19 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async withdraw(
-    userAddress: string,
-    tokenAddress: string,
+    {
+      userAddress,
+      tokenAddress,
+    }: {
+      userAddress: string
+      tokenAddress: string
+    },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
-    let balanceState = this._initBalanceState(userAddress, tokenAddress, currentBatchId)
+    const balanceState = this._initBalanceState({ userAddress, tokenAddress, currentBatchId })
 
     const pendingWithdraws = balanceState.pendingWithdraws
 
@@ -159,14 +200,27 @@ export class DepositApiMock implements DepositApi {
     balanceState.balance = balanceState.balance.sub(amount)
 
     // mock transfer tokens to user's mock `wallet`
-    await this._erc20Api.transfer(this.getContractAddress(), tokenAddress, userAddress, amount)
+    await this._erc20Api.transfer({
+      fromAddress: this.getContractAddress(),
+      tokenAddress,
+      toAddress: userAddress,
+      amount,
+    })
 
     log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 
   /********************************    private methods   ********************************/
-  private _initBalanceState(userAddress: string, tokenAddress: string, currentBatchId: number): BalanceState {
+  private _initBalanceState({
+    userAddress,
+    tokenAddress,
+    currentBatchId,
+  }: {
+    userAddress: string
+    tokenAddress: string
+    currentBatchId: number
+  }): BalanceState {
     let userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       userBalanceStates = {}
@@ -192,7 +246,15 @@ export class DepositApiMock implements DepositApi {
     return balanceState
   }
 
-  private _updateDepositsBalance(userAddress: string, tokenAddress: string, currentBatchId: number): void {
+  private _updateDepositsBalance({
+    userAddress,
+    tokenAddress,
+    currentBatchId,
+  }: {
+    userAddress: string
+    tokenAddress: string
+    currentBatchId: number
+  }): void {
     const balanceState = this._balanceStates[userAddress][tokenAddress]
     const pendingDeposits = balanceState.pendingDeposits
 

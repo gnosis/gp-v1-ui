@@ -119,7 +119,7 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  let sameToken = sellToken === receiveToken
+  const sameToken = sellToken === receiveToken
 
   async function onSubmit(data: FieldValues): Promise<void> {
     if (isConnected) {

@@ -157,7 +157,7 @@ describe('cancelOrder', () => {
   test('cancel existing order', async () => {
     const orderId = (await instance.getOrders(USER_1)).length - 1
 
-    await instance.cancelOrder(USER_1, orderId)
+    await instance.cancelOrder({ senderAddress: USER_1, orderId })
 
     const actual = (await instance.getOrders(USER_1))[orderId]
     expect(actual.validUntil).toBe(BATCH_ID - 1)
@@ -166,7 +166,7 @@ describe('cancelOrder', () => {
   test('cancel non existing order does nothing', async () => {
     const expected = await instance.getOrders(USER_1)
 
-    await instance.cancelOrder(USER_1, expected.length + 1)
+    await instance.cancelOrder({ senderAddress: USER_1, orderId: expected.length + 1 })
 
     const actual = await instance.getOrders(USER_1)
     expect(actual).toEqual(expected)
@@ -175,7 +175,7 @@ describe('cancelOrder', () => {
   test('cancel non existing order, user with no orders does nothing', async () => {
     const expected = await instance.getOrders(USER_2)
 
-    await instance.cancelOrder(USER_2, expected.length + 1)
+    await instance.cancelOrder({ senderAddress: USER_2, orderId: expected.length + 1 })
 
     const actual = await instance.getOrders(USER_2)
     expect(actual).toEqual(expected)
