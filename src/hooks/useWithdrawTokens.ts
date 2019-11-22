@@ -29,8 +29,7 @@ export const useWithdrawTokens = (params: Params): Result => {
     setWithdrawing(true)
 
     try {
-      const receipt = await depositApi.withdraw(userAddress, tokenAddress, params.txOptionalParams)
-      return receipt
+      return depositApi.withdraw({ userAddress, tokenAddress }, params.txOptionalParams)
     } finally {
       setWithdrawing(false)
     }
