@@ -121,7 +121,7 @@ export interface EpochTokenLocker extends Contract {
 
     requestWithdraw(token: string, amount: number | string | BN): TransactionObject<void>
 
-    withdraw(token: string, owner: string): TransactionObject<void>
+    withdraw(owner: string, token: string): TransactionObject<void>
 
     getPendingDepositAmount(user: string, token: string): TransactionObject<string>
 
