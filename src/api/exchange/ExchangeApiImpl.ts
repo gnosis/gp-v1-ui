@@ -155,6 +155,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const contract = await this._getContract()
 
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
       .send({ from: userAddress })

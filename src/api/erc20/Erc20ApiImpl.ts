@@ -60,6 +60,7 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
     })
@@ -82,6 +83,7 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: fromAddress,
     })
