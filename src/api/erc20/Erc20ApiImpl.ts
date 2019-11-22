@@ -109,7 +109,7 @@ export class Erc20ApiImpl implements Erc20Api {
       from: fromAddress,
     })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
