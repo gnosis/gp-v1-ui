@@ -8,6 +8,7 @@ import { Erc20ApiImpl } from './erc20/Erc20ApiImpl'
 import { DepositApiMock } from './exchange/DepositApiMock'
 import { DepositApiImpl } from './exchange/DepositApiImpl'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
+import { ExchangeApiImpl } from './exchange/ExchangeApiImpl'
 import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances, FEE_TOKEN } from '../../test/data'
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
@@ -63,16 +64,16 @@ function createDepositApi(erc20Api: Erc20Api, web3: Web3): DepositApi {
   return depositApi
 }
 
-function createExchangeApi(erc20Api: Erc20Api): ExchangeApi {
+function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
+  let exchangeApi
   if (isExchangeMock) {
     const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address)]
-    const exchangeApi = new ExchangeApiMock(exchangeBalanceStates, erc20Api, tokens)
-    window['exchangeApi'] = exchangeApi
-    return exchangeApi
+    exchangeApi = new ExchangeApiMock(exchangeBalanceStates, erc20Api, tokens)
   } else {
-    // TODO: Add actual implementation
-    throw new Error('Not implemented yet. Only mock implementation available')
+    exchangeApi = new ExchangeApiImpl(web3)
   }
+  window['exchangeApi'] = exchangeApi
+  return exchangeApi
 }
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
@@ -85,4 +86,4 @@ export const walletApi: WalletApi = createWalletApi(web3)
 export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api(web3)
 export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
-export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api)
+export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, web3)

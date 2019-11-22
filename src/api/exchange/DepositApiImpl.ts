@@ -25,7 +25,7 @@ export class DepositApiImpl implements DepositApi {
   private _ReferenceEpochTokenLocker: EpochTokenLocker
   private _web3: Web3
 
-  private static _address2ContractCache: { [K: string]: EpochTokenLocker } = {}
+  protected static _address2ContractCache: { [K: string]: EpochTokenLocker } = {}
 
   public constructor(web3: Web3) {
     this._ReferenceEpochTokenLocker = new web3.eth.Contract(EpochTokenLockerAbi)
@@ -138,7 +138,7 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Deposited ${amount} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiImpl] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
@@ -153,7 +153,7 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Requested withdraw of ${amount} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiImpl] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
@@ -174,17 +174,19 @@ export class DepositApiImpl implements DepositApi {
 
   /********************************    private methods   ********************************/
 
-  private async _getContract(): Promise<EpochTokenLocker> {
-    let networkId = getNetworkIdFromWeb3(this._web3)
+  protected async _getNetworkId(): Promise<number> {
+    const networkId = getNetworkIdFromWeb3(this._web3)
 
-    if (networkId === null) {
-      networkId = await this._web3.eth.net.getId()
-    }
+    return networkId === null ? this._web3.eth.net.getId() : networkId
+  }
+
+  protected async _getContract(): Promise<EpochTokenLocker> {
+    const networkId = await this._getNetworkId()
 
     return this._getContractForNetwork(networkId)
   }
 
-  private _getContractForNetwork(networkId: number): EpochTokenLocker {
+  protected _getContractForNetwork(networkId: number): EpochTokenLocker {
     const address = this.getContractAddress(networkId)
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
@@ -192,7 +194,7 @@ export class DepositApiImpl implements DepositApi {
     return this._getContractAtAddress(address)
   }
 
-  private _getContractAtAddress(address: string): EpochTokenLocker {
+  protected _getContractAtAddress(address: string): EpochTokenLocker {
     const contract = DepositApiImpl._address2ContractCache[address]
 
     if (contract) return contract
