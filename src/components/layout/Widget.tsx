@@ -45,11 +45,9 @@ const Widget: React.FC<Props> = ({ children, className }) => {
 
   return (
     <Wrapper className={className}>
-      <LinkWrapper
-        type="contract"
-        identifier={contractAddress || 'No address detected'}
-        label={<small>View verified contract</small>}
-      />
+      {contractAddress && (
+        <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
+      )}
       {children}
     </Wrapper>
   )
