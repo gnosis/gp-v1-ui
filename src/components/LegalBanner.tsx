@@ -7,10 +7,8 @@ const Wrapper = styled.div`
   flex-flow: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
 
   background-color: lightyellow;
-  cursor: pointer;
 
   font-size: 80%;
 
@@ -36,6 +34,7 @@ const Text = styled.p`
 interface LegalBannerProps {
   startOpen: boolean
   title: string
+  useFull: boolean
 }
 
 const LegalText: React.FC = () => (
@@ -71,7 +70,7 @@ const LegalText: React.FC = () => (
   </Text>
 )
 
-const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, title }) => {
+const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, useFull, title }) => {
   const [open, setOpen] = useState(startOpen)
 
   const openCloseDisclaimer = (): void => setOpen(!open)
@@ -79,7 +78,7 @@ const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, title }) => {
   return (
     <Wrapper onClick={openCloseDisclaimer}>
       <h3>{title}</h3>
-      {open && <LegalText />}
+      {useFull && open && <LegalText />}
     </Wrapper>
   )
 }
