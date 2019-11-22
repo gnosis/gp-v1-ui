@@ -30,6 +30,103 @@ const StablecoinConvertedAbi: AbiItem[] = [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        name: 'buyToken',
+        type: 'uint16',
+      },
+      {
+        name: 'sellToken',
+        type: 'uint16',
+      },
+      {
+        name: 'validUntil',
+        type: 'uint32',
+      },
+      {
+        name: 'buyAmount',
+        type: 'uint128',
+      },
+      {
+        name: 'sellAmount',
+        type: 'uint128',
+      },
+    ],
+    name: 'placeOrder',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'batchIndex',
+        type: 'uint32',
+      },
+      {
+        name: 'claimedObjectiveValue',
+        type: 'uint256',
+      },
+      {
+        name: 'owners',
+        type: 'address[]',
+      },
+      {
+        name: 'orderIds',
+        type: 'uint16[]',
+      },
+      {
+        name: 'buyVolumes',
+        type: 'uint128[]',
+      },
+      {
+        name: 'prices',
+        type: 'uint128[]',
+      },
+      {
+        name: 'tokenIdsForPrice',
+        type: 'uint16[]',
+      },
+    ],
+    name: 'submitSolution',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'id',
+        type: 'uint16',
+      },
+    ],
+    name: 'tokenIdToAddressMap',
+    outputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [
       {
@@ -151,6 +248,20 @@ const StablecoinConvertedAbi: AbiItem[] = [
   {
     constant: true,
     inputs: [],
+    name: 'AMOUNT_MINIMUM',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'feeToken',
     outputs: [
       {
@@ -160,6 +271,45 @@ const StablecoinConvertedAbi: AbiItem[] = [
     ],
     payable: false,
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'buyTokens',
+        type: 'uint16[]',
+      },
+      {
+        name: 'sellTokens',
+        type: 'uint16[]',
+      },
+      {
+        name: 'validFroms',
+        type: 'uint32[]',
+      },
+      {
+        name: 'validUntils',
+        type: 'uint32[]',
+      },
+      {
+        name: 'buyAmounts',
+        type: 'uint128[]',
+      },
+      {
+        name: 'sellAmounts',
+        type: 'uint128[]',
+      },
+    ],
+    name: 'placeValidFromOrders',
+    outputs: [
+      {
+        name: 'orderIds',
+        type: 'uint256[]',
+      },
+    ],
+    payable: false,
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -175,6 +325,25 @@ const StablecoinConvertedAbi: AbiItem[] = [
       {
         name: '',
         type: 'uint128',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+    ],
+    name: 'getEncodedUserOrders',
+    outputs: [
+      {
+        name: 'elements',
+        type: 'bytes',
       },
     ],
     payable: false,
@@ -267,6 +436,25 @@ const StablecoinConvertedAbi: AbiItem[] = [
   },
   {
     constant: true,
+    inputs: [
+      {
+        name: 'addr',
+        type: 'address',
+      },
+    ],
+    name: 'hasToken',
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
     inputs: [],
     name: 'latestSolution',
     outputs: [
@@ -289,6 +477,67 @@ const StablecoinConvertedAbi: AbiItem[] = [
     ],
     payable: false,
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'ids',
+        type: 'uint256[]',
+      },
+    ],
+    name: 'cancelOrders',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'batchIndex',
+        type: 'uint32',
+      },
+    ],
+    name: 'acceptingSolutions',
+    outputs: [
+      {
+        name: '',
+        type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getEncodedAuctionElements',
+    outputs: [
+      {
+        name: 'elements',
+        type: 'bytes',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'token',
+        type: 'address',
+      },
+    ],
+    name: 'addToken',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -315,6 +564,20 @@ const StablecoinConvertedAbi: AbiItem[] = [
     type: 'function',
   },
   {
+    constant: false,
+    inputs: [
+      {
+        name: 'ids',
+        type: 'uint256[]',
+      },
+    ],
+    name: 'freeStorageOfOrder',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
     constant: true,
     inputs: [],
     name: 'BATCH_TIME',
@@ -336,6 +599,25 @@ const StablecoinConvertedAbi: AbiItem[] = [
       {
         name: '',
         type: 'uint32',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'addr',
+        type: 'address',
+      },
+    ],
+    name: 'tokenAddressToIdMap',
+    outputs: [
+      {
+        name: '',
+        type: 'uint16',
       },
     ],
     payable: false,
@@ -446,6 +728,20 @@ const StablecoinConvertedAbi: AbiItem[] = [
     constant: true,
     inputs: [],
     name: 'MAX_TOUCHED_ORDERS',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
+    name: 'getCurrentObjectiveValue',
     outputs: [
       {
         name: '',
@@ -609,269 +905,6 @@ const StablecoinConvertedAbi: AbiItem[] = [
     ],
     name: 'Withdraw',
     type: 'event',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'token',
-        type: 'address',
-      },
-    ],
-    name: 'addToken',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'buyTokens',
-        type: 'uint16[]',
-      },
-      {
-        name: 'sellTokens',
-        type: 'uint16[]',
-      },
-      {
-        name: 'validFroms',
-        type: 'uint32[]',
-      },
-      {
-        name: 'validUntils',
-        type: 'uint32[]',
-      },
-      {
-        name: 'buyAmounts',
-        type: 'uint128[]',
-      },
-      {
-        name: 'sellAmounts',
-        type: 'uint128[]',
-      },
-    ],
-    name: 'placeValidFromOrders',
-    outputs: [
-      {
-        name: 'orderIds',
-        type: 'uint256[]',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'buyToken',
-        type: 'uint16',
-      },
-      {
-        name: 'sellToken',
-        type: 'uint16',
-      },
-      {
-        name: 'validUntil',
-        type: 'uint32',
-      },
-      {
-        name: 'buyAmount',
-        type: 'uint128',
-      },
-      {
-        name: 'sellAmount',
-        type: 'uint128',
-      },
-    ],
-    name: 'placeOrder',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'ids',
-        type: 'uint256[]',
-      },
-    ],
-    name: 'cancelOrder',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'ids',
-        type: 'uint256[]',
-      },
-    ],
-    name: 'freeStorageOfOrder',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      {
-        name: 'batchIndex',
-        type: 'uint32',
-      },
-      {
-        name: 'claimedObjectiveValue',
-        type: 'uint256',
-      },
-      {
-        name: 'owners',
-        type: 'address[]',
-      },
-      {
-        name: 'orderIds',
-        type: 'uint16[]',
-      },
-      {
-        name: 'volumes',
-        type: 'uint128[]',
-      },
-      {
-        name: 'prices',
-        type: 'uint128[]',
-      },
-      {
-        name: 'tokenIdsForPrice',
-        type: 'uint16[]',
-      },
-    ],
-    name: 'submitSolution',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: 'addr',
-        type: 'address',
-      },
-    ],
-    name: 'tokenAddressToIdMap',
-    outputs: [
-      {
-        name: '',
-        type: 'uint16',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: 'id',
-        type: 'uint16',
-      },
-    ],
-    name: 'tokenIdToAddressMap',
-    outputs: [
-      {
-        name: '',
-        type: 'address',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: 'addr',
-        type: 'address',
-      },
-    ],
-    name: 'hasToken',
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'getEncodedAuctionElements',
-    outputs: [
-      {
-        name: 'elements',
-        type: 'bytes',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [
-      {
-        name: 'batchIndex',
-        type: 'uint32',
-      },
-    ],
-    name: 'acceptingSolutions',
-    outputs: [
-      {
-        name: '',
-        type: 'bool',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [],
-    name: 'getCurrentObjectiveValue',
-    outputs: [
-      {
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
   },
 ]
 
