@@ -131,8 +131,6 @@ export function safeTokenName(token: TokenDetails): string {
 }
 
 export function safeFilledToken<T extends TokenDetails>(token: T): T {
-  // if (!token) return null
-
   return {
     ...token,
     name: token.name || token.symbol || abbreviateString(token.address, 6, 4),

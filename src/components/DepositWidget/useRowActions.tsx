@@ -55,7 +55,6 @@ export const useRowActions = (params: Params): Result => {
       assert(token, 'No token, aborting.')
 
       const { symbol: tokenDisplayName } = safeFilledToken(token)
-      assert(tokenDisplayName, 'No token name found - symbol, name, or address. Aborting.')
 
       _updateToken(tokenAddress, otherParams => {
         return {
