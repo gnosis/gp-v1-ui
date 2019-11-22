@@ -174,8 +174,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }
 
   public async cancelOrder(
-    senderAddress: string,
-    orderId: number,
+    { senderAddress, orderId }: { senderAddress: string; orderId: number },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
