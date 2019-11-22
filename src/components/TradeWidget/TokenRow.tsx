@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 
-import LinkToDepositPage from 'components/LinkToDepositPage'
+import LinkWithPastLocation from 'components/LinkWithPastLocation'
 import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
@@ -206,7 +206,7 @@ const TokenRow: React.FC<Props> = ({
         <WalletDetail>
           <div>
             <strong>
-              <LinkToDepositPage>Exchange wallet:</LinkToDepositPage>
+              <LinkWithPastLocation to="/deposit">Exchange wallet:</LinkWithPastLocation>
             </strong>{' '}
             <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
           </div>
