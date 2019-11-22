@@ -132,7 +132,8 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.deposit(tokenAddress, amount).send({ from: userAddress })
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -147,7 +148,8 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.requestWithdraw(tokenAddress, amount).send({ from: userAddress })
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
