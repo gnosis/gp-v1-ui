@@ -54,7 +54,6 @@ async function fetchBalancesForToken(
 
 async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[] | null> {
   const { userAddress, networkId } = walletInfo
-  log('[useTokenBalances] getBalances for %s in network %s', userAddress, networkId)
   if (!userAddress || !networkId) {
     return null
   }
