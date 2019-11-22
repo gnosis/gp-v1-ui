@@ -3,7 +3,6 @@ import { TEN } from 'const'
 import { TokenDetails } from 'types'
 
 const DEFAULT_DECIMALS = 4
-const DEFAULT_PRECISION = 18
 const ELLIPSIS = '...'
 
 function _getLocaleSymbols(): { thousands: string; decimals: string } {
@@ -39,8 +38,8 @@ function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { 
 }
 
 export function formatAmount(
-  amount?: BN,
-  amountPrecision = DEFAULT_PRECISION,
+  amount: BN | null | undefined,
+  amountPrecision: number,
   decimals = DEFAULT_DECIMALS,
   thousandSeparator: boolean = true,
 ): string | null {
@@ -67,8 +66,8 @@ export function formatAmount(
 }
 
 export function formatAmountFull(
-  amount?: BN,
-  amountPrecision = DEFAULT_PRECISION,
+  amount: BN | null | undefined,
+  amountPrecision: number,
   thousandSeparator: boolean = true,
 ): string | null {
   if (!amount) {
@@ -97,7 +96,7 @@ export function adjustPrecision(value: string | undefined | null, precision: num
   return value.replace(regexp, '$1')
 }
 
-export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
+export function parseAmount(amountFmt: string, amountPrecision: number): BN | null {
   if (!amountFmt) {
     return null
   }
