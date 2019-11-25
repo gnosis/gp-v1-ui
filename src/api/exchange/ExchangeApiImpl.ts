@@ -1,7 +1,8 @@
 import assert from 'assert'
 
 import { DepositApiImpl } from './DepositApiImpl'
-import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, StablecoinConverter, AuctionElement } from 'types'
+import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, AuctionElement } from 'types'
+import { StablecoinConverter } from 'types/StablecoinConverter'
 import StablecoinConvertedAbi from './StablecoinConverterAbi'
 import { log } from 'utils'
 
@@ -103,7 +104,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract()
     log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
-    const encodedOrders = await contract.methods.getEncodedAuctionElements().call()
+    const encodedOrders = await contract.methods.getEncodedUserOrders(userAddress).call()
 
     // is null if Contract returns empty bytes
     if (!encodedOrders) return []
@@ -180,7 +181,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.cancelOrder([orderId]).send({ from: senderAddress })
+    const tx = contract.methods.cancelOrders([orderId]).send({ from: senderAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
