@@ -33,6 +33,7 @@ export class DepositApiImpl implements DepositApi {
     this._web3 = web3
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).epoch = this._ReferenceEpochTokenLocker
   }
 

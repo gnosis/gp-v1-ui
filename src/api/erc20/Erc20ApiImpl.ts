@@ -18,6 +18,7 @@ export class Erc20ApiImpl implements Erc20Api {
     this._ReferenceERC20 = new web3.eth.Contract(Erc20ABI)
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).erc20 = this._ReferenceERC20
   }
 

@@ -95,6 +95,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     this._ReferenceExchangeContract = new web3.eth.Contract(StablecoinConvertedAbi)
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._ReferenceExchangeContract
   }
 
