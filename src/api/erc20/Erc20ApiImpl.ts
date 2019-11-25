@@ -1,4 +1,5 @@
-import { Erc20Api, TxOptionalParams, Receipt, ERC20 } from 'types'
+import { Erc20Api, TxOptionalParams, Receipt } from 'types'
+import { ERC20 } from 'types/ERC20'
 import BN from 'bn.js'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
@@ -108,7 +109,7 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.transferFrom(senderAddress, toAddress, amount).send({
+    const tx = erc20.methods.transferFrom(senderAddress, toAddress, amount.toString()).send({
       from: fromAddress,
     })
 
