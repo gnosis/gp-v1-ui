@@ -125,9 +125,9 @@ const TradeWidget: React.FC = () => {
     if (isConnected) {
       const success = await placeOrder({
         buyAmount: parseAmount(data[receiveInputId], receiveToken.decimals),
-        buyToken: receiveToken,
+        buyToken: getToken('symbol', receiveToken.symbol, tokens),
         sellAmount: parseAmount(data[sellInputId], sellToken.decimals),
-        sellToken,
+        sellToken: getToken('symbol', sellToken.symbol, tokens),
       })
       if (success) {
         // reset form on successful order placing
