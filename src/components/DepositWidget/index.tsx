@@ -16,25 +16,15 @@ import { log, formatAmount, getToken } from 'utils'
 import { ZERO } from 'const'
 import { TokenBalanceDetails } from 'types'
 
-interface ModalBodyProps {
-  pendingAmount: string
-  symbol: string
-}
-
-const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
+const OverwriteModalBody: React.FC = () => {
   return (
     <ModalBodyWrapper>
       <div>
-        <p>
-          There is already a pending withdrawal of {pendingAmount} {symbol}. If you create a new request, it will delete
-          the previous request and create a new one.
-        </p>
-        <p>
-          No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
-          consolidated.
-        </p>
+        <p>You have a pending withdraw request. </p>
+        <p>Sending this one will overwrite the pending amount.</p>
+        <p>No funds will be lost.</p>
       </div>
-      <p>Do you wish to create a new withdrawal request that replaces the previous one?</p>
+      <p>Do you wish to replace the previous withdraw request?</p>
     </ModalBodyWrapper>
   )
 }
@@ -51,20 +41,20 @@ const DepositWidget: React.FC = () => {
     symbol: '',
   })
 
-  const [withdrawConfirmationModal, toggleWithdrawConfirmationModal] = useModali({
+  const [withdrawOverwriteModal, toggleWithdrawOverwriteModal] = useModali({
     centered: true,
     animated: true,
     title: 'Confirm withdraw overwrite',
-    message: <ModalBody pendingAmount={withdrawRequest.pendingAmount} symbol={withdrawRequest.symbol} />,
+    message: <OverwriteModalBody />,
     buttons: [
-      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWithdrawConfirmationModal()} />,
+      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWithdrawOverwriteModal()} />,
       <Modali.Button
-        label="Accept"
+        label="Continue"
         key="yes"
         isStyleDefault
         onClick={async (): Promise<void> => {
           // On confirm, do the request
-          toggleWithdrawConfirmationModal()
+          toggleWithdrawOverwriteModal()
           await requestWithdraw(withdrawRequest.amount, withdrawRequest.tokenAddress)
         }}
       />,
@@ -130,7 +120,7 @@ const DepositWidget: React.FC = () => {
           </div>
         )}
       </Widget>
-      <Modali.Modal {...withdrawConfirmationModal} />
+      <Modali.Modal {...withdrawOverwriteModal} />
     </DepositWidgetWrapper>
   )
 }
