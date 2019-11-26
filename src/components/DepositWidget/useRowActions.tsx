@@ -1,11 +1,12 @@
-import { SetStateAction, Dispatch } from 'react'
+import { SetStateAction, Dispatch, useReducer } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
 import { depositApi, erc20Api } from 'api'
 import { Mutation, TokenBalanceDetails } from 'types'
-import { HIGHLIGHT_TIME, ALLOWANCE_MAX_VALUE, ZERO } from 'const'
+import { ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+
 import { formatAmount, formatAmountFull, log, getToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
@@ -16,13 +17,71 @@ interface Params {
 
 interface Result {
   enableToken: (tokenAddress: string) => Promise<void>
-  deposit: (amount: BN, tokenAddress: string) => Promise<void>
-  requestWithdraw: (amount: BN, tokenAddress: string) => Promise<void>
-  claim: (tokenAddress: string) => Promise<void>
+  depositToken: (amount: BN, tokenAddress: string) => Promise<void>
+  requestWithdrawToken: (amount: BN, tokenAddress: string) => Promise<void>
+  claimToken: (tokenAddress: string) => Promise<void>
+  // State
+  enabling: TokenLocalState['enabling']
+  highlighted: TokenLocalState['highlighted']
+  claiming: TokenLocalState['claiming']
+}
+
+interface TokenLocalState {
+  enabling: Map<string, string>
+  highlighted: Map<string, string>
+  claiming: Map<string, string>
+}
+
+const SET_ENABLING = 'enabling'
+const SET_CLAIMING = 'claiming'
+const SET_HIGHLIGHTED = 'highlighted'
+const SET_HIGHLIGHTED_AND_CLAIMING = 'highlighted_and_claiming'
+
+type Actions =
+  | { type: typeof SET_ENABLING; payload: string }
+  | { type: typeof SET_CLAIMING; payload: string }
+  | { type: typeof SET_HIGHLIGHTED; payload: string }
+  | { type: typeof SET_HIGHLIGHTED_AND_CLAIMING; payload: string }
+
+const initialState: TokenLocalState = {
+  enabling: new Map(),
+  highlighted: new Map(),
+  claiming: new Map(),
+}
+
+const initState = (): TokenLocalState => initialState
+
+const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
+  switch (action.type) {
+    case SET_ENABLING:
+    case SET_CLAIMING:
+    case SET_HIGHLIGHTED:
+      return {
+        ...state,
+        [action.type]: state[action.type].has(action.payload)
+          ? state[action.type].delete(action.payload) && state[action.type]
+          : state[action.type].set(action.payload, action.payload),
+      }
+    case SET_HIGHLIGHTED_AND_CLAIMING:
+      return {
+        ...state,
+        claiming: state.claiming.has(action.payload)
+          ? state.claiming.delete(action.payload) && state.claiming
+          : state.claiming.set(action.payload, action.payload),
+        highlighted: state.highlighted.has(action.payload)
+          ? state.highlighted.delete(action.payload) && state.highlighted
+          : state.highlighted.set(action.payload, action.payload),
+      }
+    default:
+      return state
+  }
 }
 
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
+
+  const [state, dispatch] = useReducer(reducer, initialState, initState)
+
   const { userAddress, networkId } = useWalletConnection()
   const contractAddress = depositApi.getContractAddress(networkId)
 
@@ -35,24 +94,14 @@ export const useRowActions = (params: Params): Result => {
     )
   }
 
-  function _clearHighlight(tokenAddress: string): void {
-    setTimeout(() => {
-      _updateToken(tokenAddress, tokenBalancesAux => ({
-        ...tokenBalancesAux,
-        highlighted: false,
-      }))
-    }, HIGHLIGHT_TIME)
-  }
-
   async function enableToken(tokenAddress: string): Promise<void> {
     const { symbol } = getToken('address', tokenAddress, balances)
     try {
-      _updateToken(tokenAddress, otherParams => {
-        return {
-          ...otherParams,
-          enabling: true,
-        }
+      dispatch({
+        type: SET_ENABLING,
+        payload: tokenAddress,
       })
+
       const receipt = await erc20Api.approve(
         { userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
         txOptionalParams,
@@ -63,21 +112,29 @@ export const useRowActions = (params: Params): Result => {
         return {
           ...otherParams,
           enabled: true,
-          highlighted: true,
         }
       })
-      _clearHighlight(tokenAddress)
-
       toast.success(`The token ${symbol} has been enabled for trading`)
     } catch (error) {
       console.error('Error enabling the token', error)
       toast.error('Error enabling the token')
+    } finally {
+      dispatch({
+        type: SET_ENABLING,
+        payload: tokenAddress,
+      })
     }
   }
 
-  async function deposit(amount: BN, tokenAddress: string): Promise<void> {
+  async function depositToken(amount: BN, tokenAddress: string): Promise<void> {
     try {
       const { symbol, decimals } = getToken('address', tokenAddress, balances)
+
+      dispatch({
+        type: SET_HIGHLIGHTED,
+        payload: tokenAddress,
+      })
+
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${receipt.transactionHash}`)
@@ -87,23 +144,30 @@ export const useRowActions = (params: Params): Result => {
           ...otherParams,
           depositingBalance: depositingBalance.add(amount),
           walletBalance: walletBalance.sub(amount),
-          highlighted: true,
         }
       })
-      _clearHighlight(tokenAddress)
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
       console.error('Error depositing', error)
       toast.error(`Error depositing: ${error.message}`)
+    } finally {
+      dispatch({
+        type: SET_HIGHLIGHTED,
+        payload: tokenAddress,
+      })
     }
   }
 
-  async function requestWithdraw(amount: BN, tokenAddress: string): Promise<void> {
+  async function requestWithdrawToken(amount: BN, tokenAddress: string): Promise<void> {
     const { symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
-      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+      dispatch({
+        type: SET_HIGHLIGHTED,
+        payload: tokenAddress,
+      })
 
+      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.requestWithdraw({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
@@ -111,51 +175,63 @@ export const useRowActions = (params: Params): Result => {
         return {
           ...otherParams,
           withdrawingBalance: amount,
-          claimable: false,
-          highlighted: true,
         }
       })
-      _clearHighlight(tokenAddress)
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
       console.error('Error requesting withdraw', error)
       toast.error(`Error requesting withdraw: ${error.message}`)
+    } finally {
+      dispatch({
+        type: SET_HIGHLIGHTED,
+        payload: tokenAddress,
+      })
     }
   }
 
-  async function claim(tokenAddress: string): Promise<void> {
+  async function claimToken(tokenAddress: string): Promise<void> {
     const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
-      _updateToken(tokenAddress, otherParams => {
-        return {
-          ...otherParams,
-          claiming: true,
-        }
+
+      dispatch({
+        type: SET_HIGHLIGHTED_AND_CLAIMING,
+        payload: tokenAddress,
       })
+
       const receipt = await depositApi.withdraw({ userAddress, tokenAddress }, txOptionalParams)
 
       _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
         return {
           ...otherParams,
-          claiming: false,
           exchangeBalance: exchangeBalance.sub(withdrawingBalance),
           withdrawingBalance: ZERO,
-          claimable: false,
           walletBalance: walletBalance.add(withdrawingBalance),
-          highlighted: true,
+          claimable: false,
         }
       })
-      _clearHighlight(tokenAddress)
 
       log(`The transaction has been mined: ${receipt.transactionHash}`)
       toast.success(`Withdraw of ${formatAmount(withdrawingBalance, decimals)} ${symbol} completed`)
     } catch (error) {
       console.error('Error executing the withdraw request', error)
       toast.error(`Error executing the withdraw request: ${error.message}`)
+    } finally {
+      dispatch({
+        type: SET_HIGHLIGHTED_AND_CLAIMING,
+        payload: tokenAddress,
+      })
     }
   }
 
-  return { enableToken, deposit, requestWithdraw, claim }
+  return {
+    enableToken,
+    depositToken,
+    requestWithdrawToken,
+    claimToken,
+    enabling: state.enabling,
+    claiming: state.claiming,
+    highlighted: state.highlighted,
+  }
 }
