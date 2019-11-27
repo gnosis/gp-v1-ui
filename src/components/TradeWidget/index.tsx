@@ -180,6 +180,7 @@ const TradeWidget: React.FC = () => {
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
+            tabIndex={1}
           />
           <IconWrapper onClick={swapTokens}>
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
@@ -192,6 +193,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
+            tabIndex={2}
           />
           <OrderDetails
             sellAmount={watch(sellInputId)}
@@ -199,7 +201,7 @@ const TradeWidget: React.FC = () => {
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
           />
-          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting}>
+          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>

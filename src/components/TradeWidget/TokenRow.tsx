@@ -106,6 +106,7 @@ interface Props {
   inputId: string
   isDisabled: boolean
   validateMaxAmount?: true
+  tabIndex: number
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -117,6 +118,7 @@ const TokenRow: React.FC<Props> = ({
   inputId,
   isDisabled,
   validateMaxAmount,
+  tabIndex,
 }) => {
   const { register, errors, setValue, watch } = useFormContext()
   const error = errors[inputId]
@@ -187,6 +189,7 @@ const TokenRow: React.FC<Props> = ({
         tokens={tokens}
         selected={selectedToken}
         onChange={onSelectChange}
+        tabIndex={tabIndex}
       />
       <InputBox>
         <input
@@ -203,12 +206,15 @@ const TokenRow: React.FC<Props> = ({
           onKeyPress={preventInvalidChars}
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
+          tabIndex={tabIndex + 2}
         />
         {errorOrWarning}
         <WalletDetail>
           <div>
             <strong>
-              <LinkWithPastLocation to="/deposit">Exchange wallet:</LinkWithPastLocation>
+              <LinkWithPastLocation to="/deposit" tabIndex={-1}>
+                Exchange wallet:
+              </LinkWithPastLocation>
             </strong>{' '}
             <span className="success">
               {balance ? formatAmount(exchangeBalanceAndPendingBalance, balance.decimals) : '0'}
