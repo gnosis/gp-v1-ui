@@ -80,7 +80,7 @@ const TradeWidget: React.FC = () => {
   const receiveInputId = 'receiveToken'
 
   const methods = useForm({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellAmount,
       [receiveInputId]: receiveAmount,
