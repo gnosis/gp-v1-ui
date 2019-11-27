@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
@@ -120,23 +120,26 @@ const TradeWidget: React.FC = () => {
   const { isSubmitting, placeOrder } = usePlaceOrder()
   const history = useHistory()
 
-  const swapTokens = (): void => {
+  const swapTokens = useCallback((): void => {
     setSellToken(receiveToken)
     setReceiveToken(sellToken)
-  }
+  }, [receiveToken, sellToken])
 
-  const onSelectChangeFactory = (
-    setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
-    oppositeToken: TokenDetails,
-  ): ((selected: TokenDetails) => void) => {
-    return (selected: TokenDetails): void => {
-      if (selected.symbol === oppositeToken.symbol) {
-        swapTokens()
-      } else {
-        setToken(selected)
+  const onSelectChangeFactory = useCallback(
+    (
+      setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
+      oppositeToken: TokenDetails,
+    ): ((selected: TokenDetails) => void) => {
+      return (selected: TokenDetails): void => {
+        if (selected.symbol === oppositeToken.symbol) {
+          swapTokens()
+        } else {
+          setToken(selected)
+        }
       }
-    }
-  }
+    },
+    [swapTokens],
+  )
 
   const sameToken = sellToken === receiveToken
 
