@@ -49,6 +49,7 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
         batchId: Number.MAX_SAFE_INTEGER,
       },
     },
+    // @ts-ignore
     [TOKEN_7]: undefined, // 0. DAI: decimals=18
   },
 }

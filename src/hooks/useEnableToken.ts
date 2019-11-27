@@ -1,5 +1,5 @@
 import { TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
-import assert from 'assert'
+import { assert } from 'utils/miscellaneous'
 import { erc20Api, depositApi } from 'api'
 
 import useSafeState from './useSafeState'
@@ -25,13 +25,15 @@ export const useEnableTokens = (params: Params): Result => {
   const [enabling, setEnabling] = useSafeState(false)
 
   async function enableToken(): Promise<Receipt> {
-    assert(!enabled, 'The token was already enabled')
-    assert(isConnected, "There's no connected wallet")
+    assert(!enabled && isConnected, 'The token was already enabled and/or user is not connected')
+    assert(userAddress, 'User address not found. Please check wallet.')
 
     setEnabling(true)
 
     // Set the allowance
-    const contractAddress = depositApi.getContractAddress(networkId)
+    const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
+    assert(contractAddress, 'Contract address not found. Please check wallet.')
+
     const receipt = await erc20Api.approve(
       {
         userAddress,

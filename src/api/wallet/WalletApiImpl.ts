@@ -120,7 +120,7 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
   if (
     web3 &&
     typeof web3.currentProvider === 'object' &&
-    web3.currentProvider.connected &&
+    web3.currentProvider?.connected &&
     'disconnect' in web3.currentProvider
   ) {
     // code=1000 - Normal Closure
@@ -134,7 +134,7 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
 export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
-  private _web3: Web3 | null
+  private _web3: Web3
 
   private _unsubscribe: Command = () => {}
 
@@ -197,7 +197,7 @@ export class WalletApiImpl implements WalletApi {
     this._unsubscribe()
 
     this._provider = null
-    this._web3.setProvider(getDefaultProvider())
+    this._web3?.setProvider(getDefaultProvider())
 
     log('[WalletApi] Disconnected')
     await this._notifyListeners()

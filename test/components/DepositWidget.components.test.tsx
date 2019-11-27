@@ -95,7 +95,7 @@ describe('<Row /> claimable token', () => {
 describe('<Row /> style', () => {
   it('is highlighted', () => {
     const wrapper = render(
-      _createRow(null, {
+      _createRow(undefined, {
         ...fakeRowState,
         highlighted: fakeRowState.highlighted.add(initialTokenBalanceDetails.address),
       }),
@@ -105,7 +105,7 @@ describe('<Row /> style', () => {
 
   it('is enabling', () => {
     const wrapper = render(
-      _createRow(null, {
+      _createRow(undefined, {
         ...fakeRowState,
         highlighted: new Set(),
         enabling: fakeRowState.enabling.add(initialTokenBalanceDetails.address),

@@ -7,8 +7,10 @@ import { Mutation, TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { formatAmount, formatAmountFull, log, getToken } from 'utils'
+import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
+
+const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
 
 /************************************************************** */
 // Reducer specific typings
@@ -53,14 +55,23 @@ const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
     case ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING: {
       const newClaimingSet = new Set(state.claiming)
       const newHighlightedSet = new Set(state.highlighted)
+
+      if (newClaimingSet.has(action.payload)) {
+        newClaimingSet.delete(action.payload)
+      } else {
+        newClaimingSet.add(action.payload)
+      }
+
+      if (newHighlightedSet.has(action.payload)) {
+        newHighlightedSet.delete(action.payload)
+      } else {
+        newHighlightedSet.add(action.payload)
+      }
+
       return {
         ...state,
-        claiming: newClaimingSet.has(action.payload)
-          ? newClaimingSet.delete(action.payload) && newClaimingSet
-          : newClaimingSet.add(action.payload),
-        highlighted: newHighlightedSet.has(action.payload)
-          ? newHighlightedSet.delete(action.payload) && newHighlightedSet
-          : newHighlightedSet.add(action.payload),
+        claiming: newClaimingSet,
+        highlighted: newHighlightedSet,
       }
     }
     default:
@@ -89,7 +100,7 @@ export const useRowActions = (params: Params): Result => {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   const { userAddress, networkId } = useWalletConnection()
-  const contractAddress = depositApi.getContractAddress(networkId)
+  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>
@@ -101,11 +112,25 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function enableToken(tokenAddress: string): Promise<void> {
-    const { symbol } = getToken('address', tokenAddress, balances)
     try {
+      assert(userAddress, 'User address missing. Aborting.')
+      assert(contractAddress, 'Contract address missing. Aborting.')
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token, aborting.')
+
       dispatch({
         type: ActionTypes.SET_ENABLING,
         payload: tokenAddress,
+      })
+
+      const { symbol: tokenDisplayName } = safeFilledToken(token)
+
+      _updateToken(tokenAddress, otherParams => {
+        return {
+          ...otherParams,
+          enabling: true,
+        }
       })
 
       const receipt = await erc20Api.approve(
@@ -120,7 +145,8 @@ export const useRowActions = (params: Params): Result => {
           enabled: true,
         }
       })
-      toast.success(`The token ${symbol} has been enabled for trading`)
+
+      toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
     } catch (error) {
       console.error('Error enabling the token', error)
       toast.error('Error enabling the token')
@@ -134,12 +160,17 @@ export const useRowActions = (params: Params): Result => {
 
   async function depositToken(amount: BN, tokenAddress: string): Promise<void> {
     try {
-      const { symbol, decimals } = getToken('address', tokenAddress, balances)
+      assert(userAddress, ON_ERROR_MESSAGE)
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token')
 
       dispatch({
         type: ActionTypes.SET_HIGHLIGHTED,
         payload: tokenAddress,
       })
+
+      const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
@@ -166,12 +197,20 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function requestWithdrawToken(amount: BN, tokenAddress: string): Promise<void> {
-    const { symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
+      assert(userAddress, ON_ERROR_MESSAGE)
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token')
+
       dispatch({
         type: ActionTypes.SET_HIGHLIGHTED,
         payload: tokenAddress,
       })
+
+      const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+
+      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.requestWithdraw({ userAddress, tokenAddress, amount }, txOptionalParams)
@@ -197,8 +236,14 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function claimToken(tokenAddress: string): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
+      assert(userAddress, ON_ERROR_MESSAGE)
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token')
+
+      const { withdrawingBalance, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
 
       dispatch({

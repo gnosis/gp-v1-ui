@@ -1,11 +1,10 @@
 import BN from 'bn.js'
-import assert from 'assert'
-
-import { log, toBN } from 'utils'
+import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
 import { getEpochAddressForNetwork } from './epochList'
 
-import { DepositApi, Receipt, TxOptionalParams, EpochTokenLocker } from 'types'
+import { DepositApi, Receipt, TxOptionalParams } from 'types'
+import { EpochTokenLocker } from 'types/EpochTokenLocker'
 import EpochTokenLockerAbi from './EpochTokenLockerAbi'
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
@@ -33,6 +32,7 @@ export class DepositApiImpl implements DepositApi {
     this._web3 = web3
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).epoch = this._ReferenceEpochTokenLocker
   }
 
@@ -151,7 +151,7 @@ export class DepositApiImpl implements DepositApi {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -166,7 +166,7 @@ export class DepositApiImpl implements DepositApi {
     const contract = await this._getContract()
     const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -193,6 +193,7 @@ export class DepositApiImpl implements DepositApi {
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
 
+    // as string as assert is not detected by TS
     return this._getContractAtAddress(address)
   }
 

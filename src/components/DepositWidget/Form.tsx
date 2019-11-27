@@ -27,7 +27,7 @@ interface Errors {
   amountInput: string
 }
 
-function _validateForm(totalAmount: BN, amountInput: string, decimals: number): string {
+function _validateForm(totalAmount: BN, amountInput: string, decimals: number): string | null {
   if (!amountInput) {
     return 'Required amount'
   }
@@ -52,7 +52,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
   const [validatorActive, setValidatorActive] = useSafeState(false)
   const [loading, setLoading] = useSafeState(false)
   const [errors, setErrors] = useSafeState<Errors>({
-    amountInput: null,
+    amountInput: '',
   })
 
   const cancelForm = (): void => {
@@ -66,7 +66,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
       const errorMsg = _validateForm(totalAmount, amountInput, decimals)
       setErrors(oldErrors => ({
         ...oldErrors,
-        amountInput: errorMsg,
+        amountInput: errorMsg || '',
       }))
     }
   }, [amountInput, decimals, setErrors, totalAmount, validatorActive])
@@ -77,16 +77,18 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     const error = _validateForm(totalAmount, amountInput, decimals)
     if (!error) {
       setLoading(true)
-      props.onSubmit(parseAmount(amountInput, decimals)).then(() => {
-        setLoading(false)
-        setValidatorActive(false)
-        cancelForm()
-      })
+      const parsedAmt = parseAmount(amountInput, decimals)
+      parsedAmt &&
+        props.onSubmit(parsedAmt).then(() => {
+          setLoading(false)
+          setValidatorActive(false)
+          cancelForm()
+        })
     }
   }
 
   return (
-    <DynamicWrapper responsive={responsive}>
+    <DynamicWrapper responsive={!!responsive}>
       <InnerWrapper>
         <a className="times" onClick={cancelForm}>
           &times;
@@ -97,9 +99,12 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <li>
               <label>{totalAmountLabel}</label>
               <div className="wallet">
-                <input type="text" value={formatAmountFull(totalAmount, decimals)} disabled />
+                <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
                 <br />
-                <a className="max" onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false))}>
+                <a
+                  className="max"
+                  onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}
+                >
                   <small>Use Max</small>
                 </a>
               </div>

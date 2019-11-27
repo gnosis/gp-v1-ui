@@ -41,11 +41,13 @@ interface Props {
 
 const Widget: React.FC<Props> = ({ children, className }) => {
   const { networkId } = useWalletConnection()
-  const contractAddress = depositApi.getContractAddress(networkId)
+  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
   return (
     <Wrapper className={className}>
-      <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
+      {contractAddress && (
+        <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
+      )}
       {children}
     </Wrapper>
   )

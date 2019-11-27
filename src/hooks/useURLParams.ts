@@ -5,7 +5,9 @@ function useURLParams(newParams?: string): void {
   const history = useHistory()
 
   useEffect(() => {
-    history.push(newParams)
+    if (newParams) {
+      history.push(newParams)
+    }
   }, [history, newParams])
 }
 
