@@ -184,6 +184,7 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             validateMaxAmount
             tabIndex={1}
+            onSubmit={onSubmit}
           />
           <IconWrapper onClick={swapTokens}>
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
@@ -197,6 +198,7 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
+            onSubmit={onSubmit}
           />
           <OrderDetails
             sellAmount={watch(sellInputId)}
