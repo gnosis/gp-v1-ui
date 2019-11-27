@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'react-toastify'
 
@@ -8,6 +8,7 @@ import { log } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { DEFAULT_ORDER_DURATION } from 'const'
+import useSafeState from './useSafeState'
 
 interface PlaceOrderParams {
   buyAmount: BN
@@ -22,11 +23,11 @@ interface Result {
 }
 
 export const usePlaceOrder = (): Result => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useSafeState(false)
   const { userAddress } = useWalletConnection()
 
-  const placeOrder = useMemo((): ((params: PlaceOrderParams) => Promise<boolean>) => {
-    return async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
+  const placeOrder = useCallback(
+    async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
       if (!userAddress) {
         toast.error('Wallet is not connected!')
         return false
@@ -69,11 +70,11 @@ export const usePlaceOrder = (): Result => {
 
         return false
       } finally {
-        //TODO: use mounted hook thingy when available
         setIsSubmitting(false)
       }
-    }
-  }, [userAddress])
+    },
+    [setIsSubmitting, userAddress],
+  )
 
   return { placeOrder, isSubmitting }
 }

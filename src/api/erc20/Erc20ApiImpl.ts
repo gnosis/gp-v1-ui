@@ -1,4 +1,5 @@
-import { Erc20Api, TxOptionalParams, Receipt, ERC20 } from 'types'
+import { Erc20Api, TxOptionalParams, Receipt } from 'types'
+import { ERC20 } from 'types/ERC20'
 import BN from 'bn.js'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
@@ -18,6 +19,7 @@ export class Erc20ApiImpl implements Erc20Api {
     this._ReferenceERC20 = new web3.eth.Contract(Erc20ABI)
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).erc20 = this._ReferenceERC20
   }
 
@@ -60,7 +62,8 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.approve(spenderAddress, amount).send({
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
     })
 
@@ -82,7 +85,8 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.transfer(toAddress, amount).send({
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: fromAddress,
     })
 
@@ -105,7 +109,7 @@ export class Erc20ApiImpl implements Erc20Api {
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.transferFrom(senderAddress, toAddress, amount).send({
+    const tx = erc20.methods.transferFrom(senderAddress, toAddress, amount.toString()).send({
       from: fromAddress,
     })
 

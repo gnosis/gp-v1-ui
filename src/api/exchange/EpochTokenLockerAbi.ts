@@ -12,16 +12,12 @@ const EpochTokenLockerAbi: AbiItem[] = [
         name: '',
         type: 'address',
       },
-      {
-        name: '',
-        type: 'uint256',
-      },
     ],
-    name: 'hasCreditedBalance',
+    name: 'lastCreditBatchId',
     outputs: [
       {
         name: '',
-        type: 'bool',
+        type: 'uint256',
       },
     ],
     payable: false,
@@ -162,7 +158,29 @@ const EpochTokenLockerAbi: AbiItem[] = [
         type: 'address',
       },
       {
-        name: 'owner',
+        name: 'amount',
+        type: 'uint256',
+      },
+      {
+        name: 'batchId',
+        type: 'uint32',
+      },
+    ],
+    name: 'requestFutureWithdraw',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+      {
+        name: 'token',
         type: 'address',
       },
     ],

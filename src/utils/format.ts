@@ -1,6 +1,9 @@
 import BN from 'bn.js'
-import { TEN, DEFAULT_PRECISION, DEFAULT_DECIMALS, ELLIPSIS } from 'const'
+import { TEN, DEFAULT_PRECISION } from 'const'
 import { TokenDetails } from 'types'
+
+const DEFAULT_DECIMALS = 4
+const ELLIPSIS = '...'
 
 function _getLocaleSymbols(): { thousands: string; decimals: string } {
   // Check number representation in default locale
@@ -35,8 +38,8 @@ function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { 
 }
 
 export function formatAmount(
-  amount?: BN,
-  amountPrecision = DEFAULT_PRECISION,
+  amount: BN | null | undefined,
+  amountPrecision: number,
   decimals = DEFAULT_DECIMALS,
   thousandSeparator = true,
 ): string | null {
@@ -93,7 +96,7 @@ export function adjustPrecision(value: string | undefined | null, precision: num
   return value.replace(regexp, '$1')
 }
 
-export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
+export function parseAmount(amountFmt: string, amountPrecision: number): BN | null {
   if (!amountFmt) {
     return null
   }

@@ -143,16 +143,18 @@ const TradeWidget: React.FC = () => {
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
+    const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
+    const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount) return
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken) return
 
     if (isConnected) {
       const success = await placeOrder({
         buyAmount,
-        buyToken: receiveToken,
+        buyToken: cachedBuyToken,
         sellAmount,
-        sellToken,
+        sellToken: cachedSellToken,
       })
       if (success) {
         // reset form on successful order placing

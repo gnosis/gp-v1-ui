@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { getEpoch, formatAmount, log } from 'utils'
+import { getEpoch, log } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT, RECEIPT } from '../../../test/data'
 
@@ -142,7 +142,7 @@ export class DepositApiMock implements DepositApi {
       amount,
     })
 
-    log(`[DepositApiMock] Deposited ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiMock] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 
@@ -168,7 +168,7 @@ export class DepositApiMock implements DepositApi {
       batchId: currentBatchId,
     }
 
-    log(`[DepositApiMock] Requested withdraw of ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiMock] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 
@@ -207,7 +207,7 @@ export class DepositApiMock implements DepositApi {
       amount,
     })
 
-    log(`[DepositApiMock] Withdraw ${formatAmount(amount)} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiMock] Withdraw ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 
