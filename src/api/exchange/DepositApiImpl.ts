@@ -5,7 +5,8 @@ import { log, toBN } from 'utils'
 import { ZERO } from 'const'
 import { getEpochAddressForNetwork } from './epochList'
 
-import { DepositApi, Receipt, TxOptionalParams, EpochTokenLocker } from 'types'
+import { DepositApi, Receipt, TxOptionalParams } from 'types'
+import { EpochTokenLocker } from 'types/EpochTokenLocker'
 import EpochTokenLockerAbi from './EpochTokenLockerAbi'
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
@@ -33,6 +34,7 @@ export class DepositApiImpl implements DepositApi {
     this._web3 = web3
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).epoch = this._ReferenceEpochTokenLocker
   }
 

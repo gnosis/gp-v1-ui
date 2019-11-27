@@ -151,6 +151,20 @@ const StablecoinConvertedAbi: AbiItem[] = [
   {
     constant: true,
     inputs: [],
+    name: 'AMOUNT_MINIMUM',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [],
     name: 'feeToken',
     outputs: [
       {
@@ -706,7 +720,7 @@ const StablecoinConvertedAbi: AbiItem[] = [
         type: 'uint256[]',
       },
     ],
-    name: 'cancelOrder',
+    name: 'cancelOrders',
     outputs: [],
     payable: false,
     stateMutability: 'nonpayable',
@@ -746,7 +760,7 @@ const StablecoinConvertedAbi: AbiItem[] = [
         type: 'uint16[]',
       },
       {
-        name: 'volumes',
+        name: 'buyVolumes',
         type: 'uint128[]',
       },
       {
@@ -820,6 +834,25 @@ const StablecoinConvertedAbi: AbiItem[] = [
       {
         name: '',
         type: 'bool',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [
+      {
+        name: 'user',
+        type: 'address',
+      },
+    ],
+    name: 'getEncodedUserOrders',
+    outputs: [
+      {
+        name: 'elements',
+        type: 'bytes',
       },
     ],
     payable: false,

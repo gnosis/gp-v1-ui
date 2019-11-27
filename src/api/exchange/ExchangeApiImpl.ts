@@ -1,7 +1,8 @@
 import assert from 'assert'
 
 import { DepositApiImpl } from './DepositApiImpl'
-import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, StablecoinConverter, AuctionElement } from 'types'
+import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, AuctionElement } from 'types'
+import { StablecoinConverter } from 'types/StablecoinConverter'
 import StablecoinConvertedAbi from './StablecoinConverterAbi'
 import { log } from 'utils'
 
@@ -28,10 +29,8 @@ const orderPattern = `(?<user>${hn(ADDRESS_WIDTH)})(?<sellTokenBalance>${hn(UINT
   UINT128_WIDTH,
 )})`
 
-// decodes Orders for a userAddress if passed one
-// otherwise decodes all Orders for all users
-const decodeAuctionElements = (bytes: string, userAddress?: string): AuctionElement[] => {
-  const userAddressLC = userAddress && userAddress.toLowerCase()
+// decodes Orders
+const decodeAuctionElements = (bytes: string): AuctionElement[] => {
   const result: AuctionElement[] = []
   const oneOrder = new RegExp(orderPattern, 'g')
   let order
@@ -48,36 +47,17 @@ const decodeAuctionElements = (bytes: string, userAddress?: string): AuctionElem
       remainingAmount,
     } = order.groups
 
-    const user0x = '0x' + user
-
-    // consider user matching if userAddress wasn't given (we match all users)
-    // or userAdrres is Order.user
-    const userMatch = !userAddressLC || userAddressLC === user0x.toLowerCase()
-
-    // if passed userAddress and now encounters a different user (so !userMatch)
-    // and have already found some orders for that address
-    // can stop decoding,
-    // because StablecoinConverter.getEncodedAuctionElements fills in orders by user
-    // [orders[users[0]][0],orders[users[0]][1],orders[users[1]][0],orders[users[1]][1],...]
-    // so a specific user's orders are always contiguous
-    if (!userMatch && result.length > 0) break
-    // userMatch always true when no userAdress given, so never breaks the loop
-
-    // if not passed a userAddress OR if passed one and it matches Order.user
-    // add Order to results
-    if (userMatch) {
-      result.push({
-        user: user0x,
-        sellTokenBalance: new BN(sellTokenBalance, 16),
-        buyTokenId: parseInt(buyTokenId, 16),
-        sellTokenId: parseInt(sellTokenId, 16),
-        validFrom: parseInt(validFrom, 16),
-        validUntil: parseInt(validUntil, 16),
-        priceNumerator: new BN(priceNumerator, 16),
-        priceDenominator: new BN(priceDenominator, 16),
-        remainingAmount: new BN(remainingAmount, 16),
-      })
-    }
+    result.push({
+      user: '0x' + user,
+      sellTokenBalance: new BN(sellTokenBalance, 16),
+      buyTokenId: parseInt(buyTokenId, 16),
+      sellTokenId: parseInt(sellTokenId, 16),
+      validFrom: parseInt(validFrom, 16),
+      validUntil: parseInt(validUntil, 16),
+      priceNumerator: new BN(priceNumerator, 16),
+      priceDenominator: new BN(priceDenominator, 16),
+      remainingAmount: new BN(remainingAmount, 16),
+    })
   }
   return result
 }
@@ -95,6 +75,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     this._ReferenceExchangeContract = new web3.eth.Contract(StablecoinConvertedAbi)
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._ReferenceExchangeContract
   }
 
@@ -102,12 +83,12 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract()
     log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
-    const encodedOrders = await contract.methods.getEncodedAuctionElements().call()
+    const encodedOrders = await contract.methods.getEncodedUserOrders(userAddress).call()
 
     // is null if Contract returns empty bytes
     if (!encodedOrders) return []
 
-    return decodeAuctionElements(encodedOrders, userAddress)
+    return decodeAuctionElements(encodedOrders)
   }
 
   public async getNumTokens(): Promise<number> {
@@ -179,7 +160,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.cancelOrder([orderId]).send({ from: senderAddress })
+    const tx = contract.methods.cancelOrders([orderId]).send({ from: senderAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
