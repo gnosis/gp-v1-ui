@@ -12,17 +12,15 @@ import useNoScroll from 'hooks/useNoScroll'
 import { ZERO, RESPONSIVE_SIZES } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
+import { TokenLocalState } from './useRowActions'
 
-export interface RowProps {
+export interface RowProps extends TokenLocalState {
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN) => Promise<void>
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
   innerWidth: number | null
-  highlighted: Map<string, string>
-  enabling: Map<string, string>
-  claiming: Map<string, string>
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
@@ -61,9 +59,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   useNoScroll(visibleForm && showResponsive)
 
   let className
-  if (highlighted.get(address)) {
+  if (highlighted.has(address)) {
     className = 'highlight'
-  } else if (enabling.get(address)) {
+  } else if (enabling.has(address)) {
     className = 'enabling'
   } else if (visibleForm) {
     className = 'selected'
@@ -85,13 +83,13 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals)}>
           {claimable ? (
             <>
-              <RowClaimButton className="success" onClick={onClaim} disabled={!!claiming.get(address)}>
-                {claiming.get(address) && <FontAwesomeIcon icon={faSpinner} spin />}
+              <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
+                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
               </RowClaimButton>
               <div>
                 <RowClaimLink
-                  className={claiming.get(address) ? 'disabled' : 'success'}
+                  className={claiming.has(address) ? 'disabled' : 'success'}
                   onClick={(): void => {
                     if (!claiming) {
                       onClaim()
@@ -127,8 +125,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               </button>
             </>
           ) : (
-            <button className="success" onClick={onEnableToken} disabled={!!enabling.get(address)}>
-              {enabling.get(address) ? (
+            <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
+              {enabling.has(address) ? (
                 <>
                   <FontAwesomeIcon icon={faSpinner} spin />
                   &nbsp; Enabling {symbol}
