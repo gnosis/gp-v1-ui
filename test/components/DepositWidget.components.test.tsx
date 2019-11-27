@@ -2,14 +2,16 @@ import React from 'react'
 import { render } from 'enzyme'
 import BN from 'bn.js'
 
-import { TokenBalanceDetails } from 'types'
 import { Row, RowProps } from 'components/DepositWidget/Row'
-import { ZERO, ONE } from 'const'
+import { TokenLocalState } from 'components/DepositWidget/useRowActions'
 
-const fakeRowState = {
-  enabling: new Map(),
-  claiming: new Map(),
-  highlighted: new Map(),
+import { ZERO, ONE } from 'const'
+import { TokenBalanceDetails } from 'types'
+
+const fakeRowState: TokenLocalState = {
+  enabling: new Set(),
+  claiming: new Set(),
+  highlighted: new Set(),
 }
 
 const initialTokenBalanceDetails = {
@@ -95,10 +97,7 @@ describe('<Row /> style', () => {
     const wrapper = render(
       _createRow(null, {
         ...fakeRowState,
-        highlighted: fakeRowState.highlighted.set(
-          initialTokenBalanceDetails.address,
-          initialTokenBalanceDetails.address,
-        ),
+        highlighted: fakeRowState.highlighted.add(initialTokenBalanceDetails.address),
       }),
     )
     expect(wrapper.attr('class')).toMatch(/highlight/)
@@ -108,8 +107,8 @@ describe('<Row /> style', () => {
     const wrapper = render(
       _createRow(null, {
         ...fakeRowState,
-        highlighted: new Map(),
-        enabling: fakeRowState.enabling.set(initialTokenBalanceDetails.address, initialTokenBalanceDetails.address),
+        highlighted: new Set(),
+        enabling: fakeRowState.enabling.add(initialTokenBalanceDetails.address),
       }),
     )
     expect(wrapper.attr('class')).toMatch(/enabling/)
