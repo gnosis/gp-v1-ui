@@ -211,9 +211,7 @@ const TokenRow: React.FC<Props> = ({
               <Link to="/deposit">Exchange wallet:</Link>
             </strong>{' '}
             <span className="success">
-              {exchangeBalanceAndPendingBalance
-                ? formatAmount(exchangeBalanceAndPendingBalance, balance.decimals)
-                : '0'}
+              {balance ? formatAmount(exchangeBalanceAndPendingBalance, balance.decimals) : '0'}
             </span>
           </div>
           {validateMaxAmount && <a onClick={useMax}>use max</a>}
