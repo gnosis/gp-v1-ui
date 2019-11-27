@@ -10,6 +10,7 @@ const Wrapper = styled.div`
 
   background-color: lightyellow;
 
+  text-align: center;
   font-size: 80%;
 
   @media only screen and (max-width: 500px) {
