@@ -10,77 +10,83 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull, log, getToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
-interface Params {
-  balances: TokenBalanceDetails[]
-  setBalances: Dispatch<SetStateAction<TokenBalanceDetails[]>>
+/************************************************************** */
+// Reducer specific typings
+
+export interface TokenLocalState {
+  enabling: Set<string>
+  highlighted: Set<string>
+  claiming: Set<string>
 }
 
-interface Result {
-  enableToken: (tokenAddress: string) => Promise<void>
-  depositToken: (amount: BN, tokenAddress: string) => Promise<void>
-  requestWithdrawToken: (amount: BN, tokenAddress: string) => Promise<void>
-  claimToken: (tokenAddress: string) => Promise<void>
-  // State
-  enabling: TokenLocalState['enabling']
-  highlighted: TokenLocalState['highlighted']
-  claiming: TokenLocalState['claiming']
+const enum ActionTypes {
+  SET_ENABLING = 'enabling',
+  SET_CLAIMING = 'claiming',
+  SET_HIGHLIGHTED = 'highlighted',
+  SET_HIGHLIGHTED_AND_CLAIMING = 'highlighted_and_claiming',
 }
 
-interface TokenLocalState {
-  enabling: Map<string, string>
-  highlighted: Map<string, string>
-  claiming: Map<string, string>
+interface Actions {
+  type: ActionTypes
+  payload: string
 }
-
-const SET_ENABLING = 'enabling'
-const SET_CLAIMING = 'claiming'
-const SET_HIGHLIGHTED = 'highlighted'
-const SET_HIGHLIGHTED_AND_CLAIMING = 'highlighted_and_claiming'
-
-type Actions =
-  | { type: typeof SET_ENABLING; payload: string }
-  | { type: typeof SET_CLAIMING; payload: string }
-  | { type: typeof SET_HIGHLIGHTED; payload: string }
-  | { type: typeof SET_HIGHLIGHTED_AND_CLAIMING; payload: string }
 
 const initialState: TokenLocalState = {
-  enabling: new Map(),
-  highlighted: new Map(),
-  claiming: new Map(),
+  enabling: new Set(),
+  highlighted: new Set(),
+  claiming: new Set(),
 }
-
-const initState = (): TokenLocalState => initialState
 
 const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
   switch (action.type) {
-    case SET_ENABLING:
-    case SET_CLAIMING:
-    case SET_HIGHLIGHTED:
+    case ActionTypes.SET_ENABLING:
+    case ActionTypes.SET_CLAIMING:
+    case ActionTypes.SET_HIGHLIGHTED: {
+      const newSet = new Set(state[action.type])
       return {
         ...state,
-        [action.type]: state[action.type].has(action.payload)
-          ? state[action.type].delete(action.payload) && state[action.type]
-          : state[action.type].set(action.payload, action.payload),
+        [action.type]: newSet.has(action.payload)
+          ? newSet.delete(action.payload) && newSet
+          : newSet.add(action.payload),
       }
-    case SET_HIGHLIGHTED_AND_CLAIMING:
+    }
+    case ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING: {
+      const newClaimingSet = new Set(state.claiming)
+      const newHighlightedSet = new Set(state.highlighted)
       return {
         ...state,
-        claiming: state.claiming.has(action.payload)
-          ? state.claiming.delete(action.payload) && state.claiming
-          : state.claiming.set(action.payload, action.payload),
-        highlighted: state.highlighted.has(action.payload)
-          ? state.highlighted.delete(action.payload) && state.highlighted
-          : state.highlighted.set(action.payload, action.payload),
+        claiming: newClaimingSet.has(action.payload)
+          ? newClaimingSet.delete(action.payload) && newClaimingSet
+          : newClaimingSet.add(action.payload),
+        highlighted: newHighlightedSet.has(action.payload)
+          ? newHighlightedSet.delete(action.payload) && newHighlightedSet
+          : newHighlightedSet.add(action.payload),
       }
+    }
     default:
       return state
   }
 }
 
+/************************************************************** */
+// useRowActions specific typings
+
+interface Params {
+  balances: TokenBalanceDetails[]
+  setBalances: Dispatch<SetStateAction<TokenBalanceDetails[]>>
+}
+
+interface Result extends TokenLocalState {
+  enableToken: (tokenAddress: string) => Promise<void>
+  depositToken: (amount: BN, tokenAddress: string) => Promise<void>
+  requestWithdrawToken: (amount: BN, tokenAddress: string) => Promise<void>
+  claimToken: (tokenAddress: string) => Promise<void>
+}
+
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
 
-  const [state, dispatch] = useReducer(reducer, initialState, initState)
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   const { userAddress, networkId } = useWalletConnection()
   const contractAddress = depositApi.getContractAddress(networkId)
@@ -98,7 +104,7 @@ export const useRowActions = (params: Params): Result => {
     const { symbol } = getToken('address', tokenAddress, balances)
     try {
       dispatch({
-        type: SET_ENABLING,
+        type: ActionTypes.SET_ENABLING,
         payload: tokenAddress,
       })
 
@@ -120,7 +126,7 @@ export const useRowActions = (params: Params): Result => {
       toast.error('Error enabling the token')
     } finally {
       dispatch({
-        type: SET_ENABLING,
+        type: ActionTypes.SET_ENABLING,
         payload: tokenAddress,
       })
     }
@@ -131,7 +137,7 @@ export const useRowActions = (params: Params): Result => {
       const { symbol, decimals } = getToken('address', tokenAddress, balances)
 
       dispatch({
-        type: SET_HIGHLIGHTED,
+        type: ActionTypes.SET_HIGHLIGHTED,
         payload: tokenAddress,
       })
 
@@ -153,7 +159,7 @@ export const useRowActions = (params: Params): Result => {
       toast.error(`Error depositing: ${error.message}`)
     } finally {
       dispatch({
-        type: SET_HIGHLIGHTED,
+        type: ActionTypes.SET_HIGHLIGHTED,
         payload: tokenAddress,
       })
     }
@@ -163,7 +169,7 @@ export const useRowActions = (params: Params): Result => {
     const { symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
       dispatch({
-        type: SET_HIGHLIGHTED,
+        type: ActionTypes.SET_HIGHLIGHTED,
         payload: tokenAddress,
       })
 
@@ -184,7 +190,7 @@ export const useRowActions = (params: Params): Result => {
       toast.error(`Error requesting withdraw: ${error.message}`)
     } finally {
       dispatch({
-        type: SET_HIGHLIGHTED,
+        type: ActionTypes.SET_HIGHLIGHTED,
         payload: tokenAddress,
       })
     }
@@ -196,7 +202,7 @@ export const useRowActions = (params: Params): Result => {
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
 
       dispatch({
-        type: SET_HIGHLIGHTED_AND_CLAIMING,
+        type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
         payload: tokenAddress,
       })
 
@@ -219,7 +225,7 @@ export const useRowActions = (params: Params): Result => {
       toast.error(`Error executing the withdraw request: ${error.message}`)
     } finally {
       dispatch({
-        type: SET_HIGHLIGHTED_AND_CLAIMING,
+        type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
         payload: tokenAddress,
       })
     }
