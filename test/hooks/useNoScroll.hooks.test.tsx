@@ -7,13 +7,13 @@ import useWindowSizes from 'hooks/useWindowSizes'
 
 const TestScrollComponent: React.FC = () => {
   const { innerWidth } = useWindowSizes()
-  let activateNoScroll = innerWidth < 500
+  let activateNoScroll = !!innerWidth && innerWidth < 500
 
   useNoScroll(activateNoScroll)
 
   return (
     <div>
-      <h1>{innerWidth}</h1>
+      <h1>{innerWidth || ''}</h1>
     </div>
   )
 }
@@ -29,6 +29,7 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.removeChild(container)
+  // @ts-ignore
   container = null
 })
 

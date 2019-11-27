@@ -100,7 +100,7 @@ export abstract class StablecoinConverter extends Contract {
       validUntils: (number | string)[],
       buyAmounts: (number | string)[],
       sellAmounts: (number | string)[],
-    ): TransactionObject<(string)[]>
+    ): TransactionObject<string[]>
 
     placeOrder(
       buyToken: number | string,
@@ -117,7 +117,7 @@ export abstract class StablecoinConverter extends Contract {
     submitSolution(
       batchIndex: number | string,
       claimedObjectiveValue: number | string,
-      owners: (string)[],
+      owners: string[],
       orderIds: (number | string)[],
       buyVolumes: (number | string)[],
       prices: (number | string)[],

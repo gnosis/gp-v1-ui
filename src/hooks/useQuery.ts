@@ -6,8 +6,8 @@ import { useMemo } from 'react'
  *
  * @param value Input from URL
  */
-function sanitizeInput(value: string): string {
-  return Number(value) ? value : '0'
+function sanitizeInput(value?: string | null): string {
+  return value && Number(value) ? value : '0'
 }
 
 export function useQuery(): { sellAmount: string; buyAmount: string } {

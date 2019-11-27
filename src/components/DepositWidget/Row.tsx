@@ -19,7 +19,8 @@ export interface RowProps {
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
-  innerWidth: number | null
+  innerWidth?: number
+  innerHeight?: number
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
@@ -46,8 +47,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
-  let showResponsive = innerWidth < RESPONSIVE_SIZES.MOBILE
-  useNoScroll(visibleForm && showResponsive)
+  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE
+  useNoScroll(!!visibleForm && showResponsive)
 
   let className
   if (highlighted) {
@@ -68,10 +69,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           <TokenImg src={image} alt={name} />
           <div>{name}</div>
         </div>
-        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals)}>
+        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals) || ''}>
           {formatAmount(exchangeBalanceTotal, decimals)}
         </div>
-        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals)}>
+        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals) || ''}>
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
@@ -100,7 +101,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             0
           )}
         </div>
-        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals)}>
+        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
           {formatAmount(walletBalance, decimals)}
         </div>
         <div data-label="Actions">

@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { TEN } from 'const'
+import { TEN, DEFAULT_PRECISION } from 'const'
 import { TokenDetails } from 'types'
 
 const DEFAULT_DECIMALS = 4
@@ -41,7 +41,7 @@ export function formatAmount(
   amount: BN | null | undefined,
   amountPrecision: number,
   decimals = DEFAULT_DECIMALS,
-  thousandSeparator: boolean = true,
+  thousandSeparator = true,
 ): string | null {
   if (!amount) {
     return null
@@ -66,9 +66,9 @@ export function formatAmount(
 }
 
 export function formatAmountFull(
-  amount: BN | null | undefined,
-  amountPrecision: number,
-  thousandSeparator: boolean = true,
+  amount?: BN,
+  amountPrecision = DEFAULT_PRECISION,
+  thousandSeparator = true,
 ): string | null {
   if (!amount) {
     return null
@@ -114,7 +114,7 @@ export function parseAmount(amountFmt: string, amountPrecision: number): BN | nu
   }
 }
 
-export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
+export function abbreviateString(inputString: string, prefixLength: number, suffixLength = 0): string {
   // abbreviate only if it makes sense, and make sure ellipsis fits into word
   // 1. always add ellipsis
   // 2. do not shorten words in case ellipsis will make the word longer
@@ -131,4 +131,12 @@ export function abbreviateString(inputString: string, prefixLength: number, suff
 
 export function safeTokenName(token: TokenDetails): string {
   return token.symbol || token.name || abbreviateString(token.address, 6, 4)
+}
+
+export function safeFilledToken<T extends TokenDetails>(token: T): T {
+  return {
+    ...token,
+    name: token.name || token.symbol || abbreviateString(token.address, 6, 4),
+    symbol: token.symbol || token.name || abbreviateString(token.address, 6, 4),
+  }
 }

@@ -6,8 +6,10 @@ import { depositApi, erc20Api } from 'api'
 import { Mutation, TokenBalanceDetails } from 'types'
 import { HIGHLIGHT_TIME, ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { formatAmount, formatAmountFull, log, getToken } from 'utils'
+import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
+
+const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
 
 interface Params {
   balances: TokenBalanceDetails[]
@@ -24,7 +26,7 @@ interface Result {
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
   const { userAddress, networkId } = useWalletConnection()
-  const contractAddress = depositApi.getContractAddress(networkId)
+  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
   function _updateToken(tokenAddress: string, updateBalances: Mutation<TokenBalanceDetails>): void {
     setBalances(balances =>
@@ -45,8 +47,15 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function enableToken(tokenAddress: string): Promise<void> {
-    const { symbol } = getToken('address', tokenAddress, balances)
     try {
+      assert(userAddress, 'User address missing. Aborting.')
+      assert(contractAddress, 'Contract address missing. Aborting.')
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token, aborting.')
+
+      const { symbol: tokenDisplayName } = safeFilledToken(token)
+
       _updateToken(tokenAddress, otherParams => {
         return {
           ...otherParams,
@@ -68,7 +77,7 @@ export const useRowActions = (params: Params): Result => {
       })
       _clearHighlight(tokenAddress)
 
-      toast.success(`The token ${symbol} has been enabled for trading`)
+      toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
     } catch (error) {
       console.error('Error enabling the token', error)
       toast.error('Error enabling the token')
@@ -77,7 +86,13 @@ export const useRowActions = (params: Params): Result => {
 
   async function deposit(amount: BN, tokenAddress: string): Promise<void> {
     try {
-      const { symbol, decimals } = getToken('address', tokenAddress, balances)
+      assert(userAddress, ON_ERROR_MESSAGE)
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token')
+
+      const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${receipt.transactionHash}`)
@@ -100,8 +115,14 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function requestWithdraw(amount: BN, tokenAddress: string): Promise<void> {
-    const { symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
+      assert(userAddress, ON_ERROR_MESSAGE)
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token')
+
+      const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
       const receipt = await depositApi.requestWithdraw({ userAddress, tokenAddress, amount }, txOptionalParams)
@@ -125,8 +146,14 @@ export const useRowActions = (params: Params): Result => {
   }
 
   async function claim(tokenAddress: string): Promise<void> {
-    const { withdrawingBalance, symbol, decimals } = getToken('address', tokenAddress, balances)
     try {
+      assert(userAddress, ON_ERROR_MESSAGE)
+
+      const token = getToken('address', tokenAddress, balances)
+      assert(token, 'No token')
+
+      const { withdrawingBalance, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
       _updateToken(tokenAddress, otherParams => {
         return {

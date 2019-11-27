@@ -13,8 +13,8 @@ export enum Network {
 
 export interface TokenDetails {
   name?: string
-  symbol?: string
-  decimals?: number
+  symbol: string
+  decimals: number
   address: string
   addressMainnet?: string
   image?: string
@@ -24,8 +24,8 @@ export interface TokenBalanceDetails extends TokenDetails {
   exchangeBalance: BN
   depositingBalance: BN
   withdrawingBalance: BN
-  claimable: boolean
   walletBalance: BN
+  claimable: boolean
   enabled: boolean
   highlighted: boolean
   enabling: boolean
@@ -54,7 +54,7 @@ export interface TxOptionalParams {
 export type Receipt = TransactionReceipt
 
 export interface DepositApi {
-  getContractAddress(networkId: number): string
+  getContractAddress(networkId: number): string | null
   getBatchTime(): Promise<number>
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>

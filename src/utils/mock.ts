@@ -8,8 +8,9 @@ export async function waitAndSendReceipt(params: {
   txOptionalParams?: TxOptionalParams
 }): Promise<void> {
   const { waitTime = 2500, waitTimeForReceipt = 1000, txOptionalParams } = params
-  if (txOptionalParams && txOptionalParams.onSentTransaction) {
-    wait(waitTimeForReceipt).then(() => txOptionalParams.onSentTransaction(RECEIPT.transactionHash))
+  if (txOptionalParams?.onSentTransaction) {
+    await wait(waitTimeForReceipt)
+    txOptionalParams.onSentTransaction(RECEIPT.transactionHash)
   }
-  await wait(waitTime)
+  return wait(waitTime)
 }

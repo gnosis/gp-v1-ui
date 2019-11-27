@@ -1,7 +1,5 @@
 import BN from 'bn.js'
-import assert from 'assert'
-
-import { log, toBN } from 'utils'
+import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
 import { getEpochAddressForNetwork } from './epochList'
 
@@ -153,7 +151,7 @@ export class DepositApiImpl implements DepositApi {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -168,7 +166,7 @@ export class DepositApiImpl implements DepositApi {
     const contract = await this._getContract()
     const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -195,6 +193,7 @@ export class DepositApiImpl implements DepositApi {
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
 
+    // as string as assert is not detected by TS
     return this._getContractAtAddress(address)
   }
 

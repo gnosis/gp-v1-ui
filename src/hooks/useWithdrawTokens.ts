@@ -1,5 +1,5 @@
 import { TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
-import assert from 'assert'
+import { assert } from 'utils'
 import { depositApi } from 'api'
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
@@ -22,13 +22,14 @@ export const useWithdrawTokens = (params: Params): Result => {
   const [claiming, setWithdrawing] = useSafeState(false)
 
   async function withdraw(): Promise<Receipt> {
-    assert(enabled, 'Token not enabled')
-    assert(claimable, 'Withdraw not ready')
-    assert(isConnected, "There's no connected wallet")
-
-    setWithdrawing(true)
-
     try {
+      assert(userAddress, 'No valid user address found')
+      assert(enabled, 'Token not enabled')
+      assert(claimable, 'Withdraw not ready')
+      assert(isConnected, "There's no connected wallet")
+
+      setWithdrawing(true)
+
       return depositApi.withdraw({ userAddress, tokenAddress }, params.txOptionalParams)
     } finally {
       setWithdrawing(false)

@@ -1,10 +1,8 @@
-import assert from 'assert'
-
 import { DepositApiImpl } from './DepositApiImpl'
 import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, AuctionElement } from 'types'
 import { StablecoinConverter } from 'types/StablecoinConverter'
 import StablecoinConvertedAbi from './StablecoinConverterAbi'
-import { log } from 'utils'
+import { log, assert } from 'utils'
 
 import BN from 'bn.js'
 
@@ -45,7 +43,17 @@ const decodeAuctionElements = (bytes: string): AuctionElement[] => {
       priceNumerator,
       priceDenominator,
       remainingAmount,
-    } = order.groups
+    } = order.groups as {
+      user: string
+      sellTokenBalance: string
+      buyTokenId: string
+      sellTokenId: string
+      validFrom: string
+      validUntil: string
+      priceNumerator: string
+      priceDenominator: string
+      remainingAmount: string
+    }
 
     result.push({
       user: '0x' + user,
