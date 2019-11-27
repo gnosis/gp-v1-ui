@@ -1,42 +1,25 @@
 import React from 'react'
-import Modali, { useModali } from 'modali'
+import Modali from 'modali'
 import BN from 'bn.js'
 
 import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/layout/Widget'
-import { ModalBodyWrapper, DepositWidgetWrapper } from './Styled'
+import { DepositWidgetWrapper } from './Styled'
 
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
+import { useDepositModals } from './useDepositModals'
 import useSafeState from 'hooks/useSafeState'
 import useWindowSizes from 'hooks/useWindowSizes'
 
-import { log, formatAmount, getToken } from 'utils'
+import { log, getToken } from 'utils'
 import { ZERO } from 'const'
 import { TokenBalanceDetails } from 'types'
 
-interface ModalBodyProps {
-  pendingAmount: string
-  symbol: string
-}
-
-const ModalBody: React.FC<ModalBodyProps> = ({ pendingAmount, symbol }) => {
-  return (
-    <ModalBodyWrapper>
-      <div>
-        <p>
-          There is already a pending withdrawal of {pendingAmount} {symbol}. If you create a new request, it will delete
-          the previous request and create a new one.
-        </p>
-        <p>
-          No funds are lost if you decide to continue, but you will have to wait again for the withdrawal to be
-          consolidated.
-        </p>
-      </div>
-      <p>Do you wish to create a new withdrawal request that replaces the previous one?</p>
-    </ModalBodyWrapper>
-  )
+interface WithdrawState {
+  amount: BN
+  tokenAddress: string
 }
 
 const DepositWidget: React.FC = () => {
@@ -44,48 +27,31 @@ const DepositWidget: React.FC = () => {
   const { enableToken, deposit, requestWithdraw, claim } = useRowActions({ balances, setBalances })
   const windowSpecs = useWindowSizes()
 
-  const [withdrawRequest, setWithdrawRequest] = useSafeState({
+  const [withdrawRequest, setWithdrawRequest] = useSafeState<WithdrawState>({
     amount: ZERO,
     tokenAddress: '',
-    pendingAmount: '',
-    symbol: '',
   })
 
-  const [withdrawConfirmationModal, toggleWithdrawConfirmationModal] = useModali({
-    centered: true,
-    animated: true,
-    title: 'Confirm withdraw overwrite',
-    message: <ModalBody pendingAmount={withdrawRequest.pendingAmount} symbol={withdrawRequest.symbol} />,
-    buttons: [
-      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWithdrawConfirmationModal()} />,
-      <Modali.Button
-        label="Accept"
-        key="yes"
-        isStyleDefault
-        onClick={async (): Promise<void> => {
-          // On confirm, do the request
-          toggleWithdrawConfirmationModal()
-          await requestWithdraw(withdrawRequest.amount, withdrawRequest.tokenAddress)
-        }}
-      />,
-    ],
-  })
-  const requestWithdrawConfirmation = async (amount: BN, tokenAddress: string): Promise<void> => {
-    const { withdrawingBalance, decimals, symbol } = getToken('address', tokenAddress, balances) as Required<
-      TokenBalanceDetails
-    >
+  const {
+    withdrawOverwriteModal,
+    toggleWithdrawOverwriteModal,
+    withdrawAndClaimModal,
+    toggleWithdrawAndClaimModal,
+  } = useDepositModals({ ...withdrawRequest, requestWithdraw })
+
+  const requestWithdrawConfirmation = async (amount: BN, tokenAddress: string, claimable: boolean): Promise<void> => {
+    const { withdrawingBalance, symbol } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
+
     log(`Confirm withdrawal for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
+
     if (!withdrawingBalance.isZero()) {
       // Storing current values before displaying modal
       setWithdrawRequest({
         amount,
         tokenAddress,
-        pendingAmount: formatAmount(withdrawingBalance, decimals) || '',
-        symbol,
       })
 
-      // Confirm withdrawal: There's an unclaimed withdraw request
-      toggleWithdrawConfirmationModal()
+      claimable ? toggleWithdrawAndClaimModal() : toggleWithdrawOverwriteModal()
     } else {
       // No need to confirm the withdrawal: No amount is pending to be claimed
       await requestWithdraw(amount, tokenAddress)
@@ -120,7 +86,7 @@ const DepositWidget: React.FC = () => {
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance): Promise<void> => deposit(balance, tokenBalances.address)}
                     onSubmitWithdraw={(balance): Promise<void> => {
-                      return requestWithdrawConfirmation(balance, tokenBalances.address)
+                      return requestWithdrawConfirmation(balance, tokenBalances.address, tokenBalances.claimable)
                     }}
                     onClaim={(): Promise<void> => claim(tokenBalances.address)}
                     {...windowSpecs}
@@ -130,7 +96,8 @@ const DepositWidget: React.FC = () => {
           </div>
         )}
       </Widget>
-      <Modali.Modal {...withdrawConfirmationModal} />
+      <Modali.Modal {...withdrawOverwriteModal} />
+      <Modali.Modal {...withdrawAndClaimModal} />
     </DepositWidgetWrapper>
   )
 }
