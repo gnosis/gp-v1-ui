@@ -162,7 +162,7 @@ const TokenRow: React.FC<Props> = ({
   }, [enforcePrecision])
 
   const removeExcessZeros = useCallback(
-    () => (event: React.SyntheticEvent<HTMLInputElement>): void => {
+    (event: React.SyntheticEvent<HTMLInputElement>): void => {
       // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
       // A: Because on those functions we still want the user to be able to input partial values. E.g.:
       //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
