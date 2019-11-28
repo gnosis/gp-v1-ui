@@ -12,7 +12,7 @@ import useNoScroll from 'hooks/useNoScroll'
 import { ZERO, RESPONSIVE_SIZES } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
-import { TokenLocalState } from './useRowActions'
+import { TokenLocalState } from 'reducers-actions'
 
 export interface RowProps extends TokenLocalState {
   tokenBalances: TokenBalanceDetails

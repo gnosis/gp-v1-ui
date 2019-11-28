@@ -20,6 +20,9 @@ import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
 import { walletApi } from 'api'
+// Global State
+import { withGlobalContext } from 'hooks/useGlobalState'
+import tokenRowData from 'reducers-actions/tokenRow'
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
   const isConnected = walletApi.isConnected()
@@ -66,4 +69,19 @@ const App: React.FC = () => (
   </>
 )
 
-export default hot(App)
+/************************************************************** */
+// Reducer specific typings
+
+export default hot(
+  withGlobalContext(
+    App,
+    () => {
+      // Can be dynamic setup logic here..
+      return {
+        ...tokenRowData.initialState,
+      }
+    },
+    // just default TokenRow Reducer for now
+    tokenRowData.reducer,
+  ),
+)

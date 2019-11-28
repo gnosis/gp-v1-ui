@@ -1,4 +1,4 @@
-import { SetStateAction, Dispatch, useReducer } from 'react'
+import { SetStateAction, Dispatch } from 'react'
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
 
@@ -10,74 +10,10 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
+import useGlobalState from 'hooks/useGlobalState'
+import { TokenLocalState, ActionTypes } from 'reducers-actions'
+
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
-
-/************************************************************** */
-// Reducer specific typings
-
-export interface TokenLocalState {
-  enabling: Set<string>
-  highlighted: Set<string>
-  claiming: Set<string>
-}
-
-const enum ActionTypes {
-  SET_ENABLING = 'enabling',
-  SET_CLAIMING = 'claiming',
-  SET_HIGHLIGHTED = 'highlighted',
-  SET_HIGHLIGHTED_AND_CLAIMING = 'highlighted_and_claiming',
-}
-
-interface Actions {
-  type: ActionTypes
-  payload: string
-}
-
-const initialState: TokenLocalState = {
-  enabling: new Set(),
-  highlighted: new Set(),
-  claiming: new Set(),
-}
-
-const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
-  switch (action.type) {
-    case ActionTypes.SET_ENABLING:
-    case ActionTypes.SET_CLAIMING:
-    case ActionTypes.SET_HIGHLIGHTED: {
-      const newSet = new Set(state[action.type])
-      return {
-        ...state,
-        [action.type]: newSet.has(action.payload)
-          ? newSet.delete(action.payload) && newSet
-          : newSet.add(action.payload),
-      }
-    }
-    case ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING: {
-      const newClaimingSet = new Set(state.claiming)
-      const newHighlightedSet = new Set(state.highlighted)
-
-      if (newClaimingSet.has(action.payload)) {
-        newClaimingSet.delete(action.payload)
-      } else {
-        newClaimingSet.add(action.payload)
-      }
-
-      if (newHighlightedSet.has(action.payload)) {
-        newHighlightedSet.delete(action.payload)
-      } else {
-        newHighlightedSet.add(action.payload)
-      }
-
-      return {
-        ...state,
-        claiming: newClaimingSet,
-        highlighted: newHighlightedSet,
-      }
-    }
-    default:
-      return state
-  }
-}
 
 /************************************************************** */
 // useRowActions specific typings
@@ -97,7 +33,7 @@ interface Result extends TokenLocalState {
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
 
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useGlobalState()
 
   const { userAddress, networkId } = useWalletConnection()
   const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
