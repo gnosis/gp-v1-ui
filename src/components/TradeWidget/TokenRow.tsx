@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -178,6 +178,12 @@ const TokenRow: React.FC<Props> = ({
     [inputId, setValue],
   )
 
+  const onKeyPress = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>): void =>
+      event.key === 'Enter' ? removeExcessZeros(event) : preventInvalidChars(event),
+    [removeExcessZeros],
+  )
+
   const exchangeBalanceAndPendingBalance = balance && balance.exchangeBalance.add(balance.depositingBalance)
 
   return (
@@ -203,7 +209,7 @@ const TokenRow: React.FC<Props> = ({
             pattern: { value: validInputPattern, message: 'Invalid amount' },
             validate: { positive: validatePositive },
           })}
-          onKeyPress={preventInvalidChars}
+          onKeyPress={onKeyPress}
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
           tabIndex={tabIndex + 2}
