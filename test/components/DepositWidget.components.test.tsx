@@ -3,10 +3,10 @@ import { render } from 'enzyme'
 import BN from 'bn.js'
 
 import { Row, RowProps } from 'components/DepositWidget/Row'
-import { TokenLocalState } from 'components/DepositWidget/useRowActions'
 
 import { ZERO, ONE } from 'const'
 import { TokenBalanceDetails } from 'types'
+import { TokenLocalState } from 'reducers-actions'
 
 const fakeRowState: TokenLocalState = {
   enabling: new Set(),
