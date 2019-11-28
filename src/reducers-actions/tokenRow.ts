@@ -1,15 +1,3 @@
-export interface TokenLocalState {
-  enabling: Set<string>
-  highlighted: Set<string>
-  claiming: Set<string>
-}
-
-const initialState: TokenLocalState = {
-  enabling: new Set(),
-  highlighted: new Set(),
-  claiming: new Set(),
-}
-
 export const enum ActionTypes {
   SET_ENABLING = 'enabling',
   SET_CLAIMING = 'claiming',
@@ -22,7 +10,39 @@ interface Actions {
   payload: string
 }
 
-const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
+export const setClaimingAction = (payload: string): Actions => ({
+  type: ActionTypes.SET_CLAIMING,
+  payload,
+})
+
+export const setEnablingAction = (payload: string): Actions => ({
+  type: ActionTypes.SET_ENABLING,
+  payload,
+})
+
+export const setHighlightAction = (payload: string): Actions => ({
+  type: ActionTypes.SET_HIGHLIGHTED,
+  payload,
+})
+
+export const setHighlightAndClaimingAction = (payload: string): Actions => ({
+  type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
+  payload,
+})
+
+export interface TokenLocalState {
+  enabling: Set<string>
+  highlighted: Set<string>
+  claiming: Set<string>
+}
+
+export const initialState: TokenLocalState = {
+  enabling: new Set(),
+  highlighted: new Set(),
+  claiming: new Set(),
+}
+
+export const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
   switch (action.type) {
     case ActionTypes.SET_ENABLING:
     case ActionTypes.SET_CLAIMING:

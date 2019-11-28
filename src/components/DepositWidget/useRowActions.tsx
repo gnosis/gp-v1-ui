@@ -11,12 +11,9 @@ import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken 
 import { txOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'
-import { TokenLocalState, ActionTypes } from 'reducers-actions'
+import { TokenLocalState, setHighlightAction, setEnablingAction, setHighlightAndClaimingAction } from 'reducers-actions'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
-
-/************************************************************** */
-// useRowActions specific typings
 
 interface Params {
   balances: TokenBalanceDetails[]
@@ -55,10 +52,7 @@ export const useRowActions = (params: Params): Result => {
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token, aborting.')
 
-      dispatch({
-        type: ActionTypes.SET_ENABLING,
-        payload: tokenAddress,
-      })
+      dispatch(setEnablingAction(tokenAddress))
 
       const { symbol: tokenDisplayName } = safeFilledToken(token)
 
@@ -87,10 +81,7 @@ export const useRowActions = (params: Params): Result => {
       console.error('Error enabling the token', error)
       toast.error('Error enabling the token')
     } finally {
-      dispatch({
-        type: ActionTypes.SET_ENABLING,
-        payload: tokenAddress,
-      })
+      dispatch(setEnablingAction(tokenAddress))
     }
   }
 
@@ -101,10 +92,7 @@ export const useRowActions = (params: Params): Result => {
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token')
 
-      dispatch({
-        type: ActionTypes.SET_HIGHLIGHTED,
-        payload: tokenAddress,
-      })
+      dispatch(setHighlightAction(tokenAddress))
 
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
@@ -125,10 +113,7 @@ export const useRowActions = (params: Params): Result => {
       console.error('Error depositing', error)
       toast.error(`Error depositing: ${error.message}`)
     } finally {
-      dispatch({
-        type: ActionTypes.SET_HIGHLIGHTED,
-        payload: tokenAddress,
-      })
+      dispatch(setHighlightAction(tokenAddress))
     }
   }
 
@@ -139,10 +124,7 @@ export const useRowActions = (params: Params): Result => {
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token')
 
-      dispatch({
-        type: ActionTypes.SET_HIGHLIGHTED,
-        payload: tokenAddress,
-      })
+      dispatch(setHighlightAction(tokenAddress))
 
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
@@ -164,10 +146,7 @@ export const useRowActions = (params: Params): Result => {
       console.error('Error requesting withdraw', error)
       toast.error(`Error requesting withdraw: ${error.message}`)
     } finally {
-      dispatch({
-        type: ActionTypes.SET_HIGHLIGHTED,
-        payload: tokenAddress,
-      })
+      dispatch(setHighlightAction(tokenAddress))
     }
   }
 
@@ -182,10 +161,7 @@ export const useRowActions = (params: Params): Result => {
 
       console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
 
-      dispatch({
-        type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
-        payload: tokenAddress,
-      })
+      dispatch(setHighlightAndClaimingAction(tokenAddress))
 
       const receipt = await depositApi.withdraw({ userAddress, tokenAddress }, txOptionalParams)
 
@@ -205,10 +181,7 @@ export const useRowActions = (params: Params): Result => {
       console.error('Error executing the withdraw request', error)
       toast.error(`Error executing the withdraw request: ${error.message}`)
     } finally {
-      dispatch({
-        type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
-        payload: tokenAddress,
-      })
+      dispatch(setHighlightAndClaimingAction(tokenAddress))
     }
   }
 
