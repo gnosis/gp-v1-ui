@@ -197,13 +197,13 @@ export const RowTokenDiv = styled.div`
     border-bottom-color: #fbdf8f;
   }
 
+  &.selected {
+    background-color: #ecdcff;
+  }
+
   &.loading {
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
-  }
-
-  &.selected {
-    background-color: #ecdcff;
   }
 
   @media only screen and (max-width: 500px) {

@@ -47,9 +47,6 @@ async function fetchBalancesForToken(
     claimable: withdrawingBalance.isZero() ? false : withdrawBatchId < currentBachId,
     walletBalance,
     enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
-    highlighted: false,
-    enabling: false,
-    claiming: false,
   }
 }
 

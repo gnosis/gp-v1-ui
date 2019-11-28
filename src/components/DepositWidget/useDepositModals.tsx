@@ -33,7 +33,7 @@ const defaultOptions = {
 interface Params {
   amount: BN
   tokenAddress: string
-  requestWithdraw: (amount: BN, tokenAddress: string) => Promise<void>
+  requestWithdrawToken: (amount: BN, tokenAddress: string) => Promise<void>
 }
 
 interface Result {
@@ -44,7 +44,7 @@ interface Result {
 }
 
 export function useDepositModals(params: Params): Result {
-  const { amount, tokenAddress, requestWithdraw } = params
+  const { amount, tokenAddress, requestWithdrawToken } = params
 
   const getButtons = useCallback(
     (toggleModal: toggleModaliComponent): React.ReactNode[] => {
@@ -57,12 +57,12 @@ export function useDepositModals(params: Params): Result {
           onClick={async (): Promise<void> => {
             // On confirm, do the request
             toggleModal()
-            await requestWithdraw(amount, tokenAddress)
+            await requestWithdrawToken(amount, tokenAddress)
           }}
         />,
       ]
     },
-    [amount, requestWithdraw, tokenAddress],
+    [amount, requestWithdrawToken, tokenAddress],
   )
 
   const [withdrawOverwriteModal, toggleWithdrawOverwriteModal] = useModali({

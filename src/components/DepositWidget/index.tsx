@@ -24,7 +24,17 @@ interface WithdrawState {
 
 const DepositWidget: React.FC = () => {
   const { balances, setBalances, error } = useTokenBalances()
-  const { enableToken, deposit, requestWithdraw, claim } = useRowActions({ balances, setBalances })
+  const {
+    // Dispatchers
+    enableToken,
+    depositToken,
+    requestWithdrawToken,
+    claimToken,
+    // State Map
+    enabling,
+    claiming,
+    highlighted,
+  } = useRowActions({ balances, setBalances })
   const windowSpecs = useWindowSizes()
 
   const [withdrawRequest, setWithdrawRequest] = useSafeState<WithdrawState>({
@@ -37,7 +47,7 @@ const DepositWidget: React.FC = () => {
     toggleWithdrawOverwriteModal,
     withdrawAndClaimModal,
     toggleWithdrawAndClaimModal,
-  } = useDepositModals({ ...withdrawRequest, requestWithdraw })
+  } = useDepositModals({ ...withdrawRequest, requestWithdrawToken })
 
   const requestWithdrawConfirmation = async (amount: BN, tokenAddress: string, claimable: boolean): Promise<void> => {
     const { withdrawingBalance, symbol } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
@@ -54,7 +64,7 @@ const DepositWidget: React.FC = () => {
       claimable ? toggleWithdrawAndClaimModal() : toggleWithdrawOverwriteModal()
     } else {
       // No need to confirm the withdrawal: No amount is pending to be claimed
-      await requestWithdraw(amount, tokenAddress)
+      await requestWithdrawToken(amount, tokenAddress)
     }
   }
 
@@ -84,11 +94,14 @@ const DepositWidget: React.FC = () => {
                     key={tokenBalances.addressMainnet}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                    onSubmitDeposit={(balance): Promise<void> => deposit(balance, tokenBalances.address)}
+                    onSubmitDeposit={(balance): Promise<void> => depositToken(balance, tokenBalances.address)}
                     onSubmitWithdraw={(balance): Promise<void> => {
                       return requestWithdrawConfirmation(balance, tokenBalances.address, tokenBalances.claimable)
                     }}
-                    onClaim={(): Promise<void> => claim(tokenBalances.address)}
+                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    claiming={claiming}
+                    highlighted={highlighted}
+                    enabling={enabling}
                     {...windowSpecs}
                   />
                 ))}

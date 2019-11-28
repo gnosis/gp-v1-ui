@@ -2,25 +2,34 @@ import React from 'react'
 import { render } from 'enzyme'
 import BN from 'bn.js'
 
-import { TokenBalanceDetails } from 'types'
 import { Row, RowProps } from 'components/DepositWidget/Row'
-import { ZERO, ONE } from 'const'
+import { TokenLocalState } from 'components/DepositWidget/useRowActions'
 
-function _createRow(params: Partial<TokenBalanceDetails> = {}): React.ReactElement<RowProps> {
+import { ZERO, ONE } from 'const'
+import { TokenBalanceDetails } from 'types'
+
+const fakeRowState: TokenLocalState = {
+  enabling: new Set(),
+  claiming: new Set(),
+  highlighted: new Set(),
+}
+
+const initialTokenBalanceDetails = {
+  name: 'Test token',
+  symbol: 'TTT',
+  decimals: 18,
+  address: '0x0',
+  exchangeBalance: ZERO,
+  depositingBalance: ZERO,
+  withdrawingBalance: ZERO,
+  claimable: false,
+  walletBalance: ZERO,
+  enabled: false,
+}
+
+function _createRow(params: Partial<TokenBalanceDetails> = {}, rowProps = fakeRowState): React.ReactElement<RowProps> {
   const tokenBalanceDetails: TokenBalanceDetails = {
-    name: 'Test token',
-    symbol: 'TTT',
-    decimals: 18,
-    address: '0x0',
-    exchangeBalance: ZERO,
-    depositingBalance: ZERO,
-    withdrawingBalance: ZERO,
-    claimable: false,
-    walletBalance: ZERO,
-    enabled: false,
-    highlighted: false,
-    enabling: false,
-    claiming: false,
+    ...initialTokenBalanceDetails,
     // override with partial params
     ...params,
   }
@@ -37,6 +46,7 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}): React.ReactEleme
       onSubmitDeposit={onSubmitDeposit}
       onSubmitWithdraw={onSubmitWithdraw}
       innerWidth={500}
+      {...rowProps}
     />
   )
 }
@@ -85,8 +95,9 @@ describe('<Row /> claimable token', () => {
 describe('<Row /> style', () => {
   it('is highlighted', () => {
     const wrapper = render(
-      _createRow({
-        highlighted: true,
+      _createRow(undefined, {
+        ...fakeRowState,
+        highlighted: fakeRowState.highlighted.add(initialTokenBalanceDetails.address),
       }),
     )
     expect(wrapper.attr('class')).toMatch(/highlight/)
@@ -94,8 +105,10 @@ describe('<Row /> style', () => {
 
   it('is enabling', () => {
     const wrapper = render(
-      _createRow({
-        enabling: true,
+      _createRow(undefined, {
+        ...fakeRowState,
+        highlighted: new Set(),
+        enabling: fakeRowState.enabling.add(initialTokenBalanceDetails.address),
       }),
     )
     expect(wrapper.attr('class')).toMatch(/enabling/)
