@@ -1,8 +1,7 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useMemo } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-import { FieldValues } from 'react-hook-form/dist/types'
 
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
 import TokenImg from 'components/TokenImg'
@@ -108,7 +107,6 @@ interface Props {
   isDisabled: boolean
   validateMaxAmount?: true
   tabIndex: number
-  onSubmit: (data: FieldValues) => Promise<void>
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -121,9 +119,8 @@ const TokenRow: React.FC<Props> = ({
   isDisabled,
   validateMaxAmount,
   tabIndex,
-  onSubmit,
 }) => {
-  const { register, errors, setValue, watch, handleSubmit } = useFormContext()
+  const { register, errors, setValue, watch } = useFormContext()
   const error = errors[inputId]
   const inputValue = watch(inputId)
 
@@ -181,19 +178,6 @@ const TokenRow: React.FC<Props> = ({
     [inputId, setValue],
   )
 
-  const onKeyPress = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>): void => {
-      if (event.key === 'Enter') {
-        // On enter, submit the form
-        handleSubmit(onSubmit)
-      } else {
-        // Any other key, validate inserted chars
-        preventInvalidChars(event)
-      }
-    },
-    [handleSubmit, onSubmit],
-  )
-
   const exchangeBalanceAndPendingBalance = balance && balance.exchangeBalance.add(balance.depositingBalance)
 
   return (
@@ -219,7 +203,7 @@ const TokenRow: React.FC<Props> = ({
             pattern: { value: validInputPattern, message: 'Invalid amount' },
             validate: { positive: validatePositive },
           })}
-          onKeyPress={onKeyPress}
+          onKeyPress={preventInvalidChars}
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
           tabIndex={tabIndex + 2}
