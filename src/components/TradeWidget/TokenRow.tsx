@@ -176,6 +176,8 @@ const TokenRow: React.FC<Props> = ({
     [inputId, setValue],
   )
 
+  const exchangeBalanceAndPendingBalance = balance && balance.exchangeBalance.add(balance.depositingBalance)
+
   return (
     <Wrapper>
       <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
@@ -208,7 +210,9 @@ const TokenRow: React.FC<Props> = ({
             <strong>
               <LinkWithPastLocation to="/deposit">Exchange wallet:</LinkWithPastLocation>
             </strong>{' '}
-            <span className="success">{displayBalance(balance, 'exchangeBalance')}</span>
+            <span className="success">
+              {balance ? formatAmount(exchangeBalanceAndPendingBalance, balance.decimals) : '0'}
+            </span>
           </div>
           {validateMaxAmount && <a onClick={useMax}>use max</a>}
         </WalletDetail>
