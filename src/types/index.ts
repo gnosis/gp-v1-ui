@@ -13,8 +13,8 @@ export enum Network {
 
 export interface TokenDetails {
   name?: string
-  symbol?: string
-  decimals?: number
+  symbol: string
+  decimals: number
   address: string
   addressMainnet?: string
   image?: string
@@ -24,12 +24,9 @@ export interface TokenBalanceDetails extends TokenDetails {
   exchangeBalance: BN
   depositingBalance: BN
   withdrawingBalance: BN
-  claimable: boolean
   walletBalance: BN
+  claimable: boolean
   enabled: boolean
-  highlighted: boolean
-  enabling: boolean
-  claiming: boolean
 }
 
 export interface TokenList {
@@ -54,7 +51,7 @@ export interface TxOptionalParams {
 export type Receipt = TransactionReceipt
 
 export interface DepositApi {
-  getContractAddress(networkId: number): string
+  getContractAddress(networkId: number): string | null
   getBatchTime(): Promise<number>
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
@@ -121,7 +118,7 @@ export interface EpochTokenLocker extends Contract {
 
     requestWithdraw(token: string, amount: number | string | BN): TransactionObject<void>
 
-    withdraw(token: string, owner: string): TransactionObject<void>
+    withdraw(owner: string, token: string): TransactionObject<void>
 
     getPendingDepositAmount(user: string, token: string): TransactionObject<string>
 
@@ -163,6 +160,11 @@ export interface Order {
   remainingAmount: BN
 }
 
+export interface AuctionElement extends Order {
+  user: string
+  sellTokenBalance: BN
+}
+
 export interface PlaceOrderParams {
   userAddress: string
   buyTokenId: number
@@ -173,7 +175,7 @@ export interface PlaceOrderParams {
 }
 
 export interface ExchangeApi extends DepositApi {
-  getOrders(userAddress: string): Promise<Order[]>
+  getOrders(userAddress: string): Promise<AuctionElement[]>
   getNumTokens(): Promise<number>
   getFeeDenominator(): Promise<number>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
@@ -308,5 +310,162 @@ export interface ERC20 extends Contract {
       to: string,
       value: number | string | BN,
     ): TransactionObject<boolean, [string, string, string | number | BN]>
+  }
+}
+
+export interface BatchExchange extends Contract {
+  clone(): BatchExchange
+
+  methods: EpochTokenLocker['methods'] & {
+    getSecondsRemainingInBatch(): TransactionObject<string>
+
+    feeDenominator(): TransactionObject<string>
+
+    getPendingWithdrawAmount(user: string, token: string): TransactionObject<string, [string, string]>
+
+    requestWithdraw(
+      token: string,
+      amount: number | string | BN,
+    ): TransactionObject<void, [string, number | string | BN]>
+
+    getPendingDepositAmount(user: string, token: string): TransactionObject<string, [string, string]>
+
+    deposit(token: string, amount: number | string | BN): TransactionObject<void, [string, number | string | BN]>
+
+    getPendingWithdrawBatchNumber(user: string, token: string): TransactionObject<string, [string, string]>
+
+    TOKEN_ADDITION_FEE_IN_OWL(): TransactionObject<string>
+
+    feeToken(): TransactionObject<string>
+
+    currentPrices(arg0: number | string | BN): TransactionObject<string, [number | string | BN]>
+
+    orders(
+      arg0: string,
+      arg1: number | string | BN,
+    ): TransactionObject<
+      {
+        buyToken: BN
+        sellToken: BN
+        validFrom: BN
+        validUntil: BN
+        isSellOrder: boolean
+        priceNumerator: BN
+        priceDenominator: BN
+        usedAmount: BN
+        0: BN
+        1: BN
+        2: BN
+        3: BN
+        4: BN
+        5: BN
+        6: BN
+      },
+      [string, number | string | BN]
+    >
+
+    numTokens(): TransactionObject<string>
+
+    lastCreditBatchId(arg0: string, arg1: string): TransactionObject<string>
+
+    latestSolution(): TransactionObject<{
+      batchId: string
+      solutionSubmitter: string
+      feeReward: string
+      objectiveValue: string
+      0: string
+      1: string
+      2: string
+      3: string
+    }>
+
+    getBalance(user: string, token: string): TransactionObject<string, [string, string]>
+
+    getCurrentBatchId(): TransactionObject<string>
+
+    requestFutureWithdraw(
+      token: string,
+      amount: number | string | BN,
+      batchId: number | string | BN,
+    ): TransactionObject<void, [string, number | string | BN, number | string | BN]>
+
+    hasValidWithdrawRequest(user: string, token: string): TransactionObject<boolean, [string, string]>
+
+    MAX_TOKENS(): TransactionObject<string>
+
+    getPendingDepositBatchNumber(user: string, token: string): TransactionObject<string, [string, string]>
+
+    withdraw(user: string, token: string): TransactionObject<void, [string, string]>
+
+    MAX_TOUCHED_ORDERS(): TransactionObject<string>
+
+    addToken(token: string): TransactionObject<void, [string]>
+
+    placeValidFromOrders(
+      buyTokens: (number | string | BN)[],
+      sellTokens: (number | string | BN)[],
+      validFroms: (number | string | BN)[],
+      validUntils: (number | string | BN)[],
+      buyAmounts: (number | string | BN)[],
+      sellAmounts: (number | string | BN)[],
+    ): TransactionObject<
+      string[],
+      [
+        (number | string | BN)[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+      ]
+    >
+
+    placeOrder(
+      buyToken: number | string | BN,
+      sellToken: number | string | BN,
+      validUntil: number | string | BN,
+      buyAmount: number | string | BN,
+      sellAmount: number | string | BN,
+    ): TransactionObject<
+      string,
+      [number | string | BN, number | string | BN, number | string | BN, number | string | BN, number | string | BN]
+    >
+
+    cancelOrder(ids: (number | string | BN)[]): TransactionObject<void, [(number | string | BN)[]]>
+
+    freeStorageOfOrder(ids: (number | string | BN)[]): TransactionObject<void, [(number | string | BN)[]]>
+
+    submitSolution(
+      batchIndex: number | string | BN,
+      claimedObjectiveValue: number | string | BN,
+      owners: string[],
+      orderIds: (number | string | BN)[],
+      volumes: (number | string | BN)[],
+      prices: (number | string | BN)[],
+      tokenIdsForPrice: (number | string | BN)[],
+    ): TransactionObject<
+      string,
+      [
+        number | string | BN,
+        number | string | BN,
+        string[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+        (number | string | BN)[],
+      ]
+    >
+
+    tokenAddressToIdMap(addr: string): TransactionObject<string, [string]>
+
+    tokenIdToAddressMap(id: number | string | BN): TransactionObject<string, [number | string | BN]>
+
+    hasToken(addr: string): TransactionObject<boolean, [string]>
+
+    getEncodedAuctionElements(): TransactionObject<string>
+
+    acceptingSolutions(batchIndex: number | string | BN): TransactionObject<boolean, [number | string | BN]>
+
+    getCurrentObjectiveValue(): TransactionObject<string>
   }
 }

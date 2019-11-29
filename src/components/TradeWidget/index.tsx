@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
-import useForm, { FormContext } from 'react-hook-form'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -10,18 +9,20 @@ import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
 import Widget from 'components/layout/Widget'
 
+import useForm, { FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
+import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 
 import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
-import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { ZERO } from 'const'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -69,16 +70,17 @@ const TradeWidget: React.FC = () => {
   const { sellAmount, buyAmount: receiveAmount } = useQuery()
 
   const [sellToken, setSellToken] = useState(
-    () => getToken('symbol', sellTokenSymbol, tokens) || getToken('symbol', 'DAI', tokens),
+    () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
   const [receiveToken, setReceiveToken] = useState(
-    () => getToken('symbol', receiveTokenSymbol, tokens) || getToken('symbol', 'USDC', tokens),
+    () =>
+      getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const sellInputId = 'sellToken'
   const receiveInputId = 'receiveToken'
 
   const methods = useForm({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellAmount,
       [receiveInputId]: receiveAmount,
@@ -90,44 +92,72 @@ const TradeWidget: React.FC = () => {
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url)
 
+  // TESTING
+  const NULL_BALANCE_TOKEN = {
+    exchangeBalance: ZERO,
+    depositingBalance: ZERO,
+    withdrawingBalance: ZERO,
+    walletBalance: ZERO,
+    claimable: false,
+    enabled: false,
+    highlighted: false,
+    enabling: false,
+    claiming: false,
+  }
+
   const { balances } = useTokenBalances()
 
-  const sellTokenBalance = useMemo(() => getToken('symbol', sellToken.symbol, balances), [balances, sellToken.symbol])
-  const receiveTokenBalance = useMemo(() => getToken('symbol', receiveToken.symbol, balances), [
-    balances,
-    receiveToken.symbol,
-  ])
+  const sellTokenBalance = useMemo(
+    () => getToken('symbol', sellToken.symbol, balances) || { ...sellToken, ...NULL_BALANCE_TOKEN },
+    [NULL_BALANCE_TOKEN, balances, sellToken],
+  )
+
+  const receiveTokenBalance = useMemo(
+    () => getToken('symbol', receiveToken.symbol, balances) || { ...receiveToken, ...NULL_BALANCE_TOKEN },
+    [NULL_BALANCE_TOKEN, balances, receiveToken],
+  )
 
   const { isSubmitting, placeOrder } = usePlaceOrder()
   const history = useHistory()
 
-  const swapTokens = (): void => {
+  const swapTokens = useCallback((): void => {
     setSellToken(receiveToken)
     setReceiveToken(sellToken)
-  }
+  }, [receiveToken, sellToken])
 
-  const onSelectChangeFactory = (
-    setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
-    oppositeToken: TokenDetails,
-  ): ((selected: TokenDetails) => void) => {
-    return (selected: TokenDetails): void => {
-      if (selected.symbol === oppositeToken.symbol) {
-        swapTokens()
-      } else {
-        setToken(selected)
+  const onSelectChangeFactory = useCallback(
+    (
+      setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
+      oppositeToken: TokenDetails,
+    ): ((selected: TokenDetails) => void) => {
+      return (selected: TokenDetails): void => {
+        if (selected.symbol === oppositeToken.symbol) {
+          swapTokens()
+        } else {
+          setToken(selected)
+        }
       }
-    }
-  }
+    },
+    [swapTokens],
+  )
 
   const sameToken = sellToken === receiveToken
 
   async function onSubmit(data: FieldValues): Promise<void> {
+    const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
+    const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
+    const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
+    const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
+
+    // Do not let potential null values through
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken) return
+
     if (isConnected) {
       const success = await placeOrder({
-        buyAmount: parseAmount(data[receiveInputId], receiveToken.decimals),
-        buyToken: receiveToken,
-        sellAmount: parseAmount(data[sellInputId], sellToken.decimals),
-        sellToken,
+        buyAmount,
+        buyToken: cachedBuyToken,
+        sellAmount,
+        sellToken: cachedSellToken,
       })
       if (success) {
         // reset form on successful order placing
@@ -153,6 +183,7 @@ const TradeWidget: React.FC = () => {
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
+            tabIndex={1}
           />
           <IconWrapper onClick={swapTokens}>
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
@@ -165,6 +196,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
+            tabIndex={2}
           />
           <OrderDetails
             sellAmount={watch(sellInputId)}
@@ -172,7 +204,7 @@ const TradeWidget: React.FC = () => {
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
           />
-          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting}>
+          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>

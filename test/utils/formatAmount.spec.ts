@@ -1,66 +1,67 @@
 import { ZERO, ONE, ALLOWANCE_MAX_VALUE } from 'const'
 import { formatAmount, toWei } from 'utils'
 import BN from 'bn.js'
+import { DEFAULT_PRECISION } from '../data'
 
 describe('Integer amounts', () => {
   test('0 wei', async () => {
-    expect(formatAmount(new BN('0'))).toEqual('0')
+    expect(formatAmount(new BN('0'), DEFAULT_PRECISION)).toEqual('0')
   })
 
   test('1 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('1'), 'ether')))).toEqual('1')
+    expect(formatAmount(new BN(toWei(new BN('1'), 'ether')), DEFAULT_PRECISION)).toEqual('1')
   })
 
   test('12,345 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('12345'), 'ether')))).toEqual('12,345')
+    expect(formatAmount(new BN(toWei(new BN('12345'), 'ether')), DEFAULT_PRECISION)).toEqual('12,345')
   })
 
   test('0100 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('0100'), 'ether')))).toEqual('100')
+    expect(formatAmount(new BN(toWei(new BN('0100'), 'ether')), DEFAULT_PRECISION)).toEqual('100')
   })
 
   test('123,456,789,012 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('123456789012'), 'ether')))).toEqual('123,456,789,012')
+    expect(formatAmount(new BN(toWei(new BN('123456789012'), 'ether')), DEFAULT_PRECISION)).toEqual('123,456,789,012')
   })
 })
 
 describe('Exact decimal amounts', () => {
   test('0.5 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('500'), 'milliether')))).toEqual('0.5')
+    expect(formatAmount(new BN(toWei(new BN('500'), 'milliether')), DEFAULT_PRECISION)).toEqual('0.5')
   })
 
   test('1.234 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('1234'), 'milliether')))).toEqual('1.234')
+    expect(formatAmount(new BN(toWei(new BN('1234'), 'milliether')), DEFAULT_PRECISION)).toEqual('1.234')
   })
 
   test('1.2345 Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('1234500'), 'microether')))).toEqual('1.2345')
+    expect(formatAmount(new BN(toWei(new BN('1234500'), 'microether')), DEFAULT_PRECISION)).toEqual('1.2345')
   })
 })
 
 describe('Rounding amounts', () => {
   test('0', async () => {
-    expect(formatAmount(ZERO)).toEqual('0')
+    expect(formatAmount(ZERO, DEFAULT_PRECISION)).toEqual('0')
   })
 
   test('1 wei', async () => {
-    expect(formatAmount(ONE)).toEqual('0')
+    expect(formatAmount(ONE, DEFAULT_PRECISION)).toEqual('0')
   })
 
   test('1000 wei', async () => {
-    expect(formatAmount(new BN('1000'))).toEqual('0')
+    expect(formatAmount(new BN('1000'), DEFAULT_PRECISION)).toEqual('0')
   })
 
   test('1.23451 Ether, round down', async () => {
-    expect(formatAmount(new BN(toWei(new BN('1234510'), 'microether')))).toEqual('1.2345')
+    expect(formatAmount(new BN(toWei(new BN('1234510'), 'microether')), DEFAULT_PRECISION)).toEqual('1.2345')
   })
 
   test('1.23456 Ether, round up', async () => {
-    expect(formatAmount(new BN(toWei(new BN('1234560'), 'microether')))).toEqual('1.2346')
+    expect(formatAmount(new BN(toWei(new BN('1234560'), 'microether')), DEFAULT_PRECISION)).toEqual('1.2346')
   })
 
   test('1.234567890123456789 Ether', async () => {
-    expect(formatAmount(new BN('1234567890123456789'))).toEqual('1.2346')
+    expect(formatAmount(new BN('1234567890123456789'), DEFAULT_PRECISION)).toEqual('1.2346')
   })
 })
 
@@ -172,13 +173,13 @@ describe('0 decimals', () => {
 describe('Big amounts', () => {
   // TODO: Considering showing K,M,B,...
   test('1B Ether', async () => {
-    expect(formatAmount(new BN(toWei(new BN('1000000000'), 'ether')))).toEqual('1,000,000,000')
+    expect(formatAmount(new BN(toWei(new BN('1000000000'), 'ether')), DEFAULT_PRECISION)).toEqual('1,000,000,000')
   })
 
   // TODO: Define what for arbitrarily big amounts
   test('uint max value', async () => {
     const expected = '115,792,089,237,316,195,423,570,985,008,687,907,853,269,984,665,640,564,039,457.584'
-    expect(formatAmount(new BN(new BN(ALLOWANCE_MAX_VALUE)))).toEqual(expected)
+    expect(formatAmount(new BN(new BN(ALLOWANCE_MAX_VALUE)), DEFAULT_PRECISION)).toEqual(expected)
   })
 })
 

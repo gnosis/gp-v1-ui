@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'react-toastify'
 
@@ -8,6 +8,7 @@ import { log } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { DEFAULT_ORDER_DURATION } from 'const'
+import useSafeState from './useSafeState'
 
 interface PlaceOrderParams {
   buyAmount: BN
@@ -22,11 +23,11 @@ interface Result {
 }
 
 export const usePlaceOrder = (): Result => {
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useSafeState(false)
   const { userAddress } = useWalletConnection()
 
-  const placeOrder = useMemo((): ((params: PlaceOrderParams) => Promise<boolean>) => {
-    return async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
+  const placeOrder = useCallback(
+    async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
       if (!userAddress) {
         toast.error('Wallet is not connected!')
         return false
@@ -46,34 +47,52 @@ export const usePlaceOrder = (): Result => {
           exchangeApi.getCurrentBatchId(),
         ])
 
-        const validUntil = batchId + DEFAULT_ORDER_DURATION
+        if (sellTokenId !== 0 || buyTokenId !== 0) {
+          log('sellTokenId, buyTokenId, batchId', sellTokenId, buyTokenId, batchId, sellToken.address, buyToken.address)
 
-        const params: ExchangeApiPlaceOrderParams = {
-          userAddress,
-          buyTokenId,
-          sellTokenId,
-          validUntil,
-          buyAmount,
-          sellAmount,
+          const validUntil = batchId + DEFAULT_ORDER_DURATION
+
+          const params: ExchangeApiPlaceOrderParams = {
+            userAddress,
+            buyTokenId,
+            sellTokenId,
+            validUntil,
+            buyAmount,
+            sellAmount,
+          }
+          const receipt = await exchangeApi.placeOrder(params, txOptionalParams)
+          log(`The transaction has been mined: ${receipt.transactionHash}`)
+
+          // TODO: get order id in a separate call
+          // toast.success(`Placed order id=${receipt.data} valid for 30min`)
+
+          return true
+        } else {
+          // TODO: Handle better this case
+          // TODO: Review in the contracts, cause it looks like fee token is 0, what is also used for unregistered tokens
+          // The addresses of the tokens are unknown
+          toast.error(
+            `Error placing order: One of the selected tokens is not registered in the exchange. You should register them first`,
+          )
+          console.error('At least one of the tokens has not been registered: %o', {
+            sellToken,
+            sellTokenId,
+            buyToken,
+            buyTokenId,
+          })
+          return false
         }
-        const receipt = await exchangeApi.placeOrder(params, txOptionalParams)
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
-
-        // TODO: get order id in a separate call
-        // toast.success(`Placed order id=${receipt.data} valid for 30min`)
-
-        return true
       } catch (e) {
         log(`Error placing order`, e)
         toast.error(`Error placing order: ${e.message}`)
 
         return false
       } finally {
-        //TODO: use mounted hook thingy when available
         setIsSubmitting(false)
       }
-    }
-  }, [userAddress])
+    },
+    [setIsSubmitting, userAddress],
+  )
 
   return { placeOrder, isSubmitting }
 }

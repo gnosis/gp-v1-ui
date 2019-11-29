@@ -76,9 +76,10 @@ interface Props {
   tokens: TokenDetails[]
   selected: TokenDetails
   onChange: (selected: TokenDetails) => void
+  tabIndex?: number
 }
 
-const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, onChange }) => {
+const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
   return (
@@ -93,10 +94,11 @@ const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, o
         options={options}
         value={{ token: selected }}
         onChange={(selected, { action }): void => {
-          if (action === 'select-option' && 'token' in selected) {
+          if (selected && action === 'select-option' && 'token' in selected) {
             onChange(selected.token)
           }
         }}
+        tabIndex={tabIndex.toString()}
       />
     </Wrapper>
   )

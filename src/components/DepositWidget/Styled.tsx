@@ -5,16 +5,16 @@ export const DynamicWrapper = styled.div<{ responsive: boolean }>`
   justify-content: center;
   align-items: center;
 
-  ${(props): string =>
+  ${(props): string | false =>
     props.responsive &&
     `
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background: #000000b5;
-    `}
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: #000000b5;
+  `}
 `
 
 export const InnerWrapper = styled.div`
@@ -197,13 +197,13 @@ export const RowTokenDiv = styled.div`
     border-bottom-color: #fbdf8f;
   }
 
+  &.selected {
+    background-color: #ecdcff;
+  }
+
   &.loading {
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
-  }
-
-  &.selected {
-    background-color: #ecdcff;
   }
 
   @media only screen and (max-width: 500px) {

@@ -1,11 +1,10 @@
 import BN from 'bn.js'
-import assert from 'assert'
-
-import { log, toBN } from 'utils'
+import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
 import { getEpochAddressForNetwork } from './epochList'
 
-import { DepositApi, Receipt, TxOptionalParams, EpochTokenLocker } from 'types'
+import { DepositApi, Receipt, TxOptionalParams } from 'types'
+import { EpochTokenLocker } from 'types/EpochTokenLocker'
 import EpochTokenLockerAbi from './EpochTokenLockerAbi'
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
@@ -25,7 +24,7 @@ export class DepositApiImpl implements DepositApi {
   private _ReferenceEpochTokenLocker: EpochTokenLocker
   private _web3: Web3
 
-  private static _address2ContractCache: { [K: string]: EpochTokenLocker } = {}
+  protected static _address2ContractCache: { [K: string]: EpochTokenLocker } = {}
 
   public constructor(web3: Web3) {
     this._ReferenceEpochTokenLocker = new web3.eth.Contract(EpochTokenLockerAbi)
@@ -33,6 +32,7 @@ export class DepositApiImpl implements DepositApi {
     this._web3 = web3
 
     // TODO remove later
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).epoch = this._ReferenceEpochTokenLocker
   }
 
@@ -132,13 +132,14 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.deposit(tokenAddress, amount).send({ from: userAddress })
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Deposited ${amount} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiImpl] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
@@ -147,13 +148,14 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.requestWithdraw(tokenAddress, amount).send({ from: userAddress })
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Requested withdraw of ${amount} for token ${tokenAddress}. User ${userAddress}`)
+    log(`[DepositApiImpl] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
@@ -162,9 +164,9 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.withdraw(tokenAddress, userAddress).send({ from: userAddress })
+    const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -174,25 +176,28 @@ export class DepositApiImpl implements DepositApi {
 
   /********************************    private methods   ********************************/
 
-  private async _getContract(): Promise<EpochTokenLocker> {
-    let networkId = getNetworkIdFromWeb3(this._web3)
+  protected async _getNetworkId(): Promise<number> {
+    const networkId = getNetworkIdFromWeb3(this._web3)
 
-    if (networkId === null) {
-      networkId = await this._web3.eth.net.getId()
-    }
+    return networkId === null ? this._web3.eth.net.getId() : networkId
+  }
+
+  protected async _getContract(): Promise<EpochTokenLocker> {
+    const networkId = await this._getNetworkId()
 
     return this._getContractForNetwork(networkId)
   }
 
-  private _getContractForNetwork(networkId: number): EpochTokenLocker {
+  protected _getContractForNetwork(networkId: number): EpochTokenLocker {
     const address = this.getContractAddress(networkId)
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
 
+    // as string as assert is not detected by TS
     return this._getContractAtAddress(address)
   }
 
-  private _getContractAtAddress(address: string): EpochTokenLocker {
+  protected _getContractAtAddress(address: string): EpochTokenLocker {
     const contract = DepositApiImpl._address2ContractCache[address]
 
     if (contract) return contract

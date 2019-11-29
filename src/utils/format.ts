@@ -1,9 +1,8 @@
 import BN from 'bn.js'
-import { TEN } from 'const'
+import { TEN, DEFAULT_PRECISION } from 'const'
 import { TokenDetails } from 'types'
 
 const DEFAULT_DECIMALS = 4
-const DEFAULT_PRECISION = 18
 const ELLIPSIS = '...'
 
 function _getLocaleSymbols(): { thousands: string; decimals: string } {
@@ -39,10 +38,10 @@ function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { 
 }
 
 export function formatAmount(
-  amount?: BN,
-  amountPrecision = DEFAULT_PRECISION,
+  amount: BN | null | undefined,
+  amountPrecision: number,
   decimals = DEFAULT_DECIMALS,
-  thousandSeparator: boolean = true,
+  thousandSeparator = true,
 ): string | null {
   if (!amount) {
     return null
@@ -69,7 +68,7 @@ export function formatAmount(
 export function formatAmountFull(
   amount?: BN,
   amountPrecision = DEFAULT_PRECISION,
-  thousandSeparator: boolean = true,
+  thousandSeparator = true,
 ): string | null {
   if (!amount) {
     return null
@@ -97,7 +96,7 @@ export function adjustPrecision(value: string | undefined | null, precision: num
   return value.replace(regexp, '$1')
 }
 
-export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISION): BN | null {
+export function parseAmount(amountFmt: string, amountPrecision: number): BN | null {
   if (!amountFmt) {
     return null
   }
@@ -115,7 +114,7 @@ export function parseAmount(amountFmt: string, amountPrecision = DEFAULT_PRECISI
   }
 }
 
-export function abbreviateString(inputString: string, prefixLength: number, suffixLength: number = 0): string {
+export function abbreviateString(inputString: string, prefixLength: number, suffixLength = 0): string {
   // abbreviate only if it makes sense, and make sure ellipsis fits into word
   // 1. always add ellipsis
   // 2. do not shorten words in case ellipsis will make the word longer
@@ -132,4 +131,12 @@ export function abbreviateString(inputString: string, prefixLength: number, suff
 
 export function safeTokenName(token: TokenDetails): string {
   return token.symbol || token.name || abbreviateString(token.address, 6, 4)
+}
+
+export function safeFilledToken<T extends TokenDetails>(token: T): T {
+  return {
+    ...token,
+    name: token.name || token.symbol || abbreviateString(token.address, 6, 4),
+    symbol: token.symbol || token.name || abbreviateString(token.address, 6, 4),
+  }
 }

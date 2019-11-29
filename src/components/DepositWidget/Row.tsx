@@ -10,20 +10,32 @@ import { RowTokenDiv, RowClaimButton, RowClaimLink } from './Styled'
 import useNoScroll from 'hooks/useNoScroll'
 
 import { ZERO, RESPONSIVE_SIZES } from 'const'
-import { formatAmount, formatAmountFull, log } from 'utils'
+import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
+import { TokenLocalState } from './useRowActions'
 
-export interface RowProps {
+export interface RowProps extends TokenLocalState {
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN) => Promise<void>
   onSubmitWithdraw: (amount: BN) => Promise<void>
   onClaim: Command
   onEnableToken: Command
-  innerWidth: number | null
+  innerWidth?: number
+  innerHeight?: number
 }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
-  const { tokenBalances, onSubmitDeposit, onSubmitWithdraw, onClaim, onEnableToken, innerWidth } = props
+  const {
+    tokenBalances,
+    onSubmitDeposit,
+    onSubmitWithdraw,
+    onClaim,
+    onEnableToken,
+    innerWidth,
+    highlighted,
+    enabling,
+    claiming,
+  } = props
 
   const {
     address,
@@ -38,22 +50,19 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     claimable,
     walletBalance,
     enabled,
-    highlighted,
-    enabling,
-    claiming,
   } = tokenBalances
-  log('[DepositWidgetRow] %s: %s', symbol, formatAmount(exchangeBalance, decimals))
+
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
-  let showResponsive = innerWidth < RESPONSIVE_SIZES.MOBILE
-  useNoScroll(visibleForm && showResponsive)
+  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE
+  useNoScroll(!!visibleForm && showResponsive)
 
   let className
-  if (highlighted) {
+  if (highlighted.has(address)) {
     className = 'highlight'
-  } else if (enabling) {
+  } else if (enabling.has(address)) {
     className = 'enabling'
   } else if (visibleForm) {
     className = 'selected'
@@ -69,19 +78,19 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           <TokenImg src={image} alt={name} />
           <div>{name}</div>
         </div>
-        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals)}>
+        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals) || ''}>
           {formatAmount(exchangeBalanceTotal, decimals)}
         </div>
-        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals)}>
+        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals) || ''}>
           {claimable ? (
             <>
-              <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
-                {claiming && <FontAwesomeIcon icon={faSpinner} spin />}
+              <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
+                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} spin />}
                 &nbsp; {formatAmount(withdrawingBalance, decimals)}
               </RowClaimButton>
               <div>
                 <RowClaimLink
-                  className={claiming ? 'disabled' : 'success'}
+                  className={claiming.has(address) ? 'disabled' : 'success'}
                   onClick={(): void => {
                     if (!claiming) {
                       onClaim()
@@ -101,7 +110,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             0
           )}
         </div>
-        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals)}>
+        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
           {formatAmount(walletBalance, decimals)}
         </div>
         <div data-label="Actions">
@@ -117,8 +126,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               </button>
             </>
           ) : (
-            <button className="success" onClick={onEnableToken} disabled={enabling}>
-              {enabling ? (
+            <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
+              {enabling.has(address) ? (
                 <>
                   <FontAwesomeIcon icon={faSpinner} spin />
                   &nbsp; Enabling {symbol}

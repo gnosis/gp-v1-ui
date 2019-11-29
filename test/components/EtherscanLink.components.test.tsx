@@ -7,7 +7,7 @@ import { abbreviateString } from 'utils'
 import { Network, WalletInfo } from 'types'
 
 let isConnected: boolean
-let networkId: Network
+let networkId: Network | undefined
 
 jest.mock('hooks/useWalletConnection', () => {
   return {
