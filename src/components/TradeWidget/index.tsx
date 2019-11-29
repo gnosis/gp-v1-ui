@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
@@ -80,7 +80,7 @@ const TradeWidget: React.FC = () => {
   const receiveInputId = 'receiveToken'
 
   const methods = useForm({
-    mode: 'onBlur',
+    mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellAmount,
       [receiveInputId]: receiveAmount,
@@ -120,23 +120,26 @@ const TradeWidget: React.FC = () => {
   const { isSubmitting, placeOrder } = usePlaceOrder()
   const history = useHistory()
 
-  const swapTokens = (): void => {
+  const swapTokens = useCallback((): void => {
     setSellToken(receiveToken)
     setReceiveToken(sellToken)
-  }
+  }, [receiveToken, sellToken])
 
-  const onSelectChangeFactory = (
-    setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
-    oppositeToken: TokenDetails,
-  ): ((selected: TokenDetails) => void) => {
-    return (selected: TokenDetails): void => {
-      if (selected.symbol === oppositeToken.symbol) {
-        swapTokens()
-      } else {
-        setToken(selected)
+  const onSelectChangeFactory = useCallback(
+    (
+      setToken: React.Dispatch<React.SetStateAction<TokenDetails>>,
+      oppositeToken: TokenDetails,
+    ): ((selected: TokenDetails) => void) => {
+      return (selected: TokenDetails): void => {
+        if (selected.symbol === oppositeToken.symbol) {
+          swapTokens()
+        } else {
+          setToken(selected)
+        }
       }
-    }
-  }
+    },
+    [swapTokens],
+  )
 
   const sameToken = sellToken === receiveToken
 
@@ -180,6 +183,7 @@ const TradeWidget: React.FC = () => {
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
+            tabIndex={1}
           />
           <IconWrapper onClick={swapTokens}>
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
@@ -192,6 +196,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
+            tabIndex={2}
           />
           <OrderDetails
             sellAmount={watch(sellInputId)}
@@ -199,7 +204,7 @@ const TradeWidget: React.FC = () => {
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
           />
-          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting}>
+          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
