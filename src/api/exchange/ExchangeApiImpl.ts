@@ -1,7 +1,7 @@
 import { DepositApiImpl } from './DepositApiImpl'
 import { ExchangeApi, PlaceOrderParams, Receipt, TxOptionalParams, AuctionElement } from 'types'
-import { StablecoinConverter } from 'types/StablecoinConverter'
-import StablecoinConvertedAbi from './StablecoinConverterAbi'
+import { BatchExchange } from 'types/BatchExchange'
+import BatchExchangeAbi from './BatchExchangeAbi'
 import { log, assert } from 'utils'
 
 import BN from 'bn.js'
@@ -73,14 +73,14 @@ const decodeAuctionElements = (bytes: string): AuctionElement[] => {
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  private _ReferenceExchangeContract: StablecoinConverter
+  private _ReferenceExchangeContract: BatchExchange
 
-  protected static _address2ContractCache: { [K: string]: StablecoinConverter } = {}
+  protected static _address2ContractCache: { [K: string]: BatchExchange } = {}
 
   public constructor(web3: Web3) {
     super(web3)
 
-    this._ReferenceExchangeContract = new web3.eth.Contract(StablecoinConvertedAbi)
+    this._ReferenceExchangeContract = new web3.eth.Contract(BatchExchangeAbi)
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -181,21 +181,21 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   /********************************    private methods   ********************************/
 
-  protected async _getContract(): Promise<StablecoinConverter> {
+  protected async _getContract(): Promise<BatchExchange> {
     const networkId = await this._getNetworkId()
 
     return this._getContractForNetwork(networkId)
   }
 
-  protected _getContractForNetwork(networkId: number): StablecoinConverter {
+  protected _getContractForNetwork(networkId: number): BatchExchange {
     const address = this.getContractAddress(networkId)
 
-    assert(address, `StablecoinConverter was not deployed to network ${networkId}`)
+    assert(address, `BatchExchange was not deployed to network ${networkId}`)
 
     return this._getContractAtAddress(address)
   }
 
-  protected _getContractAtAddress(address: string): StablecoinConverter {
+  protected _getContractAtAddress(address: string): BatchExchange {
     const contract = ExchangeApiImpl._address2ContractCache[address]
 
     if (contract) return contract
