@@ -1,8 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { LEGALDOCUMENT } from 'const'
-
 import Header from './Header'
 import Footer from './Footer'
 import LegalBanner from '../LegalBanner'
@@ -12,7 +10,7 @@ const Wrapper = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-rows: auto;
+  grid-template-rows: 50px auto;
 
   main {
     flex: 1;
@@ -27,7 +25,7 @@ const Wrapper = styled.div`
 
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
-    <LegalBanner startOpen={false} title={LEGALDOCUMENT.TITLE} />
+    <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
     <Header />
     <main>{children}</main>
     <Footer />
