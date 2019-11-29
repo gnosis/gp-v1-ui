@@ -36,7 +36,7 @@ export interface TokenLocalState {
   claiming: Set<string>
 }
 
-export const initialState: TokenLocalState = {
+export const TokenRowInitialState: TokenLocalState = {
   enabling: new Set(),
   highlighted: new Set(),
   claiming: new Set(),
@@ -81,5 +81,3 @@ export const reducer = (state: TokenLocalState, action: Actions): TokenLocalStat
       return state
   }
 }
-
-export default { reducer, initialState }
