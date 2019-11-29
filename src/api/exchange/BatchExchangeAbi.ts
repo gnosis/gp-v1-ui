@@ -1,6 +1,6 @@
 import { AbiItem } from 'web3-utils'
 
-const StablecoinConvertedAbi: AbiItem[] = [
+const BatchExchangeAbi: AbiItem[] = [
   {
     constant: true,
     inputs: [],
@@ -908,4 +908,4 @@ const StablecoinConvertedAbi: AbiItem[] = [
   },
 ]
 
-export default StablecoinConvertedAbi
+export default BatchExchangeAbi

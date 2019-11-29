@@ -313,8 +313,8 @@ export interface ERC20 extends Contract {
   }
 }
 
-export interface StablecoinConverter extends Contract {
-  clone(): StablecoinConverter
+export interface BatchExchange extends Contract {
+  clone(): BatchExchange
 
   methods: EpochTokenLocker['methods'] & {
     getSecondsRemainingInBatch(): TransactionObject<string>
