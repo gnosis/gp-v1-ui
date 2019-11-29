@@ -7,7 +7,7 @@ import Widget from 'components/layout/Widget'
 import Highlight from 'components/Highlight'
 import { tokenListApi } from 'api'
 import { getToken } from 'utils'
-import { Network } from 'types'
+import { Network, TokenDetails } from 'types'
 import OrderRow from './OrderRow'
 
 const OrdersWrapper = styled(Widget)`
@@ -114,12 +114,16 @@ const OrdersForm = styled.div`
 
 const OrdersWidget: React.FC = () => {
   // TODO: only for temporary layout
-  const tokens = useMemo(() => tokenListApi.getTokens(Network.Mainnet), [])
+  const { DAI, USDC, TUSD, PAX } = useMemo(() => {
+    const tokens = tokenListApi.getTokens(Network.Mainnet)
 
-  const DAI = getToken('symbol', 'DAI', tokens)
-  const USDC = getToken('symbol', 'USDC', tokens)
-  const TUSD = getToken('symbol', 'TUSD', tokens)
-  const PAX = getToken('symbol', 'PAX', tokens)
+    return {
+      DAI: getToken('symbol', 'DAI', tokens) as Required<TokenDetails>,
+      USDC: getToken('symbol', 'USDC', tokens) as Required<TokenDetails>,
+      TUSD: getToken('symbol', 'TUSD', tokens) as Required<TokenDetails>,
+      PAX: getToken('symbol', 'PAX', tokens) as Required<TokenDetails>,
+    }
+  }, [])
   // end temporary layout vars
 
   return (
