@@ -8,7 +8,8 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  background-color: lightyellow;
+  background-color: #272727;
+  color: wheat;
 
   text-align: center;
   font-size: 80%;
