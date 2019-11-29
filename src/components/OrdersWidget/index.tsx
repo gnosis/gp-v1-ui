@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
-import { faExchangeAlt, faChartLine, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import Widget from 'components/layout/Widget'
@@ -25,6 +25,8 @@ const OrdersWrapper = styled(Widget)`
 `
 
 const ButtonWithIcon = styled.button`
+  min-width: 10em;
+
   > svg {
     margin: 0 0.25em;
   }
@@ -53,16 +55,33 @@ const OrdersForm = styled.div`
   margin-top: 2em;
   margin-left: 2em;
 
+  .infoContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    div:last-child {
+      justify-self: end;
+    }
+  }
+
   .ordersContainer {
     display: grid;
     grid-template-columns: auto;
     margin: 2em 0 2em -3em;
   }
 
+  .rowContainer {
+    display: inherit;
+    grid-template-columns: 6% minmax(20em, auto) 20% 25% 10%;
+    align-items: center;
+    margin: 0.25em 0;
+  }
+
   .headerRow {
     text-transform: uppercase;
     font-weight: bold;
     font-size: 0.75em;
+    align-items: stretch;
 
     > div {
       border-bottom: 2px solid #ededed;
@@ -74,22 +93,22 @@ const OrdersForm = styled.div`
     }
   }
 
-  .rowContainer {
-    display: inherit;
-    grid-template-columns: 6% 8% auto 25% 12% 10%;
-    align-items: center;
-    margin: 0.25em 0;
-  }
-
   .cell {
     text-align: center;
-    vertical-align: middle;
   }
 
   .deleteContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  .warning {
+    color: orange;
+  }
+
+  .error {
+    color: red;
   }
 `
 
@@ -106,11 +125,10 @@ const OrdersWidget: React.FC = () => {
   return (
     <OrdersWrapper>
       <div className="header">
-        <h2>Your sell orders</h2>
-        <span>Standing orders for the connected account</span>
+        <h2>Your orders</h2>
         <CreateButtons>
           <ButtonWithIcon>
-            <FontAwesomeIcon icon={faExchangeAlt} /> Create order
+            <FontAwesomeIcon icon={faExchangeAlt} /> Trade
           </ButtonWithIcon>
           <div className="strategy">
             <ButtonWithIcon>
@@ -123,17 +141,27 @@ const OrdersWidget: React.FC = () => {
         </CreateButtons>
       </div>
       <OrdersForm>
-        <span>
-          You have <Highlight>3</Highlight> standing orders
-        </span>
+        <div className="infoContainer">
+          <div>
+            You have <Highlight>3</Highlight> standing orders
+          </div>
+          <div className="warning">
+            <FontAwesomeIcon icon={faExclamationTriangle} />
+            <strong> Low balance</strong>
+          </div>
+        </div>
         <form action="submit">
           <div className="ordersContainer">
             <div className="rowContainer headerRow">
               <input type="checkbox" />
-              <div className="cell">ID</div>
               <div className="cell">Order details</div>
-              <div className="cell">Trade at most</div>
-              <div className="cell">Matched</div>
+              <div className="cell">
+                Unfilled <br /> amount
+              </div>
+              <div className="cell">
+                Available <br />
+                amount
+              </div>
               <div className="cell">Expires</div>
             </div>
             <OrderRow
@@ -141,26 +169,19 @@ const OrdersWidget: React.FC = () => {
               sellToken={DAI}
               buyToken={TUSD}
               price="1.05"
-              sellTotal="1,500"
-              matched="500"
+              unfilledAmount="1,500"
+              availableAmount="1,000"
+              overBalance
               expiresOn="In 3 min"
             />
-            <OrderRow
-              id="543"
-              sellToken={TUSD}
-              buyToken={USDC}
-              price="1.03"
-              sellTotal={<Highlight>unlimited</Highlight>}
-              matched="5,876.8429"
-              expiresOn={<Highlight>Never</Highlight>}
-            />
+            <OrderRow id="543" sellToken={TUSD} buyToken={USDC} price="1.03" availableAmount="1,000" unlimited />
             <OrderRow
               id="1257"
               sellToken={PAX}
               buyToken={DAI}
               price="1.10"
-              sellTotal="350"
-              matched="0"
+              unfilledAmount="5,876.8429"
+              availableAmount="500"
               expiresOn="In 2 days"
             />
           </div>
