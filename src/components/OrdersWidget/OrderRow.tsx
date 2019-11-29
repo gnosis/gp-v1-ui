@@ -106,7 +106,7 @@ interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
   price: string
-  unfilledAmount: string
+  unfilledAmount?: string
   availableAmount: string
   expiresOn?: string
   overBalance?: boolean
