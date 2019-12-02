@@ -2,5 +2,5 @@ import styled from 'styled-components'
 
 export default styled.span`
   font-weight: bold;
-  color: #367be0;
+  color: ${(props): string => props.color || '#367be0'};
 `

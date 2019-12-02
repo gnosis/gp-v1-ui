@@ -114,10 +114,6 @@ const OrdersForm = styled.div`
   .warning {
     color: orange;
   }
-
-  .error {
-    color: red;
-  }
 `
 
 const OrdersWidget: React.FC = () => {
