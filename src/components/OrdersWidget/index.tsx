@@ -139,7 +139,7 @@ const OrdersWidget: React.FC = () => {
             <FontAwesomeIcon icon={faExchangeAlt} /> Trade
           </ButtonWithIcon>
           <div className="strategy">
-            <ButtonWithIcon>
+            <ButtonWithIcon className="danger">
               <FontAwesomeIcon icon={faChartLine} /> Create new strategy
             </ButtonWithIcon>
             <a href="/">
