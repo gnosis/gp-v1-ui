@@ -57,41 +57,52 @@ const OrdersForm = styled.div`
   }
 
   .ordersContainer {
-    display: grid;
-    grid-template-columns: auto;
+    // negative left margin to better position "hidden" elements
     margin: 2em 0 2em -3em;
-  }
 
-  .rowContainer {
-    display: inherit;
-    grid-template-columns: minmax(2em, 6%) minmax(20em, 1.5fr) 1fr 1fr 1fr;
-    align-items: center;
-    margin: 0.25em 0;
+    display: grid;
+    // 6 columns:
+    // loading indicator | select checkbox | order details | unfilled | available | expires
+    grid-template-columns: 3em 4em minmax(20em, 1.5fr) repeat(3, 1fr);
+    grid-row-gap: 1em;
+    place-items: center;
   }
 
   .headerRow {
+    // make the contents of this div behave as part of the parent
+    // grid container
+    display: contents;
+
     text-transform: uppercase;
     font-weight: bold;
     font-size: 0.75em;
-    align-items: stretch;
-    justify-items: stretch;
 
-    .cell {
+    .title {
+      // create a divider line only bellow titled columns
       border-bottom: 2px solid #ededed;
+      // push the border all the way to the bottom and extend it
+      place-self: stretch;
+
+      // align that text!
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
     }
 
-    div:first-child {
-      align-self: center;
-    }
-
     > * {
-      padding-bottom: 0.25em;
+      // more space for the divider line
+      padding-bottom: 0.5em;
     }
   }
 
-  .cell {
-    text-align: center;
+  .orderRow {
+    display: contents;
+  }
+
+  .checked {
+    // pull checkbox to the left to make divider line be further away
+    justify-self: left;
   }
 
   .deleteContainer {
@@ -153,20 +164,22 @@ const OrdersWidget: React.FC = () => {
         </div>
         <form action="submit">
           <div className="ordersContainer">
-            <div className="rowContainer headerRow">
-              <div>
+            <div className="headerRow">
+              <div></div> {/* Empty div on purpose */}
+              <div className="checked">
                 <input type="checkbox" />
               </div>
-              <div className="cell">Order details</div>
-              <div className="cell">
+              <div className="title">Order details</div>
+              <div className="title">
                 Unfilled <br /> amount
               </div>
-              <div className="cell">
+              <div className="title">
                 Available <br />
                 amount
               </div>
-              <div className="cell">Expires</div>
+              <div className="title">Expires</div>
             </div>
+
             <OrderRow
               id="1"
               sellToken={DAI}

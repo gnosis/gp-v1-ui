@@ -115,8 +115,9 @@ interface Props {
 const OrderRow: React.FC<Props> = props => {
   const { id, expiresOn, unlimited } = props
   return (
-    <OrderRowWrapper className="rowContainer" data-id={id}>
-      <div>
+    <OrderRowWrapper className="orderRow" data-id={id}>
+      <div></div> {/* TODO: display loading spinner */}
+      <div className="checked">
         <input type="checkbox" />
       </div>
       <OrderDetails {...props} />
