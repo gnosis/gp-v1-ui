@@ -30,7 +30,7 @@ interface Result extends TokenLocalState {
 export const useRowActions = (params: Params): Result => {
   const { balances, setBalances } = params
 
-  const [{ TokenRow: state }, dispatch] = useGlobalState()
+  const [{ TOKENS: state }, dispatch] = useGlobalState()
 
   const { userAddress, networkId } = useWalletConnection()
   const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null

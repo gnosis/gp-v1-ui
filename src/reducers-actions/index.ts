@@ -1,11 +1,21 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
-import { reducer as TokenRowReducer, TokenLocalState } from './tokenRow'
-import combineReducers from './combineReducers'
+import combineReducers from 'combine-reducers'
+import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as TOKENS } from './tokenRow'
 
 export * from './tokenRow'
 
 export interface GlobalState {
-  TokenRow: TokenLocalState
+  TOKENS: TokenLocalState
+}
+
+/**********************************
+ * Initial Global State
+ *
+ * Sets app's initial global state
+ * make sure the name of the state key(s) is/are the same as the reducer key(s) below
+ */
+
+export const INITIAL_STATE: GlobalState = {
+  TOKENS,
 }
 
 /**********************************
@@ -15,5 +25,5 @@ export interface GlobalState {
  * make sure the name of the Reducer key is the same as the state key you'd like from src/App
  */
 export const rootReducer = combineReducers({
-  TokenRow: TokenRowReducer,
+  TOKENS: TokenRowReducer,
 })

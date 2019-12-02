@@ -1,12 +1,13 @@
 import React, { useContext, useReducer } from 'react'
-import { GlobalState, TokenLocalState } from 'reducers-actions'
+import { GlobalState } from 'reducers-actions'
+import { AnyAction } from 'combine-reducers'
 
 const GlobalStateContext = React.createContext({})
 
 export function withGlobalContext<P>(
   WrappedComponent: React.FC<P>,
-  initialStateFunc: { (): { TokenRow: TokenLocalState }; (): Partial<GlobalState> },
-  reducer: React.Reducer<Partial<GlobalState>, { type: string; payload: unknown }>,
+  initialStateFunc: () => GlobalState,
+  reducer: React.Reducer<GlobalState, AnyAction>,
 ): (props: P) => JSX.Element {
   return function WrappedComponentWithGlobalState(props: P): JSX.Element {
     const [state, dispatch] = useReducer(reducer, initialStateFunc())

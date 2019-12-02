@@ -1,8 +1,8 @@
 import 'types'
 
 import React from 'react'
-import { hot } from 'react-hot-loader/root'
 import { BrowserRouter as Router, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
+import { hot } from 'react-hot-loader/root'
 
 // SCSS
 import GlobalStyles from './components/layout/GlobalStyles'
@@ -25,7 +25,7 @@ import { walletApi } from 'api'
 
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
-import { rootReducer, TokenRowInitialState as TokenRow } from 'reducers-actions'
+import { rootReducer, INITIAL_STATE } from 'reducers-actions'
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
   const isConnected = walletApi.isConnected()
@@ -76,14 +76,7 @@ export default hot(
   withGlobalContext(
     App,
     // Initial State
-    () => {
-      // Make sure key names here match that of src/reducers-actions/combineReducers keys
-      // These key names are the state slices accessible from the useGlobalState hook via
-      // const [{ TokenRow }, dispatch] = useGlobalState()
-      return {
-        TokenRow,
-      }
-    },
+    () => INITIAL_STATE,
     rootReducer,
   ),
 )
