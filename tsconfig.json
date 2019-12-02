@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "es2016",
+    "target": "es5",
     "downlevelIteration": true,
     "importHelpers": true,
     "sourceMap": true,
