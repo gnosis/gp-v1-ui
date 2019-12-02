@@ -72,7 +72,7 @@ const OrdersForm = styled.div`
 
   .rowContainer {
     display: inherit;
-    grid-template-columns: 6% minmax(20em, auto) 20% 25% 10%;
+    grid-template-columns: minmax(2em, 6%) minmax(20em, 1.5fr) 1fr 1fr 1fr;
     align-items: center;
     margin: 0.25em 0;
   }
@@ -82,17 +82,18 @@ const OrdersForm = styled.div`
     font-weight: bold;
     font-size: 0.75em;
     align-items: stretch;
+    justify-items: stretch;
 
-    > * {
+    .cell {
       border-bottom: 2px solid #ededed;
       text-align: center;
     }
+
     div:first-child {
-      border-bottom: none;
-      place-self: center;
+      align-self: center;
     }
 
-    & > * {
+    > * {
       padding-bottom: 0.25em;
     }
   }

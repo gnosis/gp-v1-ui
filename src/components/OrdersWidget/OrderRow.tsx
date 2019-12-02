@@ -17,7 +17,9 @@ const OrderRowWrapper = styled.div`
   .order-details {
     grid-template-columns: 6em 3em 5em;
     grid-template-rows: 1fr 1fr;
-    justify-items: left;
+    justify-items: start;
+    justify-self: start;
+    padding-left: 1.5em;
   }
 
   .sub-columns {
@@ -25,9 +27,6 @@ const OrderRowWrapper = styled.div`
 
     div:first-child {
       justify-self: end;
-    }
-    & > div {
-      justify-self: start;
     }
   }
 
