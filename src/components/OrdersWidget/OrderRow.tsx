@@ -117,7 +117,9 @@ const OrderRow: React.FC<Props> = props => {
   const { id, expiresOn, unlimited } = props
   return (
     <OrderRowWrapper className="rowContainer" data-id={id}>
-      <input type="checkbox" />
+      <div>
+        <input type="checkbox" />
+      </div>
       <OrderDetails {...props} />
       <UnfilledAmount {...props} />
       <AvailableAmount {...props} />

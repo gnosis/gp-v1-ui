@@ -83,9 +83,13 @@ const OrdersForm = styled.div`
     font-size: 0.75em;
     align-items: stretch;
 
-    > div {
+    > * {
       border-bottom: 2px solid #ededed;
       text-align: center;
+    }
+    div:first-child {
+      border-bottom: none;
+      place-self: center;
     }
 
     & > * {
@@ -157,7 +161,9 @@ const OrdersWidget: React.FC = () => {
         <form action="submit">
           <div className="ordersContainer">
             <div className="rowContainer headerRow">
-              <input type="checkbox" />
+              <div>
+                <input type="checkbox" />
+              </div>
               <div className="cell">Order details</div>
               <div className="cell">
                 Unfilled <br /> amount
