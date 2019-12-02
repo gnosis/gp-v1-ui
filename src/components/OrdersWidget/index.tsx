@@ -14,14 +14,6 @@ const OrdersWrapper = styled(Widget)`
   > a {
     margin-bottom: -2em;
   }
-
-  .header {
-    margin-top: 0;
-
-    h2 {
-      margin-bottom: 0.25em;
-    }
-  }
 `
 
 const ButtonWithIcon = styled.button`
@@ -133,7 +125,7 @@ const OrdersWidget: React.FC = () => {
 
   return (
     <OrdersWrapper>
-      <div className="header">
+      <div>
         <h2>Your orders</h2>
         <CreateButtons>
           <ButtonWithIcon>
