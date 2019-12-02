@@ -1,8 +1,8 @@
 import 'types'
 
+import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter as Router, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
-import { hot } from 'react-hot-loader/root'
 
 // SCSS
 import GlobalStyles from './components/layout/GlobalStyles'
