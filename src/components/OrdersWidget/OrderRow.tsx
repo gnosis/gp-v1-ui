@@ -44,6 +44,10 @@ const OrderRowWrapper = styled.div`
       padding-top: 40px;
     }
   }
+
+  &.pending {
+    color: grey;
+  }
 `
 
 const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
@@ -61,12 +65,17 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
-const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken'>> = ({ price, buyToken, sellToken }) => {
+const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken' | 'pending'>> = ({
+  price,
+  buyToken,
+  sellToken,
+  pending,
+}) => {
   return (
     <div className="container order-details">
       <div>Sell</div>
       <div>
-        <Highlight>1</Highlight>
+        <Highlight color={pending ? 'grey' : ''}>1</Highlight>
       </div>
       <div>
         <strong>{safeTokenName(sellToken)}</strong>
@@ -76,7 +85,7 @@ const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken'>> = 
         for <strong>at least</strong>
       </div>
       <div>
-        <Highlight className="error">{price}</Highlight>
+        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
       </div>
       <div>
         <strong>{safeTokenName(buyToken)}</strong>
@@ -85,15 +94,16 @@ const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken'>> = 
   )
 }
 
-const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'unfilledAmount' | 'unlimited'>> = ({
+const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'unfilledAmount' | 'unlimited' | 'pending'>> = ({
   sellToken,
   unfilledAmount,
   unlimited,
+  pending,
 }) => {
   return (
     <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
       {unlimited ? (
-        <Highlight>no limit</Highlight>
+        <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
       ) : (
         <>
           <div>{unfilledAmount}</div>
@@ -146,7 +156,7 @@ const OrderRow: React.FC<Props> = props => {
       <OrderDetails {...props} />
       <UnfilledAmount {...props} />
       <AvailableAmount {...props} />
-      <div className="cell">{unlimited ? <Highlight>Never</Highlight> : expiresOn}</div>
+      <div className="cell">{unlimited ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
     </OrderRowWrapper>
   )
 }
