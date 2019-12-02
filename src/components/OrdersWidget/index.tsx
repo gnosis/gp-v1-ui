@@ -192,6 +192,16 @@ const OrdersWidget: React.FC = () => {
             />
             <OrderRow id="543" sellToken={TUSD} buyToken={USDC} price="1.03" availableAmount="1,000" unlimited />
             <OrderRow
+              id="1287"
+              sellToken={USDC}
+              buyToken={DAI}
+              price="1.50"
+              unfilledAmount="876.849"
+              availableAmount="876.849"
+              expiresOn="In 1 days"
+              pending
+            />
+            <OrderRow
               id="1257"
               sellToken={PAX}
               buyToken={DAI}

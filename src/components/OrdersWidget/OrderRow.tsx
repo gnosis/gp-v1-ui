@@ -1,11 +1,13 @@
 import React from 'react'
 import styled from 'styled-components'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 import Highlight from 'components/Highlight'
+import { EtherscanLink } from 'components/EtherscanLink'
+
 import { TokenDetails } from 'types'
 import { safeTokenName } from 'utils'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 
 const OrderRowWrapper = styled.div`
   .container {
@@ -33,7 +35,31 @@ const OrderRowWrapper = styled.div`
   .three-columns {
     grid-template-columns: minmax(4em, 60%) minmax(3em, 30%) minmax(1em, 10%);
   }
+
+  .pendingCell {
+    place-items: center;
+
+    a {
+      position: absolute;
+      padding-top: 40px;
+    }
+  }
 `
+
+const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
+  if (!pending) {
+    // Empty div is required due to grid layout
+    return <div></div>
+  }
+
+  // TODO: use proper pending tx hash for link
+  return (
+    <div className="container pendingCell">
+      <FontAwesomeIcon icon={faSpinner} size="lg" spin />
+      <EtherscanLink identifier="bla" type="tx" label={<small>view</small>} />
+    </div>
+  )
+}
 
 const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken'>> = ({ price, buyToken, sellToken }) => {
   return (
@@ -106,13 +132,14 @@ interface Props {
   expiresOn?: string
   overBalance?: boolean
   unlimited?: boolean
+  pending?: boolean
 }
 
 const OrderRow: React.FC<Props> = props => {
-  const { id, expiresOn, unlimited } = props
+  const { id, expiresOn, unlimited, pending = false } = props
   return (
-    <OrderRowWrapper className="orderRow" data-id={id}>
-      <div></div> {/* TODO: display loading spinner */}
+    <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')} data-id={id}>
+      <PendingLink {...props} />
       <div className="checked">
         <input type="checkbox" />
       </div>
