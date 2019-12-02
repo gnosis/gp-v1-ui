@@ -12,9 +12,9 @@ interface EventOptions {
   topics?: string[]
 }
 
-export abstract class StablecoinConverter extends Contract {
+export abstract class BatchExchange extends Contract {
   //   constructor(jsonInterface: any[], address?: string, options?: ContractOptions)
-  public abstract clone(): StablecoinConverter
+  public abstract clone(): BatchExchange
   public methods: {
     getSecondsRemainingInBatch(): TransactionObject<string>
 
