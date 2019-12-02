@@ -1,10 +1,10 @@
 import combineReducers from 'combine-reducers'
-import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as TOKENS } from './tokenRow'
+import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as tokens } from './tokenRow'
 
 export * from './tokenRow'
 
 export interface GlobalState {
-  TOKENS: TokenLocalState
+  tokens: TokenLocalState
 }
 
 /**********************************
@@ -15,7 +15,7 @@ export interface GlobalState {
  */
 
 export const INITIAL_STATE: GlobalState = {
-  TOKENS,
+  tokens,
 }
 
 /**********************************
@@ -25,5 +25,5 @@ export const INITIAL_STATE: GlobalState = {
  * make sure the name of the Reducer key is the same as the state key you'd like from src/App
  */
 export const rootReducer = combineReducers({
-  TOKENS: TokenRowReducer,
+  tokens: TokenRowReducer,
 })
