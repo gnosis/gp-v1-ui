@@ -7,95 +7,101 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 // import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
 ;(window as any).WalletConnectProvider = WalletConnectProvider
 
-
-class ETHProv extends WalletConnectProvider {
-  public send(payload: any, callback: any): any {
-    console.log('send::payload,callback', payload, callback)
-    return super.send(payload, callback)
-  }
-  public handleReadRequest(payload: any): void {
-    console.log('handleReadRequest::payload', payload)
-    return super.handleReadRequest(payload)
-  }
-  public updateState(sessionParams: any): any {
-    console.log('updateState::sessionParams', sessionParams)
-    return super.updateState(sessionParams)
-  }
-
-  public enable(): Promise<[string]> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const wc = await this.getWalletConnector()
-        if (wc) {
-          wc.session && this.updateState(wc.session)
-          this.start()
-          this.subscribeWalletConnector()
-          resolve(wc.accounts)
-        } else {
-          return reject(new Error('Failed to connect to WalleConnect'))
-        }
-      } catch (error) {
-        return reject(error)
-      }
-    })
-  }
-
-  // public getWalletConnector(): any {
-  //   return new Promise((resolve, reject) => {
-  //     const wc = this.wc
-
-  //     if (this.isConnecting) {
-  //       console.log('getWalletConnector:: already connecting')
-  //       this.onConnect((x: any) => resolve(x))
-  //     } else if (!wc.connected) {
-  //       console.log('getWalletConnector:: will create session')
-  //       this.isConnecting = true
-  //       const sessionRequestOpions = this.chainId ? { chainId: this.chainId } : undefined
-  //       wc.createSession(sessionRequestOpions)
-  //         .then(() => {
-  //           if (this.qrcode) {
-  //             console.log(wc.uri)
-  //             WalletConnectQRCodeModal.open(wc.uri, () => {
-  //               reject(new Error('User closed WalletConnect modal'))
-  //             })
-  //           }
-  //           wc.on('connect', (payload: any) => {
-  //             console.log('getWalletConnector::wc.on(connect):: payload', payload)
-  //             console.log('getWalletConnector::wc.session', JSON.stringify(wc.session))
-  //             if (this.qrcode) {
-  //               WalletConnectQRCodeModal.close()
-  //             }
-  //             this.isConnecting = false
-
-  //             if (payload) {
-  //               // Handle session update
-  //               this.updateState(payload.params[0])
-  //             } else if (wc.session) { // IMPORTANT!
-  //               this.updateState(wc.session)
-  //             }
-  //             // Emit connect event
-  //             this.emit('connect')
-
-  //             this.triggerConnect(wc)
-  //             resolve(wc)
-  //           })
-  //         })
-  //         .catch((error: Error) => {
-  //           console.log('getWalletConnector::wc.createSession::error', error)
-  //           this.isConnecting = false
-  //           reject(error)
-  //         })
-  //     } else {
-  //       console.log('getWalletConnector:: already has valid session')
-  //       if (wc.session) { // IMPORTANT!
-  //         this.updateState(wc.session)
-  //       }
-  //       resolve(wc)
-  //     }
-  //   })
-  // }
+const oldEnable = WalletConnectProvider.prototype.enable
+WalletConnectProvider.prototype.enable = async function(): Promise<[string]> {
+  const accounts = await oldEnable.call(this)
+  this.wc.session && this.updateState(this.wc.session)
+  return accounts
 }
-;(window as any).ETHProv = ETHProv
+
+// class ETHProv extends WalletConnectProvider {
+//   public send(payload: any, callback: any): any {
+//     console.log('send::payload,callback', payload, callback)
+//     return super.send(payload, callback)
+//   }
+//   public handleReadRequest(payload: any): void {
+//     console.log('handleReadRequest::payload', payload)
+//     return super.handleReadRequest(payload)
+//   }
+//   public updateState(sessionParams: any): any {
+//     console.log('updateState::sessionParams', sessionParams)
+//     return super.updateState(sessionParams)
+//   }
+
+//   public enable(): Promise<[string]> {
+//     return new Promise(async (resolve, reject) => {
+//       try {
+//         const wc = await this.getWalletConnector()
+//         if (wc) {
+//           wc.session && this.updateState(wc.session)
+//           this.start()
+//           this.subscribeWalletConnector()
+//           resolve(wc.accounts)
+//         } else {
+//           return reject(new Error('Failed to connect to WalleConnect'))
+//         }
+//       } catch (error) {
+//         return reject(error)
+//       }
+//     })
+//   }
+
+//   // public getWalletConnector(): any {
+//   //   return new Promise((resolve, reject) => {
+//   //     const wc = this.wc
+
+//   //     if (this.isConnecting) {
+//   //       console.log('getWalletConnector:: already connecting')
+//   //       this.onConnect((x: any) => resolve(x))
+//   //     } else if (!wc.connected) {
+//   //       console.log('getWalletConnector:: will create session')
+//   //       this.isConnecting = true
+//   //       const sessionRequestOpions = this.chainId ? { chainId: this.chainId } : undefined
+//   //       wc.createSession(sessionRequestOpions)
+//   //         .then(() => {
+//   //           if (this.qrcode) {
+//   //             console.log(wc.uri)
+//   //             WalletConnectQRCodeModal.open(wc.uri, () => {
+//   //               reject(new Error('User closed WalletConnect modal'))
+//   //             })
+//   //           }
+//   //           wc.on('connect', (payload: any) => {
+//   //             console.log('getWalletConnector::wc.on(connect):: payload', payload)
+//   //             console.log('getWalletConnector::wc.session', JSON.stringify(wc.session))
+//   //             if (this.qrcode) {
+//   //               WalletConnectQRCodeModal.close()
+//   //             }
+//   //             this.isConnecting = false
+
+//   //             if (payload) {
+//   //               // Handle session update
+//   //               this.updateState(payload.params[0])
+//   //             } else if (wc.session) { // IMPORTANT!
+//   //               this.updateState(wc.session)
+//   //             }
+//   //             // Emit connect event
+//   //             this.emit('connect')
+
+//   //             this.triggerConnect(wc)
+//   //             resolve(wc)
+//   //           })
+//   //         })
+//   //         .catch((error: Error) => {
+//   //           console.log('getWalletConnector::wc.createSession::error', error)
+//   //           this.isConnecting = false
+//   //           reject(error)
+//   //         })
+//   //     } else {
+//   //       console.log('getWalletConnector:: already has valid session')
+//   //       if (wc.session) { // IMPORTANT!
+//   //         this.updateState(wc.session)
+//   //       }
+//   //       resolve(wc)
+//   //     }
+//   //   })
+//   // }
+// }
+// ;(window as any).ETHProv = ETHProv
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -200,8 +206,8 @@ const subscribeToBlockchainUpdate = ({
 // const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
 
 const wcOptions: WalletConnectInits = {
-  // package: WalletConnectProvider,
-  package: ETHProv,
+  package: WalletConnectProvider,
+  // package: ETHProv,
   options: {
     // TODO get infuraId from .env
     infuraId: '8b4d9b4306294d2e92e0775ff1075066',
