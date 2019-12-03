@@ -128,7 +128,7 @@
     "prettier": "^1.18.2",
     "react-dev-utils": "^9.0.1",
     "react-test-renderer": "^16.9.0",
-    "rimraf": "^2.6.3",
+    "rimraf": "^3.0.0",
     "style-loader": "^1.0.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.1.0",
