@@ -215,7 +215,7 @@ const OrdersWidget: React.FC = () => {
             <ButtonWithIcon disabled>
               <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
             </ButtonWithIcon>
-            <span>Select first the orders you want to delete</span>
+            <span>Select first the order(s) you want to delete</span>
           </div>
         </form>
       </OrdersForm>
