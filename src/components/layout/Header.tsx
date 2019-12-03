@@ -126,7 +126,7 @@ const Header: React.FC = () => {
             <LinkWithPastLocation to="/deposit">Deposit</LinkWithPastLocation>
           </li>
           <li>
-            <Link to={{ pathname: '/orders', state: { from: location } }}>Orders</Link>
+            <LinkWithPastLocation to="/orders">Orders</LinkWithPastLocation>
           </li>
         </ul>
         <Wallet />

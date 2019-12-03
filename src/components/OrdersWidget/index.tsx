@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -135,9 +136,11 @@ const OrdersWidget: React.FC = () => {
       <div>
         <h2>Your orders</h2>
         <CreateButtons>
-          <ButtonWithIcon>
-            <FontAwesomeIcon icon={faExchangeAlt} /> Trade
-          </ButtonWithIcon>
+          <Link to="/trade">
+            <ButtonWithIcon>
+              <FontAwesomeIcon icon={faExchangeAlt} /> Trade
+            </ButtonWithIcon>
+          </Link>
           <div className="strategy">
             <ButtonWithIcon className="danger">
               <FontAwesomeIcon icon={faChartLine} /> Create new strategy
