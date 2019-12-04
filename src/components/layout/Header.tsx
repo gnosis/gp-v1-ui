@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import { Switch, Route } from 'react-router'
+import { Switch, Route, useLocation } from 'react-router'
 import { rem } from 'polished'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
@@ -120,10 +120,9 @@ const Wrapper = styled.header`
 `
 
 const Header: React.FC = () => {
-  // const location = useLocation()
+  const location = useLocation()
 
-  // TODO: Why???
-  // const { from } = location.state || { from: { pathname: '/' } }
+  const { from } = location.state || { from: { pathname: '/trade' } }
 
   return (
     <Wrapper>
@@ -133,7 +132,7 @@ const Header: React.FC = () => {
         </Link>
         <ul className="nav-links">
           <li>
-            <Link to="/trade">Trade</Link>
+            <Link to={from}>Trade</Link>
           </li>
           <li>
             {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
