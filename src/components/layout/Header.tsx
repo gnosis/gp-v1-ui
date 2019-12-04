@@ -2,7 +2,6 @@ import React from 'react'
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 import { useLocation, Switch, Route } from 'react-router'
-import { rem } from 'polished'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
