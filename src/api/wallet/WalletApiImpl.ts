@@ -136,7 +136,9 @@ export class WalletApiImpl implements WalletApi {
   private _provider: Provider | null
   private _web3: Web3
 
-  private _unsubscribe: Command = () => {}
+  private _unsubscribe: Command = () => {
+    // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
+  }
 
   public constructor(web3: Web3) {
     this._listeners = []
@@ -161,6 +163,8 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(provider as any)
     log('[WalletApi] Connected')
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
     await this._notifyListeners()
@@ -171,7 +175,9 @@ export class WalletApiImpl implements WalletApi {
       this._notifyListeners.bind(this),
     )
 
-    let unsubscribeDisconnect: Command = () => {}
+    let unsubscribeDisconnect: Command = () => {
+      // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
+    }
     if (isWalletConnectSubscriptions(subscriptions)) {
       unsubscribeDisconnect = subscriptions.onStop(this.disconnect.bind(this))
     } else if (isMetamaskSubscriptions(subscriptions)) {
