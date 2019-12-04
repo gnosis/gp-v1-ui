@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
-import { Switch, Route, useLocation } from 'react-router'
+import { NavLink } from 'react-router-dom'
+import { useLocation, Switch, Route } from 'react-router'
 import { rem } from 'polished'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
@@ -10,7 +10,11 @@ import LinkWithPastLocation from 'components/LinkWithPastLocation'
 const Wrapper = styled.header`
   color: #ffffff;
   background-color: #3340a9;
-  min-height: ${rem('325px')};
+  padding-bottom: 5rem;
+
+  @media only screen and (max-width: 866px) {
+    padding-bottom: 1rem;
+  }
 
   nav {
     display: flex;
@@ -33,6 +37,11 @@ const Wrapper = styled.header`
     a {
       color: white;
       padding: 0.8em;
+      text-decoration: none;
+
+      &.active {
+        text-decoration: underline;
+      }
     }
 
     @media only screen and (max-width: 866px) {
@@ -51,6 +60,9 @@ const Wrapper = styled.header`
       color: white;
       border-color: white;
       cursor: pointer;
+    }
+    @media only screen and (max-width: 915px) {
+      display: none;
     }
   }
 
@@ -106,16 +118,6 @@ const Wrapper = styled.header`
         border-top: 0.7px solid #00000029 !important;
       }
     }
-
-    .header-title {
-      margin-bottom: 2rem;
-      h1 {
-        font-size: 1.8rem;
-      }
-      h3 {
-        font-size: 1rem;
-      }
-    }
   }
 `
 
@@ -127,23 +129,23 @@ const Header: React.FC = () => {
   return (
     <Wrapper>
       <nav>
-        <Link className="logo" to="/">
+        <NavLink className="logo" to="/trade">
           fuse
-        </Link>
+        </NavLink>
         <ul className="nav-links">
           <li>
-            <Link to={from}>Trade</Link>
+            <NavLink to={from}>Trade</NavLink>
           </li>
           <li>
             {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
-            <Link to="/strategies">Strategies</Link>
+            <NavLink to="/strategies">Strategies</NavLink>
           </li>
           <li>
             <LinkWithPastLocation to="/wallet">Wallet</LinkWithPastLocation>
           </li>
           <li>
             {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
-            <Link to="/orders">Orders</Link>
+            <NavLink to="/orders">Orders</NavLink>
           </li>
           <li>
             <LinkWithPastLocation to="/orders">Orders</LinkWithPastLocation>
