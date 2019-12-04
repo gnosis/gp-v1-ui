@@ -125,6 +125,9 @@ const Header: React.FC = () => {
           <li>
             <LinkWithPastLocation to="/deposit">Deposit</LinkWithPastLocation>
           </li>
+          <li>
+            <LinkWithPastLocation to="/orders">Orders</LinkWithPastLocation>
+          </li>
         </ul>
         <Wallet />
       </nav>
