@@ -60,12 +60,17 @@ class ETHProv extends WalletConnectProvider {
             }
             wc.on('connect', (error: Error, payload: any) => {
               // IMPORTANT!
+              if (error) {
+                this.isConnecting = false
+                return reject(error)
+              }
               console.log('getWalletConnector::wc.on(connect):: payload', payload)
               console.log('getWalletConnector::wc.session', JSON.stringify(wc.session))
               if (this.qrcode) {
                 WalletConnectQRCodeModal.close()
               }
               this.isConnecting = false
+              this.connected = true
 
               if (payload) {
                 // Handle session update
@@ -85,7 +90,8 @@ class ETHProv extends WalletConnectProvider {
           })
       } else {
         console.log('getWalletConnector:: already has valid session')
-        if (wc.session) {
+        if (!this.connected) {
+          this.connected = true
           // IMPORTANT!
           this.updateState(wc.session)
         }
