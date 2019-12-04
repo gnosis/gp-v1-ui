@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import { useLocation } from 'react-router'
+import { Switch, Route } from 'react-router'
 import { rem } from 'polished'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
@@ -43,8 +43,7 @@ const Wrapper = styled.header`
 
   .logo {
     flex: 0 1 16rem;
-    border: 2px solid #ff5097;
-    color: #ff5097;
+    color: #ff62a2;
     text-align: center;
     vertical-align: middle;
 
@@ -57,8 +56,8 @@ const Wrapper = styled.header`
 
   .nav-links,
   .logo {
-    padding: 1rem;
-    margin: 1rem;
+    padding: 0.5rem;
+    margin: 0.5rem;
   }
 
   .header-title {
@@ -66,14 +65,27 @@ const Wrapper = styled.header`
     line-height: 1.15;
     text-align: center;
     width: 95%;
+
+    h1 {
+      margin: 0;
+    }
   }
 
   h1 {
     margin-bottom: 0;
+    color: #e0e1e2;
+    font-size: 3em;
+
+    em {
+      font-size: 1.2em;
+      color: #ff62a2;
+    }
   }
-  h3 {
-    margin-top: 0;
-    color: #e0aacf;
+  h2 {
+    margin-top: 1em;
+    text-transform: uppercase;
+    color: white;
+    font-size: 0.8em;
   }
 
   @media only screen and (max-width: 500px) {
@@ -108,22 +120,31 @@ const Wrapper = styled.header`
 `
 
 const Header: React.FC = () => {
-  const location = useLocation()
+  // const location = useLocation()
 
-  const { from } = location.state || { from: { pathname: '/' } }
+  // TODO: Why???
+  // const { from } = location.state || { from: { pathname: '/' } }
 
   return (
     <Wrapper>
       <nav>
         <Link className="logo" to="/">
-          dFusion PoC
+          fuse
         </Link>
         <ul className="nav-links">
           <li>
-            <Link to={from}>Trade</Link>
+            <Link to="/trade">Trade</Link>
           </li>
           <li>
-            <LinkWithPastLocation to="/deposit">Deposit</LinkWithPastLocation>
+            {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
+            <Link to="/strategies">Strategies</Link>
+          </li>
+          <li>
+            <LinkWithPastLocation to="/wallet">Wallet</LinkWithPastLocation>
+          </li>
+          <li>
+            {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
+            <Link to="/orders">Orders</Link>
           </li>
           <li>
             <LinkWithPastLocation to="/orders">Orders</LinkWithPastLocation>
@@ -132,8 +153,27 @@ const Header: React.FC = () => {
         <Wallet />
       </nav>
       <div className="header-title">
-        <h1>Swap stable coins</h1>
-        <h3>Fair, Efficient prices, Onchain</h3>
+        <h1>
+          <em>𝚏</em>𝓊𝗌𝓮
+        </h1>
+
+        <Switch>
+          <Route path="/trade">
+            <h2>Trading</h2>
+          </Route>
+          <Route path="/strategies">
+            <h2>Set up standing orders</h2>
+          </Route>
+          <Route path="/wallet">
+            <h2>Your funds, Deposit, Withdraw</h2>
+          </Route>
+          <Route path="/orders">
+            <h2>Your orders</h2>
+          </Route>
+          <Route path="/connect-wallet">
+            <h2>Connect wallet</h2>
+          </Route>
+        </Switch>
       </div>
     </Wrapper>
   )
