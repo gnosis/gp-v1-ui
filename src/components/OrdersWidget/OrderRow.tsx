@@ -12,6 +12,7 @@ import { safeTokenName } from 'utils'
 const OrderRowWrapper = styled.div`
   .container {
     display: grid;
+    position: relative;
   }
 
   .order-details {
@@ -40,8 +41,8 @@ const OrderRowWrapper = styled.div`
     place-items: center;
 
     a {
+      top: 100%;
       position: absolute;
-      padding-top: 40px;
     }
   }
 
