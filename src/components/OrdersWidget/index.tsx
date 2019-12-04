@@ -28,44 +28,55 @@ const ButtonWithIcon = styled.button`
 
 const CreateButtons = styled.div`
   margin-top: 2em;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
 
+  // 💙 grid
+  display: grid;
 
-  button {
-    // resetting button margins to help with alignment
-    margin: 0;
+  &.withOrders {
+    justify-items: start;
+    grid-gap: 0.25em 0.75em;
+    grid:
+      'tradeBtn strategyBtn'
+      '.        strategyInfo'
+      / 1fr 1fr;
+
+    .tradeBtn {
+      justify-self: end;
+    }
   }
 
-  .strategy {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-
-  }
-
-  &.noOrders {
-    // when no orders, give some extra space
-    margin-top: 4em;
-
-    // turn buttons into a column
-    flex-direction: column
-    // align everything
-    justify-content: center;
-    align-items: center;
+  &.withoutOrders {
+    // adjust grid layout when no orders
+    place-items: center;
+    grid-row-gap: 1em;
+    grid:
+      'noOrdersInfo'
+      'tradeBtn'
+      'strategyBtn'
+      'strategyInfo';
 
     button {
       // make buttons the same width
       width: 15em;
     }
+  }
 
-    .strategy {
-      // align strategy div as well
-      justify-content: center;
-      align-items:center;
-    }
+  .noOrdersInfo {
+    grid-area: noOrdersInfo;
+  }
+  .tradeBtn {
+    grid-area: tradeBtn;
+  }
+  .strategyBtn {
+    grid-area: strategyBtn;
+  }
+  .strategyInfo {
+    grid-area: strategyInfo;
+  }
+
+  button {
+    // resetting button margins to help with alignment
+    margin: 0;
   }
 `
 
@@ -163,25 +174,23 @@ const OrdersWidget: React.FC = () => {
     <OrdersWrapper>
       <div>
         <h2>Your orders</h2>
-        <CreateButtons className={noOrders ? 'noOrders' : ''}>
+        <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
-            <p>
+            <p className="noOrdersInfo">
               It appears you haven&apos;t place any order yet. <br /> Create one!
             </p>
           )}
-          <Link to="/trade">
+          <Link to="/trade" className="tradeBtn">
             <ButtonWithIcon>
               <FontAwesomeIcon icon={faExchangeAlt} /> Trade
             </ButtonWithIcon>
           </Link>
-          <div className="strategy">
-            <ButtonWithIcon className="danger">
-              <FontAwesomeIcon icon={faChartLine} /> Create new strategy
-            </ButtonWithIcon>
-            <a href="/">
-              <small>Learn more about strategies</small>
-            </a>
-          </div>
+          <ButtonWithIcon className="danger strategyBtn">
+            <FontAwesomeIcon icon={faChartLine} /> Create new strategy
+          </ButtonWithIcon>
+          <a href="/" className="strategyInfo">
+            <small>Learn more about strategies</small>
+          </a>
         </CreateButtons>
       </div>
       {!noOrders && (
