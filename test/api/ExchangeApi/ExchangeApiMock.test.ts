@@ -19,19 +19,25 @@ beforeAll(() => {
 
 beforeEach(() => {
   mockErc20Api = new Erc20ApiMock()
-  instance = new ExchangeApiMock({}, mockErc20Api, tokens, 4, {
-    [USER_1]: [
-      {
-        buyTokenId: 1,
-        sellTokenId: 2,
-        validFrom: 0,
-        validUntil: 6,
-        priceNumerator: ONE,
-        priceDenominator: ZERO,
-        remainingAmount: ONE,
-      },
-    ],
-  })
+  instance = new ExchangeApiMock(
+    {},
+    mockErc20Api,
+    tokens,
+    {
+      [USER_1]: [
+        {
+          buyTokenId: 1,
+          sellTokenId: 2,
+          validFrom: 0,
+          validUntil: 6,
+          priceNumerator: ONE,
+          priceDenominator: ZERO,
+          remainingAmount: ONE,
+        },
+      ],
+    },
+    4,
+  )
 })
 
 describe('Basic view functions', () => {
