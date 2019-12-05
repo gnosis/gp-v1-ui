@@ -1,7 +1,10 @@
 {
   "presets": [[
     "@babel/preset-env",
-    {"exclude": ["@babel/plugin-transform-classes"]}
+    {"targets": {
+      "chrome": 80,
+      "firefox": 70
+    }}
   ],
     "@babel/preset-react"],
   "plugins": [
