@@ -164,7 +164,6 @@ const OrdersWidget: React.FC = () => {
         <form action="submit">
           <div className="ordersContainer">
             <div className="headerRow">
-              <div></div> {/* Empty div on purpose */}
               <div className="checked">
                 <input type="checkbox" />
               </div>
