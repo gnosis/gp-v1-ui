@@ -5,102 +5,60 @@ import { getDefaultProvider } from '../'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-;(window as any).WalletConnectProvider = WalletConnectProvider
 
-class ETHProv extends WalletConnectProvider {
-  public send(payload: any, callback: any): any {
-    console.log('send::payload,callback', payload, callback)
-    return super.send(payload, callback)
-  }
-  public handleReadRequest(payload: any): void {
-    console.log('handleReadRequest::payload', payload)
-    return super.handleReadRequest(payload)
-  }
-  public updateState(sessionParams: any): any {
-    console.log('updateState::sessionParams', sessionParams)
-    return super.updateState(sessionParams)
-  }
+WalletConnectProvider.prototype.getWalletConnector = function(): Promise<WalletConnector> {
+  return new Promise((resolve, reject) => {
+    const wc = this.wc
 
-  // public enable(): Promise<[string]> {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const wc = await this.getWalletConnector()
-  //       if (wc) {
-  //         wc.session && this.updateState(wc.session)
-  //         this.start()
-  //         this.subscribeWalletConnector()
-  //         resolve(wc.accounts)
-  //       } else {
-  //         return reject(new Error('Failed to connect to WalleConnect'))
-  //       }
-  //     } catch (error) {
-  //       return reject(error)
-  //     }
-  //   })
-  // }
-
-  public getWalletConnector(): any {
-    return new Promise((resolve, reject) => {
-      const wc = this.wc
-
-      if (this.isConnecting) {
-        console.log('getWalletConnector:: already connecting')
-        this.onConnect((x: any) => resolve(x))
-      } else if (!wc.connected) {
-        console.log('getWalletConnector:: will create session')
-        this.isConnecting = true
-        const sessionRequestOpions = this.chainId ? { chainId: this.chainId } : undefined
-        wc.createSession(sessionRequestOpions)
-          .then(() => {
-            if (this.qrcode) {
-              console.log(wc.uri)
-              WalletConnectQRCodeModal.open(wc.uri, () => {
-                reject(new Error('User closed WalletConnect modal'))
-              })
-            }
-            wc.on('connect', (error: Error, payload: any) => {
-              // IMPORTANT!
-              if (error) {
-                this.isConnecting = false
-                return reject(error)
-              }
-              console.log('getWalletConnector::wc.on(connect):: payload', payload)
-              console.log('getWalletConnector::wc.session', JSON.stringify(wc.session))
-              if (this.qrcode) {
-                WalletConnectQRCodeModal.close()
-              }
-              this.isConnecting = false
-              this.connected = true
-
-              if (payload) {
-                // Handle session update
-                this.updateState(payload.params[0])
-              }
-              // Emit connect event
-              this.emit('connect')
-
-              this.triggerConnect(wc)
-              resolve(wc)
+    if (this.isConnecting) {
+      this.onConnect((x: WalletConnector) => resolve(x))
+    } else if (!wc.connected) {
+      this.isConnecting = true
+      const sessionRequestOpions = this.chainId ? { chainId: this.chainId } : undefined
+      wc.createSession(sessionRequestOpions)
+        .then(() => {
+          if (this.qrcode) {
+            console.log(wc.uri)
+            WalletConnectQRCodeModal.open(wc.uri, () => {
+              reject(new Error('User closed WalletConnect modal'))
             })
-          })
-          .catch((error: Error) => {
-            console.log('getWalletConnector::wc.createSession::error', error)
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          wc.on('connect', (error: Error, payload: any) => {
+            if (error) {
+              this.isConnecting = false
+              return reject(error)
+            }
+            if (this.qrcode) {
+              WalletConnectQRCodeModal.close()
+            }
             this.isConnecting = false
-            reject(error)
+            this.connected = true
+
+            if (payload) {
+              // Handle session update
+              this.updateState(payload.params[0])
+            }
+            // Emit connect event
+            this.emit('connect')
+
+            this.triggerConnect(wc)
+            resolve(wc)
           })
-      } else {
-        console.log('getWalletConnector:: already has valid session')
-        if (!this.connected) {
-          this.connected = true
-          // IMPORTANT!
-          this.updateState(wc.session)
-        }
-        resolve(wc)
+        })
+        .catch((error: Error) => {
+          this.isConnecting = false
+          reject(error)
+        })
+    } else {
+      if (!this.connected) {
+        this.connected = true
+        this.updateState(wc.session)
       }
-    })
-  }
+      resolve(wc)
+    }
+  })
 }
-;(window as any).ETHProv = ETHProv
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -116,6 +74,7 @@ import {
   isWalletConnectSubscriptions,
   isMetamaskProvider,
   Subscriptions,
+  WalletConnector,
 } from '@gnosis.pm/dapp-ui'
 
 import { log, toBN } from 'utils'
@@ -205,8 +164,7 @@ const subscribeToBlockchainUpdate = ({
 // const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
 
 const wcOptions: WalletConnectInits = {
-  // package: WalletConnectProvider,
-  package: ETHProv,
+  package: WalletConnectProvider,
   options: {
     // TODO get infuraId from .env
     infuraId: '8b4d9b4306294d2e92e0775ff1075066',
