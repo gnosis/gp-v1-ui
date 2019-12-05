@@ -104,6 +104,7 @@ const OrdersForm = styled.div`
   .checked {
     // pull checkbox to the left to make divider line be further away
     justify-self: left;
+    grid-column-start: 2;
   }
 
   .deleteContainer {
