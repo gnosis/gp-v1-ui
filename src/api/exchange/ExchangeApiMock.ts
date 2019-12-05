@@ -43,7 +43,12 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
 
   public async getOrders(userAddress: string): Promise<AuctionElement[]> {
     this._initOrders(userAddress)
-    return this.orders[userAddress].map(order => ({ ...order, user: userAddress, sellTokenBalance: ONE }))
+    return this.orders[userAddress].map((order, index) => ({
+      ...order,
+      user: userAddress,
+      sellTokenBalance: ONE,
+      id: index,
+    }))
   }
 
   public async getNumTokens(): Promise<number> {

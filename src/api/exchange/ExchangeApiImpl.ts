@@ -32,6 +32,8 @@ const decodeAuctionElements = (bytes: string): AuctionElement[] => {
   const result: AuctionElement[] = []
   const oneOrder = new RegExp(orderPattern, 'g')
   let order
+  let index = 0 // order ID is given by position and it's not part of the encoded data
+
   while ((order = oneOrder.exec(bytes))) {
     const {
       user,
@@ -58,6 +60,7 @@ const decodeAuctionElements = (bytes: string): AuctionElement[] => {
     result.push({
       user: '0x' + user,
       sellTokenBalance: new BN(sellTokenBalance, 16),
+      id: index++,
       buyTokenId: parseInt(buyTokenId, 16),
       sellTokenId: parseInt(sellTokenId, 16),
       validFrom: parseInt(validFrom, 16),

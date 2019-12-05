@@ -147,7 +147,7 @@ describe('placeOrder', () => {
     const response = await instance.placeOrder(params)
     expect(response).toBe(RECEIPT)
     const actual = (await instance.getOrders(USER_1)).pop()
-    expect(actual).toEqual({ ...expected, user: USER_1 })
+    expect(actual).toEqual({ ...expected, user: USER_1, id: 1 })
   })
 
   test('place first order', async () => {
@@ -157,7 +157,7 @@ describe('placeOrder', () => {
     const response = await instance.placeOrder(params)
     expect(response).toBe(RECEIPT)
     const actual = (await instance.getOrders(USER_2)).pop()
-    expect(actual).toEqual({ ...expected, user: USER_2 })
+    expect(actual).toEqual({ ...expected, user: USER_2, id: 0 })
   })
 })
 describe('cancelOrder', () => {
