@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import 'types'
 
 import { hot } from 'react-hot-loader/root'
