@@ -1,6 +1,9 @@
-import { USER_1, BATCH_ID } from './basic'
 import BN from 'bn.js'
+
+import { ALLOWANCE_MAX_VALUE } from 'const'
 import { calculateBatchId, addTimeToDate } from 'utils'
+
+import { USER_1, BATCH_ID } from './basic'
 
 export const exchangeOrders = {
   [USER_1]: [
@@ -17,10 +20,10 @@ export const exchangeOrders = {
       buyTokenId: 4, // USDC
       sellTokenId: 3, // TUSD
       validFrom: BATCH_ID,
-      validUntil: BATCH_ID + 1, // TODO: how to represent a date that never expires?
+      validUntil: calculateBatchId(addTimeToDate(new Date(), 10, 'year')), // not infinite but high enough
       priceNumerator: new BN('103000000'),
       priceDenominator: new BN('100000000000000000000'),
-      remainingAmount: new BN('0'), // TODO: how to represent unlimited amount?
+      remainingAmount: ALLOWANCE_MAX_VALUE, // as big as it gets
     },
     {
       buyTokenId: 7, // DAI
