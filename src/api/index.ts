@@ -75,7 +75,12 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
   let exchangeApi
   if (isExchangeMock) {
     const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address)]
-    exchangeApi = new ExchangeApiMock(exchangeBalanceStates, erc20Api, tokens, exchangeOrders)
+    exchangeApi = new ExchangeApiMock({
+      balanceStates: exchangeBalanceStates,
+      erc20Api,
+      registeredTokens: tokens,
+      ordersByUser: exchangeOrders,
+    })
   } else {
     exchangeApi = new ExchangeApiImpl(web3)
   }
