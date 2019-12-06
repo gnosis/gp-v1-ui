@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import 'types'
 
 import { hot } from 'react-hot-loader/root'
@@ -16,12 +17,13 @@ import Layout from 'components/layout/'
 
 // Pages
 import About from 'pages/About'
-import Deposit from 'pages/Deposit'
-import Trade from 'pages/Trade'
-import Orders from 'pages/Orders'
-import SourceCode from 'pages/SourceCode'
-import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
+import Deposit from 'pages/Deposit'
+import Orders from 'pages/Orders'
+import NotFound from 'pages/NotFound'
+import SourceCode from 'pages/SourceCode'
+import Trade from 'pages/Trade'
+import WrapEther from 'pages/WrapEther'
 import { walletApi } from 'api'
 
 // Global State
@@ -62,6 +64,7 @@ const App: React.FC = () => (
         <Switch>
           <PrivateRoute path="/deposit" exact component={Deposit} />
           <PrivateRoute path="/orders" exact component={Orders} />
+          <PrivateRoute path="/wrap" exact component={WrapEther} />
           <Route path="/trade/:sell-:buy" component={Trade} />
           <Route path="/about" exact component={About} />
           <Route path="/source-code" exact component={SourceCode} />

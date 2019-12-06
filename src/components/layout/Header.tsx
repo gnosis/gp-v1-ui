@@ -128,6 +128,9 @@ const Header: React.FC = () => {
           <li>
             <LinkWithPastLocation to="/orders">Orders</LinkWithPastLocation>
           </li>
+          <li>
+            <LinkWithPastLocation to="/wrap">Wrap Ether</LinkWithPastLocation>
+          </li>
         </ul>
         <Wallet />
       </nav>
