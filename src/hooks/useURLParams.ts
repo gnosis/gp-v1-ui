@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
 import { useHistory } from 'react-router'
 
-function useURLParams(newParams?: string): void {
+function useURLParams(newParams?: string, replace = false): void {
   const history = useHistory()
 
   useEffect(() => {
     if (newParams) {
-      history.push(newParams)
+      history[replace ? 'replace' : 'push'](newParams)
     }
-  }, [history, newParams])
+  }, [history, newParams, replace])
 }
 
 export default useURLParams
