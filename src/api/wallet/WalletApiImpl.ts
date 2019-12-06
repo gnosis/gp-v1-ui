@@ -134,7 +134,7 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
 export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
-  private _web3: Web3
+  public _web3: Web3
 
   private _unsubscribe: Command = () => {
     // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
@@ -163,7 +163,6 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(provider as any)
     log('[WalletApi] Connected')
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
@@ -248,6 +247,7 @@ export class WalletApiImpl implements WalletApi {
       isConnected,
       userAddress: accounts[0],
       networkId: isConnected ? +chainId : undefined,
+      web3: this._web3,
     }
   }
 

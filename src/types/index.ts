@@ -192,6 +192,7 @@ export interface WalletInfo {
   isConnected: boolean
   userAddress?: string
   networkId?: number
+  web3?: Web3
 }
 
 export interface WalletApi {
@@ -263,6 +264,7 @@ export interface Erc20Api {
 
 import { Contract } from 'web3-eth-contract'
 import { PromiEvent, TransactionConfig, TransactionReceipt } from 'web3-core'
+import Web3 from 'web3'
 
 type CallTxOptions = Pick<TransactionConfig, 'from' | 'gas' | 'gasPrice'>
 type SendTxOptions = Pick<TransactionConfig, 'from' | 'gas' | 'gasPrice' | 'value'>
