@@ -1,4 +1,5 @@
 import React from 'react'
+import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -6,8 +7,9 @@ import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-ic
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
-import { TokenDetails } from 'types'
-import { safeTokenName } from 'utils'
+import { TokenDetails, AuctionElement } from 'types'
+import { safeTokenName, formatAmount, dateFromBatchId, addTimeToDate, formatAmountFull } from 'utils'
+import { MIN_UNLIMITED_SELL_ORDER, MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME } from 'const'
 
 const OrderRowWrapper = styled.div`
   .container {
@@ -65,7 +67,7 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
-const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken' | 'pending'>> = ({
+const OrderDetails: React.FC<Pick<Props, 'buyToken' | 'sellToken' | 'pending'> & { price: string }> = ({
   price,
   buyToken,
   sellToken,
@@ -94,12 +96,10 @@ const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken' | 'p
   )
 }
 
-const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'unfilledAmount' | 'unlimited' | 'pending'>> = ({
-  sellToken,
-  unfilledAmount,
-  unlimited,
-  pending,
-}) => {
+const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'pending'> & {
+  unfilledAmount: string
+  unlimited: boolean
+}> = ({ sellToken, unfilledAmount, unlimited, pending }) => {
   return (
     <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
       {unlimited ? (
@@ -116,11 +116,10 @@ const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'unfilledAmount' | 'unl
   )
 }
 
-const AvailableAmount: React.FC<Pick<Props, 'sellToken' | 'availableAmount' | 'overBalance'>> = ({
-  sellToken,
-  availableAmount,
-  overBalance,
-}) => {
+const AvailableAmount: React.FC<Pick<Props, 'sellToken'> & {
+  availableAmount: string
+  overBalance: boolean
+}> = ({ sellToken, availableAmount, overBalance }) => {
   return (
     <div className="container sub-columns three-columns">
       <div>{availableAmount}</div>
@@ -134,33 +133,51 @@ const AvailableAmount: React.FC<Pick<Props, 'sellToken' | 'availableAmount' | 'o
   )
 }
 
-// TODO: temporary params, adjust when implementing real logic
-// probably just take an Order object?
 interface Props {
-  id: string
   sellToken: TokenDetails
   buyToken: TokenDetails
-  price: string
-  unfilledAmount?: string
-  availableAmount: string
-  expiresOn?: string
-  overBalance?: boolean
-  unlimited?: boolean
+  order: AuctionElement
   pending?: boolean
 }
 
+function calculatePrice(_numerator?: string | null, _denominator?: string | null): string {
+  if (!_numerator || !_denominator) {
+    return 'N/A'
+  }
+  const numerator = new BigNumber(_numerator)
+  const denominator = new BigNumber(_denominator)
+  const price = numerator.dividedBy(denominator)
+  return price.toFixed(2)
+}
+
 const OrderRow: React.FC<Props> = props => {
-  const { id, expiresOn, unlimited, pending = false } = props
+  const { buyToken, sellToken, order, pending = false } = props
+
+  const price = calculatePrice(
+    formatAmountFull(order.priceNumerator, buyToken.decimals, false),
+    formatAmountFull(order.priceDenominator, sellToken.decimals, false),
+  )
+  const unfilledAmount = formatAmount(order.remainingAmount, sellToken.decimals) || '0'
+  const availableAmount = formatAmount(order.sellTokenBalance, sellToken.decimals) || '0'
+  const unlimitedAmount = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
+  const overBalance = order.remainingAmount.gt(order.sellTokenBalance)
+  const unlimitedTime =
+    dateFromBatchId(order.validUntil).getTime() >=
+    addTimeToDate(new Date(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME, 'minute').getTime()
+  const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
+
   return (
-    <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')} data-id={id}>
+    <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
       <PendingLink {...props} />
       <div className="checked">
         <input type="checkbox" />
       </div>
-      <OrderDetails {...props} />
-      <UnfilledAmount {...props} />
-      <AvailableAmount {...props} />
-      <div className="cell">{unlimited ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+      <OrderDetails {...props} price={price} />
+      <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
+      <AvailableAmount {...props} availableAmount={availableAmount} overBalance={overBalance} />
+      <div className="cell">
+        {unlimitedTime ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}
+      </div>
     </OrderRowWrapper>
   )
 }
