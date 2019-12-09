@@ -23,6 +23,11 @@ export function calculateBatchId(date?: Date): number {
   return Math.floor(timestampInSeconds / BATCH_TIME)
 }
 
+export function dateFromBatchId(batchId: number): Date {
+  const timestamp = batchId * BATCH_TIME * 1000
+  return new Date(timestamp)
+}
+
 function adjustRollover(date: Date, newDate: Date): Date {
   if (newDate.getDate() != date.getDate()) {
     newDate.setDate(0)
