@@ -134,7 +134,7 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
 export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
-  public _web3: Web3
+  private _web3: Web3
 
   private _unsubscribe: Command = () => {
     // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
