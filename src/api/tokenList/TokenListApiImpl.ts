@@ -1,5 +1,6 @@
-import { TokenList, TokenDetails } from 'types'
+import { TokenList, TokenDetails, ExchangeApi } from 'types'
 import { getTokensByNetwork } from './tokenList'
+import { log } from 'utils'
 
 /**
  * Basic implementation of Token API
@@ -10,20 +11,50 @@ import { getTokensByNetwork } from './tokenList'
 export class TokenListApiImpl implements TokenList {
   public networkIds: number[]
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
+  private _exchangeApi: ExchangeApi
 
-  public constructor(networkIds: number[]) {
+  public constructor(networkIds: number[], exchangeApi: ExchangeApi) {
     this.networkIds = networkIds
+    this._exchangeApi = exchangeApi
 
     // Init the tokens by network
     this._tokensByNetwork = {}
     networkIds.forEach(networkId => {
       // initial value
       this._tokensByNetwork[networkId] = getTokensByNetwork(networkId)
+      // update async
+      this.fetchTokenIdsFromExchange(networkId)
     })
   }
 
   public getTokens(networkId: number): TokenDetails[] {
     return this._tokensByNetwork[networkId] || []
+  }
+
+  public async fetchTokenIdsFromExchange(networkId: number): Promise<void> {
+    // on every call fetch initial list again as tokens previously discarded might have been added to exchange
+    const tokens = getTokensByNetwork(networkId)
+    if (!tokens) {
+      return
+    }
+
+    const tokenPromises = tokens.map(token => this.injectExchangeIdIntoToken(token))
+
+    this._tokensByNetwork[networkId] = (await Promise.all(tokenPromises)).filter(
+      // remove tokens which are not registered in the exchange
+      token => !!token,
+    ) as TokenDetails[]
+  }
+
+  private async injectExchangeIdIntoToken(token: TokenDetails): Promise<TokenDetails | null> {
+    try {
+      // Should throw when address not registered
+      const exchangeId = await this._exchangeApi.getTokenIdByAddress(token.address)
+      return { ...token, id: exchangeId }
+    } catch (e) {
+      log('Token not registered on the exchange %s', token.address, e)
+      return null
+    }
   }
 }
 

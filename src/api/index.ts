@@ -37,23 +37,11 @@ function createWalletApi(web3: Web3): WalletApi {
   return walletApi
 }
 
-function createTokenListApi(): TokenList {
-  let tokenListApi
-  if (isTokenListMock) {
-    tokenListApi = new TokenListApiMock(tokenList)
-  } else {
-    tokenListApi = new TokenListApiImpl([Network.Mainnet, Network.Rinkeby])
-  }
-  window['tokenListApi'] = tokenListApi // register for convenience
-  return tokenListApi
-}
-
 function createErc20Api(web3: Web3): Erc20Api {
   let erc20Api
   if (isErc20Mock) {
     erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
   } else {
-    // TODO: Add actual implementation
     erc20Api = new Erc20ApiImpl(web3)
   }
   window['erc20Api'] = erc20Api // register for convenience
@@ -88,6 +76,21 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
   return exchangeApi
 }
 
+function createTokenListApi(exchangeApi: ExchangeApi): TokenList {
+  const networks = [Network.Mainnet, Network.Rinkeby]
+
+  let tokenListApi: TokenList
+  if (isTokenListMock) {
+    tokenListApi = new TokenListApiMock(tokenList)
+  } else {
+    tokenListApi = new TokenListApiImpl(networks, exchangeApi)
+  }
+  // networks.forEach(network => tokenListApi.fetchTokenIdsFromExchange(network))
+
+  window['tokenListApi'] = tokenListApi // register for convenience
+  return tokenListApi
+}
+
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
   process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
@@ -95,7 +98,7 @@ const web3 = new Web3(getDefaultProvider())
 
 // Build APIs
 export const walletApi: WalletApi = createWalletApi(web3)
-export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api(web3)
 export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, web3)
+export const tokenListApi: TokenList = createTokenListApi(exchangeApi)
