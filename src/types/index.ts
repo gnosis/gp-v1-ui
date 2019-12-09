@@ -189,6 +189,7 @@ export interface ExchangeApi extends DepositApi {
 }
 
 export interface WalletInfo {
+  blockNumber?: number
   isConnected: boolean
   userAddress?: string
   networkId?: number

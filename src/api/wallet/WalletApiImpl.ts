@@ -252,9 +252,9 @@ export class WalletApiImpl implements WalletApi {
   }
 
   private async _notifyListeners(): Promise<void> {
-    await Promise.resolve()
+    const blockNumber = await this._blockNumber
     const walletInfo: WalletInfo = this._getWalletInfo()
-    this._listeners.forEach(listener => listener(walletInfo))
+    this._listeners.forEach(listener => listener({ ...walletInfo, blockNumber }))
   }
 
   private get _connected(): boolean {
@@ -267,6 +267,10 @@ export class WalletApiImpl implements WalletApi {
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
     return this._web3.eth.getBalance(this._user)
+  }
+  private get _blockNumber(): Promise<number> {
+    if (!this._web3) return Promise.resolve(0)
+    return this._web3.eth.getBlockNumber()
   }
   private get _networkId(): Network {
     const { chainId = 0 } = getProviderState(this._provider) || {}
