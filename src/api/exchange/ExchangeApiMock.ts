@@ -10,6 +10,14 @@ export interface OrdersByUser {
   [userAddress: string]: Order[]
 }
 
+interface ConstructorParams {
+  balanceStates: BalancesByUserAndToken
+  erc20Api: Erc20Api
+  registeredTokens?: string[]
+  ordersByUser?: OrdersByUser
+  maxTokens?: number
+}
+
 /**
  * Basic implementation of Stable Coin Converter API
  */
@@ -19,14 +27,11 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   private maxTokens: number
   private orders: OrdersByUser
 
-  public constructor(
-    balanceStates: BalancesByUserAndToken,
-    erc20Api: Erc20Api,
-    registeredTokens: string[] = [],
-    maxTokens = 10000,
-    ordersByUser: OrdersByUser = {},
-  ) {
+  public constructor(params: ConstructorParams) {
+    const { balanceStates, erc20Api, registeredTokens = [], ordersByUser = {}, maxTokens = 10000 } = params
+
     super(balanceStates, erc20Api)
+
     this.registeredTokens = registeredTokens
     this.tokenAddressToId = registeredTokens.reduce((obj, address, index) => {
       obj[address] = index

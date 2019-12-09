@@ -9,7 +9,14 @@ import { DepositApiMock } from './exchange/DepositApiMock'
 import { DepositApiImpl } from './exchange/DepositApiImpl'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiImpl } from './exchange/ExchangeApiImpl'
-import { tokenList, exchangeBalanceStates, erc20Balances, erc20Allowances, FEE_TOKEN } from '../../test/data'
+import {
+  tokenList,
+  exchangeBalanceStates,
+  erc20Balances,
+  erc20Allowances,
+  FEE_TOKEN,
+  exchangeOrders,
+} from '../../test/data'
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 
@@ -68,7 +75,12 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
   let exchangeApi
   if (isExchangeMock) {
     const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address)]
-    exchangeApi = new ExchangeApiMock(exchangeBalanceStates, erc20Api, tokens)
+    exchangeApi = new ExchangeApiMock({
+      balanceStates: exchangeBalanceStates,
+      erc20Api,
+      registeredTokens: tokens,
+      ordersByUser: exchangeOrders,
+    })
   } else {
     exchangeApi = new ExchangeApiImpl(web3)
   }
