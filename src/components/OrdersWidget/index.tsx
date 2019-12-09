@@ -1,16 +1,19 @@
-import React, { useMemo } from 'react'
+import React, { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import { useOrders } from 'hooks/useOrders'
+
 import Widget from 'components/layout/Widget'
 import Highlight from 'components/Highlight'
 import { tokenListApi } from 'api'
-import { getToken } from 'utils'
-import { Network, TokenDetails } from 'types'
+import { TokenDetails } from 'types'
 import OrderRow from './OrderRow'
-import { useOrders } from 'hooks/useOrders'
+import { getToken } from 'utils'
+import { DEFAULT_DECIMALS } from 'const'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -154,22 +157,31 @@ const OrdersForm = styled.div`
   }
 `
 
+const FAKE_TOKEN = {
+  symbol: 'UNKNOWN',
+  name: 'unknown',
+  decimals: DEFAULT_DECIMALS,
+  address: '0x...',
+}
+
 const OrdersWidget: React.FC = () => {
-  // TODO: only for temporary layout
-  const { DAI, USDC, TUSD, PAX } = useMemo(() => {
-    const tokens = tokenListApi.getTokens(Network.Mainnet)
-
-    return {
-      DAI: getToken('symbol', 'DAI', tokens) as Required<TokenDetails>,
-      USDC: getToken('symbol', 'USDC', tokens) as Required<TokenDetails>,
-      TUSD: getToken('symbol', 'TUSD', tokens) as Required<TokenDetails>,
-      PAX: getToken('symbol', 'PAX', tokens) as Required<TokenDetails>,
-    }
-  }, [])
-  // end temporary layout vars
-
   const orders = useOrders()
   const noOrders = orders.length !== 0
+
+  // TODO: find a way to update list of tokens based on address returned by contract if we don't have it in our list
+  const { networkId } = useWalletConnection()
+  // this page is behind login wall so networkId should always be set
+  const tokens = tokenListApi.getTokens(networkId as number)
+
+  const getTokenById = useCallback(
+    (id: number): TokenDetails => {
+      const token = getToken('id', id.toString(), tokens)
+      // TODO: get address from exchangeApi and add to list of tokens
+      // consider fake token like a `loading` token
+      return token ? token : { ...FAKE_TOKEN, id }
+    },
+    [tokens],
+  )
 
   return (
     <OrdersWrapper>
@@ -222,36 +234,14 @@ const OrdersWidget: React.FC = () => {
                 <div className="title">Expires</div>
               </div>
 
-              <OrderRow
-                id="1"
-                sellToken={DAI}
-                buyToken={TUSD}
-                price="1.05"
-                unfilledAmount="1,500"
-                availableAmount="1,000"
-                overBalance
-                expiresOn="In 3 min"
-              />
-              <OrderRow id="543" sellToken={TUSD} buyToken={USDC} price="1.03" availableAmount="1,000" unlimited />
-              <OrderRow
-                id="1287"
-                sellToken={USDC}
-                buyToken={DAI}
-                price="1.50"
-                unfilledAmount="876.849"
-                availableAmount="876.849"
-                expiresOn="In 1 days"
-                pending
-              />
-              <OrderRow
-                id="1257"
-                sellToken={PAX}
-                buyToken={DAI}
-                price="1.10"
-                unfilledAmount="5,876.8429"
-                availableAmount="500"
-                expiresOn="In 2 days"
-              />
+              {orders.map(order => (
+                <OrderRow
+                  key={order.id}
+                  sellToken={getTokenById(order.sellTokenId)}
+                  buyToken={getTokenById(order.buyTokenId)}
+                  order={order}
+                />
+              ))}
             </div>
 
             <div className="deleteContainer">
