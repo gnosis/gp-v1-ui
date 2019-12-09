@@ -9,9 +9,7 @@ export function useOrders(): AuctionElement[] {
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
 
   useEffect(() => {
-    exchangeApi.getOrders(userAddress as string).then(_orders => {
-      setOrders(_orders)
-    })
+    userAddress && exchangeApi.getOrders(userAddress).then(setOrders)
   }, [setOrders, userAddress])
 
   return orders
