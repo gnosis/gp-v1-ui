@@ -10,6 +10,7 @@ import { tokenListApi } from 'api'
 import { getToken } from 'utils'
 import { Network, TokenDetails } from 'types'
 import OrderRow from './OrderRow'
+import { useOrders } from 'hooks/useOrders'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -130,6 +131,9 @@ const OrdersWidget: React.FC = () => {
     }
   }, [])
   // end temporary layout vars
+
+  const orders = useOrders()
+  const noOrders = orders.length === 0
 
   return (
     <OrdersWrapper>
