@@ -28,20 +28,55 @@ const ButtonWithIcon = styled.button`
 
 const CreateButtons = styled.div`
   margin-top: 2em;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
 
-  .strategy {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
+  // 💙 grid
+  display: grid;
 
-    a,
-    button {
-      margin-left: 0.5em;
+  &.withOrders {
+    justify-items: start;
+    grid-gap: 0.25em 0.75em;
+    grid:
+      'tradeBtn strategyBtn'
+      '.        strategyInfo'
+      / 1fr 1fr;
+
+    .tradeBtn {
+      justify-self: end;
     }
+  }
+
+  &.withoutOrders {
+    // adjust grid layout when no orders
+    place-items: center;
+    grid-row-gap: 1em;
+    grid:
+      'noOrdersInfo'
+      'tradeBtn'
+      'strategyBtn'
+      'strategyInfo';
+
+    button {
+      // make buttons the same width
+      width: 15em;
+    }
+  }
+
+  .noOrdersInfo {
+    grid-area: noOrdersInfo;
+  }
+  .tradeBtn {
+    grid-area: tradeBtn;
+  }
+  .strategyBtn {
+    grid-area: strategyBtn;
+  }
+  .strategyInfo {
+    grid-area: strategyInfo;
+  }
+
+  button {
+    // resetting button margins to help with alignment
+    margin: 0;
   }
 `
 
@@ -139,90 +174,95 @@ const OrdersWidget: React.FC = () => {
     <OrdersWrapper>
       <div>
         <h2>Your orders</h2>
-        <CreateButtons>
-          <Link to="/trade">
+        <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
+          {noOrders && (
+            <p className="noOrdersInfo">
+              It appears you haven&apos;t place any order yet. <br /> Create one!
+            </p>
+          )}
+          <Link to="/trade" className="tradeBtn">
             <ButtonWithIcon>
               <FontAwesomeIcon icon={faExchangeAlt} /> Trade
             </ButtonWithIcon>
           </Link>
-          <div className="strategy">
-            <ButtonWithIcon className="danger">
-              <FontAwesomeIcon icon={faChartLine} /> Create new strategy
-            </ButtonWithIcon>
-            <a href="/">
-              <small>Learn more about strategies</small>
-            </a>
-          </div>
+          <ButtonWithIcon className="danger strategyBtn">
+            <FontAwesomeIcon icon={faChartLine} /> Create new strategy
+          </ButtonWithIcon>
+          <a href="/" className="strategyInfo">
+            <small>Learn more about strategies</small>
+          </a>
         </CreateButtons>
       </div>
-      <OrdersForm>
-        <div className="infoContainer">
-          <div>
-            You have <Highlight>3</Highlight> standing orders
+      {!noOrders && (
+        <OrdersForm>
+          <div className="infoContainer">
+            <div>
+              You have <Highlight>{orders.length}</Highlight> standing orders
+            </div>
+            <div className="warning">
+              <FontAwesomeIcon icon={faExclamationTriangle} />
+              <strong> Low balance</strong>
+            </div>
           </div>
-          <div className="warning">
-            <FontAwesomeIcon icon={faExclamationTriangle} />
-            <strong> Low balance</strong>
-          </div>
-        </div>
-        <form action="submit">
-          <div className="ordersContainer">
-            <div className="headerRow">
-              <div></div> {/* Empty div on purpose */}
-              <div className="checked">
-                <input type="checkbox" />
+          <form action="submit">
+            <div className="ordersContainer">
+              <div className="headerRow">
+                <div></div> {/* Empty div on purpose */}
+                <div className="checked">
+                  <input type="checkbox" />
+                </div>
+                <div className="title">Order details</div>
+                <div className="title">
+                  Unfilled <br /> amount
+                </div>
+                <div className="title">
+                  Available <br />
+                  amount
+                </div>
+                <div className="title">Expires</div>
               </div>
-              <div className="title">Order details</div>
-              <div className="title">
-                Unfilled <br /> amount
-              </div>
-              <div className="title">
-                Available <br />
-                amount
-              </div>
-              <div className="title">Expires</div>
+
+              <OrderRow
+                id="1"
+                sellToken={DAI}
+                buyToken={TUSD}
+                price="1.05"
+                unfilledAmount="1,500"
+                availableAmount="1,000"
+                overBalance
+                expiresOn="In 3 min"
+              />
+              <OrderRow id="543" sellToken={TUSD} buyToken={USDC} price="1.03" availableAmount="1,000" unlimited />
+              <OrderRow
+                id="1287"
+                sellToken={USDC}
+                buyToken={DAI}
+                price="1.50"
+                unfilledAmount="876.849"
+                availableAmount="876.849"
+                expiresOn="In 1 days"
+                pending
+              />
+              <OrderRow
+                id="1257"
+                sellToken={PAX}
+                buyToken={DAI}
+                price="1.10"
+                unfilledAmount="5,876.8429"
+                availableAmount="500"
+                expiresOn="In 2 days"
+              />
             </div>
 
-            <OrderRow
-              id="1"
-              sellToken={DAI}
-              buyToken={TUSD}
-              price="1.05"
-              unfilledAmount="1,500"
-              availableAmount="1,000"
-              overBalance
-              expiresOn="In 3 min"
-            />
-            <OrderRow id="543" sellToken={TUSD} buyToken={USDC} price="1.03" availableAmount="1,000" unlimited />
-            <OrderRow
-              id="1287"
-              sellToken={USDC}
-              buyToken={DAI}
-              price="1.50"
-              unfilledAmount="876.849"
-              availableAmount="876.849"
-              expiresOn="In 1 days"
-              pending
-            />
-            <OrderRow
-              id="1257"
-              sellToken={PAX}
-              buyToken={DAI}
-              price="1.10"
-              unfilledAmount="5,876.8429"
-              availableAmount="500"
-              expiresOn="In 2 days"
-            />
-          </div>
-
-          <div className="deleteContainer">
-            <ButtonWithIcon disabled>
-              <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
-            </ButtonWithIcon>
-            <span>Select first the order(s) you want to delete</span>
-          </div>
-        </form>
-      </OrdersForm>
+            <div className="deleteContainer">
+              <ButtonWithIcon disabled>
+                <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
+              </ButtonWithIcon>
+              <span>Select first the order(s) you want to delete</span>
+            </div>
+          </form>
+        </OrdersForm>
+      )}
     </OrdersWrapper>
   )
 }
