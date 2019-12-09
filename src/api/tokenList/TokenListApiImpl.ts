@@ -1,11 +1,6 @@
 import { TokenList, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 
-function _getImageUrl(tokenAddress?: string): string | undefined {
-  if (!tokenAddress) return undefined
-  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
-}
-
 /**
  * Basic implementation of Token API
  *
@@ -22,16 +17,8 @@ export class TokenListApiImpl implements TokenList {
     // Init the tokens by network
     this._tokensByNetwork = {}
     networkIds.forEach(networkId => {
-      // Get list of tokens
-      const tokens = getTokensByNetwork(networkId).map(token => {
-        // Add image to the tokens
-        return {
-          ...token,
-          image: _getImageUrl(token.addressMainnet),
-        }
-      })
-
-      this._tokensByNetwork[networkId] = tokens
+      // initial value
+      this._tokensByNetwork[networkId] = getTokensByNetwork(networkId)
     })
   }
 
