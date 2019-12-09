@@ -11,8 +11,8 @@ export interface OrdersByUser {
 }
 
 interface ConstructorParams {
-  balanceStates: BalancesByUserAndToken
   erc20Api: Erc20Api
+  balanceStates?: BalancesByUserAndToken
   registeredTokens?: string[]
   ordersByUser?: OrdersByUser
   maxTokens?: number
@@ -28,7 +28,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   private orders: OrdersByUser
 
   public constructor(params: ConstructorParams) {
-    const { balanceStates, erc20Api, registeredTokens = [], ordersByUser = {}, maxTokens = 10000 } = params
+    const { erc20Api, balanceStates = {}, registeredTokens = [], ordersByUser = {}, maxTokens = 10000 } = params
 
     super(balanceStates, erc20Api)
 
