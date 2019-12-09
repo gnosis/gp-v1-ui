@@ -8,10 +8,12 @@ import { Network } from 'types'
 const WrapEther: React.FC = () => {
   const { userAddress, networkId, web3 } = useWalletConnection()
 
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
-  const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
+  const contractAddress = useMemo(() => {
+    const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+    const tokens = tokenListApi.getTokens(fallBackNetworkId)
 
-  const contractAddress = useMemo(() => tokens.find(token => token.symbol === 'WETH')?.address, [tokens])
+    return tokens.find(token => token.symbol === 'WETH')?.address
+  }, [networkId])
 
   return web3 && userAddress && networkId && contractAddress ? (
     <WraptorComponent
