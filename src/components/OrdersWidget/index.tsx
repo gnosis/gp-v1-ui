@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
+import { useLowBalance } from './useLowBalance'
 
 import Widget from 'components/layout/Widget'
 import Highlight from 'components/Highlight'
@@ -184,6 +185,8 @@ const OrdersWidget: React.FC = () => {
     [tokens],
   )
 
+  const { isLowBalance, updateLowBalanceFactory } = useLowBalance()
+
   return (
     <OrdersWrapper>
       <div>
@@ -213,10 +216,12 @@ const OrdersWidget: React.FC = () => {
             <div>
               You have <Highlight>{orders.length}</Highlight> standing orders
             </div>
-            <div className="warning">
-              <FontAwesomeIcon icon={faExclamationTriangle} />
-              <strong> Low balance</strong>
-            </div>
+            {isLowBalance && (
+              <div className="warning">
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+                <strong> Low balance</strong>
+              </div>
+            )}
           </div>
           <form action="submit">
             <div className="ordersContainer">
@@ -241,6 +246,7 @@ const OrdersWidget: React.FC = () => {
                   sellToken={getTokenById(order.sellTokenId)}
                   buyToken={getTokenById(order.buyTokenId)}
                   order={order}
+                  updateLowBalance={updateLowBalanceFactory(order.id)}
                 />
               ))}
             </div>

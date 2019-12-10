@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -139,6 +139,7 @@ interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
   order: AuctionElement
+  updateLowBalance: (isLow: boolean, remove?: true) => void
   pending?: boolean
 }
 
@@ -153,7 +154,7 @@ function calculatePrice(_numerator?: string | null, _denominator?: string | null
 }
 
 const OrderRow: React.FC<Props> = props => {
-  const { buyToken, sellToken, order, pending = false } = props
+  const { buyToken, sellToken, order, updateLowBalance, pending = false } = props
 
   const price = useMemo(
     () =>
@@ -183,6 +184,13 @@ const OrderRow: React.FC<Props> = props => {
     [order.validUntil],
   )
   const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
+
+  useEffect(() => {
+    updateLowBalance(overBalance)
+
+    // on unmount, clean up and remove this state from the list
+    return updateLowBalance(true, true)
+  }, [updateLowBalance, overBalance])
 
   return (
     <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
