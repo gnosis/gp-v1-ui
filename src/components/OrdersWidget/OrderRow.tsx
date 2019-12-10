@@ -187,10 +187,14 @@ const OrderRow: React.FC<Props> = props => {
 
   useEffect(() => {
     updateLowBalance(overBalance)
-
-    // on unmount, clean up and remove this state from the list
-    return updateLowBalance(true, true)
   }, [updateLowBalance, overBalance])
+
+  useEffect(
+    // on unmount, clean up and remove this state from the list
+    () => updateLowBalance(true, true),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  )
 
   return (
     <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
