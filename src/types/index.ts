@@ -32,7 +32,7 @@ export interface TokenBalanceDetails extends TokenDetails {
 
 export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
-  fetchTokenIdsFromExchange: (networkId: number) => Promise<void>
+  updateTokenIdsForNetwork: (networkId: number) => Promise<void>
 }
 
 export interface PendingFlux {

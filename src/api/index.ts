@@ -85,7 +85,7 @@ function createTokenListApi(exchangeApi: ExchangeApi): TokenList {
   } else {
     tokenListApi = new TokenListApiImpl(networks, exchangeApi)
   }
-  networks.forEach(network => tokenListApi.fetchTokenIdsFromExchange(network))
+  networks.forEach(network => tokenListApi.updateTokenIdsForNetwork(network))
 
   window['tokenListApi'] = tokenListApi // register for convenience
   return tokenListApi

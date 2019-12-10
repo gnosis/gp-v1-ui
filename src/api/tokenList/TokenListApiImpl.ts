@@ -29,7 +29,7 @@ export class TokenListApiImpl implements TokenList {
     return this._tokensByNetwork[networkId] || []
   }
 
-  public async fetchTokenIdsFromExchange(networkId: number): Promise<void> {
+  public async updateTokenIdsForNetwork(networkId: number): Promise<void> {
     // on every call fetch initial list again as tokens previously discarded might have been added to exchange
     const tokens = getTokensByNetwork(networkId)
     if (!tokens) {

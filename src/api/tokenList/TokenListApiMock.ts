@@ -12,7 +12,7 @@ export class TokenListApiMock implements TokenList {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async fetchTokenIdsFromExchange(_networkId: number): Promise<void> {
+  public async updateTokenIdsForNetwork(_networkId: number): Promise<void> {
     // Simply inserts ID into tokens
     this._tokenList = this._tokenList.map((token, index) => ({ ...token, id: index }))
   }
