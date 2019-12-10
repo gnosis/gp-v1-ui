@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -155,17 +155,33 @@ function calculatePrice(_numerator?: string | null, _denominator?: string | null
 const OrderRow: React.FC<Props> = props => {
   const { buyToken, sellToken, order, pending = false } = props
 
-  const price = calculatePrice(
-    formatAmountFull(order.priceNumerator, buyToken.decimals, false),
-    formatAmountFull(order.priceDenominator, sellToken.decimals, false),
+  const price = useMemo(
+    () =>
+      calculatePrice(
+        formatAmountFull(order.priceNumerator, buyToken.decimals, false),
+        formatAmountFull(order.priceDenominator, sellToken.decimals, false),
+      ),
+    [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals],
   )
-  const unfilledAmount = formatAmount(order.remainingAmount, sellToken.decimals) || '0'
-  const availableAmount = formatAmount(order.sellTokenBalance, sellToken.decimals) || '0'
-  const unlimitedAmount = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
-  const overBalance = order.remainingAmount.gt(order.sellTokenBalance)
-  const unlimitedTime =
-    dateFromBatchId(order.validUntil).getTime() >=
-    addTimeToDate(new Date(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME, 'minute').getTime()
+  const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
+    order.remainingAmount,
+    sellToken.decimals,
+  ])
+  const availableAmount = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
+    order.sellTokenBalance,
+    sellToken.decimals,
+  ])
+  const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
+  const overBalance = useMemo(() => order.remainingAmount.gt(order.sellTokenBalance), [
+    order.remainingAmount,
+    order.sellTokenBalance,
+  ])
+  const unlimitedTime = useMemo(
+    () =>
+      dateFromBatchId(order.validUntil).getTime() >=
+      addTimeToDate(new Date(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME, 'minute').getTime(),
+    [order.validUntil],
+  )
   const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
 
   return (
