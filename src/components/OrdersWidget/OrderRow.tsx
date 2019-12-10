@@ -67,71 +67,64 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
-const OrderDetails: React.FC<Pick<Props, 'buyToken' | 'sellToken' | 'pending'> & { price: string }> = ({
-  price,
-  buyToken,
-  sellToken,
-  pending,
-}) => {
-  return (
-    <div className="container order-details">
-      <div>Sell</div>
-      <div>
-        <Highlight color={pending ? 'grey' : ''}>1</Highlight>
-      </div>
-      <div>
-        <strong>{safeTokenName(sellToken)}</strong>
-      </div>
-
-      <div>
-        for <strong>at least</strong>
-      </div>
-      <div>
-        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
-      </div>
-      <div>
-        <strong>{safeTokenName(buyToken)}</strong>
-      </div>
-    </div>
-  )
+interface OrderDetailsProps extends Pick<Props, 'buyToken' | 'sellToken' | 'pending'> {
+  price: string
 }
 
-const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'pending'> & {
+const OrderDetails: React.FC<OrderDetailsProps> = ({ price, buyToken, sellToken, pending }) => (
+  <div className="container order-details">
+    <div>Sell</div>
+    <div>
+      <Highlight color={pending ? 'grey' : ''}>1</Highlight>
+    </div>
+    <div>
+      <strong>{safeTokenName(sellToken)}</strong>
+    </div>
+
+    <div>
+      for <strong>at least</strong>
+    </div>
+    <div>
+      <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
+    </div>
+    <div>
+      <strong>{safeTokenName(buyToken)}</strong>
+    </div>
+  </div>
+)
+
+interface UnfilledAmountProps extends Pick<Props, 'sellToken' | 'pending'> {
   unfilledAmount: string
   unlimited: boolean
-}> = ({ sellToken, unfilledAmount, unlimited, pending }) => {
-  return (
-    <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
-      {unlimited ? (
-        <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
-      ) : (
-        <>
-          <div>{unfilledAmount}</div>
-          <div>
-            <strong>{safeTokenName(sellToken)}</strong>
-          </div>
-        </>
-      )}
-    </div>
-  )
 }
 
-const AvailableAmount: React.FC<Pick<Props, 'sellToken'> & {
+const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmount, unlimited, pending }) => (
+  <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
+    {unlimited ? (
+      <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+    ) : (
+      <>
+        <div>{unfilledAmount}</div>
+        <div>
+          <strong>{safeTokenName(sellToken)}</strong>
+        </div>
+      </>
+    )}
+  </div>
+)
+
+interface AvailableAmountProps extends Pick<Props, 'sellToken'> {
   availableAmount: string
   overBalance: boolean
-}> = ({ sellToken, availableAmount, overBalance }) => {
-  return (
-    <div className="container sub-columns three-columns">
-      <div>{availableAmount}</div>
-      <strong>{safeTokenName(sellToken)}</strong>
-      {overBalance && (
-        <div className="warning">
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-        </div>
-      )}
-    </div>
-  )
 }
+
+const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, overBalance }) => (
+  <div className="container sub-columns three-columns">
+    <div>{availableAmount}</div>
+    <strong>{safeTokenName(sellToken)}</strong>
+    <div className="warning">{overBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+  </div>
+)
 
 interface Props {
   sellToken: TokenDetails
