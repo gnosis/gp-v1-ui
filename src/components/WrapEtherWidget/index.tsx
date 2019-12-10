@@ -3,6 +3,8 @@ import { WraptorComponent } from '@w3stside/wraptor'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { tokenListApi } from 'api'
+import { getToken } from 'utils'
+
 import { Network } from 'types'
 
 const WrapEther: React.FC = () => {
@@ -12,7 +14,7 @@ const WrapEther: React.FC = () => {
     const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
     const tokens = tokenListApi.getTokens(fallBackNetworkId)
 
-    return tokens.find(token => token.symbol === 'WETH')?.address
+    return getToken('symbol', 'WETH', tokens)?.address
   }, [networkId])
 
   return web3 && userAddress && networkId && contractAddress ? (
