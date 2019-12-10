@@ -1,3 +1,5 @@
+import BN from 'bn.js'
+
 import ExchangeApiMock from 'api/exchange/ExchangeApiMock'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { ZERO, ONE, FEE_DENOMINATOR } from 'const'
@@ -123,7 +125,7 @@ describe('addToken', () => {
 
 describe('placeOrder', () => {
   const expected = {
-    sellTokenBalance: ONE,
+    sellTokenBalance: new BN('1500000000000000000000').add(ONE),
     buyTokenId: 1,
     sellTokenId: 2,
     validFrom: BATCH_ID,
