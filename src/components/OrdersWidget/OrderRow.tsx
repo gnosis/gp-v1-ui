@@ -126,6 +126,15 @@ const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableA
   </div>
 )
 
+interface ExpiresProps extends Pick<Props, 'pending'> {
+  unlimitedTime: boolean
+  expiresOn: string
+}
+
+const Expires: React.FC<ExpiresProps> = ({ pending, unlimitedTime, expiresOn }) => (
+  <div>{unlimitedTime ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+)
+
 interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
@@ -168,9 +177,7 @@ const OrderRow: React.FC<Props> = props => {
       <OrderDetails {...props} price={price} />
       <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
       <AvailableAmount {...props} availableAmount={availableAmount} overBalance={overBalance} />
-      <div className="cell">
-        {unlimitedTime ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}
-      </div>
+      <Expires {...props} unlimitedTime={unlimitedTime} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )
 }
