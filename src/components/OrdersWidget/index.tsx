@@ -171,7 +171,8 @@ const OrdersWidget: React.FC = () => {
   // TODO: find a way to update list of tokens based on address returned by contract if we don't have it in our list
   const { networkId } = useWalletConnection()
   // this page is behind login wall so networkId should always be set
-  const tokens = tokenListApi.getTokens(networkId as number)
+  // reference for the `variable!` notation https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator
+  const tokens = tokenListApi.getTokens(networkId!)
 
   const getTokenById = useCallback(
     (id: number): TokenDetails => {
