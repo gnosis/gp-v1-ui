@@ -90,7 +90,7 @@ const TradeWidget: React.FC = () => {
 
   const searchQuery = buildSearchQuery({ sell: watch(sellInputId), buy: watch(receiveInputId) })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
-  useURLParams(url)
+  useURLParams(url, true)
 
   // TESTING
   const NULL_BALANCE_TOKEN = {
