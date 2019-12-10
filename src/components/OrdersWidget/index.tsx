@@ -166,7 +166,7 @@ const FAKE_TOKEN = {
 
 const OrdersWidget: React.FC = () => {
   const orders = useOrders()
-  const noOrders = orders.length !== 0
+  const noOrders = orders.length === 0
 
   // TODO: find a way to update list of tokens based on address returned by contract if we don't have it in our list
   const { networkId } = useWalletConnection()
