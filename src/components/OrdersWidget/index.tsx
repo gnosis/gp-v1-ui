@@ -140,6 +140,7 @@ const OrdersForm = styled.div`
   .checked {
     // pull checkbox to the left to make divider line be further away
     justify-self: left;
+    grid-column-start: 2;
   }
 
   .deleteContainer {
@@ -168,7 +169,7 @@ const OrdersWidget: React.FC = () => {
   // end temporary layout vars
 
   const orders = useOrders()
-  const noOrders = orders.length === 0
+  const noOrders = orders.length !== 0
 
   return (
     <OrdersWrapper>
@@ -207,7 +208,6 @@ const OrdersWidget: React.FC = () => {
           <form action="submit">
             <div className="ordersContainer">
               <div className="headerRow">
-                <div></div> {/* Empty div on purpose */}
                 <div className="checked">
                   <input type="checkbox" />
                 </div>

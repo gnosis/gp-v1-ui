@@ -53,8 +53,7 @@ const OrderRowWrapper = styled.div`
 
 const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   if (!pending) {
-    // Empty div is required due to grid layout
-    return <div></div>
+    return null
   }
 
   // TODO: use proper pending tx hash for link
@@ -126,7 +125,11 @@ const AvailableAmount: React.FC<Pick<Props, 'sellToken' | 'availableAmount' | 'o
     <div className="container sub-columns three-columns">
       <div>{availableAmount}</div>
       <strong>{safeTokenName(sellToken)}</strong>
-      <div className="warning">{overBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+      {overBalance && (
+        <div className="warning">
+          <FontAwesomeIcon icon={faExclamationTriangle} />
+        </div>
+      )}
     </div>
   )
 }
