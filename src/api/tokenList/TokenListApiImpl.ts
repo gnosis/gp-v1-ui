@@ -40,10 +40,8 @@ export class TokenListApiImpl implements TokenList {
 
     const tokenPromises = tokens.map(token => this.injectExchangeIdIntoToken(token))
 
-    this._tokensByNetwork[networkId] = (await Promise.all(tokenPromises)).filter(
-      // remove tokens which are not registered in the exchange
-      token => !!token,
-    ) as TokenDetails[]
+    // Resolve promises and remove tokens which are not registered in the exchange
+    this._tokensByNetwork[networkId] = (await Promise.all(tokenPromises)).filter(Boolean) as TokenDetails[]
   }
 
   private async injectExchangeIdIntoToken(token: TokenDetails): Promise<TokenDetails | null> {
