@@ -22,8 +22,6 @@ export class TokenListApiImpl implements TokenList {
     networkIds.forEach(networkId => {
       // initial value
       this._tokensByNetwork[networkId] = getTokensByNetwork(networkId)
-      // update async
-      this.fetchTokenIdsFromExchange(networkId)
     })
   }
 

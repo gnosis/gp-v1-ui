@@ -4,8 +4,6 @@ export class TokenListApiMock implements TokenList {
 
   public constructor(tokenList: TokenDetails[]) {
     this._tokenList = tokenList
-    // fake updating tokens to simulate real impl
-    this.fetchTokenIdsFromExchange(4)
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
