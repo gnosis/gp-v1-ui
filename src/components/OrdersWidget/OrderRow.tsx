@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
+import { addMinutes, formatDistanceToNow } from 'date-fns'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
@@ -8,7 +9,7 @@ import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { TokenDetails, AuctionElement } from 'types'
-import { safeTokenName, formatAmount, dateFromBatchId, addTimeToDate, formatAmountFull } from 'utils'
+import { safeTokenName, formatAmount, dateFromBatchId, formatAmountFull } from 'utils'
 import { MIN_UNLIMITED_SELL_ORDER, MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME } from 'const'
 
 const OrderRowWrapper = styled.div`
@@ -175,7 +176,7 @@ const OrderRow: React.FC<Props> = props => {
   const unlimitedTime = useMemo(
     () =>
       dateFromBatchId(order.validUntil).getTime() >=
-      addTimeToDate(new Date(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME, 'minute').getTime(),
+      addMinutes(Date.now(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME).getTime(),
     [order.validUntil],
   )
   const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc

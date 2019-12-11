@@ -1,5 +1,7 @@
+import { addMinutes } from 'date-fns'
+
 import * as testHelpers from '../testHelpers'
-import { calculateBatchId, addTimeToDate } from 'utils'
+import { calculateBatchId } from 'utils'
 import { BATCH_ID, DATE } from '../data'
 
 beforeAll(() => {
@@ -11,15 +13,15 @@ describe('calculateBatchId', () => {
     expect(calculateBatchId()).toBe(BATCH_ID)
   })
   it('returns next batch id when exact time is set for next batch', () => {
-    const fiveMinutesInTheFuture = addTimeToDate(DATE, 5, 'minute')
+    const fiveMinutesInTheFuture = addMinutes(DATE, 5)
     expect(calculateBatchId(fiveMinutesInTheFuture)).toBe(BATCH_ID + 1)
   })
   it('returns next batch id when time is set for middle of next batch', () => {
-    const eightMinutesInTheFuture = addTimeToDate(DATE, 8, 'minute')
+    const eightMinutesInTheFuture = addMinutes(DATE, 8)
     expect(calculateBatchId(eightMinutesInTheFuture)).toBe(BATCH_ID + 1)
   })
   it('returns previous batch id when time is set for middle of previous batch', () => {
-    const threeMinutesInThePast = addTimeToDate(DATE, -3, 'minute')
+    const threeMinutesInThePast = addMinutes(DATE, -3)
     expect(calculateBatchId(threeMinutesInThePast)).toBe(BATCH_ID - 1)
   })
 })
