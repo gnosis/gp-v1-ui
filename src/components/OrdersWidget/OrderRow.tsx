@@ -179,7 +179,9 @@ const OrderRow: React.FC<Props> = props => {
       addMinutes(Date.now(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME).getTime(),
     [order.validUntil],
   )
-  const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
+  const expiresOn = useMemo(() => formatDistanceToNow(dateFromBatchId(order.validUntil), { addSuffix: true }), [
+    order.validUntil,
+  ])
 
   return (
     <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
