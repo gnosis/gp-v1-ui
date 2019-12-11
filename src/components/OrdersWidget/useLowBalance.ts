@@ -7,36 +7,36 @@ interface Result {
 }
 
 export function useLowBalance(): Result {
-  const [lowBalance, setLowBalance] = useSafeState<Set<number>>(new Set())
+  const [lowBalanceOrderIds, setLowBalanceOrderIds] = useSafeState<Set<number>>(new Set())
 
   const updateLowBalanceFactory = useCallback(
-    (id: number) => (isLow: boolean, remove?: true): void => {
+    (orderId: number) => (isLow: boolean, remove?: true): void => {
       if (remove || !isLow) {
-        setLowBalance(curr => {
-          if (!curr.has(id)) {
+        setLowBalanceOrderIds(curr => {
+          if (!curr.has(orderId)) {
             return curr
           }
           const newSet = new Set(curr)
-          newSet.delete(id)
+          newSet.delete(orderId)
           return newSet
         })
       } else {
-        setLowBalance(curr => {
-          if (curr.has(id)) {
+        setLowBalanceOrderIds(curr => {
+          if (curr.has(orderId)) {
             return curr
           }
           const newSet = new Set(curr)
-          newSet.add(id)
+          newSet.add(orderId)
           return newSet
         })
       }
     },
-    [setLowBalance],
+    [setLowBalanceOrderIds],
   )
 
   const isLowBalance = useMemo(() => {
-    return lowBalance.size > 0
-  }, [lowBalance])
+    return lowBalanceOrderIds.size > 0
+  }, [lowBalanceOrderIds])
 
   return { isLowBalance, updateLowBalanceFactory }
 }
