@@ -139,7 +139,7 @@ interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
   order: AuctionElement
-  updateLowBalance: (isLow: boolean, remove?: true) => void
+  updateLowBalance: (isLow: boolean) => void
   pending?: boolean
 }
 
@@ -191,7 +191,7 @@ const OrderRow: React.FC<Props> = props => {
 
   useEffect(
     // on unmount, clean up and remove this state from the list
-    () => updateLowBalance(true, true),
+    () => updateLowBalance(false),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   )

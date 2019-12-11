@@ -3,30 +3,29 @@ import useSafeState from 'hooks/useSafeState'
 
 interface Result {
   isLowBalance: boolean
-  updateLowBalanceFactory: (id: number) => (isLow: boolean, remove?: true) => void
+  updateLowBalanceFactory: (id: number) => (isLow: boolean) => void
 }
 
 export function useLowBalance(): Result {
   const [lowBalanceOrderIds, setLowBalanceOrderIds] = useSafeState<Set<number>>(new Set())
 
+  // Receives a orderId and returns a function to update low balance state
   const updateLowBalanceFactory = useCallback(
-    (orderId: number) => (isLow: boolean, remove?: true): void => {
-      if (remove || !isLow) {
+    (orderId: number) => {
+      // Whenever OrderRow calculates whether it's over/under balance for a given order,
+      // it calls the functioned returned here to update the overall low balance indicator
+      // Also, when unmounting the component, it calls the function with isLow === false to clear the state
+      return (isLow: boolean): void => {
+        // Update local state
         setLowBalanceOrderIds(curr => {
-          if (!curr.has(orderId)) {
+          // Do not update state when no changes are needed:
+          // - isLow and it's already in the set OR
+          // - !isLow and it's not in the set
+          if ((isLow && curr.has(orderId)) || (!isLow && !curr.has(orderId))) {
             return curr
           }
           const newSet = new Set(curr)
-          newSet.delete(orderId)
-          return newSet
-        })
-      } else {
-        setLowBalanceOrderIds(curr => {
-          if (curr.has(orderId)) {
-            return curr
-          }
-          const newSet = new Set(curr)
-          newSet.add(orderId)
+          isLow ? newSet.add(orderId) : newSet.delete(orderId)
           return newSet
         })
       }
