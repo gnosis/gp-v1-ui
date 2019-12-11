@@ -7,13 +7,14 @@ import { calculateBatchId } from 'utils'
 import { USER_1, BATCH_ID } from './basic'
 
 const NOW = Date.now()
+
 export const exchangeOrders = {
   [USER_1]: [
     {
       buyTokenId: 3, // TUSD
       sellTokenId: 7, // DAI
       validFrom: BATCH_ID,
-      validUntil: BATCH_ID + 1,
+      validUntil: calculateBatchId(addMinutes(NOW, 5)),
       priceNumerator: new BN('2100000000000000000000'),
       priceDenominator: new BN('2000000000000000000000'),
       remainingAmount: new BN('1500000000000000000000'),
