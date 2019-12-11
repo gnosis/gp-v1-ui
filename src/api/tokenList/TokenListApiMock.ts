@@ -10,12 +10,6 @@ export class TokenListApiMock implements TokenList {
   public getTokens(_networkId: number): TokenDetails[] {
     return this._tokenList
   }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async updateTokenIdsForNetwork(_networkId: number): Promise<void> {
-    // Simply inserts ID into tokens
-    this._tokenList = this._tokenList.map((token, index) => ({ ...token, id: index }))
-  }
 }
 
 export default TokenListApiMock

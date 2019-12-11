@@ -15,6 +15,7 @@ const fakeRowState: TokenLocalState = {
 }
 
 const initialTokenBalanceDetails = {
+  id: 1,
   name: 'Test token',
   symbol: 'TTT',
   decimals: 18,

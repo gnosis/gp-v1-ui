@@ -12,13 +12,13 @@ export enum Network {
 }
 
 export interface TokenDetails {
+  id: number
   name?: string
   symbol: string
   decimals: number
   address: string
   addressMainnet?: string
   image?: string
-  id?: number
 }
 
 export interface TokenBalanceDetails extends TokenDetails {
@@ -32,7 +32,6 @@ export interface TokenBalanceDetails extends TokenDetails {
 
 export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
-  updateTokenIdsForNetwork: (networkId: number) => Promise<void>
 }
 
 export interface PendingFlux {

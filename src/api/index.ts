@@ -76,16 +76,15 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
   return exchangeApi
 }
 
-function createTokenListApi(exchangeApi: ExchangeApi): TokenList {
+function createTokenListApi(): TokenList {
   const networks = [Network.Mainnet, Network.Rinkeby]
 
   let tokenListApi: TokenList
   if (isTokenListMock) {
     tokenListApi = new TokenListApiMock(tokenList)
   } else {
-    tokenListApi = new TokenListApiImpl(networks, exchangeApi)
+    tokenListApi = new TokenListApiImpl(networks)
   }
-  networks.forEach(network => tokenListApi.updateTokenIdsForNetwork(network))
 
   window['tokenListApi'] = tokenListApi // register for convenience
   return tokenListApi
@@ -101,4 +100,4 @@ export const walletApi: WalletApi = createWalletApi(web3)
 export const erc20Api: Erc20Api = createErc20Api(web3)
 export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, web3)
-export const tokenListApi: TokenList = createTokenListApi(exchangeApi)
+export const tokenListApi: TokenList = createTokenListApi()
