@@ -47,7 +47,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       ...order,
       user: userAddress,
       sellTokenBalance: ONE,
-      id: index,
+      id: index.toString(),
     }))
   }
 

@@ -60,7 +60,7 @@ const decodeAuctionElements = (bytes: string): AuctionElement[] => {
     result.push({
       user: '0x' + user,
       sellTokenBalance: new BN(sellTokenBalance, 16),
-      id: index++,
+      id: (index++).toString(),
       buyTokenId: parseInt(buyTokenId, 16),
       sellTokenId: parseInt(sellTokenId, 16),
       validFrom: parseInt(validFrom, 16),

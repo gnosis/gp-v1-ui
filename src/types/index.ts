@@ -164,7 +164,7 @@ export interface Order {
 export interface AuctionElement extends Order {
   user: string
   sellTokenBalance: BN
-  id: number
+  id: string // string because we might need natural ids
 }
 
 export interface PlaceOrderParams {
