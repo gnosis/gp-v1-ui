@@ -1,7 +1,7 @@
 import BN from 'bn.js'
-import { addDays, addYears, addMinutes } from 'date-fns'
+import { addDays, addMinutes } from 'date-fns'
 
-import { ALLOWANCE_MAX_VALUE } from 'const'
+import { ALLOWANCE_MAX_VALUE, MAX_BATCH_ID } from 'const'
 import { calculateBatchId } from 'utils'
 
 import { USER_1, BATCH_ID } from './basic'
@@ -23,7 +23,7 @@ export const exchangeOrders = {
       buyTokenId: 4, // USDC
       sellTokenId: 5, // TUSD
       validFrom: BATCH_ID,
-      validUntil: calculateBatchId(addYears(NOW, 10)), // not infinite but high enough
+      validUntil: MAX_BATCH_ID, // as big as it gets
       priceNumerator: new BN('12').mul(new BN(10).pow(new BN(64))), // price ~1.04
       priceDenominator: ALLOWANCE_MAX_VALUE,
       remainingAmount: ALLOWANCE_MAX_VALUE, // as big as it gets
