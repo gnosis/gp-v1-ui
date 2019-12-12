@@ -16,9 +16,10 @@ import Layout from 'components/layout/'
 
 // Pages
 import About from 'pages/About'
-import Deposit from 'pages/Deposit'
 import Trade from 'pages/Trade'
+import Strategies from 'pages/Strategies'
 import Orders from 'pages/Orders'
+import Wallet from 'pages/Wallet'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
@@ -60,9 +61,11 @@ const App: React.FC = () => (
     <Router basename={process.env.BASE_URL}>
       <Layout>
         <Switch>
-          <PrivateRoute path="/deposit" exact component={Deposit} />
           <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/trade/:sell-:buy" component={Trade} />
+          <PrivateRoute path="/strategies" exact component={Strategies} />
+          <PrivateRoute path="/wallet" exact component={Wallet} />
+          <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/about" exact component={About} />
           <Route path="/source-code" exact component={SourceCode} />
           <Route path="/connect-wallet" exact component={ConnectWallet} />
