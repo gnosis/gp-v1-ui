@@ -2,7 +2,7 @@ import BN from 'bn.js'
 import { addDays, addMinutes } from 'date-fns'
 
 import { ALLOWANCE_MAX_VALUE, MAX_BATCH_ID } from 'const'
-import { calculateBatchId } from 'utils'
+import { dateToBatchId } from 'utils'
 
 import { USER_1, BATCH_ID } from './basic'
 
@@ -14,7 +14,7 @@ export const exchangeOrders = {
       buyTokenId: 3, // TUSD
       sellTokenId: 7, // DAI
       validFrom: BATCH_ID,
-      validUntil: calculateBatchId(addMinutes(NOW, 5)),
+      validUntil: dateToBatchId(addMinutes(NOW, 5)),
       priceNumerator: new BN('2100000000000000000000'),
       priceDenominator: new BN('2000000000000000000000'),
       remainingAmount: new BN('1500000000000000000000'),
@@ -32,7 +32,7 @@ export const exchangeOrders = {
       buyTokenId: 7, // DAI
       sellTokenId: 5, // PAX
       validFrom: BATCH_ID,
-      validUntil: calculateBatchId(addDays(NOW, 2)),
+      validUntil: dateToBatchId(addDays(NOW, 2)),
       priceNumerator: new BN('10500000000000000000000'),
       priceDenominator: new BN('10000000000000000000000'),
       remainingAmount: new BN('5876842900000000000000'),
@@ -46,7 +46,7 @@ export const pendingOrders = {
       buyTokenId: 7, // DAI
       sellTokenId: 4, // USDC
       validFrom: BATCH_ID,
-      validUntil: calculateBatchId(addDays(NOW, 1)),
+      validUntil: dateToBatchId(addDays(NOW, 1)),
       priceNumerator: new BN('1315273500000000000000'),
       priceDenominator: new BN('876849000'),
       remainingAmount: new BN('876849000'),

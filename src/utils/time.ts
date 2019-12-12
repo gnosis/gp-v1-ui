@@ -19,25 +19,25 @@ export function getEpoch(): number {
  * @param date? Optional Date object to calculate the batchId from.
  *  Defaults to Date.now()
  */
-export function calculateBatchId(date?: Date): number {
+export function dateToBatchId(date?: Date): number {
   const timestamp = date ? date.getTime() : Date.now()
   const timestampInSeconds = Math.floor(timestamp / 1000)
   return Math.floor(timestampInSeconds / BATCH_TIME)
 }
 
-export function dateFromBatchId(batchId: number): Date {
+export function batchIdToDate(batchId: number): Date {
   const timestamp = batchId * BATCH_TIME * 1000
   return new Date(timestamp)
 }
 
 export function isBatchIdFarInTheFuture(batchId: number): boolean {
-  const date = dateFromBatchId(batchId)
+  const date = batchIdToDate(batchId)
   const farInTheFuture = addMinutes(Date.now(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME)
   return date >= farInTheFuture
 }
 
 export function formatDateFromBatchId(batchId: number): string {
-  const date = dateFromBatchId(batchId)
+  const date = batchIdToDate(batchId)
   return formatDistanceToNow(date, { addSuffix: true })
 }
 
