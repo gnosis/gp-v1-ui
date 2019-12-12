@@ -24,7 +24,7 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: inherit;
   }
   a {   
-    text-decoration: none;
+    text-decoration: underline;
     cursor: pointer;
     &, &:link, &:visited {
       color: var(--color-text-primary);
@@ -39,7 +39,6 @@ const GlobalStyles = createGlobalStyle`
   }
   h1 {
     font-size: 3rem;
-    font-weight: 1000;
     @media  only screen and (max-width: 480px) {
       font-size: 2.4rem;
     }    
