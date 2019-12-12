@@ -200,7 +200,7 @@ export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
 
 export interface WalletApi {
   isConnected(): boolean
-  connect(): Promise<boolean>
+  connect(givenProvider?: Provider): Promise<boolean>
   disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>

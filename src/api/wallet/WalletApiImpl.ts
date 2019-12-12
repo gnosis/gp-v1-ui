@@ -207,8 +207,8 @@ export class WalletApiImpl implements WalletApi {
     return this._connected
   }
 
-  public async connect(): Promise<boolean> {
-    const provider = await getProvider(wcOptions)
+  public async connect(givenProvider?: Provider): Promise<boolean> {
+    const provider = givenProvider || (await getProvider(wcOptions))
 
     if (!provider) return false
 
