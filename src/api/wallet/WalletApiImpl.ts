@@ -78,6 +78,7 @@ import {
 } from '@gnosis.pm/dapp-ui'
 
 import { log, toBN } from 'utils'
+import { INFURA_ID } from 'const'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -167,7 +168,7 @@ const wcOptions: WalletConnectInits = {
   package: WalletConnectProvider,
   options: {
     // TODO get infuraId from .env
-    infuraId: '8b4d9b4306294d2e92e0775ff1075066',
+    infuraId: INFURA_ID,
   },
 }
 
