@@ -237,8 +237,8 @@ const OrdersWidget: React.FC = () => {
                   Unfilled <br /> amount
                 </div>
                 <div className="title">
-                  Available <br />
-                  amount
+                  Account <br />
+                  balance
                 </div>
                 <div className="title">Expires</div>
               </div>
