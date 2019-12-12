@@ -12,7 +12,7 @@ const GlobalStyles = createGlobalStyle`
     min-height: 100vh;
     margin: 0;
     font-size: 16px;
-    font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-family: "Averta", Arial, Helvetica Neue, Helvetica, sans-serif;
     
     line-height: 1.5;
     
