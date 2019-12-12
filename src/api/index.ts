@@ -19,6 +19,7 @@ import {
 } from '../../test/data'
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
+import { setupAutoconnect } from './autoconnect'
 
 const isWalletMock = process.env.MOCK_WALLET === 'true'
 const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
@@ -91,6 +92,7 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
   process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
+
 const web3 = new Web3(getDefaultProvider())
 
 // Build APIs
@@ -99,3 +101,5 @@ export const tokenListApi: TokenList = createTokenListApi()
 export const erc20Api: Erc20Api = createErc20Api(web3)
 export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, web3)
+
+setupAutoconnect(walletApi)
