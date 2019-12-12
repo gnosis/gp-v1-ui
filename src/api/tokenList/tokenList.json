@@ -1,5 +1,6 @@
 [
   {
+    "id": 1,
     "name": "Wrapped Ether",
     "symbol": "WETH",
     "decimals": 18,
@@ -12,6 +13,7 @@
     "rinkeby_faucet": "https://faucet.rinkeby.io/"
   },
   {
+    "id": 2,
     "name": "Tether USD",
     "symbol": "USDT",
     "decimals": 6,
@@ -24,6 +26,7 @@
     "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712"
   },
   {
+    "id": 3,
     "name": "TrueUSD",
     "symbol": "TUSD",
     "decimals": 18,
@@ -36,6 +39,7 @@
     "rinkeby_faucet": "https://github.com/trusttoken/true-currencies#getting-testnet-tokens"
   },
   {
+    "id": 4,
     "name": "USD Coin",
     "symbol": "USDC",
     "decimals": 6,
@@ -48,6 +52,7 @@
     "rinkeby_faucet": "https://app.compound.finance/asset/cUSDC"
   },
   {
+    "id": 5,
     "name": "Paxos Standard",
     "symbol": "PAX",
     "decimals": 18,
@@ -60,6 +65,7 @@
     "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712"
   },
   {
+    "id": 6,
     "name": "Gemini dollar",
     "symbol": "GUSD",
     "decimals": 2,
@@ -72,6 +78,7 @@
     "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712. Using ERC20Impl (0x8d54C3af182A5ef4f74e7eCC07aB6182153797bB) contract, call `requestPrint(address, amount). On same contract, use the `lockId` returned from previous call and execute `confirmPrint(lockId)`."
   },
   {
+    "id": 7,
     "name": "DAI Stablecoin",
     "symbol": "DAI",
     "decimals": 18,
