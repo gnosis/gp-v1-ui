@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
@@ -6,7 +6,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
-import { useLowBalance } from './useLowBalance'
 
 import Widget from 'components/layout/Widget'
 import Highlight from 'components/Highlight'
@@ -185,7 +184,11 @@ const OrdersWidget: React.FC = () => {
     [tokens],
   )
 
-  const { isLowBalance, updateLowBalanceFactory } = useLowBalance()
+  const overBalanceOrders = useMemo(
+    () =>
+      new Set<string>(orders.filter(order => order.remainingAmount.gt(order.sellTokenBalance)).map(order => order.id)),
+    [orders],
+  )
 
   return (
     <OrdersWrapper>
@@ -216,7 +219,7 @@ const OrdersWidget: React.FC = () => {
             <div>
               You have <Highlight>{orders.length}</Highlight> standing orders
             </div>
-            {isLowBalance && (
+            {overBalanceOrders.size > 0 && (
               <div className="warning">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 <strong> Low balance</strong>
@@ -246,7 +249,7 @@ const OrdersWidget: React.FC = () => {
                   sellToken={getTokenById(order.sellTokenId)}
                   buyToken={getTokenById(order.buyTokenId)}
                   order={order}
-                  updateLowBalance={updateLowBalanceFactory(order.id)}
+                  isOverBalance={overBalanceOrders.has(order.id)}
                 />
               ))}
             </div>

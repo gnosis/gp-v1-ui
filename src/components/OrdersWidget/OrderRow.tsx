@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -113,16 +113,15 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmou
   </div>
 )
 
-interface AvailableAmountProps extends Pick<Props, 'sellToken'> {
+interface AvailableAmountProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
   availableAmount: string
-  overBalance: boolean
 }
 
-const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, overBalance }) => (
+const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, isOverBalance }) => (
   <div className="container sub-columns three-columns">
     <div>{availableAmount}</div>
     <strong>{safeTokenName(sellToken)}</strong>
-    <div className="warning">{overBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+    <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
   </div>
 )
 
@@ -139,7 +138,7 @@ interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
   order: AuctionElement
-  updateLowBalance: (isLow: boolean) => void
+  isOverBalance: boolean
   pending?: boolean
 }
 
@@ -154,7 +153,7 @@ function calculatePrice(_numerator?: string | null, _denominator?: string | null
 }
 
 const OrderRow: React.FC<Props> = props => {
-  const { buyToken, sellToken, order, updateLowBalance, pending = false } = props
+  const { buyToken, sellToken, order, pending = false } = props
 
   const price = useMemo(
     () =>
@@ -173,10 +172,6 @@ const OrderRow: React.FC<Props> = props => {
     sellToken.decimals,
   ])
   const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
-  const overBalance = useMemo(() => order.remainingAmount.gt(order.sellTokenBalance), [
-    order.remainingAmount,
-    order.sellTokenBalance,
-  ])
   const unlimitedTime = useMemo(
     () =>
       dateFromBatchId(order.validUntil).getTime() >=
@@ -184,17 +179,6 @@ const OrderRow: React.FC<Props> = props => {
     [order.validUntil],
   )
   const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
-
-  useEffect(() => {
-    updateLowBalance(overBalance)
-  }, [updateLowBalance, overBalance])
-
-  useEffect(
-    // on unmount, clean up and remove this state from the list
-    () => updateLowBalance(false),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  )
 
   return (
     <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
@@ -204,7 +188,7 @@ const OrderRow: React.FC<Props> = props => {
       </div>
       <OrderDetails {...props} price={price} />
       <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
-      <AvailableAmount {...props} availableAmount={availableAmount} overBalance={overBalance} />
+      <AvailableAmount {...props} availableAmount={availableAmount} />
       <Expires {...props} unlimitedTime={unlimitedTime} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )
