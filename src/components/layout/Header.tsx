@@ -135,16 +135,14 @@ const Header: React.FC = () => {
           <li>
             <NavLink to={from}>Trade</NavLink>
           </li>
+          {/* 
+            TODO: Placeholder for strategies
           <li>
-            {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
             <NavLink to="/strategies">Strategies</NavLink>
           </li>
+          */}
           <li>
             <LinkWithPastLocation to="/wallet">Wallet</LinkWithPastLocation>
-          </li>
-          <li>
-            {/* TODO: Not impleented yet. Comment out after reviewing this PR */}
-            <NavLink to="/orders">Orders</NavLink>
           </li>
           <li>
             <LinkWithPastLocation to="/orders">Orders</LinkWithPastLocation>
