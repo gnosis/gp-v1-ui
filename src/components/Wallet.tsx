@@ -22,7 +22,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
-import WalletImg from 'img/unknown-token.png'
+import WalletImg from 'assets/img/unknown-token.png'
 
 export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
   position: relative;

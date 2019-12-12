@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import unknownTokenImg from 'img/unknown-token.png'
+import unknownTokenImg from 'assets/img/unknown-token.png'
 
 function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
   const image = event.currentTarget

@@ -5,7 +5,7 @@ import React from 'react'
 import { BrowserRouter as Router, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
 
 // SCSS
-import GlobalStyles from './components/layout/GlobalStyles'
+import GlobalStyles from 'styles/global'
 
 // Toast notifications
 import { toast } from 'react-toastify'
