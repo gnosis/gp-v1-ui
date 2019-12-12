@@ -54,6 +54,16 @@ module.exports = ({ stats = false } = {}) => ({
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(ttf|otf|eot|woff2?)(\?[a-z0-9]+)?$/,
+        use: {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            mimetype: 'application/font-otf',
+          },
+        },
+      },
     ],
   },
   devServer: {
