@@ -1,4 +1,6 @@
-import { BATCH_TIME } from 'const'
+import { addMinutes, formatDistanceToNow } from 'date-fns'
+
+import { BATCH_TIME, MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME } from 'const'
 
 /**
  * Epoch in seconds
@@ -26,6 +28,17 @@ export function calculateBatchId(date?: Date): number {
 export function dateFromBatchId(batchId: number): Date {
   const timestamp = batchId * BATCH_TIME * 1000
   return new Date(timestamp)
+}
+
+export function isBatchIdFarInTheFuture(batchId: number): boolean {
+  const date = dateFromBatchId(batchId)
+  const farInTheFuture = addMinutes(Date.now(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME)
+  return date >= farInTheFuture
+}
+
+export function formatDateFromBatchId(batchId: number): string {
+  const date = dateFromBatchId(batchId)
+  return formatDistanceToNow(date, { addSuffix: true })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
