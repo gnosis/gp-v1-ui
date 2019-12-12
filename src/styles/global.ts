@@ -1,26 +1,23 @@
-import { createGlobalStyle, css } from 'styled-components'
-
-const variables = css`
-  :root {
-    // Colors
-    --color-text-primary: #3d414c;
-    --color-text-secondary: #8c8c8c;
-  }
-`
+import { createGlobalStyle } from 'styled-components'
+import fontFace from './fonts'
+import variables from './variables'
 
 const GlobalStyles = createGlobalStyle`
+  // global root variables
   ${variables}
+  // Import font faces
+  ${fontFace}
 
   html, body {  
     min-height: 100vh;
     margin: 0;
 
     font-size: 16px;
-    font-family: "Droid Sans", Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-family: "Averta", "Montserrat", Arial, Helvetica Neue, Helvetica, sans-serif;
     
     line-height: 1.5;
     
-    background-color: #f7f7f7;
+    background-color: var(--color-background);;
     color: var(--color-text-primary);
 
     box-sizing: border-box;
@@ -31,7 +28,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   a {   
-    text-decoration: underline;
+    text-decoration: none;
     cursor: pointer;
 
     &, &:link, &:visited {
@@ -50,6 +47,7 @@ const GlobalStyles = createGlobalStyle`
 
   h1 {
     font-size: 3rem;
+    font-weight: 1000;
     @media  only screen and (max-width: 480px) {
       font-size: 2.4rem;
     }    
@@ -76,63 +74,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   button {
-    padding: 0.5rem;
-    margin: 0.5rem;
-    border: 2px solid #8332bf;
-    color: #8332bf;
-
-    &:disabled,
-    &[disabled]{
-      background-color: rgba(187, 187, 187, 0.3);
-      border-color: #696969 !important;
-      color: #696969 !important;
-      font-style: italic;
-    }
     
-    :hover {
-      border-color: #9201fd;
-      color: #9201fd;
-    }
-
-    &.success {
-      border-color: #63ab52;
-      color: #63ab52;
-
-      :hover {
-        border-color: #167500;
-        color: #167500;
-      }
-    }
-
-    &.danger {
-      border-color: #ff5097;
-      color: #ff5097;
-
-      :hover {
-        border-color: #ea005f;
-        color: #ea005f;
-      }
-    }
-
-    &.secondary {
-      border-color: #696969;
-      color: #696969;
-
-      :hover {
-        border-color: black;
-        color: black;
-      }
-    }
-
-    &.big {
-      font-size: 1.2em;
-      padding: 0.65em 1em;
-    }
-
-    &.small {
-      font-size: 0.6em;
-      padding: 0.3em 0.5em;
-    }
   }
 
   input {
