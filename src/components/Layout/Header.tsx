@@ -7,17 +7,12 @@ import Wallet, { WalletWrapper } from 'components/Wallet'
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
 
 const Wrapper = styled.header`
-  color: #ffffff;
-  padding-bottom: 5rem;
-
-  @media only screen and (max-width: 866px) {
-    padding-bottom: 1rem;
-  }
+  padding: 1rem;
 
   nav {
     display: flex;
-    align-items: center;
     flex-flow: row wrap;
+    align-items: center;
 
     @media only screen and (max-width: 866px) {
       justify-content: center;
@@ -28,12 +23,13 @@ const Wrapper = styled.header`
     display: flex;
     flex: 1;
     justify-content: center;
+
     padding: 0;
     list-style-type: none;
     white-space: nowrap;
 
     a {
-      color: white;
+      font-size: 3.2rem;
       padding: 0.8em;
       text-decoration: none;
 
@@ -48,15 +44,19 @@ const Wrapper = styled.header`
     }
   }
 
-  .logo {
+  .logo,
+  ${WalletWrapper} {
     flex: 0 1 16rem;
-    color: #ff62a2;
+  }
+
+  .logo {
+    font-size: 2.8rem;
     text-align: center;
+    text-decoration: none;
     vertical-align: middle;
 
     &:hover {
       color: white;
-      border-color: white;
       cursor: pointer;
     }
     @media only screen and (max-width: 915px) {
@@ -116,6 +116,10 @@ const Wrapper = styled.header`
         border-top: 0.7px solid #00000029 !important;
       }
     }
+  }
+
+  @media only screen and (max-width: 866px) {
+    padding-bottom: 1rem;
   }
 `
 
