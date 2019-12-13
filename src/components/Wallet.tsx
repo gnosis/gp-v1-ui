@@ -24,16 +24,15 @@ import useSafeState from 'hooks/useSafeState'
 import { abbreviateString, getNetworkFromId } from 'utils'
 import WalletImg from 'assets/img/unknown-token.png'
 
-export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
+export const WalletWrapper = styled.div<{ $walletOpen: boolean }>`
   position: relative;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   margin: 1rem;
-  flex: 0 1 16rem;
 
   background: ghostwhite;
-  border-radius: ${(props): string => (props.walletOpen ? '10px 10px 0 0' : '10px')};
+  border-radius: ${({ $walletOpen }): string => ($walletOpen ? '10px 10px 0 0' : '10px')};
 
   text-align: center;
 `
@@ -88,15 +87,17 @@ const WalletSlideWrapper = styled.div`
   border-radius: 0 0 10px 10px;
 `
 
-const MonospaceText = styled.div<{ color?: string }>`
-  color: ${(props): string => props.color || '#283baf'};
+const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
+  color: ${({ color = '#000' }): string => color};
+  font-size: ${({ $fontSize = '1.3rem' }): string => $fontSize};
   font-weight: 800;
-  font-family: monospace;
 `
 
-const MonospaceAddress = styled(MonospaceText)`
-  font-size: 85%;
+const MonospaceAddress = styled(NetworkTitle)`
   margin: 0 10px;
+  font-family: 'monospace';
+  font-size: 85%;
+  font-weight: 100;
   word-break: break-all;
 `
 
@@ -193,12 +194,12 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   }
 
   return (
-    <WalletWrapper walletOpen={!!showWallet}>
+    <WalletWrapper $walletOpen={!!showWallet}>
       {userAddress ? (
         <>
           {/* Network */}
           <ThinWalletItem>
-            <MonospaceText>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</MonospaceText>
+            <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
           </ThinWalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
