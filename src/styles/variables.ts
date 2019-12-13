@@ -10,7 +10,8 @@ const variables = css`
     --color-background-pageWrapper: #fff;
 
     // Text
-    --color-text-primary: #3d414c;
+    // --color-text-primary: #3d414c;
+    --color-text-primary: #000;
     --color-text-secondary: #8c8c8c;
 
     // Buttons
@@ -23,6 +24,11 @@ const variables = css`
     // BORDERS
     // ------------------------------
     --border-radius: 20px;
+
+    // ------------------------------
+    // BOX-SHADOW
+    // ------------------------------
+    --box-shadow: 1px 6px 7px 0px #0000002e;
   }
 `
 

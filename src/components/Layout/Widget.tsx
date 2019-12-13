@@ -38,7 +38,7 @@ const Widget: React.FC<Props> = ({ children, className }) => {
   const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
   return (
-    <Wrapper className={className} $bgColor="transparent" $width="auto">
+    <Wrapper className={className} $bgColor="transparent" $boxShadow="none" $width="auto">
       {contractAddress && (
         <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
       )}

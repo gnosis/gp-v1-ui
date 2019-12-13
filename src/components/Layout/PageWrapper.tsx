@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
-const PageWrapper = styled.div<{ $bgColor?: string; $width?: string }>`
+const PageWrapper = styled.div<{ $bgColor?: string; $boxShadow?: string; $width?: string }>`
   background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor};
-  box-shadow: 1px 1px #e8e8e8;
+  box-shadow: ${({ $boxShadow = 'var(--box-shadow)' }): string => $boxShadow};
 
   margin: auto;
   padding: 2rem 10vw 2rem 10vw;
