@@ -1,12 +1,13 @@
 import { walletApi } from 'api'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { WalletInfo, Command } from 'types'
+import useSafeState from './useSafeState'
 
 export const useWalletConnection = (): WalletInfo => {
-  const [walletInfo, setWalletInfo] = useState<WalletInfo>({ isConnected: false })
+  const [walletInfo, setWalletInfo] = useSafeState<WalletInfo>({ isConnected: false })
 
   useEffect((): Command => {
     return walletApi.addOnChangeWalletInfo(setWalletInfo, true)
-  }, [])
+  }, [setWalletInfo])
   return walletInfo
 }
