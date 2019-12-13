@@ -4,6 +4,61 @@ import assert from 'assert'
 import { getDefaultProvider } from '../'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
+
+WalletConnectProvider.prototype.getWalletConnector = function(): Promise<WalletConnector> {
+  return new Promise((resolve, reject) => {
+    const wc = this.wc
+
+    if (this.isConnecting) {
+      this.onConnect((x: WalletConnector) => resolve(x))
+    } else if (!wc.connected) {
+      this.isConnecting = true
+      const sessionRequestOpions = this.chainId ? { chainId: this.chainId } : undefined
+      wc.createSession(sessionRequestOpions)
+        .then(() => {
+          if (this.qrcode) {
+            console.log(wc.uri)
+            WalletConnectQRCodeModal.open(wc.uri, () => {
+              reject(new Error('User closed WalletConnect modal'))
+            })
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          wc.on('connect', (error: Error, payload: any) => {
+            if (error) {
+              this.isConnecting = false
+              return reject(error)
+            }
+            if (this.qrcode) {
+              WalletConnectQRCodeModal.close()
+            }
+            this.isConnecting = false
+            this.connected = true
+
+            if (payload) {
+              // Handle session update
+              this.updateState(payload.params[0])
+            }
+            // Emit connect event
+            this.emit('connect')
+
+            this.triggerConnect(wc)
+            resolve(wc)
+          })
+        })
+        .catch((error: Error) => {
+          this.isConnecting = false
+          reject(error)
+        })
+    } else {
+      if (!this.connected) {
+        this.connected = true
+        this.updateState(wc.session)
+      }
+      resolve(wc)
+    }
+  })
+}
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -19,6 +74,7 @@ import {
   isWalletConnectSubscriptions,
   isMetamaskProvider,
   Subscriptions,
+  WalletConnector,
 } from '@gnosis.pm/dapp-ui'
 
 import { log, toBN } from 'utils'

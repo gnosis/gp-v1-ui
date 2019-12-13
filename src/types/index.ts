@@ -12,6 +12,7 @@ export enum Network {
 }
 
 export interface TokenDetails {
+  id: number
   name?: string
   symbol: string
   decimals: number
@@ -163,6 +164,7 @@ export interface Order {
 export interface AuctionElement extends Order {
   user: string
   sellTokenBalance: BN
+  id: string // string because we might need natural ids
 }
 
 export interface PlaceOrderParams {

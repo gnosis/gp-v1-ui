@@ -223,7 +223,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
             {/* Copy Confirmation */}
             {copiedToClipboard ? (
               <CopyDiv>
-                <FontAwesomeIcon color="#ff5097" icon={faCheck} /> <span>Copied!</span>
+                <FontAwesomeIcon color="#ff62a2;" icon={faCheck} /> <span>Copied!</span>
               </CopyDiv>
             ) : (
               // Address and copy button
@@ -231,7 +231,7 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
                 <MonospaceAddress color="#000">{userAddress} </MonospaceAddress>
                 <CopyToClipboard text={userAddress} onCopy={handleCopyToClipBoard}>
                   <FontAwesomeIcon
-                    color="#ff5097"
+                    color="#ff62a2;"
                     icon={faCopy}
                     style={{ cursor: 'pointer' }}
                     title="Copy address to clipboard"

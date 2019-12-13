@@ -7,6 +7,7 @@ const tokens: TokenDetails[] = [
   //  https://weth.io
   //  Wrapper of Ether to make it ERC-20 compliant
   {
+    id: 1,
     name: 'Wrapped Ether',
     symbol: 'WETH',
     decimals: 18,
@@ -19,6 +20,7 @@ const tokens: TokenDetails[] = [
   //  https://tether.to/
   //  Fiat enabled collateralized stable coin, that is backed by the most popular fiat currency, USD (US Dollar) in a 1:1 ratio
   {
+    id: 2,
     name: 'Tether USD',
     symbol: 'USDT',
     decimals: 6,
@@ -31,6 +33,7 @@ const tokens: TokenDetails[] = [
   //  https://www.trusttoken.com/trueusd
   //  US Dollar backed stable coin which is totally fiat-collateralized
   {
+    id: 3,
     name: 'TrueUSD',
     symbol: 'TUSD',
     decimals: 18,
@@ -45,6 +48,7 @@ const tokens: TokenDetails[] = [
   //  using Grant Thornton for verifying Circle’s US dollar reserves
   //  launched by cryptocurrency finance firm circle Internet financial Ltd and the CENTRE open source consortium launched
   {
+    id: 4,
     name: 'USD Coin',
     symbol: 'USDC',
     decimals: 6,
@@ -59,6 +63,7 @@ const tokens: TokenDetails[] = [
   //  launched by Paxos Trust Company
   //  approved by the New York State Department of Financial Services
   {
+    id: 5,
     name: 'Paxos Standard',
     symbol: 'PAX',
     decimals: 18,
@@ -72,6 +77,7 @@ const tokens: TokenDetails[] = [
   //  regulated by the New York State Department of Financial Services
   //  launched same day as PAX by Gemini Trust Company. backed by USD
   {
+    id: 6,
     name: 'Gemini Dollar',
     symbol: 'GUSD',
     decimals: 2,
@@ -84,6 +90,7 @@ const tokens: TokenDetails[] = [
   //  https://makerdao.com/
   //  crypto-collateralized cryptocurrency: stable coin which is pegged to USD
   {
+    id: 7,
     name: 'DAI Stablecoin',
     symbol: 'DAI',
     decimals: 18,

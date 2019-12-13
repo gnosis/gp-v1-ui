@@ -1,5 +1,4 @@
 import { TokenList, TokenDetails } from 'types'
-
 export class TokenListApiMock implements TokenList {
   private _tokenList: TokenDetails[]
 
