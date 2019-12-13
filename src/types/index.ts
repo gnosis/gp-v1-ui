@@ -215,11 +215,14 @@ export interface WalletApi {
 /**
  * Interfaces the access to ERC20 token
  *
- * Only the required methods are implemented.
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface Erc20Api {
   balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
+  name({ tokenAddress }: { tokenAddress: string }): Promise<string>
+  symbol({ tokenAddress }: { tokenAddress: string }): Promise<string>
+  decimals({ tokenAddress }: { tokenAddress: string }): Promise<number>
+
   allowance({
     tokenAddress,
     userAddress,

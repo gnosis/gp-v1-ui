@@ -2,7 +2,7 @@ import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
 
 import tokens from './tokenList.json'
-import { getImageUrl } from 'utils/index.js'
+import { getImageUrl } from 'utils'
 
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
   // Return token details

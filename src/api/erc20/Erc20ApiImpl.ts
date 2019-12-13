@@ -33,6 +33,26 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(result)
   }
 
+  public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+    const erc20 = this._getERC20AtAddress(tokenAddress)
+
+    return erc20.methods.name().call()
+  }
+
+  public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+    const erc20 = this._getERC20AtAddress(tokenAddress)
+
+    return erc20.methods.symbol().call()
+  }
+
+  public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
+    const erc20 = this._getERC20AtAddress(tokenAddress)
+
+    const decimals = erc20.methods.decimals().call()
+
+    return Number(decimals)
+  }
+
   public async allowance({
     tokenAddress,
     userAddress,

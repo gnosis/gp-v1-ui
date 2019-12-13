@@ -36,6 +36,21 @@ export class Erc20ApiMock implements Erc20Api {
     return balance ? balance : ZERO
   }
 
+  public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+    log("Don't care about %s, just making TS shut up", tokenAddress)
+    return 'token name'
+  }
+
+  public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+    log("Don't care about %s, just making TS shut up", tokenAddress)
+    return 'SMBL'
+  }
+
+  public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
+    log("Don't care about %s, just making TS shut up", tokenAddress)
+    return 18
+  }
+
   public async allowance({
     tokenAddress,
     userAddress,
