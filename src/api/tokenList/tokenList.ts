@@ -2,14 +2,7 @@ import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
 
 import tokens from './tokenList.json'
-
-/**
- * Uses images from https://github.com/trustwallet/tokens
- */
-function _getImageUrl(tokenAddress?: string): string | undefined {
-  if (!tokenAddress) return undefined
-  return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
-}
+import { getImageUrl } from 'utils/index.js'
 
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
   // Return token details
@@ -20,7 +13,7 @@ export function getTokensByNetwork(networkId: number): TokenDetails[] {
       const { id, name, symbol, decimals = DEFAULT_PRECISION } = token
       const addressMainnet = token.addressByNetwork[Network.Mainnet]
 
-      acc.push({ id, name, symbol, decimals, address, addressMainnet, image: _getImageUrl(addressMainnet) })
+      acc.push({ id, name, symbol, decimals, address, addressMainnet, image: getImageUrl(addressMainnet) })
       return acc
     }
 
