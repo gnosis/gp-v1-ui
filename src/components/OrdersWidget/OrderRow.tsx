@@ -113,13 +113,13 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmou
   </div>
 )
 
-interface AvailableAmountProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
-  availableAmount: string
+interface AccountBalanceProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
+  accountBalance: string
 }
 
-const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, isOverBalance }) => (
+const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, accountBalance, isOverBalance }) => (
   <div className="container sub-columns three-columns">
-    <div>{availableAmount}</div>
+    <div>{accountBalance}</div>
     <strong>{safeTokenName(sellToken)}</strong>
     <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
   </div>
@@ -167,7 +167,7 @@ const OrderRow: React.FC<Props> = props => {
     order.remainingAmount,
     sellToken.decimals,
   ])
-  const availableAmount = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
+  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
     order.sellTokenBalance,
     sellToken.decimals,
   ])
@@ -187,7 +187,7 @@ const OrderRow: React.FC<Props> = props => {
       </div>
       <OrderDetails {...props} price={price} />
       <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
-      <AvailableAmount {...props} availableAmount={availableAmount} />
+      <AccountBalance {...props} accountBalance={accountBalance} />
       <Expires {...props} isNeverExpires={isNeverExpires} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )
