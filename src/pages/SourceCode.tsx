@@ -1,4 +1,5 @@
 import React from 'react'
+import PageWrapper from 'components/Layout/PageWrapper'
 
 interface Link {
   label: string
@@ -25,7 +26,7 @@ const links: Link[] = [
 ]
 
 const SourceCode: React.FC = () => (
-  <div className="page">
+  <PageWrapper>
     <h1>Source code</h1>
     <p>dFusion is an Open Protocol, build on top of Ethereum</p>
     <ul>
@@ -38,7 +39,7 @@ const SourceCode: React.FC = () => (
         </li>
       ))}
     </ul>
-  </div>
+  </PageWrapper>
 )
 
 export default SourceCode
