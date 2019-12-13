@@ -29,12 +29,20 @@ const Wrapper = styled.header`
     white-space: nowrap;
 
     a {
+      color: var(--color-text-secondary);
       font-size: 3.2rem;
+      font-weight: 1000;
       padding: 0.8em;
       text-decoration: none;
 
+      transition: color 0.2s ease-in-out;
+
+      &:hover {
+        color: var(--color-text-primary);
+      }
+
       &.active {
-        text-decoration: underline;
+        color: var(--color-text-primary);
       }
     }
 
@@ -56,7 +64,7 @@ const Wrapper = styled.header`
     vertical-align: middle;
 
     &:hover {
-      color: white;
+      color: var(--color-text-secondary);
       cursor: pointer;
     }
     @media only screen and (max-width: 915px) {
@@ -107,6 +115,8 @@ const Wrapper = styled.header`
 
     .nav-links {
       margin: 0 auto;
+      flex-flow: column;
+      align-items: center;
     }
 
     ${WalletWrapper} {
