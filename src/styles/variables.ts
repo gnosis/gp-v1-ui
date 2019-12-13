@@ -7,6 +7,7 @@ const variables = css`
     //-----------------------------
     // Background
     --color-background: #dbdbdb9c;
+    --color-background-pageWrapper: #fff;
 
     // Text
     --color-text-primary: #3d414c;

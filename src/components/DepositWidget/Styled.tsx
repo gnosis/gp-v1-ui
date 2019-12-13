@@ -160,6 +160,7 @@ export const RowTokenDiv = styled.div`
   align-items: center;
   justify-content: center;
 
+  background: var(--color-background-pageWrapper);
   border-bottom: 2px solid #0000000f;
   border-radius: 20px;
   margin: 0.3rem 0;
