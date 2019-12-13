@@ -3,7 +3,7 @@ import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-u
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
-import { walletApi } from 'api'
+import { WalletApi } from 'types'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
   const provider = new WalletConnectProvider({
@@ -53,7 +53,7 @@ export const getLastProvider = (): Promise<Provider | null> => {
   return Promise.resolve(null)
 }
 
-export const setupAutoconnect = async (): Promise<boolean> => {
+export const setupAutoconnect = async (walletApi: WalletApi): Promise<boolean> => {
   window.addEventListener('beforeunload', e => {
     e.preventDefault()
     const { name } = walletApi.getProviderInfo()
