@@ -19,6 +19,18 @@ describe('getToken', () => {
     it('returns `undefined` when value not in tokens list', () => {
       expect(getToken('symbol', 'any', tokenList)).toBeUndefined()
     })
+    it('returns `undefined` when id not found', () => {
+      expect(getToken('id', -1, tokenList)).toBeUndefined()
+    })
+  })
+
+  describe('value is a number', () => {
+    it('returns token when id in the list', () => {
+      const expected = tokenList[0]
+      const actual = getToken('id', expected.id, tokenList)
+      expect(actual).not.toBeUndefined()
+      expect(actual).toBe(expected)
+    })
   })
 
   describe('string case', () => {

@@ -20,14 +20,20 @@ export const log = process.env.NODE_ENV === 'test' ? noop : console.log
 
 export function getToken<T extends TokenDetails, K extends keyof T>(
   key: K,
-  value: string | undefined = '',
+  value: string | number | undefined = '',
   tokens: T[] | undefined | null,
 ): T | undefined {
-  const valueUppercase = value.toUpperCase()
   return (tokens || []).find((token: T): boolean => {
     const tokenKeyValue = token[key]
     if (tokenKeyValue) {
-      return tokenKeyValue?.['toString']().toUpperCase() === valueUppercase
+      switch (typeof tokenKeyValue) {
+        case 'string':
+          return tokenKeyValue?.['toString']().toUpperCase() === (value as string).toUpperCase()
+        case 'number':
+          return tokenKeyValue === value
+        default:
+          return false
+      }
     } else {
       return false
     }
