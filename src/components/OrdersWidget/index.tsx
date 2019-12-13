@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
@@ -184,6 +184,12 @@ const OrdersWidget: React.FC = () => {
     [tokens],
   )
 
+  const overBalanceOrders = useMemo(
+    () =>
+      new Set<string>(orders.filter(order => order.remainingAmount.gt(order.sellTokenBalance)).map(order => order.id)),
+    [orders],
+  )
+
   return (
     <OrdersWrapper>
       <div>
@@ -213,10 +219,12 @@ const OrdersWidget: React.FC = () => {
             <div>
               You have <Highlight>{orders.length}</Highlight> standing orders
             </div>
-            <div className="warning">
-              <FontAwesomeIcon icon={faExclamationTriangle} />
-              <strong> Low balance</strong>
-            </div>
+            {overBalanceOrders.size > 0 && (
+              <div className="warning">
+                <FontAwesomeIcon icon={faExclamationTriangle} />
+                <strong> Low balance</strong>
+              </div>
+            )}
           </div>
           <form action="submit">
             <div className="ordersContainer">
@@ -241,6 +249,7 @@ const OrdersWidget: React.FC = () => {
                   sellToken={getTokenById(order.sellTokenId)}
                   buyToken={getTokenById(order.buyTokenId)}
                   order={order}
+                  isOverBalance={overBalanceOrders.has(order.id)}
                 />
               ))}
             </div>

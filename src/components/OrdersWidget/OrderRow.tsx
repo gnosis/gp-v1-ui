@@ -113,16 +113,15 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmou
   </div>
 )
 
-interface AvailableAmountProps extends Pick<Props, 'sellToken'> {
+interface AvailableAmountProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
   availableAmount: string
-  overBalance: boolean
 }
 
-const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, overBalance }) => (
+const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, isOverBalance }) => (
   <div className="container sub-columns three-columns">
     <div>{availableAmount}</div>
     <strong>{safeTokenName(sellToken)}</strong>
-    <div className="warning">{overBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+    <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
   </div>
 )
 
@@ -139,6 +138,7 @@ interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
   order: AuctionElement
+  isOverBalance: boolean
   pending?: boolean
 }
 
@@ -172,10 +172,6 @@ const OrderRow: React.FC<Props> = props => {
     sellToken.decimals,
   ])
   const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
-  const overBalance = useMemo(() => order.remainingAmount.gt(order.sellTokenBalance), [
-    order.remainingAmount,
-    order.sellTokenBalance,
-  ])
   const unlimitedTime = useMemo(
     () =>
       dateFromBatchId(order.validUntil).getTime() >=
@@ -192,7 +188,7 @@ const OrderRow: React.FC<Props> = props => {
       </div>
       <OrderDetails {...props} price={price} />
       <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
-      <AvailableAmount {...props} availableAmount={availableAmount} overBalance={overBalance} />
+      <AvailableAmount {...props} availableAmount={availableAmount} />
       <Expires {...props} unlimitedTime={unlimitedTime} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )

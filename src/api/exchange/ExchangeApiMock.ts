@@ -1,3 +1,5 @@
+import BN from 'bn.js'
+
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
@@ -46,7 +48,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return this.orders[userAddress].map((order, index) => ({
       ...order,
       user: userAddress,
-      sellTokenBalance: ONE,
+      sellTokenBalance: new BN('1500000000000000000000').add(ONE),
       id: index.toString(),
     }))
   }
