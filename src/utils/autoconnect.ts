@@ -1,9 +1,9 @@
 import Web3Connect from 'web3connect'
 import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-ui'
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import { WalletApi } from 'types'
 import { delay } from 'utils'
-import { INFURA_ID } from 'const'
+import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
+import { walletApi } from 'api'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
   const provider = new WalletConnectProvider({
@@ -27,7 +27,7 @@ const getWCIfConnected = async (): Promise<WCProvider | null> => {
 }
 
 export const getLastProvider = (): Promise<Provider | null> => {
-  const lastProviderName = localStorage.getItem('lastProvider')
+  const lastProviderName = localStorage.getItem(STORAGE_KEY_LAST_PROVIDER)
   console.log('lastProvider', lastProviderName)
 
   try {
@@ -53,12 +53,12 @@ export const getLastProvider = (): Promise<Provider | null> => {
   return Promise.resolve(null)
 }
 
-export const setupAutoconnect = async (walletApi: WalletApi): Promise<boolean> => {
+export const setupAutoconnect = async (): Promise<boolean> => {
   window.addEventListener('beforeunload', e => {
     e.preventDefault()
     const { name } = walletApi.getProviderInfo()
     console.log('LAST PROVIDER NAME', name)
-    localStorage.setItem('lastProvider', name)
+    localStorage.setItem(STORAGE_KEY_LAST_PROVIDER, name)
   })
 
   const provider = await getLastProvider()
