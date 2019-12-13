@@ -7,7 +7,7 @@ import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
-import Widget from 'components/layout/Widget'
+import Widget from 'components/Layout/Widget'
 
 import useForm, { FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'

@@ -12,7 +12,7 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.min.css'
 
 // Main layout
-import Layout from 'components/layout/'
+import Layout from 'components/Layout'
 
 // Pages
 import About from 'pages/About'

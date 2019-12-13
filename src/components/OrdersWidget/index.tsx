@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
 
-import Widget from 'components/layout/Widget'
+import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
 import { tokenListApi } from 'api'
 import { TokenDetails } from 'types'
