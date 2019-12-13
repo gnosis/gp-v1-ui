@@ -66,6 +66,7 @@
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.0.0",
     "combine-reducers": "^1.0.0",
+    "date-fns": "^2.8.1",
     "modali": "^1.2.0",
     "polished": "^3.4.1",
     "qrcode.react": "^1.0.0",

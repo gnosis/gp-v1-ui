@@ -8,8 +8,8 @@ import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { TokenDetails, AuctionElement } from 'types'
-import { safeTokenName, formatAmount, dateFromBatchId, addTimeToDate, formatAmountFull } from 'utils'
-import { MIN_UNLIMITED_SELL_ORDER, MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME } from 'const'
+import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
+import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 
 const OrderRowWrapper = styled.div`
   .container {
@@ -126,12 +126,12 @@ const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableA
 )
 
 interface ExpiresProps extends Pick<Props, 'pending'> {
-  unlimitedTime: boolean
+  isNeverExpires: boolean
   expiresOn: string
 }
 
-const Expires: React.FC<ExpiresProps> = ({ pending, unlimitedTime, expiresOn }) => (
-  <div>{unlimitedTime ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+const Expires: React.FC<ExpiresProps> = ({ pending, isNeverExpires, expiresOn }) => (
+  <div>{isNeverExpires ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
 )
 
 interface Props {
@@ -172,13 +172,12 @@ const OrderRow: React.FC<Props> = props => {
     sellToken.decimals,
   ])
   const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
-  const unlimitedTime = useMemo(
-    () =>
-      dateFromBatchId(order.validUntil).getTime() >=
-      addTimeToDate(new Date(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME, 'minute').getTime(),
-    [order.validUntil],
-  )
-  const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
+
+  const { isNeverExpires, expiresOn } = useMemo(() => {
+    const isNeverExpires = isBatchIdFarInTheFuture(order.validUntil)
+    const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
+    return { isNeverExpires, expiresOn }
+  }, [order.validUntil])
 
   return (
     <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
@@ -189,7 +188,7 @@ const OrderRow: React.FC<Props> = props => {
       <OrderDetails {...props} price={price} />
       <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
       <AvailableAmount {...props} availableAmount={availableAmount} />
-      <Expires {...props} unlimitedTime={unlimitedTime} expiresOn={expiresOn} />
+      <Expires {...props} isNeverExpires={isNeverExpires} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )
 }
