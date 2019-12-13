@@ -16,7 +16,7 @@ const GlobalStyles = createGlobalStyle`
     
     line-height: 1.5;
     
-    background-color: #f7f7f7;
+    background-color: var(--color-background);
     color: var(--color-text-primary);
     box-sizing: border-box;
   }

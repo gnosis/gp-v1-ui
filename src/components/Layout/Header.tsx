@@ -8,7 +8,6 @@ import LinkWithPastLocation from 'components/LinkWithPastLocation'
 
 const Wrapper = styled.header`
   color: #ffffff;
-  background-color: #3340a9;
   padding-bottom: 5rem;
 
   @media only screen and (max-width: 866px) {
@@ -151,26 +150,12 @@ const Header: React.FC = () => {
         <Wallet />
       </nav>
       <div className="header-title">
-        <h1>
-          <em>𝚏</em>𝓊𝗌𝓮
-        </h1>
-
         <Switch>
-          <Route path="/trade">
-            <h2>Trading</h2>
-          </Route>
-          <Route path="/strategies">
-            <h2>Set up standing orders</h2>
-          </Route>
-          <Route path="/wallet">
-            <h2>Your funds, Deposit, Withdraw</h2>
-          </Route>
-          <Route path="/orders">
-            <h2>Your orders</h2>
-          </Route>
-          <Route path="/connect-wallet">
-            <h2>Connect wallet</h2>
-          </Route>
+          <Route path="/trade" />
+          <Route path="/strategies" />
+          <Route path="/wallet" />
+          <Route path="/orders" />
+          <Route path="/connect-wallet" />
         </Switch>
       </div>
     </Wrapper>
