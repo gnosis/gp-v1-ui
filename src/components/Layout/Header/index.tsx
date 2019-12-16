@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
 import { NavigationLinks, NavLinksWrapper } from './Navigation'
 
-import useWindowSizes from 'hooks/useWindowSizes'
-import useNavigation from './useNavigation'
+import { useNavigation, useOpenCloseNav } from './hooks'
 
 import { APP_NAME } from 'const'
 
@@ -126,11 +125,7 @@ export interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps) => {
-  const [openNav, setOpenNav] = useState(false)
-
-  const { innerWidth } = useWindowSizes()
-  const isResponsive = !!(innerWidth && innerWidth < 720)
-
+  const { isResponsive, openNav, setOpenNav } = useOpenCloseNav()
   const { navigationArray, handleLinkSelect } = useNavigation(initialState, isResponsive)
 
   const handleOpenNav = (): void | false => isResponsive && setOpenNav(!openNav)
