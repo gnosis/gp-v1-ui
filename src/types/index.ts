@@ -1,4 +1,6 @@
 import BN from 'bn.js'
+import Web3Connect from 'web3connect'
+import { Provider } from '@gnosis.pm/dapp-ui'
 
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
@@ -196,15 +198,18 @@ export interface WalletInfo {
   networkId?: number
 }
 
+export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
+
 export interface WalletApi {
   isConnected(): boolean
-  connect(): Promise<boolean>
+  connect(givenProvider?: Provider): Promise<boolean>
   disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
+  getProviderInfo(): ProviderInfo
 }
 
 /**

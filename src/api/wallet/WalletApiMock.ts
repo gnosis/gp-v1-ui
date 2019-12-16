@@ -1,4 +1,4 @@
-import { WalletApi, Network, WalletInfo, Command } from 'types'
+import { WalletApi, Network, WalletInfo, Command, ProviderInfo } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 
@@ -76,6 +76,16 @@ export class WalletApiMock implements WalletApi {
 
   public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
     this._listeners = this._listeners.filter(c => c !== callback)
+  }
+
+  public getProviderInfo(): ProviderInfo {
+    return {
+      name: 'MockProvider',
+      type: 'mock',
+      logo: '',
+      check: '',
+      styled: {},
+    }
   }
 
   /* ****************      Test functions      **************** */

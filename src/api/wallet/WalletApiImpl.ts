@@ -1,4 +1,4 @@
-import { WalletApi, Network, WalletInfo, Command } from 'types'
+import { WalletApi, Network, WalletInfo, Command, ProviderInfo } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { getDefaultProvider } from '../'
@@ -6,6 +6,7 @@ import { getDefaultProvider } from '../'
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
 
+import Web3Connect from 'web3connect'
 WalletConnectProvider.prototype.getWalletConnector = function(): Promise<WalletConnector> {
   return new Promise((resolve, reject) => {
     const wc = this.wc
@@ -78,6 +79,7 @@ import {
 } from '@gnosis.pm/dapp-ui'
 
 import { log, toBN } from 'utils'
+import { INFURA_ID } from 'const'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -167,7 +169,7 @@ const wcOptions: WalletConnectInits = {
   package: WalletConnectProvider,
   options: {
     // TODO get infuraId from .env
-    infuraId: '8b4d9b4306294d2e92e0775ff1075066',
+    infuraId: INFURA_ID,
   },
 }
 
@@ -205,8 +207,8 @@ export class WalletApiImpl implements WalletApi {
     return this._connected
   }
 
-  public async connect(): Promise<boolean> {
-    const provider = await getProvider(wcOptions)
+  public async connect(givenProvider?: Provider): Promise<boolean> {
+    const provider = givenProvider || (await getProvider(wcOptions))
 
     if (!provider) return false
 
@@ -294,6 +296,10 @@ export class WalletApiImpl implements WalletApi {
 
   public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
     this._listeners = this._listeners.filter(c => c !== callback)
+  }
+
+  public getProviderInfo(): ProviderInfo {
+    return Web3Connect.getProviderInfo(this._provider)
   }
 
   /* ****************      Private Functions      **************** */

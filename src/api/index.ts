@@ -93,6 +93,7 @@ function createTokenListApi(): TokenList {
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
   process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
+
 const web3 = new Web3(getDefaultProvider())
 
 // Build APIs
