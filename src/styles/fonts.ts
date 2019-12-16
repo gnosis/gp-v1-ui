@@ -7,19 +7,19 @@ import AvertaExtraBold from '../assets/fonts/Averta-Extrabold.otf'
 const fontFace = css`
   @font-face {
     font-family: 'Averta';
-    src: url(${AvertaRegular});
+    src: url(${AvertaRegular}) format('opentype');
     font-weight: 500;
     font-style: normal;
   }
   @font-face {
     font-family: 'Averta';
-    src: url(${AvertaBold});
+    src: url(${AvertaBold}) format('opentype');
     font-weight: 700;
     font-style: normal;
   }
   @font-face {
     font-family: 'Averta';
-    src: url(${AvertaExtraBold});
+    src: url(${AvertaExtraBold}) format('opentype');
     font-weight: 900;
     font-style: normal;
   }
