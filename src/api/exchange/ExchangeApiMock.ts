@@ -1,3 +1,5 @@
+import BN from 'bn.js'
+
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
@@ -11,8 +13,8 @@ export interface OrdersByUser {
 }
 
 interface ConstructorParams {
-  balanceStates: BalancesByUserAndToken
   erc20Api: Erc20Api
+  balanceStates?: BalancesByUserAndToken
   registeredTokens?: string[]
   ordersByUser?: OrdersByUser
   maxTokens?: number
@@ -28,7 +30,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   private orders: OrdersByUser
 
   public constructor(params: ConstructorParams) {
-    const { balanceStates, erc20Api, registeredTokens = [], ordersByUser = {}, maxTokens = 10000 } = params
+    const { erc20Api, balanceStates = {}, registeredTokens = [], ordersByUser = {}, maxTokens = 10000 } = params
 
     super(balanceStates, erc20Api)
 
@@ -43,7 +45,12 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
 
   public async getOrders(userAddress: string): Promise<AuctionElement[]> {
     this._initOrders(userAddress)
-    return this.orders[userAddress].map(order => ({ ...order, user: userAddress, sellTokenBalance: ONE }))
+    return this.orders[userAddress].map((order, index) => ({
+      ...order,
+      user: userAddress,
+      sellTokenBalance: new BN('1500000000000000000000').add(ONE),
+      id: index.toString(),
+    }))
   }
 
   public async getNumTokens(): Promise<number> {

@@ -1,3 +1,5 @@
+import BN from 'bn.js'
+
 import ExchangeApiMock from 'api/exchange/ExchangeApiMock'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { ZERO, ONE, FEE_DENOMINATOR } from 'const'
@@ -123,7 +125,7 @@ describe('addToken', () => {
 
 describe('placeOrder', () => {
   const expected = {
-    sellTokenBalance: ONE,
+    sellTokenBalance: new BN('1500000000000000000000').add(ONE),
     buyTokenId: 1,
     sellTokenId: 2,
     validFrom: BATCH_ID,
@@ -147,7 +149,7 @@ describe('placeOrder', () => {
     const response = await instance.placeOrder(params)
     expect(response).toBe(RECEIPT)
     const actual = (await instance.getOrders(USER_1)).pop()
-    expect(actual).toEqual({ ...expected, user: USER_1 })
+    expect(actual).toEqual({ ...expected, user: USER_1, id: '1' })
   })
 
   test('place first order', async () => {
@@ -157,7 +159,7 @@ describe('placeOrder', () => {
     const response = await instance.placeOrder(params)
     expect(response).toBe(RECEIPT)
     const actual = (await instance.getOrders(USER_2)).pop()
-    expect(actual).toEqual({ ...expected, user: USER_2 })
+    expect(actual).toEqual({ ...expected, user: USER_2, id: '0' })
   })
 })
 describe('cancelOrder', () => {

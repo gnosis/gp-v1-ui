@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useLocation } from 'react-router'
-import { Link, LinkProps } from 'react-router-dom'
+import { LinkProps, NavLink } from 'react-router-dom'
 import { Location, LocationDescriptorObject } from 'history'
 
 // LinkProps.to can be a string, a Location object or a function returning the first two
@@ -39,7 +39,7 @@ export const usePastLocation = (to: LocationTo): LocationTo => {
 const LinkWithPastLocation: React.FC<LinkProps> = props => {
   const to = usePastLocation(props.to)
 
-  return <Link {...props} to={to} />
+  return <NavLink {...props} to={to} />
 }
 
 export default LinkWithPastLocation

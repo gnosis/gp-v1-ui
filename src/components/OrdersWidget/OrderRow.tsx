@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useMemo } from 'react'
+import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -6,8 +7,9 @@ import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-ic
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
-import { TokenDetails } from 'types'
-import { safeTokenName } from 'utils'
+import { TokenDetails, AuctionElement } from 'types'
+import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
+import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 
 const OrderRowWrapper = styled.div`
   .container {
@@ -65,102 +67,128 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
-const OrderDetails: React.FC<Pick<Props, 'price' | 'buyToken' | 'sellToken' | 'pending'>> = ({
-  price,
-  buyToken,
-  sellToken,
-  pending,
-}) => {
-  return (
-    <div className="container order-details">
-      <div>Sell</div>
-      <div>
-        <Highlight color={pending ? 'grey' : ''}>1</Highlight>
-      </div>
-      <div>
-        <strong>{safeTokenName(sellToken)}</strong>
-      </div>
-
-      <div>
-        for <strong>at least</strong>
-      </div>
-      <div>
-        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
-      </div>
-      <div>
-        <strong>{safeTokenName(buyToken)}</strong>
-      </div>
-    </div>
-  )
+interface OrderDetailsProps extends Pick<Props, 'buyToken' | 'sellToken' | 'pending'> {
+  price: string
 }
 
-const UnfilledAmount: React.FC<Pick<Props, 'sellToken' | 'unfilledAmount' | 'unlimited' | 'pending'>> = ({
-  sellToken,
-  unfilledAmount,
-  unlimited,
-  pending,
-}) => {
-  return (
-    <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
-      {unlimited ? (
-        <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
-      ) : (
-        <>
-          <div>{unfilledAmount}</div>
-          <div>
-            <strong>{safeTokenName(sellToken)}</strong>
-          </div>
-        </>
-      )}
+const OrderDetails: React.FC<OrderDetailsProps> = ({ price, buyToken, sellToken, pending }) => (
+  <div className="container order-details">
+    <div>Sell</div>
+    <div>
+      <Highlight color={pending ? 'grey' : ''}>1</Highlight>
     </div>
-  )
-}
-
-const AvailableAmount: React.FC<Pick<Props, 'sellToken' | 'availableAmount' | 'overBalance'>> = ({
-  sellToken,
-  availableAmount,
-  overBalance,
-}) => {
-  return (
-    <div className="container sub-columns three-columns">
-      <div>{availableAmount}</div>
+    <div>
       <strong>{safeTokenName(sellToken)}</strong>
-      {overBalance && (
-        <div className="warning">
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-        </div>
-      )}
     </div>
-  )
+
+    <div>
+      for <strong>at least</strong>
+    </div>
+    <div>
+      <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
+    </div>
+    <div>
+      <strong>{safeTokenName(buyToken)}</strong>
+    </div>
+  </div>
+)
+
+interface UnfilledAmountProps extends Pick<Props, 'sellToken' | 'pending'> {
+  unfilledAmount: string
+  unlimited: boolean
 }
 
-// TODO: temporary params, adjust when implementing real logic
-// probably just take an Order object?
+const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmount, unlimited, pending }) => (
+  <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
+    {unlimited ? (
+      <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+    ) : (
+      <>
+        <div>{unfilledAmount}</div>
+        <div>
+          <strong>{safeTokenName(sellToken)}</strong>
+        </div>
+      </>
+    )}
+  </div>
+)
+
+interface AccountBalanceProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
+  accountBalance: string
+}
+
+const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, accountBalance, isOverBalance }) => (
+  <div className="container sub-columns three-columns">
+    <div>{accountBalance}</div>
+    <strong>{safeTokenName(sellToken)}</strong>
+    <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+  </div>
+)
+
+interface ExpiresProps extends Pick<Props, 'pending'> {
+  isNeverExpires: boolean
+  expiresOn: string
+}
+
+const Expires: React.FC<ExpiresProps> = ({ pending, isNeverExpires, expiresOn }) => (
+  <div>{isNeverExpires ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+)
+
 interface Props {
-  id: string
   sellToken: TokenDetails
   buyToken: TokenDetails
-  price: string
-  unfilledAmount?: string
-  availableAmount: string
-  expiresOn?: string
-  overBalance?: boolean
-  unlimited?: boolean
+  order: AuctionElement
+  isOverBalance: boolean
   pending?: boolean
 }
 
+function calculatePrice(_numerator?: string | null, _denominator?: string | null): string {
+  if (!_numerator || !_denominator) {
+    return 'N/A'
+  }
+  const numerator = new BigNumber(_numerator)
+  const denominator = new BigNumber(_denominator)
+  const price = numerator.dividedBy(denominator)
+  return price.toFixed(2)
+}
+
 const OrderRow: React.FC<Props> = props => {
-  const { id, expiresOn, unlimited, pending = false } = props
+  const { buyToken, sellToken, order, pending = false } = props
+
+  const price = useMemo(
+    () =>
+      calculatePrice(
+        formatAmountFull(order.priceNumerator, buyToken.decimals, false),
+        formatAmountFull(order.priceDenominator, sellToken.decimals, false),
+      ),
+    [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals],
+  )
+  const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
+    order.remainingAmount,
+    sellToken.decimals,
+  ])
+  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
+    order.sellTokenBalance,
+    sellToken.decimals,
+  ])
+  const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
+
+  const { isNeverExpires, expiresOn } = useMemo(() => {
+    const isNeverExpires = isBatchIdFarInTheFuture(order.validUntil)
+    const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
+    return { isNeverExpires, expiresOn }
+  }, [order.validUntil])
+
   return (
-    <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')} data-id={id}>
+    <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
       <PendingLink {...props} />
       <div className="checked">
         <input type="checkbox" />
       </div>
-      <OrderDetails {...props} />
-      <UnfilledAmount {...props} />
-      <AvailableAmount {...props} />
-      <div className="cell">{unlimited ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+      <OrderDetails {...props} price={price} />
+      <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
+      <AccountBalance {...props} accountBalance={accountBalance} />
+      <Expires {...props} isNeverExpires={isNeverExpires} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )
 }
