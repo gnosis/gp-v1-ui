@@ -8,8 +8,8 @@ import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { TokenDetails, AuctionElement } from 'types'
-import { safeTokenName, formatAmount, dateFromBatchId, addTimeToDate, formatAmountFull } from 'utils'
-import { MIN_UNLIMITED_SELL_ORDER, MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME } from 'const'
+import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
+import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 
 const OrderRowWrapper = styled.div`
   .container {
@@ -113,32 +113,32 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmou
   </div>
 )
 
-interface AvailableAmountProps extends Pick<Props, 'sellToken'> {
-  availableAmount: string
-  overBalance: boolean
+interface AccountBalanceProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
+  accountBalance: string
 }
 
-const AvailableAmount: React.FC<AvailableAmountProps> = ({ sellToken, availableAmount, overBalance }) => (
+const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, accountBalance, isOverBalance }) => (
   <div className="container sub-columns three-columns">
-    <div>{availableAmount}</div>
+    <div>{accountBalance}</div>
     <strong>{safeTokenName(sellToken)}</strong>
-    <div className="warning">{overBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+    <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
   </div>
 )
 
 interface ExpiresProps extends Pick<Props, 'pending'> {
-  unlimitedTime: boolean
+  isNeverExpires: boolean
   expiresOn: string
 }
 
-const Expires: React.FC<ExpiresProps> = ({ pending, unlimitedTime, expiresOn }) => (
-  <div>{unlimitedTime ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+const Expires: React.FC<ExpiresProps> = ({ pending, isNeverExpires, expiresOn }) => (
+  <div>{isNeverExpires ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
 )
 
 interface Props {
   sellToken: TokenDetails
   buyToken: TokenDetails
   order: AuctionElement
+  isOverBalance: boolean
   pending?: boolean
 }
 
@@ -167,22 +167,17 @@ const OrderRow: React.FC<Props> = props => {
     order.remainingAmount,
     sellToken.decimals,
   ])
-  const availableAmount = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
+  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
     order.sellTokenBalance,
     sellToken.decimals,
   ])
   const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
-  const overBalance = useMemo(() => order.remainingAmount.gt(order.sellTokenBalance), [
-    order.remainingAmount,
-    order.sellTokenBalance,
-  ])
-  const unlimitedTime = useMemo(
-    () =>
-      dateFromBatchId(order.validUntil).getTime() >=
-      addTimeToDate(new Date(), MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME, 'minute').getTime(),
-    [order.validUntil],
-  )
-  const expiresOn = order.validUntil.toLocaleString() // TODO: make it nice like, 3 min, 1 day, etc
+
+  const { isNeverExpires, expiresOn } = useMemo(() => {
+    const isNeverExpires = isBatchIdFarInTheFuture(order.validUntil)
+    const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
+    return { isNeverExpires, expiresOn }
+  }, [order.validUntil])
 
   return (
     <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
@@ -192,8 +187,8 @@ const OrderRow: React.FC<Props> = props => {
       </div>
       <OrderDetails {...props} price={price} />
       <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
-      <AvailableAmount {...props} availableAmount={availableAmount} overBalance={overBalance} />
-      <Expires {...props} unlimitedTime={unlimitedTime} expiresOn={expiresOn} />
+      <AccountBalance {...props} accountBalance={accountBalance} />
+      <Expires {...props} isNeverExpires={isNeverExpires} expiresOn={expiresOn} />
     </OrderRowWrapper>
   )
 }
