@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-rows: 50px 0.4fr auto;
+  grid-template-rows: 50px 0.2fr auto;
 
   main {
     flex: 1;
@@ -45,6 +45,13 @@ const Layout: React.FC = ({ children }) => (
           order: 3,
           withPastLocation: true,
         },
+        // Place holder
+        // Strategies: {
+        //   label: 'Strategies',
+        //   to: '/strategies',
+        //   order: 4,
+        //   withPastLocation: true,
+        // },
       }}
     />
     <main>{children}</main>
