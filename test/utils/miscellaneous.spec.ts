@@ -36,7 +36,7 @@ describe('getToken', () => {
   describe('string case', () => {
     it('ignores `value` case', () => {
       const expected = tokenList[0]
-      const lowerCaseSymbol = expected.symbol.toLowerCase()
+      const lowerCaseSymbol = expected.symbol?.toLowerCase()
       const actual = getToken('symbol', lowerCaseSymbol, tokenList)
       expect(actual).not.toBeUndefined()
       expect(actual).toBe(expected)
@@ -44,7 +44,7 @@ describe('getToken', () => {
 
     it("it's case insensitive", () => {
       const expected = tokenList[0]
-      const actual = getToken('symbol', expected.symbol.toLowerCase(), tokenList)
+      const actual = getToken('symbol', expected.symbol?.toLowerCase(), tokenList)
       expect(actual).not.toBeUndefined()
       expect(actual).toBe(expected)
     })
