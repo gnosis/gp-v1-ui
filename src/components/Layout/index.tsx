@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-rows: 50px auto;
+  grid-template-rows: 50px 0.4fr auto;
 
   main {
     flex: 1;
@@ -26,7 +26,27 @@ const Wrapper = styled.div`
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
-    <Header />
+    <Header
+      navigation={{
+        Trade: {
+          label: 'Trade',
+          to: '/trade',
+          order: 1,
+        },
+        Wallet: {
+          label: 'Wallet',
+          to: '/wallet',
+          order: 2,
+          withPastLocation: true,
+        },
+        Orders: {
+          label: 'Orders',
+          to: '/orders',
+          order: 3,
+          withPastLocation: true,
+        },
+      }}
+    />
     <main>{children}</main>
     <Footer />
   </Wrapper>
