@@ -60,7 +60,6 @@ module.exports = ({ stats = false } = {}) => ({
           loader: 'file-loader',
           options: {
             name: '[name].[ext]',
-            mimetype: 'application/font-otf',
           },
         },
       },

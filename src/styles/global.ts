@@ -86,9 +86,8 @@ const GlobalStyles = createGlobalStyle`
       }
     }
     &.danger {
-      border-color: #ff62a2;;
-      color: #ff62a2;;
-
+      border-color: #ff5097;
+      color: #ff5097;
       :hover {
         border-color: #ea005f;
         color: #ea005f;
