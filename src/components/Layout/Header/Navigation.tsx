@@ -19,7 +19,6 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
 
   a {
     color: var(--color-text-secondary);
-    font-size: 3.2rem;
     font-weight: 1000;
     padding: 0.35em;
     text-decoration: none;
@@ -45,13 +44,16 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     background: #fff;
     border-radius: 10px;
     cursor: pointer;
-    height: ${$open ? 'auto' : '95px'}
+    height: ${$open ? 'auto' : '63px'}
     overflow: hidden;
+    padding: 0;
   `}
 `
 
-const OrderedNavLinkDiv = styled.div<{ $order: number }>`
+const OrderedNavLinkDiv = styled.h3<{ $order: number }>`
   order: ${({ $order }): number => $order};
+  display: flex;
+  align-items: center;
 `
 
 export interface HeaderNavLinksInterface {
@@ -84,7 +86,7 @@ const HeaderNavLink: React.FC<HeaderNavLinksInterface & {
     {responsive && order === 0 && (
       <FontAwesomeIcon
         icon={showLinkSelector ? faChevronCircleUp : faChevronCircleDown}
-        style={{ cursor: 'pointer', marginLeft: 10, verticalAlign: 'super' }}
+        style={{ cursor: 'pointer', marginLeft: 10, width: '0.5em' }}
       />
     )}
   </OrderedNavLinkDiv>

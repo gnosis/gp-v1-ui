@@ -22,14 +22,16 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
-import WalletImg from 'assets/img/unknown-token.png'
+// TODO: probably not do this
+import { ETHER_PNG } from 'const'
+// import WalletImg from 'assets/img/unknown-token.png'
 
 export const WalletWrapper = styled.div<{ $walletOpen: boolean }>`
   position: relative;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-  margin: 1rem auto;
+  margin: 1rem;
   padding: 6px 13px;
 
   background: ghostwhite;
@@ -60,8 +62,7 @@ const WalletToggler = styled(WalletItem)`
   cursor: pointer;
   padding: 6px;
 `
-const EtherImage = styled.img<{ src: string }>`
-  src: ${(props): string => props.src};
+const EtherImage = styled.img`
   max-width: 10%;
 `
 
@@ -85,7 +86,7 @@ const WalletSlideWrapper = styled.div`
 
 const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
   color: ${({ color = '#000' }): string => color};
-  font-size: ${({ $fontSize = '1.3rem' }): string => $fontSize};
+  font-size: ${({ $fontSize = '1.15rem' }): string => $fontSize};
   font-weight: 800;
 `
 
@@ -199,12 +200,9 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
           </WalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
-            <EtherImage src={WalletImg} />
+            <EtherImage src={ETHER_PNG} />
             <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
-            <FontAwesomeIcon
-              icon={showWallet ? faChevronCircleUp : faChevronCircleDown}
-              style={{ cursor: 'pointer' }}
-            />
+            <FontAwesomeIcon icon={showWallet ? faChevronCircleUp : faChevronCircleDown} size="xs" />
           </WalletToggler>
         </>
       ) : (

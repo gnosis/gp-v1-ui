@@ -10,27 +10,27 @@ import { useNavigation, useOpenCloseNav } from './hooks'
 import { APP_NAME } from 'const'
 
 const HeaderWrapper = styled.header`
-  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.2rem;
 
   nav {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-
-    @media only screen and (max-width: 866px) {
-      justify-content: center;
-    }
+    width: 92%;
   }
 
   .logo,
   ${WalletWrapper} {
-    flex: 0.2 1 16rem;
+    flex: 0 1 16rem;
   }
 
   .logo {
     order: 1;
 
-    font-size: 2.8rem;
+    font-size: 1.8rem;
     text-align: center;
     text-decoration: none;
     vertical-align: middle;
@@ -46,7 +46,8 @@ const HeaderWrapper = styled.header`
 
   ${NavLinksWrapper} {
     order: 2;
-    flex: 1 1 50%;
+    flex: 0 1 45%;
+    margin: auto;
   }
 
   ${WalletWrapper} {
@@ -64,21 +65,9 @@ const HeaderWrapper = styled.header`
     }
   }
 
-  h1 {
-    margin-bottom: 0;
-    color: #e0e1e2;
-    font-size: 3em;
-
-    em {
-      font-size: 1.2em;
-      color: #ff62a2;
-    }
-  }
-  h2 {
-    margin-top: 1em;
-    text-transform: uppercase;
-    color: white;
-    font-size: 0.8em;
+  h3 {
+    font-size: 2.2rem;
+    margin: 0;
   }
 
   @media only screen and (max-width: 1024px) {
@@ -91,11 +80,12 @@ const HeaderWrapper = styled.header`
     nav {
       flex-flow: row wrap;
     }
+    ${WalletWrapper} {
+      margin: 1rem auto;
+    }
   }
 
   @media only screen and (max-width: 720px) {
-    padding-bottom: 1rem;
-
     .logo,
     .nav-links,
     ${WalletWrapper} {
