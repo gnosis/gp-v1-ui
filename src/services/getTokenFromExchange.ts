@@ -14,7 +14,7 @@ async function getTokenFromErc20({
   erc20Api,
 }: TokenFromErc20Params): Promise<TokenDetails | null> {
   // Get base info from the ERC20 contract
-  const erc20Info = await getErc20Info({ address: tokenAddress, erc20Api })
+  const erc20Info = await getErc20Info({ tokenAddress, erc20Api })
   if (!erc20Info) {
     log('Could not get details for token token (%s)', tokenAddress)
     return null
@@ -23,7 +23,6 @@ async function getTokenFromErc20({
   const token = {
     ...erc20Info,
     id: tokenId,
-    address: tokenAddress,
     image: getImageUrl(tokenAddress),
   }
 

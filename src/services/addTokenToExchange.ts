@@ -17,7 +17,7 @@ export function addTokenToExchangeFactory({
   erc20Api,
 }: Params): (tokenAddress: string) => Promise<boolean> {
   return async (tokenAddress: string): Promise<boolean> => {
-    const erc20Info = getErc20Info({ address: tokenAddress, erc20Api })
+    const erc20Info = getErc20Info({ tokenAddress, erc20Api })
 
     if (!erc20Info) {
       // TODO: I'm forbidding, but should it be allowed to use tokens without decimals for example?
@@ -37,7 +37,6 @@ export function addTokenToExchangeFactory({
 
       const token = {
         ...erc20Info,
-        address: tokenAddress,
         id,
         image: getImageUrl(tokenAddress),
       }
