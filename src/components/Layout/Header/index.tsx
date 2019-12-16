@@ -129,11 +129,11 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
   const [openNav, setOpenNav] = useState(false)
 
   const { innerWidth } = useWindowSizes()
-  const isReponsive = !!(innerWidth && innerWidth < 720)
+  const isResponsive = !!(innerWidth && innerWidth < 720)
 
-  const { navigationArray, handleLinkSelect } = useNavigation(initialState, isReponsive)
+  const { navigationArray, handleLinkSelect } = useNavigation(initialState, isResponsive)
 
-  const handleOpenNav = (): void => setOpenNav(!openNav)
+  const handleOpenNav = (): void | false => isResponsive && setOpenNav(!openNav)
 
   return (
     <HeaderWrapper>
@@ -145,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
         {/* HEADER LINKS */}
         <NavigationLinks
           navigation={navigationArray}
-          responsive={!!(innerWidth && innerWidth < 720)}
+          responsive={isResponsive}
           handleLinkSelect={handleLinkSelect}
           handleOpenNav={handleOpenNav}
           showNav={openNav}
