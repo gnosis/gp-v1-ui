@@ -1,5 +1,7 @@
 import BN from 'bn.js'
 
+export const APP_NAME = 'fuse'
+
 // Some convenient numeric constant
 export const ZERO = new BN(0)
 export const ONE = new BN(1)
