@@ -29,45 +29,40 @@ export const WalletWrapper = styled.div<{ $walletOpen: boolean }>`
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-  margin: 1rem;
+  margin: 1rem auto;
+  padding: 6px 13px;
 
   background: ghostwhite;
   border-radius: ${({ $walletOpen }): string => ($walletOpen ? '10px 10px 0 0' : '10px')};
 
+  line-height: 1;
   text-align: center;
 `
 
-const WalletItem = styled.div`
+const WalletItem = styled.div<{ $padding?: string; $wordWrap?: string }>`
   color: #000;
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   align-items: center;
-  justify-content: space-evenly;
-  margin: 0.3rem auto;
-  padding: 1rem;
+  justify-content: center;
+  margin: auto;
+  padding: ${({ $padding = '1rem 0.2rem' }): string => $padding};
   width: 92%;
-`
 
-const ThinWalletItem = styled(WalletItem)`
-  margin: 5px auto;
-  padding: 2px 0;
+  white-space: ${({ $wordWrap = 'initial' }): string => $wordWrap};
+
+  > * {
+    margin: 0 6px;
+  }
 `
 
 const WalletToggler = styled(WalletItem)`
   cursor: pointer;
-  border-top: 1.6px solid #00000029;
   padding: 6px;
-
-  @media only screen and (max-width: 500px) {
-    border-top: 0.75px solid #00000029;
-  }
 `
 const EtherImage = styled.img<{ src: string }>`
   src: ${(props): string => props.src};
-  max-width: 15%;
-  @media only screen and (max-width: 500px) {
-    max-width: 10%;
-  }
+  max-width: 10%;
 `
 
 const CopyDiv = styled.div`
@@ -83,8 +78,9 @@ const WalletSlideWrapper = styled.div`
   width: 100%;
   top: 100%;
   left: 0;
-  box-shadow: 5px 19px 16px #00000033;
+  box-shadow: var(--box-shadow);
   border-radius: 0 0 10px 10px;
+  z-index: 2;
 `
 
 const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
@@ -177,10 +173,10 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     } else {
       onClick = connectWallet
       content = (
-        <>
+        <WalletItem $padding="0px" $wordWrap="nowrap">
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
-        </>
+        </WalletItem>
       )
     }
 
@@ -194,13 +190,13 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
   }
 
   return (
-    <WalletWrapper $walletOpen={!!showWallet}>
+    <WalletWrapper $walletOpen={!!(showWallet && userAddress)}>
       {userAddress ? (
         <>
           {/* Network */}
-          <ThinWalletItem>
+          <WalletItem $padding="6px">
             <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
-          </ThinWalletItem>
+          </WalletItem>
           {/* Wallet logo + address + chevron */}
           <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
             <EtherImage src={WalletImg} />
