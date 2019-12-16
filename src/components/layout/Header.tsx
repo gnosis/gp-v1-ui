@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
-import { useLocation, Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router'
 
 import Wallet, { WalletWrapper } from 'components/Wallet'
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
@@ -121,10 +121,6 @@ const Wrapper = styled.header`
 `
 
 const Header: React.FC = () => {
-  const location = useLocation()
-
-  const { from } = location.state || { from: { pathname: '/trade' } }
-
   return (
     <Wrapper>
       <nav>
@@ -133,7 +129,7 @@ const Header: React.FC = () => {
         </NavLink>
         <ul className="nav-links">
           <li>
-            <NavLink to={from}>Trade</NavLink>
+            <NavLink to="/trade">Trade</NavLink>
           </li>
           {/* 
             TODO: Placeholder for strategies
