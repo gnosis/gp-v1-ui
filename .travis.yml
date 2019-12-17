@@ -61,7 +61,8 @@ deploy:
 
   # add release_v*.zip file to tagged Releases on github
   - provider: releases
-    api_key: $GITHUB_GNOSIS_INFO_API_TOKEN
+    api_key:
+      secure: $GITHUB_GNOSIS_INFO_API_TOKEN
     file: release_$TRAVIS_TAG.zip
     skip_cleanup: true
     on:
