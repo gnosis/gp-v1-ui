@@ -94,7 +94,7 @@ function createTokenListApi(): TokenList {
 export const getDefaultProvider = (): string | null =>
   process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
 
-const web3 = new Web3(getDefaultProvider())
+export const web3 = new Web3(getDefaultProvider())
 
 // Build APIs
 export const walletApi: WalletApi = createWalletApi(web3)
