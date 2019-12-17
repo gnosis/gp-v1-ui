@@ -1,3 +1,5 @@
+import Web3 from 'web3'
+
 import { Erc20Api } from 'types'
 import { log } from 'utils'
 import { DEFAULT_DECIMALS } from 'const'
@@ -5,9 +7,9 @@ import { DEFAULT_DECIMALS } from 'const'
 /**
  * Wraps erc20 function and returns undefined in case of failure
  */
-async function wrapPromise<T>(_promise: Promise<T>): Promise<T | undefined> {
+async function wrapPromise<T>(promise: Promise<T>): Promise<T | undefined> {
   try {
-    return await _promise
+    return await promise
   } catch (e) {
     log('Failed to get ERC20 detail', e)
     return
@@ -17,6 +19,7 @@ async function wrapPromise<T>(_promise: Promise<T>): Promise<T | undefined> {
 interface Params {
   tokenAddress: string
   erc20Api: Erc20Api
+  web3: Web3
 }
 
 interface Erc20Info {
@@ -29,14 +32,25 @@ interface Erc20Info {
 /**
  * Fetches info for an arbitrary ERC20 token from given address
  */
-export async function getErc20Info({ tokenAddress, erc20Api }: Params): Promise<Erc20Info | null> {
-  try {
-    // TODO: find out whether there's a smart contract at given address and it complies with ERC20
-  } catch (e) {
-    log('Failed to fetch ERC20 details for address %s', tokenAddress, e)
+export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Promise<Erc20Info | null> {
+  // First check whether given address is a contract
+  const code = await web3.eth.getCode(tokenAddress)
+  if (code === '0x') {
+    log('Address %s does not contain a contract', tokenAddress)
     return null
   }
 
+  // Second, check whether it's ERC20 compliant
+  try {
+    // totalSupply is an ERC20 mandatory read only method.
+    // if the call succeeds, we assume it's compliant
+    await erc20Api.totalSupply({ tokenAddress })
+  } catch (e) {
+    log('Address %s is not ERC20 compliant', tokenAddress, e)
+    return null
+  }
+
+  // Query for optional details. Do not fail in case any is missing.
   const [symbol, name, decimals] = await Promise.all([
     wrapPromise(erc20Api.symbol({ tokenAddress })),
     wrapPromise(erc20Api.name({ tokenAddress })),

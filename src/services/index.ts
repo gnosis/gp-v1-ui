@@ -1,4 +1,4 @@
-import { tokenListApi, exchangeApi, erc20Api } from 'api'
+import { tokenListApi, exchangeApi, erc20Api, web3 } from 'api'
 
 import { getTokenFromExchangeByAddressFactory, getTokenFromExchangeByIdFactory } from './getTokenFromExchange'
 import { addTokenToExchangeFactory } from './addTokenToExchange'
@@ -7,6 +7,7 @@ const apis = {
   tokenListApi,
   exchangeApi,
   erc20Api,
+  web3,
 }
 
 export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory(apis)

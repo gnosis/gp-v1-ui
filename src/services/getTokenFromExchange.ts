@@ -1,3 +1,5 @@
+import Web3 from 'web3'
+
 import { Erc20Api, TokenDetails, TokenList, ExchangeApi } from 'types'
 import { getImageUrl, log, getToken } from 'utils'
 import { getErc20Info } from './getErc20Info'
@@ -6,15 +8,14 @@ interface TokenFromErc20Params {
   tokenAddress: string
   tokenId: number
   erc20Api: Erc20Api
+  web3: Web3
 }
 
-async function getTokenFromErc20({
-  tokenAddress,
-  tokenId,
-  erc20Api,
-}: TokenFromErc20Params): Promise<TokenDetails | null> {
+async function getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenDetails | null> {
+  const { tokenAddress, tokenId } = params
+
   // Get base info from the ERC20 contract
-  const erc20Info = await getErc20Info({ tokenAddress, erc20Api })
+  const erc20Info = await getErc20Info(params)
   if (!erc20Info) {
     log('Could not get details for token token (%s)', tokenAddress)
     return null
@@ -35,6 +36,7 @@ interface FactoryParams {
   tokenListApi: TokenList
   exchangeApi: ExchangeApi
   erc20Api: Erc20Api
+  web3: Web3
 }
 
 interface GetByAddressParams {
@@ -47,11 +49,11 @@ interface GetByAddressParams {
  * Takes as input API instances
  * Returns async function to fetch TokenDetails by address
  */
-function getTokenFromExchangeByAddressFactory({
-  tokenListApi,
-  exchangeApi,
-  erc20Api,
-}: FactoryParams): (params: GetByAddressParams) => Promise<TokenDetails | null> {
+function getTokenFromExchangeByAddressFactory(
+  factoryParams: FactoryParams,
+): (params: GetByAddressParams) => Promise<TokenDetails | null> {
+  const { tokenListApi, exchangeApi } = factoryParams
+
   return async ({ networkId, tokenAddress }: GetByAddressParams): Promise<TokenDetails | null> => {
     const tokens = tokenListApi.getTokens(networkId)
 
@@ -76,7 +78,7 @@ function getTokenFromExchangeByAddressFactory({
     }
 
     // Not there, get it from the ERC20 contract
-    return getTokenFromErc20({ tokenAddress, tokenId, erc20Api })
+    return getTokenFromErc20({ ...factoryParams, tokenAddress, tokenId })
   }
 }
 
@@ -90,11 +92,11 @@ interface GetByIdParams {
  * Takes as input API instances
  * Returns async function to fetch TokenDetails by id
  */
-function getTokenFromExchangeByIdFactory({
-  tokenListApi,
-  exchangeApi,
-  erc20Api,
-}: FactoryParams): (params: GetByIdParams) => Promise<TokenDetails | null> {
+function getTokenFromExchangeByIdFactory(
+  factoryParams: FactoryParams,
+): (params: GetByIdParams) => Promise<TokenDetails | null> {
+  const { tokenListApi, exchangeApi } = factoryParams
+
   return async ({ tokenId, networkId }: GetByIdParams): Promise<TokenDetails | null> => {
     const tokens = tokenListApi.getTokens(networkId)
 
@@ -121,7 +123,7 @@ function getTokenFromExchangeByIdFactory({
     }
 
     // Not there, get it from the ERC20 contract
-    return getTokenFromErc20({ tokenId, tokenAddress, erc20Api })
+    return getTokenFromErc20({ ...factoryParams, tokenId, tokenAddress })
   }
 }
 
