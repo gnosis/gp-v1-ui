@@ -4,14 +4,12 @@ import { useLocation } from 'react-router'
 import { HeaderProps } from 'components/Layout/Header'
 import { HeaderNavLinksInterface } from 'components/Layout/Header/Navigation'
 
-import useWindowSizes from 'hooks/useWindowSizes'
-
 interface UseNavigationProps {
   navigationArray: HeaderNavLinksInterface[]
   handleLinkSelect: (key: string) => void
 }
 
-export const useNavigation = (initialState: HeaderProps['navigation'], responsive: boolean): UseNavigationProps => {
+const useNavigation = (initialState: HeaderProps['navigation'], responsive: boolean): UseNavigationProps => {
   const [navObject, setNavObject] = useState(initialState)
   const location = useLocation()
 
@@ -56,20 +54,4 @@ export const useNavigation = (initialState: HeaderProps['navigation'], responsiv
   return { navigationArray, handleLinkSelect }
 }
 
-export const useOpenCloseNav = (): {
-  isResponsive: boolean
-  openNav: boolean
-  setOpenNav: (action: boolean) => void
-} => {
-  const [openNav, setOpenNav] = useState(false)
-
-  const { innerWidth } = useWindowSizes()
-  const isResponsive = !!(innerWidth && innerWidth < 720)
-  useMemo(() => {
-    if (openNav && !isResponsive) {
-      setOpenNav(false)
-    }
-  }, [isResponsive, openNav])
-
-  return { isResponsive, openNav, setOpenNav }
-}
+export default useNavigation

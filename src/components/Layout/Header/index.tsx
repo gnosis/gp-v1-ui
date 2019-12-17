@@ -5,7 +5,8 @@ import UserWallet from 'components/UserWallet'
 import { NavigationLinks } from './Navigation'
 import { HeaderWrapper } from './Header.styled'
 
-import { useNavigation, useOpenCloseNav } from './hooks'
+import useNavigation from './useNavigation'
+import useOpenCloseNav from './useOpenCloseNav'
 
 import { APP_NAME } from 'const'
 
