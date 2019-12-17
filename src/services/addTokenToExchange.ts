@@ -1,3 +1,5 @@
+import Web3 from 'web3'
+
 import { ExchangeApi, Erc20Api } from 'types'
 import { getErc20Info } from './getErc20Info'
 import { log, getImageUrl } from 'utils'
@@ -5,6 +7,7 @@ import { log, getImageUrl } from 'utils'
 interface Params {
   exchangeApi: ExchangeApi
   erc20Api: Erc20Api
+  web3: Web3
 }
 
 /**
@@ -12,12 +15,11 @@ interface Params {
  * Takes as input API instances
  * Returns async function to add tokenAddress to exchange
  */
-export function addTokenToExchangeFactory({
-  exchangeApi,
-  erc20Api,
-}: Params): (tokenAddress: string) => Promise<boolean> {
+export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress: string) => Promise<boolean> {
+  const { exchangeApi } = factoryParams
+
   return async (tokenAddress: string): Promise<boolean> => {
-    const erc20Info = getErc20Info({ tokenAddress, erc20Api })
+    const erc20Info = getErc20Info({ ...factoryParams, tokenAddress })
 
     if (!erc20Info) {
       // TODO: I'm forbidding, but should it be allowed to use tokens without decimals for example?
