@@ -13,12 +13,13 @@ before_install:
   - pip install awscli --upgrade --user
 before_deploy:
   # zip ./dist folder if tag IS present
-  - if [[ $TRAVIS_TAG != "" ]]; then
+  - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = ""]]; then
       pushd dist;
       zip -r  $OLDPWD/release_$TRAVIS_TAG.zip *;
       popd;
       ls;
       sudo snap install ipfs;
+      ipfs init;
       ipfs add dist/ -r --only-hash ;
       export IPFS_HASH=$(ipfs add public/ -r --only-hash --quiet | tail -1);
     fi
