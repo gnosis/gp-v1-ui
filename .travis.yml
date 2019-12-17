@@ -63,7 +63,7 @@ deploy:
 
   # add release_v*.zip file to tagged Releases on github
   - provider: releases
-    api_key: $GITHUB_RELEASE_TAG
+    api_key: $GITHUB_RELEASE_TAG_API_TOKEN
     body: "IPFS hash: $IPFS_HASH"
     file: web3_$TRAVIS_TAG.zip
     skip_cleanup: true
