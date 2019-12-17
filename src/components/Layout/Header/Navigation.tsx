@@ -1,73 +1,34 @@
 import React from 'react'
-import styled from 'styled-components'
 import { NavLink } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleUp, faChevronCircleDown } from '@fortawesome/free-solid-svg-icons'
 
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
-
-export type NavLinkKeys = 'Trade' | 'Wallet' | 'Orders'
-
-export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolean }>`
-  display: flex;
-  justify-content: space-evenly;
-
-  margin: 0.5rem;
-  padding: 0.5rem;
-
-  white-space: nowrap;
-
-  a {
-    color: var(--color-text-secondary);
-    font-weight: 1000;
-    padding: 0.35em;
-    text-decoration: none;
-
-    transition: color 0.2s ease-in-out;
-
-    &:hover {
-      color: var(--color-text-primary);
-    }
-
-    &.active {
-      color: var(--color-text-primary);
-    }
-  }
-
-  ${({ $responsive, $open }): string | false =>
-    $responsive &&
-    `
-    flex-flow: column nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    
-    background: #fff;
-    border-radius: 10px;
-    cursor: pointer;
-    height: ${$open ? 'auto' : '63px'}
-    overflow: hidden;
-    padding: 0;
-  `}
-`
-
-const OrderedNavLinkDiv = styled.h3<{ $order: number }>`
-  order: ${({ $order }): number => $order};
-  display: flex;
-  align-items: center;
-`
+import { OrderedNavLinkDiv, NavLinksWrapper } from './Navigation.styled'
 
 export interface HeaderNavLinksInterface {
   label: string
-  withPastLocation?: boolean
-  to: string | Location
   order: number
+  to: string | Location
+  withPastLocation?: boolean
 }
 
-const HeaderNavLink: React.FC<HeaderNavLinksInterface & {
+interface BaseNavigationProps {
   responsive: boolean
-  showLinkSelector?: boolean
-  handleLinkSelect: (key: NavLinkKeys) => void
-}> = ({
+  handleLinkSelect: (key: string) => void
+}
+
+interface NavigationLinksProps extends BaseNavigationProps {
+  navigation: HeaderNavLinksInterface[]
+  showNav: boolean
+  handleOpenNav: () => void
+}
+
+interface HeaderNavLinksProps extends HeaderNavLinksInterface, BaseNavigationProps {
+  showLinkSelector: boolean
+}
+
+const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({
   to,
   withPastLocation = false,
   label,
@@ -75,7 +36,7 @@ const HeaderNavLink: React.FC<HeaderNavLinksInterface & {
   handleLinkSelect,
   responsive,
   showLinkSelector,
-}: HeaderNavLinksInterface & { responsive: boolean; showLinkSelector?: boolean; handleLinkSelect: Function }) => (
+}: HeaderNavLinksProps) => (
   <OrderedNavLinkDiv $order={order} onClick={(): void => handleLinkSelect(label)}>
     {withPastLocation ? (
       <LinkWithPastLocation to={to}>{label}</LinkWithPastLocation>
@@ -91,14 +52,6 @@ const HeaderNavLink: React.FC<HeaderNavLinksInterface & {
     )}
   </OrderedNavLinkDiv>
 )
-
-interface NavigationLinksProps {
-  navigation: HeaderNavLinksInterface[]
-  responsive: boolean
-  showNav: boolean
-  handleLinkSelect: (key: NavLinkKeys) => void
-  handleOpenNav: () => void
-}
 
 export const NavigationLinks: React.FC<NavigationLinksProps> = ({
   navigation,
