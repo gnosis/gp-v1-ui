@@ -13,7 +13,7 @@ before_install:
   - pip install awscli --upgrade --user
 before_deploy:
   # zip ./dist folder if tag IS present
-  - if [ $TRAVIS_TAG != "" ]; then
+  - if [[ $TRAVIS_TAG != "" ]]; then
       pushd dist;
       zip -r  $OLDPWD/release_$TRAVIS_TAG.zip *;
       popd;
