@@ -20,8 +20,7 @@ before_deploy:
       ls;
       sudo snap install ipfs;
       ipfs init;
-      ipfs add dist/ -r --only-hash ;
-      export IPFS_HASH=$(ipfs add public/ -r --only-hash --quiet | tail -1);
+      export IPFS_HASH=$(ipfs add dist/ -r --only-hash --quiet | tail -1);
     fi
 after_success:
   # Pull Request - Deploy it to a review environment
