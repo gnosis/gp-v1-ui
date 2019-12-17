@@ -15,9 +15,8 @@ before_deploy:
   # zip ./dist folder if tag IS present
   - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = "" ]]; then
       pushd dist;
-      zip -r  $OLDPWD/release_$TRAVIS_TAG.zip *;
+      zip -r  $OLDPWD/web3_$TRAVIS_TAG.zip *;
       popd;
-      ls;
       sudo snap install ipfs;
       ipfs init;
       export IPFS_HASH=$(ipfs add dist/ -r --only-hash --quiet | tail -1);
@@ -66,7 +65,7 @@ deploy:
   - provider: releases
     api_key: $GITHUB_RELEASE_TAG
     body: "IPFS hash: $IPFS_HASH"
-    file: release_$TRAVIS_TAG.zip
+    file: web3_$TRAVIS_TAG.zip
     skip_cleanup: true
     on:
       tags: true
