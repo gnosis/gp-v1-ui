@@ -21,6 +21,8 @@ export const HeaderWrapper = styled.header`
   }
 
   .logo {
+    // TODO: remove when we have logo
+    visibility: hidden;
     order: 1;
 
     font-size: 1.8rem;
