@@ -39,7 +39,7 @@ export const UserWalletToggler = styled(UserWalletItem)`
   padding: 6px;
 `
 export const EtherImage = styled.img`
-  max-width: 10%;
+  max-width: 5%;
 `
 
 export const CopyDiv = styled.div`

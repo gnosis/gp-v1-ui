@@ -32,8 +32,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
-import { ETHER_PNG } from 'const'
-// import WalletImg from 'assets/img/unknown-token.png'
+import WalletImg from 'assets/img/black_eth_diamond.png'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string
@@ -137,7 +136,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
           </UserWalletItem>
           {/* Wallet logo + address + chevron */}
           <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)}>
-            <EtherImage src={ETHER_PNG} />
+            <EtherImage src={WalletImg} />
             <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
             <FontAwesomeIcon icon={showWallet ? faChevronCircleUp : faChevronCircleDown} size="xs" />
           </UserWalletToggler>
