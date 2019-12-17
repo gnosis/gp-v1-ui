@@ -3,7 +3,6 @@ import { withRouter, RouteComponentProps, useRouteMatch } from 'react-router'
 import { toast } from 'react-toastify'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
-import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faSpinner,
@@ -15,96 +14,31 @@ import {
   faChevronCircleUp,
 } from '@fortawesome/free-solid-svg-icons'
 
-import { EtherscanLink } from './EtherscanLink'
+import { EtherscanLink } from '../EtherscanLink'
+import {
+  UserWalletItem,
+  UserWalletWrapper,
+  NetworkTitle,
+  UserWalletToggler,
+  EtherImage,
+  UserWalletSlideWrapper,
+  CopyDiv,
+  MonospaceAddress,
+} from './UserWallet.styled'
 
 import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
-import WalletImg from 'assets/img/unknown-token.png'
+// TODO: probably not do this
+import WalletImg from 'assets/img/black_eth_diamond.png'
 
-export const WalletWrapper = styled.div<{ walletOpen: boolean }>`
-  position: relative;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  margin: 1rem;
-  flex: 0 1 16rem;
-
-  background: ghostwhite;
-  border-radius: ${(props): string => (props.walletOpen ? '10px 10px 0 0' : '10px')};
-
-  text-align: center;
-`
-
-const WalletItem = styled.div`
-  color: #000;
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-evenly;
-  margin: 0.3rem auto;
-  padding: 1rem;
-  width: 92%;
-`
-
-const ThinWalletItem = styled(WalletItem)`
-  margin: 5px auto;
-  padding: 2px 0;
-`
-
-const WalletToggler = styled(WalletItem)`
-  cursor: pointer;
-  border-top: 1.6px solid #00000029;
-  padding: 6px;
-
-  @media only screen and (max-width: 500px) {
-    border-top: 0.75px solid #00000029;
-  }
-`
-const EtherImage = styled.img<{ src: string }>`
-  src: ${(props): string => props.src};
-  max-width: 15%;
-  @media only screen and (max-width: 500px) {
-    max-width: 10%;
-  }
-`
-
-const CopyDiv = styled.div`
-  background: #90ee90ad;
-  border-radius: 50px;
-  font-size: 75%;
-  width: 80%;
-`
-
-const WalletSlideWrapper = styled.div`
-  position: absolute;
-  background: inherit;
-  width: 100%;
-  top: 100%;
-  left: 0;
-  box-shadow: 5px 19px 16px #00000033;
-  border-radius: 0 0 10px 10px;
-`
-
-const MonospaceText = styled.div<{ color?: string }>`
-  color: ${(props): string => props.color || '#283baf'};
-  font-weight: 800;
-  font-family: monospace;
-`
-
-const MonospaceAddress = styled(MonospaceText)`
-  font-size: 85%;
-  margin: 0 10px;
-  word-break: break-all;
-`
-
-interface WalletProps extends RouteComponentProps {
+interface UserWalletProps extends RouteComponentProps {
   className: string
 }
 
-const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
+const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const { isConnected, userAddress, networkId } = useWalletConnection()
 
   const [loadingLabel, setLoadingLabel] = useSafeState<string | null>(null)
@@ -176,50 +110,47 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
     } else {
       onClick = connectWallet
       content = (
-        <>
+        <UserWalletItem $padding="0px" $wordWrap="nowrap">
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
-        </>
+        </UserWalletItem>
       )
     }
 
     return (
-      <WalletItem>
+      <UserWalletItem>
         <a onClick={onClick} className={props.className}>
           {content}
         </a>
-      </WalletItem>
+      </UserWalletItem>
     )
   }
 
   return (
-    <WalletWrapper walletOpen={!!showWallet}>
+    <UserWalletWrapper $walletOpen={!!(showWallet && userAddress)}>
       {userAddress ? (
         <>
           {/* Network */}
-          <ThinWalletItem>
-            <MonospaceText>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</MonospaceText>
-          </ThinWalletItem>
+          <UserWalletItem $padding="6px">
+            <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
+          </UserWalletItem>
           {/* Wallet logo + address + chevron */}
-          <WalletToggler onClick={(): void => setShowWallet(!showWallet)}>
+          <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)}>
             <EtherImage src={WalletImg} />
             <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
-            <FontAwesomeIcon
-              icon={showWallet ? faChevronCircleUp : faChevronCircleDown}
-              style={{ cursor: 'pointer' }}
-            />
-          </WalletToggler>
+            <FontAwesomeIcon icon={showWallet ? faChevronCircleUp : faChevronCircleDown} size="xs" />
+          </UserWalletToggler>
         </>
       ) : (
         renderLogInOutButton()
       )}
       {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
       {userAddress && showWallet && (
-        <WalletSlideWrapper>
-          <WalletItem>
+        <UserWalletSlideWrapper>
+          <UserWalletItem>
             <QRCode size={100} value={userAddress} />
-          </WalletItem>
-          <WalletItem>
+          </UserWalletItem>
+          <UserWalletItem>
             {/* Copy Confirmation */}
             {copiedToClipboard ? (
               <CopyDiv>
@@ -239,20 +170,20 @@ const Wallet: React.FC<RouteComponentProps> = (props: WalletProps) => {
                 </CopyToClipboard>
               </>
             )}
-          </WalletItem>
+          </UserWalletItem>
           {/* Etherscan Link */}
           {
-            <WalletItem>
+            <UserWalletItem>
               {/* TODO: add network specific */}
               <EtherscanLink type="address" identifier={userAddress} label="View on Etherscan" />
-            </WalletItem>
+            </UserWalletItem>
           }
           {/* Log In/Out Button */}
           {renderLogInOutButton()}
-        </WalletSlideWrapper>
+        </UserWalletSlideWrapper>
       )}
-    </WalletWrapper>
+    </UserWalletWrapper>
   )
 }
 
-export default withRouter(Wallet)
+export default withRouter(UserWallet)

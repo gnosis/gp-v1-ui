@@ -3,21 +3,15 @@ import styled from 'styled-components'
 import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import PageWrapper from './PageWrapper'
 
-const Wrapper = styled.section`
+const Wrapper = styled(PageWrapper)`
   overflow-x: auto;
   font-size: 0.85rem;
   padding-bottom: 4em;
   padding: 2em;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   min-width: 58vw;
-
-  //TODO: 4 lines bellow duplicated from "page" css.
-  //extract into a common "section" component
-  background-color: white;
-  margin: -3rem auto 3rem auto;
-  box-shadow: 1px 1px #e8e8e8;
-  min-height: 25rem;
 
   display: flex;
   flex-direction: column;
@@ -44,7 +38,7 @@ const Widget: React.FC<Props> = ({ children, className }) => {
   const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
   return (
-    <Wrapper className={className}>
+    <Wrapper className={className} $bgColor="transparent" $boxShadow="none" $width="auto">
       {contractAddress && (
         <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
       )}

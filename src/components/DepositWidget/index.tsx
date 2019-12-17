@@ -4,7 +4,7 @@ import BN from 'bn.js'
 
 import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
-import Widget from 'components/layout/Widget'
+import Widget from 'components/Layout/Widget'
 import { DepositWidgetWrapper } from './Styled'
 
 import { useTokenBalances } from 'hooks/useTokenBalances'

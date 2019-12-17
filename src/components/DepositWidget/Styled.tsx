@@ -21,7 +21,7 @@ export const InnerWrapper = styled.div`
   position: relative;
   background-color: #f7f0ff;
   border-bottom: 2px solid #0000000f;
-  border-radius: 20px;
+  border-radius: var(--border-radius);
   width: 96%;
 
   > div {
@@ -160,8 +160,9 @@ export const RowTokenDiv = styled.div`
   align-items: center;
   justify-content: center;
 
-  border-bottom: 2px solid #0000000f;
-  border-radius: 20px;
+  background: var(--color-background-pageWrapper);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
   margin: 0.3rem 0;
 
   transition: background 0.1s ease-in-out;
@@ -214,8 +215,6 @@ export const RowTokenDiv = styled.div`
     justify-content: stretch;
     padding: 0 0.7rem;
 
-    box-shadow: 1px 6px 7px 0px #0000002e;
-
     > div {
       display: flex;
       flex-flow: row;
@@ -241,7 +240,7 @@ export const RowTokenDiv = styled.div`
         }
 
         > button:last-child {
-          border-radius: 0 20px 20px;
+          border-radius: 0 var(--border-radius) var(--border-radius);
         }
       }
 

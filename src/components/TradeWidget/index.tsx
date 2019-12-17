@@ -7,7 +7,7 @@ import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
-import Widget from 'components/layout/Widget'
+import Widget from 'components/Layout/Widget'
 
 import useForm, { FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -41,7 +41,7 @@ const IconWrapper = styled.a`
 
 const WarningLabel = styled.code`
   background: #ffa8a8;
-  border-radius: 25;
+  border-radius: var(--border-radius);
   font-weight: 800;
   margin: 0 auto 15px;
   padding: 6;

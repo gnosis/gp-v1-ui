@@ -2,7 +2,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWallet } from '@fortawesome/free-solid-svg-icons'
 
-import Wallet from 'components/Wallet'
+import Wallet from 'components/UserWallet'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { Redirect } from 'react-router'
 import { History } from 'history'

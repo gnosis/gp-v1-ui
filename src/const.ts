@@ -1,5 +1,10 @@
 import BN from 'bn.js'
 
+export const APP_NAME = 'fuse'
+
+export const ETHER_PNG =
+  'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
+
 // Some convenient numeric constant
 export const ZERO = new BN(0)
 export const ONE = new BN(1)
