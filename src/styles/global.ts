@@ -49,48 +49,54 @@ const GlobalStyles = createGlobalStyle`
       font-size: 1.4rem;
     }
   }
-  // cleaning default browser styles
-  button {
-    font-family: inherit;
-    font-size: 100%;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-  }
+
   #root {
     min-height: 100vh;
   }
+
   button {
+    background-color: var(--color-background-pageWrapper);
+    color: var(--color-button-primary);
+    border: 2px solid var(--color-button-primary);
+    border-radius: var(--border-radius);
+
+    font-family: inherit;
+    font-size: 100%;
+    font-weight: 1000;
+    cursor: pointer;
+
     padding: 0.5rem;
     margin: 0.5rem;
-    border: 2px solid #8332bf;
-    color: #8332bf;
+        
+    transition: all 0.2s ease-in-out;
+
+    :hover {
+      background-color: var(--color-button-primary);
+      border-color: var(--color-button-primary);
+      color: var(--color-background-pageWrapper);
+    }
+
     &:disabled,
     &[disabled]{
-      background-color: rgba(187, 187, 187, 0.3);
-      border-color: #696969 !important;
-      color: #696969 !important;
-      font-style: italic;
-    }
-    
-    :hover {
-      border-color: #9201fd;
-      color: #9201fd;
+      background-color: var(--color-button-disabled);
+      border-color: var(--color-button-disabled) !important;
     }
     &.success {
-      border-color: #63ab52;
-      color: #63ab52;
+      border-color: var(--color-button-success);
+      color: var(--color-button-success);
       :hover {
-        border-color: #167500;
-        color: #167500;
+        background-color: var(--color-button-success);
+        border-color: var(--color-button-success);
+        color: var(--color-background-pageWrapper);
       }
     }
     &.danger {
-      border-color: #ff5097;
-      color: #ff5097;
+      border-color: var(--color-button-danger);
+      color: var(--color-button-danger);
       :hover {
-        border-color: #ea005f;
-        color: #ea005f;
+        background-color: var(--color-button-danger);
+        border-color: var(--color-button-danger);
+        color: var(--color-background-pageWrapper);
       }
     }
     &.secondary {
@@ -110,11 +116,27 @@ const GlobalStyles = createGlobalStyle`
       padding: 0.3em 0.5em;
     }
   }
+
   input {
+    background-color: var(--color-background-pageWrapper);
+    border: none;
+    border-radius: var(--border-radius);
+    outline: none;
+
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    
     padding: 0.65em;
     margin: 0.4em 0.85em;
-    font-size: 0.85rem;
-    :disabled {
+    width: 100%;
+
+    transition: all 0.2s ease-in-out;
+
+    &:focus {
+      background-color: var(--color-background-pageWrapper);
+    }
+    &:disabled {
       background-color: #e0e0e0;
       border-color: #ababab;
     }

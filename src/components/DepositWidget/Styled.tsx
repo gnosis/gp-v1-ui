@@ -1,28 +1,17 @@
 import styled from 'styled-components'
 
-export const DynamicWrapper = styled.div<{ responsive: boolean }>`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  ${(props): string | false =>
-    props.responsive &&
-    `
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background: #000000b5;
-  `}
-`
-
 export const InnerWrapper = styled.div`
   position: relative;
-  background-color: #f7f0ff;
+  background-color: var(--color-background-actionCards);
   border-bottom: 2px solid #0000000f;
-  border-radius: var(--border-radius);
-  width: 96%;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-top: -14px;
+  width: 80%;
+
+  @media only screen and (max-width: 720px) {
+    width: 97%;
+  }
 
   > div {
     margin-top: 2rem;
@@ -38,53 +27,51 @@ export const InnerWrapper = styled.div`
     text-align: center;
   }
 
-  ul {
+  .WalletItemContainer {
+    display: grid;
+    grid-template-rows: repeat(2, auto) 20px auto;
+    justify-content: stretch;
     align-items: center;
-    list-style: none;
-    text-align: left;
+
+    font-weight: 800;
+
     margin: auto;
-    padding: 1rem 0 1rem 3rem;
-    max-width: 364px;
+    padding: 5px;
+    width: 80%;
 
-    @media only screen and (max-width: 420px) {
-      padding: 1rem 0;
-    }
-
-    li {
-      display: block;
-      margin: 0 auto;
-    }
-
-    li > label {
-      width: 9em;
-      color: #6c0084;
-      font-weight: bold;
-      text-align: right;
+    @media only screen and (max-width: 500px) {
+      width: 95%;
     }
 
     p.error {
       color: red;
-      padding: 0 0 0.5em 10em;
-      margin: 0;
+      padding: 0 0.5rem 0.5rem;
+      margin: auto;
     }
 
     div.wallet {
-      display: inline-block;
-      text-align: center;
       position: relative;
+      display: grid;
+      grid-template-columns: 0.6fr 0.3fr 0.6fr 0.3fr;
 
-      a.max {
-        display: inline-block;
-        margin-left: 0.5em;
-        position: absolute;
-        top: 1.3em;
-        right: -3em;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      &:last-child {
+        margin: auto;
+        width: 80%;
+        text-align: center;
       }
-    }
 
-    li > label {
-      display: block;
-      height: 100%;
+      > p {
+        text-align: right;
+      }
+
+      > input {
+        margin: 0;
+        width: 100%;
+      }
     }
 
     .buttons {
@@ -99,13 +86,35 @@ export const InnerWrapper = styled.div`
 
   .times {
     position: absolute;
+    display: inline-block;
     top: 0;
     right: 0;
-    text-decoration: none;
-    font-size: 2em;
-    display: inline-block;
     padding: 0 0.5em 0 0;
+    font-size: 2em;
+    text-decoration: none;
   }
+`
+
+export const DynamicWrapper = styled.div<{ responsive: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  ${(props): string | false =>
+    props.responsive &&
+    `
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      background: #000000b5;
+      z-index: 99;
+
+      > ${InnerWrapper} {
+        border-radius: var(--border-radius);
+      }
+  `}
 `
 
 export const DepositWidgetWrapper = styled.section`
@@ -165,10 +174,11 @@ export const RowTokenDiv = styled.div`
   box-shadow: var(--box-shadow);
   margin: 0.3rem 0;
 
+  z-index: 1;
   transition: background 0.1s ease-in-out;
 
   &:hover {
-    background: #0000000a !important;
+    background: #0000000a;
   }
 
   > div {
@@ -194,12 +204,12 @@ export const RowTokenDiv = styled.div`
   }
 
   &.highlight {
-    background-color: #fdffc1;
+    background-color: var(--color-background-highlighted);
     border-bottom-color: #fbdf8f;
   }
 
   &.selected {
-    background-color: #ecdcff;
+    background-color: var(--color-background-highlighted);
   }
 
   &.loading {
@@ -270,4 +280,9 @@ export const RowClaimLink = styled.a`
     cursor: not-allowed;
     opacity: 0.5;
   }
+`
+export const LineSeparator = styled.div`
+  border: 1px solid var(--color-text-primary);
+  margin: auto;
+  width: 75%;
 `

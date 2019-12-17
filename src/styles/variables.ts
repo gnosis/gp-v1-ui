@@ -6,8 +6,10 @@ const variables = css`
     // COLOURS
     //-----------------------------
     // Background
-    --color-background: #80808008;
+    --color-background: #f7f7f7;
     --color-background-pageWrapper: #fff;
+    --color-background-actionCards: #bbfdbb;
+    --color-background-highlighted: #fdffc1;
 
     // Text
     // --color-text-primary: #3d414c;
@@ -15,7 +17,10 @@ const variables = css`
     --color-text-secondary: #8c8c8c;
 
     // Buttons
-    --color-button-primary: #8332bf;
+    --color-button-primary: #000;
+    --color-button-success: #5ca95c;
+    --color-button-disabled: #666;
+    --color-button-danger: #e55353;
 
     // Cards
     --color-cards-primary: #f8f8ff;
