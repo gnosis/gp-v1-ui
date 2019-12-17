@@ -78,8 +78,10 @@ const GlobalStyles = createGlobalStyle`
 
     &:disabled,
     &[disabled]{
-      background-color: var(--color-button-disabled);
+      background-color: var(--color-button-disabled) !important;
       border-color: var(--color-button-disabled) !important;
+      color: var(--color-background-pageWrapper) !important;
+      pointer-events: none;
     }
     &.success {
       border-color: var(--color-button-success);
