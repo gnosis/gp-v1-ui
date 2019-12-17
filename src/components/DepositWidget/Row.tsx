@@ -144,11 +144,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       </RowTokenDiv>
       {isDepositFormVisible && (
         <Form
-          title={
-            <>
-              Deposit <span className="symbol">{symbol}</span> in Exchange Wallet
-            </>
-          }
+          title={<p>Deposit {symbol} in Exchange Wallet</p>}
           totalAmountLabel="Wallet balance"
           totalAmount={walletBalance}
           inputLabel="Deposit amount"
@@ -162,11 +158,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       )}
       {isWithdrawFormVisible && (
         <Form
-          title={
-            <>
-              Withdraw <span className="symbol">{symbol}</span> from Exchange Wallet
-            </>
-          }
+          title={<p>Withdraw {symbol} from Exchange Wallet</p>}
           totalAmountLabel="Exchange wallet"
           totalAmount={exchangeBalanceTotal}
           inputLabel="Withdraw amount"
