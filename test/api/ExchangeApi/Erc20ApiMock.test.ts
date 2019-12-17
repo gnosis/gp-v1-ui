@@ -2,12 +2,24 @@ import { Erc20Api, TxOptionalParams } from 'types'
 import BALANCES from '../../data/erc20Balances'
 import ALLOWANCES from '../../data/erc20Allowances'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
-import { USER_1, TOKEN_1, USER_2, TOKEN_6, CONTRACT, TOKEN_8, RECEIPT, USER_3, TOKEN_3 } from '../../data'
+import {
+  USER_1,
+  TOKEN_1,
+  USER_2,
+  TOKEN_6,
+  CONTRACT,
+  TOKEN_8,
+  RECEIPT,
+  USER_3,
+  TOKEN_3,
+  unregisteredTokens,
+  FEE_TOKEN,
+} from '../../data'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import BN from 'bn.js'
 import { clone } from '../../testHelpers'
 
-let instance: Erc20Api = new Erc20ApiMock({ balances: BALANCES, allowances: ALLOWANCES })
+let instance: Erc20Api = new Erc20ApiMock({ balances: BALANCES, allowances: ALLOWANCES, tokens: unregisteredTokens })
 
 describe('Basic view functions', () => {
   describe('balanceOf', () => {
@@ -51,6 +63,48 @@ describe('Basic view functions', () => {
   describe('totalSupply', () => {
     it('returns totalSupply', async () => {
       expect(await instance.totalSupply({ tokenAddress: TOKEN_1 })).toBe(ALLOWANCE_MAX_VALUE)
+    })
+  })
+
+  describe('name', () => {
+    it('returns name', async () => {
+      expect(await instance.name({ tokenAddress: FEE_TOKEN })).toBe('Fee token')
+    })
+    it("throws when there's no name", async () => {
+      try {
+        await instance.name({ tokenAddress: TOKEN_1 })
+        fail('Should not reach')
+      } catch (e) {
+        expect(e.message).toMatch(/token does not implement 'name'/)
+      }
+    })
+  })
+
+  describe('symbol', () => {
+    it('returns symbol', async () => {
+      expect(await instance.symbol({ tokenAddress: FEE_TOKEN })).toBe('FEET')
+    })
+    it("throws when there's no symbol", async () => {
+      try {
+        await instance.symbol({ tokenAddress: TOKEN_1 })
+        fail('Should not reach')
+      } catch (e) {
+        expect(e.message).toMatch(/token does not implement 'symbol'/)
+      }
+    })
+  })
+
+  describe('decimals', () => {
+    it('returns decimals', async () => {
+      expect(await instance.decimals({ tokenAddress: FEE_TOKEN })).toBe(18)
+    })
+    it("throws when there's no decimals", async () => {
+      try {
+        await instance.decimals({ tokenAddress: TOKEN_1 })
+        fail('Should not reach')
+      } catch (e) {
+        expect(e.message).toMatch(/token does not implement 'decimals'/)
+      }
     })
   })
 })

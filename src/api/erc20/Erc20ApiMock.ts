@@ -14,6 +14,16 @@ interface Allowances {
   [userAddress: string]: { [tokenAddress: string]: { [spenderAddress: string]: BN } }
 }
 
+interface Erc20Info {
+  name?: string
+  symbol?: string
+  decimals?: number
+}
+
+interface Tokens {
+  [tokenAddress: string]: Erc20Info
+}
+
 /**
  * Basic implementation of Wallet API
  */
@@ -21,11 +31,13 @@ export class Erc20ApiMock implements Erc20Api {
   private _balances: Balances
   private _allowances: Allowances
   private _totalSupply: BN
+  private _tokens: Tokens
 
-  public constructor({ balances = {}, allowances = {}, totalSupply = ALLOWANCE_MAX_VALUE } = {}) {
+  public constructor({ balances = {}, allowances = {}, totalSupply = ALLOWANCE_MAX_VALUE, tokens = {} } = {}) {
     this._balances = balances
     this._allowances = allowances
     this._totalSupply = totalSupply
+    this._tokens = tokens
   }
 
   public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
@@ -39,18 +51,30 @@ export class Erc20ApiMock implements Erc20Api {
   }
 
   public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
-    log("Don't care about %s, just making TS shut up", tokenAddress)
-    return 'token name'
+    const erc20Info = this._initTokens(tokenAddress)
+
+    // Throws when token without `name` to mock contract behavior
+    this._assertTokenProperty(erc20Info, 'name')
+
+    return erc20Info.name as string
   }
 
   public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
-    log("Don't care about %s, just making TS shut up", tokenAddress)
-    return 'SMBL'
+    const erc20Info = this._initTokens(tokenAddress)
+
+    // Throws when token without `symbol` to mock contract behavior
+    this._assertTokenProperty(erc20Info, 'symbol')
+
+    return erc20Info.symbol as string
   }
 
   public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
-    log("Don't care about %s, just making TS shut up", tokenAddress)
-    return 18
+    const erc20Info = this._initTokens(tokenAddress)
+
+    // Throws when token without `decimals` to mock contract behavior
+    this._assertTokenProperty(erc20Info, 'decimals')
+
+    return erc20Info.decimals as number
   }
 
   public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
@@ -250,6 +274,20 @@ export class Erc20ApiMock implements Erc20Api {
     }
 
     return spenderAllowance
+  }
+
+  private _initTokens(tokenAddress: string): Erc20Info {
+    if (!this._tokens[tokenAddress]) {
+      this._tokens[tokenAddress] = {}
+    }
+
+    return this._tokens[tokenAddress]
+  }
+
+  private _assertTokenProperty(tokenInfo: Erc20Info, property: keyof Erc20Info): void {
+    if (!tokenInfo[property]) {
+      throw new Error(`token does not implement '${property}'`)
+    }
   }
 }
 
