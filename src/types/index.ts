@@ -222,6 +222,7 @@ export interface Erc20Api {
   name({ tokenAddress }: { tokenAddress: string }): Promise<string>
   symbol({ tokenAddress }: { tokenAddress: string }): Promise<string>
   decimals({ tokenAddress }: { tokenAddress: string }): Promise<number>
+  totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN>
 
   allowance({
     tokenAddress,

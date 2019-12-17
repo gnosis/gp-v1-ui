@@ -3,7 +3,7 @@ import BALANCES from '../../data/erc20Balances'
 import ALLOWANCES from '../../data/erc20Allowances'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { USER_1, TOKEN_1, USER_2, TOKEN_6, CONTRACT, TOKEN_8, RECEIPT, USER_3, TOKEN_3 } from '../../data'
-import { ZERO } from 'const'
+import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import BN from 'bn.js'
 import { clone } from '../../testHelpers'
 
@@ -45,6 +45,12 @@ describe('Basic view functions', () => {
       expect(await instance.allowance({ tokenAddress: TOKEN_1, userAddress: USER_1, spenderAddress: CONTRACT })).toBe(
         ZERO,
       )
+    })
+  })
+
+  describe('totalSupply', () => {
+    it('returns totalSupply', async () => {
+      expect(await instance.totalSupply({ tokenAddress: TOKEN_1 })).toBe(ALLOWANCE_MAX_VALUE)
     })
   })
 })

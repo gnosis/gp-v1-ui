@@ -1,7 +1,7 @@
 import { Erc20Api, TxOptionalParams, Receipt } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
-import { ZERO } from 'const'
+import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
 import { log } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
@@ -20,10 +20,12 @@ interface Allowances {
 export class Erc20ApiMock implements Erc20Api {
   private _balances: Balances
   private _allowances: Allowances
+  private _totalSupply: BN
 
-  public constructor({ balances = {}, allowances = {} } = {}) {
+  public constructor({ balances = {}, allowances = {}, totalSupply = ALLOWANCE_MAX_VALUE } = {}) {
     this._balances = balances
     this._allowances = allowances
+    this._totalSupply = totalSupply
   }
 
   public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
@@ -49,6 +51,11 @@ export class Erc20ApiMock implements Erc20Api {
   public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
     log("Don't care about %s, just making TS shut up", tokenAddress)
     return 18
+  }
+
+  public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
+    log("Don't care about %s, just making TS shut up", tokenAddress)
+    return this._totalSupply
   }
 
   public async allowance({
