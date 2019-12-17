@@ -17,6 +17,7 @@ before_deploy:
       pushd dist;
       zip -r  $OLDPWD/release_$TRAVIS_TAG.zip *;
       popd;
+      ls;
     fi
 after_success:
   # Pull Request - Deploy it to a review environment
