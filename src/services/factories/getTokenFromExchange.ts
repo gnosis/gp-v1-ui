@@ -2,7 +2,8 @@ import Web3 from 'web3'
 
 import { Erc20Api, TokenDetails, TokenList, ExchangeApi } from 'types'
 import { getImageUrl, log, getToken } from 'utils'
-import { getErc20Info } from './getErc20Info'
+
+import { getErc20Info } from '../helpers'
 
 interface TokenFromErc20Params {
   tokenAddress: string
