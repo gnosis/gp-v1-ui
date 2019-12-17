@@ -23,7 +23,7 @@ const useNavigation = (initialState: HeaderProps['navigation'], responsive: bool
         }
         const newAcc = {
           ...acc,
-          [key]: { ...editedHeaderValue },
+          [key]: editedHeaderValue,
         }
 
         return newAcc
