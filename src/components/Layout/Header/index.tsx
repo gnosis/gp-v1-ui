@@ -11,19 +11,17 @@ import useOpenCloseNav from './useOpenCloseNav'
 import { APP_NAME } from 'const'
 
 export interface HeaderProps {
-  navigation: {
-    [key: string]: {
-      label: string
-      to: string | Location
-      order: number
-      withPastLocation?: boolean
-    }
-  }
+  [key: string]: {
+    label: string
+    to: string
+    order: number
+    withPastLocation?: boolean
+  }[]
 }
 
 const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps) => {
   const { isResponsive, openNav, setOpenNav } = useOpenCloseNav()
-  const { navigationArray, handleLinkSelect } = useNavigation(initialState, isResponsive)
+  const navigationArray = useNavigation(initialState, isResponsive)
 
   const handleOpenNav = (): void | false => isResponsive && setOpenNav(!openNav)
 
@@ -38,7 +36,6 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
         <NavigationLinks
           navigation={navigationArray}
           responsive={isResponsive}
-          handleLinkSelect={handleLinkSelect}
           handleOpenNav={handleOpenNav}
           showNav={openNav}
         />

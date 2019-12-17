@@ -27,32 +27,32 @@ const Layout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
     <Header
-      navigation={{
-        Trade: {
+      navigation={[
+        {
           label: 'Trade',
           to: '/trade',
           order: 1,
         },
-        Wallet: {
+        {
           label: 'Wallet',
           to: '/wallet',
           order: 2,
           withPastLocation: true,
         },
-        Orders: {
+        {
           label: 'Orders',
           to: '/orders',
           order: 3,
           withPastLocation: true,
         },
         // Place holder
-        // Strategies: {
+        // {
         //   label: 'Strategies',
         //   to: '/strategies',
         //   order: 4,
         //   withPastLocation: true,
         // },
-      }}
+      ]}
     />
     <main>{children}</main>
     <Footer />

@@ -15,7 +15,6 @@ export interface HeaderNavLinksInterface {
 
 interface BaseNavigationProps {
   responsive: boolean
-  handleLinkSelect: (key: string) => void
 }
 
 interface NavigationLinksProps extends BaseNavigationProps {
@@ -33,11 +32,10 @@ const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({
   withPastLocation = false,
   label,
   order,
-  handleLinkSelect,
   responsive,
   showLinkSelector,
 }: HeaderNavLinksProps) => (
-  <OrderedNavLinkDiv $order={order} onClick={(): void => handleLinkSelect(label)}>
+  <OrderedNavLinkDiv $order={order}>
     {withPastLocation ? (
       <LinkWithPastLocation to={to}>{label}</LinkWithPastLocation>
     ) : (
@@ -57,7 +55,6 @@ export const NavigationLinks: React.FC<NavigationLinksProps> = ({
   navigation,
   responsive,
   showNav,
-  handleLinkSelect,
   handleOpenNav,
 }: NavigationLinksProps) => (
   <NavLinksWrapper $responsive={responsive} $open={showNav} onClick={handleOpenNav}>
@@ -73,7 +70,6 @@ export const NavigationLinks: React.FC<NavigationLinksProps> = ({
         order={responsive ? order : index + 1}
         responsive={responsive}
         showLinkSelector={showNav}
-        handleLinkSelect={handleLinkSelect}
       />
     ))}
   </NavLinksWrapper>
