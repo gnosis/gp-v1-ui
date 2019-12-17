@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconDefinition, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
-import { DynamicWrapper, InnerWrapper } from './Styled'
+import { DynamicWrapper, InnerWrapper, LineSeparator } from './Styled'
 
 import useSafeState from 'hooks/useSafeState'
 
@@ -95,38 +95,41 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
         </a>
         <div>
           <h4>{title}</h4>
-          <ul>
-            <li>
-              <label>{totalAmountLabel}</label>
-              <div className="wallet">
-                <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
-                <br />
-                <a
-                  className="max"
-                  onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}
-                >
-                  <small>Use Max</small>
-                </a>
-              </div>
-            </li>
-            <li>
-              <label>{inputLabel}</label>
+          <div className="WalletItemContainer">
+            {/* Withdraw Row */}
+            <div className="wallet">
+              <p>{totalAmountLabel}</p>
+              <LineSeparator />
+              <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
+              <a
+                className="max"
+                onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}
+              >
+                <small>Use Max</small>
+              </a>
+            </div>
+            {/* Deposit Row */}
+            <div className="wallet">
+              <p>{inputLabel}</p>
+              <LineSeparator />
               <input
                 type="text"
                 value={amountInput}
                 onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
                 placeholder={symbol + ' amount'}
               />
-              {errors.amountInput && <p className="error">{errors.amountInput}</p>}
-            </li>
-            <li className="buttons">
+            </div>
+            {/* Error Message */}
+            <p className="error">{errors.amountInput || ''}</p>
+            {/* Submit/Cancel Buttons */}
+            <div style={{ margin: 'auto' }}>
               <a onClick={cancelForm}>Cancel</a>
-              <button type="button" className="success" disabled={!!errors.amountInput || loading} onClick={_onClick}>
+              <button type="button" disabled={!!errors.amountInput || loading} onClick={_onClick}>
                 <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
                 &nbsp; {submitBtnLabel}
               </button>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </InnerWrapper>
     </DynamicWrapper>
