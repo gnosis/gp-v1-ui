@@ -13,12 +13,15 @@ export enum Network {
   Kovan = 42,
 }
 
-export interface TokenDetails {
-  id: number
-  name?: string
-  symbol?: string
-  decimals: number
+export interface MinimalTokenDetails {
   address: string
+  symbol?: string
+  name?: string
+  decimals: number
+}
+
+export interface TokenDetails extends MinimalTokenDetails {
+  id: number
   addressMainnet?: string
   image?: string
 }

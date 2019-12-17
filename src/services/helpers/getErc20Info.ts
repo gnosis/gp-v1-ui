@@ -1,8 +1,8 @@
 import Web3 from 'web3'
 
-import { Erc20Api } from 'types'
+import { Erc20Api, MinimalTokenDetails } from 'types'
 import { log } from 'utils'
-import { DEFAULT_DECIMALS } from 'const'
+import { DEFAULT_PRECISION } from 'const'
 
 /**
  * Wraps erc20 function and returns undefined in case of failure
@@ -22,17 +22,10 @@ interface Params {
   web3: Web3
 }
 
-interface Erc20Info {
-  address: string
-  symbol?: string
-  name?: string
-  decimals: number
-}
-
 /**
  * Fetches info for an arbitrary ERC20 token from given address
  */
-export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Promise<Erc20Info | null> {
+export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Promise<MinimalTokenDetails | null> {
   // First check whether given address is a contract
   const code = await web3.eth.getCode(tokenAddress)
   if (code === '0x') {
@@ -56,5 +49,5 @@ export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Pr
     wrapPromise(erc20Api.name({ tokenAddress })),
     wrapPromise(erc20Api.decimals({ tokenAddress })),
   ])
-  return { address: tokenAddress, symbol, name, decimals: decimals || DEFAULT_DECIMALS }
+  return { address: tokenAddress, symbol, name, decimals: decimals || DEFAULT_PRECISION }
 }
