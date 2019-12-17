@@ -23,8 +23,7 @@ export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress:
     const erc20Info = getErc20Info({ ...factoryParams, tokenAddress })
 
     if (!erc20Info) {
-      // TODO: I'm forbidding, but should it be allowed to use tokens without decimals for example?
-      log('Cannot add token (%s) to exchange with missing details', tokenAddress)
+      log('Address %s does not contain a valid ERC20 token', tokenAddress)
       return false
     }
 
@@ -35,6 +34,8 @@ export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress:
       return false
     }
 
+    // TODO: I guess we might want to return the token and leave the proxy/cache layer to deal with it.
+    // Revisit once we add it to the interface
     try {
       const id = exchangeApi.getTokenIdByAddress(tokenAddress)
 
