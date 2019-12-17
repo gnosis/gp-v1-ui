@@ -18,6 +18,9 @@ before_deploy:
       zip -r  $OLDPWD/release_$TRAVIS_TAG.zip *;
       popd;
       ls;
+      sudo snap install ipfs;
+      ipfs add dist/ -r --only-hash ;
+      export IPFS_HASH=$(ipfs add public/ -r --only-hash --quiet | tail -1);
     fi
 after_success:
   # Pull Request - Deploy it to a review environment
@@ -62,6 +65,7 @@ deploy:
   # add release_v*.zip file to tagged Releases on github
   - provider: releases
     api_key: $GITHUB_RELEASE_TAG
+    body: "IPFS hash: $IPFS_HASH"
     file: release_$TRAVIS_TAG.zip
     skip_cleanup: true
     on:
