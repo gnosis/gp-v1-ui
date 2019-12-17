@@ -10,7 +10,7 @@ const Wrapper = styled(PageWrapper)`
   font-size: 0.85rem;
   padding-bottom: 4em;
   padding: 2em;
-  border-radius: 10px;
+  border-radius: var(--border-radius);
   min-width: 58vw;
 
   display: flex;

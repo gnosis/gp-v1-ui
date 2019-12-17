@@ -8,9 +8,10 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
   margin: 1rem;
   padding: 6px 13px;
 
-  background: ghostwhite;
-  border-radius: ${({ $walletOpen }): string => ($walletOpen ? '10px 10px 0 0' : '10px')};
-
+  background: var(--color-background-pageWrapper);
+  border-radius: ${({ $walletOpen }): string =>
+    $walletOpen ? 'var(--border-radius) var(--border-radius) 0 0' : 'var(--border-radius)'};
+  box-shadow: var(--box-shadow);
   line-height: 1;
   text-align: center;
 `
@@ -34,6 +35,7 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
 
 export const UserWalletToggler = styled(UserWalletItem)`
   cursor: pointer;
+  font-size: 0.8rem;
   padding: 6px;
 `
 export const EtherImage = styled.img`
@@ -42,9 +44,10 @@ export const EtherImage = styled.img`
 
 export const CopyDiv = styled.div`
   background: #90ee90ad;
-  border-radius: 50px;
+  border-radius: var(--border-radius);
   font-size: 75%;
-  width: 80%;
+  padding: 5px;
+  width: 60%;
 `
 
 export const UserWalletSlideWrapper = styled.div`
@@ -54,13 +57,13 @@ export const UserWalletSlideWrapper = styled.div`
   top: 100%;
   left: 0;
   box-shadow: var(--box-shadow);
-  border-radius: 0 0 10px 10px;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
   z-index: 2;
 `
 
 export const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
   color: ${({ color = '#000' }): string => color};
-  font-size: ${({ $fontSize = '1.15rem' }): string => $fontSize};
+  font-size: ${({ $fontSize = '1rem' }): string => $fontSize};
   font-weight: 800;
 `
 

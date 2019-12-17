@@ -33,8 +33,9 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     align-items: center;
     justify-content: flex-start;
     
-    background: #fff;
-    border-radius: 10px;
+    background: var(--color-background-pageWrapper);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
     cursor: pointer;
     height: ${$open ? 'auto' : '63px'}
     overflow: hidden;

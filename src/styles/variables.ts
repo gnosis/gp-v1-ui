@@ -6,7 +6,7 @@ const variables = css`
     // COLOURS
     //-----------------------------
     // Background
-    --color-background: #dbdbdb9c;
+    --color-background: #80808008;
     --color-background-pageWrapper: #fff;
 
     // Text
@@ -23,12 +23,12 @@ const variables = css`
     // ------------------------------
     // BORDERS
     // ------------------------------
-    --border-radius: 20px;
+    --border-radius: 10px;
 
     // ------------------------------
     // BOX-SHADOW
     // ------------------------------
-    --box-shadow: 1px 6px 7px 0px #0000002e;
+    --box-shadow: 1px 2px 2px -1px #00000047;
   }
 `
 
