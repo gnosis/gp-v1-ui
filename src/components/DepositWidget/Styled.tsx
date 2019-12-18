@@ -278,7 +278,7 @@ export const RowClaimLink = styled.a`
   }
 `
 export const LineSeparator = styled.div`
-  border: 1px solid var(--color-text-primary);
+  border: 0.5px solid var(--color-text-primary);
   margin: auto;
   width: calc(100% - 25px);
 `
