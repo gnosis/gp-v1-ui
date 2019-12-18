@@ -17,4 +17,4 @@ export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactor
 
 export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis)
 
-export const addTokenToExchange = addTokenToExchangeFactory({ exchangeApi, erc20Api, web3 })
+export const addTokenToExchange = addTokenToExchangeFactory(apis)
