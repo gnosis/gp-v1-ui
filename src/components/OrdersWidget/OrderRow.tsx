@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -6,6 +6,8 @@ import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-ic
 
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
+
+import { getTokenFromExchangeById } from 'services'
 
 import { TokenDetails, AuctionElement } from 'types'
 import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
@@ -67,7 +69,9 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
-interface OrderDetailsProps extends Pick<Props, 'buyToken' | 'sellToken' | 'pending'> {
+interface OrderDetailsProps extends Pick<Props, 'pending'> {
+  buyToken: TokenDetails
+  sellToken: TokenDetails
   price: string
 }
 
@@ -93,7 +97,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ price, buyToken, sellToken,
   </div>
 )
 
-interface UnfilledAmountProps extends Pick<Props, 'sellToken' | 'pending'> {
+interface UnfilledAmountProps extends Pick<Props, 'pending'> {
+  sellToken: TokenDetails
   unfilledAmount: string
   unlimited: boolean
 }
@@ -113,7 +118,8 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmou
   </div>
 )
 
-interface AccountBalanceProps extends Pick<Props, 'sellToken' | 'isOverBalance'> {
+interface AccountBalanceProps extends Pick<Props, 'isOverBalance'> {
+  sellToken: TokenDetails
   accountBalance: string
 }
 
@@ -135,10 +141,9 @@ const Expires: React.FC<ExpiresProps> = ({ pending, isNeverExpires, expiresOn })
 )
 
 interface Props {
-  sellToken: TokenDetails
-  buyToken: TokenDetails
   order: AuctionElement
   isOverBalance: boolean
+  networkId: number
   pending?: boolean
 }
 
@@ -152,25 +157,56 @@ function calculatePrice(_numerator?: string | null, _denominator?: string | null
   return price.toFixed(2)
 }
 
-const OrderRow: React.FC<Props> = props => {
-  const { buyToken, sellToken, order, pending = false } = props
+async function fetchToken(
+  tokenId: number,
+  networkId: number,
+  setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
+): Promise<void> {
+  console.log('fetching token %d', tokenId)
+  const token = await getTokenFromExchangeById({ tokenId, networkId })
+  console.log('fetched token %d', tokenId, token)
 
-  const price = useMemo(
-    () =>
-      calculatePrice(
+  // It is unlikely the token ID coming form the order won't exist
+  // Still, if that ever happens, store null and keep this order hidden
+  setFn(token)
+}
+
+const OrderRow: React.FC<Props> = props => {
+  const { order, networkId, pending = false } = props
+
+  // Fetching buy and sell tokens
+  const [sellToken, setSellToken] = useState<TokenDetails | null>(null)
+  const [buyToken, setBuyToken] = useState<TokenDetails | null>(null)
+
+  useMemo(async () => {
+    console.log('will fetch tokens')
+    await fetchToken(order.buyTokenId, networkId, setBuyToken)
+    await fetchToken(order.sellTokenId, networkId, setSellToken)
+  }, [networkId, order.buyTokenId, order.sellTokenId, setBuyToken, setSellToken])
+
+  // TODO: move these memos into respective sub components
+  const price = useMemo(() => {
+    if (buyToken && 'decimals' in buyToken && sellToken && 'decimals' in sellToken) {
+      return calculatePrice(
         formatAmountFull(order.priceNumerator, buyToken.decimals, false),
         formatAmountFull(order.priceDenominator, sellToken.decimals, false),
-      ),
-    [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals],
-  )
-  const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
-    order.remainingAmount,
-    sellToken.decimals,
-  ])
-  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
-    order.sellTokenBalance,
-    sellToken.decimals,
-  ])
+      )
+    }
+    return 'N/A'
+  }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
+
+  const { unfilledAmount, accountBalance } = useMemo(() => {
+    let unfilledAmount = 'N/A'
+    let accountBalance = 'N/A'
+
+    if (sellToken && 'decimals' in sellToken) {
+      unfilledAmount = formatAmount(order.remainingAmount, sellToken.decimals) || '0'
+      accountBalance = formatAmount(order.sellTokenBalance, sellToken.decimals) || '0'
+    }
+
+    return { unfilledAmount, accountBalance }
+  }, [order.remainingAmount, order.sellTokenBalance, sellToken])
+
   const unlimitedAmount = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
 
   const { isNeverExpires, expiresOn } = useMemo(() => {
@@ -180,16 +216,25 @@ const OrderRow: React.FC<Props> = props => {
   }, [order.validUntil])
 
   return (
-    <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
-      <PendingLink {...props} />
-      <div className="checked">
-        <input type="checkbox" />
-      </div>
-      <OrderDetails {...props} price={price} />
-      <UnfilledAmount {...props} unfilledAmount={unfilledAmount} unlimited={unlimitedAmount} />
-      <AccountBalance {...props} accountBalance={accountBalance} />
-      <Expires {...props} isNeverExpires={isNeverExpires} expiresOn={expiresOn} />
-    </OrderRowWrapper>
+    <>
+      {sellToken && buyToken && (
+        <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
+          <PendingLink {...props} />
+          <div className="checked">
+            <input type="checkbox" />
+          </div>
+          <OrderDetails {...props} price={price} sellToken={sellToken} buyToken={buyToken} />
+          <UnfilledAmount
+            {...props}
+            unfilledAmount={unfilledAmount}
+            unlimited={unlimitedAmount}
+            sellToken={sellToken}
+          />
+          <AccountBalance {...props} accountBalance={accountBalance} sellToken={sellToken} />
+          <Expires {...props} isNeverExpires={isNeverExpires} expiresOn={expiresOn} />
+        </OrderRowWrapper>
+      )}
+    </>
   )
 }
 
