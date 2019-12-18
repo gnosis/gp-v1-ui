@@ -10,6 +10,7 @@ const GlobalStyles = createGlobalStyle`
 
   html, body {  
     min-height: 100vh;
+    min-width: 320px;
     margin: 0;
     font-size: 16px;
     font-family: "Averta", Arial, Helvetica Neue, Helvetica, sans-serif;
@@ -136,7 +137,7 @@ const GlobalStyles = createGlobalStyle`
     transition: all 0.2s ease-in-out;
 
     &:focus {
-      background-color: var(--color-background-pageWrapper);
+      border: 0.11rem solid var(--color-text-primary);
     }
     &:disabled {
       background-color: #e0e0e0;
