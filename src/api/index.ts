@@ -20,11 +20,26 @@ import {
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 
+const isWeb3Mock = process.env.MOCK_WEB3 === 'true'
 const isWalletMock = process.env.MOCK_WALLET === 'true'
 const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
 const isErc20Mock = process.env.MOCK_ERC20 === 'true'
 const isDepositMock = process.env.MOCK_DEPOSIT === 'true'
 const isExchangeMock = process.env.MOCK_EXCHANGE === 'true'
+
+// TODO connect to mainnet if we need AUTOCONNECT at all
+export const getDefaultProvider = (): string | null =>
+  process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
+
+function createWeb3Api(): Web3 {
+  const web3 = new Web3(getDefaultProvider())
+
+  if (isWeb3Mock) {
+    // Only function that needs to be mocked so far. We can add more and add extra logic as needed
+    web3.eth.getCode = async (address: string): Promise<string> => address
+  }
+  return web3
+}
 
 function createWalletApi(web3: Web3): WalletApi {
   let walletApi
@@ -90,13 +105,8 @@ function createTokenListApi(): TokenList {
   return tokenListApi
 }
 
-// TODO connect to mainnet if we need AUTOCONNECT at all
-export const getDefaultProvider = (): string | null =>
-  process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
-
-export const web3 = new Web3(getDefaultProvider())
-
 // Build APIs
+export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
 export const erc20Api: Erc20Api = createErc20Api(web3)
 export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
