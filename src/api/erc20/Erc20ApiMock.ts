@@ -1,9 +1,9 @@
-import { Erc20Api, TxOptionalParams, Receipt } from 'types'
 import BN from 'bn.js'
-import assert from 'assert'
+
+import { Erc20Api, TxOptionalParams, Receipt } from 'types'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
-import { log } from 'utils'
+import { log, assert } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 
 interface Balances {
@@ -54,27 +54,27 @@ export class Erc20ApiMock implements Erc20Api {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `name` to mock contract behavior
-    this._assertTokenProperty(erc20Info, 'name')
+    assert(erc20Info.name, "token does not implement 'name'")
 
-    return erc20Info.name as string
+    return erc20Info.name
   }
 
   public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `symbol` to mock contract behavior
-    this._assertTokenProperty(erc20Info, 'symbol')
+    assert(erc20Info.symbol, "token does not implement 'symbol'")
 
-    return erc20Info.symbol as string
+    return erc20Info.symbol
   }
 
   public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `decimals` to mock contract behavior
-    this._assertTokenProperty(erc20Info, 'decimals')
+    assert(erc20Info.decimals, "token does not implement 'decimals'")
 
-    return erc20Info.decimals as number
+    return erc20Info.decimals
   }
 
   public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
@@ -282,12 +282,6 @@ export class Erc20ApiMock implements Erc20Api {
     }
 
     return this._tokens[tokenAddress]
-  }
-
-  private _assertTokenProperty(tokenInfo: Erc20Info, property: keyof Erc20Info): void {
-    if (!tokenInfo[property]) {
-      throw new Error(`token does not implement '${property}'`)
-    }
   }
 }
 
