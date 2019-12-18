@@ -37,6 +37,15 @@ export const exchangeOrders = {
       priceDenominator: new BN('10000000000000000000000'),
       remainingAmount: new BN('5876842900000000000000'),
     },
+    {
+      buyTokenId: 0, // FEE Token; not in our list (forcing token fetch)
+      sellTokenId: 1, // WETH
+      validFrom: BATCH_ID,
+      validUntil: dateToBatchId(addDays(NOW, 10)),
+      priceNumerator: new BN('500000000000000000000'),
+      priceDenominator: new BN('1000000000000000000000'),
+      remainingAmount: new BN('300000000000000000000'),
+    },
   ],
 }
 
