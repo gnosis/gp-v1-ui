@@ -28,7 +28,7 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
     if (tokenKeyValue) {
       switch (typeof tokenKeyValue) {
         case 'string':
-          return tokenKeyValue?.['toString']().toUpperCase() === (value as string).toUpperCase()
+          return tokenKeyValue.toUpperCase() === (value as string).toUpperCase()
         case 'number':
           return tokenKeyValue === value
         default:
