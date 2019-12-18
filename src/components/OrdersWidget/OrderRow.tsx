@@ -69,6 +69,14 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
+function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
+  const displayName = safeTokenName(token)
+  if (displayName.startsWith('0x')) {
+    return <EtherscanLink type="token" identifier={token.address} />
+  }
+  return displayName
+}
+
 interface OrderDetailsProps extends Pick<Props, 'pending'> {
   buyToken: TokenDetails
   sellToken: TokenDetails
@@ -82,7 +90,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ price, buyToken, sellToken,
       <Highlight color={pending ? 'grey' : ''}>1</Highlight>
     </div>
     <div>
-      <strong>{safeTokenName(sellToken)}</strong>
+      <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
     </div>
 
     <div>
@@ -92,7 +100,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ price, buyToken, sellToken,
       <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
     </div>
     <div>
-      <strong>{safeTokenName(buyToken)}</strong>
+      <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
     </div>
   </div>
 )
@@ -111,7 +119,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, unfilledAmou
       <>
         <div>{unfilledAmount}</div>
         <div>
-          <strong>{safeTokenName(sellToken)}</strong>
+          <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
         </div>
       </>
     )}
@@ -126,7 +134,7 @@ interface AccountBalanceProps extends Pick<Props, 'isOverBalance'> {
 const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, accountBalance, isOverBalance }) => (
   <div className="container sub-columns three-columns">
     <div>{accountBalance}</div>
-    <strong>{safeTokenName(sellToken)}</strong>
+    <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
     <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
   </div>
 )
