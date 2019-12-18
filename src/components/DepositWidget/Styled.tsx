@@ -52,7 +52,7 @@ export const InnerWrapper = styled.div`
     div.wallet {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(102px, 0.6fr) minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
+      grid-template-columns: 101px minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
 
       justify-content: center;
       align-items: center;
@@ -62,10 +62,6 @@ export const InnerWrapper = styled.div`
         margin: auto;
         width: 80%;
         text-align: center;
-      }
-
-      > p {
-        text-align: right;
       }
 
       > input {
