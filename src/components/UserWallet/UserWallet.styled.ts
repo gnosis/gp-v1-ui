@@ -31,6 +31,11 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
   > * {
     margin: 0 6px;
   }
+
+  > svg {
+    width: 70%;
+    height: auto;
+  }
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`

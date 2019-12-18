@@ -148,7 +148,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       {userAddress && showWallet && (
         <UserWalletSlideWrapper>
           <UserWalletItem>
-            <QRCode size={100} value={userAddress} />
+            <QRCode value={userAddress} renderAs="svg" />
           </UserWalletItem>
           <UserWalletItem>
             {/* Copy Confirmation */}
