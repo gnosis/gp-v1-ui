@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { addDays, addMinutes } from 'date-fns'
+import { addDays, addMinutes, addYears } from 'date-fns'
 
 import { ALLOWANCE_MAX_VALUE, MAX_BATCH_ID } from 'const'
 import { dateToBatchId } from 'utils'
@@ -38,13 +38,22 @@ export const exchangeOrders = {
       remainingAmount: new BN('5876842900000000000000'),
     },
     {
-      buyTokenId: 0, // FEE Token; not in our list (forcing token fetch)
+      buyTokenId: 0, // FEE Token; not in our list (forcing token fetch), registered in the exchange. Provides details
       sellTokenId: 1, // WETH
       validFrom: BATCH_ID,
       validUntil: dateToBatchId(addDays(NOW, 10)),
       priceNumerator: new BN('500000000000000000000'),
-      priceDenominator: new BN('1000000000000000000000'),
+      priceDenominator: new BN('10000000000000000000000'),
       remainingAmount: new BN('300000000000000000000'),
+    },
+    {
+      buyTokenId: 1, // WETH
+      sellTokenId: 8, // TOKEN_8; not in our list (forcing token fetch), registered in the exchange. Does not provide details (name, symbol, decimals)
+      validFrom: BATCH_ID,
+      validUntil: dateToBatchId(addYears(NOW, 101)),
+      priceNumerator: new BN('700000000000000000000000'),
+      priceDenominator: new BN('10000000000000000000000'),
+      remainingAmount: new BN('98000000000000000000'),
     },
   ],
 }
