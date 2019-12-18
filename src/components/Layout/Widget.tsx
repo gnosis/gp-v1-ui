@@ -16,9 +16,14 @@ const Wrapper = styled(PageWrapper)`
   display: flex;
   flex-direction: column;
 
-  @media only screen and (max-width: 866px) {
+  @media only screen and (max-width: 720px) {
     margin: 0 auto 3rem;
     padding: 1em;
+    width: 80%;
+  }
+
+  @media only screen and (max-width: 500px) {
+    width: 100%;
   }
 `
 
