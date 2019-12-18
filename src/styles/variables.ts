@@ -10,6 +10,7 @@ const variables = css`
     --color-background-pageWrapper: #fff;
     --color-background-actionCards: #bbfdbb;
     --color-background-highlighted: #fdffc1;
+    --color-background-selected: #dcdcdc;
 
     // Text
     // --color-text-primary: #3d414c;
