@@ -35,6 +35,11 @@ const variables = css`
     // BOX-SHADOW
     // ------------------------------
     --box-shadow: 1px 2px 2px -1px #00000047;
+
+    //-------------------------------
+    // GRID
+    // ------------------------------
+    --grid-row-size-walletPage: minmax(175px, 1.1fr) repeat(3, 1fr) minmax(156px, 1fr);
   }
 `
 

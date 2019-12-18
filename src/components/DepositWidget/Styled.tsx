@@ -52,7 +52,7 @@ export const InnerWrapper = styled.div`
     div.wallet {
       position: relative;
       display: grid;
-      grid-template-columns: 101px minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
+      grid-template-columns: minmax(101px, 115px) minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
 
       justify-content: center;
       align-items: center;
@@ -63,7 +63,9 @@ export const InnerWrapper = styled.div`
         width: 80%;
         text-align: center;
       }
-
+      > p {
+        text-align: right;
+      }
       > input {
         margin: 0;
         width: 100%;
@@ -123,7 +125,7 @@ export const DepositWidgetWrapper = styled.section`
     display: inherit;
     justify-content: center;
     align-items: center;
-    grid-template-columns: 1.1fr repeat(4, 1fr);
+    grid-template-columns: var(--grid-row-size-walletPage);
 
     > div {
       color: #000000;
@@ -161,7 +163,7 @@ export const ModalBodyWrapper = styled.div`
 
 export const RowTokenDiv = styled.div`
   display: grid;
-  grid-template-columns: 1.1fr repeat(4, 1fr);
+  grid-template-columns: var(--grid-row-size-walletPage);
   align-items: center;
   justify-content: center;
 
