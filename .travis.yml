@@ -20,6 +20,7 @@ before_deploy:
       sudo snap install ipfs;
       ipfs init;
       export IPFS_HASH=$(ipfs add dist/ -r --only-hash --quiet | tail -1);
+      echo $IPFS_HASH > ipfs_hash.txt;
     fi
 after_success:
   # Pull Request - Deploy it to a review environment
@@ -65,7 +66,9 @@ deploy:
   - provider: releases
     api_key: $GITHUB_RELEASE_TAG_API_TOKEN
     body: "IPFS hash: $IPFS_HASH"
-    file: web3_$TRAVIS_TAG.zip
+    file: 
+      - web3_$TRAVIS_TAG.zip
+      - ipfs_hash.txt
     skip_cleanup: true
     on:
       tags: true
