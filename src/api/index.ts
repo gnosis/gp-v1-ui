@@ -16,6 +16,7 @@ import {
   erc20Allowances,
   FEE_TOKEN,
   exchangeOrders,
+  unregisteredTokens,
   TOKEN_8,
 } from '../../test/data'
 import Web3 from 'web3'
@@ -56,7 +57,7 @@ function createWalletApi(web3: Web3): WalletApi {
 function createErc20Api(web3: Web3): Erc20Api {
   let erc20Api
   if (isErc20Mock) {
-    erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances })
+    erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances, tokens: unregisteredTokens })
   } else {
     erc20Api = new Erc20ApiImpl(web3)
   }
