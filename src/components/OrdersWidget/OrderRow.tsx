@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -178,10 +178,10 @@ const OrderRow: React.FC<Props> = props => {
   const [sellToken, setSellToken] = useState<TokenDetails | null>(null)
   const [buyToken, setBuyToken] = useState<TokenDetails | null>(null)
 
-  useMemo(async () => {
+  useEffect(() => {
     console.log('will fetch tokens')
-    await fetchToken(order.buyTokenId, networkId, setBuyToken)
-    await fetchToken(order.sellTokenId, networkId, setSellToken)
+    fetchToken(order.buyTokenId, networkId, setBuyToken)
+    fetchToken(order.sellTokenId, networkId, setSellToken)
   }, [networkId, order.buyTokenId, order.sellTokenId, setBuyToken, setSellToken])
 
   // TODO: move these memos into respective sub components
