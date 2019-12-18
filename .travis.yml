@@ -13,11 +13,14 @@ before_install:
   - pip install awscli --upgrade --user
 before_deploy:
   # zip ./dist folder if tag IS present
-  - if [[ $TRAVIS_TAG != "" ]]; then
+  - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = "" ]]; then
       pushd dist;
-      zip -r  $OLDPWD/release_$TRAVIS_TAG.zip *;
+      zip -r  $OLDPWD/web_$TRAVIS_TAG.zip *;
       popd;
-      ls;
+      sudo snap install ipfs;
+      ipfs init;
+      export IPFS_HASH=$(ipfs add dist/ -r --only-hash --quiet | tail -1);
+      echo $IPFS_HASH > ipfs_hash.txt;
     fi
 after_success:
   # Pull Request - Deploy it to a review environment
@@ -61,8 +64,11 @@ deploy:
 
   # add release_v*.zip file to tagged Releases on github
   - provider: releases
-    api_key: $GITHUB_GNOSIS_INFO_API_TOKEN
-    file: release_$TRAVIS_TAG.zip
+    api_key: $GITHUB_RELEASE_TAG_API_TOKEN
+    body: "IPFS hash: $IPFS_HASH"
+    file: 
+      - web_$TRAVIS_TAG.zip
+      - ipfs_hash.txt
     skip_cleanup: true
     on:
       tags: true
