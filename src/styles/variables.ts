@@ -9,7 +9,7 @@ const variables = css`
     --color-background: #f7f7f7;
     --color-background-pageWrapper: #fff;
     --color-background-actionCards: #bbfdbb;
-    --color-background-highlighted: #fdffc1;
+    --color-background-highlighted: #fcfde0;
     --color-background-selected: #dcdcdc;
 
     // Text

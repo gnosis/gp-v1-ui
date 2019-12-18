@@ -85,8 +85,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
-                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} spin />}
-                &nbsp; {formatAmount(withdrawingBalance, decimals)}
+                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+                {formatAmount(withdrawingBalance, decimals)}
               </RowClaimButton>
               <div>
                 <RowClaimLink
@@ -103,8 +103,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </>
           ) : withdrawingBalance.gt(ZERO) ? (
             <>
-              <FontAwesomeIcon icon={faClock} />
-              &nbsp; {formatAmount(withdrawingBalance, decimals)}
+              <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
+              {formatAmount(withdrawingBalance, decimals)}
             </>
           ) : (
             0
