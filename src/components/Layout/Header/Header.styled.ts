@@ -2,6 +2,10 @@ import styled from 'styled-components'
 import { NavLinksWrapper } from './Navigation.styled'
 import { UserWalletWrapper } from 'components/UserWallet/UserWallet.styled'
 
+import { RESPONSIVE_SIZES } from 'const'
+
+const { TABLET, WEB_SMALL, TABLET_LARGE } = RESPONSIVE_SIZES
+
 export const HeaderWrapper = styled.header`
   display: flex;
   align-items: center;
@@ -65,13 +69,13 @@ export const HeaderWrapper = styled.header`
     margin: 0;
   }
 
-  @media only screen and (max-width: 1024px) {
+  @media only screen and (max-width: ${WEB_SMALL}px) {
     .logo {
       display: none;
     }
   }
 
-  @media only screen and (max-width: 850px) {
+  @media only screen and (max-width: ${TABLET_LARGE}px) {
     nav {
       flex-flow: row wrap;
     }
@@ -80,7 +84,7 @@ export const HeaderWrapper = styled.header`
     }
   }
 
-  @media only screen and (max-width: 720px) {
+  @media only screen and (max-width: ${TABLET}px) {
     .logo,
     .nav-links,
     ${UserWalletWrapper} {

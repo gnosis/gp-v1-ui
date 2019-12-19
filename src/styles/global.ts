@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 import fontFace from './fonts'
 import variables from './variables'
+import { RESPONSIVE_SIZES } from 'const'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables
@@ -40,13 +41,13 @@ const GlobalStyles = createGlobalStyle`
   }
   h1 {
     font-size: 3rem;
-    @media  only screen and (max-width: 480px) {
+    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}px) {
       font-size: 2.4rem;
     }    
   }
   h2 {
     font-size: 2rem;
-    @media  only screen and (max-width: 480px) {
+    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}px) {
       font-size: 1.4rem;
     }
   }

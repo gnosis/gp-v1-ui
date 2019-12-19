@@ -1,16 +1,18 @@
 import styled from 'styled-components'
+import { RESPONSIVE_SIZES } from 'const'
 
+const { TABLET } = RESPONSIVE_SIZES
 export const InnerWrapper = styled.div`
   position: relative;
-  background-color: var(--color-background-actionCards);
+  background-color: var(--color-background-selected-dark);
   border-bottom: 2px solid #0000000f;
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   box-shadow: var(--box-shadow);
-  margin-top: -14px;
+  margin-top: -0.52rem;
   width: 80%;
 
-  @media only screen and (max-width: 720px) {
-    width: 97%;
+  @media only screen and (max-width: ${TABLET}px) {
+    width: 95%;
   }
 
   > div {
@@ -22,8 +24,9 @@ export const InnerWrapper = styled.div`
   }
 
   h4 {
-    margin: 3rem 1rem 1rem;
+    margin: 2.5rem 1rem 1rem;
     font-size: 1.3em;
+    font-weight: normal;
     text-align: center;
   }
 
@@ -39,7 +42,7 @@ export const InnerWrapper = styled.div`
     padding: 5px;
     width: 80%;
 
-    @media only screen and (max-width: 720px) {
+    @media only screen and (max-width: ${TABLET}px) {
       width: 95%;
     }
 
@@ -52,7 +55,7 @@ export const InnerWrapper = styled.div`
     div.wallet {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(101px, 115px) minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
+      grid-template-columns: minmax(101px, 116px) minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
 
       justify-content: center;
       align-items: center;
@@ -85,8 +88,8 @@ export const InnerWrapper = styled.div`
   .times {
     position: absolute;
     display: inline-block;
-    top: 0;
-    right: 0;
+    top: 0.5rem;
+    right: 0.5rem;
     padding: 0 0.5em 0 0;
     font-size: 2em;
     text-decoration: none;
@@ -137,7 +140,7 @@ export const DepositWidgetWrapper = styled.section`
       font-weight: bolder;
     }
 
-    @media only screen and (max-width: 720px) {
+    @media only screen and (max-width: ${TABLET}px) {
       display: none;
     }
   }
@@ -211,7 +214,8 @@ export const RowTokenDiv = styled.div`
   }
 
   &.selected {
-    background-color: var(--color-background-selected);
+    background-color: var(--color-button-disabled);
+    color: var(--color-background-pageWrapper);
   }
 
   &.loading {
@@ -219,7 +223,7 @@ export const RowTokenDiv = styled.div`
     border-bottom-color: #b9b9b9;
   }
 
-  @media only screen and (max-width: 720px) {
+  @media only screen and (max-width: ${TABLET}px) {
     grid-template-columns: none;
     grid-template-rows: auto;
 
@@ -227,6 +231,11 @@ export const RowTokenDiv = styled.div`
     justify-content: stretch;
     padding: 0 0.7rem;
 
+    &.selected {
+      > div {
+        border-bottom: 1px solid #ffffff40;
+      }
+    }
     > div {
       display: flex;
       flex-flow: row;

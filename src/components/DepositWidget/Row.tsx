@@ -56,7 +56,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
-  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE
+  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
@@ -144,7 +144,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       </RowTokenDiv>
       {isDepositFormVisible && (
         <Form
-          title={<p>Deposit {symbol} in Exchange Wallet</p>}
+          title={
+            <p>
+              Deposit <strong>{symbol}</strong> in Exchange Wallet
+            </p>
+          }
           totalAmountLabel="Wallet balance"
           totalAmount={walletBalance}
           inputLabel="Deposit amount"
@@ -158,7 +162,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       )}
       {isWithdrawFormVisible && (
         <Form
-          title={<p>Withdraw {symbol} from Exchange Wallet</p>}
+          title={
+            <p>
+              Withdraw <strong>{symbol}</strong> from Exchange Wallet
+            </p>
+          }
           totalAmountLabel="Exchange wallet"
           totalAmount={exchangeBalanceTotal}
           inputLabel="Withdraw amount"
