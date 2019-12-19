@@ -11,8 +11,9 @@ const variables = css`
     --color-background-pageWrapper: #fff;
     --color-background-actionCards: #bbfdbb;
     --color-background-highlighted: #fcfde0;
-    --color-background-selected: #f3f3f3;
-    --color-background-selected-darker: #dcdcdc;
+    --color-background-selected: ##d9d9d9;
+    --color-background-selected-darker: #b6b6b6;
+    --color-background-selected-dark: #bfbfbf;
 
     // Text
     // --color-text-primary: #3d414c;
@@ -31,7 +32,7 @@ const variables = css`
     // ------------------------------
     // BORDERS
     // ------------------------------
-    --border-radius: 10px;
+    --border-radius: 7px;
 
     // ------------------------------
     // BOX-SHADOW
@@ -41,7 +42,7 @@ const variables = css`
     //-------------------------------
     // GRID
     // ------------------------------
-    --grid-row-size-walletPage: minmax(175px, 1.1fr) repeat(3, 1fr) minmax(156px, 1fr);
+    --grid-row-size-walletPage: minmax(175px, 1.1fr) repeat(3, 1fr) minmax(158px, 1fr);
   }
 `
 
