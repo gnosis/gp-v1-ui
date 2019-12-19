@@ -42,7 +42,7 @@ const IconWrapper = styled.a`
 const WarningLabel = styled.code`
   background: #ffa8a8;
   border-radius: var(--border-radius);
-  font-weight: 800;
+  font-weight: bolder;
   margin: 0 auto 15px;
   padding: 6;
   text-align: center;

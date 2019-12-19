@@ -6,11 +6,13 @@ const variables = css`
     // COLOURS
     //-----------------------------
     // Background
-    --color-background: #f7f7f7;
+    --color-background-lighter: #f7f7f7;
+    --color-background: #eee;
     --color-background-pageWrapper: #fff;
     --color-background-actionCards: #bbfdbb;
     --color-background-highlighted: #fcfde0;
-    --color-background-selected: #dcdcdc;
+    --color-background-selected: #f3f3f3;
+    --color-background-selected-darker: #dcdcdc;
 
     // Text
     // --color-text-primary: #3d414c;

@@ -33,7 +33,7 @@ export const InnerWrapper = styled.div`
     justify-content: stretch;
     align-items: center;
 
-    font-weight: 800;
+    font-weight: bolder;
 
     margin: auto;
     padding: 5px;
@@ -134,7 +134,7 @@ export const DepositWidgetWrapper = styled.section`
       text-transform: uppercase;
       overflow-wrap: break-word;
       padding: 0.5em;
-      font-weight: 800;
+      font-weight: bolder;
     }
 
     @media only screen and (max-width: 720px) {

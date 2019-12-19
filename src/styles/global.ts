@@ -63,10 +63,10 @@ const GlobalStyles = createGlobalStyle`
 
     font-family: inherit;
     font-size: 100%;
-    font-weight: 1000;
+    font-weight: bolder;
     cursor: pointer;
 
-    padding: 0.5rem;
+    padding: 0.33rem 0.5rem;
     margin: 0.5rem;
         
     transition: all 0.2s ease-in-out;
@@ -128,7 +128,7 @@ const GlobalStyles = createGlobalStyle`
 
     font-family: inherit;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: bold;
     
     padding: 0.65em;
     margin: 0.4em 0.85em;
