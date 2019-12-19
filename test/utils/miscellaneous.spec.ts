@@ -19,12 +19,24 @@ describe('getToken', () => {
     it('returns `undefined` when value not in tokens list', () => {
       expect(getToken('symbol', 'any', tokenList)).toBeUndefined()
     })
+    it('returns `undefined` when id not found', () => {
+      expect(getToken('id', -1, tokenList)).toBeUndefined()
+    })
+  })
+
+  describe('value is a number', () => {
+    it('returns token when id in the list', () => {
+      const expected = tokenList[0]
+      const actual = getToken('id', expected.id, tokenList)
+      expect(actual).not.toBeUndefined()
+      expect(actual).toBe(expected)
+    })
   })
 
   describe('string case', () => {
     it('ignores `value` case', () => {
       const expected = tokenList[0]
-      const lowerCaseSymbol = expected.symbol.toLowerCase()
+      const lowerCaseSymbol = expected.symbol?.toLowerCase()
       const actual = getToken('symbol', lowerCaseSymbol, tokenList)
       expect(actual).not.toBeUndefined()
       expect(actual).toBe(expected)
@@ -32,7 +44,7 @@ describe('getToken', () => {
 
     it("it's case insensitive", () => {
       const expected = tokenList[0]
-      const actual = getToken('symbol', expected.symbol.toLowerCase(), tokenList)
+      const actual = getToken('symbol', expected.symbol?.toLowerCase(), tokenList)
       expect(actual).not.toBeUndefined()
       expect(actual).toBe(expected)
     })
