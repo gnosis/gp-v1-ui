@@ -73,6 +73,16 @@ const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
   )
 }
 
+const DeleteOrder: React.FC<Pick<Props, 'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending'>> = ({
+  isMarkedForDeletion,
+  toggleMarkedForDeletion,
+  pending,
+}) => (
+  <div className="checked">
+    <input type="checkbox" onClick={toggleMarkedForDeletion} checked={isMarkedForDeletion} disabled={pending} />
+  </div>
+)
+
 function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
   const displayName = safeTokenName(token)
   if (displayName.startsWith('0x')) {
@@ -211,6 +221,8 @@ interface Props {
   isOverBalance: boolean
   networkId: number
   pending?: boolean
+  isMarkedForDeletion: boolean
+  toggleMarkedForDeletion: () => void
 }
 
 const onError = onErrorFactory('Failed to fetch token')
@@ -232,9 +244,7 @@ const OrderRow: React.FC<Props> = props => {
       {sellToken && buyToken && (
         <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
           <PendingLink pending={pending} />
-          <div className="checked">
-            <input type="checkbox" />
-          </div>
+          <DeleteOrder {...props} />
           <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
           <UnfilledAmount order={order} sellToken={sellToken} />
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
