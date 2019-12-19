@@ -57,11 +57,14 @@ const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
 
 toast.configure({ position: toast.POSITION.BOTTOM_RIGHT, closeOnClick: false })
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const baseURL = (window as any).BASE_URL || process.env.BASE_URL
+
 // App
 const App: React.FC = () => (
   <>
     <GlobalStyles />
-    <Router basename={process.env.BASE_URL}>
+    <Router basename={baseURL}>
       <Layout>
         <Switch>
           <PrivateRoute path="/orders" exact component={Orders} />
