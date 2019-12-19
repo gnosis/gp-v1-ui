@@ -179,6 +179,14 @@ const OrdersWidget: React.FC = () => {
     [setMarkedForDeletion],
   )
 
+  const toggleSelectAll = useCallback(
+    ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) => {
+      const newSet: Set<string> = checked ? new Set(orders.map(order => order.id)) : new Set()
+      setMarkedForDeletion(newSet)
+    },
+    [orders, setMarkedForDeletion],
+  )
+
   return (
     <OrdersWrapper>
       <div>
@@ -219,7 +227,7 @@ const OrdersWidget: React.FC = () => {
             <div className="ordersContainer">
               <div className="headerRow">
                 <div className="checked">
-                  <input type="checkbox" />
+                  <input type="checkbox" onClick={toggleSelectAll} checked={orders.length === markedForDeletion.size} />
                 </div>
                 <div className="title">Order details</div>
                 <div className="title">
