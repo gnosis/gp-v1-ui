@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -8,6 +8,8 @@ import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { getTokenFromExchangeById } from 'services'
+
+import useSafeState from 'hooks/useSafeState'
 
 import { TokenDetails, AuctionElement } from 'types'
 import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
@@ -187,8 +189,10 @@ async function fetchToken(
   networkId: number,
   setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
 ): Promise<void> {
+  console.log('fetching token %d', tokenId)
   const token = await getTokenFromExchangeById({ tokenId, networkId })
 
+  console.log('fetched token %d', tokenId, token)
   // It is unlikely the token ID coming form the order won't exist
   // Still, if that ever happens, store null and keep this order hidden
   setFn(token)
@@ -205,10 +209,11 @@ const OrderRow: React.FC<Props> = props => {
   const { order, networkId, pending = false } = props
 
   // Fetching buy and sell tokens
-  const [sellToken, setSellToken] = useState<TokenDetails | null>(null)
-  const [buyToken, setBuyToken] = useState<TokenDetails | null>(null)
+  const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
+  const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
 
   useEffect(() => {
+    console.log('will fetch tokens')
     fetchToken(order.buyTokenId, networkId, setBuyToken)
     fetchToken(order.sellTokenId, networkId, setSellToken)
   }, [networkId, order.buyTokenId, order.sellTokenId, setBuyToken, setSellToken])
