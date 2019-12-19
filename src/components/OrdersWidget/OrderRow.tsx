@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -13,6 +14,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { TokenDetails, AuctionElement } from 'types'
 import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
+import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 
 const OrderRowWrapper = styled.div`
@@ -186,16 +188,22 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
 
 async function fetchToken(
   tokenId: number,
+  orderId: string,
   networkId: number,
   setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
 ): Promise<void> {
-  console.log('fetching token %d', tokenId)
   const token = await getTokenFromExchangeById({ tokenId, networkId })
 
-  console.log('fetched token %d', tokenId, token)
   // It is unlikely the token ID coming form the order won't exist
   // Still, if that ever happens, store null and keep this order hidden
   setFn(token)
+
+  // Also, inform the user this token failed and the order is hidden.
+  if (!token) {
+    toast.warn(
+      `Token id ${tokenId} used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`,
+    )
+  }
 }
 
 interface Props {
@@ -213,10 +221,10 @@ const OrderRow: React.FC<Props> = props => {
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
 
   useEffect(() => {
-    console.log('will fetch tokens')
-    fetchToken(order.buyTokenId, networkId, setBuyToken)
-    fetchToken(order.sellTokenId, networkId, setSellToken)
-  }, [networkId, order.buyTokenId, order.sellTokenId, setBuyToken, setSellToken])
+    const errorMsg = 'Failed to fetch token'
+    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken).catch(onErrorFactory(errorMsg))
+    fetchToken(order.sellTokenId, order.id, networkId, setSellToken).catch(onErrorFactory(errorMsg))
+  }, [networkId, order, setBuyToken, setSellToken])
 
   return (
     <>
