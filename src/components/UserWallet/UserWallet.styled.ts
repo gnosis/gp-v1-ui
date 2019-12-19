@@ -31,6 +31,11 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
   > * {
     margin: 0 6px;
   }
+
+  > svg {
+    width: 70%;
+    height: auto;
+  }
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`
@@ -64,13 +69,13 @@ export const UserWalletSlideWrapper = styled.div`
 export const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
   color: ${({ color = '#000' }): string => color};
   font-size: ${({ $fontSize = '1rem' }): string => $fontSize};
-  font-weight: 800;
+  font-weight: bolder;
 `
 
 export const MonospaceAddress = styled(NetworkTitle)`
   margin: 0 10px;
   font-family: 'monospace';
   font-size: 85%;
-  font-weight: 100;
+  font-weight: lighter;
   word-break: break-all;
 `

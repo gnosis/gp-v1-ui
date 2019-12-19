@@ -56,7 +56,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
-  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE
+  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
@@ -85,8 +85,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
-                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} spin />}
-                &nbsp; {formatAmount(withdrawingBalance, decimals)}
+                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+                {formatAmount(withdrawingBalance, decimals)}
               </RowClaimButton>
               <div>
                 <RowClaimLink
@@ -103,8 +103,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </>
           ) : withdrawingBalance.gt(ZERO) ? (
             <>
-              <FontAwesomeIcon icon={faClock} />
-              &nbsp; {formatAmount(withdrawingBalance, decimals)}
+              <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
+              {formatAmount(withdrawingBalance, decimals)}
             </>
           ) : (
             0
@@ -145,9 +145,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isDepositFormVisible && (
         <Form
           title={
-            <>
-              Deposit <span className="symbol">{symbol}</span> in Exchange Wallet
-            </>
+            <p>
+              Deposit <strong>{symbol}</strong> in Exchange Wallet
+            </p>
           }
           totalAmountLabel="Wallet balance"
           totalAmount={walletBalance}
@@ -163,9 +163,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isWithdrawFormVisible && (
         <Form
           title={
-            <>
-              Withdraw <span className="symbol">{symbol}</span> from Exchange Wallet
-            </>
+            <p>
+              Withdraw <strong>{symbol}</strong> from Exchange Wallet
+            </p>
           }
           totalAmountLabel="Exchange wallet"
           totalAmount={exchangeBalanceTotal}

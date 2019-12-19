@@ -3,6 +3,7 @@ import styled from 'styled-components'
 import { Link } from 'react-router-dom'
 
 const Wrapper = styled.footer`
+  align-self: flex-end;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;

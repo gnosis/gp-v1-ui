@@ -4,11 +4,13 @@ import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import PageWrapper from './PageWrapper'
+import { RESPONSIVE_SIZES } from 'const'
+
+const { TABLET, MOBILE_LARGE } = RESPONSIVE_SIZES
 
 const Wrapper = styled(PageWrapper)`
   overflow-x: auto;
   font-size: 0.85rem;
-  padding-bottom: 4em;
   padding: 2em;
   border-radius: var(--border-radius);
   min-width: 58vw;
@@ -16,15 +18,20 @@ const Wrapper = styled(PageWrapper)`
   display: flex;
   flex-direction: column;
 
-  @media only screen and (max-width: 866px) {
+  @media only screen and (max-width: ${TABLET}px) {
     margin: 0 auto 3rem;
     padding: 1em;
+    width: 80%;
+  }
+
+  @media only screen and (max-width: ${MOBILE_LARGE}px) {
+    width: 100%;
   }
 `
 
 const LinkWrapper = styled(EtherscanLink)`
   text-align: right;
-  margin-bottom: 3em;
+  margin-bottom: 2em;
   display: block;
 `
 

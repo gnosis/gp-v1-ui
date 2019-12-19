@@ -5,6 +5,8 @@ import Header from './Header'
 import Footer from './Footer'
 import LegalBanner from '../LegalBanner'
 
+import { RESPONSIVE_SIZES } from 'const'
+
 const Wrapper = styled.div`
   min-height: 100vh;
   width: 100%;
@@ -17,7 +19,7 @@ const Wrapper = styled.div`
     margin: auto;
     min-width: 40vw;
 
-    @media only screen and (max-width: 768px) {
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}px) {
       width: 100%;
     }
   }

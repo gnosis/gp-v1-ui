@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { LEGALDOCUMENT } from 'const'
+import { LEGALDOCUMENT, RESPONSIVE_SIZES } from 'const'
+
+const { MOBILE } = RESPONSIVE_SIZES
 
 const Wrapper = styled.div`
   display: flex;
@@ -14,7 +16,7 @@ const Wrapper = styled.div`
   text-align: center;
   font-size: 80%;
 
-  @media only screen and (max-width: 500px) {
+  @media only screen and (max-width: ${MOBILE}px) {
     padding: 0.2rem 2rem;
   }
 `

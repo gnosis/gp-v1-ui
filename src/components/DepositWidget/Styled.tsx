@@ -1,4 +1,100 @@
 import styled from 'styled-components'
+import { RESPONSIVE_SIZES } from 'const'
+
+const { TABLET } = RESPONSIVE_SIZES
+export const InnerWrapper = styled.div`
+  position: relative;
+  background-color: var(--color-background-selected-dark);
+  border-bottom: 2px solid #0000000f;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-top: -0.52rem;
+  width: 80%;
+
+  @media only screen and (max-width: ${TABLET}px) {
+    width: 95%;
+  }
+
+  > div {
+    margin-top: 2rem;
+  }
+
+  span.symbol {
+    color: #b02ace;
+  }
+
+  h4 {
+    margin: 2.5rem 1rem 1rem;
+    font-size: 1.3em;
+    font-weight: normal;
+    text-align: center;
+  }
+
+  .WalletItemContainer {
+    display: grid;
+    grid-template-rows: repeat(2, auto) 20px auto;
+    justify-content: stretch;
+    align-items: center;
+
+    font-weight: bolder;
+
+    margin: auto;
+    padding: 5px;
+    width: 80%;
+
+    @media only screen and (max-width: ${TABLET}px) {
+      width: 95%;
+    }
+
+    p.error {
+      color: red;
+      padding: 0 0.5rem 0.5rem;
+      margin: auto;
+    }
+
+    div.wallet {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(101px, 116px) minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
+
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      &:last-child {
+        margin: auto;
+        width: 80%;
+        text-align: center;
+      }
+      > p {
+        text-align: right;
+      }
+      > input {
+        margin: 0;
+        width: 100%;
+      }
+    }
+
+    .buttons {
+      text-align: center;
+      padding-top: 1em;
+      button {
+        min-width: 7em;
+        margin-left: 1.2em;
+      }
+    }
+  }
+
+  .times {
+    position: absolute;
+    display: inline-block;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0 0.5em 0 0;
+    font-size: 2em;
+    text-decoration: none;
+  }
+`
 
 export const DynamicWrapper = styled.div<{ responsive: boolean }>`
   display: flex;
@@ -14,98 +110,12 @@ export const DynamicWrapper = styled.div<{ responsive: boolean }>`
       bottom: 0;
       right: 0;
       background: #000000b5;
+      z-index: 99;
+
+      > ${InnerWrapper} {
+        border-radius: var(--border-radius);
+      }
   `}
-`
-
-export const InnerWrapper = styled.div`
-  position: relative;
-  background-color: #f7f0ff;
-  border-bottom: 2px solid #0000000f;
-  border-radius: var(--border-radius);
-  width: 96%;
-
-  > div {
-    margin-top: 2rem;
-  }
-
-  span.symbol {
-    color: #b02ace;
-  }
-
-  h4 {
-    margin: 3rem 1rem 1rem;
-    font-size: 1.3em;
-    text-align: center;
-  }
-
-  ul {
-    align-items: center;
-    list-style: none;
-    text-align: left;
-    margin: auto;
-    padding: 1rem 0 1rem 3rem;
-    max-width: 364px;
-
-    @media only screen and (max-width: 420px) {
-      padding: 1rem 0;
-    }
-
-    li {
-      display: block;
-      margin: 0 auto;
-    }
-
-    li > label {
-      width: 9em;
-      color: #6c0084;
-      font-weight: bold;
-      text-align: right;
-    }
-
-    p.error {
-      color: red;
-      padding: 0 0 0.5em 10em;
-      margin: 0;
-    }
-
-    div.wallet {
-      display: inline-block;
-      text-align: center;
-      position: relative;
-
-      a.max {
-        display: inline-block;
-        margin-left: 0.5em;
-        position: absolute;
-        top: 1.3em;
-        right: -3em;
-      }
-    }
-
-    li > label {
-      display: block;
-      height: 100%;
-    }
-
-    .buttons {
-      text-align: center;
-      padding-top: 1em;
-      button {
-        min-width: 7em;
-        margin-left: 1.2em;
-      }
-    }
-  }
-
-  .times {
-    position: absolute;
-    top: 0;
-    right: 0;
-    text-decoration: none;
-    font-size: 2em;
-    display: inline-block;
-    padding: 0 0.5em 0 0;
-  }
 `
 
 export const DepositWidgetWrapper = styled.section`
@@ -118,7 +128,7 @@ export const DepositWidgetWrapper = styled.section`
     display: inherit;
     justify-content: center;
     align-items: center;
-    grid-template-columns: 1.1fr repeat(4, 1fr);
+    grid-template-columns: var(--grid-row-size-walletPage);
 
     > div {
       color: #000000;
@@ -127,10 +137,10 @@ export const DepositWidgetWrapper = styled.section`
       text-transform: uppercase;
       overflow-wrap: break-word;
       padding: 0.5em;
-      font-weight: 800;
+      font-weight: bolder;
     }
 
-    @media only screen and (max-width: 500px) {
+    @media only screen and (max-width: ${TABLET}px) {
       display: none;
     }
   }
@@ -156,7 +166,7 @@ export const ModalBodyWrapper = styled.div`
 
 export const RowTokenDiv = styled.div`
   display: grid;
-  grid-template-columns: 1.1fr repeat(4, 1fr);
+  grid-template-columns: var(--grid-row-size-walletPage);
   align-items: center;
   justify-content: center;
 
@@ -165,10 +175,11 @@ export const RowTokenDiv = styled.div`
   box-shadow: var(--box-shadow);
   margin: 0.3rem 0;
 
-  transition: background 0.1s ease-in-out;
+  z-index: 1;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    background: #0000000a !important;
+    background: var(--color-background-selected);
   }
 
   > div {
@@ -176,6 +187,10 @@ export const RowTokenDiv = styled.div`
     padding: 0.7rem;
     text-align: center;
     transition: all 0.5s ease;
+
+    > button {
+      margin: 0.2rem;
+    }
 
     &:first-child {
       display: flex;
@@ -194,12 +209,13 @@ export const RowTokenDiv = styled.div`
   }
 
   &.highlight {
-    background-color: #fdffc1;
+    background-color: var(--color-background-highlighted);
     border-bottom-color: #fbdf8f;
   }
 
   &.selected {
-    background-color: #ecdcff;
+    background-color: var(--color-button-disabled);
+    color: var(--color-background-pageWrapper);
   }
 
   &.loading {
@@ -207,7 +223,7 @@ export const RowTokenDiv = styled.div`
     border-bottom-color: #b9b9b9;
   }
 
-  @media only screen and (max-width: 500px) {
+  @media only screen and (max-width: ${TABLET}px) {
     grid-template-columns: none;
     grid-template-rows: auto;
 
@@ -215,6 +231,11 @@ export const RowTokenDiv = styled.div`
     justify-content: stretch;
     padding: 0 0.7rem;
 
+    &.selected {
+      > div {
+        border-bottom: 1px solid #ffffff40;
+      }
+    }
     > div {
       display: flex;
       flex-flow: row;
@@ -234,10 +255,6 @@ export const RowTokenDiv = styled.div`
         border: none;
         flex-flow: row nowrap;
         padding: 0.7rem 0 0.7rem 0.7rem;
-
-        > button {
-          margin: 0.2rem;
-        }
 
         > button:last-child {
           border-radius: 0 var(--border-radius) var(--border-radius);
@@ -270,4 +287,9 @@ export const RowClaimLink = styled.a`
     cursor: not-allowed;
     opacity: 0.5;
   }
+`
+export const LineSeparator = styled.div`
+  border: 0.5px solid var(--color-text-primary);
+  margin: auto;
+  width: calc(100% - 25px);
 `

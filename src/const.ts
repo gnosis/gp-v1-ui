@@ -38,7 +38,12 @@ export const LEGALDOCUMENT = {
 }
 
 export const RESPONSIVE_SIZES = {
+  MOBILE_SMALL: 320,
   MOBILE: 500,
+  MOBILE_LARGE: 532,
+  TABLET: 720,
+  TABLET_LARGE: 866,
+  WEB_SMALL: 1024,
 }
 
 export const DEFAULT_DECIMALS = 4
