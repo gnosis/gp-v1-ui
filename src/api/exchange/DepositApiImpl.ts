@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
-import { getEpochAddressForNetwork } from './epochList'
+import { getEpochAddressForNetwork } from './batchExchangeAddresses'
 
 import { DepositApi, Receipt, TxOptionalParams } from 'types'
 import { EpochTokenLocker } from 'types/EpochTokenLocker'

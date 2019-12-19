@@ -8,7 +8,7 @@ function _getAddress(contractName: string, networkId: number): string {
   return networkInfo ? networkInfo.address : ''
 }
 
-const Network2Epoch = CONTRACTS.reduce((acc, contractName) => {
+const addressesByNetwork = CONTRACTS.reduce((acc, contractName) => {
   acc[contractName] = {
     [Network.Rinkeby]: _getAddress(contractName, Network.Rinkeby),
     [Network.Mainnet]: _getAddress(contractName, Network.Mainnet),
@@ -17,8 +17,6 @@ const Network2Epoch = CONTRACTS.reduce((acc, contractName) => {
   return acc
 }, {})
 
-console.log('Network2Epoch', Network2Epoch)
+export const getAddressForNetwork = (networkId: Network): string | null => addressesByNetwork[networkId] || null
 
-export const getEpochAddressForNetwork = (networkId: Network): string | null => Network2Epoch[networkId] || null
-
-export default Network2Epoch
+export default addressesByNetwork
