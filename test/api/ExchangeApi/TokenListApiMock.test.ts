@@ -1,7 +1,7 @@
 import { Network, TokenDetails } from 'types'
 
 import TokenListApiMock from 'api/tokenList/TokenListApiMock'
-import { TokenListApiImpl, TokenList } from 'api/tokenList/TokenListApiImpl'
+import { TokenListApiImpl, TokenList } from 'api/tokenList/TokenListApi'
 import { tokenList } from '@gnosis.pm/dex-js'
 
 let instanceMock: TokenList
