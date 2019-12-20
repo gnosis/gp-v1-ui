@@ -1,13 +1,19 @@
 import BN from 'bn.js'
+import { AbiItem } from 'web3-utils'
 import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
-import { getEpochAddressForNetwork } from './epochList'
 
+import { BatchExchangeContract } from '@gnosis.pm/dex-js'
+import { getAddressForNetwork } from './batchExchangeAddresses'
 import { DepositApi, Receipt, TxOptionalParams } from 'types'
-import { EpochTokenLocker } from 'types/EpochTokenLocker'
-import EpochTokenLockerAbi from './EpochTokenLockerAbi'
+
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
+
+// TODO: Very likely, this ABI makes webpack build heavier. Review how to instruct to discard info
+//  https://github.com/gnosis/dex-react/issues/97
+// import { abi } from '@gnosis.pm/dex-contracts/build/contracts/BatchExchange.json'
+import batchExchangeAbi from '@gnosis.pm/dex-js/build/src/contracts/abi/BatchExchange.json'
 
 const getNetworkIdFromWeb3 = (web3: Web3): null | number => {
   if (!web3.currentProvider) return null
@@ -21,23 +27,21 @@ const getNetworkIdFromWeb3 = (web3: Web3): null | number => {
 }
 
 export class DepositApiImpl implements DepositApi {
-  private _ReferenceEpochTokenLocker: EpochTokenLocker
-  private _web3: Web3
-
-  protected static _address2ContractCache: { [K: string]: EpochTokenLocker } = {}
+  protected _contractPrototype: BatchExchangeContract
+  protected _web3: Web3
+  protected static _contractsCache: { [K: string]: BatchExchangeContract } = {}
 
   public constructor(web3: Web3) {
-    this._ReferenceEpochTokenLocker = new web3.eth.Contract(EpochTokenLockerAbi)
-
+    this._contractPrototype = new web3.eth.Contract(batchExchangeAbi as AbiItem[]) as BatchExchangeContract
     this._web3 = web3
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).epoch = this._ReferenceEpochTokenLocker
+    ;(window as any).epoch = this._contractPrototype
   }
 
   public getContractAddress(networkId: number): string | null {
-    return getEpochAddressForNetwork(networkId)
+    return getAddressForNetwork(networkId)
   }
 
   public async getBatchTime(): Promise<number> {
@@ -77,7 +81,9 @@ export class DepositApiImpl implements DepositApi {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
-    const depositAmount = await contract.methods.getPendingDepositAmount(userAddress, tokenAddress).call()
+    // TODO: Update APIs to the new get balances changes
+    // https://github.com/gnosis/dex-react/issues/332
+    const { 0: depositAmount } = await contract.methods.getPendingDeposit(userAddress, tokenAddress).call()
 
     return toBN(depositAmount)
   }
@@ -92,7 +98,9 @@ export class DepositApiImpl implements DepositApi {
     if (!userAddress || !tokenAddress) return 0
 
     const contract = await this._getContract()
-    const depositBatchId = await contract.methods.getPendingDepositBatchNumber(userAddress, tokenAddress).call()
+    // TODO: Update APIs to the new get balances changes
+    // https://github.com/gnosis/dex-react/issues/332
+    const { 1: depositBatchId } = await contract.methods.getPendingDeposit(userAddress, tokenAddress).call()
 
     return +depositBatchId
   }
@@ -107,7 +115,9 @@ export class DepositApiImpl implements DepositApi {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
-    const withdrawAmount = await contract.methods.getPendingWithdrawAmount(userAddress, tokenAddress).call()
+    // TODO: Update APIs to the new get balances changes
+    // https://github.com/gnosis/dex-react/issues/332
+    const { 0: withdrawAmount } = await contract.methods.getPendingWithdraw(userAddress, tokenAddress).call()
 
     return toBN(withdrawAmount)
   }
@@ -122,7 +132,9 @@ export class DepositApiImpl implements DepositApi {
     if (!userAddress || !tokenAddress) return 0
 
     const contract = await this._getContract()
-    const withdrawBatchId = await contract.methods.getPendingWithdrawBatchNumber(userAddress, tokenAddress).call()
+    // TODO: Update APIs to the new get balances changes
+    // https://github.com/gnosis/dex-react/issues/332
+    const { 1: withdrawBatchId } = await contract.methods.getPendingWithdraw(userAddress, tokenAddress).call()
 
     return +withdrawBatchId
   }
@@ -182,13 +194,13 @@ export class DepositApiImpl implements DepositApi {
     return networkId === null ? this._web3.eth.net.getId() : networkId
   }
 
-  protected async _getContract(): Promise<EpochTokenLocker> {
+  protected async _getContract(): Promise<BatchExchangeContract> {
     const networkId = await this._getNetworkId()
 
     return this._getContractForNetwork(networkId)
   }
 
-  protected _getContractForNetwork(networkId: number): EpochTokenLocker {
+  protected _getContractForNetwork(networkId: number): BatchExchangeContract {
     const address = this.getContractAddress(networkId)
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
@@ -197,14 +209,14 @@ export class DepositApiImpl implements DepositApi {
     return this._getContractAtAddress(address)
   }
 
-  protected _getContractAtAddress(address: string): EpochTokenLocker {
-    const contract = DepositApiImpl._address2ContractCache[address]
+  protected _getContractAtAddress(address: string): BatchExchangeContract {
+    const contract = DepositApiImpl._contractsCache[address]
 
     if (contract) return contract
 
-    const newContract = this._ReferenceEpochTokenLocker.clone()
+    const newContract = this._contractPrototype.clone()
     newContract.options.address = address
 
-    return (DepositApiImpl._address2ContractCache[address] = newContract)
+    return (DepositApiImpl._contractsCache[address] = newContract)
   }
 }

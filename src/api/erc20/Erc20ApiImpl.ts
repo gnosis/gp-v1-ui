@@ -1,5 +1,5 @@
 import { Erc20Api, TxOptionalParams, Receipt } from 'types'
-import { ERC20 } from 'types/ERC20'
+import { Erc20Contract } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
@@ -11,16 +11,16 @@ import Web3 from 'web3'
  * Basic implementation of ERC20 API
  */
 export class Erc20ApiImpl implements Erc20Api {
-  private _ReferenceERC20: ERC20
+  private _contractPrototype: Erc20Contract
 
-  private static _contractsCache: { [K: string]: ERC20 } = {}
+  private static _contractsCache: { [K: string]: Erc20Contract } = {}
 
   public constructor(web3: Web3) {
-    this._ReferenceERC20 = new web3.eth.Contract(Erc20ABI)
+    this._contractPrototype = new web3.eth.Contract(Erc20ABI)
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).erc20 = this._ReferenceERC20
+    ;(window as any).erc20 = this._contractPrototype
   }
 
   public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
@@ -150,12 +150,12 @@ export class Erc20ApiImpl implements Erc20Api {
 
   /********************************    private methods   ********************************/
 
-  private _getERC20AtAddress(address: string): ERC20 {
+  private _getERC20AtAddress(address: string): Erc20Contract {
     const erc20 = Erc20ApiImpl._contractsCache[address]
 
     if (erc20) return erc20
 
-    const newERC20 = this._ReferenceERC20.clone()
+    const newERC20 = this._contractPrototype.clone()
     newERC20.options.address = address
 
     return (Erc20ApiImpl._contractsCache[address] = newERC20)
