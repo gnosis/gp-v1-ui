@@ -33,6 +33,7 @@ export interface TokenBalanceDetails extends TokenDetails {
   walletBalance: BN
   claimable: boolean
   enabled: boolean
+  totalExchangeBalance: BN
 }
 
 export interface TokenList {
