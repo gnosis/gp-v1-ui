@@ -1,6 +1,6 @@
 import { Network } from 'types'
 import { WalletApiMock } from './wallet/WalletApiMock'
-import { WalletApiImpl, WalletApi } from './wallet/WalletApiImpl'
+import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
 import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'

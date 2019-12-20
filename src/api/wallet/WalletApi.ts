@@ -1,7 +1,7 @@
 import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
-import { getDefaultProvider } from '../'
+import { getDefaultProvider } from '..'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
