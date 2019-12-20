@@ -5,7 +5,7 @@ import { ZERO } from 'const'
 
 import { BatchExchangeContract } from '@gnosis.pm/dex-js'
 import { getAddressForNetwork } from './batchExchangeAddresses'
-import { Receipt, TxOptionalParams, PendingFlux } from 'types'
+import { Receipt, TxOptionalParams } from 'types'
 
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
@@ -13,6 +13,7 @@ import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
 // TODO: Very likely, this ABI makes webpack build heavier. Review how to instruct to discard info
 //  https://github.com/gnosis/dex-react/issues/97
 import { abi as batchExchangeAbi } from '@gnosis.pm/dex-contracts/build/contracts/BatchExchange.json'
+import { PendingFlux } from './ExchangeApiImpl'
 
 export interface DepositApi {
   getContractAddress(networkId: number): string | null

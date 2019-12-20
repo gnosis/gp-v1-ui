@@ -43,6 +43,17 @@ export interface Order {
   remainingAmount: BN
 }
 
+export interface PendingFlux {
+  amount: BN
+  batchId: number
+}
+
+export interface BalanceState {
+  balance: BN
+  pendingDeposits: PendingFlux
+  pendingWithdraws: PendingFlux
+}
+
 /**
  * Basic implementation of Stable Coin Converter API
  */

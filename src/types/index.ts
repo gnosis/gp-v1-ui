@@ -1,5 +1,6 @@
 import BN from 'bn.js'
 import { TransactionReceipt } from 'web3-core'
+import { PendingFlux } from 'api/exchange/ExchangeApiImpl'
 
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
@@ -37,17 +38,6 @@ export interface TokenBalanceDetails extends TokenDetails {
 
 export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
-}
-
-export interface PendingFlux {
-  amount: BN
-  batchId: number
-}
-
-export interface BalanceState {
-  balance: BN
-  pendingDeposits: PendingFlux
-  pendingWithdraws: PendingFlux
 }
 
 export interface TxOptionalParams {
