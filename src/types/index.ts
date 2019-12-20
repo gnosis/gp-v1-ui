@@ -36,10 +36,6 @@ export interface TokenBalanceDetails extends TokenDetails {
   totalExchangeBalance: BN
 }
 
-export interface TokenList {
-  getTokens: (networkId: number) => TokenDetails[]
-}
-
 export interface TxOptionalParams {
   onSentTransaction?: (transactionHash: string) => void
 }
