@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { AbiItem } from 'web3-utils'
 import { Erc20Contract } from '@gnosis.pm/dex-js'
-import erc20Abi from '@gnosis.pm/dex-js/build/src/contracts/abi/Erc20.json'
+import erc20Abi from '@gnosis.pm/dex-js/build/contracts/abi/Erc20.json'
 
 import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'

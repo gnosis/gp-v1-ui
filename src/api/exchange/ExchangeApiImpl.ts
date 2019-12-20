@@ -1,9 +1,9 @@
-import { DepositApiImpl } from './DepositApiImpl'
+import { DepositApiImpl, DepositApi } from './DepositApiImpl'
 import { PlaceOrderParams, Receipt, TxOptionalParams, AuctionElement } from 'types'
 import { log, decodeAuctionElements } from 'utils'
 import Web3 from 'web3'
 
-export interface ExchangeApi extends DepositApiImpl {
+export interface ExchangeApi extends DepositApi {
   getOrders(userAddress: string): Promise<AuctionElement[]>
   getNumTokens(): Promise<number>
   getFeeDenominator(): Promise<number>
