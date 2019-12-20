@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { DepositApiImpl, DepositApi } from './DepositApiImpl'
+import { DepositApiImpl, DepositApi } from './DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { log, decodeAuctionElements } from 'utils'
 import Web3 from 'web3'
