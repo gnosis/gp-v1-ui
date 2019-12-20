@@ -57,48 +57,6 @@ export interface TxOptionalParams {
 
 export type Receipt = TransactionReceipt
 
-export interface DepositApi {
-  getContractAddress(networkId: number): string | null
-  getBatchTime(): Promise<number>
-  getCurrentBatchId(): Promise<number>
-  getSecondsRemainingInBatch(): Promise<number>
-
-  getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
-  getPendingDeposit({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
-  getPendingWithdraw({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
-
-  deposit(
-    {
-      userAddress,
-      tokenAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-
-  requestWithdraw(
-    {
-      userAddress,
-      tokenAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-
-  withdraw(
-    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-}
-
 export interface EpochTokenLocker extends Contract {
   clone(): EpochTokenLocker
 
@@ -166,20 +124,6 @@ export interface PlaceOrderParams {
   validUntil: number
   buyAmount: BN
   sellAmount: BN
-}
-
-export interface ExchangeApi extends DepositApi {
-  getOrders(userAddress: string): Promise<AuctionElement[]>
-  getNumTokens(): Promise<number>
-  getFeeDenominator(): Promise<number>
-  getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
-  getTokenIdByAddress(tokenAddress: string): Promise<number>
-  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  cancelOrder(
-    { senderAddress, orderId }: { senderAddress: string; orderId: number },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
 }
 
 export interface WalletInfo {
