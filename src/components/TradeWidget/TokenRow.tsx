@@ -126,7 +126,7 @@ const TokenRow: React.FC<Props> = ({
 
   let overMax = ZERO
   if (balance && validateMaxAmount) {
-    const max = balance.exchangeBalance
+    const max = balance.totalExchangeBalance
     const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
     overMax = value.gt(max) ? value.sub(max) : ZERO
   }
@@ -144,7 +144,7 @@ const TokenRow: React.FC<Props> = ({
   )
 
   function useMax(): void {
-    setValue(inputId, formatAmountFull(balance.exchangeBalance, balance.decimals, false))
+    setValue(inputId, formatAmountFull(balance.totalExchangeBalance, balance.decimals, false))
   }
 
   const enforcePrecision = useCallback(() => {
@@ -184,8 +184,6 @@ const TokenRow: React.FC<Props> = ({
     [removeExcessZeros],
   )
 
-  const exchangeBalanceAndPendingBalance = balance && balance.exchangeBalance.add(balance.depositingBalance)
-
   return (
     <Wrapper>
       <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
@@ -223,7 +221,7 @@ const TokenRow: React.FC<Props> = ({
               </LinkWithPastLocation>
             </strong>{' '}
             <span className="success">
-              {balance ? formatAmount(exchangeBalanceAndPendingBalance, balance.decimals) : '0'}
+              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
             </span>
           </div>
           {validateMaxAmount && <a onClick={useMax}>use max</a>}

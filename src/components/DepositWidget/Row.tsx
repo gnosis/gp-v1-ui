@@ -44,16 +44,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     image,
     symbol,
     decimals,
-    exchangeBalance,
-    depositingBalance,
-    withdrawingBalance,
+    totalExchangeBalance,
+    pendingWithdraw,
     claimable,
     walletBalance,
     enabled,
   } = tokenBalances
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
-  const exchangeBalanceTotal = exchangeBalance.add(depositingBalance)
 
   // Checks innerWidth
   const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE
@@ -78,15 +76,15 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           <TokenImg src={image} alt={name} />
           <div>{name}</div>
         </div>
-        <div data-label="Exchange Wallet" title={formatAmountFull(exchangeBalanceTotal, decimals) || ''}>
-          {formatAmount(exchangeBalanceTotal, decimals)}
+        <div data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
+          {formatAmount(totalExchangeBalance, decimals)}
         </div>
-        <div data-label="Pending Withdrawals" title={formatAmountFull(withdrawingBalance, decimals) || ''}>
+        <div data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
                 {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
-                {formatAmount(withdrawingBalance, decimals)}
+                {formatAmount(pendingWithdraw.amount, decimals)}
               </RowClaimButton>
               <div>
                 <RowClaimLink
@@ -101,10 +99,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                 </RowClaimLink>
               </div>
             </>
-          ) : withdrawingBalance.gt(ZERO) ? (
+          ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
-              {formatAmount(withdrawingBalance, decimals)}
+              {formatAmount(pendingWithdraw.amount, decimals)}
             </>
           ) : (
             0
@@ -168,7 +166,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </p>
           }
           totalAmountLabel="Exchange wallet"
-          totalAmount={exchangeBalanceTotal}
+          totalAmount={totalExchangeBalance}
           inputLabel="Withdraw amount"
           tokenBalances={tokenBalances}
           submitBtnLabel="Withdraw"

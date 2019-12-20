@@ -22,6 +22,7 @@ const initialTokenBalanceDetails = {
   decimals: 18,
   address: '0x0',
   exchangeBalance: ZERO,
+  totalExchangeBalance: ZERO,
   pendingDeposit: createFlux(),
   pendingWithdraw: createFlux(),
   claimable: false,
