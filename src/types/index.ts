@@ -146,66 +146,6 @@ export interface WalletApi {
   getProviderInfo(): ProviderInfo
 }
 
-/**
- * Interfaces the access to ERC20 token
- *
- * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
- */
-export interface Erc20Api {
-  balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
-  name({ tokenAddress }: { tokenAddress: string }): Promise<string>
-  symbol({ tokenAddress }: { tokenAddress: string }): Promise<string>
-  decimals({ tokenAddress }: { tokenAddress: string }): Promise<number>
-  totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN>
-
-  allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN>
-
-  approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-
-  transfer(
-    {
-      fromAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-
-  transferFrom(
-    {
-      senderAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      fromAddress: string
-      toAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-}
-
 import { Contract } from 'web3-eth-contract'
 import { PromiEvent, TransactionConfig, TransactionReceipt } from 'web3-core'
 
