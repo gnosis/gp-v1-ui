@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 
 import { TokenDetails } from 'types'
 import { exchangeApi } from 'api'
-import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApiImpl'
+import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
 import { log } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'

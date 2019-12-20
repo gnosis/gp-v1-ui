@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { AuctionElement } from 'api/exchange/ExchangeApiImpl'
+import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 const ADDRESS_WIDTH = 20 * 2
 const UINT256_WIDTH = 32 * 2

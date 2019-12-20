@@ -7,7 +7,7 @@ import { Receipt, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
-import { ExchangeApi, AuctionElement, PlaceOrderParams, Order } from './ExchangeApiImpl'
+import { ExchangeApi, AuctionElement, PlaceOrderParams, Order } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface OrdersByUser {

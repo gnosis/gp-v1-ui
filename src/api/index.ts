@@ -7,7 +7,7 @@ import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiImpl, Erc20Api } from './erc20/Erc20Api'
 import { DepositApiMock } from './exchange/DepositApiMock'
 import { DepositApiImpl, DepositApi } from './exchange/DepositApi'
-import { ExchangeApiImpl, ExchangeApi } from './exchange/ExchangeApiImpl'
+import { ExchangeApiImpl, ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import {
   tokenList,
