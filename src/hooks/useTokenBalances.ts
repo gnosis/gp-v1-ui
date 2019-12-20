@@ -8,12 +8,20 @@ import { useWalletConnection } from './useWalletConnection'
 
 import { formatAmount, log, assert } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
-import { TokenBalanceDetails, TokenDetails, WalletInfo } from 'types'
+import { TokenBalanceDetails, TokenDetails, WalletInfo, PendingFlux } from 'types'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]
   error: boolean
   setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[]>>
+}
+
+function calculateTotalBalance(balance: BN, currentBatchId: number, pendingDeposit: PendingFlux): BN {
+  const { amount, batchId } = pendingDeposit
+  // Only matured deposits are added to the balance:
+  // https://github.com/gnosis/dex-contracts/blob/master/contracts/EpochTokenLocker.sol#L165
+  // In the UI we always display the pending amount as part of user's balance
+  return batchId >= currentBatchId ? balance.add(amount) : balance
 }
 
 async function fetchBalancesForToken(
@@ -42,6 +50,7 @@ async function fetchBalancesForToken(
     ...token,
     decimals: token.decimals,
     exchangeBalance,
+    totalExchangeBalance: calculateTotalBalance(exchangeBalance, currentBachId, pendingDeposit),
     pendingDeposit,
     pendingWithdraw,
     claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBachId,
