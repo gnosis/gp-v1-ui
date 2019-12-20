@@ -1,4 +1,6 @@
 import { useEffect } from 'react'
+import BN from 'bn.js'
+
 import { tokenListApi, erc20Api, depositApi } from 'api'
 
 import useSafeState from './useSafeState'
@@ -22,17 +24,15 @@ async function fetchBalancesForToken(
   const tokenAddress = token.address
   const [
     exchangeBalance,
-    depositingBalance,
-    withdrawingBalance,
-    withdrawBatchId,
+    pendingDeposit,
+    pendingWithdraw,
     currentBachId,
     walletBalance,
     allowance,
   ] = await Promise.all([
     depositApi.getBalance({ userAddress, tokenAddress }),
-    depositApi.getPendingDepositAmount({ userAddress, tokenAddress }),
-    depositApi.getPendingWithdrawAmount({ userAddress, tokenAddress }),
-    depositApi.getPendingWithdrawBatchId({ userAddress, tokenAddress }),
+    depositApi.getPendingDeposit({ userAddress, tokenAddress }),
+    depositApi.getPendingWithdraw({ userAddress, tokenAddress }),
     depositApi.getCurrentBatchId(),
     erc20Api.balanceOf({ userAddress, tokenAddress }),
     erc20Api.allowance({ userAddress, tokenAddress, spenderAddress: contractAddress }),
@@ -42,9 +42,9 @@ async function fetchBalancesForToken(
     ...token,
     decimals: token.decimals,
     exchangeBalance,
-    depositingBalance,
-    withdrawingBalance,
-    claimable: withdrawingBalance.isZero() ? false : withdrawBatchId < currentBachId,
+    pendingDeposit,
+    pendingWithdraw,
+    claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBachId,
     walletBalance,
     enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
   }

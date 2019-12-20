@@ -7,6 +7,7 @@ import { Row, RowProps } from 'components/DepositWidget/Row'
 import { ZERO, ONE } from 'const'
 import { TokenBalanceDetails } from 'types'
 import { TokenLocalState } from 'reducers-actions'
+import { createFlux } from '../data'
 
 const fakeRowState: TokenLocalState = {
   enabling: new Set(),
@@ -21,8 +22,8 @@ const initialTokenBalanceDetails = {
   decimals: 18,
   address: '0x0',
   exchangeBalance: ZERO,
-  depositingBalance: ZERO,
-  withdrawingBalance: ZERO,
+  pendingDeposit: createFlux(),
+  pendingWithdraw: createFlux(),
   claimable: false,
   walletBalance: ZERO,
   enabled: false,
@@ -84,7 +85,7 @@ describe('<Row /> claimable token', () => {
   const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
     enabled: true,
     claimable: true,
-    withdrawingBalance: ONE,
+    pendingWithdraw: createFlux(ONE),
   }
 
   it('contains 2 <button> elements (claim, deposit, withdraw)', () => {
