@@ -63,22 +63,8 @@ export interface DepositApi {
   getSecondsRemainingInBatch(): Promise<number>
 
   getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
-  getPendingDepositAmount({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
-  getPendingDepositBatchId({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<number>
-  getPendingWithdrawAmount({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
-  getPendingWithdrawBatchId({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<number>
+  getPendingDeposit({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
+  getPendingWithdraw({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
 
   deposit(
     {

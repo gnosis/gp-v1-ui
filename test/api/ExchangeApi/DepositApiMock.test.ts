@@ -4,6 +4,7 @@ import { BATCH_TIME, ZERO, TWO } from 'const'
 import { DepositApiMock } from 'api/exchange/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
+import { createFlux } from '../../data'
 
 const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, AMOUNT, AMOUNT_SMALL } = testHelpers
 
@@ -11,6 +12,8 @@ jest.mock('api/erc20/Erc20ApiMock')
 
 let instance: DepositApi
 let mockErc20Api: Erc20Api
+
+const ZERO_FLUX = createFlux()
 
 beforeAll(() => {
   testHelpers.mockTimes()
@@ -116,22 +119,16 @@ describe('Get pending deposit amounts', () => {
     // GIVEN: An user that hasn't deposit any tokens yet
     // WHEN: -
 
-    // THEN: there's no pending deposits
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_2, tokenAddress: TOKEN_1 })).toEqual(ZERO)
-
-    // THEN: there's no batch id
-    expect(await instance.getPendingDepositBatchId({ userAddress: USER_2, tokenAddress: TOKEN_1 })).toEqual(0)
+    // THEN: there's no pending deposits nor batchId
+    expect(await instance.getPendingDeposit({ userAddress: USER_2, tokenAddress: TOKEN_1 })).toEqual(ZERO_FLUX)
   })
 
   test('Unknown token', async () => {
     // GIVEN: An user with no token balance for TOKEN_3
     // WHEN: -
 
-    // THEN: there's no pending deposits
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
-
-    // THEN: there's no batch id
-    expect(await instance.getPendingDepositBatchId({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(0)
+    // THEN: there's no pending deposits nor batchId
+    expect(await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO_FLUX)
   })
 
   test('No pending balance', async () => {
@@ -139,7 +136,7 @@ describe('Get pending deposit amounts', () => {
     // WHEN: -
 
     // THEN: there's no pending deposits
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_2 })).toEqual(ZERO)
+    expect(await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_2 })).toEqual(ZERO_FLUX)
   })
 })
 
@@ -148,22 +145,16 @@ describe('Get pending withdraw amounts', () => {
     // GIVEN: An user that hasn't any tokens yet
     // WHEN: -
 
-    // THEN: there's no pending withdraws
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_2, tokenAddress: TOKEN_1 })).toEqual(ZERO)
-
-    // THEN: there's no batch id
-    expect(await instance.getPendingWithdrawBatchId({ userAddress: USER_2, tokenAddress: TOKEN_1 })).toEqual(0)
+    // THEN: there's no pending withdraws nor batchId
+    expect(await instance.getPendingWithdraw({ userAddress: USER_2, tokenAddress: TOKEN_1 })).toEqual(ZERO_FLUX)
   })
 
   test('Unknown token', async () => {
     // GIVEN: An user with no token balance for TOKEN_3
     // WHEN: -
 
-    // THEN: there's no pending withdraws
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
-
-    // THEN: there's no batch id
-    expect(await instance.getPendingWithdrawBatchId({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(0)
+    // THEN: there's no pending withdraws nor batchId
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO_FLUX)
   })
 
   test('No pending balance', async () => {
@@ -171,7 +162,7 @@ describe('Get pending withdraw amounts', () => {
     // WHEN: -
 
     // THEN: there's no pending withdraws
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_2 })).toEqual(ZERO)
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_2 })).toEqual(ZERO_FLUX)
   })
 })
 
@@ -179,7 +170,7 @@ describe('Deposit', () => {
   test('Unknown token', async () => {
     // GIVEN: An user with no token balance for TOKEN_3 and no pending deposits
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
+    expect(await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO_FLUX)
 
     // WHEN: Deposits AMOUNT
     await instance.deposit({ userAddress: USER_1, tokenAddress: TOKEN_3, amount: AMOUNT })
@@ -188,13 +179,14 @@ describe('Deposit', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
 
     // THEN: There's a pending deposit of AMOUNT
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_3 })
+    expect(amount).toEqual(AMOUNT)
   })
 
   test('No balance', async () => {
     // GIVEN: An user with no token balance for TOKEN_1 and no pending deposits
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
+    expect(await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO_FLUX)
 
     // WHEN: Deposits AMOUNT
     await instance.deposit({ userAddress: USER_1, tokenAddress: TOKEN_1, amount: AMOUNT })
@@ -203,13 +195,15 @@ describe('Deposit', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
 
     // THEN: There's a pending deposit of AMOUNT
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_1 })
+    expect(amount).toEqual(AMOUNT)
   })
 
   test('Applicable pending balance', async () => {
     // GIVEN: An user with no balance for TOKEN_4, and applicable pending deposits
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount).toEqual(AMOUNT)
 
     // WHEN: Deposits AMOUNT
     await instance.deposit({ userAddress: USER_1, tokenAddress: TOKEN_4, amount: AMOUNT })
@@ -218,13 +212,15 @@ describe('Deposit', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
 
     // THEN: There's a pending deposit of AMOUNT
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
+    const { amount: amount2 } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount2).toEqual(AMOUNT)
   })
 
   test('Unapplicable pending balance', async () => {
     // GIVEN: An user with an unapplicable pending deposit for TOKEN_5
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_5 })
+    expect(amount).toEqual(AMOUNT)
 
     // WHEN: Deposits AMOUNT
     await instance.deposit({ userAddress: USER_1, tokenAddress: TOKEN_5, amount: AMOUNT })
@@ -233,9 +229,8 @@ describe('Deposit', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
 
     // THEN: There's a pending deposit of AMOUNT + AMOUNT
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(
-      AMOUNT.add(AMOUNT),
-    )
+    const { amount: amount2 } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_5 })
+    expect(amount2).toEqual(AMOUNT.add(AMOUNT))
   })
 })
 
@@ -243,7 +238,7 @@ describe('Request withdraw', () => {
   test('Unknown token', async () => {
     // GIVEN: An user with no token balance for TOKEN_3 and no pending withdraw
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO_FLUX)
 
     // WHEN: Requesting a withdraw of AMOUNT
     await instance.requestWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_3, amount: AMOUNT })
@@ -252,13 +247,14 @@ describe('Request withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
 
     // THEN: There's a pending withdraw of AMOUNT
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_3 })
+    expect(amount).toEqual(AMOUNT)
   })
 
   test('No balance', async () => {
     // GIVEN: An user with no token balance for TOKEN_1 and no pending withdraw
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO_FLUX)
 
     // WHEN: Requesting a withdraw of AMOUNT
     await instance.requestWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_1, amount: AMOUNT })
@@ -267,13 +263,15 @@ describe('Request withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
 
     // THEN: There's a pending withdraw of AMOUNT
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_1 })
+    expect(amount).toEqual(AMOUNT)
   })
 
   test('Increase previous withdraw request amount', async () => {
     // GIVEN: An user with no balance for TOKEN_4, and a previous pending withdraw of AMOUNT
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount).toEqual(AMOUNT)
 
     // WHEN: Requesting a withdraw of 2 * AMOUNT
     await instance.requestWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4, amount: AMOUNT.mul(TWO) })
@@ -282,15 +280,15 @@ describe('Request withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
 
     // THEN: There's a pending withdraw of 2 * AMOUNT
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(
-      AMOUNT.mul(TWO),
-    )
+    const { amount: amount2 } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount2).toEqual(AMOUNT.mul(TWO))
   })
 
   test('Decrease previous withdraw request amount', async () => {
     // GIVEN: An user with no balance for TOKEN_4, and a previous pending withdraw of AMOUNT
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount).toEqual(AMOUNT)
 
     // WHEN: Requesting a withdraw of 2 * AMOUNT
     await instance.requestWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4, amount: AMOUNT.div(TWO) })
@@ -299,9 +297,8 @@ describe('Request withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
 
     // THEN: There's a pending withdraw of 2 * AMOUNT
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(
-      AMOUNT.div(TWO),
-    )
+    const { amount: amount2 } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount2).toEqual(AMOUNT.div(TWO))
   })
 })
 
@@ -309,7 +306,7 @@ describe('Withdraw', () => {
   test('Unknown token', async () => {
     // GIVEN: An user with no token balance for TOKEN_3 and no pending withdraw
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO_FLUX)
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw({ userAddress: USER_1, tokenAddress: TOKEN_3 })
@@ -321,13 +318,14 @@ describe('Withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
 
     // THEN: There's still no pending withdraw
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_3 })).toEqual(ZERO)
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_3 })
+    expect(amount).toEqual(ZERO)
   })
 
   test('No balance', async () => {
     // GIVEN: An user with no token balance for TOKEN_1 and no pending withdraw
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO_FLUX)
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw({ userAddress: USER_1, tokenAddress: TOKEN_1 })
@@ -339,13 +337,14 @@ describe('Withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
 
     // THEN: There's still no pending withdraw
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO)
+    expect(await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_1 })).toEqual(ZERO_FLUX)
   })
 
   test('Settled withdraw request, but not balance', async () => {
     // GIVEN: An user with no balance for TOKEN_4, and a previous pending withdraw of AMOUNT
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount).toEqual(AMOUNT)
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
@@ -357,15 +356,15 @@ describe('Withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(ZERO)
 
     // THEN: There's still a withdraw request
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_4 })).toEqual(AMOUNT)
+    const { amount: amount2 } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_4 })
+    expect(amount2).toEqual(AMOUNT)
   })
 
   test('Settled withdraw request', async () => {
     // GIVEN: An user with AMOUNT balance for TOKEN_6, and a previous pending withdraw of AMOUNT_SMALL
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_6 })).toEqual(AMOUNT)
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_6 })).toEqual(
-      AMOUNT_SMALL,
-    )
+    const { amount } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_6 })
+    expect(amount).toEqual(AMOUNT_SMALL)
 
     // WHEN: Withdraw AMOUNT_SMALL
     await instance.withdraw({ userAddress: USER_1, tokenAddress: TOKEN_6 })
@@ -374,16 +373,16 @@ describe('Withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_6 })).toEqual(AMOUNT.sub(AMOUNT_SMALL))
 
     // THEN: There's no pending withdraw anymore
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_6 })).toEqual(ZERO)
+    const { amount: amount2 } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_6 })
+    expect(amount2).toEqual(ZERO)
   })
 
   test('Unsettled withdraw request', async () => {
     // GIVEN: An user with a non applicable withdraw request on TOKEN_5
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
-    expect(await instance.getPendingDepositAmount({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
-    expect(await instance.getCurrentBatchId()).toBeGreaterThanOrEqual(
-      await instance.getPendingDepositBatchId({ userAddress: USER_1, tokenAddress: TOKEN_5 }),
-    )
+    const { amount, batchId } = await instance.getPendingDeposit({ userAddress: USER_1, tokenAddress: TOKEN_5 })
+    expect(amount).toEqual(AMOUNT)
+    expect(await instance.getCurrentBatchId()).toBeGreaterThanOrEqual(batchId)
 
     // WHEN: Withdraw AMOUNT
     const withdrawPromise = instance.withdraw({ userAddress: USER_1, tokenAddress: TOKEN_5 })
@@ -395,6 +394,7 @@ describe('Withdraw', () => {
     expect(await instance.getBalance({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
 
     // THEN: There's still the same withdraw request
-    expect(await instance.getPendingWithdrawAmount({ userAddress: USER_1, tokenAddress: TOKEN_5 })).toEqual(AMOUNT)
+    const { amount: amount2 } = await instance.getPendingWithdraw({ userAddress: USER_1, tokenAddress: TOKEN_5 })
+    expect(amount2).toEqual(AMOUNT)
   })
 })
