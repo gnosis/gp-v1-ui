@@ -8,7 +8,7 @@ import { CONTRACT, RECEIPT, createFlux } from '../../../test/data'
 import { Receipt, TxOptionalParams } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 import { DepositApi } from './DepositApiImpl'
-import { Erc20Api } from 'api/erc20/Erc20ApiImpl'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 import { BalanceState, PendingFlux } from './ExchangeApiImpl'
 
 export interface BalancesByUserAndToken {

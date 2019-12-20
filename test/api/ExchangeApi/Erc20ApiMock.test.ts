@@ -1,7 +1,7 @@
 import { TxOptionalParams } from 'types'
 import BALANCES from '../../data/erc20Balances'
 import ALLOWANCES from '../../data/erc20Allowances'
-import { Erc20Api } from 'api/erc20/Erc20ApiImpl'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import {
   USER_1,

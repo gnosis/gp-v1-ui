@@ -4,7 +4,7 @@ import { TokenDetails } from 'types'
 import { getImageUrl, log, getToken } from 'utils'
 
 import { getErc20Info } from '../helpers'
-import { Erc20Api } from 'api/erc20/Erc20ApiImpl'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 import { ExchangeApi } from 'api/exchange/ExchangeApiImpl'
 import { TokenList } from 'api/tokenList/TokenListApiImpl'
 

@@ -8,7 +8,7 @@ import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
 import { ExchangeApi, AuctionElement, PlaceOrderParams, Order } from './ExchangeApiImpl'
-import { Erc20Api } from 'api/erc20/Erc20ApiImpl'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface OrdersByUser {
   [userAddress: string]: Order[]

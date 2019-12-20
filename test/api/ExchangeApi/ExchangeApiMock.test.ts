@@ -6,7 +6,7 @@ import { ZERO, ONE, FEE_DENOMINATOR } from 'const'
 import * as testHelpers from '../../testHelpers'
 import { RECEIPT } from '../../data'
 import { ExchangeApi } from 'api/exchange/ExchangeApiImpl'
-import { Erc20Api } from 'api/erc20/Erc20ApiImpl'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 const { USER_1, USER_2, USER_3, FEE_TOKEN, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, BATCH_ID } = testHelpers
 
