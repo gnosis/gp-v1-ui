@@ -8,7 +8,8 @@ import { useWalletConnection } from './useWalletConnection'
 
 import { formatAmount, log, assert } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
-import { TokenBalanceDetails, TokenDetails, WalletInfo, PendingFlux } from 'types'
+import { TokenBalanceDetails, TokenDetails, PendingFlux } from 'types'
+import { WalletInfo } from 'api/wallet/WalletApiImpl'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]

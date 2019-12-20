@@ -55,28 +55,3 @@ export interface TxOptionalParams {
 }
 
 export type Receipt = TransactionReceipt
-
-export interface Order {
-  buyTokenId: number
-  sellTokenId: number
-  validFrom: number
-  validUntil: number
-  priceNumerator: BN
-  priceDenominator: BN
-  remainingAmount: BN
-}
-
-export interface AuctionElement extends Order {
-  user: string
-  sellTokenBalance: BN
-  id: string // string because we might need natural ids
-}
-
-export interface PlaceOrderParams {
-  userAddress: string
-  buyTokenId: number
-  sellTokenId: number
-  validUntil: number
-  buyAmount: BN
-  sellAmount: BN
-}

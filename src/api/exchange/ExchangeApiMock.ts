@@ -3,11 +3,11 @@ import BN from 'bn.js'
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
-import { AuctionElement, PlaceOrderParams, Receipt, TxOptionalParams, Order } from 'types'
+import { Receipt, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
-import { ExchangeApi } from './ExchangeApiImpl'
+import { ExchangeApi, AuctionElement, PlaceOrderParams, Order } from './ExchangeApiImpl'
 import { Erc20Api } from 'api/erc20/Erc20ApiImpl'
 
 export interface OrdersByUser {

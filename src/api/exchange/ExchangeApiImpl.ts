@@ -1,5 +1,6 @@
+import BN from 'bn.js'
 import { DepositApiImpl, DepositApi } from './DepositApiImpl'
-import { PlaceOrderParams, Receipt, TxOptionalParams, AuctionElement } from 'types'
+import { Receipt, TxOptionalParams } from 'types'
 import { log, decodeAuctionElements } from 'utils'
 import Web3 from 'web3'
 
@@ -15,6 +16,31 @@ export interface ExchangeApi extends DepositApi {
     { senderAddress, orderId }: { senderAddress: string; orderId: number },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
+}
+
+export interface PlaceOrderParams {
+  userAddress: string
+  buyTokenId: number
+  sellTokenId: number
+  validUntil: number
+  buyAmount: BN
+  sellAmount: BN
+}
+
+export interface AuctionElement extends Order {
+  user: string
+  sellTokenBalance: BN
+  id: string // string because we might need natural ids
+}
+
+export interface Order {
+  buyTokenId: number
+  sellTokenId: number
+  validFrom: number
+  validUntil: number
+  priceNumerator: BN
+  priceDenominator: BN
+  remainingAmount: BN
 }
 
 /**
