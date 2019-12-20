@@ -28,8 +28,8 @@ export interface TokenDetails extends MinimalTokenDetails {
 
 export interface TokenBalanceDetails extends TokenDetails {
   exchangeBalance: BN
-  depositingBalance: BN
-  withdrawingBalance: BN
+  pendingDeposit: PendingFlux
+  pendingWithdraw: PendingFlux
   walletBalance: BN
   claimable: boolean
   enabled: boolean
