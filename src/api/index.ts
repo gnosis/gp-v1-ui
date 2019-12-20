@@ -5,8 +5,6 @@ import { TokenListApiImpl } from './tokenList/TokenListApiImpl'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiImpl } from './erc20/Erc20ApiImpl'
-import { DepositApiMock } from './exchange/DepositApiMock'
-import { DepositApiImpl } from './exchange/DepositApiImpl'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiImpl } from './exchange/ExchangeApiImpl'
 import {
@@ -23,7 +21,6 @@ import { INITIAL_INFURA_ENDPOINT } from 'const'
 const isWalletMock = process.env.MOCK_WALLET === 'true'
 const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
 const isErc20Mock = process.env.MOCK_ERC20 === 'true'
-const isDepositMock = process.env.MOCK_DEPOSIT === 'true'
 const isExchangeMock = process.env.MOCK_EXCHANGE === 'true'
 
 function createWalletApi(web3: Web3): WalletApi {
@@ -46,17 +43,6 @@ function createErc20Api(web3: Web3): Erc20Api {
   }
   window['erc20Api'] = erc20Api // register for convenience
   return erc20Api
-}
-
-function createDepositApi(erc20Api: Erc20Api, web3: Web3): DepositApi {
-  let depositApi
-  if (isDepositMock) {
-    depositApi = new DepositApiMock(exchangeBalanceStates, erc20Api)
-  } else {
-    depositApi = new DepositApiImpl(web3)
-  }
-  window['depositApi'] = depositApi // register for convenience
-  return depositApi
 }
 
 function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
@@ -99,6 +85,6 @@ const web3 = new Web3(getDefaultProvider())
 // Build APIs
 export const walletApi: WalletApi = createWalletApi(web3)
 export const erc20Api: Erc20Api = createErc20Api(web3)
-export const depositApi: DepositApi = createDepositApi(erc20Api, web3)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, web3)
+export const depositApi: DepositApi = exchangeApi
 export const tokenListApi: TokenList = createTokenListApi()
