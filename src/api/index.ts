@@ -34,6 +34,7 @@ export const getDefaultProvider = (): string | null =>
   process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
 
 function createWeb3Api(): Web3 {
+  // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
   const web3 = new Web3(getDefaultProvider())
 
   if (isWeb3Mock) {
