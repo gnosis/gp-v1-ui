@@ -55,7 +55,7 @@ const Footer: React.FC = () => (
       <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
         v{VERSION}
       </a>{' '}
-      - contracts{' '}
+      - Contracts{' '}
       <a
         target="_blank"
         rel="noopener noreferrer"
