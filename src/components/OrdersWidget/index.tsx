@@ -227,7 +227,11 @@ const OrdersWidget: React.FC = () => {
             <div className="ordersContainer">
               <div className="headerRow">
                 <div className="checked">
-                  <input type="checkbox" onClick={toggleSelectAll} checked={orders.length === markedForDeletion.size} />
+                  <input
+                    type="checkbox"
+                    onChange={toggleSelectAll}
+                    checked={orders.length === markedForDeletion.size}
+                  />
                 </div>
                 <div className="title">Order details</div>
                 <div className="title">

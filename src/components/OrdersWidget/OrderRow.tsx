@@ -81,7 +81,7 @@ const DeleteOrder: React.FC<Pick<Props, 'isMarkedForDeletion' | 'toggleMarkedFor
   <div className="checked">
     <input
       type="checkbox"
-      onClick={toggleMarkedForDeletion}
+      onChange={toggleMarkedForDeletion}
       checked={isMarkedForDeletion && !pending}
       disabled={pending}
     />
