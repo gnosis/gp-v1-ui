@@ -95,8 +95,9 @@ const TradeWidget: React.FC = () => {
   // TESTING
   const NULL_BALANCE_TOKEN = {
     exchangeBalance: ZERO,
-    depositingBalance: ZERO,
-    withdrawingBalance: ZERO,
+    totalExchangeBalance: ZERO,
+    pendingDeposit: { amount: ZERO, batchId: 0 },
+    pendingWithdraw: { amount: ZERO, batchId: 0 },
     walletBalance: ZERO,
     claimable: false,
     enabled: false,

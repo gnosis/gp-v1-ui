@@ -3,9 +3,9 @@ import assert from 'assert'
 
 import { getEpoch, log } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
-import { CONTRACT, RECEIPT } from '../../../test/data'
+import { CONTRACT, RECEIPT, createFlux } from '../../../test/data'
 
-import { DepositApi, BalanceState, Receipt, TxOptionalParams, Erc20Api } from 'types'
+import { DepositApi, BalanceState, Receipt, TxOptionalParams, Erc20Api, PendingFlux } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 
 export interface BalancesByUserAndToken {
@@ -47,65 +47,35 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.balance : ZERO
   }
 
-  public async getPendingDepositAmount({
+  public async getPendingDeposit({
     userAddress,
     tokenAddress,
   }: {
     userAddress: string
     tokenAddress: string
-  }): Promise<BN> {
+  }): Promise<PendingFlux> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
-      return ZERO
+      return createFlux()
     }
     const balanceState = userBalanceStates[tokenAddress]
 
-    return balanceState ? balanceState.pendingDeposits.amount : ZERO
+    return balanceState ? balanceState.pendingDeposits : createFlux()
   }
 
-  public async getPendingDepositBatchId({
+  public async getPendingWithdraw({
     userAddress,
     tokenAddress,
   }: {
     userAddress: string
     tokenAddress: string
-  }): Promise<number> {
+  }): Promise<PendingFlux> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
-      return 0
+      return createFlux()
     }
     const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingDeposits.batchId : 0
-  }
-
-  public async getPendingWithdrawAmount({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<BN> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return ZERO
-    }
-    const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingWithdraws.amount : ZERO
-  }
-
-  public async getPendingWithdrawBatchId({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<number> {
-    const userBalanceStates = this._balanceStates[userAddress]
-    if (!userBalanceStates) {
-      return 0
-    }
-    const balanceState = userBalanceStates[tokenAddress]
-    return balanceState ? balanceState.pendingWithdraws.batchId : 0
+    return balanceState ? balanceState.pendingWithdraws : createFlux()
   }
 
   public async deposit(

@@ -50,9 +50,12 @@ const DepositWidget: React.FC = () => {
   } = useDepositModals({ ...withdrawRequest, requestWithdrawToken })
 
   const requestWithdrawConfirmation = async (amount: BN, tokenAddress: string, claimable: boolean): Promise<void> => {
-    const { withdrawingBalance, symbol } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
+    const {
+      pendingWithdraw: { amount: withdrawingBalance },
+      symbol,
+    } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
 
-    log(`Confirm withdrawal for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
+    log(`Confirm withdraw for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
 
     if (!withdrawingBalance.isZero()) {
       // Storing current values before displaying modal

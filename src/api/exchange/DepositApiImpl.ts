@@ -5,7 +5,7 @@ import { ZERO } from 'const'
 
 import { BatchExchangeContract } from '@gnosis.pm/dex-js'
 import { getAddressForNetwork } from './batchExchangeAddresses'
-import { DepositApi, Receipt, TxOptionalParams } from 'types'
+import { DepositApi, Receipt, TxOptionalParams, PendingFlux } from 'types'
 
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
@@ -70,72 +70,36 @@ export class DepositApiImpl implements DepositApi {
     return toBN(balance)
   }
 
-  public async getPendingDepositAmount({
+  public async getPendingDeposit({
     userAddress,
     tokenAddress,
   }: {
     userAddress: string
     tokenAddress: string
-  }): Promise<BN> {
-    if (!userAddress || !tokenAddress) return ZERO
+  }): Promise<PendingFlux> {
+    if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
     const contract = await this._getContract()
-    // TODO: Update APIs to the new get balances changes
-    // https://github.com/gnosis/dex-react/issues/332
-    const { 0: depositAmount } = await contract.methods.getPendingDeposit(userAddress, tokenAddress).call()
 
-    return toBN(depositAmount)
+    const { 0: amount, 1: batchId } = await contract.methods.getPendingDeposit(userAddress, tokenAddress).call()
+
+    return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async getPendingDepositBatchId({
+  public async getPendingWithdraw({
     userAddress,
     tokenAddress,
   }: {
     userAddress: string
     tokenAddress: string
-  }): Promise<number> {
-    if (!userAddress || !tokenAddress) return 0
+  }): Promise<PendingFlux> {
+    if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
     const contract = await this._getContract()
-    // TODO: Update APIs to the new get balances changes
-    // https://github.com/gnosis/dex-react/issues/332
-    const { 1: depositBatchId } = await contract.methods.getPendingDeposit(userAddress, tokenAddress).call()
 
-    return +depositBatchId
-  }
+    const { 0: amount, 1: batchId } = await contract.methods.getPendingWithdraw(userAddress, tokenAddress).call()
 
-  public async getPendingWithdrawAmount({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<BN> {
-    if (!userAddress || !tokenAddress) return ZERO
-
-    const contract = await this._getContract()
-    // TODO: Update APIs to the new get balances changes
-    // https://github.com/gnosis/dex-react/issues/332
-    const { 0: withdrawAmount } = await contract.methods.getPendingWithdraw(userAddress, tokenAddress).call()
-
-    return toBN(withdrawAmount)
-  }
-
-  public async getPendingWithdrawBatchId({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<number> {
-    if (!userAddress || !tokenAddress) return 0
-
-    const contract = await this._getContract()
-    // TODO: Update APIs to the new get balances changes
-    // https://github.com/gnosis/dex-react/issues/332
-    const { 1: withdrawBatchId } = await contract.methods.getPendingWithdraw(userAddress, tokenAddress).call()
-
-    return +withdrawBatchId
+    return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
   public async deposit(

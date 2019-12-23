@@ -7,7 +7,7 @@ import { Mutation, TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE, ZERO } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken } from 'utils'
+import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken, dateToBatchId } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'
@@ -100,10 +100,16 @@ export const useRowActions = (params: Params): Result => {
       const receipt = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
-      _updateToken(tokenAddress, ({ depositingBalance, walletBalance, ...otherParams }) => {
+      _updateToken(tokenAddress, ({ pendingDeposit, walletBalance, totalExchangeBalance, ...otherParams }) => {
+        const { amount: pendingAmount } = pendingDeposit
+        // Since this updates the interface right after the action, and will be updated once a new block is mined
+        // we calculate the batchId ourselves rather than query the contract,
+        // and make it so this is in the next batch
+        const batchId = dateToBatchId() + 1
         return {
           ...otherParams,
-          depositingBalance: depositingBalance.add(amount),
+          pendingDeposit: { batchId, amount: pendingAmount.add(amount) },
+          totalExchangeBalance: totalExchangeBalance.add(amount),
           walletBalance: walletBalance.sub(amount),
         }
       })
@@ -135,9 +141,11 @@ export const useRowActions = (params: Params): Result => {
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       _updateToken(tokenAddress, otherParams => {
+        const batchId = dateToBatchId() + 1
+
         return {
           ...otherParams,
-          withdrawingBalance: amount,
+          pendingWithdraw: { batchId, amount },
         }
       })
 
@@ -157,26 +165,25 @@ export const useRowActions = (params: Params): Result => {
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token')
 
-      const { withdrawingBalance, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+      const { pendingWithdraw, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      console.debug(`Starting the withdraw for ${formatAmountFull(withdrawingBalance, decimals)} of ${symbol}`)
+      console.debug(`Starting the withdraw for ${formatAmountFull(pendingWithdraw.amount, decimals)} of ${symbol}`)
 
       dispatch(setHighlightAndClaimingAction(tokenAddress))
 
       const receipt = await depositApi.withdraw({ userAddress, tokenAddress }, txOptionalParams)
 
-      _updateToken(tokenAddress, ({ exchangeBalance, walletBalance, ...otherParams }) => {
+      _updateToken(tokenAddress, ({ walletBalance, ...otherParams }) => {
         return {
           ...otherParams,
-          exchangeBalance: exchangeBalance.sub(withdrawingBalance),
-          withdrawingBalance: ZERO,
-          walletBalance: walletBalance.add(withdrawingBalance),
+          pendingWithdraw: { amount: ZERO, batchId: 0 },
+          walletBalance: walletBalance.add(pendingWithdraw.amount),
           claimable: false,
         }
       })
 
       log(`The transaction has been mined: ${receipt.transactionHash}`)
-      toast.success(`Withdraw of ${formatAmount(withdrawingBalance, decimals)} ${symbol} completed`)
+      toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
     } catch (error) {
       console.error('Error executing the withdraw request', error)
       toast.error(`Error executing the withdraw request: ${error.message}`)

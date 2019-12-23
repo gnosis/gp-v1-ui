@@ -7,8 +7,8 @@ import { PendingFlux } from 'types'
 
 // Using a function to build flux objects because if we use the same
 // object everywhere, anytime it's updated, it'll reflect everywhere
-const createFlux = (): PendingFlux => {
-  return { amount: ZERO, batchId: 0 }
+export const createFlux = (amount: BN = ZERO, batchId = 0): PendingFlux => {
+  return { amount, batchId }
 }
 
 const STATE_ZERO = {
@@ -17,7 +17,7 @@ const STATE_ZERO = {
   pendingWithdraws: createFlux(),
 }
 
-const exchangeBalanceStates: BalancesByUserAndToken = {
+export const exchangeBalanceStates: BalancesByUserAndToken = {
   [USER_1]: {
     [TOKEN_1]: STATE_ZERO, // 0. WETH: decimals=18
     [TOKEN_2]: {
@@ -53,5 +53,3 @@ const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_7]: undefined, // 0. DAI: decimals=18
   },
 }
-
-export default exchangeBalanceStates
