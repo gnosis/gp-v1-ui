@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
@@ -9,11 +9,7 @@ import { useOrders } from 'hooks/useOrders'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
-import { tokenListApi } from 'api'
-import { TokenDetails } from 'types'
 import OrderRow from './OrderRow'
-import { getToken } from 'utils'
-import { DEFAULT_DECIMALS } from 'const'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -157,32 +153,12 @@ const OrdersForm = styled.div`
   }
 `
 
-const FAKE_TOKEN = {
-  symbol: 'UNKNOWN',
-  name: 'unknown',
-  decimals: DEFAULT_DECIMALS,
-  address: '0x...',
-}
-
 const OrdersWidget: React.FC = () => {
   const orders = useOrders()
   const noOrders = orders.length === 0
 
-  // TODO: find a way to update list of tokens based on address returned by contract if we don't have it in our list
-  const { networkId } = useWalletConnection()
   // this page is behind login wall so networkId should always be set
-  // reference for the `variable!` notation https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html#non-null-assertion-operator
-  const tokens = tokenListApi.getTokens(networkId!)
-
-  const getTokenById = useCallback(
-    (id: number): TokenDetails => {
-      const token = getToken('id', id.toString(), tokens)
-      // TODO: get address from exchangeApi and add to list of tokens
-      // consider fake token like a `loading` token
-      return token ? token : { ...FAKE_TOKEN, id }
-    },
-    [tokens],
-  )
+  const { networkId } = useWalletConnection()
 
   const overBalanceOrders = useMemo(
     () =>
@@ -213,7 +189,7 @@ const OrdersWidget: React.FC = () => {
           </a>
         </CreateButtons>
       </div>
-      {!noOrders && (
+      {!noOrders && networkId && (
         <OrdersForm>
           <div className="infoContainer">
             <div>
@@ -246,9 +222,8 @@ const OrdersWidget: React.FC = () => {
               {orders.map(order => (
                 <OrderRow
                   key={order.id}
-                  sellToken={getTokenById(order.sellTokenId)}
-                  buyToken={getTokenById(order.buyTokenId)}
                   order={order}
+                  networkId={networkId}
                   isOverBalance={overBalanceOrders.has(order.id)}
                 />
               ))}
