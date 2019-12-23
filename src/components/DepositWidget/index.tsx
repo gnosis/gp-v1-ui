@@ -23,7 +23,7 @@ interface WithdrawState {
 }
 
 const DepositWidget: React.FC = () => {
-  const { balances, setBalances, error } = useTokenBalances()
+  const { balances, error } = useTokenBalances()
   const {
     // Dispatchers
     enableToken,
@@ -34,7 +34,7 @@ const DepositWidget: React.FC = () => {
     enabling,
     claiming,
     highlighted,
-  } = useRowActions({ balances, setBalances })
+  } = useRowActions({ balances })
   const windowSpecs = useWindowSizes()
 
   const [withdrawRequest, setWithdrawRequest] = useSafeState<WithdrawState>({
