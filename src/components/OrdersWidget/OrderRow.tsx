@@ -138,7 +138,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
     order.remainingAmount,
     sellToken.decimals,
   ])
-  const unlimited = useMemo(() => order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER), [order.priceDenominator])
+  const unlimited = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
 
   return (
     <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
