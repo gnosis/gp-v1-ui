@@ -972,19 +972,19 @@
   dependencies:
     web3connect "^1.0.0-beta.23"
 
-"@gnosis.pm/dex-contracts@^0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-contracts/-/dex-contracts-0.1.2.tgz#a824eabb1504d13daa6d3aad02feacfedc46df50"
-  integrity sha512-GSJ6kL/k5eSZy6ut8Rl6Bu57GLNUVzuiRS0+s7EZjlkDMJM1rb7hojio1MtXxkp0+mxSFSsL4ewPj+gyd4guVg==
+"@gnosis.pm/dex-contracts@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-contracts/-/dex-contracts-0.1.3.tgz#8474ed83c879a3c3a22ce13741e3ad43dac6dd68"
+  integrity sha512-HRRw+AGZYe6almCQRj8pNL1AELLnkvB1jqLs20faaoISy+5f9I4nsgHbkw9qzxi/R8NQ8pAc/wIx4rvH7hSeCw==
   dependencies:
     bn.js "^5.0.0"
 
-"@gnosis.pm/dex-js@0.1.0-RC.19":
-  version "0.1.0-RC.19"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.0-RC.19.tgz#cb7adf6db096c03abc21c7ddd743563ba0571795"
-  integrity sha512-WeCPIIIQkaxSSPz0cLInUsftSU2uS8/ta5k5QDTS5IZai5lbtz31hJBvYhInCOCxybn6LAlyU+owv8q3uwI2qw==
+"@gnosis.pm/dex-js@0.1.0-RC.21":
+  version "0.1.0-RC.21"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.0-RC.21.tgz#462bfb3f58362dfd3ecf76ec1e65286afe896e3d"
+  integrity sha512-s69zUjEUTaGjBjEg4+MnP5KgMKRPJSo4+M5c+j/5RFb+Wzt1ejygQghJqBJM5SIFd1yEpoafzIf+xZ8YUahjgw==
   dependencies:
-    "@gnosis.pm/dex-contracts" "^0.1.2"
+    "@gnosis.pm/dex-contracts" "^0.1.3"
     web3 "^1.2.4"
 
 "@hot-loader/react-dom@^16.8.6":
