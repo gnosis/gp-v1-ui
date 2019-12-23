@@ -1,12 +1,12 @@
 import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
 
-import tokens from './tokenList.json'
+import { tokenList } from '@gnosis.pm/dex-js'
 import { getImageUrl } from 'utils'
 
 export function getTokensByNetwork(networkId: number): TokenDetails[] {
   // Return token details
-  const tokenDetails: TokenDetails[] = tokens.reduce((acc: TokenDetails[], token) => {
+  const tokenDetails: TokenDetails[] = tokenList.reduce((acc: TokenDetails[], token) => {
     const address = token.addressByNetwork[networkId]
     if (address) {
       // There's an address for the current network
@@ -23,4 +23,4 @@ export function getTokensByNetwork(networkId: number): TokenDetails[] {
   return tokenDetails
 }
 
-export default tokens
+export default tokenList

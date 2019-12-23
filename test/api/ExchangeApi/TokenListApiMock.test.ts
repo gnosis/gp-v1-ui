@@ -1,14 +1,14 @@
-import { Network, TokenList } from 'types'
+import { Network, TokenList, TokenDetails } from 'types'
 
 import TokenListApiMock from 'api/tokenList/TokenListApiMock'
 import TokenListApiImpl from 'api/tokenList/TokenListApiImpl'
-import tokens from 'api/tokenList/tokenList'
+import { tokenList } from '@gnosis.pm/dex-js'
 
 let instanceMock: TokenList
 let instanceReal: TokenList
 
 beforeEach(() => {
-  instanceMock = new TokenListApiMock(tokens)
+  instanceMock = new TokenListApiMock(tokenList as TokenDetails[])
   instanceReal = new TokenListApiImpl([Network.Mainnet, Network.Rinkeby])
 })
 
