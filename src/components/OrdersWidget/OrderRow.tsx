@@ -233,7 +233,7 @@ interface Props {
 const onError = onErrorFactory('Failed to fetch token')
 
 const OrderRow: React.FC<Props> = props => {
-  const { order, isOverBalance, networkId, pending = false } = props
+  const { order, isOverBalance, networkId, pending = false, isMarkedForDeletion, toggleMarkedForDeletion } = props
 
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
@@ -249,7 +249,11 @@ const OrderRow: React.FC<Props> = props => {
       {sellToken && buyToken && (
         <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
           <PendingLink pending={pending} />
-          <DeleteOrder {...props} />
+          <DeleteOrder
+            isMarkedForDeletion={isMarkedForDeletion}
+            toggleMarkedForDeletion={toggleMarkedForDeletion}
+            pending={pending}
+          />
           <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
           <UnfilledAmount order={order} sellToken={sellToken} />
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
