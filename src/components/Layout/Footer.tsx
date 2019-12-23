@@ -34,6 +34,9 @@ const Wrapper = styled.footer`
 
   .version {
     font-size: 0.85em;
+    a {
+      text-decoration: none;
+    }
   }
 `
 
@@ -47,7 +50,20 @@ const Footer: React.FC = () => (
         <Link to="/source-code">Source code</Link>
       </li>
     </ul>
-    <div className="version">dFusion PoC v{VERSION}</div>
+    <div className="version">
+      Web{' '}
+      <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+        v{VERSION}
+      </a>{' '}
+      - contracts{' '}
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
+      >
+        v{CONTRACT_VERSION}
+      </a>
+    </div>
   </Wrapper>
 )
 

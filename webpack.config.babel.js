@@ -90,6 +90,8 @@ module.exports = ({ stats = false } = {}) => ({
     // define inside one plugin instance
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
+      DEX_JS_VERSION: JSON.stringify(require('@gnosis.pm/dex-js/package.json').version),
+      CONTRACT_VERSION: JSON.stringify(require('@gnosis.pm/dex-contracts/package.json').version),
 
       // MOCK: Use mock or real API implementation
       'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
