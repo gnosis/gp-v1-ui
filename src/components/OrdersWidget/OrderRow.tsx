@@ -213,6 +213,8 @@ interface Props {
   pending?: boolean
 }
 
+const onError = onErrorFactory('Failed to fetch token')
+
 const OrderRow: React.FC<Props> = props => {
   const { order, networkId, pending = false } = props
 
@@ -221,9 +223,8 @@ const OrderRow: React.FC<Props> = props => {
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
 
   useEffect(() => {
-    const errorMsg = 'Failed to fetch token'
-    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken).catch(onErrorFactory(errorMsg))
-    fetchToken(order.sellTokenId, order.id, networkId, setSellToken).catch(onErrorFactory(errorMsg))
+    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken).catch(onError)
+    fetchToken(order.sellTokenId, order.id, networkId, setSellToken).catch(onError)
   }, [networkId, order, setBuyToken, setSellToken])
 
   return (
