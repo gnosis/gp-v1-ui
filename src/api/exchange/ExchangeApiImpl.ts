@@ -105,7 +105,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
    */
   public async getFeeDenominator(): Promise<number> {
     const contract = await this._getContract()
-    const feeDenominator = await contract.methods.feeDenominator().call()
+    const feeDenominator = await contract.methods.FEE_DENOMINATOR().call()
     return +feeDenominator
   }
 
