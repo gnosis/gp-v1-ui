@@ -19,13 +19,13 @@ const About: React.FC = () => (
     <p>Versions used in this web:</p>
     <ul>
       <li>
-        Web version:&nbsp;
+        Web:&nbsp;
         <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
           v{VERSION}
         </a>{' '}
       </li>
       <li>
-        Smart Contract version:&nbsp;
+        Smart Contract:&nbsp;
         <a
           target="_blank"
           rel="noopener noreferrer"
