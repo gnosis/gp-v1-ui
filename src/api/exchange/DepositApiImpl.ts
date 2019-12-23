@@ -12,8 +12,7 @@ import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
 
 // TODO: Very likely, this ABI makes webpack build heavier. Review how to instruct to discard info
 //  https://github.com/gnosis/dex-react/issues/97
-// import { abi } from '@gnosis.pm/dex-contracts/build/contracts/BatchExchange.json'
-import batchExchangeAbi from '@gnosis.pm/dex-js/build/src/contracts/abi/BatchExchange.json'
+import { abi as batchExchangeAbi } from '@gnosis.pm/dex-contracts/build/contracts/BatchExchange.json'
 
 const getNetworkIdFromWeb3 = (web3: Web3): null | number => {
   if (!web3.currentProvider) return null
