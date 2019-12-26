@@ -195,10 +195,12 @@ export const RowTokenDiv = styled.div`
     &:first-child {
       display: flex;
       flex-flow: row wrap;
-      justify-content: space-evenly;
       align-items: center;
       > * {
         margin: 5px;
+      }
+      > div:last-child {
+        flex-grow: 1;
       }
     }
 
