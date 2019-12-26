@@ -9,13 +9,13 @@ import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { getTokenFromExchangeById } from 'services'
-
 import useSafeState from 'hooks/useSafeState'
+import { TokenDetails } from 'types'
 
-import { TokenDetails, AuctionElement } from 'types'
 import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER } from 'const'
+import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 const OrderRowWrapper = styled.div`
   .container {

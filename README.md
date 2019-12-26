@@ -94,4 +94,4 @@ If you use Visual Studio Code, it's recommended to install [Prettier - Code form
 ## Testnet faucets
 
 In order to get testing tokens, read up the information here:
-[faucet](./src/api/tokenList/Faucet_info.md)
+[faucet](./src/docs/faucet-info.md)

@@ -2,8 +2,8 @@ import BN from 'bn.js'
 import { ZERO } from 'const'
 
 import { USER_1, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7 } from './basic'
-import { BalancesByUserAndToken } from 'api/exchange/DepositApiMock'
-import { PendingFlux } from 'types'
+import { BalancesByUserAndToken } from 'api/deposit/DepositApiMock'
+import { PendingFlux } from 'api/deposit/DepositApi'
 
 // Using a function to build flux objects because if we use the same
 // object everywhere, anytime it's updated, it'll reflect everywhere

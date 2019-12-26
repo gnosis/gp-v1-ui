@@ -1,5 +1,9 @@
-import { TokenList, TokenDetails } from 'types'
+import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
+
+export interface TokenList {
+  getTokens: (networkId: number) => TokenDetails[]
+}
 
 /**
  * Basic implementation of Token API

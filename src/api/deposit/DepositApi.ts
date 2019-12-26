@@ -5,7 +5,7 @@ import { ZERO } from 'const'
 
 import { BatchExchangeContract } from '@gnosis.pm/dex-js'
 import { getAddressForNetwork } from './batchExchangeAddresses'
-import { DepositApi, Receipt, TxOptionalParams, PendingFlux } from 'types'
+import { Receipt, TxOptionalParams } from 'types'
 
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
@@ -13,6 +13,53 @@ import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
 // TODO: Very likely, this ABI makes webpack build heavier. Review how to instruct to discard info
 //  https://github.com/gnosis/dex-react/issues/97
 import { abi as batchExchangeAbi } from '@gnosis.pm/dex-contracts/build/contracts/BatchExchange.json'
+
+export interface DepositApi {
+  getContractAddress(networkId: number): string | null
+  getBatchTime(): Promise<number>
+  getCurrentBatchId(): Promise<number>
+  getSecondsRemainingInBatch(): Promise<number>
+
+  getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
+  getPendingDeposit({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
+  getPendingWithdraw({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
+
+  deposit(
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+
+  requestWithdraw(
+    {
+      userAddress,
+      tokenAddress,
+      amount,
+    }: {
+      userAddress: string
+      tokenAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+
+  withdraw(
+    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+}
+
+export interface PendingFlux {
+  amount: BN
+  batchId: number
+}
 
 const getNetworkIdFromWeb3 = (web3: Web3): null | number => {
   if (!web3.currentProvider) return null

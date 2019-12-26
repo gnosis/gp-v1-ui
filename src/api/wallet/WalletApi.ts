@@ -1,12 +1,32 @@
-import { WalletApi, Network, WalletInfo, Command, ProviderInfo } from 'types'
+import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
-import { getDefaultProvider } from '../'
+import { getDefaultProvider } from '..'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
-
 import Web3Connect from 'web3connect'
+
+export interface WalletApi {
+  isConnected(): boolean
+  connect(givenProvider?: Provider): Promise<boolean>
+  disconnect(): Promise<void>
+  getAddress(): Promise<string>
+  getBalance(): Promise<BN>
+  getNetworkId(): Promise<number>
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
+  removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
+  getProviderInfo(): ProviderInfo
+}
+
+export interface WalletInfo {
+  isConnected: boolean
+  userAddress?: string
+  networkId?: number
+}
+
+export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
+
 WalletConnectProvider.prototype.getWalletConnector = function(): Promise<WalletConnector> {
   return new Promise((resolve, reject) => {
     const wc = this.wc

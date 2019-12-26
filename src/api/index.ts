@@ -1,14 +1,14 @@
-import { Network, TokenList, WalletApi, DepositApi, Erc20Api, ExchangeApi } from 'types'
+import { Network } from 'types'
 import { WalletApiMock } from './wallet/WalletApiMock'
-import WalletApiImpl from './wallet/WalletApiImpl'
-import { TokenListApiImpl } from './tokenList/TokenListApiImpl'
+import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
+import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
-import { Erc20ApiImpl } from './erc20/Erc20ApiImpl'
-import { DepositApiMock } from './exchange/DepositApiMock'
-import { DepositApiImpl } from './exchange/DepositApiImpl'
+import { Erc20ApiImpl, Erc20Api } from './erc20/Erc20Api'
+import { DepositApiMock } from './deposit/DepositApiMock'
+import { DepositApiImpl, DepositApi } from './deposit/DepositApi'
+import { ExchangeApiImpl, ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
-import { ExchangeApiImpl } from './exchange/ExchangeApiImpl'
 import {
   tokenList,
   exchangeBalanceStates,
