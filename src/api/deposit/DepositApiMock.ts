@@ -9,7 +9,12 @@ import { Receipt, TxOptionalParams } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 import { DepositApi, PendingFlux } from './DepositApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
-import { BalanceState } from '../exchange/ExchangeApi'
+
+export interface BalanceState {
+  balance: BN
+  pendingDeposits: PendingFlux
+  pendingWithdraws: PendingFlux
+}
 
 export interface BalancesByUserAndToken {
   [userAddress: string]: { [tokenAddress: string]: BalanceState }

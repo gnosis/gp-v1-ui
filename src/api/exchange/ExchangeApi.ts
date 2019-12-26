@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { DepositApiImpl, DepositApi, PendingFlux } from '../deposit/DepositApi'
+import { DepositApiImpl, DepositApi } from '../deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { log } from 'utils'
 import Web3 from 'web3'
@@ -42,12 +42,6 @@ export interface Order {
   priceNumerator: BN
   priceDenominator: BN
   remainingAmount: BN
-}
-
-export interface BalanceState {
-  balance: BN
-  pendingDeposits: PendingFlux
-  pendingWithdraws: PendingFlux
 }
 
 /**
