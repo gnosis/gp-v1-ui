@@ -1,6 +1,6 @@
 import BN from 'bn.js'
 import { TransactionReceipt } from 'web3-core'
-import { PendingFlux } from 'api/exchange/ExchangeApiImpl'
+import { PendingFlux } from 'api/exchange/ExchangeApi'
 
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
