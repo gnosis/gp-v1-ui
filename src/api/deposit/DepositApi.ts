@@ -1,18 +1,13 @@
 import BN from 'bn.js'
-import { AbiItem } from 'web3-utils'
 import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
 
-import { BatchExchangeContract } from '@gnosis.pm/dex-js'
+import { BatchExchangeContract, batchExchangeAbi } from '@gnosis.pm/dex-js'
 import { getAddressForNetwork } from './batchExchangeAddresses'
 import { Receipt, TxOptionalParams } from 'types'
 
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
-
-// TODO: Very likely, this ABI makes webpack build heavier. Review how to instruct to discard info
-//  https://github.com/gnosis/dex-react/issues/97
-import { abi as batchExchangeAbi } from '@gnosis.pm/dex-contracts/build/contracts/BatchExchange.json'
 
 export interface DepositApi {
   getContractAddress(networkId: number): string | null
@@ -78,7 +73,7 @@ export class DepositApiImpl implements DepositApi {
   protected static _contractsCache: { [K: string]: BatchExchangeContract } = {}
 
   public constructor(web3: Web3) {
-    this._contractPrototype = new web3.eth.Contract(batchExchangeAbi as AbiItem[]) as BatchExchangeContract
+    this._contractPrototype = new web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
     this._web3 = web3
 
     // TODO remove later
