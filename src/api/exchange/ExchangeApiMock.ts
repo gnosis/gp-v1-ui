@@ -2,7 +2,7 @@ import BN from 'bn.js'
 
 import assert from 'assert'
 
-import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
+import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
 import { Receipt, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
