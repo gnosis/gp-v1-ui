@@ -5,8 +5,16 @@ import { getEpoch, log } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT, RECEIPT, createFlux } from '../../../test/data'
 
-import { DepositApi, BalanceState, Receipt, TxOptionalParams, Erc20Api, PendingFlux } from 'types'
+import { Receipt, TxOptionalParams } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
+import { DepositApi, PendingFlux } from './DepositApi'
+import { Erc20Api } from 'api/erc20/Erc20Api'
+
+export interface BalanceState {
+  balance: BN
+  pendingDeposits: PendingFlux
+  pendingWithdraws: PendingFlux
+}
 
 export interface BalancesByUserAndToken {
   [userAddress: string]: { [tokenAddress: string]: BalanceState }

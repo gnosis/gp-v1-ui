@@ -1,9 +1,10 @@
-import { WalletApi, Network, WalletInfo, Command, ProviderInfo } from 'types'
+import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 
 import { log, wait, toWei } from 'utils'
 import { USER_1, USER_2 } from '../../../test/data'
+import { WalletApi, WalletInfo, ProviderInfo } from './WalletApi'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 

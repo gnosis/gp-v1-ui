@@ -1,10 +1,11 @@
 import BN from 'bn.js'
 
-import { Erc20Api, TxOptionalParams, Receipt } from 'types'
+import { TxOptionalParams, Receipt } from 'types'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
 import { log, assert } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
+import { Erc20Api } from './Erc20Api'
 
 interface Balances {
   [userAddress: string]: { [tokenAddress: string]: BN }

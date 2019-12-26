@@ -1,8 +1,9 @@
 import Web3 from 'web3'
 
-import { Erc20Api, MinimalTokenDetails } from 'types'
+import { MinimalTokenDetails } from 'types'
 import { log } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 /**
  * Wraps erc20 function and returns undefined in case of failure

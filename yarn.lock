@@ -979,10 +979,10 @@
   dependencies:
     bn.js "^5.0.0"
 
-"@gnosis.pm/dex-js@0.1.3":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.3.tgz#368964ffc2e2a498d8fc15b31c9a17905018e7a1"
-  integrity sha512-nRun3Ax4AWmAQVETQRySa456KQakk8uFkuv32xwEI9t05A1+7lJPsajVifQkq9l4dBgUG1QVtJcuhAt/HplcJg==
+"@gnosis.pm/dex-js@0.1.4":
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.4.tgz#315863df63f104871850123982c74435409975bd"
+  integrity sha512-qKw588hsupYOUT14ZcajCsULFWIHlCvwPcI5s7MhxfwaylQLB6WHz9AUwoy3xZFJD1E1zd4vt7BpuCkIQN2S7w==
   dependencies:
     "@gnosis.pm/dex-contracts" "^0.1.3"
     web3 "^1.2.4"

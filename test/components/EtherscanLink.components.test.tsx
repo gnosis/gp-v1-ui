@@ -4,7 +4,8 @@ import { render } from 'enzyme'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { TX_HASH, USER_1, CONTRACT, TOKEN_1 } from '../data'
 import { abbreviateString } from 'utils'
-import { Network, WalletInfo } from 'types'
+import { Network } from 'types'
+import { WalletInfo } from 'api/wallet/WalletApi'
 
 let isConnected: boolean
 let networkId: Network | undefined
