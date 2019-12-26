@@ -1,8 +1,9 @@
 import BN from 'bn.js'
 import { DepositApiImpl, DepositApi, PendingFlux } from '../deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
-import { log, decodeAuctionElements } from 'utils'
+import { log } from 'utils'
 import Web3 from 'web3'
+import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
 export interface ExchangeApi extends DepositApi {
   getOrders(userAddress: string): Promise<AuctionElement[]>
