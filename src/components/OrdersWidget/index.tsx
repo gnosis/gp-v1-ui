@@ -239,7 +239,7 @@ const OrdersWidget: React.FC = () => {
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
             <p className="noOrdersInfo">
-              It appears you haven&apos;t place any order yet. <br /> Create one!
+              It appears you haven&apos;t placed any order yet. <br /> Create one!
             </p>
           )}
           <Link to="/trade" className="tradeBtn">
