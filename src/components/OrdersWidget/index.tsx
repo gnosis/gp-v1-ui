@@ -149,7 +149,7 @@ const OrdersForm = styled.div`
     align-items: center;
 
     .hidden {
-      display: none;
+      visibility: hidden;
     }
   }
 
