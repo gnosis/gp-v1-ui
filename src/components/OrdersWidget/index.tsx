@@ -1,22 +1,17 @@
 import React, { useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { toast } from 'react-toastify'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-import { exchangeApi } from 'api'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
 
-import { txOptionalParams } from 'utils/transaction'
-import { log, assert } from 'utils'
-
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
+import { useDeleteOrders } from './useDeleteOrders'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -197,39 +192,21 @@ const OrdersWidget: React.FC = () => {
     [orders, setMarkedForDeletion],
   )
 
-  const { userAddress } = useWalletConnection()
-  const [deleting, setDeleting] = useSafeState<boolean>(false)
+  const { deleteOrders, deleting } = useDeleteOrders()
 
   const onSubmit = useCallback(
     async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
       event.preventDefault()
 
-      log(`Trying to cancel the orderIds ${markedForDeletion.values()} for user ${userAddress}`)
+      const success = await deleteOrders(Array.from(markedForDeletion.values()))
 
-      try {
-        assert(userAddress, 'User address is missing. Aborting.')
-        assert(markedForDeletion.size > 0, 'No orders to cancel. Aborting.')
-
-        setDeleting(true)
-        const orderIds = Array.from(markedForDeletion.values()).map(Number)
-
-        const receipt = await exchangeApi.cancelOrders({ senderAddress: userAddress, orderIds }, txOptionalParams)
-
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
-
-        toast.success('The selected orders have been cancelled')
-
-        // todo: might not be needed once orders are filtered out
+      if (success) {
+        // reset selections
+        // TODO: might no longer be needed once filtering is in place
         setMarkedForDeletion(new Set<string>())
-      } catch (e) {
-        console.error(`Failed to cancel orders ${markedForDeletion.values()} for user ${userAddress}`, e)
-
-        toast.error('Failed to cancel selected orders')
-      } finally {
-        setDeleting(false)
       }
     },
-    [markedForDeletion, setDeleting, setMarkedForDeletion, userAddress],
+    [deleteOrders, markedForDeletion, setMarkedForDeletion],
   )
 
   return (
