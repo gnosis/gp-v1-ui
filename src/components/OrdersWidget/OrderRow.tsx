@@ -59,16 +59,15 @@ const OrderRowWrapper = styled.div`
   }
 `
 
-const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
+const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ pending, transactionHash }) => {
   if (!pending) {
     return null
   }
 
-  // TODO: use proper pending tx hash for link
   return (
     <div className="container pendingCell">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
-      <EtherscanLink identifier="bla" type="tx" label={<small>view</small>} />
+      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
     </div>
   )
 }
@@ -226,6 +225,7 @@ interface Props {
   isOverBalance: boolean
   networkId: number
   pending?: boolean
+  transactionHash?: string
   isMarkedForDeletion: boolean
   toggleMarkedForDeletion: () => void
 }
@@ -233,7 +233,15 @@ interface Props {
 const onError = onErrorFactory('Failed to fetch token')
 
 const OrderRow: React.FC<Props> = props => {
-  const { order, isOverBalance, networkId, pending = false, isMarkedForDeletion, toggleMarkedForDeletion } = props
+  const {
+    order,
+    isOverBalance,
+    networkId,
+    pending = false,
+    transactionHash,
+    isMarkedForDeletion,
+    toggleMarkedForDeletion,
+  } = props
 
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
@@ -248,7 +256,7 @@ const OrderRow: React.FC<Props> = props => {
     <>
       {sellToken && buyToken && (
         <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
-          <PendingLink pending={pending} />
+          <PendingLink pending={pending} transactionHash={transactionHash} />
           <DeleteOrder
             isMarkedForDeletion={isMarkedForDeletion}
             toggleMarkedForDeletion={toggleMarkedForDeletion}
