@@ -147,6 +147,10 @@ const OrdersForm = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    .hidden {
+      display: none;
+    }
   }
 
   .warning {
@@ -260,7 +264,9 @@ const OrdersWidget: React.FC = () => {
               <ButtonWithIcon disabled={markedForDeletion.size == 0}>
                 <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
               </ButtonWithIcon>
-              {markedForDeletion.size == 0 && <span>Select first the order(s) you want to delete</span>}
+              <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                Select first the order(s) you want to delete
+              </span>
             </div>
           </form>
         </OrdersForm>
