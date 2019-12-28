@@ -267,6 +267,7 @@ const OrdersWidget: React.FC = () => {
                     type="checkbox"
                     onChange={toggleSelectAll}
                     checked={orders.length === markedForDeletion.size}
+                    disabled={deleting}
                   />
                 </div>
                 <div className="title">Order details</div>
@@ -289,6 +290,7 @@ const OrdersWidget: React.FC = () => {
                   isMarkedForDeletion={markedForDeletion.has(order.id)}
                   toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
                   pending={deleting && markedForDeletion.has(order.id)}
+                  disabled={deleting}
                 />
               ))}
             </div>

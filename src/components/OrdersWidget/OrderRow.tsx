@@ -72,17 +72,16 @@ const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ pen
   )
 }
 
-const DeleteOrder: React.FC<Pick<Props, 'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending'>> = ({
-  isMarkedForDeletion,
-  toggleMarkedForDeletion,
-  pending,
-}) => (
+const DeleteOrder: React.FC<Pick<
+  Props,
+  'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
+>> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
   <div className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
       checked={isMarkedForDeletion && !pending}
-      disabled={pending}
+      disabled={disabled}
     />
   </div>
 )
@@ -228,6 +227,7 @@ interface Props {
   transactionHash?: string
   isMarkedForDeletion: boolean
   toggleMarkedForDeletion: () => void
+  disabled: boolean
 }
 
 const onError = onErrorFactory('Failed to fetch token')
@@ -241,6 +241,7 @@ const OrderRow: React.FC<Props> = props => {
     transactionHash,
     isMarkedForDeletion,
     toggleMarkedForDeletion,
+    disabled,
   } = props
 
   // Fetching buy and sell tokens
@@ -261,6 +262,7 @@ const OrderRow: React.FC<Props> = props => {
             isMarkedForDeletion={isMarkedForDeletion}
             toggleMarkedForDeletion={toggleMarkedForDeletion}
             pending={pending}
+            disabled={disabled}
           />
           <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
           <UnfilledAmount order={order} sellToken={sellToken} />
