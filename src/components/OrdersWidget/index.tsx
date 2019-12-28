@@ -216,10 +216,11 @@ const OrdersWidget: React.FC = () => {
       if (success) {
         // reset selections
         // TODO: might no longer be needed once filtering is in place
+        setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
         setMarkedForDeletion(new Set<string>())
       }
     },
-    [deleteOrders, markedForDeletion, setMarkedForDeletion],
+    [deleteOrders, markedForDeletion, orders, setMarkedForDeletion, setOrders],
   )
 
   return (
