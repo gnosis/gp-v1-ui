@@ -251,6 +251,8 @@ export const RowTokenDiv = styled.div`
         margin-left: 10px;
       }
       &:first-child {
+        grid-template-columns: 1fr max-content auto;
+
         > img {
           order: 2;
           margin-right: -8px;
