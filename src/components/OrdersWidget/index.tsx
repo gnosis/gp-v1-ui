@@ -10,7 +10,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
-import { dateToBatchId } from 'utils'
+import { batchIdToDate } from 'utils'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
@@ -204,18 +204,30 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
     </button>
   )
 }
+
+const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now
+
 const OrdersWidget: React.FC = () => {
   const allOrders = useOrders()
 
   const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
 
+  const [showActive, setShowActive] = useSafeState<boolean>(true)
+
+  const toggleShowActive = useCallback(() => {
+    setShowActive(isActive => !isActive)
+  }, [setShowActive])
+
   useEffect(() => {
-    const filteredOrders = allOrders.filter(order => order.validUntil > dateToBatchId())
+    const now = new Date()
+    const filtered = allOrders.filter(order => showActive === isOrderActive(order, now))
+    setOrders(filtered)
+  }, [allOrders, setOrders, showActive])
 
-    setOrders(filteredOrders)
-  }, [allOrders, setOrders])
+  const shownOrdersCount = orders.length
+  const hiddenOrdersCount = allOrders.length - shownOrdersCount
 
-  const noOrders = orders.length === 0
+  const noOrders = allOrders.length === 0
 
   // this page is behind login wall so networkId should always be set
   const { networkId } = useWalletConnection()
@@ -256,7 +268,6 @@ const OrdersWidget: React.FC = () => {
 
       if (success) {
         // reset selections
-        // TODO: might no longer be needed once filtering is in place
         setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
         setMarkedForDeletion(new Set<string>())
       }
