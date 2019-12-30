@@ -193,14 +193,17 @@ export const RowTokenDiv = styled.div`
     }
 
     &:first-child {
-      display: flex;
-      flex-flow: row wrap;
+      display: grid;
+      grid-template-columns: min-content max-content;
+      grid-gap: 1em;
       align-items: center;
+
       > * {
         margin: 5px;
       }
+
       > div:last-child {
-        flex-grow: 1;
+        text-align: initial;
       }
     }
 
