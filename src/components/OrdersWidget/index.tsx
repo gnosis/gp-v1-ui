@@ -10,7 +10,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
-import { batchIdToDate } from 'utils'
+import { isOrderActive } from 'utils'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
@@ -205,8 +205,6 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
   )
 }
 
-const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now
-
 const OrdersWidget: React.FC = () => {
   const allOrders = useOrders()
 
@@ -320,7 +318,7 @@ const OrdersWidget: React.FC = () => {
                 onClick={toggleShowActive}
               />
             </div>
-            {overBalanceOrders.size > 0 && (
+            {overBalanceOrders.size > 0 && showActive && (
               <div className="warning">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 <strong> Low balance</strong>
