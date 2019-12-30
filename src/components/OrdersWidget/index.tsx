@@ -363,10 +363,10 @@ const OrdersWidget: React.FC = () => {
 
             <div className="deleteContainer">
               <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
-                <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
+                <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
               </ButtonWithIcon>
               <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
-                Select first the order(s) you want to delete
+                Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
               </span>
             </div>
           </form>
