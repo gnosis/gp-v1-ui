@@ -198,7 +198,7 @@ const OrdersWidget: React.FC = () => {
     async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
       event.preventDefault()
 
-      const success = await deleteOrders(Array.from(markedForDeletion.values()))
+      const success = await deleteOrders(Array.from(markedForDeletion))
 
       if (success) {
         // reset selections

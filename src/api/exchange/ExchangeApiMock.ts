@@ -121,7 +121,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     this._initOrders(senderAddress)
     const batchId = await this.getCurrentBatchId()
 
-    orderIds.map(orderId => {
+    orderIds.forEach(orderId => {
       if (this.orders[senderAddress][orderId]) {
         this.orders[senderAddress][orderId].validUntil = batchId - 1
       }
