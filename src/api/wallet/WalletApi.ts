@@ -1,7 +1,7 @@
-import { WalletApi, Network, WalletInfo, Command, ProviderInfo } from 'types'
+import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
-import { getDefaultProvider } from '../'
+import { getDefaultProvider } from '..'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 
@@ -25,6 +25,27 @@ import {
 
 import { log, toBN } from 'utils'
 import { INFURA_ID } from 'const'
+
+export interface WalletApi {
+  isConnected(): boolean
+  connect(givenProvider?: Provider): Promise<boolean>
+  disconnect(): Promise<void>
+  getAddress(): Promise<string>
+  getBalance(): Promise<BN>
+  getNetworkId(): Promise<number>
+  getWalletInfo(): WalletInfo
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
+  removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
+  getProviderInfo(): ProviderInfo
+}
+
+export interface WalletInfo {
+  isConnected: boolean
+  userAddress?: string
+  networkId?: number
+}
+
+export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 

@@ -1,10 +1,10 @@
-import { DepositApi, Erc20Api } from 'types'
-
 import { BATCH_TIME, ZERO, TWO } from 'const'
-import { DepositApiMock } from 'api/exchange/DepositApiMock'
+import { DepositApiMock } from 'api/deposit/DepositApiMock'
 import * as testHelpers from '../../testHelpers'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { createFlux } from '../../data'
+import { DepositApi } from 'api/deposit/DepositApi'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 const { USER_1, USER_2, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, AMOUNT, AMOUNT_SMALL } = testHelpers
 

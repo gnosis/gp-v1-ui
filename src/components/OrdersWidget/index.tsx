@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
+import useSafeState from 'hooks/useSafeState'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
@@ -146,6 +147,10 @@ const OrdersForm = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    .hidden {
+      visibility: hidden;
+    }
   }
 
   .warning {
@@ -164,6 +169,26 @@ const OrdersWidget: React.FC = () => {
     () =>
       new Set<string>(orders.filter(order => order.remainingAmount.gt(order.sellTokenBalance)).map(order => order.id)),
     [orders],
+  )
+
+  const [markedForDeletion, setMarkedForDeletion] = useSafeState<Set<string>>(new Set())
+
+  const toggleMarkForDeletionFactory = useCallback(
+    (orderId: string): (() => void) => (): void =>
+      setMarkedForDeletion(curr => {
+        const newSet = new Set(curr)
+        newSet.has(orderId) ? newSet.delete(orderId) : newSet.add(orderId)
+        return newSet
+      }),
+    [setMarkedForDeletion],
+  )
+
+  const toggleSelectAll = useCallback(
+    ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) => {
+      const newSet: Set<string> = checked ? new Set(orders.map(order => order.id)) : new Set()
+      setMarkedForDeletion(newSet)
+    },
+    [orders, setMarkedForDeletion],
   )
 
   return (
@@ -206,7 +231,11 @@ const OrdersWidget: React.FC = () => {
             <div className="ordersContainer">
               <div className="headerRow">
                 <div className="checked">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    onChange={toggleSelectAll}
+                    checked={orders.length === markedForDeletion.size}
+                  />
                 </div>
                 <div className="title">Order details</div>
                 <div className="title">
@@ -225,15 +254,19 @@ const OrdersWidget: React.FC = () => {
                   order={order}
                   networkId={networkId}
                   isOverBalance={overBalanceOrders.has(order.id)}
+                  isMarkedForDeletion={markedForDeletion.has(order.id)}
+                  toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
                 />
               ))}
             </div>
 
             <div className="deleteContainer">
-              <ButtonWithIcon disabled>
+              <ButtonWithIcon disabled={markedForDeletion.size == 0}>
                 <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
               </ButtonWithIcon>
-              <span>Select first the order(s) you want to delete</span>
+              <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                Select first the order(s) you want to delete
+              </span>
             </div>
           </form>
         </OrdersForm>
