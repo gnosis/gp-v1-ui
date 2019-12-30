@@ -3,6 +3,7 @@ import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { useEffect } from 'react'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { ZERO } from 'const'
 
 /**
  * Filter out deleted orders.
@@ -16,12 +17,12 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
   return orders.filter(
     order =>
       !(
-        !order.buyTokenId &&
-        !order.sellTokenId &&
-        !order.priceDenominator &&
-        !order.priceNumerator &&
-        !order.validFrom &&
-        !order.validUntil
+        order.buyTokenId === 0 &&
+        order.sellTokenId === 0 &&
+        order.priceDenominator.eq(ZERO) &&
+        order.priceNumerator.eq(ZERO) &&
+        order.validFrom === 0 &&
+        order.validUntil === 0
       ),
   )
 }
