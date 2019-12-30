@@ -14,7 +14,7 @@
         baseHref = ipfsMatch[0]
         if (!baseHref.endsWith('/')) baseHref += '/'
 
-        window.BASE_URL = ipfsMatch[0]
+        window.IS_IPFS = true
         
       } else {
         baseHref = '/'
