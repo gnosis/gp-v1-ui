@@ -92,9 +92,26 @@ const OrdersForm = styled.div`
   .infoContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    align-items: center;
 
     .warning {
       justify-self: end;
+    }
+
+    .countContainer {
+      display: grid;
+      grid: 'total active expired';
+      align-items: center;
+    }
+
+    .total {
+      grid-area: total;
+    }
+    .active {
+      grid-area: active;
+    }
+    .expired {
+      grid-area: expired;
     }
   }
 
@@ -163,6 +180,30 @@ const OrdersForm = styled.div`
   }
 `
 
+interface ShowOrdersButtonProps {
+  type: 'active' | 'expired'
+  isActive: boolean
+  shownCount: number
+  hiddenCount: number
+  onClick: () => void
+}
+
+const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, shownCount, hiddenCount, onClick }) => {
+  const count = isActive ? shownCount : hiddenCount
+
+  return (
+    <button className={type} disabled={isActive} onClick={onClick}>
+      {!isActive ? (
+        <>
+          Show <Highlight>{count}</Highlight>
+        </>
+      ) : (
+        <>{count}</>
+      )}
+      <> {type}</>
+    </button>
+  )
+}
 const OrdersWidget: React.FC = () => {
   const allOrders = useOrders()
 
@@ -249,8 +290,10 @@ const OrdersWidget: React.FC = () => {
       {!noOrders && networkId && (
         <OrdersForm>
           <div className="infoContainer">
-            <div>
-              You have <Highlight>{orders.length}</Highlight> standing orders
+            <div className="countContainer">
+              <div className="total">
+                You have <Highlight>{allOrders.length}</Highlight> standing orders:
+              </div>
             </div>
             {overBalanceOrders.size > 0 && (
               <div className="warning">
