@@ -37,7 +37,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     cursor: pointer;
-    height: ${$open ? 'auto' : '63px'}
+    height: ${$open ? 'auto' : '3.9375rem'}
     overflow: hidden;
     padding: 0;
   `}
