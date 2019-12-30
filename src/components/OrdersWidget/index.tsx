@@ -11,6 +11,7 @@ import useSafeState from 'hooks/useSafeState'
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
+import { useDeleteOrders } from './useDeleteOrders'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -191,6 +192,23 @@ const OrdersWidget: React.FC = () => {
     [orders, setMarkedForDeletion],
   )
 
+  const { deleteOrders, deleting } = useDeleteOrders()
+
+  const onSubmit = useCallback(
+    async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
+      event.preventDefault()
+
+      const success = await deleteOrders(Array.from(markedForDeletion))
+
+      if (success) {
+        // reset selections
+        // TODO: might no longer be needed once filtering is in place
+        setMarkedForDeletion(new Set<string>())
+      }
+    },
+    [deleteOrders, markedForDeletion, setMarkedForDeletion],
+  )
+
   return (
     <OrdersWrapper>
       <div>
@@ -198,7 +216,7 @@ const OrdersWidget: React.FC = () => {
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
             <p className="noOrdersInfo">
-              It appears you haven&apos;t place any order yet. <br /> Create one!
+              It appears you haven&apos;t placed any order yet. <br /> Create one!
             </p>
           )}
           <Link to="/trade" className="tradeBtn">
@@ -227,7 +245,7 @@ const OrdersWidget: React.FC = () => {
               </div>
             )}
           </div>
-          <form action="submit">
+          <form action="submit" onSubmit={onSubmit}>
             <div className="ordersContainer">
               <div className="headerRow">
                 <div className="checked">
@@ -256,12 +274,13 @@ const OrdersWidget: React.FC = () => {
                   isOverBalance={overBalanceOrders.has(order.id)}
                   isMarkedForDeletion={markedForDeletion.has(order.id)}
                   toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                  pending={deleting && markedForDeletion.has(order.id)}
                 />
               ))}
             </div>
 
             <div className="deleteContainer">
-              <ButtonWithIcon disabled={markedForDeletion.size == 0}>
+              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
                 <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
               </ButtonWithIcon>
               <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
