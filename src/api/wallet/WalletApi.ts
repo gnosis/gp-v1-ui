@@ -4,82 +4,8 @@ import assert from 'assert'
 import { getDefaultProvider } from '..'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
+
 import Web3Connect from 'web3connect'
-
-export interface WalletApi {
-  isConnected(): boolean
-  connect(givenProvider?: Provider): Promise<boolean>
-  disconnect(): Promise<void>
-  getAddress(): Promise<string>
-  getBalance(): Promise<BN>
-  getNetworkId(): Promise<number>
-  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
-  removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
-  getProviderInfo(): ProviderInfo
-}
-
-export interface WalletInfo {
-  isConnected: boolean
-  userAddress?: string
-  networkId?: number
-}
-
-export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
-
-WalletConnectProvider.prototype.getWalletConnector = function(): Promise<WalletConnector> {
-  return new Promise((resolve, reject) => {
-    const wc = this.wc
-
-    if (this.isConnecting) {
-      this.onConnect((x: WalletConnector) => resolve(x))
-    } else if (!wc.connected) {
-      this.isConnecting = true
-      const sessionRequestOpions = this.chainId ? { chainId: this.chainId } : undefined
-      wc.createSession(sessionRequestOpions)
-        .then(() => {
-          if (this.qrcode) {
-            console.log(wc.uri)
-            WalletConnectQRCodeModal.open(wc.uri, () => {
-              reject(new Error('User closed WalletConnect modal'))
-            })
-          }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          wc.on('connect', (error: Error, payload: any) => {
-            if (error) {
-              this.isConnecting = false
-              return reject(error)
-            }
-            if (this.qrcode) {
-              WalletConnectQRCodeModal.close()
-            }
-            this.isConnecting = false
-            this.connected = true
-
-            if (payload) {
-              // Handle session update
-              this.updateState(payload.params[0])
-            }
-            // Emit connect event
-            this.emit('connect')
-
-            this.triggerConnect(wc)
-            resolve(wc)
-          })
-        })
-        .catch((error: Error) => {
-          this.isConnecting = false
-          reject(error)
-        })
-    } else {
-      if (!this.connected) {
-        this.connected = true
-        this.updateState(wc.session)
-      }
-      resolve(wc)
-    }
-  })
-}
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -95,11 +21,31 @@ import {
   isWalletConnectSubscriptions,
   isMetamaskProvider,
   Subscriptions,
-  WalletConnector,
 } from '@gnosis.pm/dapp-ui'
 
 import { log, toBN } from 'utils'
 import { INFURA_ID } from 'const'
+
+export interface WalletApi {
+  isConnected(): boolean
+  connect(givenProvider?: Provider): Promise<boolean>
+  disconnect(): Promise<void>
+  getAddress(): Promise<string>
+  getBalance(): Promise<BN>
+  getNetworkId(): Promise<number>
+  getWalletInfo(): WalletInfo
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
+  removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
+  getProviderInfo(): ProviderInfo
+}
+
+export interface WalletInfo {
+  isConnected: boolean
+  userAddress?: string
+  networkId?: number
+}
+
+export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -308,7 +254,7 @@ export class WalletApiImpl implements WalletApi {
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
     this._listeners.push(callback)
     if (trigger) {
-      callback(this._getWalletInfo())
+      callback(this.getWalletInfo())
     }
 
     return (): void => this.removeOnChangeWalletInfo(callback)
@@ -322,9 +268,7 @@ export class WalletApiImpl implements WalletApi {
     return Web3Connect.getProviderInfo(this._provider)
   }
 
-  /* ****************      Private Functions      **************** */
-
-  private _getWalletInfo(): WalletInfo {
+  public getWalletInfo(): WalletInfo {
     const { isConnected = false, accounts = [], chainId = 0 } = getProviderState(this._provider) || {}
     return {
       isConnected,
@@ -333,9 +277,11 @@ export class WalletApiImpl implements WalletApi {
     }
   }
 
+  /* ****************      Private Functions      **************** */
+
   private async _notifyListeners(): Promise<void> {
     await Promise.resolve()
-    const walletInfo: WalletInfo = this._getWalletInfo()
+    const walletInfo: WalletInfo = this.getWalletInfo()
     this._listeners.forEach(listener => listener(walletInfo))
   }
 
