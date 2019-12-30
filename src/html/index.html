@@ -5,13 +5,13 @@
   <%if (htmlWebpackPlugin.options.ipfsHack) { %>
   <script>
     (function () {
-      const { origin, pathname } = window.location
+      const { pathname } = window.location
       const ipfsMatch = /.*\/Qm\w{44}/.exec(pathname)
       const base = document.createElement('base')
       let baseHref
       if (ipfsMatch) {
 
-        baseHref = origin + ipfsMatch[0]
+        baseHref = ipfsMatch[0]
         if (!baseHref.endsWith('/')) baseHref += '/'
 
         window.BASE_URL = ipfsMatch[0]
