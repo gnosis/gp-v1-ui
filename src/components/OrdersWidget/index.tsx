@@ -305,6 +305,20 @@ const OrdersWidget: React.FC = () => {
               <div className="total">
                 You have <Highlight>{allOrders.length}</Highlight> standing orders:
               </div>
+              <ShowOrdersButton
+                type="active"
+                isActive={showActive}
+                shownCount={shownOrdersCount}
+                hiddenCount={hiddenOrdersCount}
+                onClick={toggleShowActive}
+              />
+              <ShowOrdersButton
+                type="expired"
+                isActive={!showActive}
+                shownCount={shownOrdersCount}
+                hiddenCount={hiddenOrdersCount}
+                onClick={toggleShowActive}
+              />
             </div>
             {overBalanceOrders.size > 0 && (
               <div className="warning">
