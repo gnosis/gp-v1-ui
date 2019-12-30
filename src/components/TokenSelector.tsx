@@ -22,7 +22,7 @@ const Wrapper = styled.div`
 
   label {
     text-transform: uppercase;
-    padding-left: 8px; // to align with Select input padding
+    padding-left: 0.5rem; // to align with Select input padding
   }
 
   input {

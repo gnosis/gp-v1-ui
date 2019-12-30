@@ -43,7 +43,7 @@ const WarningLabel = styled.code`
   background: #ffa8a8;
   border-radius: var(--border-radius);
   font-weight: bolder;
-  margin: 0 auto 15px;
+  margin: 0 auto 0.9375rem;
   padding: 6;
   text-align: center;
   width: 75%;

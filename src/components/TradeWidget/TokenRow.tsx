@@ -37,11 +37,11 @@ const InputBox = styled.div`
     width: 100%;
 
     &.error {
-      box-shadow: 0 0 3px #cc0000;
+      box-shadow: 0 0 0.1875rem #cc0000;
     }
 
     &.warning {
-      box-shadow: 0 0 3px #ff7500;
+      box-shadow: 0 0 0.1875rem #ff7500;
     }
 
     &:disabled {
