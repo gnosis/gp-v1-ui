@@ -28,9 +28,6 @@ import { walletApi } from 'api'
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
-import { setupAutoconnect } from 'utils'
-
-setupAutoconnect(walletApi)
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
   const isConnected = walletApi.isConnected()

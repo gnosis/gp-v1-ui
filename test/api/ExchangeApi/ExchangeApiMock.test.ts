@@ -3,9 +3,10 @@ import BN from 'bn.js'
 import ExchangeApiMock from 'api/exchange/ExchangeApiMock'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { ZERO, ONE, FEE_DENOMINATOR } from 'const'
-import { ExchangeApi, Erc20Api } from 'types'
 import * as testHelpers from '../../testHelpers'
 import { RECEIPT } from '../../data'
+import { ExchangeApi } from 'api/exchange/ExchangeApi'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 const { USER_1, USER_2, USER_3, FEE_TOKEN, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, BATCH_ID } = testHelpers
 
