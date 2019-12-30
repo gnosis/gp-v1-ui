@@ -233,7 +233,7 @@ export class WalletApiImpl implements WalletApi {
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
     this._listeners.push(callback)
     if (trigger) {
-      callback(this._getWalletInfo())
+      callback(this.getWalletInfo())
     }
 
     return (): void => this.removeOnChangeWalletInfo(callback)
@@ -247,9 +247,7 @@ export class WalletApiImpl implements WalletApi {
     return Web3Connect.getProviderInfo(this._provider)
   }
 
-  /* ****************      Private Functions      **************** */
-
-  private _getWalletInfo(): WalletInfo {
+  public getWalletInfo(): WalletInfo {
     const { isConnected = false, accounts = [], chainId = 0 } = getProviderState(this._provider) || {}
     return {
       isConnected,
@@ -258,9 +256,11 @@ export class WalletApiImpl implements WalletApi {
     }
   }
 
+  /* ****************      Private Functions      **************** */
+
   private async _notifyListeners(): Promise<void> {
     await Promise.resolve()
-    const walletInfo: WalletInfo = this._getWalletInfo()
+    const walletInfo: WalletInfo = this.getWalletInfo()
     this._listeners.forEach(listener => listener(walletInfo))
   }
 

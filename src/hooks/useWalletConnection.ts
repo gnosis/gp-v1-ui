@@ -4,10 +4,10 @@ import { WalletInfo, Command } from 'types'
 import useSafeState from './useSafeState'
 
 export const useWalletConnection = (): WalletInfo => {
-  const [walletInfo, setWalletInfo] = useSafeState<WalletInfo>({ isConnected: false })
+  const [walletInfo, setWalletInfo] = useSafeState<WalletInfo>(() => walletApi.getWalletInfo())
 
   useEffect((): Command => {
-    return walletApi.addOnChangeWalletInfo(setWalletInfo, true)
+    return walletApi.addOnChangeWalletInfo(setWalletInfo)
   }, [setWalletInfo])
   return walletInfo
 }
