@@ -8,8 +8,6 @@ import { WalletApi, WalletInfo, ProviderInfo } from './WalletApi'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
-const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
-
 /**
  * Basic implementation of Wallet API
  */
@@ -21,7 +19,7 @@ export class WalletApiMock implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
 
   public constructor() {
-    this._connected = AUTOCONNECT
+    this._connected = process.env.AUTOCONNECT === 'true'
     this._user = USER_1
     this._networkId = Network.Rinkeby
     this._balance = toWei(new BN(2.75), 'ether')

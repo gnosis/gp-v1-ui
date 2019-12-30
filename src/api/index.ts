@@ -22,13 +22,6 @@ import {
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 
-const isWeb3Mock = process.env.MOCK_WEB3 === 'true'
-const isWalletMock = process.env.MOCK_WALLET === 'true'
-const isTokenListMock = process.env.MOCK_TOKEN_LIST === 'true'
-const isErc20Mock = process.env.MOCK_ERC20 === 'true'
-const isDepositMock = process.env.MOCK_DEPOSIT === 'true'
-const isExchangeMock = process.env.MOCK_EXCHANGE === 'true'
-
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
   process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
@@ -37,7 +30,7 @@ function createWeb3Api(): Web3 {
   // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
   const web3 = new Web3(getDefaultProvider())
 
-  if (isWeb3Mock) {
+  if (process.env.MOCK_WEB3 === 'true') {
     // Only function that needs to be mocked so far. We can add more and add extra logic as needed
     web3.eth.getCode = async (address: string): Promise<string> => address
   }
@@ -46,7 +39,7 @@ function createWeb3Api(): Web3 {
 
 function createWalletApi(web3: Web3): WalletApi {
   let walletApi
-  if (isWalletMock) {
+  if (process.env.MOCK_WALLET === 'true') {
     walletApi = new WalletApiMock()
   } else {
     walletApi = new WalletApiImpl(web3)
@@ -57,7 +50,7 @@ function createWalletApi(web3: Web3): WalletApi {
 
 function createErc20Api(web3: Web3): Erc20Api {
   let erc20Api
-  if (isErc20Mock) {
+  if (process.env.MOCK_ERC20 === 'true') {
     erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances, tokens: unregisteredTokens })
   } else {
     erc20Api = new Erc20ApiImpl(web3)
@@ -68,7 +61,7 @@ function createErc20Api(web3: Web3): Erc20Api {
 
 function createDepositApi(erc20Api: Erc20Api, web3: Web3): DepositApi {
   let depositApi
-  if (isDepositMock) {
+  if (process.env.MOCK_DEPOSIT === 'true') {
     depositApi = new DepositApiMock(exchangeBalanceStates, erc20Api)
   } else {
     depositApi = new DepositApiImpl(web3)
@@ -79,7 +72,7 @@ function createDepositApi(erc20Api: Erc20Api, web3: Web3): DepositApi {
 
 function createExchangeApi(erc20Api: Erc20Api, web3: Web3): ExchangeApi {
   let exchangeApi
-  if (isExchangeMock) {
+  if (process.env.MOCK_EXCHANGE === 'true') {
     const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address), TOKEN_8]
     exchangeApi = new ExchangeApiMock({
       balanceStates: exchangeBalanceStates,
@@ -98,7 +91,7 @@ function createTokenListApi(): TokenList {
   const networks = [Network.Mainnet, Network.Rinkeby]
 
   let tokenListApi: TokenList
-  if (isTokenListMock) {
+  if (process.env.MOCK_TOKEN_LIST === 'true') {
     tokenListApi = new TokenListApiMock(tokenList)
   } else {
     tokenListApi = new TokenListApiImpl(networks)
