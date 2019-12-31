@@ -2,7 +2,7 @@ import 'types'
 
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
-import { BrowserRouter as Router, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
 
 // SCSS
 import GlobalStyles from 'styles/global'
@@ -53,6 +53,9 @@ const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
 }
 
 toast.configure({ position: toast.POSITION.BOTTOM_RIGHT, closeOnClick: false })
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
 
 // App
 const App: React.FC = () => (
