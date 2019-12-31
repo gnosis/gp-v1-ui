@@ -18,13 +18,13 @@ const Wrapper = styled(PageWrapper)`
   display: flex;
   flex-direction: column;
 
-  @media only screen and (max-width: ${TABLET}px) {
+  @media only screen and (max-width: ${TABLET}em) {
     margin: 0 auto 3rem;
     padding: 1em;
     width: 80%;
   }
 
-  @media only screen and (max-width: ${MOBILE_LARGE}px) {
+  @media only screen and (max-width: ${MOBILE_LARGE}em) {
     width: 100%;
   }
 `

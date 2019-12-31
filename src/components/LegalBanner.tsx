@@ -14,9 +14,9 @@ const Wrapper = styled.div`
   color: wheat;
 
   text-align: center;
-  font-size: 80%;
+  font-size: 0.65rem;
 
-  @media only screen and (max-width: ${MOBILE}px) {
+  @media only screen and (max-width: ${MOBILE}em) {
     padding: 0.2rem 2rem;
   }
 `

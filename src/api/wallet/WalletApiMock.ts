@@ -8,8 +8,6 @@ import { WalletApi, WalletInfo, ProviderInfo } from './WalletApi'
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
-const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
-
 /**
  * Basic implementation of Wallet API
  */
@@ -21,7 +19,7 @@ export class WalletApiMock implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
 
   public constructor() {
-    this._connected = AUTOCONNECT
+    this._connected = process.env.AUTOCONNECT === 'true'
     this._user = USER_1
     this._networkId = Network.Rinkeby
     this._balance = toWei(new BN(2.75), 'ether')
@@ -69,7 +67,7 @@ export class WalletApiMock implements WalletApi {
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
     this._listeners.push(callback)
     if (trigger) {
-      callback(this._getWalletInfo())
+      callback(this.getWalletInfo())
     }
 
     return (): void => this.removeOnChangeWalletInfo(callback)
@@ -102,9 +100,7 @@ export class WalletApiMock implements WalletApi {
     this._notifyListeners()
   }
 
-  /* ****************      Private Functions      **************** */
-
-  private _getWalletInfo(): WalletInfo {
+  public getWalletInfo(): WalletInfo {
     return {
       isConnected: this._connected,
       userAddress: this._connected ? this._user : undefined,
@@ -112,8 +108,10 @@ export class WalletApiMock implements WalletApi {
     }
   }
 
+  /* ****************      Private Functions      **************** */
+
   private _notifyListeners(): void {
-    const walletInfo: WalletInfo = this._getWalletInfo()
+    const walletInfo: WalletInfo = this.getWalletInfo()
     this._listeners.forEach(listener => listener(walletInfo))
   }
 }

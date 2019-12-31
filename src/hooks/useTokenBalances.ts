@@ -15,7 +15,6 @@ import { PendingFlux } from 'api/deposit/DepositApi'
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]
   error: boolean
-  setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[]>>
 }
 
 function calculateTotalBalance(balance: BN, currentBatchId: number, pendingDeposit: PendingFlux): BN {
@@ -105,5 +104,5 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
       })
   }, [setBalances, setError, walletInfo])
 
-  return { balances, error, setBalances }
+  return { balances, error }
 }

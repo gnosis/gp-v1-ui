@@ -11,13 +11,9 @@ const hexPattern = '[0-9a-fA-F]'
 const hn = (n: number): string => hexPattern + `{${n}}`
 
 // /(address)(sellTokenBalance)(buyTokenId)(sellTokenId)(validFrom)(validUntil)(priceNumerator)(priceDenominator)(remainingAmount)/g
-const orderPattern = `(?<user>${hn(ADDRESS_WIDTH)})(?<sellTokenBalance>${hn(UINT256_WIDTH)})(?<buyTokenId>${hn(
-  UINT16_WIDTH,
-)})(?<sellTokenId>${hn(UINT16_WIDTH)})(?<validFrom>${hn(UINT32_WIDTH)})(?<validUntil>${hn(
+const orderPattern = `(${hn(ADDRESS_WIDTH)})(${hn(UINT256_WIDTH)})(${hn(UINT16_WIDTH)})(${hn(UINT16_WIDTH)})(${hn(
   UINT32_WIDTH,
-)})(?<priceNumerator>${hn(UINT128_WIDTH)})(?<priceDenominator>${hn(UINT128_WIDTH)})(?<remainingAmount>${hn(
-  UINT128_WIDTH,
-)})`
+)})(${hn(UINT32_WIDTH)})(${hn(UINT128_WIDTH)})(${hn(UINT128_WIDTH)})(${hn(UINT128_WIDTH)})`
 
 // decodes Orders
 export function decodeAuctionElements(bytes: string): AuctionElement[] {
@@ -27,7 +23,8 @@ export function decodeAuctionElements(bytes: string): AuctionElement[] {
   let index = 0 // order ID is given by position and it's not part of the encoded data
 
   while ((order = oneOrder.exec(bytes))) {
-    const {
+    const [
+      ,
       user,
       sellTokenBalance,
       buyTokenId,
@@ -37,17 +34,7 @@ export function decodeAuctionElements(bytes: string): AuctionElement[] {
       priceNumerator,
       priceDenominator,
       remainingAmount,
-    } = order.groups as {
-      user: string
-      sellTokenBalance: string
-      buyTokenId: string
-      sellTokenId: string
-      validFrom: string
-      validUntil: string
-      priceNumerator: string
-      priceDenominator: string
-      remainingAmount: string
-    }
+    ] = order
 
     result.push({
       user: '0x' + user,

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
@@ -6,10 +6,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
+import useSafeState from 'hooks/useSafeState'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
+import { useDeleteOrders } from './useDeleteOrders'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -115,7 +117,7 @@ const OrdersForm = styled.div`
 
     .title {
       // create a divider line only bellow titled columns
-      border-bottom: 2px solid #ededed;
+      border-bottom: 0.125rem solid #ededed;
       // push the border all the way to the bottom and extend it
       place-self: stretch;
 
@@ -146,6 +148,10 @@ const OrdersForm = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    .hidden {
+      visibility: hidden;
+    }
   }
 
   .warning {
@@ -166,6 +172,43 @@ const OrdersWidget: React.FC = () => {
     [orders],
   )
 
+  const [markedForDeletion, setMarkedForDeletion] = useSafeState<Set<string>>(new Set())
+
+  const toggleMarkForDeletionFactory = useCallback(
+    (orderId: string): (() => void) => (): void =>
+      setMarkedForDeletion(curr => {
+        const newSet = new Set(curr)
+        newSet.has(orderId) ? newSet.delete(orderId) : newSet.add(orderId)
+        return newSet
+      }),
+    [setMarkedForDeletion],
+  )
+
+  const toggleSelectAll = useCallback(
+    ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) => {
+      const newSet: Set<string> = checked ? new Set(orders.map(order => order.id)) : new Set()
+      setMarkedForDeletion(newSet)
+    },
+    [orders, setMarkedForDeletion],
+  )
+
+  const { deleteOrders, deleting } = useDeleteOrders()
+
+  const onSubmit = useCallback(
+    async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
+      event.preventDefault()
+
+      const success = await deleteOrders(Array.from(markedForDeletion))
+
+      if (success) {
+        // reset selections
+        // TODO: might no longer be needed once filtering is in place
+        setMarkedForDeletion(new Set<string>())
+      }
+    },
+    [deleteOrders, markedForDeletion, setMarkedForDeletion],
+  )
+
   return (
     <OrdersWrapper>
       <div>
@@ -173,7 +216,7 @@ const OrdersWidget: React.FC = () => {
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
             <p className="noOrdersInfo">
-              It appears you haven&apos;t place any order yet. <br /> Create one!
+              It appears you haven&apos;t placed any order yet. <br /> Create one!
             </p>
           )}
           <Link to="/trade" className="tradeBtn">
@@ -202,11 +245,15 @@ const OrdersWidget: React.FC = () => {
               </div>
             )}
           </div>
-          <form action="submit">
+          <form action="submit" onSubmit={onSubmit}>
             <div className="ordersContainer">
               <div className="headerRow">
                 <div className="checked">
-                  <input type="checkbox" />
+                  <input
+                    type="checkbox"
+                    onChange={toggleSelectAll}
+                    checked={orders.length === markedForDeletion.size}
+                  />
                 </div>
                 <div className="title">Order details</div>
                 <div className="title">
@@ -225,15 +272,20 @@ const OrdersWidget: React.FC = () => {
                   order={order}
                   networkId={networkId}
                   isOverBalance={overBalanceOrders.has(order.id)}
+                  isMarkedForDeletion={markedForDeletion.has(order.id)}
+                  toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                  pending={deleting && markedForDeletion.has(order.id)}
                 />
               ))}
             </div>
 
             <div className="deleteContainer">
-              <ButtonWithIcon disabled>
+              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
                 <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
               </ButtonWithIcon>
-              <span>Select first the order(s) you want to delete</span>
+              <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                Select first the order(s) you want to delete
+              </span>
             </div>
           </form>
         </OrdersForm>

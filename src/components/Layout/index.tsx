@@ -12,14 +12,14 @@ const Wrapper = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-rows: 50px 0.2fr auto;
+  grid-template-rows: 3.125rem 0.2fr auto;
 
   main {
     flex: 1;
     margin: auto;
     min-width: 40vw;
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}px) {
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
       width: 100%;
     }
   }
