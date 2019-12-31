@@ -131,7 +131,7 @@ export const DepositWidgetWrapper = styled.section`
     grid-template-columns: var(--grid-row-size-walletPage);
 
     > div {
-      color: #000000;
+      color: var(--color-text-deposit-primary);
       line-height: 1.5;
       font-size: 0.8em;
       text-transform: uppercase;
