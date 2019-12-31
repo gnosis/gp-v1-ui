@@ -9,6 +9,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
+import useScrollIntoView from 'hooks/useScrollIntoView'
 
 export interface FormProps {
   tokenBalances: TokenBalanceDetails
@@ -87,8 +88,10 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     }
   }
 
+  const ref = useScrollIntoView<HTMLDivElement>()
+
   return (
-    <DynamicWrapper responsive={!!responsive}>
+    <DynamicWrapper responsive={!!responsive} ref={ref}>
       <InnerWrapper>
         <a className="times" onClick={cancelForm}>
           &times;

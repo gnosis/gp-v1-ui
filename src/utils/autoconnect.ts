@@ -3,20 +3,39 @@ import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-u
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
-import { WalletApi } from 'types'
+import { WalletApi } from 'api/wallet/WalletApi'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
   const provider = new WalletConnectProvider({
     infuraId: INFURA_ID,
   })
 
-  // TODO: listen for specific websocket events when they are available
-  // hack to wait while WC tries connection with last session's key and uri
-  await delay(1000)
-
   if (!provider.wc.connected) return null
 
   try {
+    await new Promise((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      provider.wc.on('transport_open', (error: Error, event: any) => {
+        if (error) reject(error)
+        else resolve(event)
+      })
+    })
+
+    await Promise.race([
+      // some time for connection to settle
+      delay(250),
+      new Promise((resolve, reject) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        provider.wc.on('disconnect', (error: Error, event: any) => {
+          // wc.connected is set to false here
+          if (error) reject(error)
+          else resolve(event)
+        })
+      }),
+    ])
+
+    if (!provider.wc.connected) return null
+
     await provider.enable()
   } catch (error) {
     console.warn('Error reestablishing previous WC connection', error)

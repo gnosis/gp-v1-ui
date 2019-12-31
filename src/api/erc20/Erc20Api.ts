@@ -1,11 +1,73 @@
-import { Erc20Api, TxOptionalParams, Receipt } from 'types'
-import { Erc20Contract } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
+import { AbiItem } from 'web3-utils'
+import { Erc20Contract } from '@gnosis.pm/dex-js'
+import erc20Abi from '@gnosis.pm/dex-js/build/contracts/abi/Erc20.json'
+
+import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
-import Erc20ABI from './Erc20ABI'
 
 import Web3 from 'web3'
+
+/**
+ * Interfaces the access to ERC20 token
+ *
+ * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
+ */
+export interface Erc20Api {
+  balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
+  name({ tokenAddress }: { tokenAddress: string }): Promise<string>
+  symbol({ tokenAddress }: { tokenAddress: string }): Promise<string>
+  decimals({ tokenAddress }: { tokenAddress: string }): Promise<number>
+  totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN>
+
+  allowance({
+    tokenAddress,
+    userAddress,
+    spenderAddress,
+  }: {
+    tokenAddress: string
+    userAddress: string
+    spenderAddress: string
+  }): Promise<BN>
+
+  approve(
+    {
+      userAddress,
+      tokenAddress,
+      spenderAddress,
+      amount,
+    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+
+  transfer(
+    {
+      fromAddress,
+      tokenAddress,
+      toAddress,
+      amount,
+    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+
+  transferFrom(
+    {
+      senderAddress,
+      tokenAddress,
+      fromAddress,
+      toAddress,
+      amount,
+    }: {
+      senderAddress: string
+      tokenAddress: string
+      fromAddress: string
+      toAddress: string
+      amount: BN
+    },
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt>
+}
 
 /**
  * Basic implementation of ERC20 API
@@ -16,7 +78,7 @@ export class Erc20ApiImpl implements Erc20Api {
   private static _contractsCache: { [K: string]: Erc20Contract } = {}
 
   public constructor(web3: Web3) {
-    this._contractPrototype = new web3.eth.Contract(Erc20ABI)
+    this._contractPrototype = new web3.eth.Contract(erc20Abi as AbiItem[]) as Erc20Contract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

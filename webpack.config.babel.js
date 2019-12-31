@@ -9,7 +9,8 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const isProduction = process.env.NODE_ENV == 'production'
-const baseUrl = '/'
+
+const baseUrl = isProduction ? '' : '/'
 
 module.exports = ({ stats = false } = {}) => ({
   devtool: 'eval-source-map',
@@ -79,6 +80,7 @@ module.exports = ({ stats = false } = {}) => ({
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
       title: 'dex-react',
+      ipfsHack: isProduction,
     }),
     isProduction && new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime/]),
     new webpack.EnvironmentPlugin({

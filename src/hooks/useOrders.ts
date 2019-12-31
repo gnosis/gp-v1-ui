@@ -1,8 +1,8 @@
-import { AuctionElement } from 'types'
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { useEffect } from 'react'
+import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 export function useOrders(): AuctionElement[] {
   const { userAddress } = useWalletConnection()

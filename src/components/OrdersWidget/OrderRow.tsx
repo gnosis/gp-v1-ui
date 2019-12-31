@@ -9,13 +9,13 @@ import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { getTokenFromExchangeById } from 'services'
-
 import useSafeState from 'hooks/useSafeState'
+import { TokenDetails } from 'types'
 
-import { TokenDetails, AuctionElement } from 'types'
 import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER } from 'const'
+import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 const OrderRowWrapper = styled.div`
   .container {
@@ -59,19 +59,33 @@ const OrderRowWrapper = styled.div`
   }
 `
 
-const PendingLink: React.FC<Pick<Props, 'pending'>> = ({ pending }) => {
+const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ pending, transactionHash }) => {
   if (!pending) {
     return null
   }
 
-  // TODO: use proper pending tx hash for link
   return (
     <div className="container pendingCell">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
-      <EtherscanLink identifier="bla" type="tx" label={<small>view</small>} />
+      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
     </div>
   )
 }
+
+const DeleteOrder: React.FC<Pick<Props, 'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending'>> = ({
+  isMarkedForDeletion,
+  toggleMarkedForDeletion,
+  pending,
+}) => (
+  <div className="checked">
+    <input
+      type="checkbox"
+      onChange={toggleMarkedForDeletion}
+      checked={isMarkedForDeletion && !pending}
+      disabled={pending}
+    />
+  </div>
+)
 
 function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
   const displayName = safeTokenName(token)
@@ -211,12 +225,23 @@ interface Props {
   isOverBalance: boolean
   networkId: number
   pending?: boolean
+  transactionHash?: string
+  isMarkedForDeletion: boolean
+  toggleMarkedForDeletion: () => void
 }
 
 const onError = onErrorFactory('Failed to fetch token')
 
 const OrderRow: React.FC<Props> = props => {
-  const { order, isOverBalance, networkId, pending = false } = props
+  const {
+    order,
+    isOverBalance,
+    networkId,
+    pending = false,
+    transactionHash,
+    isMarkedForDeletion,
+    toggleMarkedForDeletion,
+  } = props
 
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
@@ -231,10 +256,12 @@ const OrderRow: React.FC<Props> = props => {
     <>
       {sellToken && buyToken && (
         <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
-          <PendingLink pending={pending} />
-          <div className="checked">
-            <input type="checkbox" />
-          </div>
+          <PendingLink pending={pending} transactionHash={transactionHash} />
+          <DeleteOrder
+            isMarkedForDeletion={isMarkedForDeletion}
+            toggleMarkedForDeletion={toggleMarkedForDeletion}
+            pending={pending}
+          />
           <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
           <UnfilledAmount order={order} sellToken={sellToken} />
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />

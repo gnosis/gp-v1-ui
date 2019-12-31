@@ -1,4 +1,5 @@
-import { TokenList, TokenDetails } from 'types'
+import { TokenDetails } from 'types'
+import { TokenList } from './TokenListApi'
 export class TokenListApiMock implements TokenList {
   private _tokenList: TokenDetails[]
 

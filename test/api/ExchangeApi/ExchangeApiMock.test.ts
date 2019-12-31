@@ -3,9 +3,10 @@ import BN from 'bn.js'
 import ExchangeApiMock from 'api/exchange/ExchangeApiMock'
 import Erc20ApiMock from 'api/erc20/Erc20ApiMock'
 import { ZERO, ONE, FEE_DENOMINATOR } from 'const'
-import { ExchangeApi, Erc20Api } from 'types'
 import * as testHelpers from '../../testHelpers'
 import { RECEIPT } from '../../data'
+import { ExchangeApi } from 'api/exchange/ExchangeApi'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 const { USER_1, USER_2, USER_3, FEE_TOKEN, TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, BATCH_ID } = testHelpers
 
@@ -166,7 +167,7 @@ describe('cancelOrder', () => {
   test('cancel existing order', async () => {
     const orderId = (await instance.getOrders(USER_1)).length - 1
 
-    await instance.cancelOrder({ senderAddress: USER_1, orderId })
+    await instance.cancelOrders({ senderAddress: USER_1, orderIds: [orderId] })
 
     const actual = (await instance.getOrders(USER_1))[orderId]
     expect(actual.validUntil).toBe(BATCH_ID - 1)
@@ -175,7 +176,7 @@ describe('cancelOrder', () => {
   test('cancel non existing order does nothing', async () => {
     const expected = await instance.getOrders(USER_1)
 
-    await instance.cancelOrder({ senderAddress: USER_1, orderId: expected.length + 1 })
+    await instance.cancelOrders({ senderAddress: USER_1, orderIds: [expected.length + 1] })
 
     const actual = await instance.getOrders(USER_1)
     expect(actual).toEqual(expected)
@@ -184,7 +185,7 @@ describe('cancelOrder', () => {
   test('cancel non existing order, user with no orders does nothing', async () => {
     const expected = await instance.getOrders(USER_2)
 
-    await instance.cancelOrder({ senderAddress: USER_2, orderId: expected.length + 1 })
+    await instance.cancelOrders({ senderAddress: USER_2, orderIds: [expected.length + 1] })
 
     const actual = await instance.getOrders(USER_2)
     expect(actual).toEqual(expected)

@@ -1,9 +1,10 @@
 import Web3 from 'web3'
 
-import { ExchangeApi, Erc20Api } from 'types'
 import { log, getImageUrl } from 'utils'
 
 import { getErc20Info } from '../helpers'
+import { ExchangeApi } from 'api/exchange/ExchangeApi'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 interface Params {
   exchangeApi: ExchangeApi

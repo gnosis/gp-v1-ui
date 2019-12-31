@@ -8,12 +8,13 @@ import { useWalletConnection } from './useWalletConnection'
 
 import { formatAmount, log, assert } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
-import { TokenBalanceDetails, TokenDetails, WalletInfo, PendingFlux } from 'types'
+import { TokenBalanceDetails, TokenDetails } from 'types'
+import { WalletInfo } from 'api/wallet/WalletApi'
+import { PendingFlux } from 'api/deposit/DepositApi'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]
   error: boolean
-  setBalances: React.Dispatch<React.SetStateAction<TokenBalanceDetails[]>>
 }
 
 function calculateTotalBalance(balance: BN, currentBatchId: number, pendingDeposit: PendingFlux): BN {
@@ -103,5 +104,5 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
       })
   }, [setBalances, setError, walletInfo])
 
-  return { balances, error, setBalances }
+  return { balances, error }
 }

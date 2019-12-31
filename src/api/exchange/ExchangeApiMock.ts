@@ -2,11 +2,13 @@ import BN from 'bn.js'
 
 import assert from 'assert'
 
-import { DepositApiMock, BalancesByUserAndToken } from './DepositApiMock'
-import { ExchangeApi, AuctionElement, PlaceOrderParams, Erc20Api, Receipt, TxOptionalParams, Order } from 'types'
+import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
+import { Receipt, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
+import { ExchangeApi, AuctionElement, PlaceOrderParams, Order } from './ExchangeApi'
+import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface OrdersByUser {
   [userAddress: string]: Order[]
@@ -104,22 +106,26 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return RECEIPT
   }
 
-  public async cancelOrder(
+  public async cancelOrders(
     {
       senderAddress,
-      orderId,
+      orderIds,
     }: {
       senderAddress: string
-      orderId: number
+      orderIds: number[]
     },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initOrders(senderAddress)
-    if (this.orders[senderAddress][orderId]) {
-      this.orders[senderAddress][orderId].validUntil = (await this.getCurrentBatchId()) - 1
-    }
+    const batchId = await this.getCurrentBatchId()
+
+    orderIds.forEach(orderId => {
+      if (this.orders[senderAddress][orderId]) {
+        this.orders[senderAddress][orderId].validUntil = batchId - 1
+      }
+    })
 
     return RECEIPT
   }
