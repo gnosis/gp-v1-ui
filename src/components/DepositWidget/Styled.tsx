@@ -5,13 +5,13 @@ const { TABLET } = RESPONSIVE_SIZES
 export const InnerWrapper = styled.div`
   position: relative;
   background-color: var(--color-background-selected-dark);
-  border-bottom: 2px solid #0000000f;
+  border-bottom: 0.125rem solid #0000000f;
   border-radius: 0 0 var(--border-radius) var(--border-radius);
   box-shadow: var(--box-shadow);
   margin-top: -0.52rem;
   width: 80%;
 
-  @media only screen and (max-width: ${TABLET}px) {
+  @media only screen and (max-width: ${TABLET}em) {
     width: 95%;
   }
 
@@ -32,17 +32,17 @@ export const InnerWrapper = styled.div`
 
   .WalletItemContainer {
     display: grid;
-    grid-template-rows: repeat(2, auto) 20px auto;
+    grid-template-rows: repeat(2, auto) 1.25rem auto;
     justify-content: stretch;
     align-items: center;
 
     font-weight: bolder;
 
     margin: auto;
-    padding: 5px;
+    padding: 0.375rem;
     width: 80%;
 
-    @media only screen and (max-width: ${TABLET}px) {
+    @media only screen and (max-width: ${TABLET}em) {
       width: 95%;
     }
 
@@ -55,7 +55,7 @@ export const InnerWrapper = styled.div`
     div.wallet {
       position: relative;
       display: grid;
-      grid-template-columns: minmax(101px, 116px) minmax(25px, 0.3fr) minmax(54px, 0.6fr) 65px;
+      grid-template-columns: minmax(6.3125rem, 7.25rem) minmax(1.5625rem, 0.3fr) minmax(3.375rem, 0.6fr) 4.0625rem;
 
       justify-content: center;
       align-items: center;
@@ -140,7 +140,7 @@ export const DepositWidgetWrapper = styled.section`
       font-weight: bolder;
     }
 
-    @media only screen and (max-width: ${TABLET}px) {
+    @media only screen and (max-width: ${TABLET}em) {
       display: none;
     }
   }
@@ -193,12 +193,17 @@ export const RowTokenDiv = styled.div`
     }
 
     &:first-child {
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: space-evenly;
+      display: grid;
+      grid-template-columns: min-content max-content;
+      grid-gap: 1em;
       align-items: center;
+
       > * {
-        margin: 5px;
+        margin: 0.375rem;
+      }
+
+      > div:last-child {
+        text-align: initial;
       }
     }
 
@@ -223,7 +228,7 @@ export const RowTokenDiv = styled.div`
     border-bottom-color: #b9b9b9;
   }
 
-  @media only screen and (max-width: ${TABLET}px) {
+  @media only screen and (max-width: ${TABLET}em) {
     grid-template-columns: none;
     grid-template-rows: auto;
 
@@ -233,22 +238,24 @@ export const RowTokenDiv = styled.div`
 
     &.selected {
       > div {
-        border-bottom: 1px solid #ffffff40;
+        border-bottom: 0.0625rem solid #ffffff40;
       }
     }
     > div {
       display: flex;
       flex-flow: row;
       align-items: center;
-      border-bottom: 1px solid #00000024;
+      border-bottom: 0.0625rem solid #00000024;
 
       > * {
-        margin-left: 10px;
+        margin-left: 0.625rem;
       }
       &:first-child {
+        grid-template-columns: 1fr max-content auto;
+
         > img {
           order: 2;
-          margin-right: -8px;
+          margin-right: -0.5rem;
         }
       }
       &:last-child {
@@ -289,7 +296,7 @@ export const RowClaimLink = styled.a`
   }
 `
 export const LineSeparator = styled.div`
-  border: 0.5px solid var(--color-text-primary);
+  border: 0.03125rem solid var(--color-text-primary);
   margin: auto;
-  width: calc(100% - 25px);
+  width: calc(100% - 1.5625rem);
 `

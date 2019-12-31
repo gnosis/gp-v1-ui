@@ -117,7 +117,7 @@ const OrdersForm = styled.div`
 
     .title {
       // create a divider line only bellow titled columns
-      border-bottom: 2px solid #ededed;
+      border-bottom: 0.125rem solid #ededed;
       // push the border all the way to the bottom and extend it
       place-self: stretch;
 

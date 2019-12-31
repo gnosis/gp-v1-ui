@@ -131,7 +131,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       {userAddress ? (
         <>
           {/* Network */}
-          <UserWalletItem $padding="6px">
+          <UserWalletItem $padding="0.375rem">
             <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
           </UserWalletItem>
           {/* Wallet logo + address + chevron */}

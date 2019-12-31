@@ -41,13 +41,13 @@ const GlobalStyles = createGlobalStyle`
   }
   h1 {
     font-size: 3rem;
-    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}px) {
+    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}em) {
       font-size: 2.4rem;
     }    
   }
   h2 {
     font-size: 2rem;
-    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}px) {
+    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}em) {
       font-size: 1.4rem;
     }
   }
@@ -59,7 +59,7 @@ const GlobalStyles = createGlobalStyle`
   button {
     background-color: var(--color-background-pageWrapper);
     color: var(--color-button-primary);
-    border: 2px solid var(--color-button-primary);
+    border: 0.125rem solid var(--color-button-primary);
     border-radius: var(--border-radius);
 
     font-family: inherit;

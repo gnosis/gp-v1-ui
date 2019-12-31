@@ -69,13 +69,13 @@ export const HeaderWrapper = styled.header`
     margin: 0;
   }
 
-  @media only screen and (max-width: ${WEB_SMALL}px) {
+  @media only screen and (max-width: ${WEB_SMALL}em) {
     .logo {
       display: none;
     }
   }
 
-  @media only screen and (max-width: ${TABLET_LARGE}px) {
+  @media only screen and (max-width: ${TABLET_LARGE}em) {
     nav {
       flex-flow: row wrap;
     }
@@ -84,7 +84,7 @@ export const HeaderWrapper = styled.header`
     }
   }
 
-  @media only screen and (max-width: ${TABLET}px) {
+  @media only screen and (max-width: ${TABLET}em) {
     .logo,
     .nav-links,
     ${UserWalletWrapper} {
@@ -96,7 +96,7 @@ export const HeaderWrapper = styled.header`
       order: 1;
 
       a {
-        padding: 5px;
+        padding: 0.3125rem;
       }
     }
   }

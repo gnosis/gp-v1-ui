@@ -6,7 +6,7 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
   flex-flow: column nowrap;
   justify-content: center;
   margin: 1rem;
-  padding: 6px 13px;
+  padding: 0.375rem 0.8125rem;
 
   background: var(--color-background-pageWrapper);
   border-radius: ${({ $walletOpen }): string =>
@@ -29,7 +29,7 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
   white-space: ${({ $wordWrap = 'initial' }): string => $wordWrap};
 
   > * {
-    margin: 0 6px;
+    margin: 0 0.375rem;
   }
 
   > svg {
@@ -41,7 +41,7 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
 export const UserWalletToggler = styled(UserWalletItem)`
   cursor: pointer;
   font-size: 0.8rem;
-  padding: 6px;
+  padding: 0.375rem;
 `
 export const EtherImage = styled.img`
   max-width: 5%;
@@ -51,7 +51,7 @@ export const CopyDiv = styled.div`
   background: #90ee90ad;
   border-radius: var(--border-radius);
   font-size: 75%;
-  padding: 5px;
+  padding: 0.375rem;
   width: 60%;
 `
 
@@ -73,7 +73,7 @@ export const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
 `
 
 export const MonospaceAddress = styled(NetworkTitle)`
-  margin: 0 10px;
+  margin: 0 0.625rem;
   font-family: 'monospace';
   font-size: 85%;
   font-weight: lighter;

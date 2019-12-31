@@ -32,17 +32,17 @@ const variables = css`
     // ------------------------------
     // BORDERS
     // ------------------------------
-    --border-radius: 7px;
+    --border-radius: 0.4375rem;
 
     // ------------------------------
     // BOX-SHADOW
     // ------------------------------
-    --box-shadow: 1px 2px 2px -1px #00000047;
+    --box-shadow: 0.0625rem 0.125rem 0.125rem -0.0625rem #00000047;
 
     //-------------------------------
     // GRID
     // ------------------------------
-    --grid-row-size-walletPage: minmax(175px, 1.1fr) repeat(3, 1fr) minmax(158px, 1fr);
+    --grid-row-size-walletPage: minmax(10.9375rem, 1.1fr) repeat(3, 1fr) minmax(10.3125rem, 1fr);
   }
 `
 
