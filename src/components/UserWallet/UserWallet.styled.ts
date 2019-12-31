@@ -45,6 +45,16 @@ export const UserWalletToggler = styled(UserWalletItem)`
 `
 export const EtherImage = styled.img`
   max-width: 5%;
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light-theme) & {
+      filter: invert(100%);
+    }
+  }
+
+  body.dark-theme & {
+    filter: invert(100%);
+  }
 `
 
 export const CopyDiv = styled.div`
