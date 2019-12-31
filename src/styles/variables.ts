@@ -44,6 +44,16 @@ const variables = css`
     // ------------------------------
     --grid-row-size-walletPage: minmax(10.9375rem, 1.1fr) repeat(3, 1fr) minmax(10.3125rem, 1fr);
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      filter: invert(1);
+    }
+  }
+
+  body.dark-theme {
+    filter: invert(1);
+  }
 `
 
 export default variables
