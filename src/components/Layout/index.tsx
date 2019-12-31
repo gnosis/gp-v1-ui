@@ -6,6 +6,7 @@ import Footer from './Footer'
 import LegalBanner from '../LegalBanner'
 
 import { RESPONSIVE_SIZES } from 'const'
+import ThemeToggler from 'components/ThemeToggler'
 
 const Wrapper = styled.div`
   min-height: 100vh;
@@ -28,6 +29,7 @@ const Wrapper = styled.div`
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
+    <ThemeToggler />
     <Header
       navigation={[
         {
