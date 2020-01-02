@@ -52,7 +52,7 @@ const DarkColors = `
 
   // Text
   --color-text-primary: #e8e6e3;
-  --color-text-secondary: #bab5ab;
+  --color-text-secondar: #545454;
 
   // Buttons
   --color-button-primary: #e8e6e3;
