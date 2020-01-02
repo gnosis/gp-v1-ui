@@ -94,6 +94,8 @@ const OrdersForm = styled.div`
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
 
+    margin: 1em 0;
+
     .warning {
       justify-self: end;
     }
@@ -173,6 +175,13 @@ const OrdersForm = styled.div`
     .hidden {
       visibility: hidden;
     }
+  }
+
+  .noOrders {
+    padding: 3em;
+
+    display: flex;
+    justify-content: center;
   }
 
   .warning {
@@ -319,51 +328,57 @@ const OrdersWidget: React.FC = () => {
               </div>
             )}
           </div>
-          <form action="submit" onSubmit={onSubmit}>
-            <div className="ordersContainer">
-              <div className="headerRow">
-                <div className="checked">
-                  <input
-                    type="checkbox"
-                    onChange={toggleSelectAll}
-                    checked={orders.length === markedForDeletion.size}
+          {shownOrdersCount ? (
+            <form action="submit" onSubmit={onSubmit}>
+              <div className="ordersContainer">
+                <div className="headerRow">
+                  <div className="checked">
+                    <input
+                      type="checkbox"
+                      onChange={toggleSelectAll}
+                      checked={orders.length === markedForDeletion.size}
+                      disabled={deleting}
+                    />
+                  </div>
+                  <div className="title">Order details</div>
+                  <div className="title">
+                    Unfilled <br /> amount
+                  </div>
+                  <div className="title">
+                    Account <br />
+                    balance
+                  </div>
+                  <div className="title">Expires</div>
+                </div>
+
+                {orders.map(order => (
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    networkId={networkId}
+                    isOverBalance={overBalanceOrders.has(order.id)}
+                    isMarkedForDeletion={markedForDeletion.has(order.id)}
+                    toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                    pending={deleting && markedForDeletion.has(order.id)}
                     disabled={deleting}
                   />
-                </div>
-                <div className="title">Order details</div>
-                <div className="title">
-                  Unfilled <br /> amount
-                </div>
-                <div className="title">
-                  Account <br />
-                  balance
-                </div>
-                <div className="title">Expires</div>
+                ))}
               </div>
 
-              {orders.map(order => (
-                <OrderRow
-                  key={order.id}
-                  order={order}
-                  networkId={networkId}
-                  isOverBalance={overBalanceOrders.has(order.id)}
-                  isMarkedForDeletion={markedForDeletion.has(order.id)}
-                  toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
-                  pending={deleting && markedForDeletion.has(order.id)}
-                  disabled={deleting}
-                />
-              ))}
+              <div className="deleteContainer">
+                <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
+                  <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
+                </ButtonWithIcon>
+                <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                  Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
+                </span>
+              </div>
+            </form>
+          ) : (
+            <div className="noOrders">
+              <span>You have no {showActive ? 'active' : 'expired'} orders</span>
             </div>
-
-            <div className="deleteContainer">
-              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
-                <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
-              </ButtonWithIcon>
-              <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
-                Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
-              </span>
-            </div>
-          </form>
+          )}
         </OrdersForm>
       )}
     </OrdersWrapper>
