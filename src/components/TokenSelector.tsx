@@ -65,9 +65,33 @@ function formatOptionLabel(
 }
 
 const customSelectStyles = {
-  control: (provided: CSSProperties): CSSProperties => ({ ...provided, border: 'none' }),
-  menu: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '300px' }),
-  valueContainer: (provided: CSSProperties): CSSProperties => ({ ...provided, minWidth: '4.5em' }),
+  control: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    border: 'none',
+    background: 'var(--color-background-pageWrapper)',
+  }),
+  menu: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    minWidth: '300px',
+    background: 'var(--color-background-pageWrapper)',
+    color: 'var(--color-text-primary)',
+  }),
+  option: (provided: CSSProperties): CSSProperties & { '&:hover': CSSProperties } => ({
+    ...provided,
+    background: 'none',
+    cursor: 'pointer',
+    '&:hover': {
+      background: 'var(--color-background)',
+    },
+  }),
+  valueContainer: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    minWidth: '4.5em',
+  }),
+  singleValue: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    color: 'var(--color-text-primary)',
+  }),
 }
 
 interface Props {
