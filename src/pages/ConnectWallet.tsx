@@ -31,9 +31,8 @@ const ConnectWallet: React.FC<ConnectWalletProps> = (props: ConnectWalletProps) 
   return (
     <Wrapper className="widget">
       <IconWallet icon={faWallet} size="6x" />
-      <h1>Connect Wallet</h1>
-      <p>Please connect your wallet first</p>
-      <Wallet />
+      <h1>Wallet Disconnected</h1>
+      <p>Please connect your wallet in the upper right hand corner 👆</p>
     </Wrapper>
   )
 }
