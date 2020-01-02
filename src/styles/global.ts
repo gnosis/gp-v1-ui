@@ -125,6 +125,7 @@ const GlobalStyles = createGlobalStyle`
     background-color: var(--color-background-pageWrapper);
     border: none;
     border-radius: var(--border-radius);
+    color: var(--color-text-primary);
     outline: none;
 
     font-family: inherit;
