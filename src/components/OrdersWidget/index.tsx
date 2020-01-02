@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { faExchangeAlt, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -10,7 +10,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
-import { dateToBatchId } from 'utils'
+import { isOrderActive } from 'utils'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
@@ -92,9 +92,28 @@ const OrdersForm = styled.div`
   .infoContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    align-items: center;
+
+    margin: 1em 0;
 
     .warning {
       justify-self: end;
+    }
+
+    .countContainer {
+      display: grid;
+      grid: 'total active expired';
+      align-items: center;
+    }
+
+    .total {
+      grid-area: total;
+    }
+    .active {
+      grid-area: active;
+    }
+    .expired {
+      grid-area: expired;
     }
   }
 
@@ -158,23 +177,58 @@ const OrdersForm = styled.div`
     }
   }
 
+  .noOrders {
+    padding: 3em;
+
+    display: flex;
+    justify-content: center;
+  }
+
   .warning {
     color: orange;
   }
 `
+
+interface ShowOrdersButtonProps {
+  type: 'active' | 'expired'
+  isActive: boolean
+  shownCount: number
+  hiddenCount: number
+  onClick: () => void
+}
+
+const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, shownCount, hiddenCount, onClick }) => {
+  const count = isActive ? shownCount : hiddenCount
+
+  return (
+    <button className={type} disabled={isActive} onClick={onClick}>
+      {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>}
+      <> {type}</>
+    </button>
+  )
+}
 
 const OrdersWidget: React.FC = () => {
   const allOrders = useOrders()
 
   const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
 
+  const [showActive, setShowActive] = useSafeState<boolean>(true)
+
+  const toggleShowActive = useCallback(() => {
+    setShowActive(isActive => !isActive)
+  }, [setShowActive])
+
   useEffect(() => {
-    const filteredOrders = allOrders.filter(order => order.validUntil > dateToBatchId())
+    const now = new Date()
+    const filtered = allOrders.filter(order => showActive === isOrderActive(order, now))
+    setOrders(filtered)
+  }, [allOrders, setOrders, showActive])
 
-    setOrders(filteredOrders)
-  }, [allOrders, setOrders])
+  const shownOrdersCount = orders.length
+  const hiddenOrdersCount = allOrders.length - shownOrdersCount
 
-  const noOrders = orders.length === 0
+  const noOrders = allOrders.length === 0
 
   // this page is behind login wall so networkId should always be set
   const { networkId } = useWalletConnection()
@@ -215,7 +269,6 @@ const OrdersWidget: React.FC = () => {
 
       if (success) {
         // reset selections
-        // TODO: might no longer be needed once filtering is in place
         setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
         setMarkedForDeletion(new Set<string>())
       }
@@ -238,72 +291,95 @@ const OrdersWidget: React.FC = () => {
               <FontAwesomeIcon icon={faExchangeAlt} /> Trade
             </ButtonWithIcon>
           </Link>
-          <ButtonWithIcon className="danger strategyBtn">
+          {/* TODO: enable when the strategy page is implemented */}
+          {/* <ButtonWithIcon className="danger strategyBtn">
             <FontAwesomeIcon icon={faChartLine} /> Create new strategy
           </ButtonWithIcon>
           <a href="/" className="strategyInfo">
             <small>Learn more about strategies</small>
-          </a>
+          </a> */}
         </CreateButtons>
       </div>
       {!noOrders && networkId && (
         <OrdersForm>
           <div className="infoContainer">
-            <div>
-              You have <Highlight>{orders.length}</Highlight> standing orders
+            <div className="countContainer">
+              <div className="total">
+                You have <Highlight>{allOrders.length}</Highlight> standing orders:
+              </div>
+              <ShowOrdersButton
+                type="active"
+                isActive={showActive}
+                shownCount={shownOrdersCount}
+                hiddenCount={hiddenOrdersCount}
+                onClick={toggleShowActive}
+              />
+              <ShowOrdersButton
+                type="expired"
+                isActive={!showActive}
+                shownCount={shownOrdersCount}
+                hiddenCount={hiddenOrdersCount}
+                onClick={toggleShowActive}
+              />
             </div>
-            {overBalanceOrders.size > 0 && (
+            {overBalanceOrders.size > 0 && showActive && (
               <div className="warning">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 <strong> Low balance</strong>
               </div>
             )}
           </div>
-          <form action="submit" onSubmit={onSubmit}>
-            <div className="ordersContainer">
-              <div className="headerRow">
-                <div className="checked">
-                  <input
-                    type="checkbox"
-                    onChange={toggleSelectAll}
-                    checked={orders.length === markedForDeletion.size}
+          {shownOrdersCount ? (
+            <form action="submit" onSubmit={onSubmit}>
+              <div className="ordersContainer">
+                <div className="headerRow">
+                  <div className="checked">
+                    <input
+                      type="checkbox"
+                      onChange={toggleSelectAll}
+                      checked={orders.length === markedForDeletion.size}
+                      disabled={deleting}
+                    />
+                  </div>
+                  <div className="title">Order details</div>
+                  <div className="title">
+                    Unfilled <br /> amount
+                  </div>
+                  <div className="title">
+                    Account <br />
+                    balance
+                  </div>
+                  <div className="title">Expires</div>
+                </div>
+
+                {orders.map(order => (
+                  <OrderRow
+                    key={order.id}
+                    order={order}
+                    networkId={networkId}
+                    isOverBalance={overBalanceOrders.has(order.id)}
+                    isMarkedForDeletion={markedForDeletion.has(order.id)}
+                    toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                    pending={deleting && markedForDeletion.has(order.id)}
                     disabled={deleting}
                   />
-                </div>
-                <div className="title">Order details</div>
-                <div className="title">
-                  Unfilled <br /> amount
-                </div>
-                <div className="title">
-                  Account <br />
-                  balance
-                </div>
-                <div className="title">Expires</div>
+                ))}
               </div>
 
-              {orders.map(order => (
-                <OrderRow
-                  key={order.id}
-                  order={order}
-                  networkId={networkId}
-                  isOverBalance={overBalanceOrders.has(order.id)}
-                  isMarkedForDeletion={markedForDeletion.has(order.id)}
-                  toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
-                  pending={deleting && markedForDeletion.has(order.id)}
-                  disabled={deleting}
-                />
-              ))}
+              <div className="deleteContainer">
+                <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
+                  <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
+                </ButtonWithIcon>
+                <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                  Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
+                </span>
+              </div>
+            </form>
+          ) : (
+            <div className="noOrders">
+              <span>You have no {showActive ? 'active' : 'expired'} orders</span>
             </div>
-
-            <div className="deleteContainer">
-              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
-                <FontAwesomeIcon icon={faTrashAlt} /> Delete orders
-              </ButtonWithIcon>
-              <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
-                Select first the order(s) you want to delete
-              </span>
-            </div>
-          </form>
+          )}
         </OrdersForm>
       )}
     </OrdersWrapper>

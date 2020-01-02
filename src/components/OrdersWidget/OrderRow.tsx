@@ -12,7 +12,14 @@ import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import { safeTokenName, formatAmount, formatAmountFull, isBatchIdFarInTheFuture, formatDateFromBatchId } from 'utils'
+import {
+  safeTokenName,
+  formatAmount,
+  formatAmountFull,
+  isBatchIdFarInTheFuture,
+  formatDateFromBatchId,
+  isOrderActive,
+} from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
@@ -178,12 +185,13 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
     order.sellTokenBalance,
     sellToken.decimals,
   ])
+  const isActive = isOrderActive(order, new Date())
 
   return (
     <div className="container sub-columns three-columns">
       <div>{accountBalance}</div>
       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      <div className="warning">{isOverBalance && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+      <div className="warning">{isOverBalance && isActive && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
     </div>
   )
 }
