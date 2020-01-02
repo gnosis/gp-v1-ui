@@ -9,6 +9,19 @@ const GlobalStyles = createGlobalStyle`
   // Import font faces
   ${fontFace}
 
+  // Web3Connect styling
+  // SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
+  // or am i missing something?
+  #WEB3_CONNECT_MODAL_ID > div > div > div:nth-child(2) {
+    background: transparent;
+    grid-gap: 0.4rem;
+    div {
+      background: var(--color-background);
+      border-radius: var(--border-radius);
+      color: var(--color-text-primary);
+    }
+  }
+
   html, body {  
     min-height: 100vh;
     min-width: 320px;
