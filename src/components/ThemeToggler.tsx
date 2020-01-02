@@ -3,22 +3,27 @@ import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
 
 const ToggleLabel = styled.label<{ selected: boolean }>`
-  color: var(--color-text-primary);
-  background-color: ${(props): string =>
-    props.selected ? 'var(--color-background-highlighted);' : 'var(--color-background);'}
-  border: 1px solid gray;
+  color: ${(props): string => (props.selected ? 'var(--color-text-primary)' : 'var(--color-text-secondary)')};
+  cursor: pointer;
+  font-weight: ${(props): string => (props.selected ? 'bolder' : 'normal')};
+
+  padding: 0.125rem 0.5rem;
   text-transform: uppercase;
+
+  transition: all 0.2s ease-in-out;
+
+  &:nth-child(2) {
+    border-left: 0.0625rem solid var(--color-text-primary);
+    border-right: 0.0625rem solid var(--color-text-primary);
+  }
+
+  &:hover {
+    color: var(--color-text-primary);
+  }
 
   > input {
     display: none;
   }
-`
-
-const TogglesStyled = styled.div`
-  position: absolute;
-  top: 0;
-  right: 0;
-  display: flex;
 `
 
 const toggleValues = ['auto', 'light', 'dark']
@@ -39,7 +44,8 @@ const ThemeToggler: React.FC = () => {
   }, [active])
 
   return (
-    <TogglesStyled>
+    <div>
+      Theme:{' '}
       {toggleValues.map(value => (
         <ToggleLabel key={value} selected={value === active}>
           <input
@@ -52,7 +58,7 @@ const ThemeToggler: React.FC = () => {
           {value}
         </ToggleLabel>
       ))}
-    </TogglesStyled>
+    </div>
   )
 }
 
