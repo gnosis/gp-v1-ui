@@ -11,6 +11,9 @@ const LightColors = `
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #bfbfbf;
 
+  // Borders
+  --color-border: transparent;
+
   // Text
   // --color-text-primary: #3d414c;
   --color-text-primary: #000;
@@ -36,7 +39,7 @@ const LightColors = `
 const DarkColors = `
   // Background
   --color-background-lighter: #f7f7f7;
-  --color-background: #1d1f20;
+  --color-background: #2e2e2e;
   --color-background-pageWrapper: #181a1b;
   --color-background-actionCards: #bbfdbb;
   --color-background-highlighted: #3f4104;
@@ -44,8 +47,10 @@ const DarkColors = `
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #2a2d2f;
 
+  // Borders
+  --color-border: #262626;
+
   // Text
-  // --color-text-primary: #3d414c;
   --color-text-primary: #e8e6e3;
   --color-text-secondary: #bab5ab;
 

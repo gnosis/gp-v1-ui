@@ -171,6 +171,7 @@ export const RowTokenDiv = styled.div`
   justify-content: center;
 
   background: var(--color-background-pageWrapper);
+  border: 0.125rem solid transparent;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   margin: 0.3rem 0;
@@ -180,6 +181,7 @@ export const RowTokenDiv = styled.div`
 
   &:hover {
     background: var(--color-background-selected);
+    border: 0.125rem solid var(--color-border);
   }
 
   > div {
