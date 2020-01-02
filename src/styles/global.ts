@@ -35,6 +35,23 @@ const GlobalStyles = createGlobalStyle`
       color: var(--color-text-secondary);
     }
   }
+
+  body::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    background-color: var(--color-background);
+  }
+
+  body::-webkit-scrollbar {
+    width: 12px;
+    background-color: var(--color-background);
+  }
+
+  body::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: var(--color-background-pageWrapper);
+  }
+
   h1, h2, h3 {
     margin: 0;
     margin: 0.5em 0;
