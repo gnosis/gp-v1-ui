@@ -1,35 +1,39 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
+import ThemeToggler from 'components/ThemeToggler'
 
 const Wrapper = styled.footer`
-  align-self: flex-end;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: var(--color-background);
+  z-index: 2000;
+
   display: flex;
   flex-flow: row wrap;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   padding 1.3em;
   text-align: center;
-  position: relative;
+  
   color: var(--color-text-secondary);
   font-size: 0.85rem;
 
-  ul {
+  > div {
+    margin: 0.2rem auto;
+    flex: 1 1 15rem;
+  }
+
+  > .footerLinks {
     display: flex;
-    list-style-type: none;
+    flex-flow: row wrap;
     justify-content: center;
-    white-space: nowrap;
-  }
+    align-items: center;
 
-  li {
-    margin: 0 1rem;
-    a {
-      color: var(--color-text-secondary);
+    > div {
+      margin: 0 0.5rem;
     }
-  }
-
-  ul, .version {
-    margin-left: auto;
   }
 
   .version {
@@ -42,14 +46,15 @@ const Wrapper = styled.footer`
 
 const Footer: React.FC = () => (
   <Wrapper>
-    <ul>
-      <li>
+    <ThemeToggler />
+    <div className="footerLinks">
+      <div>
         <Link to="/about">About dFusion</Link>
-      </li>
-      <li>
+      </div>
+      <div>
         <Link to="/source-code">Source code</Link>
-      </li>
-    </ul>
+      </div>
+    </div>
     <div className="version">
       Web{' '}
       <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
