@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
-import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { faExchangeAlt, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -291,12 +291,13 @@ const OrdersWidget: React.FC = () => {
               <FontAwesomeIcon icon={faExchangeAlt} /> Trade
             </ButtonWithIcon>
           </Link>
-          <ButtonWithIcon className="danger strategyBtn">
+          {/* TODO: enable when the strategy page is implemented */}
+          {/* <ButtonWithIcon className="danger strategyBtn">
             <FontAwesomeIcon icon={faChartLine} /> Create new strategy
           </ButtonWithIcon>
           <a href="/" className="strategyInfo">
             <small>Learn more about strategies</small>
-          </a>
+          </a> */}
         </CreateButtons>
       </div>
       {!noOrders && networkId && (
