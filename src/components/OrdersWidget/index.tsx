@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import { faExchangeAlt, faChartLine, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
@@ -7,6 +7,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
+
+import { AuctionElement } from 'api/exchange/ExchangeApi'
+
+import { dateToBatchId } from 'utils'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
@@ -160,7 +164,16 @@ const OrdersForm = styled.div`
 `
 
 const OrdersWidget: React.FC = () => {
-  const orders = useOrders()
+  const allOrders = useOrders()
+
+  const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
+
+  useEffect(() => {
+    const filteredOrders = allOrders.filter(order => order.validUntil > dateToBatchId())
+
+    setOrders(filteredOrders)
+  }, [allOrders, setOrders])
+
   const noOrders = orders.length === 0
 
   // this page is behind login wall so networkId should always be set
@@ -203,10 +216,11 @@ const OrdersWidget: React.FC = () => {
       if (success) {
         // reset selections
         // TODO: might no longer be needed once filtering is in place
+        setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
         setMarkedForDeletion(new Set<string>())
       }
     },
-    [deleteOrders, markedForDeletion, setMarkedForDeletion],
+    [deleteOrders, markedForDeletion, orders, setMarkedForDeletion, setOrders],
   )
 
   return (
@@ -253,6 +267,7 @@ const OrdersWidget: React.FC = () => {
                     type="checkbox"
                     onChange={toggleSelectAll}
                     checked={orders.length === markedForDeletion.size}
+                    disabled={deleting}
                   />
                 </div>
                 <div className="title">Order details</div>
@@ -275,6 +290,7 @@ const OrdersWidget: React.FC = () => {
                   isMarkedForDeletion={markedForDeletion.has(order.id)}
                   toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
                   pending={deleting && markedForDeletion.has(order.id)}
+                  disabled={deleting}
                 />
               ))}
             </div>

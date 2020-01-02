@@ -41,12 +41,12 @@ const Layout: React.FC = ({ children }) => (
           order: 2,
           withPastLocation: true,
         },
-        // {
-        //   label: 'Orders',
-        //   to: '/orders',
-        //   order: 3,
-        //   withPastLocation: true,
-        // },
+        {
+          label: 'Orders',
+          to: '/orders',
+          order: 3,
+          withPastLocation: true,
+        },
         // Place holder
         // {
         //   label: 'Strategies',
