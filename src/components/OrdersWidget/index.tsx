@@ -193,13 +193,7 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
 
   return (
     <button className={type} disabled={isActive} onClick={onClick}>
-      {!isActive ? (
-        <>
-          Show <Highlight>{count}</Highlight>
-        </>
-      ) : (
-        <>{count}</>
-      )}
+      {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>}
       <> {type}</>
     </button>
   )
