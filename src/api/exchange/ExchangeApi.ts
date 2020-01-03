@@ -6,6 +6,7 @@ import Web3 from 'web3'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
 export interface AddTokenParams {
+  userAddress: string
   tokenAddress: string
 }
 
@@ -99,9 +100,12 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return +tokenId
   }
 
-  public async addToken({ tokenAddress }: AddTokenParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+  public async addToken(
+    { userAddress, tokenAddress }: AddTokenParams,
+    txOptionalParams?: TxOptionalParams,
+  ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.addToken(tokenAddress).send()
+    const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)

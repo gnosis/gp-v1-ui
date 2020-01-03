@@ -99,7 +99,7 @@ describe('addToken', () => {
   it('adds token not registered', async () => {
     const tokenCount = await instance.getNumTokens()
 
-    await instance.addToken({ tokenAddress: TOKEN_3 })
+    await instance.addToken({ userAddress: USER_1, tokenAddress: TOKEN_3 })
 
     expect(await instance.getNumTokens()).toBe(tokenCount + 1)
     expect(await instance.getTokenIdByAddress(TOKEN_3)).toBe(tokenCount)
@@ -108,7 +108,7 @@ describe('addToken', () => {
 
   it('throws when token already registered', async () => {
     try {
-      await instance.addToken({ tokenAddress: tokens[0] })
+      await instance.addToken({ userAddress: USER_1, tokenAddress: tokens[0] })
       fail('Should not reach')
     } catch (e) {
       expect(e.message).toMatch(/^Token already registered$/)
@@ -116,7 +116,7 @@ describe('addToken', () => {
   })
   it('throws when MAX_TOKENS reached', async () => {
     try {
-      await instance.addToken({ tokenAddress: TOKEN_4 })
+      await instance.addToken({ userAddress: USER_1, tokenAddress: TOKEN_4 })
       fail('Should not reach')
     } catch (e) {
       expect(e.message).toMatch(/^Max tokens reached$/)
