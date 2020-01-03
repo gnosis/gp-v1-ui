@@ -60,8 +60,9 @@ export const usePlaceOrder = (): Result => {
             validUntil,
             buyAmount,
             sellAmount,
+            txOptionalParams,
           }
-          const receipt = await exchangeApi.placeOrder(params, txOptionalParams)
+          const receipt = await exchangeApi.placeOrder(params)
           log(`The transaction has been mined: ${receipt.transactionHash}`)
 
           // TODO: get order id in a separate call

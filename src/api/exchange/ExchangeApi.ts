@@ -17,12 +17,16 @@ export interface GetTokenIdByAddressParams {
   tokenAddress: string
 }
 
-export interface AddTokenParams {
+interface WithTxOptionalParams {
+  txOptionalParams?: TxOptionalParams
+}
+
+export interface AddTokenParams extends WithTxOptionalParams {
   userAddress: string
   tokenAddress: string
 }
 
-export interface PlaceOrderParams {
+export interface PlaceOrderParams extends WithTxOptionalParams {
   userAddress: string
   buyTokenId: number
   sellTokenId: number
@@ -31,7 +35,7 @@ export interface PlaceOrderParams {
   sellAmount: BN
 }
 
-export interface CancelOrdersParams {
+export interface CancelOrdersParams extends WithTxOptionalParams {
   userAddress: string
   orderIds: number[]
 }
@@ -45,9 +49,9 @@ export interface ExchangeApi extends DepositApi {
   getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
 
-  addToken(params: AddTokenParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  placeOrder(params: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  cancelOrders(params: CancelOrdersParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  addToken(params: AddTokenParams): Promise<Receipt>
+  placeOrder(params: PlaceOrderParams): Promise<Receipt>
+  cancelOrders(params: CancelOrdersParams): Promise<Receipt>
 }
 
 export interface AuctionElement extends Order {
@@ -115,10 +119,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return +tokenId
   }
 
-  public async addToken(
-    { userAddress, tokenAddress }: AddTokenParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async addToken({ userAddress, tokenAddress, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     const contract = await this._getContract()
     const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
@@ -131,8 +132,8 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return tx
   }
 
-  public async placeOrder(params: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
-    const { userAddress, buyTokenId, sellTokenId, validUntil, buyAmount, sellAmount } = params
+  public async placeOrder(params: PlaceOrderParams): Promise<Receipt> {
+    const { userAddress, buyTokenId, sellTokenId, validUntil, buyAmount, sellAmount, txOptionalParams } = params
 
     const contract = await this._getContract()
 
@@ -155,10 +156,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return tx
   }
 
-  public async cancelOrders(
-    { userAddress, orderIds }: CancelOrdersParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async cancelOrders({ userAddress, orderIds, txOptionalParams }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract()
     const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
 

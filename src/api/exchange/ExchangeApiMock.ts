@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
-import { Receipt, TxOptionalParams } from 'types'
+import { Receipt } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
@@ -87,7 +87,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return this.tokenAddressToId[tokenAddress]
   }
 
-  public async addToken({ tokenAddress }: AddTokenParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+  public async addToken({ tokenAddress, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     assert(typeof this.tokenAddressToId[tokenAddress] !== 'number', 'Token already registered')
@@ -98,28 +98,26 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return RECEIPT
   }
 
-  public async placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+  public async placeOrder(params: PlaceOrderParams): Promise<Receipt> {
+    const { buyTokenId, sellTokenId, validUntil, txOptionalParams } = params
     await waitAndSendReceipt({ txOptionalParams })
 
-    this._initOrders(orderParams.userAddress)
+    this._initOrders(params.userAddress)
 
-    this.orders[orderParams.userAddress].push({
-      buyTokenId: orderParams.buyTokenId,
-      sellTokenId: orderParams.sellTokenId,
+    this.orders[params.userAddress].push({
+      buyTokenId,
+      sellTokenId,
       validFrom: await this.getCurrentBatchId(),
-      validUntil: orderParams.validUntil,
-      priceNumerator: orderParams.buyAmount,
-      priceDenominator: orderParams.sellAmount,
-      remainingAmount: orderParams.sellAmount,
+      validUntil,
+      priceNumerator: params.buyAmount,
+      priceDenominator: params.sellAmount,
+      remainingAmount: params.sellAmount,
     })
 
     return RECEIPT
   }
 
-  public async cancelOrders(
-    { userAddress, orderIds }: CancelOrdersParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async cancelOrders({ userAddress, orderIds, txOptionalParams }: CancelOrdersParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initOrders(userAddress)
