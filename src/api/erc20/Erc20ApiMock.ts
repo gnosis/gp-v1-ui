@@ -5,7 +5,15 @@ import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
 import { log, assert } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
-import { Erc20Api } from './Erc20Api'
+import {
+  Erc20Api,
+  UserReadOnlyParams,
+  ContractReadOnlyParams,
+  AllowanceParams,
+  ApproveParams,
+  TransferParams,
+  TransferFromParams,
+} from './Erc20Api'
 
 interface Balances {
   [userAddress: string]: { [tokenAddress: string]: BN }
@@ -41,7 +49,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._tokens = tokens
   }
 
-  public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: UserReadOnlyParams): Promise<BN> {
     const userBalances = this._balances[userAddress]
     if (!userBalances) {
       return ZERO
@@ -51,7 +59,7 @@ export class Erc20ApiMock implements Erc20Api {
     return balance ? balance : ZERO
   }
 
-  public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async name({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `name` to mock contract behavior
@@ -60,7 +68,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.name
   }
 
-  public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async symbol({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `symbol` to mock contract behavior
@@ -69,7 +77,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.symbol
   }
 
-  public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
+  public async decimals({ tokenAddress }: ContractReadOnlyParams): Promise<number> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `decimals` to mock contract behavior
@@ -78,20 +86,12 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.decimals
   }
 
-  public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
+  public async totalSupply({ tokenAddress }: ContractReadOnlyParams): Promise<BN> {
     log("Don't care about %s, just making TS shut up", tokenAddress)
     return this._totalSupply
   }
 
-  public async allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN> {
+  public async allowance({ tokenAddress, userAddress, spenderAddress }: AllowanceParams): Promise<BN> {
     const userAllowances = this._allowances[userAddress]
     if (!userAllowances) {
       return ZERO
@@ -107,12 +107,7 @@ export class Erc20ApiMock implements Erc20Api {
   }
 
   public async approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
+    { userAddress, tokenAddress, spenderAddress, amount }: ApproveParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
@@ -136,12 +131,7 @@ export class Erc20ApiMock implements Erc20Api {
    * @param txOptionalParams Optional params
    */
   public async transfer(
-    {
-      userAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; toAddress: string; amount: BN },
+    { userAddress, tokenAddress, toAddress, amount }: TransferParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
@@ -172,19 +162,7 @@ export class Erc20ApiMock implements Erc20Api {
    * @param txOptionalParams Optional params
    */
   public async transferFrom(
-    {
-      userAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      fromAddress: string
-      toAddress: string
-      amount: BN
-    },
+    { userAddress, tokenAddress, fromAddress, toAddress, amount }: TransferFromParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })

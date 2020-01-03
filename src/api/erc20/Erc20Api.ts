@@ -9,64 +9,51 @@ import { toBN } from 'utils'
 
 import Web3 from 'web3'
 
+export interface ContractReadOnlyParams {
+  tokenAddress: string
+}
+
+export interface UserReadOnlyParams extends ContractReadOnlyParams {
+  userAddress: string
+}
+
+export interface AllowanceParams extends UserReadOnlyParams {
+  spenderAddress: string
+}
+
+export interface ApproveParams extends AllowanceParams {
+  amount: BN
+}
+
+export interface TransferParams extends UserReadOnlyParams {
+  toAddress: string
+  amount: BN
+}
+
+export interface TransferFromParams extends TransferParams {
+  fromAddress: string
+}
+
 /**
  * Interfaces the access to ERC20 token
  *
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface Erc20Api {
-  balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
-  name({ tokenAddress }: { tokenAddress: string }): Promise<string>
-  symbol({ tokenAddress }: { tokenAddress: string }): Promise<string>
-  decimals({ tokenAddress }: { tokenAddress: string }): Promise<number>
-  totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN>
+  name(params: ContractReadOnlyParams): Promise<string>
+  symbol(params: ContractReadOnlyParams): Promise<string>
+  decimals(params: ContractReadOnlyParams): Promise<number>
+  totalSupply(params: ContractReadOnlyParams): Promise<BN>
 
-  allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN>
+  balanceOf(params: UserReadOnlyParams): Promise<BN>
 
-  approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  allowance(params: AllowanceParams): Promise<BN>
 
-  transfer(
-    {
-      userAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; toAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  approve(params: ApproveParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 
-  transferFrom(
-    {
-      userAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      fromAddress: string
-      toAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  transfer(params: TransferParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+
+  transferFrom(params: TransferFromParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 /**
@@ -85,7 +72,7 @@ export class Erc20ApiImpl implements Erc20Api {
     ;(window as any).erc20 = this._contractPrototype
   }
 
-  public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: UserReadOnlyParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -95,19 +82,19 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(result)
   }
 
-  public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async name({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     return await erc20.methods.name().call()
   }
 
-  public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async symbol({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     return await erc20.methods.symbol().call()
   }
 
-  public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
+  public async decimals({ tokenAddress }: ContractReadOnlyParams): Promise<number> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const decimals = await erc20.methods.decimals().call()
@@ -115,7 +102,7 @@ export class Erc20ApiImpl implements Erc20Api {
     return Number(decimals)
   }
 
-  public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
+  public async totalSupply({ tokenAddress }: ContractReadOnlyParams): Promise<BN> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const totalSupply = await erc20.methods.totalSupply().call()
@@ -123,15 +110,7 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(totalSupply)
   }
 
-  public async allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN> {
+  public async allowance({ tokenAddress, userAddress, spenderAddress }: AllowanceParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -142,12 +121,7 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
+    { userAddress, tokenAddress, spenderAddress, amount }: ApproveParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -165,12 +139,7 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async transfer(
-    {
-      userAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; toAddress: string; amount: BN },
+    { userAddress, tokenAddress, toAddress, amount }: TransferParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -188,13 +157,7 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async transferFrom(
-    {
-      userAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; fromAddress: string; toAddress: string; amount: BN },
+    { userAddress, tokenAddress, fromAddress, toAddress, amount }: TransferFromParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
