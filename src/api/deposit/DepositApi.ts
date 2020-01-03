@@ -14,13 +14,17 @@ export interface ReadOnlyParams {
   tokenAddress: string
 }
 
-export interface DepositParams extends ReadOnlyParams {
+interface WithTxOptionalParams {
+  txOptionalParams?: TxOptionalParams
+}
+
+export interface DepositParams extends ReadOnlyParams, WithTxOptionalParams {
   amount: BN
 }
 
 export type RequestWithdrawParams = DepositParams
 
-export type WithdrawParams = ReadOnlyParams
+export type WithdrawParams = ReadOnlyParams & WithTxOptionalParams
 
 export interface DepositApi {
   getContractAddress(networkId: number): string | null
@@ -32,9 +36,9 @@ export interface DepositApi {
   getPendingDeposit(params: ReadOnlyParams): Promise<PendingFlux>
   getPendingWithdraw(params: ReadOnlyParams): Promise<PendingFlux>
 
-  deposit(params: DepositParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  requestWithdraw(params: RequestWithdrawParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  withdraw(params: WithdrawParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  deposit(params: DepositParams): Promise<Receipt>
+  requestWithdraw(params: RequestWithdrawParams): Promise<Receipt>
+  withdraw(params: WithdrawParams): Promise<Receipt>
 }
 
 export interface PendingFlux {
@@ -118,10 +122,7 @@ export class DepositApiImpl implements DepositApi {
     return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async deposit(
-    { userAddress, tokenAddress, amount }: DepositParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async deposit({ userAddress, tokenAddress, amount, txOptionalParams }: DepositParams): Promise<Receipt> {
     const contract = await this._getContract()
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
@@ -134,10 +135,12 @@ export class DepositApiImpl implements DepositApi {
     return tx
   }
 
-  public async requestWithdraw(
-    { userAddress, tokenAddress, amount }: RequestWithdrawParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async requestWithdraw({
+    userAddress,
+    tokenAddress,
+    amount,
+    txOptionalParams,
+  }: RequestWithdrawParams): Promise<Receipt> {
     const contract = await this._getContract()
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
@@ -150,10 +153,7 @@ export class DepositApiImpl implements DepositApi {
     return tx
   }
 
-  public async withdraw(
-    { userAddress, tokenAddress }: WithdrawParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async withdraw({ userAddress, tokenAddress, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     const contract = await this._getContract()
     const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 

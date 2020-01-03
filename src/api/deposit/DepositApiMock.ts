@@ -5,7 +5,7 @@ import { getEpoch, log } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT, RECEIPT, createFlux } from '../../../test/data'
 
-import { Receipt, TxOptionalParams } from 'types'
+import { Receipt } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 import {
   DepositApi,
@@ -81,10 +81,7 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingWithdraws : createFlux()
   }
 
-  public async deposit(
-    { userAddress, tokenAddress, amount }: DepositParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async deposit({ userAddress, tokenAddress, amount, txOptionalParams }: DepositParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     // Create the balance state if it's the first deposit
@@ -111,10 +108,12 @@ export class DepositApiMock implements DepositApi {
     return RECEIPT
   }
 
-  public async requestWithdraw(
-    { userAddress, tokenAddress, amount }: RequestWithdrawParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async requestWithdraw({
+    userAddress,
+    tokenAddress,
+    amount,
+    txOptionalParams,
+  }: RequestWithdrawParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
@@ -129,10 +128,7 @@ export class DepositApiMock implements DepositApi {
     return RECEIPT
   }
 
-  public async withdraw(
-    { userAddress, tokenAddress }: WithdrawParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async withdraw({ userAddress, tokenAddress, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
