@@ -21,16 +21,20 @@ export interface AllowanceParams extends UserReadOnlyParams {
   spenderAddress: string
 }
 
-export interface ApproveParams extends AllowanceParams {
+interface WithTxOptionalParams {
+  txOptionalParams?: TxOptionalParams
+}
+
+export interface ApproveParams extends AllowanceParams, WithTxOptionalParams {
   amount: BN
 }
 
-export interface TransferParams extends UserReadOnlyParams {
+export interface TransferParams extends UserReadOnlyParams, WithTxOptionalParams {
   toAddress: string
   amount: BN
 }
 
-export interface TransferFromParams extends TransferParams {
+export interface TransferFromParams extends TransferParams, WithTxOptionalParams {
   fromAddress: string
 }
 
@@ -49,11 +53,11 @@ export interface Erc20Api {
 
   allowance(params: AllowanceParams): Promise<BN>
 
-  approve(params: ApproveParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  approve(params: ApproveParams): Promise<Receipt>
 
-  transfer(params: TransferParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  transfer(params: TransferParams): Promise<Receipt>
 
-  transferFrom(params: TransferFromParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  transferFrom(params: TransferFromParams): Promise<Receipt>
 }
 
 /**
@@ -120,10 +124,13 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(result)
   }
 
-  public async approve(
-    { userAddress, tokenAddress, spenderAddress, amount }: ApproveParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async approve({
+    userAddress,
+    tokenAddress,
+    spenderAddress,
+    amount,
+    txOptionalParams,
+  }: ApproveParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
@@ -138,10 +145,13 @@ export class Erc20ApiImpl implements Erc20Api {
     return tx
   }
 
-  public async transfer(
-    { userAddress, tokenAddress, toAddress, amount }: TransferParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transfer({
+    userAddress,
+    tokenAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
@@ -156,10 +166,14 @@ export class Erc20ApiImpl implements Erc20Api {
     return tx
   }
 
-  public async transferFrom(
-    { userAddress, tokenAddress, fromAddress, toAddress, amount }: TransferFromParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transferFrom({
+    userAddress,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferFromParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({

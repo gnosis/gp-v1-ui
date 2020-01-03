@@ -112,7 +112,7 @@ describe('Basic view functions', () => {
 
 describe('Write functions', () => {
   const mockFunction = jest.fn()
-  const optionalParams: TxOptionalParams = {
+  const txOptionalParams: TxOptionalParams = {
     onSentTransaction: mockFunction,
   }
   function resetInstance(): void {
@@ -125,10 +125,13 @@ describe('Write functions', () => {
   describe('approve', () => {
     const amount = new BN('5289375492345723')
     it('allowance is set', async () => {
-      const result = await instance.approve(
-        { userAddress: USER_1, tokenAddress: TOKEN_1, spenderAddress: USER_2, amount },
-        optionalParams,
-      )
+      const result = await instance.approve({
+        userAddress: USER_1,
+        tokenAddress: TOKEN_1,
+        spenderAddress: USER_2,
+        amount,
+        txOptionalParams,
+      })
 
       expect(await instance.allowance({ tokenAddress: TOKEN_1, userAddress: USER_1, spenderAddress: USER_2 })).toBe(
         amount,
@@ -137,10 +140,13 @@ describe('Write functions', () => {
     })
 
     it('calls optional callback', async () => {
-      await instance.approve(
-        { userAddress: USER_1, tokenAddress: TOKEN_1, spenderAddress: USER_2, amount },
-        optionalParams,
-      )
+      await instance.approve({
+        userAddress: USER_1,
+        tokenAddress: TOKEN_1,
+        spenderAddress: USER_2,
+        amount,
+        txOptionalParams,
+      })
       expect(mockFunction.mock.calls.length).toBe(1)
     })
   })
@@ -176,10 +182,13 @@ describe('Write functions', () => {
     })
 
     it('calls optional callback', async () => {
-      await instance.transfer(
-        { userAddress: CONTRACT, tokenAddress: TOKEN_1, toAddress: USER_2, amount },
-        optionalParams,
-      )
+      await instance.transfer({
+        userAddress: CONTRACT,
+        tokenAddress: TOKEN_1,
+        toAddress: USER_2,
+        amount,
+        txOptionalParams,
+      })
       expect(mockFunction.mock.calls.length).toBe(1)
     })
   })
@@ -238,10 +247,14 @@ describe('Write functions', () => {
 
     it('calls optional callback', async () => {
       await instance.approve({ userAddress: USER_1, tokenAddress: TOKEN_1, spenderAddress: USER_3, amount })
-      await instance.transferFrom(
-        { userAddress: USER_3, tokenAddress: TOKEN_1, fromAddress: USER_1, toAddress: USER_2, amount },
-        optionalParams,
-      )
+      await instance.transferFrom({
+        userAddress: USER_3,
+        tokenAddress: TOKEN_1,
+        fromAddress: USER_1,
+        toAddress: USER_2,
+        amount,
+        txOptionalParams,
+      })
       expect(mockFunction.mock.calls.length).toBe(1)
     })
   })

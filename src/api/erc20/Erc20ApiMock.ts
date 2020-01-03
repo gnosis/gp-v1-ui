@@ -1,6 +1,6 @@
 import BN from 'bn.js'
 
-import { TxOptionalParams, Receipt } from 'types'
+import { Receipt } from 'types'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
 import { log, assert } from 'utils'
@@ -106,10 +106,13 @@ export class Erc20ApiMock implements Erc20Api {
     return allowance ? allowance : ZERO
   }
 
-  public async approve(
-    { userAddress, tokenAddress, spenderAddress, amount }: ApproveParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async approve({
+    userAddress,
+    tokenAddress,
+    spenderAddress,
+    amount,
+    txOptionalParams,
+  }: ApproveParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initAllowances({ userAddress, tokenAddress, spenderAddress })
@@ -130,10 +133,13 @@ export class Erc20ApiMock implements Erc20Api {
    * @param amount The amount transferred
    * @param txOptionalParams Optional params
    */
-  public async transfer(
-    { userAddress, tokenAddress, toAddress, amount }: TransferParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transfer({
+    userAddress,
+    tokenAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances({ userAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })
@@ -161,10 +167,14 @@ export class Erc20ApiMock implements Erc20Api {
    * @param amount The amount transferred
    * @param txOptionalParams Optional params
    */
-  public async transferFrom(
-    { userAddress, tokenAddress, fromAddress, toAddress, amount }: TransferFromParams,
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transferFrom({
+    userAddress,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferFromParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances({ userAddress: fromAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })

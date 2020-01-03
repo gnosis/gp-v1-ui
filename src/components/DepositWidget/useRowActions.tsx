@@ -45,10 +45,13 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol: tokenDisplayName } = safeFilledToken(token)
 
-      const receipt = await erc20Api.approve(
-        { userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
+      const receipt = await erc20Api.approve({
+        userAddress,
+        tokenAddress,
+        spenderAddress: contractAddress,
+        amount: ALLOWANCE_MAX_VALUE,
         txOptionalParams,
-      )
+      })
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
