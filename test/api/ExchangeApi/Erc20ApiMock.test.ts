@@ -152,7 +152,7 @@ describe('Write functions', () => {
       const userBalance = await instance.balanceOf({ tokenAddress: TOKEN_1, userAddress: USER_2 })
 
       const result = await instance.transfer({
-        fromAddress: CONTRACT,
+        userAddress: CONTRACT,
         tokenAddress: TOKEN_1,
         toAddress: USER_2,
         amount,
@@ -168,7 +168,7 @@ describe('Write functions', () => {
     it('does not transfer when balance is insufficient', async () => {
       // TODO: after hours, couldn't figure out a way to check for the AssertionError using expect().toThrow()
       await instance
-        .transfer({ fromAddress: USER_2, tokenAddress: TOKEN_1, toAddress: CONTRACT, amount })
+        .transfer({ userAddress: USER_2, tokenAddress: TOKEN_1, toAddress: CONTRACT, amount })
         .then(() => fail('Should not succeed'))
         .catch(e => {
           expect(e.message).toMatch(/^The user doesn't have enough balance$/)
@@ -177,7 +177,7 @@ describe('Write functions', () => {
 
     it('calls optional callback', async () => {
       await instance.transfer(
-        { fromAddress: CONTRACT, tokenAddress: TOKEN_1, toAddress: USER_2, amount },
+        { userAddress: CONTRACT, tokenAddress: TOKEN_1, toAddress: USER_2, amount },
         optionalParams,
       )
       expect(mockFunction.mock.calls.length).toBe(1)
@@ -197,7 +197,7 @@ describe('Write functions', () => {
       await instance.approve({ userAddress: USER_1, tokenAddress: TOKEN_1, spenderAddress: USER_3, amount })
 
       const result = await instance.transferFrom({
-        senderAddress: USER_3,
+        userAddress: USER_3,
         tokenAddress: TOKEN_1,
         fromAddress: USER_1,
         toAddress: USER_2,
@@ -216,7 +216,7 @@ describe('Write functions', () => {
       await instance.approve({ userAddress: USER_2, tokenAddress: TOKEN_3, spenderAddress: USER_3, amount })
 
       await instance
-        .transferFrom({ senderAddress: USER_3, tokenAddress: TOKEN_3, fromAddress: USER_2, toAddress: USER_1, amount })
+        .transferFrom({ userAddress: USER_3, tokenAddress: TOKEN_3, fromAddress: USER_2, toAddress: USER_1, amount })
         .then(() => {
           fail('Should not succeed')
         })
@@ -227,7 +227,7 @@ describe('Write functions', () => {
 
     it('does not transfer when allowance is insufficient', async () => {
       await instance
-        .transferFrom({ senderAddress: USER_3, tokenAddress: TOKEN_3, fromAddress: USER_1, toAddress: USER_2, amount })
+        .transferFrom({ userAddress: USER_3, tokenAddress: TOKEN_3, fromAddress: USER_1, toAddress: USER_2, amount })
         .then(() => {
           fail('Should not succeed')
         })
@@ -239,7 +239,7 @@ describe('Write functions', () => {
     it('calls optional callback', async () => {
       await instance.approve({ userAddress: USER_1, tokenAddress: TOKEN_1, spenderAddress: USER_3, amount })
       await instance.transferFrom(
-        { senderAddress: USER_3, tokenAddress: TOKEN_1, fromAddress: USER_1, toAddress: USER_2, amount },
+        { userAddress: USER_3, tokenAddress: TOKEN_1, fromAddress: USER_1, toAddress: USER_2, amount },
         optionalParams,
       )
       expect(mockFunction.mock.calls.length).toBe(1)

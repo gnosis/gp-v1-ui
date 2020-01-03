@@ -113,7 +113,7 @@ export class DepositApiMock implements DepositApi {
 
     // mock transfer tokens from user's mock `wallet`
     await this._erc20Api.transferFrom({
-      senderAddress: this.getContractAddress(),
+      userAddress: this.getContractAddress(),
       tokenAddress,
       fromAddress: userAddress,
       toAddress: this.getContractAddress(),
@@ -179,7 +179,7 @@ export class DepositApiMock implements DepositApi {
 
     // mock transfer tokens to user's mock `wallet`
     await this._erc20Api.transfer({
-      fromAddress: this.getContractAddress(),
+      userAddress: this.getContractAddress(),
       tokenAddress,
       toAddress: userAddress,
       amount,

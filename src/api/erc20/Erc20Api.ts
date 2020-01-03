@@ -43,23 +43,23 @@ export interface Erc20Api {
 
   transfer(
     {
-      fromAddress,
+      userAddress,
       tokenAddress,
       toAddress,
       amount,
-    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
+    }: { userAddress: string; tokenAddress: string; toAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 
   transferFrom(
     {
-      senderAddress,
+      userAddress,
       tokenAddress,
       fromAddress,
       toAddress,
       amount,
     }: {
-      senderAddress: string
+      userAddress: string
       tokenAddress: string
       fromAddress: string
       toAddress: string
@@ -166,18 +166,18 @@ export class Erc20ApiImpl implements Erc20Api {
 
   public async transfer(
     {
-      fromAddress,
+      userAddress,
       tokenAddress,
       toAddress,
       amount,
-    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
+    }: { userAddress: string; tokenAddress: string; toAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
-      from: fromAddress,
+      from: userAddress,
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -189,17 +189,17 @@ export class Erc20ApiImpl implements Erc20Api {
 
   public async transferFrom(
     {
-      senderAddress,
+      userAddress,
       tokenAddress,
       fromAddress,
       toAddress,
       amount,
-    }: { senderAddress: string; tokenAddress: string; fromAddress: string; toAddress: string; amount: BN },
+    }: { userAddress: string; tokenAddress: string; fromAddress: string; toAddress: string; amount: BN },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.transferFrom(senderAddress, toAddress, amount.toString()).send({
+    const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({
       from: fromAddress,
     })
 
