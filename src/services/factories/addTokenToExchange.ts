@@ -29,7 +29,7 @@ export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress:
     }
 
     try {
-      await exchangeApi.addToken(tokenAddress)
+      await exchangeApi.addToken({ tokenAddress })
     } catch (e) {
       log('Failed to add token (%s) to exchange', tokenAddress)
       return false

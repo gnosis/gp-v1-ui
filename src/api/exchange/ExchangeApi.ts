@@ -5,6 +5,10 @@ import { log } from 'utils'
 import Web3 from 'web3'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
+export interface AddTokenParams {
+  tokenAddress: string
+}
+
 export interface PlaceOrderParams {
   userAddress: string
   buyTokenId: number
@@ -25,7 +29,7 @@ export interface ExchangeApi extends DepositApi {
   getFeeDenominator(): Promise<number>
   getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(tokenAddress: string): Promise<number>
-  addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  addToken(params: AddTokenParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   cancelOrders(params: CancelOrdersParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
@@ -95,7 +99,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return +tokenId
   }
 
-  public async addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+  public async addToken({ tokenAddress }: AddTokenParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
     const contract = await this._getContract()
     const tx = contract.methods.addToken(tokenAddress).send()
 
