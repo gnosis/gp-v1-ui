@@ -153,7 +153,7 @@ const GlobalStyles = createGlobalStyle`
 
   input {
     background-color: var(--color-background-pageWrapper);
-    border: none;
+    border: 0.11rem solid transparent;
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
     outline: none;
@@ -169,7 +169,7 @@ const GlobalStyles = createGlobalStyle`
     transition: all 0.2s ease-in-out;
 
     &:focus {
-      border: 0.11rem solid var(--color-text-primary);
+      border-color: var(--color-text-primary);
     }
     &:disabled {
       background-color: #e0e0e0;
