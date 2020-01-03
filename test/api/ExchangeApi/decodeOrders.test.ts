@@ -21,6 +21,41 @@ function _transformBnToString(order: {
   }
 }
 
+function _encodeOrder(order: {
+  user: number
+  sellTokenBalance: number
+  buyTokenId: number
+  sellTokenId: number
+  validFrom: number
+  validUntil: number
+  priceNumerator: number
+  priceDenominator: number
+  remainingAmount: number
+}): string {
+  const {
+    user,
+    sellTokenBalance,
+    buyTokenId,
+    sellTokenId,
+    validFrom,
+    validUntil,
+    priceNumerator,
+    priceDenominator,
+    remainingAmount,
+  } = order
+  return (
+    user.toString(16).padStart(40, '0') +
+    sellTokenBalance.toString(16).padStart(64, '0') +
+    buyTokenId.toString(16).padStart(4, '0') +
+    sellTokenId.toString(16).padStart(4, '0') +
+    validFrom.toString(16).padStart(8, '0') +
+    validUntil.toString(16).padStart(8, '0') +
+    priceNumerator.toString(16).padStart(32, '0') +
+    priceDenominator.toString(16).padStart(32, '0') +
+    remainingAmount.toString(16).padStart(32, '0')
+  )
+}
+
 describe('Decode orders', () => {
   test('Test no orders', async () => {
     // GIVEN: An empty encoded order
@@ -34,9 +69,28 @@ describe('Decode orders', () => {
   })
 
   test('Test single order', async () => {
-    // GIVEN: A single order
-    const encodedOrders =
-      '0x0000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000040007005040240050402a0000000000000000000000000016e36000000000000000000de0b6b3a764000000000000000000000de0b6b3a7640000'
+    // GIVEN: An encode order
+    const user = 1
+    const sellTokenBalance = 0
+    const buyTokenId = 4
+    const sellTokenId = 7
+    const validFrom = 5259300
+    const validUntil = 5259306
+    const priceNumerator = 1500000
+    const priceDenominator = 1000000000000000000
+    const remainingAmount = 1000000000000000000
+    const encodedOrder = _encodeOrder({
+      user,
+      sellTokenBalance,
+      buyTokenId,
+      sellTokenId,
+      validFrom,
+      validUntil,
+      priceNumerator,
+      priceDenominator,
+      remainingAmount,
+    })
+    const encodedOrders = '0x' + encodedOrder
 
     // WHEN: decoding
     const orders = decodeAuctionElements(encodedOrders).map(_transformBnToString)
@@ -44,24 +98,54 @@ describe('Decode orders', () => {
     // THEN: The decoded oder matches the order
     expect(orders).toEqual([
       {
-        user: '0x0000000000000000000000000000000000000001',
+        user: '0x' + user.toString(16).padStart(40, '0'),
         sellTokenBalance: '0',
         id: '0',
-        buyTokenId: 4,
-        sellTokenId: 7,
-        validFrom: 5259300,
-        validUntil: 5259306,
-        priceNumerator: '1500000',
-        priceDenominator: '1000000000000000000',
-        remainingAmount: '1000000000000000000',
+        buyTokenId,
+        sellTokenId,
+        validFrom,
+        validUntil,
+        priceNumerator: priceNumerator.toString(),
+        priceDenominator: priceDenominator.toString(),
+        remainingAmount: remainingAmount.toString(),
       },
     ])
   })
 
   test('Test empty orders', async () => {
     // GIVEN: An 2 empty encoded orders
-    const encodedOrders =
-      '0x0000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+    const user = 0
+    const sellTokenBalance = 0
+    const buyTokenId = 0
+    const sellTokenId = 0
+    const validFrom = 0
+    const validUntil = 0
+    const priceNumerator = 0
+    const priceDenominator = 0
+    const remainingAmount = 0
+    const encodedOrder1 = _encodeOrder({
+      user,
+      sellTokenBalance,
+      buyTokenId,
+      sellTokenId,
+      validFrom,
+      validUntil,
+      priceNumerator,
+      priceDenominator,
+      remainingAmount,
+    })
+    const encodedOrder2 = _encodeOrder({
+      user,
+      sellTokenBalance,
+      buyTokenId,
+      sellTokenId,
+      validFrom,
+      validUntil,
+      priceNumerator,
+      priceDenominator,
+      remainingAmount,
+    })
+    const encodedOrders = '0x' + encodedOrder1 + encodedOrder2
 
     // WHEN: when decoding
     const orders = decodeAuctionElements(encodedOrders).map(_transformBnToString)
@@ -69,25 +153,25 @@ describe('Decode orders', () => {
     // THEN: The decoded orders matches the empty orders
     expect(orders).toEqual([
       {
-        user: '0x0000000000000000000000000000000000000001',
+        user: '0x' + user.toString(16).padStart(40, '0'),
         sellTokenBalance: '0',
         id: '0',
-        buyTokenId: 0,
-        sellTokenId: 0,
-        validFrom: 0,
-        validUntil: 0,
+        buyTokenId,
+        sellTokenId,
+        validFrom,
+        validUntil,
         priceNumerator: '0',
         priceDenominator: '0',
         remainingAmount: '0',
       },
       {
-        user: '0x0000000000000000000000000000000000000001',
+        user: '0x' + user.toString(16).padStart(40, '0'),
         sellTokenBalance: '0',
         id: '1',
-        buyTokenId: 0,
-        sellTokenId: 0,
-        validFrom: 0,
-        validUntil: 0,
+        buyTokenId,
+        sellTokenId,
+        validFrom,
+        validUntil,
         priceNumerator: '0',
         priceDenominator: '0',
         remainingAmount: '0',
