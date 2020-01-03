@@ -7,7 +7,17 @@ import { Receipt, TxOptionalParams } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
-import { ExchangeApi, AuctionElement, PlaceOrderParams, Order, CancelOrdersParams, AddTokenParams } from './ExchangeApi'
+import {
+  ExchangeApi,
+  AuctionElement,
+  PlaceOrderParams,
+  Order,
+  CancelOrdersParams,
+  AddTokenParams,
+  GetOrdersParams,
+  GetTokenAddressByIdParams,
+  GetTokenIdByAddressParams,
+} from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface OrdersByUser {
@@ -45,7 +55,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     this.orders = ordersByUser
   }
 
-  public async getOrders(userAddress: string): Promise<AuctionElement[]> {
+  public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {
     this._initOrders(userAddress)
     return this.orders[userAddress].map((order, index) => ({
       ...order,
@@ -67,12 +77,12 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return FEE_DENOMINATOR
   }
 
-  public async getTokenAddressById(tokenId: number): Promise<string> {
+  public async getTokenAddressById({ tokenId }: GetTokenAddressByIdParams): Promise<string> {
     assert(typeof this.registeredTokens[tokenId] === 'string', 'Must have ID to get Address')
     return this.registeredTokens[tokenId]
   }
 
-  public async getTokenIdByAddress(tokenAddress: string): Promise<number> {
+  public async getTokenIdByAddress({ tokenAddress }: GetTokenIdByAddressParams): Promise<number> {
     assert(typeof this.tokenAddressToId[tokenAddress] === 'number', 'Must have Address to get ID')
     return this.tokenAddressToId[tokenAddress]
   }

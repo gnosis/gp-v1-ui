@@ -34,7 +34,7 @@ export function useOrders(): AuctionElement[] {
   useEffect(() => {
     userAddress &&
       exchangeApi
-        .getOrders(userAddress)
+        .getOrders({ userAddress })
         .then(filterDeletedOrders)
         .then(setOrders)
   }, [setOrders, userAddress])

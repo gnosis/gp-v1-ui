@@ -45,7 +45,7 @@ export function addTokenToExchangeFactory(
     // TODO: I guess we might want to return the token and leave the proxy/cache layer to deal with it.
     // Revisit once we add it to the interface
     try {
-      const id = exchangeApi.getTokenIdByAddress(tokenAddress)
+      const id = exchangeApi.getTokenIdByAddress({ tokenAddress })
 
       const token = {
         ...erc20Info,

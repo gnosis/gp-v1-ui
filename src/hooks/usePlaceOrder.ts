@@ -43,8 +43,8 @@ export const usePlaceOrder = (): Result => {
 
       try {
         const [sellTokenId, buyTokenId, batchId] = await Promise.all([
-          exchangeApi.getTokenIdByAddress(sellToken.address),
-          exchangeApi.getTokenIdByAddress(buyToken.address),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: sellToken.address }),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: buyToken.address }),
           exchangeApi.getCurrentBatchId(),
         ])
 

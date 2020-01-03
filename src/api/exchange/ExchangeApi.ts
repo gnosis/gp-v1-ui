@@ -5,6 +5,18 @@ import { log } from 'utils'
 import Web3 from 'web3'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
+export interface GetOrdersParams {
+  userAddress: string
+}
+
+export interface GetTokenAddressByIdParams {
+  tokenId: number
+}
+
+export interface GetTokenIdByAddressParams {
+  tokenAddress: string
+}
+
 export interface AddTokenParams {
   userAddress: string
   tokenAddress: string
@@ -25,13 +37,16 @@ export interface CancelOrdersParams {
 }
 
 export interface ExchangeApi extends DepositApi {
-  getOrders(userAddress: string): Promise<AuctionElement[]>
   getNumTokens(): Promise<number>
   getFeeDenominator(): Promise<number>
-  getTokenAddressById(tokenId: number): Promise<string> // tokenAddressToIdMap
-  getTokenIdByAddress(tokenAddress: string): Promise<number>
+
+  getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
+
+  getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
+  getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
+
   addToken(params: AddTokenParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  placeOrder(params: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   cancelOrders(params: CancelOrdersParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
@@ -61,7 +76,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     ;(window as any).exchange = this._contractPrototype
   }
 
-  public async getOrders(userAddress: string): Promise<AuctionElement[]> {
+  public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {
     const contract = await this._getContract()
     log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
@@ -89,12 +104,12 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return +feeDenominator
   }
 
-  public async getTokenAddressById(tokenId: number): Promise<string> {
+  public async getTokenAddressById({ tokenId }: GetTokenAddressByIdParams): Promise<string> {
     const contract = await this._getContract()
     return contract.methods.tokenIdToAddressMap(tokenId).call()
   }
 
-  public async getTokenIdByAddress(tokenAddress: string): Promise<number> {
+  public async getTokenIdByAddress({ tokenAddress }: GetTokenIdByAddressParams): Promise<number> {
     const contract = await this._getContract()
     const tokenId = await contract.methods.tokenAddressToIdMap(tokenAddress).call()
     return +tokenId
@@ -116,8 +131,8 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return tx
   }
 
-  public async placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
-    const { userAddress, buyTokenId, sellTokenId, validUntil, buyAmount, sellAmount } = orderParams
+  public async placeOrder(params: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+    const { userAddress, buyTokenId, sellTokenId, validUntil, buyAmount, sellAmount } = params
 
     const contract = await this._getContract()
 
