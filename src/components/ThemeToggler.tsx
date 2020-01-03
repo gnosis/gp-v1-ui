@@ -36,13 +36,6 @@ const toggleValues = ['auto', 'light', 'dark']
 const toggleValue2class = {
   light: 'light-theme',
   dark: 'dark-theme',
-  get auto(): 'light-theme' | 'dark-theme' {
-    const hours = new Date().getHours()
-    // after 0800 but before 1700 (day)
-    const isDay = hours > 8 && hours < 17
-
-    return isDay ? 'light-theme' : 'dark-theme'
-  },
 }
 const themeClasses = Object.values(toggleValue2class)
 

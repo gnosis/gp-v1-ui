@@ -10,7 +10,6 @@ import { RESPONSIVE_SIZES } from 'const'
 const Wrapper = styled.div`
   min-height: 100vh;
   width: 100%;
-  padding-bottom: 5rem;
 
   display: grid;
   grid-template-rows: 3.125rem 0.2fr auto min-content;
@@ -58,7 +57,7 @@ const Layout: React.FC = ({ children }) => (
       ]}
     />
     <main>{children}</main>
-    <Footer fixedFooter />
+    <Footer />
   </Wrapper>
 )
 
