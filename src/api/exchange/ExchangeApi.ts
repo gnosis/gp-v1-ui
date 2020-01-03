@@ -14,7 +14,7 @@ export interface ExchangeApi extends DepositApi {
   addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   cancelOrders(
-    { senderAddress, orderIds }: { senderAddress: string; orderIds: number[] },
+    { userAddress, orderIds }: { userAddress: string; orderIds: number[] },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt>
 }
@@ -130,11 +130,11 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }
 
   public async cancelOrders(
-    { senderAddress, orderIds }: { senderAddress: string; orderIds: number[] },
+    { userAddress, orderIds }: { userAddress: string; orderIds: number[] },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
-    const tx = contract.methods.cancelOrders(orderIds).send({ from: senderAddress })
+    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)

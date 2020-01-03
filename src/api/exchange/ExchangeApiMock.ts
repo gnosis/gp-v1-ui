@@ -108,22 +108,22 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
 
   public async cancelOrders(
     {
-      senderAddress,
+      userAddress,
       orderIds,
     }: {
-      senderAddress: string
+      userAddress: string
       orderIds: number[]
     },
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
-    this._initOrders(senderAddress)
+    this._initOrders(userAddress)
     const batchId = await this.getCurrentBatchId()
 
     orderIds.forEach(orderId => {
-      if (this.orders[senderAddress][orderId]) {
-        this.orders[senderAddress][orderId].validUntil = batchId - 1
+      if (this.orders[userAddress][orderId]) {
+        this.orders[userAddress][orderId].validUntil = batchId - 1
       }
     })
 
