@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   padding-bottom: 5rem;
 
   display: grid;
-  grid-template-rows: 3.125rem 0.2fr auto;
+  grid-template-rows: 3.125rem 0.2fr auto min-content;
 
   main {
     flex: 1;
@@ -58,7 +58,7 @@ const Layout: React.FC = ({ children }) => (
       ]}
     />
     <main>{children}</main>
-    <Footer />
+    <Footer fixedFooter />
   </Wrapper>
 )
 

@@ -5,12 +5,13 @@ import ThemeToggler from 'components/ThemeToggler'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons'
 
-const Wrapper = styled.footer<{ $open: boolean }>`
-  position: fixed;
+const Wrapper = styled.footer<{ $fixed?: boolean; $open: boolean }>`
+  position: ${({ $fixed }): string => ($fixed ? 'fixed' : 'relative')};
+  height: ${({ $open = true }): string => ($open ? 'auto' : '0px')};
+  margin-bottom: ${({ $fixed }): string => ($fixed ? '0' : '-5rem')};
   bottom: 0;
   width: 100%;
   z-index: 2000;
-  height: ${({ $open = true }): string => ($open ? 'auto' : '0px')};
 
   display: flex;
   flex-flow: row wrap;
@@ -55,14 +56,20 @@ const FooterToggler = styled.a`
   cursor: pointer;
 `
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  fixedFooter?: boolean
+}
+
+const Footer: React.FC<FooterProps> = ({ fixedFooter }: FooterProps) => {
   const [footerOpen, setFooterOpen] = useState(true)
   return (
-    <Wrapper $open={footerOpen}>
+    <Wrapper $fixed={fixedFooter} $open={footerOpen}>
       {/* FOOTER ACTION HANDLER */}
-      <FooterToggler onClick={(): void => setFooterOpen(!footerOpen)}>
-        <FontAwesomeIcon size="lg" icon={footerOpen ? faChevronCircleDown : faChevronCircleUp} />
-      </FooterToggler>
+      {fixedFooter && (
+        <FooterToggler onClick={(): void => setFooterOpen(!footerOpen)}>
+          <FontAwesomeIcon size="lg" icon={footerOpen ? faChevronCircleDown : faChevronCircleUp} />
+        </FooterToggler>
+      )}
       {/* DARK/LIGHT MODE TOGGLER */}
       <ThemeToggler />
       {/* LINKS */}
