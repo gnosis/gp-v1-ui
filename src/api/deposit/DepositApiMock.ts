@@ -7,7 +7,14 @@ import { CONTRACT, RECEIPT, createFlux } from '../../../test/data'
 
 import { Receipt, TxOptionalParams } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
-import { DepositApi, PendingFlux } from './DepositApi'
+import {
+  DepositApi,
+  PendingFlux,
+  ReadOnlyParams,
+  RequestWithdrawParams,
+  WithdrawParams,
+  DepositParams,
+} from './DepositApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface BalanceState {
@@ -45,7 +52,7 @@ export class DepositApiMock implements DepositApi {
     return BATCH_TIME - (getEpoch() % BATCH_TIME)
   }
 
-  public async getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress }: ReadOnlyParams): Promise<BN> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return ZERO
@@ -55,13 +62,7 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.balance : ZERO
   }
 
-  public async getPendingDeposit({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<PendingFlux> {
+  public async getPendingDeposit({ userAddress, tokenAddress }: ReadOnlyParams): Promise<PendingFlux> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return createFlux()
@@ -71,13 +72,7 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingDeposits : createFlux()
   }
 
-  public async getPendingWithdraw({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<PendingFlux> {
+  public async getPendingWithdraw({ userAddress, tokenAddress }: ReadOnlyParams): Promise<PendingFlux> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return createFlux()
@@ -87,15 +82,7 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async deposit(
-    {
-      userAddress,
-      tokenAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      amount: BN
-    },
+    { userAddress, tokenAddress, amount }: DepositParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
@@ -125,15 +112,7 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async requestWithdraw(
-    {
-      userAddress,
-      tokenAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      amount: BN
-    },
+    { userAddress, tokenAddress, amount }: RequestWithdrawParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
@@ -151,13 +130,7 @@ export class DepositApiMock implements DepositApi {
   }
 
   public async withdraw(
-    {
-      userAddress,
-      tokenAddress,
-    }: {
-      userAddress: string
-      tokenAddress: string
-    },
+    { userAddress, tokenAddress }: WithdrawParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
