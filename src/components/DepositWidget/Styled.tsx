@@ -70,8 +70,14 @@ export const InnerWrapper = styled.div`
         text-align: right;
       }
       > input {
+        background-color: #fff;
+        color: #000;
         margin: 0;
         width: 100%;
+
+        &:disabled {
+          background-color: #6f6f6f;
+        }
       }
     }
 
@@ -222,7 +228,7 @@ export const RowTokenDiv = styled.div`
 
   &.selected {
     background-color: var(--color-button-disabled);
-    color: var(--color-background-pageWrapper);
+    color: #fff;
   }
 
   &.loading {
