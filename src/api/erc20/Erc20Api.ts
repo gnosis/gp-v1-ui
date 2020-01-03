@@ -34,7 +34,7 @@ export interface TransferParams extends UserReadOnlyParams, WithTxOptionalParams
   amount: BN
 }
 
-export interface TransferFromParams extends TransferParams, WithTxOptionalParams {
+export interface TransferFromParams extends TransferParams {
   fromAddress: string
 }
 

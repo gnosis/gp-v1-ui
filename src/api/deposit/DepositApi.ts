@@ -24,7 +24,7 @@ export interface DepositParams extends ReadOnlyParams, WithTxOptionalParams {
 
 export type RequestWithdrawParams = DepositParams
 
-export type WithdrawParams = ReadOnlyParams & WithTxOptionalParams
+export type WithdrawParams = Omit<RequestWithdrawParams, 'amount'>
 
 export interface DepositApi {
   getContractAddress(networkId: number): string | null
