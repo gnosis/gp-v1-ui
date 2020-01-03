@@ -5,6 +5,20 @@ import { log } from 'utils'
 import Web3 from 'web3'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
+export interface PlaceOrderParams {
+  userAddress: string
+  buyTokenId: number
+  sellTokenId: number
+  validUntil: number
+  buyAmount: BN
+  sellAmount: BN
+}
+
+export interface CancelOrdersParams {
+  userAddress: string
+  orderIds: number[]
+}
+
 export interface ExchangeApi extends DepositApi {
   getOrders(userAddress: string): Promise<AuctionElement[]>
   getNumTokens(): Promise<number>
@@ -13,19 +27,7 @@ export interface ExchangeApi extends DepositApi {
   getTokenIdByAddress(tokenAddress: string): Promise<number>
   addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
   placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
-  cancelOrders(
-    { userAddress, orderIds }: { userAddress: string; orderIds: number[] },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-}
-
-export interface PlaceOrderParams {
-  userAddress: string
-  buyTokenId: number
-  sellTokenId: number
-  validUntil: number
-  buyAmount: BN
-  sellAmount: BN
+  cancelOrders(params: CancelOrdersParams, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 export interface AuctionElement extends Order {
@@ -50,6 +52,7 @@ export interface Order {
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   public constructor(web3: Web3) {
     super(web3)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
   }
 
@@ -130,7 +133,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }
 
   public async cancelOrders(
-    { userAddress, orderIds }: { userAddress: string; orderIds: number[] },
+    { userAddress, orderIds }: CancelOrdersParams,
     txOptionalParams?: TxOptionalParams,
   ): Promise<Receipt> {
     const contract = await this._getContract()
