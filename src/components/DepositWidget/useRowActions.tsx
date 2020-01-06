@@ -36,6 +36,7 @@ export const useRowActions = (params: Params): Result => {
   async function enableToken(tokenAddress: string): Promise<void> {
     try {
       assert(userAddress, 'User address missing. Aborting.')
+      assert(networkId, 'NetworkId missing. Aborting.')
       assert(contractAddress, 'Contract address missing. Aborting.')
 
       const token = getToken('address', tokenAddress, balances)
@@ -49,6 +50,7 @@ export const useRowActions = (params: Params): Result => {
         userAddress,
         tokenAddress,
         spenderAddress: contractAddress,
+        networkId,
         amount: ALLOWANCE_MAX_VALUE,
         txOptionalParams,
       })

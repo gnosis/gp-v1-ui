@@ -11,6 +11,7 @@ import { TokenList } from 'api/tokenList/TokenListApi'
 interface TokenFromErc20Params {
   tokenAddress: string
   tokenId: number
+  networkId: number
   erc20Api: Erc20Api
   web3: Web3
 }
@@ -82,7 +83,7 @@ function getTokenFromExchangeByAddressFactory(
     }
 
     // Not there, get it from the ERC20 contract
-    return getTokenFromErc20({ ...factoryParams, tokenAddress, tokenId })
+    return getTokenFromErc20({ ...factoryParams, tokenAddress, tokenId, networkId })
   }
 }
 
@@ -127,7 +128,7 @@ function getTokenFromExchangeByIdFactory(
     }
 
     // Not there, get it from the ERC20 contract
-    return getTokenFromErc20({ ...factoryParams, tokenId, tokenAddress })
+    return getTokenFromErc20({ ...factoryParams, tokenId, tokenAddress, networkId })
   }
 }
 

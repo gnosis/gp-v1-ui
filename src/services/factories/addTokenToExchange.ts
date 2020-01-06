@@ -29,7 +29,7 @@ export function addTokenToExchangeFactory(
   const { exchangeApi } = factoryParams
 
   return async ({ userAddress, tokenAddress, networkId }: AddTokenToExchangeParams): Promise<boolean> => {
-    const erc20Info = getErc20Info({ ...factoryParams, tokenAddress })
+    const erc20Info = getErc20Info({ ...factoryParams, tokenAddress, networkId })
 
     if (!erc20Info) {
       log('Address %s does not contain a valid ERC20 token', tokenAddress)

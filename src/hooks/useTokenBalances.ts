@@ -44,8 +44,8 @@ async function fetchBalancesForToken(
     depositApi.getPendingDeposit({ userAddress, tokenAddress, networkId }),
     depositApi.getPendingWithdraw({ userAddress, tokenAddress, networkId }),
     depositApi.getCurrentBatchId(networkId),
-    erc20Api.balanceOf({ userAddress, tokenAddress }),
-    erc20Api.allowance({ userAddress, tokenAddress, spenderAddress: contractAddress }),
+    erc20Api.balanceOf({ userAddress, tokenAddress, networkId }),
+    erc20Api.allowance({ userAddress, tokenAddress, networkId, spenderAddress: contractAddress }),
   ])
 
   return {
