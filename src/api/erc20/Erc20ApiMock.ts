@@ -7,8 +7,11 @@ import { log, assert } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 import {
   Erc20Api,
-  UserReadOnlyParams,
-  ContractReadOnlyParams,
+  NameParams,
+  SymbolParams,
+  DecimalsParams,
+  TotalSupplyParams,
+  BalanceOfParams,
   AllowanceParams,
   ApproveParams,
   TransferParams,
@@ -49,7 +52,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._tokens = tokens
   }
 
-  public async balanceOf({ tokenAddress, userAddress }: UserReadOnlyParams): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: BalanceOfParams): Promise<BN> {
     const userBalances = this._balances[userAddress]
     if (!userBalances) {
       return ZERO
@@ -59,7 +62,7 @@ export class Erc20ApiMock implements Erc20Api {
     return balance ? balance : ZERO
   }
 
-  public async name({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
+  public async name({ tokenAddress }: NameParams): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `name` to mock contract behavior
@@ -68,7 +71,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.name
   }
 
-  public async symbol({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
+  public async symbol({ tokenAddress }: SymbolParams): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `symbol` to mock contract behavior
@@ -77,7 +80,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.symbol
   }
 
-  public async decimals({ tokenAddress }: ContractReadOnlyParams): Promise<number> {
+  public async decimals({ tokenAddress }: DecimalsParams): Promise<number> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `decimals` to mock contract behavior
@@ -86,7 +89,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.decimals
   }
 
-  public async totalSupply({ tokenAddress }: ContractReadOnlyParams): Promise<BN> {
+  public async totalSupply({ tokenAddress }: TotalSupplyParams): Promise<BN> {
     log("Don't care about %s, just making TS shut up", tokenAddress)
     return this._totalSupply
   }

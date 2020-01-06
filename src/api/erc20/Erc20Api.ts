@@ -9,15 +9,20 @@ import { toBN } from 'utils'
 
 import Web3 from 'web3'
 
-export interface ContractReadOnlyParams {
+interface BaseParams {
   tokenAddress: string
 }
 
-export interface UserReadOnlyParams extends ContractReadOnlyParams {
+export type NameParams = BaseParams
+export type SymbolParams = BaseParams
+export type DecimalsParams = BaseParams
+export type TotalSupplyParams = BaseParams
+
+export interface BalanceOfParams extends BaseParams {
   userAddress: string
 }
 
-export interface AllowanceParams extends UserReadOnlyParams {
+export interface AllowanceParams extends BalanceOfParams {
   spenderAddress: string
 }
 
@@ -29,7 +34,7 @@ export interface ApproveParams extends AllowanceParams, WithTxOptionalParams {
   amount: BN
 }
 
-export interface TransferParams extends UserReadOnlyParams, WithTxOptionalParams {
+export interface TransferParams extends BalanceOfParams, WithTxOptionalParams {
   toAddress: string
   amount: BN
 }
@@ -44,12 +49,12 @@ export interface TransferFromParams extends TransferParams {
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface Erc20Api {
-  name(params: ContractReadOnlyParams): Promise<string>
-  symbol(params: ContractReadOnlyParams): Promise<string>
-  decimals(params: ContractReadOnlyParams): Promise<number>
-  totalSupply(params: ContractReadOnlyParams): Promise<BN>
+  name(params: NameParams): Promise<string>
+  symbol(params: SymbolParams): Promise<string>
+  decimals(params: DecimalsParams): Promise<number>
+  totalSupply(params: TotalSupplyParams): Promise<BN>
 
-  balanceOf(params: UserReadOnlyParams): Promise<BN>
+  balanceOf(params: BalanceOfParams): Promise<BN>
 
   allowance(params: AllowanceParams): Promise<BN>
 
@@ -76,7 +81,7 @@ export class Erc20ApiImpl implements Erc20Api {
     ;(window as any).erc20 = this._contractPrototype
   }
 
-  public async balanceOf({ tokenAddress, userAddress }: UserReadOnlyParams): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: BalanceOfParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -86,19 +91,19 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(result)
   }
 
-  public async name({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
+  public async name({ tokenAddress }: NameParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     return await erc20.methods.name().call()
   }
 
-  public async symbol({ tokenAddress }: ContractReadOnlyParams): Promise<string> {
+  public async symbol({ tokenAddress }: SymbolParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     return await erc20.methods.symbol().call()
   }
 
-  public async decimals({ tokenAddress }: ContractReadOnlyParams): Promise<number> {
+  public async decimals({ tokenAddress }: DecimalsParams): Promise<number> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const decimals = await erc20.methods.decimals().call()
@@ -106,7 +111,7 @@ export class Erc20ApiImpl implements Erc20Api {
     return Number(decimals)
   }
 
-  public async totalSupply({ tokenAddress }: ContractReadOnlyParams): Promise<BN> {
+  public async totalSupply({ tokenAddress }: TotalSupplyParams): Promise<BN> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const totalSupply = await erc20.methods.totalSupply().call()
