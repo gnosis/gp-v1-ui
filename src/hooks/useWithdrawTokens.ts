@@ -15,7 +15,7 @@ interface Result {
 }
 
 export const useWithdrawTokens = (params: Params): Result => {
-  const { userAddress, isConnected } = useWalletConnection()
+  const { userAddress, isConnected, networkId } = useWalletConnection()
   const {
     tokenBalances: { enabled, address: tokenAddress, claimable },
     txOptionalParams,
@@ -28,10 +28,11 @@ export const useWithdrawTokens = (params: Params): Result => {
       assert(enabled, 'Token not enabled')
       assert(claimable, 'Withdraw not ready')
       assert(isConnected, "There's no connected wallet")
+      assert(networkId, 'No valid networkId found')
 
       setWithdrawing(true)
 
-      return depositApi.withdraw({ userAddress, tokenAddress, txOptionalParams })
+      return depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
     } finally {
       setWithdrawing(false)
     }

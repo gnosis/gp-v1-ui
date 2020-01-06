@@ -25,11 +25,11 @@ interface Result {
 
 export const usePlaceOrder = (): Result => {
   const [isSubmitting, setIsSubmitting] = useSafeState(false)
-  const { userAddress } = useWalletConnection()
+  const { userAddress, networkId } = useWalletConnection()
 
   const placeOrder = useCallback(
     async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
-      if (!userAddress) {
+      if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
         return false
       }
@@ -43,9 +43,9 @@ export const usePlaceOrder = (): Result => {
 
       try {
         const [sellTokenId, buyTokenId, batchId] = await Promise.all([
-          exchangeApi.getTokenIdByAddress({ tokenAddress: sellToken.address }),
-          exchangeApi.getTokenIdByAddress({ tokenAddress: buyToken.address }),
-          exchangeApi.getCurrentBatchId(),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: sellToken.address, networkId }),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: buyToken.address, networkId }),
+          exchangeApi.getCurrentBatchId(networkId),
         ])
 
         if (sellTokenId !== 0 || buyTokenId !== 0) {
@@ -60,6 +60,7 @@ export const usePlaceOrder = (): Result => {
             validUntil,
             buyAmount,
             sellAmount,
+            networkId,
             txOptionalParams,
           }
           const receipt = await exchangeApi.placeOrder(params)
@@ -93,7 +94,7 @@ export const usePlaceOrder = (): Result => {
         setIsSubmitting(false)
       }
     },
-    [setIsSubmitting, userAddress],
+    [networkId, setIsSubmitting, userAddress],
   )
 
   return { placeOrder, isSubmitting }

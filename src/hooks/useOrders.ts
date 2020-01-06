@@ -28,16 +28,17 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
 }
 
 export function useOrders(): AuctionElement[] {
-  const { userAddress } = useWalletConnection()
+  const { userAddress, networkId } = useWalletConnection()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
 
   useEffect(() => {
     userAddress &&
+      networkId &&
       exchangeApi
-        .getOrders({ userAddress })
+        .getOrders({ userAddress, networkId })
         .then(filterDeletedOrders)
         .then(setOrders)
-  }, [setOrders, userAddress])
+  }, [networkId, setOrders, userAddress])
 
   return orders
 }

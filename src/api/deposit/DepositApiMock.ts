@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import BN from 'bn.js'
 import assert from 'assert'
 
@@ -38,19 +39,19 @@ export class DepositApiMock implements DepositApi {
     this._erc20Api = erc20Api
   }
 
-  public getContractAddress(): string {
+  public getContractAddress(_networkId = 0): string {
     return CONTRACT
   }
 
-  public async getBatchTime(): Promise<number> {
+  public async getBatchTime(_networkId = 0): Promise<number> {
     return BATCH_TIME
   }
 
-  public async getCurrentBatchId(): Promise<number> {
+  public async getCurrentBatchId(_networkId = 0): Promise<number> {
     return Math.floor(getEpoch() / BATCH_TIME)
   }
 
-  public async getSecondsRemainingInBatch(): Promise<number> {
+  public async getSecondsRemainingInBatch(_networkId = 0): Promise<number> {
     return BATCH_TIME - (getEpoch() % BATCH_TIME)
   }
 
