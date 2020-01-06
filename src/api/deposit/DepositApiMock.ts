@@ -10,7 +10,9 @@ import { waitAndSendReceipt } from 'utils/mock'
 import {
   DepositApi,
   PendingFlux,
-  ReadOnlyParams,
+  GetBalanceParams,
+  GetPendingDepositParams,
+  GetPendingWithdrawParams,
   RequestWithdrawParams,
   WithdrawParams,
   DepositParams,
@@ -52,7 +54,7 @@ export class DepositApiMock implements DepositApi {
     return BATCH_TIME - (getEpoch() % BATCH_TIME)
   }
 
-  public async getBalance({ userAddress, tokenAddress }: ReadOnlyParams): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress }: GetBalanceParams): Promise<BN> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return ZERO
@@ -62,7 +64,7 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.balance : ZERO
   }
 
-  public async getPendingDeposit({ userAddress, tokenAddress }: ReadOnlyParams): Promise<PendingFlux> {
+  public async getPendingDeposit({ userAddress, tokenAddress }: GetPendingDepositParams): Promise<PendingFlux> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return createFlux()
@@ -72,7 +74,7 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingDeposits : createFlux()
   }
 
-  public async getPendingWithdraw({ userAddress, tokenAddress }: ReadOnlyParams): Promise<PendingFlux> {
+  public async getPendingWithdraw({ userAddress, tokenAddress }: GetPendingWithdrawParams): Promise<PendingFlux> {
     const userBalanceStates = this._balanceStates[userAddress]
     if (!userBalanceStates) {
       return createFlux()

@@ -9,10 +9,14 @@ import { Receipt, TxOptionalParams } from 'types'
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
 
-export interface ReadOnlyParams {
+interface ReadOnlyParams {
   userAddress: string
   tokenAddress: string
 }
+
+export type GetBalanceParams = ReadOnlyParams
+export type GetPendingDepositParams = ReadOnlyParams
+export type GetPendingWithdrawParams = ReadOnlyParams
 
 interface WithTxOptionalParams {
   txOptionalParams?: TxOptionalParams
@@ -32,9 +36,9 @@ export interface DepositApi {
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
 
-  getBalance(params: ReadOnlyParams): Promise<BN>
-  getPendingDeposit(params: ReadOnlyParams): Promise<PendingFlux>
-  getPendingWithdraw(params: ReadOnlyParams): Promise<PendingFlux>
+  getBalance(params: GetBalanceParams): Promise<BN>
+  getPendingDeposit(params: GetPendingDepositParams): Promise<PendingFlux>
+  getPendingWithdraw(params: GetPendingWithdrawParams): Promise<PendingFlux>
 
   deposit(params: DepositParams): Promise<Receipt>
   requestWithdraw(params: RequestWithdrawParams): Promise<Receipt>
@@ -93,7 +97,7 @@ export class DepositApiImpl implements DepositApi {
     return +secondsRemainingInBatch
   }
 
-  public async getBalance({ userAddress, tokenAddress }: ReadOnlyParams): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress }: GetBalanceParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
@@ -102,7 +106,7 @@ export class DepositApiImpl implements DepositApi {
     return toBN(balance)
   }
 
-  public async getPendingDeposit({ userAddress, tokenAddress }: ReadOnlyParams): Promise<PendingFlux> {
+  public async getPendingDeposit({ userAddress, tokenAddress }: GetPendingDepositParams): Promise<PendingFlux> {
     if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
     const contract = await this._getContract()
@@ -112,7 +116,7 @@ export class DepositApiImpl implements DepositApi {
     return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async getPendingWithdraw({ userAddress, tokenAddress }: ReadOnlyParams): Promise<PendingFlux> {
+  public async getPendingWithdraw({ userAddress, tokenAddress }: GetPendingWithdrawParams): Promise<PendingFlux> {
     if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
     const contract = await this._getContract()
