@@ -19,10 +19,6 @@ import { CacheProxy } from 'api/proxy'
 const DEFAULT_CACHE_TIME = 30
 
 export class Erc20ApiProxy extends CacheProxy<Erc20Api> implements Erc20Api {
-  public constructor(erc20Api: Erc20Api) {
-    super(erc20Api)
-  }
-
   public name(params: NameParams): Promise<string> {
     return this.fetchWithCache('name', params, DEFAULT_CACHE_TIME)
   }
