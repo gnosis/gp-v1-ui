@@ -2,12 +2,7 @@ import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faExclamationTriangle,
-  faSpinner /* , faExchangeAlt */,
-  faTrash,
-  faExchangeAlt,
-} from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle, faSpinner, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'

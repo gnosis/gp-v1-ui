@@ -94,6 +94,10 @@ const OrdersForm = styled.div`
 
     margin: 1em 0;
 
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+      grid-template-columns: 2fr 1fr;
+    }
+
     .warning {
       justify-self: end;
     }
@@ -136,6 +140,10 @@ const OrdersForm = styled.div`
 
     .hidden {
       visibility: hidden;
+    }
+
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+      display: none;
     }
   }
 
