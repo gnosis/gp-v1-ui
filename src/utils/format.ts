@@ -143,7 +143,7 @@ export function safeFilledToken<T extends TokenDetails>(token: T): T {
 }
 
 export function calculatePriceBigNumber(numerator?: BigNumber, denominator?: BigNumber): BigNumber | null {
-  if (!numerator || !denominator) {
+  if (!numerator || !denominator || denominator.isZero()) {
     return null
   }
 
