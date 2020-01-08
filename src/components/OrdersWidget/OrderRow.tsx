@@ -103,8 +103,13 @@ export const OrderRowWrapper = styled.div<{ $open: boolean }>`
         }
       }
 
-      .order-details .order-details-subgrid {
-        grid-template-columns: min-content minmax(2.2rem, max-content);
+      > .order-details {
+        display: none;
+        // grid-template-columns: min-content minmax(2.2rem, max-content);
+      }
+
+      > .order-details-responsive {
+        display: flex;
       }
 
       &.checked {
@@ -145,6 +150,10 @@ export const OrderRowWrapper = styled.div<{ $open: boolean }>`
     }
   }
 
+  .order-details-responsive {
+    display: none;
+  }
+
   .order-details {
     display: grid;
     grid-template-columns: max-content max-content;
@@ -170,7 +179,7 @@ export const OrderRowWrapper = styled.div<{ $open: boolean }>`
       justify-self: end;
     }
 
-    > * {
+    > *:not(:last-child) {
       margin: 0 0.3rem;
     }
   }
@@ -268,7 +277,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
     [buyToken, order.priceDenominator, order.priceNumerator, sellToken],
   )
   return (
-    <div className="container" data-label="Order">
+    <div className="container" data-label="Price (at least)">
       <div className="order-details">
         <div>Sell</div>
         <div className="order-details-subgrid">
@@ -278,6 +287,12 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
         <div>
           for <strong>at least</strong>
         </div>
+        <div className="order-details-subgrid">
+          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
+          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
+        </div>
+      </div>
+      <div className="order-details-responsive">
         <div className="order-details-subgrid">
           <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
           <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
