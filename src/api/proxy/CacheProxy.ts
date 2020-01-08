@@ -79,11 +79,8 @@ export class CacheProxy<T> {
    *
    */
   private hashParams<P>(methodName: string, params: P): string {
-    return (
-      methodName +
-      Object.keys(params)
-        .sort()
-        .reduce((acc, key) => `${acc}|${key}:${params[key]}`, '')
-    )
+    return Object.keys(params)
+      .sort()
+      .reduce((acc, key) => `${acc}|${key}:${params[key]}`, methodName)
   }
 }
