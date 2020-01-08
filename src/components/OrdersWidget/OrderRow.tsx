@@ -2,7 +2,12 @@ import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationTriangle, faSpinner /* , faExchangeAlt */, faTrash } from '@fortawesome/free-solid-svg-icons'
+import {
+  faExclamationTriangle,
+  faSpinner /* , faExchangeAlt */,
+  faTrash,
+  faExchangeAlt,
+} from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
@@ -24,6 +29,7 @@ import {
 import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
+import TokenImg from 'components/TokenImg'
 
 export const OrderRowWrapper = styled.div`
   display: grid;
@@ -59,18 +65,33 @@ export const OrderRowWrapper = styled.div`
       border-bottom: 0.0625rem solid #00000024;
       padding: 0.7rem;
 
-      > * {
-        margin-left: 0.625rem;
-      }
-
       &:first-child {
         // grid-template-columns: 1fr max-content auto;
         width: 100%;
-        grid-row-start: 5;
+        grid-row-start: 6;
 
         > img {
           order: 2;
           margin-right: -0.5rem;
+        }
+      }
+
+      &.order-image-row {
+        display: initial;
+
+        > div {
+          display: flex;
+          align-items: center;
+          justify-content: space-evenly;
+
+          > div {
+            display: inherit;
+            justify-content: inherit;
+            align-items: center;
+            > * {
+              margin: 0 0.3rem;
+            }
+          }
         }
       }
 
@@ -97,7 +118,7 @@ export const OrderRowWrapper = styled.div`
       //   }
       // }
 
-      &::before {
+      &:not(:nth-child(2))::before {
         content: attr(data-label);
         margin-right: auto;
         font-weight: bold;
@@ -105,6 +126,10 @@ export const OrderRowWrapper = styled.div`
         font-size: 0.7rem;
       }
     }
+  }
+
+  .order-image-row {
+    display: none;
   }
 
   .checked {
@@ -206,6 +231,26 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
 }
 
+const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = ({ buyToken, sellToken }) => {
+  return (
+    <div className="container order-image-row">
+      <div>
+        {/* e.g SELL DAI <-> BUY TUSD */}
+        <div>
+          <TokenImg src={sellToken.image} alt={sellToken.addressMainnet} />{' '}
+          <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+        </div>
+        {/* Switcher icon */}
+        <FontAwesomeIcon icon={faExchangeAlt} size="1x" />
+        <div>
+          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>{' '}
+          <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order, pending }) => {
   const price = useMemo(
     () =>
@@ -232,34 +277,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
         </div>
       </div>
     </div>
-    // <div className="container order-details">
-    //   {/* SELL DAI <-> BUY TUSD */}
-    //   <div>
-    //     <div>
-    //       <TokenImg src={sellToken.image} alt={sellToken.addressMainnet} />
-    //       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-    //     </div>
-    //     {/* Switcher icon */}
-    //     <FontAwesomeIcon icon={faExchangeAlt} size="1x" />
-    //     <div>
-    //       <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-    //       <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
-    //     </div>
-    //   </div>
-    //   {/* AMOUNTS */}
-    //   <div data-label="Price (at least)">
-    //     <div className="order-details-subgrid">
-    //       <span>Sell</span>
-    //       <Highlight color={pending ? 'grey' : ''}>1</Highlight>
-    //       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-    //     </div>
-    //     <div className="order-details-subgrid">
-    //       <span>for at least</span>
-    //       <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
-    //       <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-    //     </div>
-    //   </div>
-    // </div>
   )
 }
 
@@ -401,6 +418,7 @@ const OrderRow: React.FC<Props> = props => {
               disabled={disabled}
             />
           )}
+          <OrderImage sellToken={sellToken} buyToken={buyToken} />
           <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
           <UnfilledAmount order={order} sellToken={sellToken} />
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
