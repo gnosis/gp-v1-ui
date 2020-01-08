@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
 
+const DECIMALS_FOR_PRICE = 4
+
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
   font-size: 0.8em;
@@ -18,8 +20,7 @@ const Wrapper = styled.dl`
   }
 `
 
-// TODO: move to utils?
-function calculatePrice(sellAmount: number, receiveAmount: number): number {
+function _calculatePrice(sellAmount: number, receiveAmount: number): number {
   return sellAmount > 0 ? receiveAmount / sellAmount : 0
 }
 
@@ -38,9 +39,7 @@ const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmoun
     return null
   }
 
-  function _calculatePrice(): string {
-    return calculatePrice(sellAmountNumber, receiveAmountNumber).toFixed(2)
-  }
+  const price = _calculatePrice(sellAmountNumber, receiveAmountNumber).toFixed(DECIMALS_FOR_PRICE)
 
   return (
     <Wrapper>
@@ -52,7 +51,7 @@ const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmoun
         </Highlight>{' '}
         at a price{' '}
         <Highlight>
-          1 {sellTokenName} = {_calculatePrice()} {receiveTokenName}
+          1 {sellTokenName} = {price} {receiveTokenName}
         </Highlight>{' '}
         or better. <br />
         Your order might be partially filled.
