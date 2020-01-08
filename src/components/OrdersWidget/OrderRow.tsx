@@ -2,11 +2,12 @@ import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationTriangle, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle, faSpinner /* , faExchangeAlt */ } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
+// import TokenImg from 'components/TokenImg'
 
 import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
@@ -21,35 +22,102 @@ import {
   isOrderActive,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
-import { MIN_UNLIMITED_SELL_ORDER } from 'const'
+import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
-const OrderRowWrapper = styled.div`
-  .container {
-    display: grid;
-    position: relative;
+export const OrderRowWrapper = styled.div`
+  display: grid;
+  grid-template-columns: 5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 5.5rem;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-background-pageWrapper);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin: 0.3rem 0;
+  min-height: 4rem;
+  text-align: center;
+  z-index: 1;
+  transition: all 0.2s ease-in-out;
+
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    grid-template-columns: none;
+    grid-template-rows: auto;
+
+    align-items: center;
+    justify-content: stretch;
+    padding: 0 0.7rem;
+
+    &.selected {
+      > div {
+        border-bottom: 0.0625rem solid #ffffff40;
+      }
+    }
+    > div {
+      display: flex;
+      flex-flow: row;
+      align-items: center;
+      border-bottom: 0.0625rem solid #00000024;
+
+      > * {
+        margin-left: 0.625rem;
+      }
+      &:first-child {
+        grid-template-columns: 1fr max-content auto;
+        grid-row-start: 5;
+
+        > img {
+          order: 2;
+          margin-right: -0.5rem;
+        }
+      }
+      &:last-child {
+        border: none;
+        flex-flow: row nowrap;
+        padding: 0.7rem 0 0.7rem 0.7rem;
+
+        > button:last-child {
+          border-radius: 0 var(--border-radius) var(--border-radius);
+        }
+      }
+
+      &::before {
+        content: attr(data-label);
+        margin-right: auto;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+    }
   }
 
   .order-details {
-    grid-template-columns: 6em 3em 5em;
-    grid-template-rows: repeat(2, 1fr);
-    justify-self: start;
+    display: grid;
+    grid-template-columns: max-content max-content;
+    grid-gap: 0 1rem;
+    text-align: left;
+    justify-content: space-evenly;
+
+    .order-details-subgrid {
+      display: grid;
+      grid-template-columns: min-content minmax(5.6rem, max-content);
+      grid-gap: 0 0.5rem;
+      justify-content: space-between;
+    }
   }
 
   .sub-columns {
-    gap: 0.5em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
 
     div:first-child {
       justify-self: end;
     }
-  }
 
-  .two-columns {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .three-columns {
-    grid-template-columns: minmax(4em, 60%) minmax(3em, 30%) minmax(1em, 10%);
+    > * {
+      margin: 0 0.3rem;
+    }
   }
 
   .pendingCell {
@@ -67,10 +135,6 @@ const OrderRowWrapper = styled.div`
 `
 
 const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ pending, transactionHash }) => {
-  if (!pending) {
-    return null
-  }
-
   return (
     <div className="container pendingCell">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
@@ -83,7 +147,7 @@ const DeleteOrder: React.FC<Pick<
   Props,
   'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
 >> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
-  <div className="checked">
+  <div data-label="Actions" className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
@@ -125,27 +189,49 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
       ),
     [buyToken, order.priceDenominator, order.priceNumerator, sellToken],
   )
-
   return (
     <div className="container order-details">
       <div>Sell</div>
-      <div>
-        <Highlight color={pending ? 'grey' : ''}>1</Highlight>
-      </div>
-      <div>
-        <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+      <div className="order-details-subgrid">
+        <Highlight color={pending ? 'grey' : ''}>1</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
       </div>
 
       <div>
         for <strong>at least</strong>
       </div>
-      <div>
-        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
-      </div>
-      <div>
+      <div className="order-details-subgrid">
+        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
         <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
       </div>
     </div>
+    // <div className="container order-details">
+    //   {/* SELL DAI <-> BUY TUSD */}
+    //   <div>
+    //     <div>
+    //       <TokenImg src={sellToken.image} alt={sellToken.addressMainnet} />
+    //       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+    //     </div>
+    //     {/* Switcher icon */}
+    //     <FontAwesomeIcon icon={faExchangeAlt} size="1x" />
+    //     <div>
+    //       <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
+    //       <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
+    //     </div>
+    //   </div>
+    //   {/* AMOUNTS */}
+    //   <div data-label="Price (at least)">
+    //     <div className="order-details-subgrid">
+    //       <span>Sell</span>
+    //       <Highlight color={pending ? 'grey' : ''}>1</Highlight>
+    //       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+    //     </div>
+    //     <div className="order-details-subgrid">
+    //       <span>for at least</span>
+    //       <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>
+    //       <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
+    //     </div>
+    //   </div>
+    // </div>
   )
 }
 
@@ -161,7 +247,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   const unlimited = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
 
   return (
-    <div className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
+    <div data-label="Unfilled Amount" className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
       {unlimited ? (
         <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
       ) : (
@@ -188,7 +274,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
   const isActive = isOrderActive(order, new Date())
 
   return (
-    <div className="container sub-columns three-columns">
+    <div data-label="Account Balance" className="container sub-columns three-columns">
       <div>{accountBalance}</div>
       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
       <div className="warning">{isOverBalance && isActive && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
@@ -204,7 +290,11 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
     return { isNeverExpires, expiresOn }
   }, [order.validUntil])
 
-  return <div>{isNeverExpires ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}</div>
+  return (
+    <div data-label="Expires">
+      {isNeverExpires ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}
+    </div>
+  )
 }
 
 async function fetchToken(
@@ -265,13 +355,16 @@ const OrderRow: React.FC<Props> = props => {
     <>
       {sellToken && buyToken && (
         <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
-          <PendingLink pending={pending} transactionHash={transactionHash} />
-          <DeleteOrder
-            isMarkedForDeletion={isMarkedForDeletion}
-            toggleMarkedForDeletion={toggleMarkedForDeletion}
-            pending={pending}
-            disabled={disabled}
-          />
+          {pending ? (
+            <PendingLink pending={pending} transactionHash={transactionHash} />
+          ) : (
+            <DeleteOrder
+              isMarkedForDeletion={isMarkedForDeletion}
+              toggleMarkedForDeletion={toggleMarkedForDeletion}
+              pending={pending}
+              disabled={disabled}
+            />
+          )}
           <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
           <UnfilledAmount order={order} sellToken={sellToken} />
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
