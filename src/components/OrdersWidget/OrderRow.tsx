@@ -19,7 +19,7 @@ import {
   isBatchIdFarInTheFuture,
   formatDateFromBatchId,
   isOrderActive,
-  formatPriceBigNumber,
+  formatPrice,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER } from 'const'
@@ -108,7 +108,7 @@ function calculatePrice(numeratorString?: string | null, denominatorString?: str
     const numerator = new BigNumber(numeratorString)
     const denominator = new BigNumber(denominatorString)
 
-    price = formatPriceBigNumber(numerator, denominator)
+    price = formatPrice(numerator, denominator)
   }
 
   return price || 'N/A'

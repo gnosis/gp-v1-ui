@@ -150,12 +150,12 @@ export function calculatePriceBigNumber(numerator?: BigNumber, denominator?: Big
   return numerator.dividedBy(denominator)
 }
 
-export function formatPriceBigNumber(
+export function formatPrice(
   numerator?: BigNumber,
   denominator?: BigNumber,
   decimals = DEFAULT_DECIMALS,
 ): string | null {
   const price = calculatePriceBigNumber(numerator, denominator)
 
-  return price ? price.toFixed(decimals) : 'N/A'
+  return price ? price.toFixed(decimals) : null
 }
