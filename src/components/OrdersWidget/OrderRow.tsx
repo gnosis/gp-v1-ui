@@ -2,7 +2,7 @@ import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationTriangle, faSpinner /* , faExchangeAlt */ } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle, faSpinner /* , faExchangeAlt */, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
@@ -78,6 +78,15 @@ export const OrderRowWrapper = styled.div`
         grid-template-columns: min-content minmax(2.2rem, max-content);
       }
 
+      &.checked {
+        > button {
+          display: initial;
+        }
+        > input {
+          display: none;
+        }
+      }
+
       // &:last-child {
       //   border: none;
       //   flex-flow: row nowrap;
@@ -95,6 +104,12 @@ export const OrderRowWrapper = styled.div`
         text-transform: uppercase;
         font-size: 0.7rem;
       }
+    }
+  }
+
+  .checked {
+    > button {
+      display: none;
     }
   }
 
@@ -144,7 +159,7 @@ export const OrderRowWrapper = styled.div`
 
 const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ transactionHash }) => {
   return (
-    <div className="container pendingCell">
+    <div className="container pendingCell" data-label="Actions">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
     </div>
@@ -162,6 +177,9 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
+    <button className="danger" onClick={toggleMarkedForDeletion}>
+      Delete Order <FontAwesomeIcon icon={faTrash} />
+    </button>
   </div>
 )
 
