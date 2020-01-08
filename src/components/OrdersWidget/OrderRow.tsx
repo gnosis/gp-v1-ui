@@ -33,7 +33,7 @@ import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
 
-export const OrderRowWrapper = styled.div<{ $open: boolean }>`
+export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
   display: grid;
   grid-template-columns: 5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 5.5rem;
   align-items: center;
