@@ -9,46 +9,40 @@ import { Receipt, TxOptionalParams } from 'types'
 import Web3 from 'web3'
 import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
 
+interface ReadOnlyParams {
+  userAddress: string
+  tokenAddress: string
+}
+
+export type GetBalanceParams = ReadOnlyParams
+export type GetPendingDepositParams = ReadOnlyParams
+export type GetPendingWithdrawParams = ReadOnlyParams
+
+interface WithTxOptionalParams {
+  txOptionalParams?: TxOptionalParams
+}
+
+export interface DepositParams extends ReadOnlyParams, WithTxOptionalParams {
+  amount: BN
+}
+
+export type RequestWithdrawParams = DepositParams
+
+export type WithdrawParams = Omit<RequestWithdrawParams, 'amount'>
+
 export interface DepositApi {
   getContractAddress(networkId: number): string | null
   getBatchTime(): Promise<number>
   getCurrentBatchId(): Promise<number>
   getSecondsRemainingInBatch(): Promise<number>
 
-  getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN>
-  getPendingDeposit({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
-  getPendingWithdraw({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<PendingFlux>
+  getBalance(params: GetBalanceParams): Promise<BN>
+  getPendingDeposit(params: GetPendingDepositParams): Promise<PendingFlux>
+  getPendingWithdraw(params: GetPendingWithdrawParams): Promise<PendingFlux>
 
-  deposit(
-    {
-      userAddress,
-      tokenAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-
-  requestWithdraw(
-    {
-      userAddress,
-      tokenAddress,
-      amount,
-    }: {
-      userAddress: string
-      tokenAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
-
-  withdraw(
-    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  deposit(params: DepositParams): Promise<Receipt>
+  requestWithdraw(params: RequestWithdrawParams): Promise<Receipt>
+  withdraw(params: WithdrawParams): Promise<Receipt>
 }
 
 export interface PendingFlux {
@@ -103,7 +97,7 @@ export class DepositApiImpl implements DepositApi {
     return +secondsRemainingInBatch
   }
 
-  public async getBalance({ userAddress, tokenAddress }: { userAddress: string; tokenAddress: string }): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress }: GetBalanceParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const contract = await this._getContract()
@@ -112,13 +106,7 @@ export class DepositApiImpl implements DepositApi {
     return toBN(balance)
   }
 
-  public async getPendingDeposit({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<PendingFlux> {
+  public async getPendingDeposit({ userAddress, tokenAddress }: GetPendingDepositParams): Promise<PendingFlux> {
     if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
     const contract = await this._getContract()
@@ -128,13 +116,7 @@ export class DepositApiImpl implements DepositApi {
     return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async getPendingWithdraw({
-    userAddress,
-    tokenAddress,
-  }: {
-    userAddress: string
-    tokenAddress: string
-  }): Promise<PendingFlux> {
+  public async getPendingWithdraw({ userAddress, tokenAddress }: GetPendingWithdrawParams): Promise<PendingFlux> {
     if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
     const contract = await this._getContract()
@@ -144,10 +126,7 @@ export class DepositApiImpl implements DepositApi {
     return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async deposit(
-    { userAddress, tokenAddress, amount }: { userAddress: string; tokenAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async deposit({ userAddress, tokenAddress, amount, txOptionalParams }: DepositParams): Promise<Receipt> {
     const contract = await this._getContract()
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
@@ -160,10 +139,12 @@ export class DepositApiImpl implements DepositApi {
     return tx
   }
 
-  public async requestWithdraw(
-    { userAddress, tokenAddress, amount }: { userAddress: string; tokenAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async requestWithdraw({
+    userAddress,
+    tokenAddress,
+    amount,
+    txOptionalParams,
+  }: RequestWithdrawParams): Promise<Receipt> {
     const contract = await this._getContract()
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
@@ -176,10 +157,7 @@ export class DepositApiImpl implements DepositApi {
     return tx
   }
 
-  public async withdraw(
-    { userAddress, tokenAddress }: { userAddress: string; tokenAddress: string },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async withdraw({ userAddress, tokenAddress, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     const contract = await this._getContract()
     const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 

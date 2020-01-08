@@ -12,15 +12,22 @@ interface Params {
   web3: Web3
 }
 
+interface AddTokenToExchangeParams {
+  userAddress: string
+  tokenAddress: string
+}
+
 /**
  * Factory of addTokenToExchange
  * Takes as input API instances
  * Returns async function to add tokenAddress to exchange
  */
-export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress: string) => Promise<boolean> {
+export function addTokenToExchangeFactory(
+  factoryParams: Params,
+): (params: AddTokenToExchangeParams) => Promise<boolean> {
   const { exchangeApi } = factoryParams
 
-  return async (tokenAddress: string): Promise<boolean> => {
+  return async ({ userAddress, tokenAddress }: AddTokenToExchangeParams): Promise<boolean> => {
     const erc20Info = getErc20Info({ ...factoryParams, tokenAddress })
 
     if (!erc20Info) {
@@ -29,7 +36,7 @@ export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress:
     }
 
     try {
-      await exchangeApi.addToken(tokenAddress)
+      await exchangeApi.addToken({ userAddress, tokenAddress })
     } catch (e) {
       log('Failed to add token (%s) to exchange', tokenAddress)
       return false
@@ -38,7 +45,7 @@ export function addTokenToExchangeFactory(factoryParams: Params): (tokenAddress:
     // TODO: I guess we might want to return the token and leave the proxy/cache layer to deal with it.
     // Revisit once we add it to the interface
     try {
-      const id = exchangeApi.getTokenIdByAddress(tokenAddress)
+      const id = exchangeApi.getTokenIdByAddress({ tokenAddress })
 
       const token = {
         ...erc20Info,

@@ -18,6 +18,7 @@ export const useWithdrawTokens = (params: Params): Result => {
   const { userAddress, isConnected } = useWalletConnection()
   const {
     tokenBalances: { enabled, address: tokenAddress, claimable },
+    txOptionalParams,
   } = params
   const [claiming, setWithdrawing] = useSafeState(false)
 
@@ -30,7 +31,7 @@ export const useWithdrawTokens = (params: Params): Result => {
 
       setWithdrawing(true)
 
-      return depositApi.withdraw({ userAddress, tokenAddress }, params.txOptionalParams)
+      return depositApi.withdraw({ userAddress, tokenAddress, txOptionalParams })
     } finally {
       setWithdrawing(false)
     }

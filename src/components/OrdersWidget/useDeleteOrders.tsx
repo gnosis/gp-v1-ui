@@ -36,7 +36,7 @@ export function useDeleteOrders(): Result {
 
         const orderIds = extractExchangeOrderIds(uiOrderIds)
 
-        const receipt = await exchangeApi.cancelOrders({ senderAddress: userAddress, orderIds }, txOptionalParams)
+        const receipt = await exchangeApi.cancelOrders({ userAddress, orderIds, txOptionalParams })
 
         log(`The transaction has been mined: ${receipt.transactionHash}`)
 

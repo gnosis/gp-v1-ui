@@ -69,7 +69,7 @@ function getTokenFromExchangeByAddressFactory(
 
     let tokenId: number
     try {
-      tokenId = await exchangeApi.getTokenIdByAddress(tokenAddress)
+      tokenId = await exchangeApi.getTokenIdByAddress({ tokenAddress })
     } catch (e) {
       log('Token with address %s not registered on contract', tokenAddress, e)
       return null
@@ -113,7 +113,7 @@ function getTokenFromExchangeByIdFactory(
     // Not there, get the address from the contract
     let tokenAddress: string
     try {
-      tokenAddress = await exchangeApi.getTokenAddressById(tokenId)
+      tokenAddress = await exchangeApi.getTokenAddressById({ tokenId })
     } catch (e) {
       log('Token with id %d not registered on contract', tokenId, e)
       return null

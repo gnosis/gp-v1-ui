@@ -43,8 +43,8 @@ export const usePlaceOrder = (): Result => {
 
       try {
         const [sellTokenId, buyTokenId, batchId] = await Promise.all([
-          exchangeApi.getTokenIdByAddress(sellToken.address),
-          exchangeApi.getTokenIdByAddress(buyToken.address),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: sellToken.address }),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: buyToken.address }),
           exchangeApi.getCurrentBatchId(),
         ])
 
@@ -60,8 +60,9 @@ export const usePlaceOrder = (): Result => {
             validUntil,
             buyAmount,
             sellAmount,
+            txOptionalParams,
           }
-          const receipt = await exchangeApi.placeOrder(params, txOptionalParams)
+          const receipt = await exchangeApi.placeOrder(params)
           log(`The transaction has been mined: ${receipt.transactionHash}`)
 
           // TODO: get order id in a separate call

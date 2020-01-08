@@ -9,64 +9,60 @@ import { toBN } from 'utils'
 
 import Web3 from 'web3'
 
+interface BaseParams {
+  tokenAddress: string
+}
+
+export type NameParams = BaseParams
+export type SymbolParams = BaseParams
+export type DecimalsParams = BaseParams
+export type TotalSupplyParams = BaseParams
+
+export interface BalanceOfParams extends BaseParams {
+  userAddress: string
+}
+
+export interface AllowanceParams extends BalanceOfParams {
+  spenderAddress: string
+}
+
+interface WithTxOptionalParams {
+  txOptionalParams?: TxOptionalParams
+}
+
+export interface ApproveParams extends AllowanceParams, WithTxOptionalParams {
+  amount: BN
+}
+
+export interface TransferParams extends BalanceOfParams, WithTxOptionalParams {
+  toAddress: string
+  amount: BN
+}
+
+export interface TransferFromParams extends TransferParams {
+  fromAddress: string
+}
+
 /**
  * Interfaces the access to ERC20 token
  *
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface Erc20Api {
-  balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN>
-  name({ tokenAddress }: { tokenAddress: string }): Promise<string>
-  symbol({ tokenAddress }: { tokenAddress: string }): Promise<string>
-  decimals({ tokenAddress }: { tokenAddress: string }): Promise<number>
-  totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN>
+  name(params: NameParams): Promise<string>
+  symbol(params: SymbolParams): Promise<string>
+  decimals(params: DecimalsParams): Promise<number>
+  totalSupply(params: TotalSupplyParams): Promise<BN>
 
-  allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN>
+  balanceOf(params: BalanceOfParams): Promise<BN>
 
-  approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  allowance(params: AllowanceParams): Promise<BN>
 
-  transfer(
-    {
-      fromAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  approve(params: ApproveParams): Promise<Receipt>
 
-  transferFrom(
-    {
-      senderAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      fromAddress: string
-      toAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt>
+  transfer(params: TransferParams): Promise<Receipt>
+
+  transferFrom(params: TransferFromParams): Promise<Receipt>
 }
 
 /**
@@ -85,7 +81,7 @@ export class Erc20ApiImpl implements Erc20Api {
     ;(window as any).erc20 = this._contractPrototype
   }
 
-  public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: BalanceOfParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -95,19 +91,19 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(result)
   }
 
-  public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async name({ tokenAddress }: NameParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     return await erc20.methods.name().call()
   }
 
-  public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async symbol({ tokenAddress }: SymbolParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     return await erc20.methods.symbol().call()
   }
 
-  public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
+  public async decimals({ tokenAddress }: DecimalsParams): Promise<number> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const decimals = await erc20.methods.decimals().call()
@@ -115,7 +111,7 @@ export class Erc20ApiImpl implements Erc20Api {
     return Number(decimals)
   }
 
-  public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
+  public async totalSupply({ tokenAddress }: TotalSupplyParams): Promise<BN> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     const totalSupply = await erc20.methods.totalSupply().call()
@@ -123,15 +119,7 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(totalSupply)
   }
 
-  public async allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN> {
+  public async allowance({ tokenAddress, userAddress, spenderAddress }: AllowanceParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(tokenAddress)
@@ -141,15 +129,13 @@ export class Erc20ApiImpl implements Erc20Api {
     return toBN(result)
   }
 
-  public async approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async approve({
+    userAddress,
+    tokenAddress,
+    spenderAddress,
+    amount,
+    txOptionalParams,
+  }: ApproveParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
@@ -164,20 +150,18 @@ export class Erc20ApiImpl implements Erc20Api {
     return tx
   }
 
-  public async transfer(
-    {
-      fromAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transfer({
+    userAddress,
+    tokenAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
-      from: fromAddress,
+      from: userAddress,
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -187,19 +171,17 @@ export class Erc20ApiImpl implements Erc20Api {
     return tx
   }
 
-  public async transferFrom(
-    {
-      senderAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: { senderAddress: string; tokenAddress: string; fromAddress: string; toAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transferFrom({
+    userAddress,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferFromParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(tokenAddress)
 
-    const tx = erc20.methods.transferFrom(senderAddress, toAddress, amount.toString()).send({
+    const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({
       from: fromAddress,
     })
 
