@@ -28,6 +28,7 @@ export const useEnableTokens = (params: Params): Result => {
   async function enableToken(): Promise<Receipt> {
     assert(!enabled && isConnected, 'The token was already enabled and/or user is not connected')
     assert(userAddress, 'User address not found. Please check wallet.')
+    assert(networkId, 'NetworkId not found. Please check wallet.')
 
     setEnabling(true)
 
@@ -40,6 +41,7 @@ export const useEnableTokens = (params: Params): Result => {
       tokenAddress,
       spenderAddress: contractAddress,
       amount: ALLOWANCE_MAX_VALUE,
+      networkId,
       txOptionalParams,
     })
 

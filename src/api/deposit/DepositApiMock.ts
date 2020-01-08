@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import BN from 'bn.js'
 import assert from 'assert'
 
@@ -38,19 +39,19 @@ export class DepositApiMock implements DepositApi {
     this._erc20Api = erc20Api
   }
 
-  public getContractAddress(): string {
+  public getContractAddress(_networkId = 0): string {
     return CONTRACT
   }
 
-  public async getBatchTime(): Promise<number> {
+  public async getBatchTime(_networkId = 0): Promise<number> {
     return BATCH_TIME
   }
 
-  public async getCurrentBatchId(): Promise<number> {
+  public async getCurrentBatchId(_networkId = 0): Promise<number> {
     return Math.floor(getEpoch() / BATCH_TIME)
   }
 
-  public async getSecondsRemainingInBatch(): Promise<number> {
+  public async getSecondsRemainingInBatch(_networkId = 0): Promise<number> {
     return BATCH_TIME - (getEpoch() % BATCH_TIME)
   }
 
@@ -83,7 +84,13 @@ export class DepositApiMock implements DepositApi {
     return balanceState ? balanceState.pendingWithdraws : createFlux()
   }
 
-  public async deposit({ userAddress, tokenAddress, amount, txOptionalParams }: DepositParams): Promise<Receipt> {
+  public async deposit({
+    userAddress,
+    tokenAddress,
+    amount,
+    networkId,
+    txOptionalParams,
+  }: DepositParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     // Create the balance state if it's the first deposit
@@ -104,6 +111,7 @@ export class DepositApiMock implements DepositApi {
       fromAddress: userAddress,
       toAddress: this.getContractAddress(),
       amount,
+      networkId,
     })
 
     log(`[DepositApiMock] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
@@ -130,7 +138,7 @@ export class DepositApiMock implements DepositApi {
     return RECEIPT
   }
 
-  public async withdraw({ userAddress, tokenAddress, txOptionalParams }: WithdrawParams): Promise<Receipt> {
+  public async withdraw({ userAddress, tokenAddress, networkId, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     const currentBatchId = await this.getCurrentBatchId()
@@ -154,6 +162,7 @@ export class DepositApiMock implements DepositApi {
       tokenAddress,
       toAddress: userAddress,
       amount,
+      networkId,
     })
 
     log(`[DepositApiMock] Withdraw ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)

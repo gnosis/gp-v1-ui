@@ -5,15 +5,19 @@ import { log } from 'utils'
 import Web3 from 'web3'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
-export interface GetOrdersParams {
+interface BaseParams {
+  networkId: number
+}
+
+export interface GetOrdersParams extends BaseParams {
   userAddress: string
 }
 
-export interface GetTokenAddressByIdParams {
+export interface GetTokenAddressByIdParams extends BaseParams {
   tokenId: number
 }
 
-export interface GetTokenIdByAddressParams {
+export interface GetTokenIdByAddressParams extends BaseParams {
   tokenAddress: string
 }
 
@@ -21,12 +25,12 @@ interface WithTxOptionalParams {
   txOptionalParams?: TxOptionalParams
 }
 
-export interface AddTokenParams extends WithTxOptionalParams {
+export interface AddTokenParams extends BaseParams, WithTxOptionalParams {
   userAddress: string
   tokenAddress: string
 }
 
-export interface PlaceOrderParams extends WithTxOptionalParams {
+export interface PlaceOrderParams extends BaseParams, WithTxOptionalParams {
   userAddress: string
   buyTokenId: number
   sellTokenId: number
@@ -35,14 +39,14 @@ export interface PlaceOrderParams extends WithTxOptionalParams {
   sellAmount: BN
 }
 
-export interface CancelOrdersParams extends WithTxOptionalParams {
+export interface CancelOrdersParams extends BaseParams, WithTxOptionalParams {
   userAddress: string
   orderIds: number[]
 }
 
 export interface ExchangeApi extends DepositApi {
-  getNumTokens(): Promise<number>
-  getFeeDenominator(): Promise<number>
+  getNumTokens(networkId: number): Promise<number>
+  getFeeDenominator(networkId: number): Promise<number>
 
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
 
@@ -80,8 +84,8 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     ;(window as any).exchange = this._contractPrototype
   }
 
-  public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {
-    const contract = await this._getContract()
+  public async getOrders({ userAddress, networkId }: GetOrdersParams): Promise<AuctionElement[]> {
+    const contract = await this._getContract(networkId)
     log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
     const encodedOrders = await contract.methods.getEncodedUserOrders(userAddress).call()
@@ -92,8 +96,8 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return decodeAuctionElements(encodedOrders)
   }
 
-  public async getNumTokens(): Promise<number> {
-    const contract = await this._getContract()
+  public async getNumTokens(networkId: number): Promise<number> {
+    const contract = await this._getContract(networkId)
     const numTokens = await contract.methods.numTokens().call()
     return +numTokens
   }
@@ -102,25 +106,25 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
    * Fee is 1/fee_denominator.
    * i.e. 1/1000 = 0.1%
    */
-  public async getFeeDenominator(): Promise<number> {
-    const contract = await this._getContract()
+  public async getFeeDenominator(networkId: number): Promise<number> {
+    const contract = await this._getContract(networkId)
     const feeDenominator = await contract.methods.FEE_DENOMINATOR().call()
     return +feeDenominator
   }
 
-  public async getTokenAddressById({ tokenId }: GetTokenAddressByIdParams): Promise<string> {
-    const contract = await this._getContract()
+  public async getTokenAddressById({ tokenId, networkId }: GetTokenAddressByIdParams): Promise<string> {
+    const contract = await this._getContract(networkId)
     return contract.methods.tokenIdToAddressMap(tokenId).call()
   }
 
-  public async getTokenIdByAddress({ tokenAddress }: GetTokenIdByAddressParams): Promise<number> {
-    const contract = await this._getContract()
+  public async getTokenIdByAddress({ tokenAddress, networkId }: GetTokenIdByAddressParams): Promise<number> {
+    const contract = await this._getContract(networkId)
     const tokenId = await contract.methods.tokenAddressToIdMap(tokenAddress).call()
     return +tokenId
   }
 
-  public async addToken({ userAddress, tokenAddress, txOptionalParams }: AddTokenParams): Promise<Receipt> {
-    const contract = await this._getContract()
+  public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {
+    const contract = await this._getContract(networkId)
     const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
@@ -133,9 +137,18 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }
 
   public async placeOrder(params: PlaceOrderParams): Promise<Receipt> {
-    const { userAddress, buyTokenId, sellTokenId, validUntil, buyAmount, sellAmount, txOptionalParams } = params
+    const {
+      userAddress,
+      buyTokenId,
+      sellTokenId,
+      validUntil,
+      buyAmount,
+      sellAmount,
+      networkId,
+      txOptionalParams,
+    } = params
 
-    const contract = await this._getContract()
+    const contract = await this._getContract(networkId)
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods
@@ -156,8 +169,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return tx
   }
 
-  public async cancelOrders({ userAddress, orderIds, txOptionalParams }: CancelOrdersParams): Promise<Receipt> {
-    const contract = await this._getContract()
+  public async cancelOrders({
+    userAddress,
+    orderIds,
+    networkId,
+    txOptionalParams,
+  }: CancelOrdersParams): Promise<Receipt> {
+    const contract = await this._getContract(networkId)
     const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {

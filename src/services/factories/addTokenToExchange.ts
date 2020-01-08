@@ -15,6 +15,7 @@ interface Params {
 interface AddTokenToExchangeParams {
   userAddress: string
   tokenAddress: string
+  networkId: number
 }
 
 /**
@@ -27,8 +28,8 @@ export function addTokenToExchangeFactory(
 ): (params: AddTokenToExchangeParams) => Promise<boolean> {
   const { exchangeApi } = factoryParams
 
-  return async ({ userAddress, tokenAddress }: AddTokenToExchangeParams): Promise<boolean> => {
-    const erc20Info = getErc20Info({ ...factoryParams, tokenAddress })
+  return async ({ userAddress, tokenAddress, networkId }: AddTokenToExchangeParams): Promise<boolean> => {
+    const erc20Info = getErc20Info({ ...factoryParams, tokenAddress, networkId })
 
     if (!erc20Info) {
       log('Address %s does not contain a valid ERC20 token', tokenAddress)
@@ -36,7 +37,7 @@ export function addTokenToExchangeFactory(
     }
 
     try {
-      await exchangeApi.addToken({ userAddress, tokenAddress })
+      await exchangeApi.addToken({ userAddress, tokenAddress, networkId })
     } catch (e) {
       log('Failed to add token (%s) to exchange', tokenAddress)
       return false
@@ -45,7 +46,7 @@ export function addTokenToExchangeFactory(
     // TODO: I guess we might want to return the token and leave the proxy/cache layer to deal with it.
     // Revisit once we add it to the interface
     try {
-      const id = exchangeApi.getTokenIdByAddress({ tokenAddress })
+      const id = exchangeApi.getTokenIdByAddress({ tokenAddress, networkId })
 
       const token = {
         ...erc20Info,

@@ -7,11 +7,11 @@ import { getAddressForNetwork } from './batchExchangeAddresses'
 import { Receipt, TxOptionalParams } from 'types'
 
 import Web3 from 'web3'
-import { getProviderState, Provider, ProviderState } from '@gnosis.pm/dapp-ui'
 
 interface ReadOnlyParams {
   userAddress: string
   tokenAddress: string
+  networkId: number
 }
 
 export type GetBalanceParams = ReadOnlyParams
@@ -32,9 +32,9 @@ export type WithdrawParams = Omit<RequestWithdrawParams, 'amount'>
 
 export interface DepositApi {
   getContractAddress(networkId: number): string | null
-  getBatchTime(): Promise<number>
-  getCurrentBatchId(): Promise<number>
-  getSecondsRemainingInBatch(): Promise<number>
+  getBatchTime(networkId: number): Promise<number>
+  getCurrentBatchId(networkId: number): Promise<number>
+  getSecondsRemainingInBatch(networkId: number): Promise<number>
 
   getBalance(params: GetBalanceParams): Promise<BN>
   getPendingDeposit(params: GetPendingDepositParams): Promise<PendingFlux>
@@ -50,21 +50,10 @@ export interface PendingFlux {
   batchId: number
 }
 
-const getNetworkIdFromWeb3 = (web3: Web3): null | number => {
-  if (!web3.currentProvider) return null
-
-  // web3.currentProvider may be our provider wrapped in a Proxy
-  // depending on web3 version
-  // or internally created provider from url
-  const providerState: ProviderState | null = getProviderState((web3.currentProvider as unknown) as Provider | null)
-
-  return providerState && providerState.chainId
-}
-
 export class DepositApiImpl implements DepositApi {
   protected _contractPrototype: BatchExchangeContract
   protected _web3: Web3
-  protected static _contractsCache: { [K: string]: BatchExchangeContract } = {}
+  protected static _contractsCache: { [network: number]: { [address: string]: BatchExchangeContract } } = {}
 
   public constructor(web3: Web3) {
     this._contractPrototype = new web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
@@ -79,55 +68,69 @@ export class DepositApiImpl implements DepositApi {
     return getAddressForNetwork(networkId)
   }
 
-  public async getBatchTime(): Promise<number> {
-    const contract = await this._getContract()
+  public async getBatchTime(networkId: number): Promise<number> {
+    const contract = await this._getContract(networkId)
     const BATCH_TIME = await contract.methods.BATCH_TIME().call()
     return +BATCH_TIME
   }
 
-  public async getCurrentBatchId(): Promise<number> {
-    const contract = await this._getContract()
+  public async getCurrentBatchId(networkId: number): Promise<number> {
+    const contract = await this._getContract(networkId)
     const batchId = await contract.methods.getCurrentBatchId().call()
     return +batchId
   }
 
-  public async getSecondsRemainingInBatch(): Promise<number> {
-    const contract = await this._getContract()
+  public async getSecondsRemainingInBatch(networkId: number): Promise<number> {
+    const contract = await this._getContract(networkId)
     const secondsRemainingInBatch = await contract.methods.getSecondsRemainingInBatch().call()
     return +secondsRemainingInBatch
   }
 
-  public async getBalance({ userAddress, tokenAddress }: GetBalanceParams): Promise<BN> {
+  public async getBalance({ userAddress, tokenAddress, networkId }: GetBalanceParams): Promise<BN> {
     if (!userAddress || !tokenAddress) return ZERO
 
-    const contract = await this._getContract()
+    const contract = await this._getContract(networkId)
     const balance = await contract.methods.getBalance(userAddress, tokenAddress).call()
 
     return toBN(balance)
   }
 
-  public async getPendingDeposit({ userAddress, tokenAddress }: GetPendingDepositParams): Promise<PendingFlux> {
+  public async getPendingDeposit({
+    userAddress,
+    tokenAddress,
+    networkId,
+  }: GetPendingDepositParams): Promise<PendingFlux> {
     if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
-    const contract = await this._getContract()
+    const contract = await this._getContract(networkId)
 
     const { 0: amount, 1: batchId } = await contract.methods.getPendingDeposit(userAddress, tokenAddress).call()
 
     return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async getPendingWithdraw({ userAddress, tokenAddress }: GetPendingWithdrawParams): Promise<PendingFlux> {
+  public async getPendingWithdraw({
+    userAddress,
+    tokenAddress,
+    networkId,
+  }: GetPendingWithdrawParams): Promise<PendingFlux> {
     if (!userAddress || !tokenAddress) return { amount: ZERO, batchId: 0 }
 
-    const contract = await this._getContract()
+    const contract = await this._getContract(networkId)
 
     const { 0: amount, 1: batchId } = await contract.methods.getPendingWithdraw(userAddress, tokenAddress).call()
 
     return { amount: toBN(amount), batchId: Number(batchId) }
   }
 
-  public async deposit({ userAddress, tokenAddress, amount, txOptionalParams }: DepositParams): Promise<Receipt> {
-    const contract = await this._getContract()
+  public async deposit({
+    userAddress,
+    tokenAddress,
+    networkId,
+    amount,
+    txOptionalParams,
+  }: DepositParams): Promise<Receipt> {
+    const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
@@ -142,10 +145,11 @@ export class DepositApiImpl implements DepositApi {
   public async requestWithdraw({
     userAddress,
     tokenAddress,
+    networkId,
     amount,
     txOptionalParams,
   }: RequestWithdrawParams): Promise<Receipt> {
-    const contract = await this._getContract()
+    const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
@@ -157,8 +161,8 @@ export class DepositApiImpl implements DepositApi {
     return tx
   }
 
-  public async withdraw({ userAddress, tokenAddress, txOptionalParams }: WithdrawParams): Promise<Receipt> {
-    const contract = await this._getContract()
+  public async withdraw({ userAddress, tokenAddress, networkId, txOptionalParams }: WithdrawParams): Promise<Receipt> {
+    const contract = await this._getContract(networkId)
     const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -171,15 +175,7 @@ export class DepositApiImpl implements DepositApi {
 
   /********************************    private methods   ********************************/
 
-  protected async _getNetworkId(): Promise<number> {
-    const networkId = getNetworkIdFromWeb3(this._web3)
-
-    return networkId === null ? this._web3.eth.net.getId() : networkId
-  }
-
-  protected async _getContract(): Promise<BatchExchangeContract> {
-    const networkId = await this._getNetworkId()
-
+  protected async _getContract(networkId: number): Promise<BatchExchangeContract> {
     return this._getContractForNetwork(networkId)
   }
 
@@ -188,18 +184,25 @@ export class DepositApiImpl implements DepositApi {
 
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
 
-    // as string as assert is not detected by TS
-    return this._getContractAtAddress(address)
+    return this._getContractAtAddress(networkId, address)
   }
 
-  protected _getContractAtAddress(address: string): BatchExchangeContract {
-    const contract = DepositApiImpl._contractsCache[address]
+  protected _getContractAtAddress(networkId: number, address: string): BatchExchangeContract {
+    let contract: BatchExchangeContract | undefined = undefined
 
-    if (contract) return contract
+    if (DepositApiImpl._contractsCache[networkId]) {
+      contract = DepositApiImpl._contractsCache[networkId][address]
+    } else {
+      DepositApiImpl._contractsCache[networkId] = {}
+    }
+
+    if (contract) {
+      return contract
+    }
 
     const newContract = this._contractPrototype.clone()
     newContract.options.address = address
 
-    return (DepositApiImpl._contractsCache[address] = newContract)
+    return (DepositApiImpl._contractsCache[networkId][address] = newContract)
   }
 }
