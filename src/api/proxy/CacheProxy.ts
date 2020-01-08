@@ -16,9 +16,8 @@ export class CacheProxy<T> {
   }
 
   /**
-   * Returns value from cache for given `methodName` and `params` if any.
+   * Returns value from cache for given `hash`.
    * Cache behaviour is given by `expiration` property:
-   *  undefined: no cache
    *  0: return cache if found == cache forever
    *  number: return cache if found and cache younger than now + `expiration` seconds
    */
