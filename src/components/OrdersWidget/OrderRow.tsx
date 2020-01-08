@@ -2,7 +2,14 @@ import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faExclamationTriangle, faSpinner, faTrash, faExchangeAlt } from '@fortawesome/free-solid-svg-icons'
+import {
+  faExclamationTriangle,
+  faSpinner,
+  faTrash,
+  faExchangeAlt,
+  faChevronUp,
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
@@ -26,7 +33,7 @@ import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
 
-export const OrderRowWrapper = styled.div`
+export const OrderRowWrapper = styled.div<{ $open: boolean }>`
   display: grid;
   grid-template-columns: 5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 5.5rem;
   align-items: center;
@@ -71,9 +78,13 @@ export const OrderRowWrapper = styled.div`
         }
       }
 
-      &.order-image-row {
+      &.order-image-row,
+      &.cardOpener {
+        cursor: pointer;
         display: initial;
+      }
 
+      &.order-image-row {
         > div {
           display: flex;
           align-items: center;
@@ -105,27 +116,26 @@ export const OrderRowWrapper = styled.div`
         }
       }
 
-      // &:last-child {
-      //   border: none;
-      //   flex-flow: row nowrap;
-      //   padding: 0.7rem 0 0.7rem 0.7rem;
-
-      //   > button:last-child {
-      //     border-radius: 0 var(--border-radius) var(--border-radius);
-      //   }
-      // }
-
-      &:not(:nth-child(2))::before {
+      &:not(:nth-child(2)):not(:last-child)::before {
         content: attr(data-label);
         margin-right: auto;
         font-weight: bold;
         text-transform: uppercase;
         font-size: 0.7rem;
       }
+
+      ${(props): string | false =>
+        !props.$open &&
+        `
+        &:not(:nth-child(2)):not(:nth-child(3)):not(:last-child) {
+          display: none;
+        }
+      `}
     }
   }
 
-  .order-image-row {
+  .order-image-row,
+  .cardOpener {
     display: none;
   }
 
@@ -367,6 +377,19 @@ async function fetchToken(
   }
 }
 
+interface ResponsiveRowSizeTogglerProps {
+  handleOpen: () => void
+  openStatus: boolean
+}
+
+const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
+  return (
+    <div className="container cardOpener" onClick={handleOpen}>
+      <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
+    </div>
+  )
+}
+
 interface Props {
   order: AuctionElement
   isOverBalance: boolean
@@ -395,6 +418,7 @@ const OrderRow: React.FC<Props> = props => {
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
+  const [openCard, setOpenCard] = useSafeState(true)
 
   useEffect(() => {
     fetchToken(order.buyTokenId, order.id, networkId, setBuyToken).catch(onError)
@@ -404,7 +428,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     <>
       {sellToken && buyToken && (
-        <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')}>
+        <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')} $open={openCard}>
           {pending ? (
             <PendingLink pending={pending} transactionHash={transactionHash} />
           ) : (
@@ -420,6 +444,7 @@ const OrderRow: React.FC<Props> = props => {
           <UnfilledAmount order={order} sellToken={sellToken} />
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
           <Expires order={order} pending={pending} />
+          <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
         </OrderRowWrapper>
       )}
     </>
