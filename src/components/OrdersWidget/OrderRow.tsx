@@ -83,6 +83,8 @@ export const OrderRowWrapper = styled.div`
           display: flex;
           align-items: center;
           justify-content: space-evenly;
+          max-width: 72%;
+          margin: auto;
 
           > div {
             display: inherit;
@@ -241,7 +243,7 @@ const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = 
           <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
         </div>
         {/* Switcher icon */}
-        <FontAwesomeIcon icon={faExchangeAlt} size="1x" />
+        <FontAwesomeIcon icon={faExchangeAlt} size="lg" />
         <div>
           <strong>{displayTokenSymbolOrLink(buyToken)}</strong>{' '}
           <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
