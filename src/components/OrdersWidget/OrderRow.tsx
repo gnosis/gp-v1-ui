@@ -57,12 +57,15 @@ export const OrderRowWrapper = styled.div`
       flex-flow: row;
       align-items: center;
       border-bottom: 0.0625rem solid #00000024;
+      padding: 0.7rem;
 
       > * {
         margin-left: 0.625rem;
       }
+
       &:first-child {
-        grid-template-columns: 1fr max-content auto;
+        // grid-template-columns: 1fr max-content auto;
+        width: 100%;
         grid-row-start: 5;
 
         > img {
@@ -70,15 +73,20 @@ export const OrderRowWrapper = styled.div`
           margin-right: -0.5rem;
         }
       }
-      &:last-child {
-        border: none;
-        flex-flow: row nowrap;
-        padding: 0.7rem 0 0.7rem 0.7rem;
 
-        > button:last-child {
-          border-radius: 0 var(--border-radius) var(--border-radius);
-        }
+      .order-details .order-details-subgrid {
+        grid-template-columns: min-content minmax(2.2rem, max-content);
       }
+
+      // &:last-child {
+      //   border: none;
+      //   flex-flow: row nowrap;
+      //   padding: 0.7rem 0 0.7rem 0.7rem;
+
+      //   > button:last-child {
+      //     border-radius: 0 var(--border-radius) var(--border-radius);
+      //   }
+      // }
 
       &::before {
         content: attr(data-label);
@@ -134,7 +142,7 @@ export const OrderRowWrapper = styled.div`
   }
 `
 
-const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ pending, transactionHash }) => {
+const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ transactionHash }) => {
   return (
     <div className="container pendingCell">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
@@ -190,18 +198,20 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
     [buyToken, order.priceDenominator, order.priceNumerator, sellToken],
   )
   return (
-    <div className="container order-details">
-      <div>Sell</div>
-      <div className="order-details-subgrid">
-        <Highlight color={pending ? 'grey' : ''}>1</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      </div>
+    <div className="container" data-label="Order">
+      <div className="order-details">
+        <div>Sell</div>
+        <div className="order-details-subgrid">
+          <Highlight color={pending ? 'grey' : ''}>1</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+        </div>
 
-      <div>
-        for <strong>at least</strong>
-      </div>
-      <div className="order-details-subgrid">
-        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-        <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
+        <div>
+          for <strong>at least</strong>
+        </div>
+        <div className="order-details-subgrid">
+          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
+          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
+        </div>
       </div>
     </div>
     // <div className="container order-details">
@@ -277,7 +287,11 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
     <div data-label="Account Balance" className="container sub-columns three-columns">
       <div>{accountBalance}</div>
       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      <div className="warning">{isOverBalance && isActive && <FontAwesomeIcon icon={faExclamationTriangle} />}</div>
+      {isOverBalance && isActive && (
+        <div className="warning">
+          <FontAwesomeIcon icon={faExclamationTriangle} />
+        </div>
+      )}
     </div>
   )
 }
@@ -292,7 +306,11 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
 
   return (
     <div data-label="Expires">
-      {isNeverExpires ? <Highlight color={pending ? 'grey' : ''}>Never</Highlight> : expiresOn}
+      {isNeverExpires ? (
+        <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
+      ) : (
+        <Highlight color={'inherit'}>{expiresOn}</Highlight>
+      )}
     </div>
   )
 }
