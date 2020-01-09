@@ -36,6 +36,7 @@ export const useRowActions = (params: Params): Result => {
   async function enableToken(tokenAddress: string): Promise<void> {
     try {
       assert(userAddress, 'User address missing. Aborting.')
+      assert(networkId, 'NetworkId missing. Aborting.')
       assert(contractAddress, 'Contract address missing. Aborting.')
 
       const token = getToken('address', tokenAddress, balances)
@@ -45,10 +46,14 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol: tokenDisplayName } = safeFilledToken(token)
 
-      const receipt = await erc20Api.approve(
-        { userAddress, tokenAddress, spenderAddress: contractAddress, amount: ALLOWANCE_MAX_VALUE },
+      const receipt = await erc20Api.approve({
+        userAddress,
+        tokenAddress,
+        spenderAddress: contractAddress,
+        networkId,
+        amount: ALLOWANCE_MAX_VALUE,
         txOptionalParams,
-      )
+      })
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
@@ -63,6 +68,7 @@ export const useRowActions = (params: Params): Result => {
   async function depositToken(amount: BN, tokenAddress: string): Promise<void> {
     try {
       assert(userAddress, ON_ERROR_MESSAGE)
+      assert(networkId, ON_ERROR_MESSAGE)
 
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token')
@@ -72,7 +78,7 @@ export const useRowActions = (params: Params): Result => {
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
       log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-      const receipt = await depositApi.deposit({ userAddress, tokenAddress, amount }, txOptionalParams)
+      const receipt = await depositApi.deposit({ userAddress, tokenAddress, networkId, amount, txOptionalParams })
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
@@ -87,6 +93,7 @@ export const useRowActions = (params: Params): Result => {
   async function requestWithdrawToken(amount: BN, tokenAddress: string): Promise<void> {
     try {
       assert(userAddress, ON_ERROR_MESSAGE)
+      assert(networkId, ON_ERROR_MESSAGE)
 
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token')
@@ -98,7 +105,13 @@ export const useRowActions = (params: Params): Result => {
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
       log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
-      const receipt = await depositApi.requestWithdraw({ userAddress, tokenAddress, amount }, txOptionalParams)
+      const receipt = await depositApi.requestWithdraw({
+        userAddress,
+        tokenAddress,
+        networkId,
+        amount,
+        txOptionalParams,
+      })
       log(`The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
@@ -113,6 +126,7 @@ export const useRowActions = (params: Params): Result => {
   async function claimToken(tokenAddress: string): Promise<void> {
     try {
       assert(userAddress, ON_ERROR_MESSAGE)
+      assert(networkId, ON_ERROR_MESSAGE)
 
       const token = getToken('address', tokenAddress, balances)
       assert(token, 'No token')
@@ -123,7 +137,7 @@ export const useRowActions = (params: Params): Result => {
 
       dispatch(setHighlightAndClaimingAction(tokenAddress))
 
-      const receipt = await depositApi.withdraw({ userAddress, tokenAddress }, txOptionalParams)
+      const receipt = await depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
 
       log(`The transaction has been mined: ${receipt.transactionHash}`)
       toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)

@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faExclamationTriangle,
   faSpinner,
-  faTrash,
+  faTrashAlt,
   faExchangeAlt,
   faChevronUp,
   faChevronDown,
@@ -41,6 +41,13 @@ export const OrderRowWrapper = styled.tr<{ $open?: boolean }>`
   .checked {
     > button {
       display: none;
+      justify-content: center;
+      align-items: center;
+
+      margin: 0 0 0 auto;
+      > * {
+        margin: 0 0.5rem;
+      }
     }
   }
 
@@ -161,7 +168,7 @@ export const OrderRowWrapper = styled.tr<{ $open?: boolean }>`
   }
 `
 
-const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ transactionHash }) => {
+const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
   return (
     <div className="pendingCell" data-label="Actions">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
@@ -182,7 +189,7 @@ const DeleteOrder: React.FC<Pick<
       disabled={disabled}
     />
     <button className="danger" onClick={toggleMarkedForDeletion}>
-      Delete Order <FontAwesomeIcon icon={faTrash} />
+      Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
     </button>
   </div>
 )
@@ -408,7 +415,7 @@ const OrderRow: React.FC<Props> = props => {
     buyToken && (
       <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
         {pending ? (
-          <PendingLink pending={pending} transactionHash={transactionHash} />
+          <PendingLink transactionHash={transactionHash} />
         ) : (
           <DeleteOrder
             isMarkedForDeletion={isMarkedForDeletion}

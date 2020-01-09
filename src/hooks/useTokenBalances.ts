@@ -29,6 +29,7 @@ async function fetchBalancesForToken(
   token: TokenDetails,
   userAddress: string,
   contractAddress: string,
+  networkId: number,
 ): Promise<TokenBalanceDetails> {
   const tokenAddress = token.address
   const [
@@ -39,12 +40,12 @@ async function fetchBalancesForToken(
     walletBalance,
     allowance,
   ] = await Promise.all([
-    depositApi.getBalance({ userAddress, tokenAddress }),
-    depositApi.getPendingDeposit({ userAddress, tokenAddress }),
-    depositApi.getPendingWithdraw({ userAddress, tokenAddress }),
-    depositApi.getCurrentBatchId(),
-    erc20Api.balanceOf({ userAddress, tokenAddress }),
-    erc20Api.allowance({ userAddress, tokenAddress, spenderAddress: contractAddress }),
+    depositApi.getBalance({ userAddress, tokenAddress, networkId }),
+    depositApi.getPendingDeposit({ userAddress, tokenAddress, networkId }),
+    depositApi.getPendingWithdraw({ userAddress, tokenAddress, networkId }),
+    depositApi.getCurrentBatchId(networkId),
+    erc20Api.balanceOf({ userAddress, tokenAddress, networkId }),
+    erc20Api.allowance({ userAddress, tokenAddress, networkId, spenderAddress: contractAddress }),
   ])
 
   return {
@@ -72,7 +73,7 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
   const tokens = tokenListApi.getTokens(networkId)
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
-    fetchBalancesForToken(token, userAddress, contractAddress).catch(e => {
+    fetchBalancesForToken(token, userAddress, contractAddress, networkId).catch(e => {
       log('Error for', token, userAddress, contractAddress)
       log(e)
       return null

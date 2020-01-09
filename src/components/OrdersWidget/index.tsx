@@ -160,6 +160,37 @@ const OrdersForm = styled.div`
   }
 `
 
+const OrdersHeader = styled(OrderRowWrapper)`
+  background: transparent;
+  box-shadow: none;
+
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75em;
+
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    display: none;
+  }
+
+  .title {
+    // create a divider line only bellow titled columns
+    border-bottom: 0.125rem solid #ededed;
+    // push the border all the way to the bottom and extend it
+    place-self: stretch;
+
+    // align that text!
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  > * {
+    // more space for the divider line
+    padding-bottom: 0.5em;
+  }
+`
+
 interface ShowOrdersButtonProps {
   type: 'active' | 'expired'
   isActive: boolean
