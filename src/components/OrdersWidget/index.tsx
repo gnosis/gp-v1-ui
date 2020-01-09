@@ -14,9 +14,10 @@ import { isOrderActive } from 'utils'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
-import OrderRow, { OrderRowWrapper } from './OrderRow'
+import OrderRow from './OrderRow'
 import { useDeleteOrders } from './useDeleteOrders'
 import { RESPONSIVE_SIZES } from 'const'
+import { CardTable } from 'components/Layout/Card/Card'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -156,37 +157,6 @@ const OrdersForm = styled.div`
 
   .warning {
     color: orange;
-  }
-`
-
-const OrdersHeader = styled(OrderRowWrapper)`
-  background: transparent;
-  box-shadow: none;
-
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 0.75em;
-
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    display: none;
-  }
-
-  .title {
-    // create a divider line only bellow titled columns
-    border-bottom: 0.125rem solid #ededed;
-    // push the border all the way to the bottom and extend it
-    place-self: stretch;
-
-    // align that text!
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  > * {
-    // more space for the divider line
-    padding-bottom: 0.5em;
   }
 `
 
@@ -333,35 +303,39 @@ const OrdersWidget: React.FC = () => {
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">
-                {/* GRID HEADER */}
-                <OrdersHeader>
-                  <div className="checked">
-                    <input
-                      type="checkbox"
-                      onChange={toggleSelectAll}
-                      checked={orders.length === markedForDeletion.size}
-                      disabled={deleting}
-                    />
-                    <span>All</span>
-                  </div>
-                  <div className="title">Order details</div>
-                  <div className="title">Unfilled amount</div>
-                  <div className="title">Account balance</div>
-                  <div className="title">Expires</div>
-                </OrdersHeader>
-
-                {orders.map(order => (
-                  <OrderRow
-                    key={order.id}
-                    order={order}
-                    networkId={networkId}
-                    isOverBalance={overBalanceOrders.has(order.id)}
-                    isMarkedForDeletion={markedForDeletion.has(order.id)}
-                    toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
-                    pending={deleting && markedForDeletion.has(order.id)}
-                    disabled={deleting}
-                  />
-                ))}
+                <CardTable $columns="5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 5.5rem">
+                  <thead>
+                    <tr>
+                      <th className="checked">
+                        <input
+                          type="checkbox"
+                          onChange={toggleSelectAll}
+                          checked={orders.length === markedForDeletion.size}
+                          disabled={deleting}
+                        />
+                        <span>All</span>
+                      </th>
+                      <th className="title">Order details</th>
+                      <th className="title">Unfilled amount</th>
+                      <th className="title">Account balance</th>
+                      <th className="title">Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(order => (
+                      <OrderRow
+                        key={order.id}
+                        order={order}
+                        networkId={networkId}
+                        isOverBalance={overBalanceOrders.has(order.id)}
+                        isMarkedForDeletion={markedForDeletion.has(order.id)}
+                        toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                        pending={deleting && markedForDeletion.has(order.id)}
+                        disabled={deleting}
+                      />
+                    ))}
+                  </tbody>
+                </CardTable>
               </div>
 
               <div className="deleteContainer">
