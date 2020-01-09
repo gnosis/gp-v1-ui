@@ -5,10 +5,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faExclamationTriangle,
   faSpinner,
-  faTrash,
   faExchangeAlt,
   faChevronUp,
   faChevronDown,
+  faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
@@ -35,7 +35,7 @@ import TokenImg from 'components/TokenImg'
 
 export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
   display: grid;
-  grid-template-columns: 5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 5.5rem;
+  grid-template-columns: 5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 6.5rem;
   align-items: center;
   justify-content: center;
   background: var(--color-background-pageWrapper);
@@ -46,6 +46,10 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
   text-align: center;
   z-index: 1;
   transition: all 0.2s ease-in-out;
+
+  > div {
+    margin: 0 0.85rem;
+  }
 
   @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
     grid-template-columns: none;
@@ -60,17 +64,19 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
         border-bottom: 0.0625rem solid #ffffff40;
       }
     }
+
     > div {
       display: flex;
       flex-flow: row;
       align-items: center;
       border-bottom: 0.0625rem solid #00000024;
+
+      margin: 0;
       padding: 0.7rem;
 
       &:first-child {
-        // grid-template-columns: 1fr max-content auto;
-        width: 100%;
         grid-row-start: 6;
+        width: 100%;
 
         > img {
           order: 2;
@@ -80,7 +86,6 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
 
       &.order-image-row,
       &.cardOpener {
-        cursor: pointer;
         display: initial;
       }
 
@@ -113,8 +118,10 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
       }
 
       &.checked {
+        grid-template-columns: 0.5fr 1fr;
+
         > button {
-          display: initial;
+          display: flex;
         }
         > input {
           display: none;
@@ -139,6 +146,10 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
     }
   }
 
+  .cardOpener {
+    cursor: pointer;
+  }
+
   .order-image-row,
   .cardOpener {
     display: none;
@@ -147,6 +158,13 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
   .checked {
     > button {
       display: none;
+      justify-content: center;
+      align-items: center;
+
+      margin: 0 0 0 auto;
+      > * {
+        margin: 0 0.5rem;
+      }
     }
   }
 
@@ -219,7 +237,7 @@ const DeleteOrder: React.FC<Pick<
       disabled={disabled}
     />
     <button className="danger" onClick={toggleMarkedForDeletion}>
-      Delete Order <FontAwesomeIcon icon={faTrash} />
+      Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
     </button>
   </div>
 )
