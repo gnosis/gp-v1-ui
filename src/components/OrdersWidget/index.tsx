@@ -14,8 +14,9 @@ import { isOrderActive } from 'utils'
 
 import Widget from 'components/Layout/Widget'
 import Highlight from 'components/Highlight'
-import OrderRow from './OrderRow'
+import OrderRow, { OrderRowWrapper } from './OrderRow'
 import { useDeleteOrders } from './useDeleteOrders'
+import { RESPONSIVE_SIZES } from 'const'
 
 const OrdersWrapper = styled(Widget)`
   > a {
@@ -86,15 +87,16 @@ const CreateButtons = styled.div`
 `
 
 const OrdersForm = styled.div`
-  margin-top: 2em;
-  margin-left: 2em;
-
   .infoContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
 
     margin: 1em 0;
+
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+      grid-template-columns: 2fr 1fr;
+    }
 
     .warning {
       justify-self: end;
@@ -118,53 +120,17 @@ const OrdersForm = styled.div`
   }
 
   .ordersContainer {
-    // negative left margin to better position "hidden" elements
-    margin: 2em 0 2em -3em;
-
     display: grid;
-    // 6 columns:
-    // loading indicator | select checkbox | order details | unfilled | available | expires
-    grid-template-columns: 3em 4em minmax(20em, 1.5fr) repeat(3, 1fr);
-    grid-row-gap: 1em;
-    place-items: center;
-  }
-
-  .headerRow {
-    // make the contents of this div behave as part of the parent
-    // grid container
-    display: contents;
-
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 0.75em;
-
-    .title {
-      // create a divider line only bellow titled columns
-      border-bottom: 0.125rem solid #ededed;
-      // push the border all the way to the bottom and extend it
-      place-self: stretch;
-
-      // align that text!
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    > * {
-      // more space for the divider line
-      padding-bottom: 0.5em;
-    }
-  }
-
-  .orderRow {
-    display: contents;
   }
 
   .checked {
     // pull checkbox to the left to make divider line be further away
     justify-self: left;
-    grid-column-start: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    justify-content: center;
+    align-items: center;
+    gap: 0 0.6rem;
   }
 
   .deleteContainer {
@@ -174,6 +140,10 @@ const OrdersForm = styled.div`
 
     .hidden {
       visibility: hidden;
+    }
+
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+      display: none;
     }
   }
 
@@ -186,6 +156,37 @@ const OrdersForm = styled.div`
 
   .warning {
     color: orange;
+  }
+`
+
+const OrdersHeader = styled(OrderRowWrapper)`
+  background: transparent;
+  box-shadow: none;
+
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75em;
+
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    display: none;
+  }
+
+  .title {
+    // create a divider line only bellow titled columns
+    border-bottom: 0.125rem solid #ededed;
+    // push the border all the way to the bottom and extend it
+    place-self: stretch;
+
+    // align that text!
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  > * {
+    // more space for the divider line
+    padding-bottom: 0.5em;
   }
 `
 
@@ -332,7 +333,8 @@ const OrdersWidget: React.FC = () => {
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">
-                <div className="headerRow">
+                {/* GRID HEADER */}
+                <OrdersHeader>
                   <div className="checked">
                     <input
                       type="checkbox"
@@ -340,17 +342,13 @@ const OrdersWidget: React.FC = () => {
                       checked={orders.length === markedForDeletion.size}
                       disabled={deleting}
                     />
+                    <span>All</span>
                   </div>
                   <div className="title">Order details</div>
-                  <div className="title">
-                    Unfilled <br /> amount
-                  </div>
-                  <div className="title">
-                    Account <br />
-                    balance
-                  </div>
+                  <div className="title">Unfilled amount</div>
+                  <div className="title">Account balance</div>
                   <div className="title">Expires</div>
-                </div>
+                </OrdersHeader>
 
                 {orders.map(order => (
                   <OrderRow
