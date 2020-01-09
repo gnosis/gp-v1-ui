@@ -19,6 +19,7 @@ async function wrapPromise<T>(promise: Promise<T>): Promise<T | undefined> {
 
 interface Params {
   tokenAddress: string
+  networkId: number
   erc20Api: Erc20Api
   web3: Web3
 }
@@ -26,7 +27,12 @@ interface Params {
 /**
  * Fetches info for an arbitrary ERC20 token from given address
  */
-export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Promise<MinimalTokenDetails | null> {
+export async function getErc20Info({
+  tokenAddress,
+  networkId,
+  erc20Api,
+  web3,
+}: Params): Promise<MinimalTokenDetails | null> {
   // First check whether given address is a contract
   const code = await web3.eth.getCode(tokenAddress)
   if (code === '0x') {
@@ -38,7 +44,7 @@ export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Pr
   try {
     // totalSupply is an ERC20 mandatory read only method.
     // if the call succeeds, we assume it's compliant
-    await erc20Api.totalSupply({ tokenAddress })
+    await erc20Api.totalSupply({ tokenAddress, networkId })
   } catch (e) {
     log('Address %s is not ERC20 compliant', tokenAddress, e)
     return null
@@ -46,9 +52,9 @@ export async function getErc20Info({ tokenAddress, erc20Api, web3 }: Params): Pr
 
   // Query for optional details. Do not fail in case any is missing.
   const [symbol, name, decimals] = await Promise.all([
-    wrapPromise(erc20Api.symbol({ tokenAddress })),
-    wrapPromise(erc20Api.name({ tokenAddress })),
-    wrapPromise(erc20Api.decimals({ tokenAddress })),
+    wrapPromise(erc20Api.symbol({ tokenAddress, networkId })),
+    wrapPromise(erc20Api.name({ tokenAddress, networkId })),
+    wrapPromise(erc20Api.decimals({ tokenAddress, networkId })),
   ])
   return { address: tokenAddress, symbol, name, decimals: decimals || DEFAULT_PRECISION }
 }

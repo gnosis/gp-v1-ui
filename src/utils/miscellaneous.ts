@@ -1,5 +1,7 @@
 import { TokenDetails } from 'types'
 import { AssertionError } from 'assert'
+import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { batchIdToDate } from './time'
 
 export function assert<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (!val) {
@@ -49,3 +51,5 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
   if (!tokenAddress) return undefined
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
 }
+
+export const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now

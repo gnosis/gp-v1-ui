@@ -1,11 +1,22 @@
 import BN from 'bn.js'
 
-import { TxOptionalParams, Receipt } from 'types'
+import { Receipt } from 'types'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
 import { log, assert } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
-import { Erc20Api } from './Erc20Api'
+import {
+  Erc20Api,
+  NameParams,
+  SymbolParams,
+  DecimalsParams,
+  TotalSupplyParams,
+  BalanceOfParams,
+  AllowanceParams,
+  ApproveParams,
+  TransferParams,
+  TransferFromParams,
+} from './Erc20Api'
 
 interface Balances {
   [userAddress: string]: { [tokenAddress: string]: BN }
@@ -41,7 +52,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._tokens = tokens
   }
 
-  public async balanceOf({ tokenAddress, userAddress }: { tokenAddress: string; userAddress: string }): Promise<BN> {
+  public async balanceOf({ tokenAddress, userAddress }: BalanceOfParams): Promise<BN> {
     const userBalances = this._balances[userAddress]
     if (!userBalances) {
       return ZERO
@@ -51,7 +62,7 @@ export class Erc20ApiMock implements Erc20Api {
     return balance ? balance : ZERO
   }
 
-  public async name({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async name({ tokenAddress }: NameParams): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `name` to mock contract behavior
@@ -60,7 +71,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.name
   }
 
-  public async symbol({ tokenAddress }: { tokenAddress: string }): Promise<string> {
+  public async symbol({ tokenAddress }: SymbolParams): Promise<string> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `symbol` to mock contract behavior
@@ -69,7 +80,7 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.symbol
   }
 
-  public async decimals({ tokenAddress }: { tokenAddress: string }): Promise<number> {
+  public async decimals({ tokenAddress }: DecimalsParams): Promise<number> {
     const erc20Info = this._initTokens(tokenAddress)
 
     // Throws when token without `decimals` to mock contract behavior
@@ -78,20 +89,12 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.decimals
   }
 
-  public async totalSupply({ tokenAddress }: { tokenAddress: string }): Promise<BN> {
+  public async totalSupply({ tokenAddress }: TotalSupplyParams): Promise<BN> {
     log("Don't care about %s, just making TS shut up", tokenAddress)
     return this._totalSupply
   }
 
-  public async allowance({
-    tokenAddress,
-    userAddress,
-    spenderAddress,
-  }: {
-    tokenAddress: string
-    userAddress: string
-    spenderAddress: string
-  }): Promise<BN> {
+  public async allowance({ tokenAddress, userAddress, spenderAddress }: AllowanceParams): Promise<BN> {
     const userAllowances = this._allowances[userAddress]
     if (!userAllowances) {
       return ZERO
@@ -106,15 +109,13 @@ export class Erc20ApiMock implements Erc20Api {
     return allowance ? allowance : ZERO
   }
 
-  public async approve(
-    {
-      userAddress,
-      tokenAddress,
-      spenderAddress,
-      amount,
-    }: { userAddress: string; tokenAddress: string; spenderAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async approve({
+    userAddress,
+    tokenAddress,
+    spenderAddress,
+    amount,
+    txOptionalParams,
+  }: ApproveParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     this._initAllowances({ userAddress, tokenAddress, spenderAddress })
@@ -127,89 +128,79 @@ export class Erc20ApiMock implements Erc20Api {
   }
 
   /**
-   * Transfers from `senderAddress`. No allowance required.
+   * Transfers from `userAddress`. No allowance required.
    *
-   * @param senderAddress The sender of the tx
+   * @param userAddress The sender of the tx
    * @param tokenAddress The token being transferred
    * @param toAddress The recipient's address
    * @param amount The amount transferred
    * @param txOptionalParams Optional params
    */
-  public async transfer(
-    {
-      fromAddress,
-      tokenAddress,
-      toAddress,
-      amount,
-    }: { fromAddress: string; tokenAddress: string; toAddress: string; amount: BN },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transfer({
+    userAddress,
+    tokenAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
-    this._initBalances({ userAddress: fromAddress, tokenAddress })
+    this._initBalances({ userAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })
 
-    const balance = this._balances[fromAddress][tokenAddress]
+    const balance = this._balances[userAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
-    this._balances[fromAddress][tokenAddress] = balance.sub(amount)
+    this._balances[userAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
     log(
-      `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress}`,
+      `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${userAddress} to ${toAddress}`,
     )
 
     return RECEIPT
   }
 
   /**
-   * Transfers on behalf of `fromAddress` if `senderAddress` has allowance
+   * Transfers on behalf of `fromAddress` if `userAddress` has allowance
    *
-   * @param senderAddress The sender of the tx
+   * @param userAddress The sender of the tx
    * @param tokenAddress The token being transferred
    * @param fromAddress The source of the tokens
    * @param toAddress The recipient's address
    * @param amount The amount transferred
    * @param txOptionalParams Optional params
    */
-  public async transferFrom(
-    {
-      senderAddress,
-      tokenAddress,
-      fromAddress,
-      toAddress,
-      amount,
-    }: {
-      senderAddress: string
-      tokenAddress: string
-      fromAddress: string
-      toAddress: string
-      amount: BN
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async transferFrom({
+    userAddress,
+    tokenAddress,
+    fromAddress,
+    toAddress,
+    amount,
+    txOptionalParams,
+  }: TransferFromParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
     this._initBalances({ userAddress: fromAddress, tokenAddress })
     this._initBalances({ userAddress: toAddress, tokenAddress })
-    this._initAllowances({ userAddress: fromAddress, tokenAddress, spenderAddress: senderAddress })
+    this._initAllowances({ userAddress: fromAddress, tokenAddress, spenderAddress: userAddress })
 
     const balance = this._balances[fromAddress][tokenAddress]
     assert(balance.gte(amount), "The user doesn't have enough balance")
 
     assert(
-      this._hasAllowance({ fromAddress, tokenAddress, spenderAddress: senderAddress, amount }),
+      this._hasAllowance({ fromAddress, tokenAddress, spenderAddress: userAddress, amount }),
       'Not allowed to perform this transfer',
     )
-    const allowance = this._allowances[fromAddress][tokenAddress][senderAddress]
-    this._allowances[fromAddress][tokenAddress][senderAddress] = allowance.sub(amount)
+    const allowance = this._allowances[fromAddress][tokenAddress][userAddress]
+    this._allowances[fromAddress][tokenAddress][userAddress] = allowance.sub(amount)
     log(
-      `[Erc20ApiMock:transferFrom] Updated allowance: ${allowance} => ${this._allowances[fromAddress][tokenAddress][senderAddress]}`,
+      `[Erc20ApiMock:transferFrom] Updated allowance: ${allowance} => ${this._allowances[fromAddress][tokenAddress][userAddress]}`,
     )
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
     log(
-      `[Erc20ApiMock:transferFrom] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${senderAddress}`,
+      `[Erc20ApiMock:transferFrom] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${userAddress}`,
     )
 
     return RECEIPT
