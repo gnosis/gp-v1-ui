@@ -27,6 +27,7 @@ import {
   isBatchIdFarInTheFuture,
   formatDateFromBatchId,
   isOrderActive,
+  formatPrice,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
@@ -250,14 +251,16 @@ function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string
   return displayName
 }
 
-function calculatePrice(_numerator?: string | null, _denominator?: string | null): string {
-  if (!_numerator || !_denominator) {
-    return 'N/A'
+function calculatePrice(numeratorString?: string | null, denominatorString?: string | null): string {
+  let price
+  if (numeratorString && denominatorString) {
+    const numerator = new BigNumber(numeratorString)
+    const denominator = new BigNumber(denominatorString)
+
+    price = formatPrice(numerator, denominator)
   }
-  const numerator = new BigNumber(_numerator)
-  const denominator = new BigNumber(_denominator)
-  const price = numerator.dividedBy(denominator)
-  return price.toFixed(2)
+
+  return price || 'N/A'
 }
 
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
@@ -286,14 +289,13 @@ const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = 
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order, pending }) => {
-  const price = useMemo(
-    () =>
-      calculatePrice(
-        formatAmountFull(order.priceNumerator, buyToken.decimals, false),
-        formatAmountFull(order.priceDenominator, sellToken.decimals, false),
-      ),
-    [buyToken, order.priceDenominator, order.priceNumerator, sellToken],
-  )
+  const price = useMemo(() => {
+    const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
+    const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
+
+    return calculatePrice(numeratorString, denominatorString)
+  }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
+
   return (
     <div className="container" data-label="Price (at least)">
       <div className="order-details">

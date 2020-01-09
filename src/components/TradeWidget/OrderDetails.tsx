@@ -1,8 +1,10 @@
 import React from 'react'
 import styled from 'styled-components'
+import BigNumber from 'bignumber.js'
 
 import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
+import { formatPrice } from 'utils'
 
 const DECIMALS_FOR_PRICE = 4
 
@@ -20,10 +22,6 @@ const Wrapper = styled.dl`
   }
 `
 
-function _calculatePrice(sellAmount: number, receiveAmount: number): number {
-  return sellAmount > 0 ? receiveAmount / sellAmount : 0
-}
-
 interface Props {
   sellAmount: string
   sellTokenName: string
@@ -31,15 +29,19 @@ interface Props {
   receiveTokenName: string
 }
 
-const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmount, receiveTokenName }) => {
-  const sellAmountNumber = Number(sellAmount)
-  const receiveAmountNumber = Number(receiveAmount)
+const OrderDetails: React.FC<Props> = ({
+  sellAmount: sellAmountString,
+  sellTokenName,
+  receiveAmount: receiveAmountString,
+  receiveTokenName,
+}) => {
+  const sellAmount = new BigNumber(sellAmountString)
+  const receiveAmount = new BigNumber(receiveAmountString)
 
-  if (!(sellAmountNumber > 0 && receiveAmountNumber > 0)) {
+  const price = formatPrice(sellAmount, receiveAmount)
+  if (!price) {
     return null
   }
-
-  const price = _calculatePrice(sellAmountNumber, receiveAmountNumber).toFixed(DECIMALS_FOR_PRICE)
 
   return (
     <Wrapper>
@@ -47,7 +49,7 @@ const OrderDetails: React.FC<Props> = ({ sellAmount, sellTokenName, receiveAmoun
       <dt>
         Sell up to{' '}
         <Highlight>
-          {sellAmount} {sellTokenName}
+          {sellAmountString} {sellTokenName}
         </Highlight>{' '}
         at a price{' '}
         <Highlight>
