@@ -198,7 +198,7 @@ export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
   }
 `
 
-const PendingLink: React.FC<Pick<Props, 'pending' | 'transactionHash'>> = ({ transactionHash }) => {
+const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
   return (
     <div className="container pendingCell" data-label="Actions">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
@@ -445,7 +445,7 @@ const OrderRow: React.FC<Props> = props => {
       {sellToken && buyToken && (
         <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')} $open={openCard}>
           {pending ? (
-            <PendingLink pending={pending} transactionHash={transactionHash} />
+            <PendingLink transactionHash={transactionHash} />
           ) : (
             <DeleteOrder
               isMarkedForDeletion={isMarkedForDeletion}
