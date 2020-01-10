@@ -6,8 +6,6 @@ import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
 import { formatPrice } from 'utils'
 
-const DECIMALS_FOR_PRICE = 4
-
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
   font-size: 0.8em;
