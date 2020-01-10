@@ -2,6 +2,7 @@ import { CacheProxy } from 'api/proxy'
 
 interface TestApi {
   cachedMethod(params: Params): Promise<string>
+  customHashFn(params: Params): Promise<string>
   nonCachedMethod(params: Params): Promise<string>
 }
 
@@ -13,6 +14,9 @@ class TestApiImpl implements TestApi {
   public async cachedMethod({ p }: Params): Promise<string> {
     return p
   }
+  public async customHashFn(params: Params): Promise<string> {
+    return this.cachedMethod(params)
+  }
   public async nonCachedMethod(params: Params): Promise<string> {
     return this.cachedMethod(params)
   }
@@ -21,6 +25,10 @@ class TestApiImpl implements TestApi {
 class TestApiProxy extends CacheProxy<TestApi> implements TestApi {
   public async cachedMethod(params: Params): Promise<string> {
     return this.fetchWithCache('cachedMethod', params, 10)
+  }
+  public async customHashFn(params: Params): Promise<string> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return this.fetchWithCache('customHashFn', params, undefined, (..._params: any[]): string => 'always the same lol')
   }
   public async nonCachedMethod(params: Params): Promise<string> {
     return this.api.nonCachedMethod(params)
@@ -60,6 +68,19 @@ describe('With cache', () => {
 
     expect(spy).toHaveBeenCalledTimes(1)
     expect(firstValue).toEqual(secondValue)
+  })
+
+  it('uses custom hash function', async () => {
+    spy = jest.spyOn(api, 'customHashFn')
+
+    const firstValue = await instance.customHashFn({ p })
+    const secondValue = await instance.customHashFn({ p: 'something else' })
+
+    // the custom hash function provided always hash to the same key, so doesn't matter the params,
+    // the return should always be the result of the first invocation
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(firstValue).toEqual(secondValue)
+    expect(secondValue).toBe(p)
   })
 })
 
