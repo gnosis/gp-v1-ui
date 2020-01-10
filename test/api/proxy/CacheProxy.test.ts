@@ -1,6 +1,8 @@
-import { CacheProxy } from 'api/proxy'
+// import { CacheProxy } from 'api/proxy'
+import { CacheMixin } from 'api/proxy/CacheMixin'
 
 interface TestApi {
+  echo(params: Params): string
   cachedMethod(params: Params): Promise<string>
   syncCachedMethod(params: Params): string
   customHashFn(params: Params): Promise<string>
@@ -12,43 +14,69 @@ interface Params {
 }
 
 class TestApiImpl implements TestApi {
-  public async cachedMethod({ p }: Params): Promise<string> {
+  // 'public' to be able to spy on
+  public echo({ p }: Params): string {
     return p
   }
-  public syncCachedMethod({ p }: Params): string {
-    return p
-  }
-  public async customHashFn(params: Params): Promise<string> {
-    return this.cachedMethod(params)
-  }
-  public async nonCachedMethod(params: Params): Promise<string> {
-    return this.cachedMethod(params)
-  }
-}
 
-class TestApiProxy extends CacheProxy<TestApi> implements TestApi {
-  public cachedMethod(params: Params): Promise<string> {
-    return this.fetchWithCache('cachedMethod', params, 10)
+  public async cachedMethod(params: Params): Promise<string> {
+    return this.echo(params)
   }
   public syncCachedMethod(params: Params): string {
-    return this.fetchWithCache('syncCachedMethod', params)
+    return this.echo(params)
   }
-  public customHashFn(params: Params): Promise<string> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.fetchWithCache('customHashFn', params, undefined, (..._params: any[]): string => 'always the same lol')
+  public async customHashFn(params: Params): Promise<string> {
+    return this.echo(params)
   }
-  public nonCachedMethod(params: Params): Promise<string> {
-    return this.api.nonCachedMethod(params)
+  public async nonCachedMethod(params: Params): Promise<string> {
+    return this.echo(params)
   }
 }
 
-let api: TestApi
-let instance: TestApiProxy
-let spy: jest.SpyInstance<Promise<string>, [Params]>
+function hashFn(..._params: any[]): string {
+  return 'always the same lol'
+}
+
+// class TestApiProxy extends CacheProxy<TestApi> implements TestApi {
+//   public cachedMethod(params: Params): Promise<string> {
+//     return this.fetchWithCache('cachedMethod', params, 10)
+//   }
+//   public syncCachedMethod(params: Params): string {
+//     return this.fetchWithCache('syncCachedMethod', params)
+//   }
+//   public customHashFn(params: Params): Promise<string> {
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     return this.fetchWithCache('customHashFn', params, undefined, hashFn)
+//   }
+//   public nonCachedMethod(params: Params): Promise<string> {
+//     return this.api.nonCachedMethod(params)
+//   }
+// }
+
+class TestApiProxyV2 extends TestApiImpl {
+  private cache: CacheMixin
+
+  public constructor() {
+    super()
+
+    this.cache = new CacheMixin()
+
+    this.cache.injectCache<TestApi>(this, [
+      { method: 'cachedMethod', ttl: 10 },
+      { method: 'syncCachedMethod' },
+      { method: 'customHashFn', hashFn },
+    ])
+  }
+}
+
+// let api: TestApi
+let instance: TestApi
+let spy: jest.SpyInstance<string, [Params]>
 
 beforeEach(() => {
-  api = new TestApiImpl()
-  instance = new TestApiProxy(api)
+  // api = new TestApiImpl()
+  // instance = new TestApiProxy(api)
+  instance = new TestApiProxyV2()
 })
 
 afterEach(() => {
@@ -59,7 +87,7 @@ const p = 'parameter'
 
 describe('With cache', () => {
   it('calls original api when parameters are different', async () => {
-    spy = jest.spyOn(api, 'cachedMethod')
+    spy = jest.spyOn(instance, 'echo')
 
     const firstValue = await instance.cachedMethod({ p })
     const secondValue = await instance.cachedMethod({ p: 'different value' })
@@ -68,7 +96,7 @@ describe('With cache', () => {
   })
 
   it('finds cache on second invocation with same parameters', async () => {
-    spy = jest.spyOn(api, 'cachedMethod')
+    spy = jest.spyOn(instance, 'echo')
 
     const firstValue = await instance.cachedMethod({ p })
     const secondValue = await instance.cachedMethod({ p })
@@ -78,7 +106,7 @@ describe('With cache', () => {
   })
 
   it('caching works as well for sync methods', () => {
-    const syncSpy = jest.spyOn(api, 'syncCachedMethod')
+    const syncSpy = jest.spyOn(instance, 'echo')
 
     const firstValue = instance.syncCachedMethod({ p })
     const secondValue = instance.syncCachedMethod({ p })
@@ -88,7 +116,7 @@ describe('With cache', () => {
   })
 
   it('uses custom hash function', async () => {
-    spy = jest.spyOn(api, 'customHashFn')
+    spy = jest.spyOn(instance, 'echo')
 
     const firstValue = await instance.customHashFn({ p })
     const secondValue = await instance.customHashFn({ p: 'something else' })
@@ -103,7 +131,7 @@ describe('With cache', () => {
 
 describe('Without cache', () => {
   it('calls original api multiple times when no cache is set', async () => {
-    spy = jest.spyOn(api, 'nonCachedMethod')
+    spy = jest.spyOn(instance, 'echo')
 
     expect(await instance.nonCachedMethod({ p })).toMatch(p)
     expect(await instance.nonCachedMethod({ p })).toMatch(p)
