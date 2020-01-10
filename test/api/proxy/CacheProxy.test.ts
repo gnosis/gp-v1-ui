@@ -23,7 +23,7 @@ class TestApiProxy extends CacheProxy<TestApi> implements TestApi {
     return this.fetchWithCache('cachedMethod', params, 10)
   }
   public async nonCachedMethod(params: Params): Promise<string> {
-    return this.fetchWithCache('nonCachedMethod', params)
+    return this.api.nonCachedMethod(params)
   }
 }
 

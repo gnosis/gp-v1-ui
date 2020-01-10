@@ -1,70 +1,49 @@
-import { addSeconds } from 'date-fns'
-
-interface CacheObj<O> {
-  obj: O
-  createdOn: Date
-}
+import NodeCache from 'node-cache'
 
 export class CacheProxy<T> {
   protected api: T
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private cache: { [hash: string]: CacheObj<any> }
+  private cache: NodeCache
 
   public constructor(api: T) {
     this.api = api
-    this.cache = {}
+    this.cache = new NodeCache({ useClones: false })
   }
 
-  /**
-   * Returns value from cache for given `hash`.
-   * Cache behaviour is given by `expiration` property:
-   *  0: return cache if found == cache forever
-   *  number: return cache if found and cache younger than now + `expiration` seconds
-   */
-  private get<R>(hash: string, expiration: number): R | undefined {
-    const cacheObj = this.cache[hash]
+  private get<R>(hash: string): R | undefined {
+    const obj = this.cache.get(hash)
 
-    if (!cacheObj) {
-      // there's no cache
-      return
+    if (obj) {
+      console.debug(`cache hit for ${hash}`)
+      return obj as R
     }
 
-    if (expiration > 0) {
-      const validUntil = addSeconds(new Date(), expiration)
-
-      if (cacheObj.createdOn > validUntil) {
-        // the cache is expired
-        return
-      }
-    }
-
-    // cache was found
-    console.debug(`cache hit for ${hash}`)
-    return cacheObj.obj
+    return
   }
 
-  private store<O>(hash: string, obj: O): void {
-    this.cache[hash] = { obj, createdOn: new Date() }
+  private store<O>(hash: string, obj: O, expiration?: number): void {
+    if (expiration) {
+      // with TTL
+      this.cache.set(hash, obj, expiration)
+    } else {
+      // based on default config
+      this.cache.set(hash, obj)
+    }
   }
 
   protected async fetchWithCache<P, R, M = keyof T>(method: M, params: P, expiration?: number): Promise<R> {
     const methodName = String(method)
     const hash = this.hashParams(methodName, params)
 
-    let value: R | undefined
+    let value = this.get<R>(hash)
 
-    if (expiration !== undefined) {
-      value = this.get<R>(hash, expiration)
-
-      if (value) {
-        // cache is enabled and we found a value
-        return value
-      }
+    if (value) {
+      return value
     }
 
     value = await this.api[methodName](params)
 
-    this.store(hash, value)
+    this.store(hash, value, expiration)
 
     return value as R
   }
