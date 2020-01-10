@@ -7,6 +7,7 @@ import { getAddressForNetwork } from './batchExchangeAddresses'
 import { Receipt, TxOptionalParams } from 'types'
 
 import Web3 from 'web3'
+import fetchGasPrice from 'api/gasStation'
 
 interface ReadOnlyParams {
   userAddress: string
@@ -132,7 +133,9 @@ export class DepositApiImpl implements DepositApi {
   }: DepositParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
-    const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
+    const tx = contract.methods
+      .deposit(tokenAddress, amount.toString())
+      .send({ from: userAddress, gasPrice: await fetchGasPrice() })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -151,7 +154,9 @@ export class DepositApiImpl implements DepositApi {
   }: RequestWithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
-    const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
+    const tx = contract.methods
+      .requestWithdraw(tokenAddress, amount.toString())
+      .send({ from: userAddress, gasPrice: await fetchGasPrice() })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -163,7 +168,9 @@ export class DepositApiImpl implements DepositApi {
 
   public async withdraw({ userAddress, tokenAddress, networkId, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
+    const tx = contract.methods
+      .withdraw(userAddress, tokenAddress)
+      .send({ from: userAddress, gasPrice: await fetchGasPrice() })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)

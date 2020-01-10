@@ -9,6 +9,8 @@ import { toBN } from 'utils'
 
 import Web3 from 'web3'
 
+import fetchGasPrice from 'api/gasStation'
+
 interface BaseParams {
   tokenAddress: string
   networkId: number
@@ -143,6 +145,7 @@ export class Erc20ApiImpl implements Erc20Api {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
+      gasPrice: await fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -165,6 +168,7 @@ export class Erc20ApiImpl implements Erc20Api {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: userAddress,
+      gasPrice: await fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -187,6 +191,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({
       from: fromAddress,
+      gasPrice: await fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
