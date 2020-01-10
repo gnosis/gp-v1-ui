@@ -2,6 +2,7 @@ import { CacheProxy } from 'api/proxy'
 
 interface TestApi {
   cachedMethod(params: Params): Promise<string>
+  syncCachedMethod(params: Params): string
   customHashFn(params: Params): Promise<string>
   nonCachedMethod(params: Params): Promise<string>
 }
@@ -14,6 +15,9 @@ class TestApiImpl implements TestApi {
   public async cachedMethod({ p }: Params): Promise<string> {
     return p
   }
+  public syncCachedMethod({ p }: Params): string {
+    return p
+  }
   public async customHashFn(params: Params): Promise<string> {
     return this.cachedMethod(params)
   }
@@ -23,14 +27,17 @@ class TestApiImpl implements TestApi {
 }
 
 class TestApiProxy extends CacheProxy<TestApi> implements TestApi {
-  public async cachedMethod(params: Params): Promise<string> {
+  public cachedMethod(params: Params): Promise<string> {
     return this.fetchWithCache('cachedMethod', params, 10)
   }
-  public async customHashFn(params: Params): Promise<string> {
+  public syncCachedMethod(params: Params): string {
+    return this.fetchWithCache('syncCachedMethod', params)
+  }
+  public customHashFn(params: Params): Promise<string> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.fetchWithCache('customHashFn', params, undefined, (..._params: any[]): string => 'always the same lol')
   }
-  public async nonCachedMethod(params: Params): Promise<string> {
+  public nonCachedMethod(params: Params): Promise<string> {
     return this.api.nonCachedMethod(params)
   }
 }
@@ -67,6 +74,16 @@ describe('With cache', () => {
     const secondValue = await instance.cachedMethod({ p })
 
     expect(spy).toHaveBeenCalledTimes(1)
+    expect(firstValue).toEqual(secondValue)
+  })
+
+  it('caching works as well for sync methods', () => {
+    const syncSpy = jest.spyOn(api, 'syncCachedMethod')
+
+    const firstValue = instance.syncCachedMethod({ p })
+    const secondValue = instance.syncCachedMethod({ p })
+
+    expect(syncSpy).toHaveBeenCalledTimes(1)
     expect(firstValue).toEqual(secondValue)
   })
 

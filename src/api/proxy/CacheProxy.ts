@@ -31,12 +31,12 @@ export class CacheProxy<T> {
     }
   }
 
-  protected async fetchWithCache<P, R, M = keyof T>(
+  protected fetchWithCache<P, R, M = keyof T>(
     method: M,
     params: P,
     expiration?: number,
     hashFn?: (method: string, params: P) => string,
-  ): Promise<R> {
+  ): R {
     const methodName = String(method)
     const hash = hashFn ? hashFn(methodName, params) : this.hashParams(methodName, params)
 
@@ -46,7 +46,7 @@ export class CacheProxy<T> {
       return value
     }
 
-    value = await this.api[methodName](params)
+    value = this.api[methodName](params)
 
     this.store(hash, value, expiration)
 
