@@ -16,31 +16,30 @@ import {
 } from './Erc20Api'
 import { CacheProxy } from 'api/proxy'
 
-const DEFAULT_CACHE_TIME = 30
-
 export class Erc20ApiProxy extends CacheProxy<Erc20Api> implements Erc20Api {
   public name(params: NameParams): Promise<string> {
-    return this.fetchWithCache('name', params, DEFAULT_CACHE_TIME)
+    return this.fetchWithCache('name', params)
   }
 
   public symbol(params: SymbolParams): Promise<string> {
-    return this.fetchWithCache('symbol', params, DEFAULT_CACHE_TIME)
+    return this.fetchWithCache('symbol', params)
   }
 
   public decimals(params: DecimalsParams): Promise<number> {
-    return this.fetchWithCache('decimals', params, DEFAULT_CACHE_TIME)
+    return this.fetchWithCache('decimals', params)
   }
 
   public totalSupply(params: TotalSupplyParams): Promise<BN> {
-    return this.fetchWithCache('totalSupply', params, DEFAULT_CACHE_TIME)
+    return this.fetchWithCache('totalSupply', params)
   }
 
+  // guess we shouldn't cache these two either, or at best cache only for a few seconds
   public balanceOf(params: BalanceOfParams): Promise<BN> {
-    return this.fetchWithCache('balanceOf', params)
+    return this.api.balanceOf(params)
   }
 
   public allowance(params: AllowanceParams): Promise<BN> {
-    return this.fetchWithCache('allowance', params)
+    return this.api.allowance(params)
   }
 
   // pass through methods, cache doesn't apply to these
