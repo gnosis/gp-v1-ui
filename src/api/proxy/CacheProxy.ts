@@ -2,7 +2,6 @@ import NodeCache from 'node-cache'
 
 export class CacheProxy<T> {
   protected api: T
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private cache: NodeCache
 
   public constructor(api: T) {

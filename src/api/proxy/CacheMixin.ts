@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import NodeCache from 'node-cache'
 
 interface CacheOptions<T> {
   method: keyof T
   ttl?: number
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hashFn?: (...params: any[]) => string
 }
 
