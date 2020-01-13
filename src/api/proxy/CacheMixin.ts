@@ -75,14 +75,14 @@ export class CacheMixin {
   }
 
   private get<R>(hash: string): R | undefined {
-    const obj = this.cache.get(hash)
+    const obj = this.cache.get<R>(hash)
 
-    if (obj) {
-      console.debug(`cache hit for ${hash}`)
-      return obj as R
+    if (!obj) {
+      return
     }
 
-    return
+    console.debug(`cache hit for ${hash}`)
+    return obj
   }
 
   private store<R>(hash: string, obj: R, expiration?: number): void {

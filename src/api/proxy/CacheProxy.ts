@@ -10,14 +10,14 @@ export class CacheProxy<T> {
   }
 
   private get<R>(hash: string): R | undefined {
-    const obj = this.cache.get(hash)
+    const obj = this.cache.get<R>(hash)
 
-    if (obj) {
-      console.debug(`cache hit for ${hash}`)
-      return obj as R
+    if (!obj) {
+      return
     }
 
-    return
+    console.debug(`cache hit for ${hash}`)
+    return obj
   }
 
   private store<O>(hash: string, obj: O, expiration?: number): void {
