@@ -1,6 +1,5 @@
 import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faExclamationTriangle,
@@ -14,7 +13,6 @@ import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
-// import TokenImg from 'components/TokenImg'
 
 import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
@@ -29,151 +27,17 @@ import {
   isOrderActive,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
-import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
+import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
-
-export const OrderRowWrapper = styled.tr<{ $open?: boolean }>`
-  .order-image-row {
-    display: none;
-  }
-
-  .checked {
-    > button {
-      display: none;
-      justify-content: center;
-      align-items: center;
-
-      margin: 0 0 0 auto;
-      > * {
-        margin: 0 0.5rem;
-      }
-    }
-  }
-
-  .order-details-responsive {
-    display: none;
-  }
-
-  .order-details {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    grid-gap: 0 1rem;
-    text-align: left;
-    justify-content: space-evenly;
-
-    .order-details-subgrid {
-      display: grid;
-      grid-template-columns: min-content minmax(5.6rem, max-content);
-      grid-gap: 0 0.5rem;
-      justify-content: space-between;
-    }
-  }
-
-  .sub-columns {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: center;
-    align-items: center;
-
-    div:first-child {
-      justify-self: end;
-    }
-
-    > *:not(:last-child) {
-      margin: 0 0.3rem;
-    }
-  }
-
-  .pendingCell {
-    place-items: center;
-
-    a {
-      top: 100%;
-      position: absolute;
-    }
-  }
-
-  &.pending {
-    color: grey;
-  }
-
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    &.selected {
-      > div {
-        border-bottom: 0.0625rem solid #ffffff40;
-      }
-    }
-
-    // All TR row items
-    > div {
-      // Cancel Order Row - shown as button in responsive
-      &:first-child {
-        width: 100%;
-        grid-row-start: 6;
-
-        > img {
-          order: 2;
-          margin-right: -0.5rem;
-        }
-      }
-
-      // First row - TokenA <-> TokenB - visible in Responsive
-      &.order-image-row {
-        cursor: pointer;
-        display: initial;
-        > div {
-          display: flex;
-          align-items: center;
-          justify-content: space-evenly;
-          max-width: 72%;
-          margin: auto;
-
-          > div {
-            display: inherit;
-            justify-content: inherit;
-            align-items: center;
-            > * {
-              margin: 0 0.3rem;
-            }
-          }
-        }
-      }
-
-      // Hide Web view "Order Details" for condensed responsive version
-      > .order-details {
-        display: none;
-      }
-      > .order-details-responsive {
-        display: flex;
-      }
-      // Web view checkbox for order cancellation
-      &.checked {
-        > button {
-          display: initial;
-        }
-        > input {
-          display: none;
-        }
-      }
-
-      ${(props): string | false =>
-        !props.$open &&
-        `
-        // &:not(:nth-child(2)):not(:nth-child(3)):not(:last-child) {
-        //   display: none;
-        // }
-      `}
-    }
-  }
-`
+import { OrderRowWrapper } from './OrderRow.styled'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
   return (
-    <div className="pendingCell" data-label="Actions">
+    <td className="pendingCell" data-label="Actions">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
-    </div>
+    </td>
   )
 }
 
@@ -181,7 +45,7 @@ const DeleteOrder: React.FC<Pick<
   Props,
   'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
 >> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
-  <div data-label="Actions" className="checked">
+  <td data-label="Actions" className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
@@ -191,7 +55,7 @@ const DeleteOrder: React.FC<Pick<
     <button className="danger" onClick={toggleMarkedForDeletion}>
       Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
     </button>
-  </div>
+  </td>
 )
 
 function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
@@ -219,7 +83,7 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 
 const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = ({ buyToken, sellToken }) => {
   return (
-    <div className="order-image-row">
+    <td className="order-image-row">
       <div>
         {/* e.g SELL DAI <-> BUY TUSD */}
         <div>
@@ -233,7 +97,7 @@ const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = 
           <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
         </div>
       </div>
-    </div>
+    </td>
   )
 }
 
@@ -247,7 +111,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
     [buyToken, order.priceDenominator, order.priceNumerator, sellToken],
   )
   return (
-    <div data-label="Price (at least)">
+    <td data-label="Price (at least)">
       <div className="order-details">
         <div>Sell</div>
         <div className="order-details-subgrid">
@@ -268,7 +132,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
           <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
         </div>
       </div>
-    </div>
+    </td>
   )
 }
 
@@ -284,7 +148,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   const unlimited = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
 
   return (
-    <div data-label="Unfilled Amount" className={unlimited ? '' : 'sub-columns two-columns'}>
+    <td data-label="Unfilled Amount" className={unlimited ? '' : 'sub-columns two-columns'}>
       {unlimited ? (
         <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
       ) : (
@@ -295,7 +159,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
           </div>
         </>
       )}
-    </div>
+    </td>
   )
 }
 
@@ -311,7 +175,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
   const isActive = isOrderActive(order, new Date())
 
   return (
-    <div data-label="Account Balance" className="sub-columns three-columns">
+    <td data-label="Account Balance" className="sub-columns three-columns">
       <div>{accountBalance}</div>
       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
       {isOverBalance && isActive && (
@@ -319,7 +183,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
           <FontAwesomeIcon icon={faExclamationTriangle} />
         </div>
       )}
-    </div>
+    </td>
   )
 }
 
@@ -332,13 +196,13 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
   }, [order.validUntil])
 
   return (
-    <div data-label="Expires">
+    <td data-label="Expires">
       {isNeverExpires ? (
         <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
       ) : (
         <Highlight color={'inherit'}>{expiresOn}</Highlight>
       )}
-    </div>
+    </td>
   )
 }
 
@@ -369,9 +233,9 @@ interface ResponsiveRowSizeTogglerProps {
 
 const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
   return (
-    <div className="cardOpener" onClick={handleOpen}>
+    <td className="cardOpener" onClick={handleOpen}>
       <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
-    </div>
+    </td>
   )
 }
 
