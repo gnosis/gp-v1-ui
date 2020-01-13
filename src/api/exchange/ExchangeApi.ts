@@ -1,10 +1,9 @@
 import BN from 'bn.js'
-import { DepositApiImpl, DepositApi } from 'api/deposit/DepositApi'
+import { DepositApiImpl, DepositApi, InjectedDependencies } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { log } from 'utils'
 import Web3 from 'web3'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
-import fetchGasPrice from 'api/gasStation'
 
 interface BaseParams {
   networkId: number
@@ -79,8 +78,8 @@ export interface Order {
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  public constructor(web3: Web3) {
-    super(web3)
+  public constructor(web3: Web3, injectedDependencies: InjectedDependencies) {
+    super(web3, injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
   }
@@ -126,7 +125,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress, gasPrice: await fetchGasPrice() })
+    const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -154,7 +153,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
-      .send({ from: userAddress, gasPrice: await fetchGasPrice() })
+      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -177,7 +176,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams,
   }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress, gasPrice: await fetchGasPrice() })
+    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)

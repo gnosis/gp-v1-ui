@@ -1,4 +1,4 @@
-import { walletApi } from './'
+import { WalletApi } from './wallet/WalletApi'
 
 const GAS_STATIONS = {
   1: 'https://safe-relay.gnosis.pm/api/v1/gas-station/',
@@ -26,7 +26,7 @@ interface GasStationResponse {
   fastest: string
 }
 
-const fetchGasPrice = async (): Promise<string | undefined> => {
+const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string | undefined> => {
   const { blockchainState } = walletApi
 
   if (!blockchainState) return undefined
@@ -62,4 +62,4 @@ const fetchGasPrice = async (): Promise<string | undefined> => {
   return undefined
 }
 
-export default fetchGasPrice
+export default fetchGasPriceFactory

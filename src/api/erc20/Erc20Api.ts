@@ -9,8 +9,6 @@ import { toBN } from 'utils'
 
 import Web3 from 'web3'
 
-import fetchGasPrice from 'api/gasStation'
-
 interface BaseParams {
   tokenAddress: string
   networkId: number
@@ -68,6 +66,10 @@ export interface Erc20Api {
   transferFrom(params: TransferFromParams): Promise<Receipt>
 }
 
+export interface InjectedDependencies {
+  fetchGasPrice(): Promise<string | undefined>
+}
+
 /**
  * Basic implementation of ERC20 API
  */
@@ -76,8 +78,12 @@ export class Erc20ApiImpl implements Erc20Api {
 
   private static _contractsCache: { [network: number]: { [address: string]: Erc20Contract } } = {}
 
-  public constructor(web3: Web3) {
+  private fetchGasPrice: InjectedDependencies['fetchGasPrice']
+
+  public constructor(web3: Web3, injectedDependencies: InjectedDependencies) {
     this._contractPrototype = new web3.eth.Contract(erc20Abi as AbiItem[]) as Erc20Contract
+
+    Object.assign(this, injectedDependencies)
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -145,7 +151,7 @@ export class Erc20ApiImpl implements Erc20Api {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
-      gasPrice: await fetchGasPrice(),
+      gasPrice: await this.fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -168,7 +174,7 @@ export class Erc20ApiImpl implements Erc20Api {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: userAddress,
-      gasPrice: await fetchGasPrice(),
+      gasPrice: await this.fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -191,7 +197,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({
       from: fromAddress,
-      gasPrice: await fetchGasPrice(),
+      gasPrice: await this.fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
