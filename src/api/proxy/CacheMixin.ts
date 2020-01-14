@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import NodeCache from 'node-cache'
 
 import { log } from 'utils'
@@ -5,7 +6,6 @@ import { log } from 'utils'
 interface CacheOptions<T> {
   method: keyof T
   ttl?: number
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hashFn?: (...params: any[]) => string
 }
 
@@ -54,8 +54,8 @@ export class CacheMixin {
     method,
     ttl,
     hashFn,
-  }: CacheMethodParams<T, P, R>): (params: P) => R {
-    return (params: P): R => {
+  }: CacheMethodParams<T, P, R>): (...params: any[]) => R {
+    return (...params: any[]): R => {
       const hash = hashFn ? hashFn(method, params) : this.hashParams(method.toString(), params)
 
       let value = this.get<R>(hash)
@@ -67,7 +67,7 @@ export class CacheMixin {
 
       // call original fn
       // needs to bind to original instance so it has the proper `this`
-      value = fnToCache.bind(instance)(params)
+      value = fnToCache.bind(instance)(...params)
 
       // save it for next round
       this.store(hash, value, ttl)
