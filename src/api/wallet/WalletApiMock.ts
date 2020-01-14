@@ -18,6 +18,12 @@ export class WalletApiMock implements WalletApi {
   private _balance: BN
   private _listeners: ((walletInfo: WalletInfo) => void)[]
 
+  public blockchainState = {
+    account: USER_1,
+    chainId: 1,
+    blockHeader: null,
+  }
+
   public constructor() {
     this._connected = process.env.AUTOCONNECT === 'true'
     this._user = USER_1
