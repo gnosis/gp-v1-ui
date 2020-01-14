@@ -1,6 +1,7 @@
 import BN from 'bn.js'
 import { TEN, DEFAULT_PRECISION } from 'const'
 import { TokenDetails } from 'types'
+import BigNumber from 'bignumber.js'
 
 const DEFAULT_DECIMALS = 4
 const ELLIPSIS = '...'
@@ -139,4 +140,22 @@ export function safeFilledToken<T extends TokenDetails>(token: T): T {
     name: token.name || token.symbol || abbreviateString(token.address, 6, 4),
     symbol: token.symbol || token.name || abbreviateString(token.address, 6, 4),
   }
+}
+
+export function calculatePriceBigNumber(numerator?: BigNumber, denominator?: BigNumber): BigNumber | null {
+  if (!numerator || !denominator || denominator.isZero()) {
+    return null
+  }
+
+  return numerator.dividedBy(denominator)
+}
+
+export function formatPrice(
+  numerator?: BigNumber,
+  denominator?: BigNumber,
+  decimals = DEFAULT_DECIMALS,
+): string | null {
+  const price = calculatePriceBigNumber(numerator, denominator)
+
+  return price ? price.toFixed(decimals) : null
 }

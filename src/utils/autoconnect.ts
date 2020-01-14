@@ -47,7 +47,6 @@ const getWCIfConnected = async (): Promise<WCProvider | null> => {
 
 export const getLastProvider = (): Promise<Provider | null> => {
   const lastProviderName = localStorage.getItem(STORAGE_KEY_LAST_PROVIDER)
-  console.log('lastProvider', lastProviderName)
 
   try {
     // last provider was WalletConnect
@@ -56,14 +55,9 @@ export const getLastProvider = (): Promise<Provider | null> => {
     if (lastProviderName === 'WalletConnect') return getWCIfConnected()
 
     const injectedProviderName = Web3Connect.getInjectedProviderName()
-    console.log('injectedProvider', injectedProviderName)
     // last provider is the current injected provider
     // and it's still injected
-    if (injectedProviderName === lastProviderName) {
-      // if (injectedProvider === 'MetaMask') {
-      //   const provider = window.ethereum || window.web3?.currentProvider
-      //   provider._metamask?.isUnlocked()
-      // }
+    if (injectedProviderName && injectedProviderName === lastProviderName) {
       return Web3Connect.ConnectToInjected()
     }
   } catch (error) {
