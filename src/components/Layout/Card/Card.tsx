@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { RESPONSIVE_SIZES } from 'const'
+import useWindowSizes from 'hooks/useWindowSizes'
 
-export const CardRowDrawer = styled.tr<{ responsive: boolean }>`
+const CardRowDrawer = styled.tr<{ responsive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,7 +18,6 @@ export const CardRowDrawer = styled.tr<{ responsive: boolean }>`
     border-bottom: 0.125rem solid #0000000f;
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     box-shadow: var(--box-shadow);
-    margin-top: -1.52rem;
     width: 80%;
 
     @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
@@ -145,6 +145,12 @@ export const CardTable = styled.table<{
         margin: ${({ $cellSeparation = '0 0.5rem' }): string => $cellSeparation};
       }
     }
+
+    > ${CardRowDrawer} {
+      > td {
+        margin-top: ${({ $rowSeparation = '1rem' }): string => `-${Number($rowSeparation.split('rem')[0]) * 2.2}rem`};
+      }
+    }
   }
   
   // Table Header
@@ -245,36 +251,95 @@ export const CardTable = styled.table<{
 
 // TODO: remove all below
 const fakeData = [
-  { a: 1, b: 2, c: 3 },
-  { a: 1, b: 2, c: 3 },
-  { a: 1, b: 2, c: 3 },
+  { a: 1, b: 2, c: 3, d: 'Open Drawer' },
+  { a: 1, b: 2, c: 3, d: 'Open Drawer' },
+  { a: 1, b: 2, c: 3, d: 'Open Drawer' },
 ]
 
 const webCSS = `
-  background: lightsalmon;
-  min-height: 4rem;
+  background: transparent;
+  &:not(:first-child) { margin-top: 3rem; }
+  > tbody, thead { 
+    > tr {
+      min-height: 3rem;
+    }
+  }
 `
 const responsiveCSS = `
-  background: lightyellow;
+  background: transparent;
   color: #000;
 `
-export const Test: React.FC = () => (
-  <CardTable $columns="repeat(3, 1fr)" $bgColor="lightgrey" $webCSS={webCSS} $responsiveCSS={responsiveCSS}>
-    <thead>
-      <tr>
-        <th>One</th>
-        <th>Two</th>
-        <th>Three</th>
-      </tr>
-    </thead>
-    <tbody>
-      {fakeData.map((item, index) => (
-        <tr key={index + Math.random()}>
-          <div data-label="Yo">{item.a}</div>
-          <div data-label="Labels">{item.b}</div>
-          <div data-label="AreDope">{item.c}</div>
+export const Test: React.FC = () => {
+  const [openDrawer, setOpenDrawer] = useState(false)
+  const { innerWidth } = useWindowSizes()
+
+  return (
+    <CardTable
+      $columns="repeat(4, 1fr)"
+      $bgColor="lightgrey"
+      $webCSS={webCSS}
+      $responsiveCSS={responsiveCSS}
+      $rowSeparation="0.7rem"
+    >
+      <thead>
+        <tr>
+          <th>One</th>
+          <th>Two</th>
+          <th>Three</th>
+          <th>Action</th>
         </tr>
-      ))}
-    </tbody>
-  </CardTable>
-)
+      </thead>
+      <tbody>
+        {fakeData.map((item, index) => (
+          <React.Fragment key={index + Math.random()}>
+            <tr>
+              <td data-label="Yo">{item.a}</td>
+              <td data-label="Labels">{item.b}</td>
+              <td data-label="Are Dope">{item.c}</td>
+              <td data-label="Action">
+                <button onClick={(): void => setOpenDrawer(!openDrawer)}>
+                  {openDrawer ? 'Close Drawer' : 'Open Drawer'}
+                </button>
+              </td>
+            </tr>
+            {openDrawer && (
+              <CardDrawer
+                responsive={!!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE_PX}
+                closeDrawer={(): void => setOpenDrawer(false)}
+              >
+                <CardTable
+                  $columns="repeat(4, 1fr)"
+                  $bgColor="lightblue"
+                  $webCSS={webCSS}
+                  $responsiveCSS={responsiveCSS}
+                  $rowSeparation="0.7rem"
+                >
+                  <thead>
+                    <tr>
+                      <th>One</th>
+                      <th>Two</th>
+                      <th>Three</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {fakeData.map((item, index) => (
+                      <React.Fragment key={index + Math.random()}>
+                        <tr>
+                          <td data-label="Sub 1">{item.a}</td>
+                          <td data-label="Sub 2">{item.b}</td>
+                          <td data-label="Sub 4">{item.c}</td>
+                          <td data-label="Sub 4">Hello World</td>
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </CardTable>
+              </CardDrawer>
+            )}
+          </React.Fragment>
+        ))}
+      </tbody>
+    </CardTable>
+  )
+}

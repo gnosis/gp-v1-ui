@@ -12,7 +12,7 @@ export const ModalBodyWrapper = styled.div`
 `
 
 export const TokenRow = styled.tr`
-  // Each cell wrapper
+  // Each cell wrapper (td)
   > * {
     margin: 0.1rem;
     padding: 0.7rem;
