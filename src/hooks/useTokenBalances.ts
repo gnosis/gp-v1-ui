@@ -90,6 +90,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
 
   useEffect(() => {
     // can return NULL (if no address or network)
+    walletInfo.isConnected &&
     _getBalances(walletInfo)
       .then(balances => {
         log(
