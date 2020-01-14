@@ -55,9 +55,9 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}, rowProps = fakeRo
 }
 
 describe('<Row /> not enabled token', () => {
-  it('contains 6 <div> elements', () => {
+  it('contains 5 <td> elements', () => {
     const wrapper = render(_createRow())
-    expect(wrapper.find('div')).toHaveLength(6)
+    expect(wrapper.find('td')).toHaveLength(5)
   })
 
   it('contains 1 <button> (enable)', () => {
@@ -71,9 +71,9 @@ describe('<Row /> enabled token', () => {
     enabled: true,
   }
 
-  it('contains 6 <div> elements', () => {
+  it('contains 5 <td> elements', () => {
     const wrapper = render(_createRow(tokenBalanceDetails))
-    expect(wrapper.find('div')).toHaveLength(6)
+    expect(wrapper.find('td')).toHaveLength(5)
   })
 
   it('contains 2 <button> elements (deposit and withdraw)', () => {
