@@ -1,7 +1,8 @@
 import Web3 from 'web3'
 
-import Erc20ApiImpl, { Erc20Api, InjectedDependencies } from './Erc20Api'
 import { CacheMixin } from 'api/proxy/CacheMixin'
+
+import Erc20ApiImpl, { Erc20Api, InjectedDependencies } from './Erc20Api'
 
 export class Erc20ApiProxy extends Erc20ApiImpl {
   private cache: CacheMixin

@@ -3,13 +3,15 @@ import { WalletApiMock } from './wallet/WalletApiMock'
 import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
 import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
-import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20Api, InjectedDependencies as Erc20ApiDependencies } from './erc20/Erc20Api'
+import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiProxy } from './erc20/Erc20ApiProxy'
+import { DepositApi, InjectedDependencies as DepositApiDependencies } from './deposit/DepositApi'
 import { DepositApiMock } from './deposit/DepositApiMock'
-import { DepositApiImpl, DepositApi, InjectedDependencies as DepositApiDependencies } from './deposit/DepositApi'
-import { ExchangeApiImpl, ExchangeApi } from './exchange/ExchangeApi'
+import { DepositApiProxy } from './deposit/DepositApiProxy'
+import { ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
+import { ExchangeApiProxy } from './exchange/ExchangeApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -66,7 +68,7 @@ function createDepositApi(erc20Api: Erc20Api, web3: Web3, injectedDependencies: 
   if (process.env.MOCK_DEPOSIT === 'true') {
     depositApi = new DepositApiMock(exchangeBalanceStates, erc20Api)
   } else {
-    depositApi = new DepositApiImpl(web3, injectedDependencies)
+    depositApi = new DepositApiProxy(web3, injectedDependencies)
   }
   window['depositApi'] = depositApi // register for convenience
   return depositApi
@@ -83,7 +85,7 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3, injectedDependencies:
       ordersByUser: exchangeOrders,
     })
   } else {
-    exchangeApi = new ExchangeApiImpl(web3, injectedDependencies)
+    exchangeApi = new ExchangeApiProxy(web3, injectedDependencies)
   }
   window['exchangeApi'] = exchangeApi
   return exchangeApi
