@@ -29,6 +29,7 @@ import { walletApi } from 'api'
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
 
+import Web3Connect from 'web3connect'
 import useSafeState from 'hooks/useSafeState'
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
@@ -92,6 +93,9 @@ const App: React.FC = () => (
         </Switch>
       </Layout>
     </Router>
+    {process.env.NODE_ENV === 'development' &&
+      Web3Connect.isMobile() &&
+      React.createElement(require('./Console').default)}
   </>
 )
 
