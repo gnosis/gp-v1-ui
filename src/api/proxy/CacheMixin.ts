@@ -46,7 +46,7 @@ export class CacheMixin {
   /**
    * HOF that returns a new function caching the return value of provided `fnToCache`
    */
-  public cacheMethod<T, P, R>({
+  private cacheMethod<T, P, R>({
     fnToCache,
     instance,
     method,

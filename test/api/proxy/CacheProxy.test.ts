@@ -1,4 +1,3 @@
-// import { CacheProxy } from 'api/proxy'
 import { CacheMixin } from 'api/proxy/CacheMixin'
 
 interface TestApi {
@@ -37,22 +36,6 @@ function hashFn(..._params: any[]): string {
   return 'always the same lol'
 }
 
-// class TestApiProxy extends CacheProxy<TestApi> implements TestApi {
-//   public cachedMethod(params: Params): Promise<string> {
-//     return this.fetchWithCache('cachedMethod', params, 10)
-//   }
-//   public syncCachedMethod(params: Params): string {
-//     return this.fetchWithCache('syncCachedMethod', params)
-//   }
-//   public customHashFn(params: Params): Promise<string> {
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//     return this.fetchWithCache('customHashFn', params, undefined, hashFn)
-//   }
-//   public nonCachedMethod(params: Params): Promise<string> {
-//     return this.api.nonCachedMethod(params)
-//   }
-// }
-
 class TestApiProxyV2 extends TestApiImpl {
   private cache: CacheMixin
 
@@ -69,13 +52,10 @@ class TestApiProxyV2 extends TestApiImpl {
   }
 }
 
-// let api: TestApi
 let instance: TestApi
 let spy: jest.SpyInstance<string, [Params]>
 
 beforeEach(() => {
-  // api = new TestApiImpl()
-  // instance = new TestApiProxy(api)
   instance = new TestApiProxyV2()
 })
 

@@ -5,7 +5,7 @@ import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20Api, InjectedDependencies as Erc20ApiDependencies } from './erc20/Erc20Api'
-import { Erc20ApiProxyV2 } from './erc20/Erc20ApiProxy'
+import { Erc20ApiProxy } from './erc20/Erc20ApiProxy'
 import { DepositApiMock } from './deposit/DepositApiMock'
 import { DepositApiImpl, DepositApi, InjectedDependencies as DepositApiDependencies } from './deposit/DepositApi'
 import { ExchangeApiImpl, ExchangeApi } from './exchange/ExchangeApi'
@@ -55,7 +55,7 @@ function createErc20Api(web3: Web3, injectedDependencies: Erc20ApiDependencies):
   if (process.env.MOCK_ERC20 === 'true') {
     erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances, tokens: unregisteredTokens })
   } else {
-    erc20Api = new Erc20ApiProxyV2(web3, injectedDependencies)
+    erc20Api = new Erc20ApiProxy(web3, injectedDependencies)
   }
   window['erc20Api'] = erc20Api // register for convenience
   return erc20Api
