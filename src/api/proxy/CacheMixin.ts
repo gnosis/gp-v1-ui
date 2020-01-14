@@ -109,8 +109,25 @@ export class CacheMixin {
    *
    */
   private hashParams<P>(methodName: string, params: P): string {
-    return Object.keys(params)
+    return `${methodName}>>${this.hash(params)}`
+  }
+
+  private hash(obj: any): string {
+    // primitive type
+    if (typeof obj !== 'object') {
+      return obj.toString()
+    }
+    // array
+    if (Array.isArray(obj)) {
+      return obj
+        .sort()
+        .map(this.hash.bind(this))
+        .join('|')
+    }
+    // obj
+    return Object.keys(obj)
       .sort()
-      .reduce((acc, key) => `${acc}|${key}:${params[key]}`, methodName)
+      .map(key => `${key}:${this.hash.bind(this)(obj[key])}`)
+      .join('|')
   }
 }
