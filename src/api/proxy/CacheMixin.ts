@@ -1,5 +1,7 @@
 import NodeCache from 'node-cache'
 
+import { log } from 'utils'
+
 interface CacheOptions<T> {
   method: keyof T
   ttl?: number
@@ -81,7 +83,8 @@ export class CacheMixin {
       return
     }
 
-    console.debug(`cache hit for ${hash}`)
+    // TODO: remove when done testing
+    log(`cache hit for ${hash}`)
     return obj
   }
 
