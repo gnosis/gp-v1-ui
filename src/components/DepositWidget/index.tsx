@@ -2,6 +2,7 @@ import React from 'react'
 import Modali from 'modali'
 import BN from 'bn.js'
 
+import { CardTable } from 'components/Layout/Card'
 import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
@@ -82,15 +83,17 @@ const DepositWidget: React.FC = () => {
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
         ) : (
-          <div className="gridContainer">
-            <div className="headerContainer">
-              <div className="row">Token</div>
-              <div className="row">Exchange wallet</div>
-              <div className="row">Pending withdrawals</div>
-              <div className="row">Wallet</div>
-              <div className="row">Actions</div>
-            </div>
-            <div className="rowContainer">
+          <CardTable $columns="var(--grid-row-size-walletPage)">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Exchange wallet</th>
+                <th>Pending withdrawals</th>
+                <th>Wallet</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
               {balances &&
                 balances.map(tokenBalances => (
                   <Row
@@ -108,8 +111,8 @@ const DepositWidget: React.FC = () => {
                     {...windowSpecs}
                   />
                 ))}
-            </div>
-          </div>
+            </tbody>
+          </CardTable>
         )}
       </Widget>
       <Modali.Modal {...withdrawOverwriteModal} />
