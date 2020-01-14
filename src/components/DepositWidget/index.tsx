@@ -6,7 +6,6 @@ import { CardTable } from 'components/Layout/Card'
 import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
-import { DepositWidgetWrapper } from './Styled'
 
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
@@ -78,7 +77,7 @@ const DepositWidget: React.FC = () => {
   }
 
   return (
-    <DepositWidgetWrapper>
+    <section>
       <Widget>
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
@@ -117,7 +116,7 @@ const DepositWidget: React.FC = () => {
       </Widget>
       <Modali.Modal {...withdrawOverwriteModal} />
       <Modali.Modal {...withdrawAndClaimModal} />
-    </DepositWidgetWrapper>
+    </section>
   )
 }
 

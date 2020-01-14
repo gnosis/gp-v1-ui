@@ -1,7 +1,8 @@
 import styled from 'styled-components'
 import { RESPONSIVE_SIZES } from 'const'
 
-export const OrderRowWrapper = styled.tr<{ $open?: boolean }>`
+export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
+  color: ${({ $color = '' }): string => $color};
   min-height: 4rem;
 
   .order-image-row {
@@ -62,10 +63,6 @@ export const OrderRowWrapper = styled.tr<{ $open?: boolean }>`
       top: 100%;
       position: absolute;
     }
-  }
-
-  &.pending {
-    color: grey;
   }
 
   @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {

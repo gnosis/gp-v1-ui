@@ -3,18 +3,6 @@ import { RESPONSIVE_SIZES } from 'const'
 
 const { TABLET } = RESPONSIVE_SIZES
 
-export const DepositWidgetWrapper = styled.section`
-  .rowContainer {
-    display: inherit;
-    grid-template-rows: auto;
-  }
-
-  .row {
-    text-align: center;
-    transition: all 0.5s ease;
-  }
-`
-
 export const ModalBodyWrapper = styled.div`
   div > p {
     padding: 0 1em;

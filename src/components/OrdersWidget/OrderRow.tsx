@@ -279,7 +279,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
+      <OrderRowWrapper $color={pending ? 'grey' : 'inherit'} $open={openCard}>
         {pending ? (
           <PendingLink transactionHash={transactionHash} />
         ) : (
