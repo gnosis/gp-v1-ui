@@ -9,9 +9,8 @@ interface CacheOptions<T> {
   hashFn?: (...params: any[]) => string
 }
 
-interface CacheMethodParams<T, P, R> extends CacheOptions<T> {
-  fnToCache: (params: P) => R
-  instance: T
+interface CacheMethodParams<T, R> extends CacheOptions<T> {
+  fnToCache: (...params: any[]) => R
 }
 
 export class CacheMixin {
@@ -33,12 +32,11 @@ export class CacheMixin {
       const { method } = cacheConfig
       const methodName = method.toString()
 
-      const fnToCache = instance[methodName]
+      const fnToCache = instance[methodName].bind(instance)
 
-      const params: CacheMethodParams<T, Parameters<typeof fnToCache>, ReturnType<typeof fnToCache>> = {
+      const params: CacheMethodParams<T, ReturnType<typeof fnToCache>> = {
         ...cacheConfig,
         fnToCache,
-        instance,
       }
 
       instance[methodName] = this.cacheMethod(params)
@@ -48,13 +46,7 @@ export class CacheMixin {
   /**
    * HOF that returns a new function caching the return value of provided `fnToCache`
    */
-  private cacheMethod<T, P, R>({
-    fnToCache,
-    instance,
-    method,
-    ttl,
-    hashFn,
-  }: CacheMethodParams<T, P, R>): (...params: any[]) => R {
+  private cacheMethod<T, R>({ fnToCache, method, ttl, hashFn }: CacheMethodParams<T, R>): (...params: any[]) => R {
     return (...params: any[]): R => {
       const hash = hashFn ? hashFn(method, params) : this.hashParams(method.toString(), params)
 
@@ -66,8 +58,7 @@ export class CacheMixin {
       }
 
       // call original fn
-      // needs to bind to original instance so it has the proper `this`
-      value = fnToCache.bind(instance)(...params)
+      value = fnToCache(...params)
 
       // save it for next round
       this.store(hash, value, ttl)
@@ -108,7 +99,7 @@ export class CacheMixin {
    * @param params The params we want to hash
    *
    */
-  private hashParams<P>(methodName: string, params: P): string {
+  private hashParams(methodName: string, params: any): string {
     return `${methodName}>>${this.hash(params)}`
   }
 
@@ -117,17 +108,19 @@ export class CacheMixin {
     if (typeof obj !== 'object') {
       return obj.toString()
     }
+    // local this.hash with correct `this` reference
+    const hash = this.hash.bind(this)
     // array
     if (Array.isArray(obj)) {
       return obj
         .sort()
-        .map(this.hash.bind(this))
+        .map(hash)
         .join('|')
     }
     // obj
     return Object.keys(obj)
       .sort()
-      .map(key => `${key}:${this.hash.bind(this)(obj[key])}`)
+      .map(key => `${key}:${hash(obj[key])}`)
       .join('|')
   }
 }
