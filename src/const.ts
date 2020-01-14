@@ -45,6 +45,7 @@ export const RESPONSIVE_SIZES = {
   // TABLET: 720,
   // TABLET_LARGE: 866,
   // WEB_SMALL: 1024,
+  // WEB: 1200,
 
   // REM SIZES:
   MOBILE_SMALL: 20,
@@ -53,6 +54,7 @@ export const RESPONSIVE_SIZES = {
   TABLET: 45,
   TABLET_LARGE: 54.125,
   WEB_SMALL: 64,
+  WEB: 75,
 }
 
 export const DEFAULT_DECIMALS = 4
