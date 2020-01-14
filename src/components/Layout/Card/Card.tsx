@@ -137,7 +137,7 @@ export const CardTable = styled.table<{
 
       &.selected {
         background-color: var(--color-button-disabled);
-        color: var(--color-background-pageWrapper);
+        color: #fff;
       }
 
       // Separation between CELLS
@@ -153,6 +153,16 @@ export const CardTable = styled.table<{
     > tr {
       background-color: transparent;
       box-shadow: none;
+
+      > th {
+        color: var(--color-text-deposit-primary);
+        line-height: 1.5;
+        font-size: 0.8em;
+        text-transform: uppercase;
+        overflow-wrap: break-word;
+        padding: 0.5em;
+        font-weight: bolder;
+      }
     }
   }
 
@@ -160,6 +170,7 @@ export const CardTable = styled.table<{
   tbody {
     > tr:not(${CardRowDrawer}) {
       background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor};
+      border: 0.125rem solid transparent;
       box-shadow: var(--box-shadow);
 
       > td {
@@ -171,6 +182,7 @@ export const CardTable = styled.table<{
       // Don't highlight on hover selected rows or the drawer
       &:not(.selected):not(${CardRowDrawer}):hover {
         background: var(--color-background-selected);
+        border: 0.125rem solid var(--color-border);
       }
     }
   }

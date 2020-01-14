@@ -4,20 +4,6 @@ import { RESPONSIVE_SIZES } from 'const'
 const { TABLET } = RESPONSIVE_SIZES
 
 export const DepositWidgetWrapper = styled.section`
-  thead {
-    > tr {
-      > * {
-        color: #000000;
-        line-height: 1.5;
-        font-size: 0.8em;
-        text-transform: uppercase;
-        overflow-wrap: break-word;
-        padding: 0.5em;
-        font-weight: bolder;
-      }
-    }
-  }
-
   .rowContainer {
     display: inherit;
     grid-template-rows: auto;
@@ -38,11 +24,6 @@ export const ModalBodyWrapper = styled.div`
 `
 
 export const TokenRow = styled.tr`
-  &:hover {
-    background: var(--color-background-selected);
-    border: 0.125rem solid var(--color-border);
-  }
-
   // Each cell wrapper
   > * {
     margin: 0.1rem;

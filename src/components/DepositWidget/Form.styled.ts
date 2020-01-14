@@ -27,11 +27,9 @@ export const WalletDrawerInnerWrapper = styled.div`
     position: relative;
     display: grid;
     grid-template-columns: minmax(6.3125rem, 7.25rem) minmax(1.5625rem, 0.3fr) minmax(3.375rem, 0.6fr) 4.0625rem;
-
     justify-content: center;
     align-items: center;
     text-align: center;
-
     &:last-child {
       margin: auto;
       width: 80%;
@@ -41,8 +39,14 @@ export const WalletDrawerInnerWrapper = styled.div`
       text-align: right;
     }
     > input {
+      background-color: #fff;
+      color: #000;
       margin: 0;
       width: 100%;
+
+      &:disabled {
+        background-color: #6f6f6f;
+      }
     }
   }
 
