@@ -1,1 +1,1 @@
-export * from './CacheProxy'
+export * from './CacheMixin'

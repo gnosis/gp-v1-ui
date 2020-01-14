@@ -1,4 +1,4 @@
-import { CacheMixin } from 'api/proxy/CacheMixin'
+import { CacheMixin } from 'api/proxy'
 
 interface TestApi {
   echo(params: Params): string
