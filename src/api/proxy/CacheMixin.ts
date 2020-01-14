@@ -85,10 +85,10 @@ export class CacheMixin {
     return obj
   }
 
-  private store<R>(hash: string, obj: R, expiration?: number): void {
-    if (expiration) {
+  private store<R>(hash: string, obj: R, ttl?: number): void {
+    if (ttl) {
       // with TTL
-      this.cache.set(hash, obj, expiration)
+      this.cache.set(hash, obj, ttl)
     } else {
       // based on default config
       this.cache.set(hash, obj)
