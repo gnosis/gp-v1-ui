@@ -1,7 +1,7 @@
 import 'types'
 
 import { hot } from 'react-hot-loader/root'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
 
 // SCSS
@@ -29,10 +29,25 @@ import { walletApi } from 'api'
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
 
+import useSafeState from 'hooks/useSafeState'
+
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
-  const isConnected = walletApi.isConnected()
+  const [isPending, setIsPending] = useSafeState(true)
+  const [isConnected, setIsConnected] = useSafeState(false)
+
+  useEffect(() => {
+    Promise.resolve(walletApi.isConnected()).then(connected => {
+      setIsConnected(connected)
+      setIsPending(false)
+    })
+  }, [setIsConnected, setIsPending])
 
   const { component: Component, ...rest } = props
+
+  if (isPending) {
+    return <Route {...rest} render={(): null => null} />
+  }
+
   return (
     <Route
       {...rest}
