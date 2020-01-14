@@ -77,7 +77,7 @@ export class CacheMixin {
   private get<R>(hash: string): R | undefined {
     const obj = this.cache.get<R>(hash)
 
-    if (obj !== undefined) {
+    if (obj === undefined) {
       return
     }
 
