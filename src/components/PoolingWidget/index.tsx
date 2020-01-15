@@ -12,12 +12,12 @@ import {
 
 interface ProgressBarProps {
   step: number
+  stepArray: string[]
 }
 
-const stepArray = ['Select Token', 'Define Spread', 'Create Strategy', 'Add Funding']
 const stepChecker = (step: number, index: number): boolean => step >= index + 1 && step <= 4
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ step }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
   return (
     <>
       <BarWrapper>
@@ -60,7 +60,7 @@ const PoolingInterface: React.FC = () => {
     <Widget>
       <PoolingInterfaceWrapper $width="75vw">
         <h2>New Strategy</h2>
-        <ProgressBar step={step} />
+        <ProgressBar step={step} stepArray={['Select Token', 'Define Spread', 'Create Strategy', 'Add Funding']} />
         {/* Main Components here */}
         <div>
           <button disabled={step < 2} onClick={(): void => prevStep()}>
