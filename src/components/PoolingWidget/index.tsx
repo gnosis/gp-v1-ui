@@ -29,6 +29,10 @@ const ProgressStep = styled.div<{ $bgColor?: string }>`
   background: ${({ $bgColor = 'lightgrey' }): string => $bgColor};
 `
 
+const ProgressStepText = styled.p<{ $bold: string }>`
+  font-weight: ${({ $bold }): string => $bold};
+`
+
 const StepSeparator = styled.div<{ $bgColor?: string }>`
   align-self: center;
   height: 1rem;
@@ -59,7 +63,7 @@ const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>`
     white-space: nowrap;
   }
 
-  > ${ProgressStep}, ${StepSeparator} {
+  > ${ProgressStep}, ${StepSeparator}, ${ProgressStepText} {
     transition: all 0.7s ease-in-out;
   }
 
@@ -78,6 +82,7 @@ interface ProgressBarProps {
 }
 
 const stepArray = ['Select Token', 'Define Spread', 'Create Strategy', 'Add Funding']
+const stepChecker = (step: number, index: number): boolean => step >= index + 1 && step <= 4
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ step }) => {
   return (
@@ -85,19 +90,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step }) => {
       <BarWrapper>
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
-            <ProgressStep $bgColor={step >= index + 1 && step <= 4 ? 'lightskyblue' : 'lightgrey'}>
-              {index + 1}
-            </ProgressStep>
-            {index + 1 < 4 && (
-              <StepSeparator $bgColor={step >= index + 1 && step <= 4 ? 'lightskyblue' : 'lightgrey'} />
-            )}
+            <ProgressStep $bgColor={stepChecker(step, index) ? 'lightskyblue' : 'lightgrey'}>{index + 1}</ProgressStep>
+            {index + 1 < 4 && <StepSeparator $bgColor={stepChecker(step, index) ? 'lightskyblue' : 'lightgrey'} />}
           </React.Fragment>
         ))}
       </BarWrapper>
       <BarWrapper $minHeight="auto">
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
-            <p>{stepName}</p>
+            <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{stepName}</ProgressStepText>
             {index + 1 < 4 && <p />}
           </React.Fragment>
         ))}
