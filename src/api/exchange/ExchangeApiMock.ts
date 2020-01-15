@@ -17,6 +17,7 @@ import {
   GetOrdersParams,
   GetTokenAddressByIdParams,
   GetTokenIdByAddressParams,
+  PlaceValidFromOrdersParams,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
@@ -113,6 +114,42 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       priceDenominator: params.sellAmount,
       remainingAmount: params.sellAmount,
     })
+
+    return RECEIPT
+  }
+
+  public async placeValidFromOrders({
+    userAddress,
+    buyTokens,
+    sellTokens,
+    validFroms,
+    validUntils,
+    buyAmounts,
+    sellAmounts,
+    txOptionalParams,
+  }: PlaceValidFromOrdersParams): Promise<Receipt> {
+    const length = buyTokens.length
+    assert(
+      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every(el => el.length === length),
+      'Parameters length do not match',
+    )
+    assert(length > 0, 'At least one order required')
+
+    await waitAndSendReceipt({ txOptionalParams })
+
+    this._initOrders(userAddress)
+
+    for (let i = 0; i < length; i++) {
+      this.orders[userAddress].push({
+        buyTokenId: buyTokens[i],
+        sellTokenId: sellTokens[i],
+        validFrom: validFroms[i],
+        validUntil: validUntils[i],
+        priceNumerator: buyAmounts[i],
+        priceDenominator: sellAmounts[i],
+        remainingAmount: sellAmounts[i],
+      })
+    }
 
     return RECEIPT
   }
