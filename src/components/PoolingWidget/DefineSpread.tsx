@@ -5,7 +5,7 @@ import { SpreadInformationWrapper, DefineSpreadWrapper } from './DefineSpread.st
 import { DEFAULT_DECIMALS } from 'const'
 
 interface DefineSpreadProps {
-  selectedTokens: TokenDetails[]
+  selectedTokensMap: Map<number, TokenDetails>
   defaultSpread?: number
 }
 
@@ -13,7 +13,7 @@ interface SpreadInformationProps extends DefineSpreadProps {
   spread: number
 }
 
-const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokens, spread }) => (
+const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => (
   <SpreadInformationWrapper>
     {/* [{ name: 'DAI', ... }, ...] */}
     <table>
@@ -24,9 +24,9 @@ const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokens, s
         </tr>
       </thead>
       <tbody>
-        {selectedTokens.map((token, index: number, arr) =>
-          arr.map(otherToken => {
-            if (otherToken.id === token.id) return
+        {Array.from(selectedTokensMap).map(([id, token], index: number, arr) =>
+          arr.map(([otherId, otherToken]) => {
+            if (otherId === id) return
             return (
               <tr key={index}>
                 <td>
@@ -46,7 +46,7 @@ const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokens, s
   </SpreadInformationWrapper>
 )
 
-const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokens, defaultSpread = 0.2 }) => {
+const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, defaultSpread = 0.2 }) => {
   const [spread, setSpread] = useSafeState(defaultSpread)
 
   const handleSpreadChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>): void => {
@@ -58,7 +58,7 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokens, defaultSpre
   return (
     <DefineSpreadWrapper>
       <input type="number" step="0.1" value={spread} onChange={handleSpreadChange} />
-      <SpreadInformation selectedTokens={selectedTokens} spread={spread} />
+      <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
     </DefineSpreadWrapper>
   )
 }
