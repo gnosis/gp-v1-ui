@@ -256,9 +256,9 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async disconnect(): Promise<void> {
-    if (isWalletConnectProvider(this._provider) && (await this._connected)) await this._provider.close()
-
     this._unsubscribe()
+
+    if (isWalletConnectProvider(this._provider) && (await this._connected)) await this._provider.close()
 
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
