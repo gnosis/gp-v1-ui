@@ -9,7 +9,7 @@ import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
-interface TokenSelectorProps {
+export interface TokenSelectorProps {
   handleTokenSelect: (tokenData: TokenDetails) => void
   selectedTokens: number[]
   tokens: TokenDetails[]
