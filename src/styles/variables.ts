@@ -10,6 +10,7 @@ const LightColors = `
   --color-background-selected: ##d9d9d9;
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #bfbfbf;
+  --color-background-progressBar: lightskyblue;
 
   // Borders
   --color-border: transparent;
@@ -46,6 +47,7 @@ const DarkColors = `
   --color-background-selected: ##d9d9d9;
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #2a2d2f;
+  --color-background-progressBar: #4338b5;
 
   // Borders
   --color-border: #262626;
