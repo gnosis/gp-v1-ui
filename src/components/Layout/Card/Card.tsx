@@ -1,7 +1,6 @@
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import { RESPONSIVE_SIZES } from 'const'
-import useWindowSizes from 'hooks/useWindowSizes'
 
 const CardRowDrawer = styled.tr<{ responsive: boolean }>`
   display: flex;
@@ -248,98 +247,3 @@ export const CardTable = styled.table<{
     ${({ $responsiveCSS }): string | undefined => $responsiveCSS}
   }
 `
-
-// TODO: remove all below
-const fakeData = [
-  { a: 1, b: 2, c: 3, d: 'Open Drawer' },
-  { a: 1, b: 2, c: 3, d: 'Open Drawer' },
-  { a: 1, b: 2, c: 3, d: 'Open Drawer' },
-]
-
-const webCSS = `
-  background: transparent;
-  &:not(:first-child) { margin-top: 3rem; }
-  > tbody, thead { 
-    > tr {
-      min-height: 3rem;
-    }
-  }
-`
-const responsiveCSS = `
-  background: transparent;
-  color: #000;
-`
-export const Test: React.FC = () => {
-  const [openDrawer, setOpenDrawer] = useState(false)
-  const { innerWidth } = useWindowSizes()
-
-  return (
-    <CardTable
-      $columns="repeat(4, 1fr)"
-      $bgColor="lightgrey"
-      $webCSS={webCSS}
-      $responsiveCSS={responsiveCSS}
-      $rowSeparation="0.7rem"
-    >
-      <thead>
-        <tr>
-          <th>One</th>
-          <th>Two</th>
-          <th>Three</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {fakeData.map((item, index) => (
-          <React.Fragment key={index + Math.random()}>
-            <tr>
-              <td data-label="Yo">{item.a}</td>
-              <td data-label="Labels">{item.b}</td>
-              <td data-label="Are Dope">{item.c}</td>
-              <td data-label="Action">
-                <button onClick={(): void => setOpenDrawer(!openDrawer)}>
-                  {openDrawer ? 'Close Drawer' : 'Open Drawer'}
-                </button>
-              </td>
-            </tr>
-            {openDrawer && (
-              <CardDrawer
-                responsive={!!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE_PX}
-                closeDrawer={(): void => setOpenDrawer(false)}
-              >
-                <CardTable
-                  $columns="repeat(4, 1fr)"
-                  $bgColor="lightblue"
-                  $webCSS={webCSS}
-                  $responsiveCSS={responsiveCSS}
-                  $rowSeparation="0.7rem"
-                >
-                  <thead>
-                    <tr>
-                      <th>One</th>
-                      <th>Two</th>
-                      <th>Three</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {fakeData.map((item, index) => (
-                      <React.Fragment key={index + Math.random()}>
-                        <tr>
-                          <td data-label="Sub 1">{item.a}</td>
-                          <td data-label="Sub 2">{item.b}</td>
-                          <td data-label="Sub 4">{item.c}</td>
-                          <td data-label="Sub 4">Hello World</td>
-                        </tr>
-                      </React.Fragment>
-                    ))}
-                  </tbody>
-                </CardTable>
-              </CardDrawer>
-            )}
-          </React.Fragment>
-        ))}
-      </tbody>
-    </CardTable>
-  )
-}
