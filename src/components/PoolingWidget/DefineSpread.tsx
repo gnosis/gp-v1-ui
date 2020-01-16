@@ -4,8 +4,12 @@ import useSafeState from 'hooks/useSafeState'
 import { SpreadInformationWrapper, DefineSpreadWrapper } from './DefineSpread.styled'
 import { DEFAULT_DECIMALS } from 'const'
 
-interface SpreadInformationProps {
+interface DefineSpreadProps {
   selectedTokens: TokenDetails[]
+  defaultSpread?: number
+}
+
+interface SpreadInformationProps extends DefineSpreadProps {
   spread: number
 }
 
@@ -42,8 +46,8 @@ const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokens, s
   </SpreadInformationWrapper>
 )
 
-const DefineSpread: React.FC<SpreadInformationProps> = ({ selectedTokens }) => {
-  const [spread, setSpread] = useSafeState(0.2)
+const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokens, defaultSpread = 0.2 }) => {
+  const [spread, setSpread] = useSafeState(defaultSpread)
 
   const handleSpreadChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>): void => {
     if (+value < 0) return
