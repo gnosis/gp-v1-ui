@@ -17,7 +17,7 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
 `
 
 export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string }>`
-  color: #000;
+  color: var(--color-text-primary);
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
@@ -45,6 +45,16 @@ export const UserWalletToggler = styled(UserWalletItem)`
 `
 export const EtherImage = styled.img`
   max-width: 5%;
+
+  @media (prefers-color-scheme: dark) {
+    body:not(.light-theme) & {
+      filter: invert(100%);
+    }
+  }
+
+  body.dark-theme & {
+    filter: invert(100%);
+  }
 `
 
 export const CopyDiv = styled.div`
@@ -67,7 +77,7 @@ export const UserWalletSlideWrapper = styled.div`
 `
 
 export const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
-  color: ${({ color = '#000' }): string => color};
+  color: ${({ color = 'var(--color-text-primary)' }): string => color};
   font-size: ${({ $fontSize = '1rem' }): string => $fontSize};
   font-weight: bolder;
 `

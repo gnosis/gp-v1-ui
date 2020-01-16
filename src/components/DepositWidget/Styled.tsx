@@ -70,8 +70,14 @@ export const InnerWrapper = styled.div`
         text-align: right;
       }
       > input {
+        background-color: #fff;
+        color: #000;
         margin: 0;
         width: 100%;
+
+        &:disabled {
+          background-color: #6f6f6f;
+        }
       }
     }
 
@@ -131,7 +137,7 @@ export const DepositWidgetWrapper = styled.section`
     grid-template-columns: var(--grid-row-size-walletPage);
 
     > div {
-      color: #000000;
+      color: var(--color-text-deposit-primary);
       line-height: 1.5;
       font-size: 0.8em;
       text-transform: uppercase;
@@ -171,6 +177,7 @@ export const RowTokenDiv = styled.div`
   justify-content: center;
 
   background: var(--color-background-pageWrapper);
+  border: 0.125rem solid transparent;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
   margin: 0.3rem 0;
@@ -180,6 +187,7 @@ export const RowTokenDiv = styled.div`
 
   &:hover {
     background: var(--color-background-selected);
+    border: 0.125rem solid var(--color-border);
   }
 
   > div {
@@ -220,7 +228,7 @@ export const RowTokenDiv = styled.div`
 
   &.selected {
     background-color: var(--color-button-disabled);
-    color: var(--color-background-pageWrapper);
+    color: #fff;
   }
 
   &.loading {

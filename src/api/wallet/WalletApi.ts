@@ -37,6 +37,7 @@ export interface WalletApi {
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo
+  blockchainState: BlockchainUpdatePrompt
 }
 
 export interface WalletInfo {
@@ -193,6 +194,8 @@ export class WalletApiImpl implements WalletApi {
   private _provider: Provider | null
   private _web3: Web3
 
+  public blockchainState: BlockchainUpdatePrompt
+
   private _unsubscribe: Command = () => {
     // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
   }
@@ -224,7 +227,18 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
-    await this._notifyListeners()
+    const {
+      accounts: [account],
+      chainId,
+    } = getProviderState(provider)
+
+    this.blockchainState = {
+      account,
+      chainId,
+      blockHeader: null,
+    }
+
+    await this._notifyListeners(this.blockchainState)
 
     const subscriptions = createSubscriptions(provider)
     console.log('Provider', provider)
@@ -331,7 +345,9 @@ export class WalletApiImpl implements WalletApi {
     }
   }
 
-  private async _notifyListeners(): Promise<void> {
+  private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
+    if (blockchainUpdate) this.blockchainState = blockchainUpdate
+
     await Promise.resolve()
     // const walletInfo: WalletInfo = this.getWalletInfo()
     // const account = (await this._web3.eth.getAccounts())[0]

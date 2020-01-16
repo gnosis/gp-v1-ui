@@ -159,7 +159,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
             ) : (
               // Address and copy button
               <>
-                <MonospaceAddress color="#000">{userAddress} </MonospaceAddress>
+                <MonospaceAddress>{userAddress} </MonospaceAddress>
                 <CopyToClipboard text={userAddress} onCopy={handleCopyToClipBoard}>
                   <FontAwesomeIcon
                     color="#ff62a2;"

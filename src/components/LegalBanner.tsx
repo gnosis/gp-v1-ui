@@ -10,8 +10,8 @@ const Wrapper = styled.div`
   align-items: center;
   justify-content: center;
 
-  background-color: #272727;
-  color: wheat;
+  background-color: var(--color-background-banner);
+  color: var(--color-text-banner);
 
   text-align: center;
   font-size: 0.65rem;
