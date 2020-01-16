@@ -201,8 +201,8 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const contract = await this._getContract(networkId)
 
-    const buyAmountsStr = buyAmounts.map(amountBn => amountBn.toString())
-    const sellAmountsStr = sellAmounts.map(amountBn => amountBn.toString())
+    const buyAmountsStr = buyAmounts.map(String)
+    const sellAmountsStr = sellAmounts.map(String)
 
     const tx = contract.methods
       .placeValidFromOrders(buyTokens, sellTokens, validFroms, validUntils, buyAmountsStr, sellAmountsStr)
