@@ -91,7 +91,11 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             'Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1',
         }
       case 2:
-        return { title: '2. Define your spread', subtext: '' }
+        return {
+          title: '2. Define your spread',
+          subtext:
+            'The spread defines the percentage you want to sell above $1, and buy below 1$ between all selected tokens',
+        }
       case 3:
         return { title: '3. Create strategy', subtext: '' }
       case 4:
@@ -185,10 +189,6 @@ const PoolingInterface: React.FC = () => {
         <SubComponents step={step} {...restProps} />
 
         <StepButtonsWrapper>
-          <GreySubText>
-            Please select at least two tokens to continue{' '}
-            {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
-          </GreySubText>
           <button disabled={step < 2 || selectedTokensMap.size < 2} onClick={(): void => prevStep()}>
             Back
           </button>
