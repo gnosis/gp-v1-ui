@@ -28,6 +28,7 @@ import { walletApi } from 'api'
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
+import { Test } from 'components/Layout/Card/Card'
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
   const isConnected = walletApi.isConnected()
@@ -72,6 +73,7 @@ const App: React.FC = () => (
           <Route path="/about" exact component={About} />
           <Route path="/source-code" exact component={SourceCode} />
           <Route path="/connect-wallet" exact component={ConnectWallet} />
+          <Route path="/test" exact component={Test} />
           <Redirect from="/" to="/trade/DAI-USDC?sell=0&buy=0" />
           <Route component={NotFound} />
         </Switch>

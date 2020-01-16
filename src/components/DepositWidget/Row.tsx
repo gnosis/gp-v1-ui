@@ -5,7 +5,7 @@ import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
-import { RowTokenDiv, RowClaimButton, RowClaimLink } from './Styled'
+import { TokenRow, RowClaimButton, RowClaimLink } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
@@ -54,7 +54,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
 
   // Checks innerWidth
-  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE
+  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE_PX
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
@@ -71,15 +71,15 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   return (
     <>
-      <RowTokenDiv data-address={address} className={className} data-address-mainnet={addressMainnet}>
-        <div data-label="Token">
+      <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
+        <td data-label="Token">
           <TokenImg src={image} alt={name} />
           <div>{name}</div>
-        </div>
-        <div data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
+        </td>
+        <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
           {formatAmount(totalExchangeBalance, decimals)}
-        </div>
-        <div data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
+        </td>
+        <td data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
@@ -107,11 +107,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           ) : (
             0
           )}
-        </div>
-        <div data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
+        </td>
+        <td data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
           {formatAmount(walletBalance, decimals)}
-        </div>
-        <div data-label="Actions">
+        </td>
+        <td data-label="Actions">
           {enabled ? (
             <>
               <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
@@ -138,8 +138,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               )}
             </button>
           )}
-        </div>
-      </RowTokenDiv>
+        </td>
+      </TokenRow>
       {isDepositFormVisible && (
         <Form
           title={

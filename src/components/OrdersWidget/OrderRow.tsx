@@ -1,20 +1,18 @@
 import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
-import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faExclamationTriangle,
   faSpinner,
+  faTrashAlt,
   faExchangeAlt,
   faChevronUp,
   faChevronDown,
-  faTrashAlt,
 } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
-// import TokenImg from 'components/TokenImg'
 
 import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
@@ -30,199 +28,17 @@ import {
   formatPrice,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
-import { MIN_UNLIMITED_SELL_ORDER, RESPONSIVE_SIZES } from 'const'
+import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
-
-export const OrderRowWrapper = styled.div<{ $open?: boolean }>`
-  display: grid;
-  grid-template-columns: 5rem minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) 6.5rem;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-background-pageWrapper);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-  margin: 0.3rem 0;
-  min-height: 4rem;
-  text-align: center;
-  z-index: 1;
-  transition: all 0.2s ease-in-out;
-
-  > div {
-    margin: 0 0.85rem;
-  }
-
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    grid-template-columns: none;
-    grid-template-rows: auto;
-
-    align-items: center;
-    justify-content: stretch;
-    padding: 0 0.7rem;
-
-    &.selected {
-      > div {
-        border-bottom: 0.0625rem solid #ffffff40;
-      }
-    }
-
-    > div {
-      display: flex;
-      flex-flow: row;
-      align-items: center;
-      border-bottom: 0.0625rem solid #00000024;
-
-      margin: 0;
-      padding: 0.7rem;
-
-      &:first-child {
-        grid-row-start: 6;
-        width: 100%;
-
-        > img {
-          order: 2;
-          margin-right: -0.5rem;
-        }
-      }
-
-      &.order-image-row,
-      &.cardOpener {
-        display: initial;
-      }
-
-      &.order-image-row {
-        > div {
-          display: flex;
-          align-items: center;
-          justify-content: space-evenly;
-          max-width: 72%;
-          margin: auto;
-
-          > div {
-            display: inherit;
-            justify-content: inherit;
-            align-items: center;
-            > * {
-              margin: 0 0.3rem;
-            }
-          }
-        }
-      }
-
-      > .order-details {
-        display: none;
-        // grid-template-columns: min-content minmax(2.2rem, max-content);
-      }
-
-      > .order-details-responsive {
-        display: flex;
-      }
-
-      &.checked {
-        grid-template-columns: 0.5fr 1fr;
-
-        > button {
-          display: flex;
-        }
-        > input {
-          display: none;
-        }
-      }
-
-      &:not(:nth-child(2)):not(:last-child)::before {
-        content: attr(data-label);
-        margin-right: auto;
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 0.7rem;
-      }
-
-      ${(props): string | false =>
-        !props.$open &&
-        `
-        &:not(:nth-child(2)):not(:nth-child(3)):not(:last-child) {
-          display: none;
-        }
-      `}
-    }
-  }
-
-  .cardOpener {
-    cursor: pointer;
-  }
-
-  .order-image-row,
-  .cardOpener {
-    display: none;
-  }
-
-  .checked {
-    > button {
-      display: none;
-      justify-content: center;
-      align-items: center;
-
-      margin: 0 0 0 auto;
-      > * {
-        margin: 0 0.5rem;
-      }
-    }
-  }
-
-  .order-details-responsive {
-    display: none;
-  }
-
-  .order-details {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    grid-gap: 0 1rem;
-    text-align: left;
-    justify-content: space-evenly;
-
-    .order-details-subgrid {
-      display: grid;
-      grid-template-columns: min-content minmax(5.6rem, max-content);
-      grid-gap: 0 0.5rem;
-      justify-content: space-between;
-    }
-  }
-
-  .sub-columns {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: center;
-    align-items: center;
-
-    div:first-child {
-      justify-self: end;
-    }
-
-    > *:not(:last-child) {
-      margin: 0 0.3rem;
-    }
-  }
-
-  .pendingCell {
-    place-items: center;
-
-    a {
-      top: 100%;
-      position: absolute;
-    }
-  }
-
-  &.pending {
-    color: grey;
-  }
-`
+import { OrderRowWrapper } from './OrderRow.styled'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
   return (
-    <div className="container pendingCell" data-label="Actions">
+    <td className="pendingCell" data-label="Actions">
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
-    </div>
+    </td>
   )
 }
 
@@ -230,7 +46,7 @@ const DeleteOrder: React.FC<Pick<
   Props,
   'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
 >> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
-  <div data-label="Actions" className="checked">
+  <td data-label="Actions" className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
@@ -240,7 +56,7 @@ const DeleteOrder: React.FC<Pick<
     <button className="danger" onClick={toggleMarkedForDeletion}>
       Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
     </button>
-  </div>
+  </td>
 )
 
 function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
@@ -270,7 +86,7 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 
 const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = ({ buyToken, sellToken }) => {
   return (
-    <div className="container order-image-row">
+    <td className="order-image-row">
       <div>
         {/* e.g SELL DAI <-> BUY TUSD */}
         <div>
@@ -284,7 +100,7 @@ const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = 
           <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
         </div>
       </div>
-    </div>
+    </td>
   )
 }
 
@@ -297,7 +113,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
   }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
 
   return (
-    <div className="container" data-label="Price (at least)">
+    <td data-label="Price (at least)">
       <div className="order-details">
         <div>Sell</div>
         <div className="order-details-subgrid">
@@ -318,7 +134,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
           <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
         </div>
       </div>
-    </div>
+    </td>
   )
 }
 
@@ -334,7 +150,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   const unlimited = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
 
   return (
-    <div data-label="Unfilled Amount" className={'container' + (unlimited ? '' : ' sub-columns two-columns')}>
+    <td data-label="Unfilled Amount" className={unlimited ? '' : 'sub-columns two-columns'}>
       {unlimited ? (
         <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
       ) : (
@@ -345,7 +161,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
           </div>
         </>
       )}
-    </div>
+    </td>
   )
 }
 
@@ -361,7 +177,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
   const isActive = isOrderActive(order, new Date())
 
   return (
-    <div data-label="Account Balance" className="container sub-columns three-columns">
+    <td data-label="Account Balance" className="sub-columns three-columns">
       <div>{accountBalance}</div>
       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
       {isOverBalance && isActive && (
@@ -369,7 +185,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
           <FontAwesomeIcon icon={faExclamationTriangle} />
         </div>
       )}
-    </div>
+    </td>
   )
 }
 
@@ -382,13 +198,13 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
   }, [order.validUntil])
 
   return (
-    <div data-label="Expires">
+    <td data-label="Expires">
       {isNeverExpires ? (
         <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
       ) : (
         <Highlight color={'inherit'}>{expiresOn}</Highlight>
       )}
-    </div>
+    </td>
   )
 }
 
@@ -419,9 +235,9 @@ interface ResponsiveRowSizeTogglerProps {
 
 const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
   return (
-    <div className="container cardOpener" onClick={handleOpen}>
+    <td className="cardOpener" onClick={handleOpen}>
       <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
-    </div>
+    </td>
   )
 }
 
@@ -461,28 +277,27 @@ const OrderRow: React.FC<Props> = props => {
   }, [networkId, order, setBuyToken, setSellToken])
 
   return (
-    <>
-      {sellToken && buyToken && (
-        <OrderRowWrapper className={'orderRow' + (pending ? ' pending' : '')} $open={openCard}>
-          {pending ? (
-            <PendingLink transactionHash={transactionHash} />
-          ) : (
-            <DeleteOrder
-              isMarkedForDeletion={isMarkedForDeletion}
-              toggleMarkedForDeletion={toggleMarkedForDeletion}
-              pending={pending}
-              disabled={disabled}
-            />
-          )}
-          <OrderImage sellToken={sellToken} buyToken={buyToken} />
-          <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-          <UnfilledAmount order={order} sellToken={sellToken} />
-          <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
-          <Expires order={order} pending={pending} />
-          <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
-        </OrderRowWrapper>
-      )}
-    </>
+    sellToken &&
+    buyToken && (
+      <OrderRowWrapper $color={pending ? 'grey' : 'inherit'} $open={openCard}>
+        {pending ? (
+          <PendingLink transactionHash={transactionHash} />
+        ) : (
+          <DeleteOrder
+            isMarkedForDeletion={isMarkedForDeletion}
+            toggleMarkedForDeletion={toggleMarkedForDeletion}
+            pending={pending}
+            disabled={disabled}
+          />
+        )}
+        <OrderImage sellToken={sellToken} buyToken={buyToken} />
+        <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
+        <UnfilledAmount order={order} sellToken={sellToken} />
+        <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
+        <Expires order={order} pending={pending} />
+        <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
+      </OrderRowWrapper>
+    )
   )
 }
 
