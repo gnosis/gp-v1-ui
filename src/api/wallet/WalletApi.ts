@@ -74,10 +74,7 @@ const subscribeToBlockchainUpdate = ({
   subscriptions?: Subscriptions
   web3: Web3
 }): BlockchainUpdatePromptCallback => {
-  console.log('provider', provider)
   const subs = subscriptions || createSubscriptions(provider)
-  console.log('subscriptions', subscriptions)
-  console.log('subs', subs)
 
   const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
     const blockSub = web3.eth.subscribe('newBlockHeaders').on('data', cb)
@@ -86,16 +83,31 @@ const subscribeToBlockchainUpdate = ({
     }
   }
 
-  if (!subs) {
-    let blockchainPrompt: BlockchainUpdatePrompt = {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      account: (provider as any).address,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      chainId: +(provider as any).chainId,
+  let blockchainPrompt: BlockchainUpdatePrompt
+
+  const providerState = getProviderState(provider)
+
+  if (providerState) {
+    const {
+      accounts: [account],
+      chainId,
+    } = providerState
+
+    blockchainPrompt = {
+      account,
+      chainId: +chainId,
       blockHeader: null,
     }
+  } else {
+    blockchainPrompt = {
+      account: '',
+      chainId: 0,
+      blockHeader: null,
+    }
+  }
+
+  if (!subs || !providerState) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    console.log('(provider as any).address', (provider as any).address)
 
     const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
       const unsubBlock = blockUpdate(blockHeader => {
@@ -118,17 +130,6 @@ const subscribeToBlockchainUpdate = ({
   if (isWalletConnectSubscriptions(subs)) networkUpdate = subs.onChainChanged
 
   const accountsUpdate = subs.onAccountsChanged
-
-  const {
-    accounts: [account],
-    chainId,
-  } = getProviderState(provider)
-
-  let blockchainPrompt: BlockchainUpdatePrompt = {
-    account,
-    chainId: +chainId,
-    blockHeader: null,
-  }
 
   const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
     const unsubNetwork = networkUpdate(chainId => {
@@ -227,8 +228,6 @@ export class WalletApiImpl implements WalletApi {
     await this._notifyListeners()
 
     const subscriptions = createSubscriptions(provider)
-    console.log('Provider', provider)
-    console.log('Subscriptions', subscriptions)
 
     const unsubscribeUpdates = subscribeToBlockchainUpdate({ subscriptions, provider, web3: this._web3 })(
       this._notifyListeners.bind(this),
