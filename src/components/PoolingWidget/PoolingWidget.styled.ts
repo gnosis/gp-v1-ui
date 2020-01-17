@@ -11,6 +11,11 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
   > h2 {
     margin-right: auto;
   }
+
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_LARGE}em) {
+    padding: 1.5rem;
+    width: auto;
+  }
 `
 
 export const ProgressStep = styled.div<{ $bgColor?: string }>`
@@ -22,7 +27,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
   font-size: xx-large;
   font-weight: bolder;
 
-  background: ${({ $bgColor = 'lightgrey' }): string => $bgColor};
+  background: ${({ $bgColor = 'var(--color-background)' }): string => $bgColor};
 `
 
 export const ProgressStepText = styled.p<{ $bold: string }>`
@@ -92,6 +97,16 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
     > p {
       white-space: normal;
     }
+  }
+
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_LARGE}em) {
+    min-height: 10vw;
+    min-width: 72vw;
+  }
+
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_SMALL}em) {
+    margin: 0;
+    width: 90%;
   }
 `
 

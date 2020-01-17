@@ -37,12 +37,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
       <BarWrapper>
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
-            <ProgressStep $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'lightgrey'}>
+            <ProgressStep
+              $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
+            >
               <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{index + 1}</ProgressStepText>
             </ProgressStep>
             {index + 1 < 4 && (
               <StepSeparator
-                $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'lightgrey'}
+                $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
               />
             )}
           </React.Fragment>
