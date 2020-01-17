@@ -17,8 +17,14 @@ export function adjustAmountToLowerPrecision(amount: BN, higherPrecision: number
   // 1.2345, precision 4, amount == 12345
   // 1.2345, precision 2, amount == 12345 / 10 ^ (4 - 2) => 12345 / 100 => 123
   // 1.5550, precision 1, amount == 15550 / 10 ^ (4 - 1) => 15550 / 1000 => 16
-  // return amount.divRound(TEN.pow(difference))
   return amount.divRound(TEN.pow(difference))
+}
+
+function bigNumberToBN(n: BigNumber | BN): BN {
+  if (n instanceof BN) {
+    return n
+  }
+  return new BN(n.integerValue().toString(10))
 }
 
 interface Amounts {
@@ -43,43 +49,29 @@ export function maxAmountsForSpread(spread: number, buyTokenPrecision: number, s
   // Enforcing positive spreads: 0 < spread < 100
   assert(spread > 0 && spread < 100, 'Invalid spread amount')
 
-  BigNumber.config({ ROUNDING_MODE: BigNumber.ROUND_HALF_DOWN })
-
   const spreadPercentage = new BigNumber(spread).dividedBy(new BigNumber(100))
+
+  let buyAmount
+  let sellAmount
 
   if (buyTokenPrecision === sellTokenPrecision) {
     // case 1: same precision
     // buyAmount == MAX, sellAmount == buyAmount * (1 - (spread/100))
-    const _buyAmount = MAX
-    const _sellAmount = _buyAmount.multipliedBy(ONE.minus(spreadPercentage))
-
-    const buyAmount = new BN(_buyAmount.integerValue().toString(10))
-    const sellAmount = new BN(_sellAmount.integerValue().toString(10))
-
-    return { buyAmount, sellAmount }
+    buyAmount = MAX
+    sellAmount = buyAmount.multipliedBy(ONE.minus(spreadPercentage))
   } else if (buyTokenPrecision > sellTokenPrecision) {
     // case 2: buyTokenPrecision > sellTokenPrecision
     // buyAmount == MAX, sellAmount == buyAmount * (1 - (spread/100))
-    const buyAmount = MAX
+    buyAmount = MAX
     const rawSellAmount = buyAmount.multipliedBy(ONE.minus(spreadPercentage))
-    const sellAmount = adjustAmountToLowerPrecision(
-      new BN(rawSellAmount.integerValue().toString(10)),
-      buyTokenPrecision,
-      sellTokenPrecision,
-    )
-
-    return { buyAmount: new BN(buyAmount.integerValue().toString(10)), sellAmount }
+    sellAmount = adjustAmountToLowerPrecision(bigNumberToBN(rawSellAmount), buyTokenPrecision, sellTokenPrecision)
   } else {
     // case 3: buyTokenPrecision < sellTokenPrecision
     // sellAmount == MAX, buyAmount == sellAmount * (1 + (spread/100))
-    const sellAmount = MAX
+    sellAmount = MAX
     const rawBuyAmount = sellAmount.multipliedBy(ONE.plus(spreadPercentage))
-    const buyAmount = adjustAmountToLowerPrecision(
-      new BN(rawBuyAmount.integerValue().toString(10)),
-      sellTokenPrecision,
-      buyTokenPrecision,
-    )
-
-    return { buyAmount, sellAmount: new BN(sellAmount.integerValue().toString(10)) }
+    buyAmount = adjustAmountToLowerPrecision(bigNumberToBN(rawBuyAmount), sellTokenPrecision, buyTokenPrecision)
   }
+
+  return { buyAmount: bigNumberToBN(buyAmount), sellAmount: bigNumberToBN(sellAmount) }
 }
