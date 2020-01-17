@@ -53,6 +53,7 @@ export const RESPONSIVE_SIZES = {
   TABLET: 45,
   TABLET_LARGE: 54.125,
   WEB_SMALL: 64,
+  WEB: 75,
 }
 
 export const DEFAULT_DECIMALS = 4
