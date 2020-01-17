@@ -26,6 +26,8 @@ import {
 import { log, toBN } from 'utils'
 import { INFURA_ID } from 'const'
 
+import { subscribeToWeb3Event } from './subscriptionHelpers'
+
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
@@ -78,10 +80,13 @@ const subscribeToBlockchainUpdate = ({
   const subs = subscriptions || createSubscriptions(provider)
 
   const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
-    const blockSub = web3.eth.subscribe('newBlockHeaders').on('data', cb)
-    return (): void => {
-      blockSub.unsubscribe()
-    }
+    return subscribeToWeb3Event({
+      web3,
+      interval: 8000,
+      callback: cb,
+      getter: web3 => web3.eth.getBlock('latest'),
+      event: 'newBlockHeaders',
+    })
   }
 
   let blockchainPrompt: BlockchainUpdatePrompt
@@ -117,9 +122,7 @@ const subscribeToBlockchainUpdate = ({
         callback(blockchainPrompt)
       })
 
-      return (): void => {
-        unsubBlock()
-      }
+      return unsubBlock
     }
 
     return subscriptionHOC
