@@ -15,7 +15,6 @@ interface SpreadInformationProps extends DefineSpreadProps {
 
 const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => (
   <SpreadInformationWrapper>
-    {/* [{ name: 'DAI', ... }, ...] */}
     <table>
       <thead>
         <tr>
@@ -24,11 +23,11 @@ const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap
         </tr>
       </thead>
       <tbody>
-        {Array.from(selectedTokensMap).map(([id, token], index: number, arr) =>
+        {Array.from(selectedTokensMap).map(([id, token], _, arr) =>
           arr.map(([otherId, otherToken]) => {
             if (otherId === id) return
             return (
-              <tr key={index}>
+              <tr key={`${token.address}-${otherToken.address}`} data-label={`${token.symbol}-${otherToken.symbol}`}>
                 <td>
                   Sell {token.symbol || token.name} and {otherToken.symbol || otherToken.name} for{' '}
                   <strong>at least</strong> ${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}
