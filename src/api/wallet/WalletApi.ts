@@ -26,6 +26,8 @@ import {
 import { log, toBN } from 'utils'
 import { INFURA_ID } from 'const'
 
+import { subscribeToWeb3Event } from './subscriptionHelpers'
+
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
@@ -75,28 +77,43 @@ const subscribeToBlockchainUpdate = ({
   subscriptions?: Subscriptions
   web3: Web3
 }): BlockchainUpdatePromptCallback => {
-  console.log('provider', provider)
   const subs = subscriptions || createSubscriptions(provider)
-  console.log('subscriptions', subscriptions)
-  console.log('subs', subs)
 
   const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
-    const blockSub = web3.eth.subscribe('newBlockHeaders').on('data', cb)
-    return (): void => {
-      blockSub.unsubscribe()
+    return subscribeToWeb3Event({
+      web3,
+      interval: 8000,
+      callback: cb,
+      getter: web3 => web3.eth.getBlock('latest'),
+      event: 'newBlockHeaders',
+    })
+  }
+
+  let blockchainPrompt: BlockchainUpdatePrompt
+
+  const providerState = getProviderState(provider)
+
+  if (providerState) {
+    const {
+      accounts: [account],
+      chainId,
+    } = providerState
+
+    blockchainPrompt = {
+      account,
+      chainId: +chainId,
+      blockHeader: null,
+    }
+  } else {
+    blockchainPrompt = {
+      account: '',
+      chainId: 0,
+      blockHeader: null,
     }
   }
 
-  if (!subs) {
-    let blockchainPrompt: BlockchainUpdatePrompt = {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      account: (provider as any).address,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      chainId: +(provider as any).chainId,
-      blockHeader: null,
-    }
+  if (!subs || !providerState) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    console.log('(provider as any).address', (provider as any).address)
 
     const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
       const unsubBlock = blockUpdate(blockHeader => {
@@ -105,9 +122,7 @@ const subscribeToBlockchainUpdate = ({
         callback(blockchainPrompt)
       })
 
-      return (): void => {
-        unsubBlock()
-      }
+      return unsubBlock
     }
 
     return subscriptionHOC
@@ -119,17 +134,6 @@ const subscribeToBlockchainUpdate = ({
   if (isWalletConnectSubscriptions(subs)) networkUpdate = subs.onChainChanged
 
   const accountsUpdate = subs.onAccountsChanged
-
-  const {
-    accounts: [account],
-    chainId,
-  } = getProviderState(provider)
-
-  let blockchainPrompt: BlockchainUpdatePrompt = {
-    account,
-    chainId: +chainId,
-    blockHeader: null,
-  }
 
   const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
     const unsubNetwork = networkUpdate(chainId => {
@@ -241,8 +245,6 @@ export class WalletApiImpl implements WalletApi {
     await this._notifyListeners(this.blockchainState)
 
     const subscriptions = createSubscriptions(provider)
-    console.log('Provider', provider)
-    console.log('Subscriptions', subscriptions)
 
     const unsubscribeUpdates = subscribeToBlockchainUpdate({ subscriptions, provider, web3: this._web3 })(
       this._notifyListeners.bind(this),
@@ -271,9 +273,9 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async disconnect(): Promise<void> {
-    if (isWalletConnectProvider(this._provider) && (await this._connected)) await this._provider.close()
-
     this._unsubscribe()
+
+    if (isWalletConnectProvider(this._provider) && (await this._connected)) await this._provider.close()
 
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
