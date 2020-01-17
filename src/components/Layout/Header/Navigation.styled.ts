@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { RESPONSIVE_SIZES } from 'const'
 
 export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolean }>`
   display: flex;
@@ -10,6 +11,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   white-space: nowrap;
 
   a {
+    border: 0.125rem solid transparent;
     color: var(--color-text-secondary);
     font-weight: bolder;
     padding: 0.35em;
@@ -23,6 +25,10 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
 
     &.active {
       color: var(--color-text-primary);
+
+      @media only screen and (min-width: ${RESPONSIVE_SIZES.TABLET}em) {
+        border-bottom: 0.125rem solid var(--color-text-primary);
+      }
     }
   }
 

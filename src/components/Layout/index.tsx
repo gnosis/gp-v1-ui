@@ -12,7 +12,7 @@ const Wrapper = styled.div`
   width: 100%;
 
   display: grid;
-  grid-template-rows: 3.125rem 0.2fr auto;
+  grid-template-rows: 3.125rem 0.2fr auto min-content;
 
   main {
     flex: 1;

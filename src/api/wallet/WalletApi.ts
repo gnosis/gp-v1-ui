@@ -37,6 +37,7 @@ export interface WalletApi {
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo
+  blockchainState: BlockchainUpdatePrompt
 }
 
 export interface WalletInfo {
@@ -194,6 +195,8 @@ export class WalletApiImpl implements WalletApi {
   private _provider: Provider | null
   private _web3: Web3
 
+  public blockchainState: BlockchainUpdatePrompt
+
   private _unsubscribe: Command = () => {
     // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
   }
@@ -225,7 +228,18 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
-    await this._notifyListeners()
+    const {
+      accounts: [account],
+      chainId,
+    } = getProviderState(provider)
+
+    this.blockchainState = {
+      account,
+      chainId,
+      blockHeader: null,
+    }
+
+    await this._notifyListeners(this.blockchainState)
 
     const subscriptions = createSubscriptions(provider)
 
@@ -321,24 +335,28 @@ export class WalletApiImpl implements WalletApi {
   /* ****************      Private Functions      **************** */
 
   private async _getAsyncWalletInfo(): Promise<WalletInfo> {
-    const [[userAddress], networkId] = await Promise.all([this._web3.eth.getAccounts(), this._web3.eth.net.getId()])
+    try {
+      const [[userAddress], networkId] = await Promise.all([this._web3.eth.getAccounts(), this._web3.eth.net.getId()])
 
-    return {
-      userAddress,
-      networkId,
-      isConnected: !!userAddress && !!networkId,
+      return {
+        userAddress,
+        networkId,
+        isConnected: !!userAddress && !!networkId,
+      }
+    } catch (error) {
+      log('Error asynchrously getting WalletInfo', error)
+      return {
+        userAddress: '',
+        networkId: 0,
+        isConnected: false,
+      }
     }
   }
 
-  private async _notifyListeners(): Promise<void> {
+  private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
+    if (blockchainUpdate) this.blockchainState = blockchainUpdate
+
     await Promise.resolve()
-    // const walletInfo: WalletInfo = this.getWalletInfo()
-    // const account = (await this._web3.eth.getAccounts())[0]
-    // const walletInfo: WalletInfo = {
-    //   userAddress: account,
-    //   networkId: await this._web3.eth.net.getId(),
-    //   isConnected: !!account,
-    // }
 
     const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
 
@@ -351,7 +369,6 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.isConnected
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.isConnected)
-    // return !!(getProviderState(this._provider) || { isConnected: true }).isConnected
   }
   private get _user(): string | Promise<string> {
     const providerState = getProviderState(this._provider)
@@ -359,14 +376,10 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.accounts[0]
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.userAddress || '')
-
-    // const { accounts: [account] = [] } = getProviderState(this._provider) || {}
-    // return account
   }
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
     return Promise.resolve(this._user).then(user => this._web3.eth.getBalance(user))
-    // return this._web3.eth.getBalance(await this._user)
   }
   private get _networkId(): Network | Promise<Network> {
     const providerState = getProviderState(this._provider)
@@ -374,8 +387,6 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.chainId || 0
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
-    // const { chainId = 0 } = getProviderState(this._provider) || {}
-    // return chainId
   }
 }
 

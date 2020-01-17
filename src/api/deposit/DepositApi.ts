@@ -50,14 +50,22 @@ export interface PendingFlux {
   batchId: number
 }
 
+export interface InjectedDependencies {
+  fetchGasPrice(): Promise<string | undefined>
+}
+
 export class DepositApiImpl implements DepositApi {
   protected _contractPrototype: BatchExchangeContract
   protected _web3: Web3
   protected static _contractsCache: { [network: number]: { [address: string]: BatchExchangeContract } } = {}
 
-  public constructor(web3: Web3) {
+  protected fetchGasPrice: InjectedDependencies['fetchGasPrice']
+
+  public constructor(web3: Web3, injectedDependencies: InjectedDependencies) {
     this._contractPrototype = new web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
     this._web3 = web3
+
+    Object.assign(this, injectedDependencies)
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,7 +140,9 @@ export class DepositApiImpl implements DepositApi {
   }: DepositParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
-    const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
+    const tx = contract.methods
+      .deposit(tokenAddress, amount.toString())
+      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -151,7 +161,9 @@ export class DepositApiImpl implements DepositApi {
   }: RequestWithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
-    const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
+    const tx = contract.methods
+      .requestWithdraw(tokenAddress, amount.toString())
+      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -163,7 +175,9 @@ export class DepositApiImpl implements DepositApi {
 
   public async withdraw({ userAddress, tokenAddress, networkId, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
+    const tx = contract.methods
+      .withdraw(userAddress, tokenAddress)
+      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
