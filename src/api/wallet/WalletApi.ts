@@ -322,12 +322,21 @@ export class WalletApiImpl implements WalletApi {
   /* ****************      Private Functions      **************** */
 
   private async _getAsyncWalletInfo(): Promise<WalletInfo> {
-    const [[userAddress], networkId] = await Promise.all([this._web3.eth.getAccounts(), this._web3.eth.net.getId()])
+    try {
+      const [[userAddress], networkId] = await Promise.all([this._web3.eth.getAccounts(), this._web3.eth.net.getId()])
 
-    return {
-      userAddress,
-      networkId,
-      isConnected: !!userAddress && !!networkId,
+      return {
+        userAddress,
+        networkId,
+        isConnected: !!userAddress && !!networkId,
+      }
+    } catch (error) {
+      log('Error asynchrously getting WalletInfo', error)
+      return {
+        userAddress: '',
+        networkId: 0,
+        isConnected: false,
+      }
     }
   }
 
