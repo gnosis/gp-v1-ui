@@ -17,6 +17,8 @@ export const ALLOWANCE_MAX_VALUE = TWO.pow(new BN(256)).sub(ONE) // 115792089237
 export const ALLOWANCE_FOR_ENABLED_TOKEN = TWO.pow(new BN(128)) // 340282366920938463463374607431768211456
 // How much a sell order must be selling to be considered `unlimited`
 export const MIN_UNLIMITED_SELL_ORDER = ALLOWANCE_MAX_VALUE.div(TEN).mul(new BN(7)) // Currently set to 70% of max allowance
+// Amount for an order to be considered unlimited, from contract's point of view: https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L35
+export const UNLIMITED_ORDER_AMOUNT = TWO.pow(new BN(128))
 
 // Model constants
 export const FEE_DENOMINATOR = 1000 // Fee is 1/fee_denominator i.e. 1/1000 = 0.1%
@@ -29,7 +31,7 @@ export const MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME = 60 * 24 * 365 * 100 // 1
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000
-export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntatic sugar for displaying purposes
+export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntactic sugar for displaying purposes
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
