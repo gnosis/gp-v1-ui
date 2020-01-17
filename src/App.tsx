@@ -1,7 +1,7 @@
 import 'types'
 
 import { hot } from 'react-hot-loader/root'
-import React, { useEffect } from 'react'
+import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
 
 // SCSS
