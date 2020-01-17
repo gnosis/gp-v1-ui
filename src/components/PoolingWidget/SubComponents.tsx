@@ -9,19 +9,19 @@ interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
 
 const SubComponents: React.FC<SubComponentProps> = props => {
   const { step, handleTokenSelect, selectedTokens, tokens } = props
-  return step === 1 ? (
-    // STEP 1 - SELECT STABLECOINS
-    <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokens={selectedTokens} />
-  ) : step === 2 ? (
-    // STEP 2 - SELECT SPREAD
-    <div>Step 2</div>
-  ) : step === 3 ? (
-    // STEP 3 - CREATE STRATEGY
-    <div>Step 3</div>
-  ) : (
-    // STEP 4 - ADD FUNDS
-    <div>Step 4</div>
-  )
+
+  switch (step) {
+    case 1:
+      return <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokens={selectedTokens} />
+    case 2:
+      return <div>Step 2 </div>
+    case 3:
+      return <div>Step 3</div>
+    case 4:
+      return <div>Step 4</div>
+    default:
+      return <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokens={selectedTokens} />
+  }
 }
 
 export default SubComponents
