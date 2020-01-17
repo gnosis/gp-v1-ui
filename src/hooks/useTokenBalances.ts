@@ -90,19 +90,20 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
 
   useEffect(() => {
     // can return NULL (if no address or network)
-    _getBalances(walletInfo)
-      .then(balances => {
-        log(
-          '[useTokenBalances] Wallet balances',
-          balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
-        )
-        setBalances(balances)
-        setError(false)
-      })
-      .catch(error => {
-        console.error('Error loading balances', error)
-        setError(true)
-      })
+    walletInfo.isConnected &&
+      _getBalances(walletInfo)
+        .then(balances => {
+          log(
+            '[useTokenBalances] Wallet balances',
+            balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
+          )
+          setBalances(balances)
+          setError(false)
+        })
+        .catch(error => {
+          console.error('Error loading balances', error)
+          setError(true)
+        })
   }, [setBalances, setError, walletInfo])
 
   return { balances, error }

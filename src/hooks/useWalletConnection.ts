@@ -1,14 +1,24 @@
 import { walletApi } from 'api'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Command } from 'types'
 import useSafeState from './useSafeState'
-import { WalletInfo } from 'api/wallet/WalletApi'
+import { WalletInfo, isPromise } from 'api/wallet/WalletApi'
 
-export const useWalletConnection = (): WalletInfo => {
-  const [walletInfo, setWalletInfo] = useSafeState<WalletInfo>(() => walletApi.getWalletInfo())
+const PendingState: { pending: true } & { [K in keyof WalletInfo]: undefined } = {
+  pending: true,
+  isConnected: undefined,
+  userAddress: undefined,
+  networkId: undefined,
+}
+
+export const useWalletConnection = (): (WalletInfo & { pending: false }) | typeof PendingState => {
+  const [walletInfo, setWalletInfo] = useSafeState(() => walletApi.getWalletInfo())
 
   useEffect((): Command => {
     return walletApi.addOnChangeWalletInfo(setWalletInfo)
   }, [setWalletInfo])
-  return walletInfo
+
+  return useMemo(() => {
+    return isPromise(walletInfo) ? PendingState : { ...walletInfo, pending: false }
+  }, [walletInfo])
 }
