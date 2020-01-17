@@ -8,11 +8,13 @@ interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokens, tokens } = props
+  const { step, handleTokenSelect, selectedTokensMap, tokens } = props
 
   switch (step) {
     case 1:
-      return <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokens={selectedTokens} />
+      return (
+        <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
+      )
     case 2:
       return <div>Step 2 </div>
     case 3:
@@ -20,7 +22,9 @@ const SubComponents: React.FC<SubComponentProps> = props => {
     case 4:
       return <div>Step 4</div>
     default:
-      return <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokens={selectedTokens} />
+      return (
+        <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
+      )
   }
 }
 

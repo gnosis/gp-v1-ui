@@ -111,24 +111,36 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
   )
 }
 
-function addRemoveItem(arr: number[], newItem: number): number[] {
-  if (!arr.includes(newItem)) return arr.concat(newItem)
+// function addRemoveItem(arr: number[], newItem: number): number[] {
+//   if (!arr.includes(newItem)) return arr.concat(newItem)
 
-  return arr.reduce((acc: number[], item) => {
-    if (item === newItem) return acc
+//   return arr.reduce((acc: number[], item) => {
+//     if (item === newItem) return acc
 
-    const newAcc = acc.concat(item)
-    return newAcc
-  }, [])
+//     const newAcc = acc.concat(item)
+//     return newAcc
+//   }, [])
+// }
+
+function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails): Map<number, TokenDetails> {
+  // Cache map (no mutate)
+  const copyMap = new Map(map)
+  // Map item doesn't exist? Add that fool in
+  if (!copyMap.get(newToken.id)) return copyMap.set(newToken.id, newToken)
+  // Else remove that b
+  copyMap.delete(newToken.id)
+  return copyMap
 }
 
 const PoolingInterface: React.FC = () => {
   const [step, setStep] = useSafeState(1)
-  const [selectedTokens, setSelectedTokens] = useSafeState<number[]>([])
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
 
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+
+  // TODO: switched to tagged tokens @anxo @leandro
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId).filter(({ symbol }) => symbol !== 'WETH'), [
     fallBackNetworkId,
   ])
@@ -145,20 +157,20 @@ const PoolingInterface: React.FC = () => {
   }
 
   const handleTokenSelect = useCallback(
-    ({ id }: Pick<TokenDetails, 'id'>): void => {
-      const state = addRemoveItem(selectedTokens, id)
-      return setSelectedTokens(state)
+    (token: TokenDetails): void => {
+      const state = addRemoveMapItem(selectedTokensMap, token)
+      return setSelectedTokensMap(state)
     },
-    [selectedTokens, setSelectedTokens],
+    [selectedTokensMap, setSelectedTokensMap],
   )
 
   const restProps = useMemo(
     () => ({
       handleTokenSelect,
       tokens,
-      selectedTokens,
+      selectedTokensMap,
     }),
-    [handleTokenSelect, selectedTokens, tokens],
+    [handleTokenSelect, selectedTokensMap, tokens],
   )
 
   return (
@@ -175,12 +187,12 @@ const PoolingInterface: React.FC = () => {
         <StepButtonsWrapper>
           <GreySubText>
             Please select at least two tokens to continue{' '}
-            {selectedTokens.length >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
+            {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
           </GreySubText>
-          <button disabled={step < 2 || selectedTokens.length < 2} onClick={(): void => prevStep()}>
+          <button disabled={step < 2 || selectedTokensMap.size < 2} onClick={(): void => prevStep()}>
             Back
           </button>
-          <button disabled={step >= 4 || selectedTokens.length < 2} onClick={(): void => nextStep()}>
+          <button disabled={step >= 4 || selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
             Continue
           </button>
         </StepButtonsWrapper>

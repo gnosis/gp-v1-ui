@@ -11,11 +11,11 @@ import { TokenDetails } from '@gnosis.pm/dex-js'
 
 export interface TokenSelectorProps {
   handleTokenSelect: (tokenData: TokenDetails) => void
-  selectedTokens: number[]
+  selectedTokensMap: Map<number, TokenDetails>
   tokens: TokenDetails[]
 }
 
-const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, selectedTokens, tokens }) => {
+const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, selectedTokensMap, tokens }) => {
   return (
     <TokenSelectorWrapper>
       {tokens.map(tokenDetails => {
@@ -24,7 +24,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, select
           <TokenBox
             key={address}
             onClick={(): void => handleTokenSelect(tokenDetails)}
-            $selected={selectedTokens.includes(id)}
+            $selected={selectedTokensMap.has(id)}
           >
             <CheckboxWrapper>
               <FontAwesomeIcon icon={faCheckCircle} color="green" />
