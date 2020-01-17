@@ -70,9 +70,13 @@ const ConsoleFrame: React.FC = () => {
         (async function() {
           return ${command}
         })()
-      `).then(console.log)
+      `).then(console.log, console.error)
     } else {
-      console.log(eval(command))
+      try {
+        console.log(eval(command))
+      } catch (error) {
+        console.error(error)
+      }
     }
 
     if (input.current) input.current.value = ''
@@ -82,7 +86,6 @@ const ConsoleFrame: React.FC = () => {
   }
 
   const handleCommand = async (e: React.KeyboardEvent<HTMLInputElement>): Promise<void> => {
-    // console.log('e', e.key)
     const command = e.currentTarget.value
     if (e.key === 'Enter' && command) {
       processCommand(command)
