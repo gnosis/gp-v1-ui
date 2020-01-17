@@ -23,28 +23,19 @@ import Wallet from 'pages/Wallet'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
-import { walletApi } from 'api'
 
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
 
-import useSafeState from 'hooks/useSafeState'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
-  const [isPending, setIsPending] = useSafeState(true)
-  const [isConnected, setIsConnected] = useSafeState(false)
-
-  useEffect(() => {
-    Promise.resolve(walletApi.isConnected()).then(connected => {
-      setIsConnected(connected)
-      setIsPending(false)
-    })
-  }, [setIsConnected, setIsPending])
+  const { pending, isConnected } = useWalletConnection()
 
   const { component: Component, ...rest } = props
 
-  if (isPending) {
+  if (pending) {
     return <Route {...rest} render={(): null => null} />
   }
 
