@@ -342,13 +342,6 @@ export class WalletApiImpl implements WalletApi {
 
   private async _notifyListeners(): Promise<void> {
     await Promise.resolve()
-    // const walletInfo: WalletInfo = this.getWalletInfo()
-    // const account = (await this._web3.eth.getAccounts())[0]
-    // const walletInfo: WalletInfo = {
-    //   userAddress: account,
-    //   networkId: await this._web3.eth.net.getId(),
-    //   isConnected: !!account,
-    // }
 
     const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
 
@@ -361,7 +354,6 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.isConnected
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.isConnected)
-    // return !!(getProviderState(this._provider) || { isConnected: true }).isConnected
   }
   private get _user(): string | Promise<string> {
     const providerState = getProviderState(this._provider)
@@ -369,14 +361,10 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.accounts[0]
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.userAddress || '')
-
-    // const { accounts: [account] = [] } = getProviderState(this._provider) || {}
-    // return account
   }
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
     return Promise.resolve(this._user).then(user => this._web3.eth.getBalance(user))
-    // return this._web3.eth.getBalance(await this._user)
   }
   private get _networkId(): Network | Promise<Network> {
     const providerState = getProviderState(this._provider)
@@ -384,8 +372,6 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.chainId || 0
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
-    // const { chainId = 0 } = getProviderState(this._provider) || {}
-    // return chainId
   }
 }
 
