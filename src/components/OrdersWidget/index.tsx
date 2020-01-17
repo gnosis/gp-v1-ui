@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
 import { faExchangeAlt, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -12,183 +11,12 @@ import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive } from 'utils'
 
-import Widget from 'components/Layout/Widget'
+import { CardTable } from 'components/Layout/Card'
 import Highlight from 'components/Highlight'
-import OrderRow, { OrderRowWrapper } from './OrderRow'
+import OrderRow from './OrderRow'
+
 import { useDeleteOrders } from './useDeleteOrders'
-import { RESPONSIVE_SIZES } from 'const'
-
-const OrdersWrapper = styled(Widget)`
-  > a {
-    margin-bottom: -2em;
-  }
-`
-
-const ButtonWithIcon = styled.button`
-  min-width: 10em;
-
-  > svg {
-    margin: 0 0.25em;
-  }
-`
-
-const CreateButtons = styled.div`
-  margin-top: 2em;
-
-  // 💙 grid
-  display: grid;
-
-  &.withOrders {
-    justify-items: start;
-    grid-gap: 0.25em 0.75em;
-    grid:
-      'tradeBtn strategyBtn'
-      '.        strategyInfo'
-      / 1fr 1fr;
-
-    .tradeBtn {
-      justify-self: end;
-    }
-  }
-
-  &.withoutOrders {
-    // adjust grid layout when no orders
-    place-items: center;
-    grid-row-gap: 1em;
-    grid:
-      'noOrdersInfo'
-      'tradeBtn'
-      'strategyBtn'
-      'strategyInfo';
-
-    button {
-      // make buttons the same width
-      width: 15em;
-    }
-  }
-
-  .noOrdersInfo {
-    grid-area: noOrdersInfo;
-  }
-  .tradeBtn {
-    grid-area: tradeBtn;
-  }
-  .strategyBtn {
-    grid-area: strategyBtn;
-  }
-  .strategyInfo {
-    grid-area: strategyInfo;
-  }
-
-  button {
-    // resetting button margins to help with alignment
-    margin: 0;
-  }
-`
-
-const OrdersForm = styled.div`
-  .infoContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: center;
-
-    margin: 1em 0;
-
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-      grid-template-columns: 2fr 1fr;
-    }
-
-    .warning {
-      justify-self: end;
-    }
-
-    .countContainer {
-      display: grid;
-      grid: 'total active expired';
-      align-items: center;
-    }
-
-    .total {
-      grid-area: total;
-    }
-    .active {
-      grid-area: active;
-    }
-    .expired {
-      grid-area: expired;
-    }
-  }
-
-  .ordersContainer {
-    display: grid;
-  }
-
-  .checked {
-    // pull checkbox to the left to make divider line be further away
-    justify-self: left;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    justify-content: center;
-    align-items: center;
-    gap: 0 0.6rem;
-  }
-
-  .deleteContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .hidden {
-      visibility: hidden;
-    }
-
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-      display: none;
-    }
-  }
-
-  .noOrders {
-    padding: 3em;
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .warning {
-    color: orange;
-  }
-`
-
-const OrdersHeader = styled(OrderRowWrapper)`
-  background: transparent;
-  box-shadow: none;
-
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 0.75em;
-
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    display: none;
-  }
-
-  .title {
-    // create a divider line only bellow titled columns
-    border-bottom: 0.125rem solid #ededed;
-    // push the border all the way to the bottom and extend it
-    place-self: stretch;
-
-    // align that text!
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  > * {
-    // more space for the divider line
-    padding-bottom: 0.5em;
-  }
-`
+import { OrdersWrapper, CreateButtons, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
 
 interface ShowOrdersButtonProps {
   type: 'active' | 'expired'
@@ -333,35 +161,43 @@ const OrdersWidget: React.FC = () => {
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">
-                {/* GRID HEADER */}
-                <OrdersHeader>
-                  <div className="checked">
-                    <input
-                      type="checkbox"
-                      onChange={toggleSelectAll}
-                      checked={orders.length === markedForDeletion.size}
-                      disabled={deleting}
-                    />
-                    <span>All</span>
-                  </div>
-                  <div className="title">Order details</div>
-                  <div className="title">Unfilled amount</div>
-                  <div className="title">Account balance</div>
-                  <div className="title">Expires</div>
-                </OrdersHeader>
-
-                {orders.map(order => (
-                  <OrderRow
-                    key={order.id}
-                    order={order}
-                    networkId={networkId}
-                    isOverBalance={overBalanceOrders.has(order.id)}
-                    isMarkedForDeletion={markedForDeletion.has(order.id)}
-                    toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
-                    pending={deleting && markedForDeletion.has(order.id)}
-                    disabled={deleting}
-                  />
-                ))}
+                <CardTable
+                  $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
+                  $cellSeparation="0.2rem"
+                  $rowSeparation="0.6rem"
+                >
+                  <thead>
+                    <tr>
+                      <th className="checked">
+                        <input
+                          type="checkbox"
+                          onChange={toggleSelectAll}
+                          checked={orders.length === markedForDeletion.size}
+                          disabled={deleting}
+                        />
+                        <span>All</span>
+                      </th>
+                      <th>Order details</th>
+                      <th>Unfilled amount</th>
+                      <th>Account balance</th>
+                      <th>Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(order => (
+                      <OrderRow
+                        key={order.id}
+                        order={order}
+                        networkId={networkId}
+                        isOverBalance={overBalanceOrders.has(order.id)}
+                        isMarkedForDeletion={markedForDeletion.has(order.id)}
+                        toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                        pending={deleting && markedForDeletion.has(order.id)}
+                        disabled={deleting}
+                      />
+                    ))}
+                  </tbody>
+                </CardTable>
               </div>
 
               <div className="deleteContainer">
