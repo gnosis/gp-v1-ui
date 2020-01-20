@@ -8,18 +8,24 @@ import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/Ex
 import { log } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
-import { DEFAULT_ORDER_DURATION } from 'const'
+import { DEFAULT_ORDER_DURATION, MAX_BATCH_ID } from 'const'
 import useSafeState from './useSafeState'
 
-interface PlaceOrderParams {
+interface PlaceOrderParams<T> {
   buyAmount: BN
-  buyToken: TokenDetails
+  buyToken: T
   sellAmount: BN
-  sellToken: TokenDetails
+  sellToken: T
+  validUntil?: number
+}
+
+interface PlaceMultipleOrdersParams extends PlaceOrderParams<number> {
+  validFrom?: number
 }
 
 interface Result {
-  placeOrder: (params: PlaceOrderParams) => Promise<boolean>
+  placeOrder: (params: PlaceOrderParams<TokenDetails>) => Promise<boolean>
+  placeMultipleOrders: (orders: PlaceMultipleOrdersParams[]) => Promise<boolean>
   isSubmitting: boolean
 }
 
@@ -28,7 +34,13 @@ export const usePlaceOrder = (): Result => {
   const { userAddress, networkId } = useWalletConnection()
 
   const placeOrder = useCallback(
-    async ({ buyAmount, buyToken, sellAmount, sellToken }: PlaceOrderParams): Promise<boolean> => {
+    async ({
+      buyAmount,
+      buyToken,
+      sellAmount,
+      sellToken,
+      validUntil,
+    }: PlaceOrderParams<TokenDetails>): Promise<boolean> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
         return false
@@ -51,13 +63,11 @@ export const usePlaceOrder = (): Result => {
         if (sellTokenId !== 0 || buyTokenId !== 0) {
           log('sellTokenId, buyTokenId, batchId', sellTokenId, buyTokenId, batchId, sellToken.address, buyToken.address)
 
-          const validUntil = batchId + DEFAULT_ORDER_DURATION
-
           const params: ExchangeApiPlaceOrderParams = {
             userAddress,
             buyTokenId,
             sellTokenId,
-            validUntil,
+            validUntil: validUntil || batchId + DEFAULT_ORDER_DURATION,
             buyAmount,
             sellAmount,
             networkId,
@@ -66,8 +76,8 @@ export const usePlaceOrder = (): Result => {
           const receipt = await exchangeApi.placeOrder(params)
           log(`The transaction has been mined: ${receipt.transactionHash}`)
 
-          // TODO: get order id in a separate call
-          // toast.success(`Placed order id=${receipt.data} valid for 30min`)
+          // TODO: show link to orders page?
+          toast.success(`Placed order valid for 30min`)
 
           return true
         } else {
@@ -97,5 +107,71 @@ export const usePlaceOrder = (): Result => {
     [networkId, setIsSubmitting, userAddress],
   )
 
-  return { placeOrder, isSubmitting }
+  const placeMultipleOrders = useCallback(
+    async (orders: PlaceMultipleOrdersParams[]): Promise<boolean> => {
+      if (!userAddress || !networkId) {
+        toast.error('Wallet is not connected!')
+        return false
+      }
+
+      setIsSubmitting(true)
+      log(`Placing ${orders.length} orders at once`)
+
+      try {
+        const buyTokens: number[] = []
+        const sellTokens: number[] = []
+
+        const validFroms: number[] = []
+        const validUntils: number[] = []
+
+        const buyAmounts: BN[] = []
+        const sellAmounts: BN[] = []
+
+        const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
+
+        orders.forEach(order => {
+          buyTokens.push(order.buyToken)
+          sellTokens.push(order.sellToken)
+
+          // if not set, order is valid from placement
+          validFroms.push(order.validFrom || currentBatchId)
+          // if not set, order is valid forever
+          validUntils.push(order.validUntil || MAX_BATCH_ID)
+
+          buyAmounts.push(order.buyAmount)
+          sellAmounts.push(order.sellAmount)
+        })
+
+        const params = {
+          userAddress,
+          networkId,
+          buyTokens,
+          sellTokens,
+          validFroms,
+          validUntils,
+          buyAmounts,
+          sellAmounts,
+        }
+
+        const receipt = await exchangeApi.placeValidFromOrders(params)
+
+        log(`The transaction has been mined: ${receipt.transactionHash}`)
+
+        // TODO: link to orders page?
+        toast.success(`Placed ${orders.length} orders`)
+
+        return true
+      } catch (e) {
+        log(`Error placing orders`, e)
+        toast.error(`Error placing orders: ${e.message}`)
+
+        return false
+      } finally {
+        setIsSubmitting(false)
+      }
+    },
+    [networkId, setIsSubmitting, userAddress],
+  )
+
+  return { placeOrder, isSubmitting, placeMultipleOrders }
 }
