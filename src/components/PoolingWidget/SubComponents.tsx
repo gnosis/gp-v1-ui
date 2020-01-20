@@ -7,6 +7,7 @@ import { GreySubText } from './PoolingWidget.styled'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import { TokenDetails } from '@gnosis.pm/dex-js'
+import { CreateStrategy } from './CreateStrategy'
 
 interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
   step: number
@@ -30,7 +31,12 @@ const SubComponents: React.FC<SubComponentProps> = props => {
     case 2:
       return <DefineSpread selectedTokensMap={selectedTokensMap} defaultSpread={0.2} />
     case 3:
-      return <div>Step 3</div>
+      return (
+        <>
+          <CreateStrategy spread={spread} selectedTokensMap={selectedTokensMap} />
+          <GreySubText>Review your strategy summary above and then send your transaction</GreySubText>
+        </>
+      )
     case 4:
       return <div>Step 4</div>
     default:

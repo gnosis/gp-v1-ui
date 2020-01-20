@@ -15,6 +15,7 @@ interface SpreadInformationProps extends DefineSpreadProps {
 }
 
 const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
+export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
   const tokenSymbolsString = React.useMemo(() => Array.from(selectedTokensMap.values()).map(token => token.symbol), [
     selectedTokensMap,
   ])
