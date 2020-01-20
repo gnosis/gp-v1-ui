@@ -47,13 +47,12 @@ const Layout: React.FC = ({ children }) => (
           order: 3,
           withPastLocation: true,
         },
-        // Place holder
-        // {
-        //   label: 'Strategies',
-        //   to: '/strategies',
-        //   order: 4,
-        //   withPastLocation: true,
-        // },
+        {
+          label: 'Liquidity',
+          to: '/liquidity',
+          order: 4,
+          withPastLocation: true,
+        },
       ]}
     />
     <main>{children}</main>
