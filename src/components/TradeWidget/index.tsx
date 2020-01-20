@@ -154,7 +154,7 @@ const TradeWidget: React.FC = () => {
     if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken) return
 
     if (isConnected) {
-      const success = await placeOrder({
+      const { success } = await placeOrder({
         buyAmount,
         buyToken: cachedBuyToken,
         sellAmount,
