@@ -111,17 +111,6 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
   )
 }
 
-// function addRemoveItem(arr: number[], newItem: number): number[] {
-//   if (!arr.includes(newItem)) return arr.concat(newItem)
-
-//   return arr.reduce((acc: number[], item) => {
-//     if (item === newItem) return acc
-
-//     const newAcc = acc.concat(item)
-//     return newAcc
-//   }, [])
-// }
-
 function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails): Map<number, TokenDetails> {
   // Cache map (no mutate)
   const copyMap = new Map(map)
@@ -176,7 +165,7 @@ const PoolingInterface: React.FC = () => {
   return (
     <Widget>
       <PoolingInterfaceWrapper $width="75vw">
-        <h2>New Strategy</h2>
+        <h2>New Liquidity</h2>
         <ProgressBar step={step} stepArray={['Select Token', 'Define Spread', 'Create Strategy', 'Add Funding']} />
         <StepDescription />
         <StepTitle step={step} />
