@@ -1,4 +1,5 @@
 import BN from 'bn.js'
+import BigNumber from 'bignumber.js'
 
 export const APP_NAME = 'fuse'
 
@@ -19,6 +20,7 @@ export const ALLOWANCE_FOR_ENABLED_TOKEN = TWO.pow(new BN(128)) // 3402823669209
 export const MIN_UNLIMITED_SELL_ORDER = ALLOWANCE_MAX_VALUE.div(TEN).mul(new BN(7)) // Currently set to 70% of max allowance
 // Amount for an order to be considered unlimited, from contract's point of view: https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L35
 export const UNLIMITED_ORDER_AMOUNT = TWO.pow(new BN(128)).sub(ONE)
+export const UNLIMITED_ORDER_AMOUNT_BIGNUMBER = new BigNumber(UNLIMITED_ORDER_AMOUNT.toString())
 
 // Model constants
 export const FEE_DENOMINATOR = 1000 // Fee is 1/fee_denominator i.e. 1/1000 = 0.1%

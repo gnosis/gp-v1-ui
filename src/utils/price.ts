@@ -1,6 +1,6 @@
 import BN from 'bn.js'
 import { assert } from './miscellaneous'
-import { TEN, UNLIMITED_ORDER_AMOUNT } from 'const'
+import { TEN, UNLIMITED_ORDER_AMOUNT_BIGNUMBER } from 'const'
 import BigNumber from 'bignumber.js'
 
 export function adjustAmountToLowerPrecision(amount: BN, higherPrecision: number, lowerPrecision: number): BN {
@@ -32,9 +32,6 @@ interface Amounts {
   sellAmount: BN
 }
 
-const MAX = new BigNumber(UNLIMITED_ORDER_AMOUNT.toString())
-const ONE = new BigNumber(1)
-
 /**
  * Calculates the max amounts within given `spread` for unlimited orders
  *
@@ -48,6 +45,9 @@ const ONE = new BigNumber(1)
 export function maxAmountsForSpread(spread: number, buyTokenPrecision: number, sellTokenPrecision: number): Amounts {
   // Enforcing positive spreads: 0 < spread < 100
   assert(spread > 0 && spread < 100, 'Invalid spread amount')
+
+  const MAX = UNLIMITED_ORDER_AMOUNT_BIGNUMBER
+  const ONE = new BigNumber(1)
 
   const spreadPercentage = new BigNumber(spread).dividedBy(new BigNumber(100))
 
