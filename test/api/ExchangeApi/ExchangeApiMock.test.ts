@@ -165,6 +165,72 @@ describe('placeOrder', () => {
     expect(actual).toEqual({ ...expected, user: USER_2, id: '0' })
   })
 })
+
+describe('placeValidFromOrders', () => {
+  const baseParams = {
+    userAddress: USER_1,
+    networkId: NETWORK_ID,
+    buyTokens: [],
+    sellTokens: [],
+    validFroms: [],
+    validUntils: [],
+    buyAmounts: [],
+    sellAmounts: [],
+  }
+  test('no order data provided', async () => {
+    try {
+      await instance.placeValidFromOrders(baseParams)
+      fail('Should not reach')
+    } catch (e) {
+      expect(e.message).toMatch(/At least one order required/)
+    }
+  })
+
+  test('parameters do not align', async () => {
+    const params = { ...baseParams, buyTokens: [1] }
+
+    try {
+      await instance.placeValidFromOrders(params)
+      fail('Should not reach')
+    } catch (e) {
+      expect(e.message).toMatch(/Parameters length do not match/)
+    }
+  })
+
+  test('placing multiple orders', async () => {
+    const params = {
+      ...baseParams,
+      buyTokens: [1, 2],
+      sellTokens: [3, 1],
+      validFroms: [BATCH_ID, BATCH_ID],
+      validUntils: [BATCH_ID + 10, BATCH_ID + 101],
+      buyAmounts: [new BN(6), new BN(3)],
+      sellAmounts: [new BN(5), new BN(4)],
+    }
+
+    const response = await instance.placeValidFromOrders(params)
+    expect(response).toBe(RECEIPT)
+
+    // drop the first order, we just care about the last 2
+    const [, ...orders] = await instance.getOrders(params)
+
+    orders.forEach((order, index) => {
+      expect(order).toEqual({
+        buyTokenId: params.buyTokens[index],
+        sellTokenId: params.sellTokens[index],
+        validFrom: params.validFroms[index],
+        validUntil: params.validUntils[index],
+        priceNumerator: params.buyAmounts[index],
+        priceDenominator: params.sellAmounts[index],
+        remainingAmount: params.sellAmounts[index],
+        user: params.userAddress,
+        id: (index + 1).toString(),
+        sellTokenBalance: new BN('1500000000000000000000').add(ONE),
+      })
+    })
+  })
+})
+
 describe('cancelOrder', () => {
   test('cancel existing order', async () => {
     const orderId = (await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })).length - 1

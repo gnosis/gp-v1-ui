@@ -1,8 +1,9 @@
 import BN from 'bn.js'
+import Web3 from 'web3'
+
 import { DepositApiImpl, DepositApi, InjectedDependencies } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
-import { log } from 'utils'
-import Web3 from 'web3'
+import { log, assert } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
 interface BaseParams {
@@ -39,6 +40,16 @@ export interface PlaceOrderParams extends BaseParams, WithTxOptionalParams {
   sellAmount: BN
 }
 
+export interface PlaceValidFromOrdersParams extends BaseParams, WithTxOptionalParams {
+  userAddress: string
+  buyTokens: number[]
+  sellTokens: number[]
+  validFroms: number[]
+  validUntils: number[]
+  buyAmounts: BN[]
+  sellAmounts: BN[]
+}
+
 export interface CancelOrdersParams extends BaseParams, WithTxOptionalParams {
   userAddress: string
   orderIds: number[]
@@ -55,6 +66,7 @@ export interface ExchangeApi extends DepositApi {
 
   addToken(params: AddTokenParams): Promise<Receipt>
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
+  placeValidFromOrders(params: PlaceValidFromOrdersParams): Promise<Receipt>
   cancelOrders(params: CancelOrdersParams): Promise<Receipt>
 }
 
@@ -164,6 +176,50 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       SELL ${sellAmount.toString()} tokenId ${sellTokenId} for ${buyAmount.toString()} tokenId ${buyTokenId}
       order valid until ${validUntil}
       `,
+    )
+
+    return tx
+  }
+
+  public async placeValidFromOrders({
+    userAddress,
+    networkId,
+    buyTokens,
+    sellTokens,
+    validFroms,
+    validUntils,
+    buyAmounts,
+    sellAmounts,
+    txOptionalParams,
+  }: PlaceValidFromOrdersParams): Promise<Receipt> {
+    const length = buyTokens.length
+    assert(
+      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every(el => el.length === length),
+      'Parameters length do not match',
+    )
+    assert(length > 0, 'At least one order required')
+
+    const contract = await this._getContract(networkId)
+
+    const buyAmountsStr = buyAmounts.map(String)
+    const sellAmountsStr = sellAmounts.map(String)
+
+    const tx = contract.methods
+      .placeValidFromOrders(buyTokens, sellTokens, validFroms, validUntils, buyAmountsStr, sellAmountsStr)
+      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+
+    if (txOptionalParams?.onSentTransaction) {
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
+    }
+
+    log(
+      `[ExchangeApiImpl] Placed multiple orders for user ${userAddress} with the following params:\n
+      buyTokens: ${buyTokens}\n
+      sellTokens: ${sellTokens}\n
+      validFroms: ${validFroms}\n
+      validUntils: ${validUntils}\n
+      buyAmounts: ${buyAmountsStr}\n
+      sellAmounts: ${sellAmountsStr}`,
     )
 
     return tx
