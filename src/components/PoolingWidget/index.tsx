@@ -37,12 +37,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
       <BarWrapper>
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
-            <ProgressStep $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'lightgrey'}>
+            <ProgressStep
+              $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
+            >
               <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{index + 1}</ProgressStepText>
             </ProgressStep>
             {index + 1 < 4 && (
               <StepSeparator
-                $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'lightgrey'}
+                $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
               />
             )}
           </React.Fragment>
@@ -91,7 +93,11 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             'Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1',
         }
       case 2:
-        return { title: '2. Define your spread', subtext: '' }
+        return {
+          title: '2. Define your spread',
+          subtext:
+            'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
+        }
       case 3:
         return { title: '3. Create strategy', subtext: '' }
       case 4:
@@ -185,10 +191,6 @@ const PoolingInterface: React.FC = () => {
         <SubComponents step={step} {...restProps} />
 
         <StepButtonsWrapper>
-          <GreySubText>
-            Please select at least two tokens to continue{' '}
-            {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
-          </GreySubText>
           <button disabled={step < 2 || selectedTokensMap.size < 2} onClick={(): void => prevStep()}>
             Back
           </button>

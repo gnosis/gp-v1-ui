@@ -1,10 +1,16 @@
 import React from 'react'
 
 import TokenSelector from './TokenSelector'
+import DefineSpread from './DefineSpread'
 import { TokenSelectorProps } from './TokenSelector'
+import { GreySubText } from './PoolingWidget.styled'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { TokenDetails } from '@gnosis.pm/dex-js'
 
 interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
   step: number
+  selectedTokensMap: Map<number, TokenDetails>
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
@@ -13,10 +19,16 @@ const SubComponents: React.FC<SubComponentProps> = props => {
   switch (step) {
     case 1:
       return (
-        <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
+        <>
+          <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
+          <GreySubText>
+            Please select at least two tokens to continue{' '}
+            {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
+          </GreySubText>
+        </>
       )
     case 2:
-      return <div>Step 2 </div>
+      return <DefineSpread selectedTokensMap={selectedTokensMap} defaultSpread={0.2} />
     case 3:
       return <div>Step 3</div>
     case 4:
