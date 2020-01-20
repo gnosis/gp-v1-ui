@@ -96,7 +96,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
         return {
           title: '2. Define your spread',
           subtext:
-            'The spread defines the percentage you want to sell above $1, and buy below 1$ between all selected tokens',
+            'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
         }
       case 3:
         return { title: '3. Create strategy', subtext: '' }
