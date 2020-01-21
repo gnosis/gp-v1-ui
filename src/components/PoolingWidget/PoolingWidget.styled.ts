@@ -8,6 +8,8 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
 
   align-items: center;
 
+  padding: 2rem 8vw;
+
   > h2 {
     margin-right: auto;
   }
@@ -127,4 +129,9 @@ export const StepDescriptionWrapper = styled.div`
       }
     }
   }
+`
+
+export const HighlightDiv = styled.div`
+  background: var(--color-background-highlighted);
+  width: max-content;
 `
