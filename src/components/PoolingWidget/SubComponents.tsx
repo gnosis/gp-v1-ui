@@ -44,7 +44,12 @@ const SubComponents: React.FC<SubComponentProps> = props => {
         </>
       )
     case 4:
-      return <AddFunding txHash={txHash} />
+      return (
+        <>
+          <AddFunding txIdentifier={txHash} />
+          <GreySubText>Review the funding in the Wallet page</GreySubText>
+        </>
+      )
     default:
       return (
         <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
