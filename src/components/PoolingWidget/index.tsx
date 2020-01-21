@@ -13,11 +13,12 @@ import {
   GreySubText,
 } from './PoolingWidget.styled'
 
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faSpinner, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { usePlaceOrder, PlaceMultipleOrdersParams } from 'hooks/usePlaceOrder'
 
 import { tokenListApi } from 'api'
 
@@ -192,6 +193,18 @@ const PoolingInterface: React.FC = () => {
     return setStep(step + 1)
   }, [setStep, step])
 
+  const { isSubmitting, placeMultipleOrders } = usePlaceOrder()
+
+  const sendTransaction = useCallback(async () => {
+    const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
+
+    const { success } = await placeMultipleOrders(orders)
+
+    if (success) {
+      nextStep()
+    }
+  }, [nextStep, placeMultipleOrders, selectedTokensMap, spread])
+
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
       const state = addRemoveMapItem(selectedTokensMap, token)
@@ -223,12 +236,18 @@ const PoolingInterface: React.FC = () => {
         <SubComponents step={step} {...restProps} />
 
         <StepButtonsWrapper>
-          <button disabled={step < 2 || selectedTokensMap.size < 2} onClick={(): void => prevStep()}>
+          <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
             Back
           </button>
-          <button disabled={step >= 4 || selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
-            Continue
-          </button>
+          {step !== 3 ? (
+            <button disabled={step >= 4 || selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+              Continue
+            </button>
+          ) : (
+            <button className="success" onClick={sendTransaction} disabled={isSubmitting}>
+              <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} spin={isSubmitting} /> Send transaction
+            </button>
+          )}
         </StepButtonsWrapper>
       </PoolingInterfaceWrapper>
     </Widget>
