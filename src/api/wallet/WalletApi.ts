@@ -46,6 +46,7 @@ export interface WalletInfo {
   isConnected: boolean
   userAddress?: string
   networkId?: number
+  blockNumber?: number
 }
 
 export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
@@ -347,7 +348,7 @@ export class WalletApiImpl implements WalletApi {
         isConnected: !!userAddress && !!networkId,
       }
     } catch (error) {
-      log('Error asynchrously getting WalletInfo', error)
+      log('Error asynchronously getting WalletInfo', error)
       return {
         userAddress: '',
         networkId: 0,
@@ -362,8 +363,9 @@ export class WalletApiImpl implements WalletApi {
     await Promise.resolve()
 
     const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
+    const wInfoExtended = { ...walletInfo, blockNumber: blockchainUpdate?.blockHeader?.number }
 
-    this._listeners.forEach(listener => listener(walletInfo))
+    this._listeners.forEach(listener => listener(wInfoExtended))
   }
 
   private get _connected(): boolean | Promise<boolean> {
