@@ -136,7 +136,6 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
 // TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
 export function createOrderParams(tokens: TokenDetails[], spread: number): MultipleOrdersOrder[] {
   // We'll create 2 orders for each pair: SELL_A -> BUY_B and SELL_B -> BUY_A
-  // where buyAmount == max uint128, buyAmount > sellAmount and sellAmount == buyAmount * (1 - spread / 100)
 
   // With 2 tokens A, B, we have 1 pair [(A, B)] == 2 orders
   // With 3 tokens A, B, C, we have 3 pairs [(A, B), (A, C), (B, C)] == 6 orders
@@ -150,11 +149,11 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
       // We don't want to pair a token with itself
       if (buyToken !== sellToken) {
         // calculating buy/sell amounts
-        const { buyAmount, sellAmount } = maxAmountsForSpread(
+        const { buyAmount, sellAmount } = maxAmountsForSpread({
           spread,
-          buyToken.decimals || DEFAULT_PRECISION,
-          sellToken.decimals || DEFAULT_PRECISION,
-        )
+          buyTokenPrecision: buyToken.decimals || DEFAULT_PRECISION,
+          sellTokenPrecision: sellToken.decimals || DEFAULT_PRECISION,
+        })
 
         orders.push({
           buyToken: buyToken.id,
