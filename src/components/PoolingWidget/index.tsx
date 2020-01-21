@@ -142,16 +142,16 @@ const PoolingInterface: React.FC = () => {
     fallBackNetworkId,
   ])
 
-  const prevStep = (): void => {
+  const prevStep = useCallback((): void => {
     if (step == 1) return
 
     return setStep(step - 1)
-  }
-  const nextStep = (): void => {
+  }, [setStep, step])
+  const nextStep = useCallback((): void => {
     if (step == 4) return
 
     return setStep(step + 1)
-  }
+  }, [setStep, step])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
