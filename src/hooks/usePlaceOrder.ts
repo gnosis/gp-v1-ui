@@ -2,11 +2,11 @@ import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'react-toastify'
 
-import { TokenDetails } from 'types'
+import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
 import { log } from 'utils'
-import { txOptionalParams } from 'utils/transaction'
+import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { DEFAULT_ORDER_DURATION, MAX_BATCH_ID } from 'const'
 import useSafeState from './useSafeState'
@@ -17,16 +17,27 @@ interface PlaceOrderParams<T> {
   sellAmount: BN
   sellToken: T
   validUntil?: number
+  txOptionalParams?: TxOptionalParams
 }
 
-interface PlaceMultipleOrdersParams extends PlaceOrderParams<number> {
+export interface MultipleOrdersOrder extends Omit<PlaceOrderParams<number>, 'txOptionalParams'> {
   validFrom?: number
 }
 
+interface PlaceMultipleOrdersParams {
+  orders: MultipleOrdersOrder[]
+  txOptionalParams?: TxOptionalParams
+}
+
 interface Result {
-  placeOrder: (params: PlaceOrderParams<TokenDetails>) => Promise<boolean>
-  placeMultipleOrders: (orders: PlaceMultipleOrdersParams[]) => Promise<boolean>
+  placeOrder: (params: PlaceOrderParams<TokenDetails>) => Promise<PlaceOrderResult>
+  placeMultipleOrders: (params: PlaceMultipleOrdersParams) => Promise<PlaceOrderResult>
   isSubmitting: boolean
+}
+
+interface PlaceOrderResult {
+  success: boolean
+  receipt?: Receipt
 }
 
 export const usePlaceOrder = (): Result => {
@@ -40,10 +51,11 @@ export const usePlaceOrder = (): Result => {
       sellAmount,
       sellToken,
       validUntil,
-    }: PlaceOrderParams<TokenDetails>): Promise<boolean> => {
+      txOptionalParams,
+    }: PlaceOrderParams<TokenDetails>): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
-        return false
+        return { success: false }
       }
 
       setIsSubmitting(true)
@@ -71,7 +83,7 @@ export const usePlaceOrder = (): Result => {
             buyAmount,
             sellAmount,
             networkId,
-            txOptionalParams,
+            txOptionalParams: txOptionalParams || defaultTxOptionalParams,
           }
           const receipt = await exchangeApi.placeOrder(params)
           log(`The transaction has been mined: ${receipt.transactionHash}`)
@@ -79,7 +91,7 @@ export const usePlaceOrder = (): Result => {
           // TODO: show link to orders page?
           toast.success(`Placed order valid for 30min`)
 
-          return true
+          return { success: true, receipt }
         } else {
           // TODO: Handle better this case
           // TODO: Review in the contracts, cause it looks like fee token is 0, what is also used for unregistered tokens
@@ -93,13 +105,13 @@ export const usePlaceOrder = (): Result => {
             buyToken,
             buyTokenId,
           })
-          return false
+          return { success: false }
         }
       } catch (e) {
         log(`Error placing order`, e)
         toast.error(`Error placing order: ${e.message}`)
 
-        return false
+        return { success: false }
       } finally {
         setIsSubmitting(false)
       }
@@ -108,10 +120,10 @@ export const usePlaceOrder = (): Result => {
   )
 
   const placeMultipleOrders = useCallback(
-    async (orders: PlaceMultipleOrdersParams[]): Promise<boolean> => {
+    async ({ orders, txOptionalParams }: PlaceMultipleOrdersParams): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
-        return false
+        return { success: false }
       }
 
       setIsSubmitting(true)
@@ -151,6 +163,7 @@ export const usePlaceOrder = (): Result => {
           validUntils,
           buyAmounts,
           sellAmounts,
+          txOptionalParams: txOptionalParams || defaultTxOptionalParams,
         }
 
         const receipt = await exchangeApi.placeValidFromOrders(params)
@@ -160,12 +173,12 @@ export const usePlaceOrder = (): Result => {
         // TODO: link to orders page?
         toast.success(`Placed ${orders.length} orders`)
 
-        return true
+        return { success: true, receipt }
       } catch (e) {
         log(`Error placing orders`, e)
         toast.error(`Error placing orders: ${e.message}`)
 
-        return false
+        return { success: false }
       } finally {
         setIsSubmitting(false)
       }

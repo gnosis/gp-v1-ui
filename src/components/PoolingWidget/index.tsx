@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
+import { toast } from 'react-toastify'
 
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
@@ -13,16 +14,20 @@ import {
   GreySubText,
 } from './PoolingWidget.styled'
 
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faSpinner, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
 
 import { tokenListApi } from 'api'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { Network } from 'types'
+
+import { maxAmountsForSpread, log } from 'utils'
+import { DEFAULT_PRECISION } from 'const'
 
 interface ProgressBarProps {
   step: number
@@ -128,9 +133,46 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
   return copyMap
 }
 
+// TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
+export function createOrderParams(tokens: TokenDetails[], spread: number): MultipleOrdersOrder[] {
+  // We'll create 2 orders for each pair: SELL_A -> BUY_B and SELL_B -> BUY_A
+  // where buyAmount == max uint128, buyAmount > sellAmount and sellAmount == buyAmount * (1 - spread / 100)
+
+  // With 2 tokens A, B, we have 1 pair [(A, B)] == 2 orders
+  // With 3 tokens A, B, C, we have 3 pairs [(A, B), (A, C), (B, C)] == 6 orders
+  // With 4 tokens A, B, C, D, we have 6 pairs [(A, B), (A, C), (A, D), (B, C), (B, D), (C, D)] == 12 orders
+  // And so on...
+  // The number of orders is equal to num_tokens * (num_tokens -1)
+  const orders: MultipleOrdersOrder[] = []
+
+  tokens.forEach(buyToken =>
+    tokens.forEach(sellToken => {
+      // We don't want to pair a token with itself
+      if (buyToken !== sellToken) {
+        // calculating buy/sell amounts
+        const { buyAmount, sellAmount } = maxAmountsForSpread(
+          spread,
+          buyToken.decimals || DEFAULT_PRECISION,
+          sellToken.decimals || DEFAULT_PRECISION,
+        )
+
+        orders.push({
+          buyToken: buyToken.id,
+          sellToken: sellToken.id,
+          buyAmount,
+          sellAmount,
+        })
+      }
+    }),
+  )
+
+  return orders
+}
+
 const PoolingInterface: React.FC = () => {
   const [step, setStep] = useSafeState(1)
   const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
+  const [spread, setSpread] = useSafeState(0.2)
 
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -141,16 +183,45 @@ const PoolingInterface: React.FC = () => {
     fallBackNetworkId,
   ])
 
-  const prevStep = (): void => {
+  const prevStep = useCallback((): void => {
     if (step == 1) return
 
     return setStep(step - 1)
-  }
-  const nextStep = (): void => {
+  }, [setStep, step])
+  const nextStep = useCallback((): void => {
     if (step == 4) return
 
     return setStep(step + 1)
-  }
+  }, [setStep, step])
+
+  const { isSubmitting, placeMultipleOrders } = usePlaceOrder()
+
+  const [txHash, setTxHash] = useSafeState('')
+
+  const onSentTransaction = useCallback(
+    txHash => {
+      setTxHash(txHash)
+      nextStep()
+    },
+    [nextStep, setTxHash],
+  )
+
+  const sendTransaction = useCallback(() => {
+    const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
+
+    placeMultipleOrders({
+      orders,
+      txOptionalParams: {
+        onSentTransaction,
+      },
+    }).catch(e => {
+      log('Failed to place orders for strategy', e)
+      toast.error('Not able to create your orders, please try again')
+
+      // Get back to current step
+      setStep(3)
+    })
+  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, setStep, spread])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
@@ -165,8 +236,11 @@ const PoolingInterface: React.FC = () => {
       handleTokenSelect,
       tokens,
       selectedTokensMap,
+      spread,
+      setSpread,
+      txHash,
     }),
-    [handleTokenSelect, selectedTokensMap, tokens],
+    [handleTokenSelect, selectedTokensMap, setSpread, spread, tokens, txHash],
   )
 
   return (
@@ -181,12 +255,18 @@ const PoolingInterface: React.FC = () => {
         <SubComponents step={step} {...restProps} />
 
         <StepButtonsWrapper>
-          <button disabled={step < 2 || selectedTokensMap.size < 2} onClick={(): void => prevStep()}>
+          <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
             Back
           </button>
-          <button disabled={step >= 4 || selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
-            Continue
-          </button>
+          {step !== 3 ? (
+            <button disabled={step >= 4 || selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+              Continue
+            </button>
+          ) : (
+            <button className="success" onClick={sendTransaction} disabled={isSubmitting}>
+              <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} spin={isSubmitting} /> Send transaction
+            </button>
+          )}
         </StepButtonsWrapper>
       </PoolingInterfaceWrapper>
     </Widget>
