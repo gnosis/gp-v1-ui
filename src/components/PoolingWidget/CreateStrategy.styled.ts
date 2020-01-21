@@ -21,3 +21,7 @@ export const StrategyDetailsWrapper = styled.div`
     }
   }
 `
+
+export const UnderlinedText = styled.span`
+  text-decoration: underline;
+`

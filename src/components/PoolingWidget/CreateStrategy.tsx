@@ -5,7 +5,7 @@ import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { RedBoldText } from './DefineSpread.styled'
 import { SpreadInformation } from './DefineSpread'
-import { CreateStrategyWrapper, StrategyDetailsWrapper } from './CreateStrategy.styled'
+import { CreateStrategyWrapper, StrategyDetailsWrapper, UnderlinedText } from './CreateStrategy.styled'
 
 export interface CreateStrategyProps {
   selectedTokensMap: Map<number, TokenDetails>
@@ -30,7 +30,7 @@ export const CreateStrategy: React.FC<CreateStrategyProps> = ({ selectedTokensMa
         will be created.
       </p>
       <p>
-        These orders <a href="">can only be executed</a> with the deposited balance in the{' '}
+        These orders <UnderlinedText>can only be executed</UnderlinedText> with the deposited balance in the{' '}
         <strong>Exchange Wallet</strong>.
       </p>
       <p>
