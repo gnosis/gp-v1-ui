@@ -12,10 +12,12 @@ import { CreateStrategy } from './CreateStrategy'
 interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
   step: number
   selectedTokensMap: Map<number, TokenDetails>
+  spread: number
+  setSpread: React.Dispatch<React.SetStateAction<number>>
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokensMap, tokens } = props
+  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread } = props
 
   switch (step) {
     case 1:
@@ -29,7 +31,7 @@ const SubComponents: React.FC<SubComponentProps> = props => {
         </>
       )
     case 2:
-      return <DefineSpread selectedTokensMap={selectedTokensMap} defaultSpread={0.2} />
+      return <DefineSpread selectedTokensMap={selectedTokensMap} spread={spread} setSpread={setSpread} />
     case 3:
       return (
         <>

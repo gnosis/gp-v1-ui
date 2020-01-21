@@ -1,20 +1,18 @@
 import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
-import useSafeState from 'hooks/useSafeState'
 import { SpreadInformationWrapper, DefineSpreadWrapper, RedBoldText } from './DefineSpread.styled'
 import { DEFAULT_DECIMALS } from 'const'
 import { CardTable } from 'components/Layout/Card'
 
 interface DefineSpreadProps {
   selectedTokensMap: Map<number, TokenDetails>
-  defaultSpread?: number
-}
 
-interface SpreadInformationProps extends DefineSpreadProps {
   spread: number
+  setSpread: React.Dispatch<React.SetStateAction<number>>
 }
 
-const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
+type SpreadInformationProps = Omit<DefineSpreadProps, 'setSpread'>
+
 export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
   const tokenSymbolsString = React.useMemo(() => Array.from(selectedTokensMap.values()).map(token => token.symbol), [
     selectedTokensMap,
@@ -88,9 +86,7 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
   )
 }
 
-const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, defaultSpread = 0.2 }) => {
-  const [spread, setSpread] = useSafeState(defaultSpread)
-
+const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, setSpread }) => {
   const handleSpreadChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>): void => {
     if (+value < 0 || +value >= 100) return
 
