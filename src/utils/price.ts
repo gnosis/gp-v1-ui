@@ -3,7 +3,13 @@ import { assert } from './miscellaneous'
 import { TEN, UNLIMITED_ORDER_AMOUNT_BIGNUMBER } from 'const'
 import BigNumber from 'bignumber.js'
 
-export function adjustAmountToLowerPrecision(amount: BN, higherPrecision: number, lowerPrecision: number): BN {
+interface AdjustAmountParams {
+  amount: BN
+  higherPrecision: number
+  lowerPrecision: number
+}
+
+export function adjustAmountToLowerPrecision({ amount, higherPrecision, lowerPrecision }: AdjustAmountParams): BN {
   if (higherPrecision === lowerPrecision) {
     // no adjustment required
     return amount
@@ -27,6 +33,12 @@ function bigNumberToBN(n: BigNumber | BN): BN {
   return new BN(n.integerValue().toString(10))
 }
 
+interface MaxAmountForSpreadParam {
+  spread: number
+  buyTokenPrecision: number
+  sellTokenPrecision: number
+}
+
 interface Amounts {
   buyAmount: BN
   sellAmount: BN
@@ -42,7 +54,11 @@ interface Amounts {
  * @param buyTokenPrecision Decimals of buy token
  * @param sellTokenPrecision Decimals of sell token
  */
-export function maxAmountsForSpread(spread: number, buyTokenPrecision: number, sellTokenPrecision: number): Amounts {
+export function maxAmountsForSpread({
+  spread,
+  buyTokenPrecision,
+  sellTokenPrecision,
+}: MaxAmountForSpreadParam): Amounts {
   // Enforcing positive spreads: 0 < spread < 100
   assert(spread > 0 && spread < 100, 'Invalid spread amount')
 
@@ -64,13 +80,21 @@ export function maxAmountsForSpread(spread: number, buyTokenPrecision: number, s
     // buyAmount == MAX, sellAmount == buyAmount * (1 - (spread/100))
     buyAmount = MAX
     const rawSellAmount = buyAmount.multipliedBy(ONE.minus(spreadPercentage))
-    sellAmount = adjustAmountToLowerPrecision(bigNumberToBN(rawSellAmount), buyTokenPrecision, sellTokenPrecision)
+    sellAmount = adjustAmountToLowerPrecision({
+      amount: bigNumberToBN(rawSellAmount),
+      higherPrecision: buyTokenPrecision,
+      lowerPrecision: sellTokenPrecision,
+    })
   } else {
     // case 3: buyTokenPrecision < sellTokenPrecision
     // sellAmount == MAX, buyAmount == sellAmount * (1 + (spread/100))
     sellAmount = MAX
     const rawBuyAmount = sellAmount.multipliedBy(ONE.plus(spreadPercentage))
-    buyAmount = adjustAmountToLowerPrecision(bigNumberToBN(rawBuyAmount), sellTokenPrecision, buyTokenPrecision)
+    buyAmount = adjustAmountToLowerPrecision({
+      amount: bigNumberToBN(rawBuyAmount),
+      higherPrecision: sellTokenPrecision,
+      lowerPrecision: buyTokenPrecision,
+    })
   }
 
   return { buyAmount: bigNumberToBN(buyAmount), sellAmount: bigNumberToBN(sellAmount) }
