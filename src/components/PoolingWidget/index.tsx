@@ -18,7 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { usePlaceOrder, PlaceMultipleOrdersParams } from 'hooks/usePlaceOrder'
+import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
 
 import { tokenListApi } from 'api'
 
@@ -133,7 +133,7 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
 }
 
 // TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
-export function createOrderParams(tokens: TokenDetails[], spread: number): PlaceMultipleOrdersParams[] {
+export function createOrderParams(tokens: TokenDetails[], spread: number): MultipleOrdersOrder[] {
   // We'll create 2 orders for each pair: SELL_A -> BUY_B and SELL_B -> BUY_A
   // where buyAmount == max uint128, buyAmount > sellAmount and sellAmount == buyAmount * (1 - spread / 100)
 
@@ -142,7 +142,7 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Place
   // With 4 tokens A, B, C, D, we have 6 pairs [(A, B), (A, C), (A, D), (B, C), (B, D), (C, D)] == 12 orders
   // And so on...
   // The number of orders is equal to num_tokens * (num_tokens -1)
-  const orders: PlaceMultipleOrdersParams[] = []
+  const orders: MultipleOrdersOrder[] = []
 
   tokens.forEach(buyToken =>
     tokens.forEach(sellToken => {
@@ -198,7 +198,7 @@ const PoolingInterface: React.FC = () => {
   const sendTransaction = useCallback(async () => {
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
 
-    const { success } = await placeMultipleOrders(orders)
+    const { success } = await placeMultipleOrders({ orders })
 
     if (success) {
       nextStep()
