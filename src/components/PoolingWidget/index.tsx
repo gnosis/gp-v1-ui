@@ -64,7 +64,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
 
 const StepDescription: React.FC = () => (
   <StepDescriptionWrapper>
-    <p>Setup your strategy once and allow your funds to be traded on your behalf.</p>
+    <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
     <ul>
       <li>
         <FontAwesomeIcon icon={faCheckCircle} />
@@ -79,7 +79,8 @@ const StepDescription: React.FC = () => (
         Cancellation possible at any time
       </li>
     </ul>
-    <a href="#">Learn more about strategies</a>
+    {/* TODO: add URL */}
+    <a href="#">Learn more about liquidity provision</a>
   </StepDescriptionWrapper>
 )
 
@@ -99,7 +100,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
         }
       case 3:
-        return { title: '3. Create strategy', subtext: '' }
+        return { title: '3. Create liquidity', subtext: '' }
       case 4:
         return { title: '4. Add funding', subtext: '' }
       default:
@@ -116,17 +117,6 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
     </div>
   )
 }
-
-// function addRemoveItem(arr: number[], newItem: number): number[] {
-//   if (!arr.includes(newItem)) return arr.concat(newItem)
-
-//   return arr.reduce((acc: number[], item) => {
-//     if (item === newItem) return acc
-
-//     const newAcc = acc.concat(item)
-//     return newAcc
-//   }, [])
-// }
 
 function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails): Map<number, TokenDetails> {
   // Cache map (no mutate)
@@ -182,8 +172,8 @@ const PoolingInterface: React.FC = () => {
   return (
     <Widget>
       <PoolingInterfaceWrapper $width="75vw">
-        <h2>New Strategy</h2>
-        <ProgressBar step={step} stepArray={['Select Token', 'Define Spread', 'Create Strategy', 'Add Funding']} />
+        <h2>New Liquidity</h2>
+        <ProgressBar step={step} stepArray={['Select Token', 'Define Spread', 'Create Liquidity', 'Add Funding']} />
         <StepDescription />
         <StepTitle step={step} />
 

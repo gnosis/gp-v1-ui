@@ -73,7 +73,7 @@ const App: React.FC = () => (
         <Switch>
           <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/trade/:sell-:buy" component={Trade} />
-          <PrivateRoute path="/strategies" exact component={Strategies} />
+          <PrivateRoute path="/liquidity" exact component={Strategies} />
           <PrivateRoute path="/wallet" exact component={Wallet} />
           <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/about" exact component={About} />
