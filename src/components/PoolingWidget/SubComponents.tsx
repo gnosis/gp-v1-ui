@@ -1,11 +1,14 @@
 import React from 'react'
 
-import TokenSelector from './TokenSelector'
-import DefineSpread from './DefineSpread'
-import { TokenSelectorProps } from './TokenSelector'
-import { GreySubText } from './PoolingWidget.styled'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+
+import TokenSelector from './TokenSelector'
+import { TokenSelectorProps } from './TokenSelector'
+import DefineSpread from './DefineSpread'
+import AddFunding from './AddFunding'
+import { GreySubText } from './PoolingWidget.styled'
+
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
 
@@ -41,7 +44,7 @@ const SubComponents: React.FC<SubComponentProps> = props => {
         </>
       )
     case 4:
-      return <div>Pending transaction: {txHash}</div>
+      return <AddFunding txHash={txHash} />
     default:
       return (
         <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
