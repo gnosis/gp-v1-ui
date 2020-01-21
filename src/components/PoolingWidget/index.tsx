@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
+import { toast } from 'react-toastify'
 
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
@@ -25,7 +26,7 @@ import { tokenListApi } from 'api'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { Network } from 'types'
 
-import { maxAmountsForSpread } from 'utils'
+import { maxAmountsForSpread, log } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 
 interface ProgressBarProps {
@@ -213,8 +214,14 @@ const PoolingInterface: React.FC = () => {
       txOptionalParams: {
         onSentTransaction,
       },
+    }).catch(e => {
+      log('Failed to place orders for strategy', e)
+      toast.error('Not able to create your orders, please try again')
+
+      // Get back to current step
+      setStep(3)
     })
-  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, spread])
+  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, setStep, spread])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
