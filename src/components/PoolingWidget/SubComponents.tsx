@@ -14,10 +14,11 @@ interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
   selectedTokensMap: Map<number, TokenDetails>
   spread: number
   setSpread: React.Dispatch<React.SetStateAction<number>>
+  txHash: string
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread } = props
+  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash } = props
 
   switch (step) {
     case 1:
@@ -40,7 +41,7 @@ const SubComponents: React.FC<SubComponentProps> = props => {
         </>
       )
     case 4:
-      return <div>Step 4</div>
+      return <div>Pending transaction: {txHash}</div>
     default:
       return (
         <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />

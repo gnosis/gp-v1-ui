@@ -195,15 +195,26 @@ const PoolingInterface: React.FC = () => {
 
   const { isSubmitting, placeMultipleOrders } = usePlaceOrder()
 
-  const sendTransaction = useCallback(async () => {
+  const [txHash, setTxHash] = useSafeState('')
+
+  const onSentTransaction = useCallback(
+    txHash => {
+      setTxHash(txHash)
+      nextStep()
+    },
+    [nextStep, setTxHash],
+  )
+
+  const sendTransaction = useCallback(() => {
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
 
-    const { success } = await placeMultipleOrders({ orders })
-
-    if (success) {
-      nextStep()
-    }
-  }, [nextStep, placeMultipleOrders, selectedTokensMap, spread])
+    placeMultipleOrders({
+      orders,
+      txOptionalParams: {
+        onSentTransaction,
+      },
+    })
+  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, spread])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
@@ -220,8 +231,9 @@ const PoolingInterface: React.FC = () => {
       selectedTokensMap,
       spread,
       setSpread,
+      txHash,
     }),
-    [handleTokenSelect, selectedTokensMap, setSpread, spread, tokens],
+    [handleTokenSelect, selectedTokensMap, setSpread, spread, tokens, txHash],
   )
 
   return (
