@@ -8,8 +8,8 @@ import ExchangeApiImpl, { ExchangeApi } from './ExchangeApi'
 export class ExchangeApiProxy extends ExchangeApiImpl {
   private cache: CacheMixin
 
-  public constructor(web3: Web3, injectedDependencies: InjectedDependencies) {
-    super(web3, injectedDependencies)
+  public constructor(injectedDependencies: InjectedDependencies) {
+    super(injectedDependencies)
 
     this.cache = new CacheMixin()
 

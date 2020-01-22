@@ -51,21 +51,21 @@ export interface PendingFlux {
 }
 
 export interface InjectedDependencies {
+  web3: Web3
   fetchGasPrice(): Promise<string | undefined>
 }
 
 export class DepositApiImpl implements DepositApi {
   protected _contractPrototype: BatchExchangeContract
-  protected _web3: Web3
+  protected web3: Web3
   protected static _contractsCache: { [network: number]: { [address: string]: BatchExchangeContract } } = {}
 
   protected fetchGasPrice: InjectedDependencies['fetchGasPrice']
 
-  public constructor(web3: Web3, injectedDependencies: InjectedDependencies) {
-    this._contractPrototype = new web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
-    this._web3 = web3
-
+  public constructor(injectedDependencies: InjectedDependencies) {
     Object.assign(this, injectedDependencies)
+
+    this._contractPrototype = new this.web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
