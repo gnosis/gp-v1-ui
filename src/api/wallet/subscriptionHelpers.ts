@@ -40,13 +40,13 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
         reject(e)
       }
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const params: [any, any] = (logOptions && event === 'logs'
-      ? [event, logOptions, detectValidSubCb]
-      : [event, detectValidSubCb]) as [T, Function]
-    // calls web3.eth.subscribe('pendingTransactions' | 'syncing' | 'newBlockHeaders', callback)
-    // or web3.eth.subscribe('logs', logOptions, callback)
-    const sub = web3.eth.subscribe(...params) as Subscription<Event2Data[T]>
+
+    const sub = (logOptions && event === 'logs'
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        web3.eth.subscribe(event as any, logOptions as any, detectValidSubCb)
+      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        web3.eth.subscribe(event as any, detectValidSubCb)) as Subscription<Event2Data[T]>
+
     sub
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
