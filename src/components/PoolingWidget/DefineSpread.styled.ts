@@ -11,7 +11,7 @@ export const DefineSpreadWrapper = styled.div`
   }
   > input {
     background: var(--color-background-highlighted);
-    border: 0.2rem solid var(--color-button-primary);
+    border: 0.14rem solid var(--color-button-primary);
     font-size: larger;
     margin: auto;
     width: 20%;
