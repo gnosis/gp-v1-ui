@@ -1,7 +1,5 @@
-import Web3 from 'web3'
-
 import { CacheMixin } from 'api/proxy'
-import { InjectedDependencies } from 'api/erc20/Erc20Api'
+import { InjectedDependencies } from 'api/deposit/DepositApi'
 
 import ExchangeApiImpl, { ExchangeApi } from './ExchangeApi'
 
