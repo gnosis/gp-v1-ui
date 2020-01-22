@@ -12,7 +12,7 @@ import { GreySubText } from './PoolingWidget.styled'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
 
-interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
+interface SubComponentProps extends TokenSelectorProps {
   step: number
   selectedTokensMap: Map<number, TokenDetails>
   spread: number

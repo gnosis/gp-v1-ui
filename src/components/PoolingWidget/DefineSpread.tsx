@@ -1,8 +1,10 @@
 import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
-import { SpreadInformationWrapper, DefineSpreadWrapper, RedBoldText } from './DefineSpread.styled'
-import { DEFAULT_DECIMALS } from 'const'
+
 import { CardTable } from 'components/Layout/Card'
+import { SpreadInformationWrapper, DefineSpreadWrapper, RedBoldText } from './DefineSpread.styled'
+
+import { DEFAULT_DECIMALS } from 'const'
 
 interface DefineSpreadProps {
   selectedTokensMap: Map<number, TokenDetails>
