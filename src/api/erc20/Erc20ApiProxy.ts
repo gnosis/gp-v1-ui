@@ -1,11 +1,11 @@
 import { CacheMixin } from 'api/proxy'
 
-import Erc20ApiImpl, { Erc20Api, InjectedDependencies } from './Erc20Api'
+import Erc20ApiImpl, { Erc20Api, Params } from './Erc20Api'
 
 export class Erc20ApiProxy extends Erc20ApiImpl {
   private cache: CacheMixin
 
-  public constructor(injectedDependencies: InjectedDependencies) {
+  public constructor(injectedDependencies: Params) {
     super(injectedDependencies)
 
     // Potentially, we could have a global cache obj OR

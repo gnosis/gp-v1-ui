@@ -66,7 +66,7 @@ export interface Erc20Api {
   transferFrom(params: TransferFromParams): Promise<Receipt>
 }
 
-export interface InjectedDependencies {
+export interface Params {
   web3: Web3
   fetchGasPrice(): Promise<string | undefined>
 }
@@ -80,9 +80,9 @@ export class Erc20ApiImpl implements Erc20Api {
 
   private static _contractsCache: { [network: number]: { [address: string]: Erc20Contract } } = {}
 
-  private fetchGasPrice: InjectedDependencies['fetchGasPrice']
+  private fetchGasPrice: Params['fetchGasPrice']
 
-  public constructor(injectedDependencies: InjectedDependencies) {
+  public constructor(injectedDependencies: Params) {
     Object.assign(this, injectedDependencies)
 
     this._contractPrototype = new this.web3.eth.Contract(erc20Abi as AbiItem[]) as Erc20Contract
