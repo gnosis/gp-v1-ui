@@ -11,6 +11,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
+import { isOrderUnlimited } from '@gnosis.pm/dex-js'
+
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
@@ -28,7 +30,6 @@ import {
   formatPrice,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
-import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
 import { OrderRowWrapper } from './OrderRow.styled'
@@ -147,7 +148,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
     order.remainingAmount,
     sellToken.decimals,
   ])
-  const unlimited = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
+  const unlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
   return (
     <td data-label="Unfilled Amount" className={unlimited ? '' : 'sub-columns two-columns'}>
