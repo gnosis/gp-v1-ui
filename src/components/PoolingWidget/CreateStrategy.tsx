@@ -17,7 +17,7 @@ export const CreateStrategy: React.FC<CreateStrategyProps> = ({ selectedTokensMa
 
   return (
     <CreateStrategyWrapper>
-      <h3>New strategy details</h3>
+      <h3>New liquidity details</h3>
       <StrategyDetailsWrapper>
         <FontAwesomeIcon icon={faChartArea} size="7x" color="orange" className="graph" />
         <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
