@@ -1,4 +1,3 @@
-import { AbiItem } from 'web3-utils'
 import BN from 'bn.js'
 import { log, assert, toBN } from 'utils'
 import { ZERO } from 'const'
@@ -66,7 +65,7 @@ export class DepositApiImpl implements DepositApi {
   public constructor(injectedDependencies: Params) {
     Object.assign(this, injectedDependencies)
 
-    this._contractPrototype = new this.web3.eth.Contract(batchExchangeAbi as AbiItem[]) as BatchExchangeContract
+    this._contractPrototype = new this.web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
