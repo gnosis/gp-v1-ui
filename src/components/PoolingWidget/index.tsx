@@ -14,7 +14,7 @@ import {
   GreySubText,
 } from './PoolingWidget.styled'
 
-import { faCheckCircle, faSpinner, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faSpinner, faPaperPlane, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import useSafeState from 'hooks/useSafeState'
@@ -28,6 +28,7 @@ import { Network, Receipt } from 'types'
 
 import { maxAmountsForSpread, log } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
+import { Link } from 'react-router-dom'
 
 interface ProgressBarProps {
   step: number
@@ -262,17 +263,27 @@ const PoolingInterface: React.FC = () => {
         <SubComponents step={step} {...restProps} />
 
         <StepButtonsWrapper>
-          <button
-            disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting || !!txReceipt}
-            onClick={(): void => prevStep()}
-          >
-            Back
-          </button>
+          {/* REMOVE BACK BUTTON ON TXRECEIPT */}
+          {!txReceipt && (
+            <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
+              Back
+            </button>
+          )}
+          {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
           {step !== 3 ? (
             <button disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
               Continue
             </button>
+          ) : // STEP 3 - TXRECEIPT OR NOT?
+          txReceipt ? (
+            // TX RCEIPT SUCCESS
+            <Link to="/wallet">
+              <button className="success">
+                <FontAwesomeIcon icon={faFlagCheckered} /> Finish and go to Wallet
+              </button>
+            </Link>
           ) : (
+            // NOT YET SUBMITTED TX
             <button className="success" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
               <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} spin={isSubmitting} /> Send transaction
             </button>
