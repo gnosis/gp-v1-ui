@@ -3,10 +3,10 @@ import { WalletApiMock } from './wallet/WalletApiMock'
 import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
 import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
-import { Erc20Api, InjectedDependencies as Erc20ApiDependencies } from './erc20/Erc20Api'
+import { Erc20Api, Params as Erc20ApiDependencies } from './erc20/Erc20Api'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiProxy } from './erc20/Erc20ApiProxy'
-import { DepositApi, InjectedDependencies as DepositApiDependencies } from './deposit/DepositApi'
+import { DepositApi, Params as DepositApiDependencies } from './deposit/DepositApi'
 import { DepositApiMock } from './deposit/DepositApiMock'
 import { DepositApiProxy } from './deposit/DepositApiProxy'
 import { ExchangeApi } from './exchange/ExchangeApi'
@@ -52,29 +52,29 @@ function createWalletApi(web3: Web3): WalletApi {
   return walletApi
 }
 
-function createErc20Api(web3: Web3, injectedDependencies: Erc20ApiDependencies): Erc20Api {
+function createErc20Api(injectedDependencies: Erc20ApiDependencies): Erc20Api {
   let erc20Api
   if (process.env.MOCK_ERC20 === 'true') {
     erc20Api = new Erc20ApiMock({ balances: erc20Balances, allowances: erc20Allowances, tokens: unregisteredTokens })
   } else {
-    erc20Api = new Erc20ApiProxy(web3, injectedDependencies)
+    erc20Api = new Erc20ApiProxy(injectedDependencies)
   }
   window['erc20Api'] = erc20Api // register for convenience
   return erc20Api
 }
 
-function createDepositApi(erc20Api: Erc20Api, web3: Web3, injectedDependencies: DepositApiDependencies): DepositApi {
+function createDepositApi(erc20Api: Erc20Api, injectedDependencies: DepositApiDependencies): DepositApi {
   let depositApi
   if (process.env.MOCK_DEPOSIT === 'true') {
     depositApi = new DepositApiMock(exchangeBalanceStates, erc20Api)
   } else {
-    depositApi = new DepositApiProxy(web3, injectedDependencies)
+    depositApi = new DepositApiProxy(injectedDependencies)
   }
   window['depositApi'] = depositApi // register for convenience
   return depositApi
 }
 
-function createExchangeApi(erc20Api: Erc20Api, web3: Web3, injectedDependencies: DepositApiDependencies): ExchangeApi {
+function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiDependencies): ExchangeApi {
   let exchangeApi
   if (process.env.MOCK_EXCHANGE === 'true') {
     const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address), TOKEN_8]
@@ -85,7 +85,7 @@ function createExchangeApi(erc20Api: Erc20Api, web3: Web3, injectedDependencies:
       ordersByUser: exchangeOrders,
     })
   } else {
-    exchangeApi = new ExchangeApiProxy(web3, injectedDependencies)
+    exchangeApi = new ExchangeApiProxy(injectedDependencies)
   }
   window['exchangeApi'] = exchangeApi
   return exchangeApi
@@ -110,10 +110,11 @@ export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
 
 const injectedDependencies = {
+  web3,
   fetchGasPrice: fetchGasPriceFactory(walletApi),
 }
 
-export const erc20Api: Erc20Api = createErc20Api(web3, injectedDependencies)
-export const depositApi: DepositApi = createDepositApi(erc20Api, web3, injectedDependencies)
-export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, web3, injectedDependencies)
+export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
+export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDependencies)
+export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()

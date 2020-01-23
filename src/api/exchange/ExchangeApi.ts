@@ -1,7 +1,5 @@
 import BN from 'bn.js'
-import Web3 from 'web3'
-
-import { DepositApiImpl, DepositApi, InjectedDependencies } from 'api/deposit/DepositApi'
+import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { log, assert } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
@@ -90,8 +88,8 @@ export interface Order {
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  public constructor(web3: Web3, injectedDependencies: InjectedDependencies) {
-    super(web3, injectedDependencies)
+  public constructor(injectedDependencies: Params) {
+    super(injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
   }
