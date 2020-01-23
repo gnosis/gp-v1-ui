@@ -113,29 +113,31 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled ? (
+            <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
+              <FontAwesomeIcon icon={faPlus} />
+              &nbsp; Deposit
+            </button>
+          ) : (
             <>
-              <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
-                <FontAwesomeIcon icon={faPlus} />
-                &nbsp; Deposit
-              </button>
-              <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
-                <FontAwesomeIcon icon={faMinus} />
-                &nbsp; Withdraw
+              <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
+                {enabling.has(address) ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} spin />
+                    &nbsp; Enabling {symbol}
+                  </>
+                ) : (
+                  <>
+                    <FontAwesomeIcon icon={faCheck} />
+                    &nbsp; Enable {symbol}
+                  </>
+                )}
               </button>
             </>
-          ) : (
-            <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
-              {enabling.has(address) ? (
-                <>
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                  &nbsp; Enabling {symbol}
-                </>
-              ) : (
-                <>
-                  <FontAwesomeIcon icon={faCheck} />
-                  &nbsp; Enable {symbol}
-                </>
-              )}
+          )}
+          {!totalExchangeBalance.isZero() && (
+            <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
+              <FontAwesomeIcon icon={faMinus} />
+              &nbsp; Withdraw
             </button>
           )}
         </td>
