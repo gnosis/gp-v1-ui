@@ -83,7 +83,6 @@ const subscribeToBlockchainUpdate = ({
   const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
     return subscribeToWeb3Event({
       web3,
-      interval: 8000,
       callback: cb,
       getter: web3 => web3.eth.getBlock('latest'),
       event: 'newBlockHeaders',
