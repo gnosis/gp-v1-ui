@@ -1,11 +1,12 @@
 import BN from 'bn.js'
 import { addDays, addMinutes, addYears } from 'date-fns'
 
-import { MAX_BATCH_ID, ONE } from 'const'
+import { UNLIMITED_ORDER_AMOUNT, MAX_BATCH_ID } from '@gnosis.pm/dex-js'
+
+import { ONE } from 'const'
 import { dateToBatchId } from 'utils'
 
 import { USER_1, BATCH_ID } from './basic'
-import { UNLIMITED_ORDER_AMOUNT } from '@gnosis.pm/dex-js'
 
 const NOW = Date.now()
 
