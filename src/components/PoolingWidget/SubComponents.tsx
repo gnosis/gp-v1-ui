@@ -6,11 +6,11 @@ import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 import TokenSelector from './TokenSelector'
 import { TokenSelectorProps } from './TokenSelector'
 import DefineSpread from './DefineSpread'
-import AddFunding from './AddFunding'
 import { GreySubText } from './PoolingWidget.styled'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
+import { Receipt } from 'types'
 
 interface SubComponentProps extends TokenSelectorProps {
   step: number
@@ -18,10 +18,12 @@ interface SubComponentProps extends TokenSelectorProps {
   spread: number
   setSpread: React.Dispatch<React.SetStateAction<number>>
   txHash: string
+  txReceipt?: Receipt
+  txError?: Error
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash } = props
+  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash, txReceipt, txError } = props
 
   switch (step) {
     case 1:
@@ -39,15 +41,14 @@ const SubComponents: React.FC<SubComponentProps> = props => {
     case 3:
       return (
         <>
-          <CreateStrategy spread={spread} selectedTokensMap={selectedTokensMap} />
+          <CreateStrategy
+            spread={spread}
+            selectedTokensMap={selectedTokensMap}
+            txIdentifier={txHash}
+            txReceipt={txReceipt}
+            txError={txError}
+          />
           <GreySubText>Review your strategy summary above and then send your transaction</GreySubText>
-        </>
-      )
-    case 4:
-      return (
-        <>
-          <AddFunding txIdentifier={txHash} />
-          <GreySubText>Review the funding in the Wallet page</GreySubText>
         </>
       )
     default:

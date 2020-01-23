@@ -1,17 +1,19 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
 import { EtherscanLink } from 'components/EtherscanLink'
 import { HighlightDiv } from './PoolingWidget.styled'
 import { AddFundingWrapper } from './AddFunding.styled'
+import { Receipt } from 'types'
 
 interface AddFundingProps {
   txIdentifier: string
+  txReceipt?: Receipt
 }
 
-const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier }) => (
+const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
   <AddFundingWrapper>
     <p>
       <strong>Great</strong> - your liquidity provision is being created right now.
@@ -19,7 +21,12 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier }) => (
 
     <div>
       <HighlightDiv>
-        <FontAwesomeIcon color="var(--color-button-primary)" icon={faSpinner} size="lg" spin />{' '}
+        <FontAwesomeIcon
+          color="var(--color-button-primary)"
+          icon={txReceipt ? faCheckCircle : faSpinner}
+          size="lg"
+          spin={!txReceipt}
+        />{' '}
         <span>
           You can check the transactions status on:{' '}
           <strong>
