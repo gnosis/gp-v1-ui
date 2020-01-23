@@ -48,7 +48,11 @@ const SubComponents: React.FC<SubComponentProps> = props => {
             txReceipt={txReceipt}
             txError={txError}
           />
-          <GreySubText>Review your strategy summary above and then send your transaction</GreySubText>
+          <GreySubText>
+            {txReceipt
+              ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
+              : 'Review your liquidity summary above and then send your transaction'}
+          </GreySubText>
         </>
       )
     default:

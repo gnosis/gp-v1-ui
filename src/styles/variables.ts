@@ -42,7 +42,7 @@ const DarkColors = `
   --color-background-lighter: #f7f7f7;
   --color-background: #2e2e2e;
   --color-background-pageWrapper: #181a1b;
-  --color-background-actionCards: #bbfdbb;
+  --color-background-actionCards: #026902;
   --color-background-highlighted: #3f4104;
   --color-background-selected: ##d9d9d9;
   --color-background-selected-darker: #b6b6b6;

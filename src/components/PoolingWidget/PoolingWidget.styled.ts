@@ -136,7 +136,9 @@ export const StepDescriptionWrapper = styled.div`
   }
 `
 
-export const HighlightDiv = styled.div`
-  background: var(--color-background-highlighted);
+export const HighlightDiv = styled.div<{ $bgColor?: string }>`
+  background: ${({ $bgColor = 'var(--color-background-highlighted)' }): string => $bgColor};
   display: inline-flex;
+
+  transition: all 0.5s ease-in-out;
 `
