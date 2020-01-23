@@ -77,9 +77,14 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
 
   > * {
     display: flex;
-    flex: 1;
-
     text-align: center;
+
+    &:nth-child(odd) {
+      flex: 1;
+    }
+    &:nth-child(even) {
+      flex: 2;
+    }
   }
 
   > p,
@@ -133,5 +138,5 @@ export const StepDescriptionWrapper = styled.div`
 
 export const HighlightDiv = styled.div`
   background: var(--color-background-highlighted);
-  width: max-content;
+  display: inline-flex;
 `
