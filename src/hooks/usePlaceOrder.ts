@@ -35,7 +35,7 @@ interface Result {
   isSubmitting: boolean
 }
 
-interface PlaceOrderResult {
+export interface PlaceOrderResult {
   success: boolean
   receipt?: Receipt
 }

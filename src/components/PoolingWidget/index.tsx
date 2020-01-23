@@ -14,7 +14,7 @@ import {
   GreySubText,
 } from './PoolingWidget.styled'
 
-import { faCheckCircle, faSpinner, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faCheckCircle, faSpinner, faPaperPlane, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import useSafeState from 'hooks/useSafeState'
@@ -24,17 +24,18 @@ import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
 import { tokenListApi } from 'api'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
-import { Network } from 'types'
+import { Network, Receipt } from 'types'
 
 import { maxAmountsForSpread, log } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
+import { Link } from 'react-router-dom'
 
 interface ProgressBarProps {
   step: number
   stepArray: string[]
 }
 
-const stepChecker = (step: number, index: number): boolean => step >= index + 1 && step <= 4
+const stepChecker = (step: number, index: number): boolean => step >= index + 1 && step <= 3
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
   return (
@@ -47,7 +48,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
             >
               <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{index + 1}</ProgressStepText>
             </ProgressStep>
-            {index + 1 < 4 && (
+            {index + 1 < 3 && (
               <StepSeparator
                 $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
               />
@@ -59,7 +60,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
             <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{stepName}</ProgressStepText>
-            {index + 1 < 4 && <p />}
+            {index + 1 < 3 && <p />}
           </React.Fragment>
         ))}
       </BarWrapper>
@@ -106,8 +107,6 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
         }
       case 3:
         return { title: '3. Create liquidity', subtext: '' }
-      case 4:
-        return { title: '4. Add funding', subtext: '' }
       default:
         return { title: 'An error occurred, please try again' }
     }
@@ -169,9 +168,13 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
 }
 
 const PoolingInterface: React.FC = () => {
-  const [step, setStep] = useSafeState(1)
   const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
   const [spread, setSpread] = useSafeState(0.2)
+  const [step, setStep] = useSafeState(1)
+
+  const [txHash, setTxHash] = useSafeState('')
+  const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
+  const [txError, setTxError] = useSafeState(undefined)
 
   const { networkId } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -188,39 +191,43 @@ const PoolingInterface: React.FC = () => {
     return setStep(step - 1)
   }, [setStep, step])
   const nextStep = useCallback((): void => {
-    if (step == 4) return
+    if (step == 3) return
 
     return setStep(step + 1)
   }, [setStep, step])
 
   const { isSubmitting, placeMultipleOrders } = usePlaceOrder()
 
-  const [txHash, setTxHash] = useSafeState('')
-
   const onSentTransaction = useCallback(
     txHash => {
       setTxHash(txHash)
-      nextStep()
+      // nextStep()
     },
-    [nextStep, setTxHash],
+    [setTxHash],
   )
 
-  const sendTransaction = useCallback(() => {
+  const sendTransaction = useCallback(async () => {
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
 
-    placeMultipleOrders({
-      orders,
-      txOptionalParams: {
-        onSentTransaction,
-      },
-    }).catch(e => {
+    try {
+      setTxReceipt(undefined)
+
+      const { receipt } = await placeMultipleOrders({
+        orders,
+        txOptionalParams: {
+          onSentTransaction,
+        },
+      })
+
+      setTxReceipt(receipt)
+    } catch (e) {
       log('Failed to place orders for strategy', e)
       toast.error('Not able to create your orders, please try again')
 
-      // Get back to current step
-      setStep(3)
-    })
-  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, setStep, spread])
+      // Error handle
+      setTxError(e)
+    }
+  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, setTxError, setTxReceipt, spread])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
@@ -238,15 +245,17 @@ const PoolingInterface: React.FC = () => {
       spread,
       setSpread,
       txHash,
+      txReceipt,
+      txError,
     }),
-    [handleTokenSelect, selectedTokensMap, setSpread, spread, tokens, txHash],
+    [handleTokenSelect, selectedTokensMap, setSpread, spread, tokens, txError, txHash, txReceipt],
   )
 
   return (
     <Widget>
       <PoolingInterfaceWrapper $width="75vw">
         <h2>New Liquidity</h2>
-        <ProgressBar step={step} stepArray={['Select Token', 'Define Spread', 'Create Liquidity', 'Add Funding']} />
+        <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
         <StepDescription />
         <StepTitle step={step} />
 
@@ -254,15 +263,28 @@ const PoolingInterface: React.FC = () => {
         <SubComponents step={step} {...restProps} />
 
         <StepButtonsWrapper>
-          <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
-            Back
-          </button>
+          {/* REMOVE BACK BUTTON ON TXRECEIPT */}
+          {!txReceipt && (
+            <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
+              Back
+            </button>
+          )}
+          {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
           {step !== 3 ? (
-            <button disabled={step >= 4 || selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+            <button disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
               Continue
             </button>
+          ) : // STEP 3 - TXRECEIPT OR NOT?
+          txReceipt ? (
+            // TX RCEIPT SUCCESS
+            <Link to="/wallet">
+              <button className="success">
+                <FontAwesomeIcon icon={faFlagCheckered} /> Finish and go to Wallet
+              </button>
+            </Link>
           ) : (
-            <button className="success" onClick={sendTransaction} disabled={isSubmitting}>
+            // NOT YET SUBMITTED TX
+            <button className="success" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
               <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} spin={isSubmitting} /> Send transaction
             </button>
           )}

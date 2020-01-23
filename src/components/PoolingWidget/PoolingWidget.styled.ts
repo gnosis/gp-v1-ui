@@ -8,6 +8,8 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
 
   align-items: center;
 
+  padding: 2rem 8vw;
+
   > h2 {
     margin-right: auto;
   }
@@ -75,9 +77,14 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
 
   > * {
     display: flex;
-    flex: 1;
-
     text-align: center;
+
+    &:nth-child(odd) {
+      flex: 1;
+    }
+    &:nth-child(even) {
+      flex: 2;
+    }
   }
 
   > p,
@@ -127,4 +134,11 @@ export const StepDescriptionWrapper = styled.div`
       }
     }
   }
+`
+
+export const HighlightDiv = styled.div<{ $bgColor?: string }>`
+  background: ${({ $bgColor = 'var(--color-background-highlighted)' }): string => $bgColor};
+  display: inline-flex;
+
+  transition: all 0.5s ease-in-out;
 `

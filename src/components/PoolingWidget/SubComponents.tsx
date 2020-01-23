@@ -1,24 +1,29 @@
 import React from 'react'
 
-import TokenSelector from './TokenSelector'
-import DefineSpread from './DefineSpread'
-import { TokenSelectorProps } from './TokenSelector'
-import { GreySubText } from './PoolingWidget.styled'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+
+import TokenSelector from './TokenSelector'
+import { TokenSelectorProps } from './TokenSelector'
+import DefineSpread from './DefineSpread'
+import { GreySubText } from './PoolingWidget.styled'
+
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
+import { Receipt } from 'types'
 
-interface SubComponentProps extends TokenSelectorProps /* , All Other Steps */ {
+interface SubComponentProps extends TokenSelectorProps {
   step: number
   selectedTokensMap: Map<number, TokenDetails>
   spread: number
   setSpread: React.Dispatch<React.SetStateAction<number>>
   txHash: string
+  txReceipt?: Receipt
+  txError?: Error
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash } = props
+  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash, txReceipt, txError } = props
 
   switch (step) {
     case 1:
@@ -36,12 +41,20 @@ const SubComponents: React.FC<SubComponentProps> = props => {
     case 3:
       return (
         <>
-          <CreateStrategy spread={spread} selectedTokensMap={selectedTokensMap} />
-          <GreySubText>Review your strategy summary above and then send your transaction</GreySubText>
+          <CreateStrategy
+            spread={spread}
+            selectedTokensMap={selectedTokensMap}
+            txIdentifier={txHash}
+            txReceipt={txReceipt}
+            txError={txError}
+          />
+          <GreySubText>
+            {txReceipt
+              ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
+              : 'Review your liquidity summary above and then send your transaction'}
+          </GreySubText>
         </>
       )
-    case 4:
-      return <div>Pending transaction: {txHash}</div>
     default:
       return (
         <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />

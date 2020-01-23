@@ -1,8 +1,10 @@
 import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
-import { SpreadInformationWrapper, DefineSpreadWrapper, RedBoldText } from './DefineSpread.styled'
-import { DEFAULT_DECIMALS } from 'const'
+
 import { CardTable } from 'components/Layout/Card'
+import { SpreadInformationWrapper, DefineSpreadWrapper, RedBoldText } from './DefineSpread.styled'
+
+import { DEFAULT_DECIMALS } from 'const'
 
 interface DefineSpreadProps {
   selectedTokensMap: Map<number, TokenDetails>
@@ -26,6 +28,7 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
         // TODO: change CardTable so that header row margins
         // is a props and doesn't need !important
         $webCSS={`
+        font-size: larger;
         thead > tr { margin: 0 !important; };
         tbody > tr { 
           min-height: 3.5rem;
@@ -53,6 +56,8 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
         <tbody>
           <tr>
             <td className="responsive-cell">{tokenSymbolsString.join(' - ')}</td>
+
+            {/* SELL SPREAD */}
             <td data-label="Sell (at least)">
               <div className="responsive-cell">
                 <RedBoldText as="span" $bold="normal">
@@ -66,6 +71,8 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
                 </RedBoldText>
               </div>
             </td>
+
+            {/* BUY SPREAD */}
             <td data-label="Buy (at most)">
               <div className="responsive-cell">
                 <RedBoldText as="span" $bold="normal">
