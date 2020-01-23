@@ -20,7 +20,9 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
     </p>
 
     <div>
-      <HighlightDiv>
+      <HighlightDiv
+        $bgColor={txReceipt ? 'var(--color-background-actionCards)' : 'var(--color-background-highlighted)'}
+      >
         <FontAwesomeIcon
           color="var(--color-button-primary)"
           icon={txReceipt ? faCheckCircle : faSpinner}
