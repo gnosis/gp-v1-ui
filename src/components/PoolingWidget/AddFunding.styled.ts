@@ -15,6 +15,10 @@ export const AddFundingWrapper = styled.div`
     padding: 0.8rem;
     > span {
       margin: 0 0.5rem;
+      // Etherscan link
+      a {
+        word-break: break-all;
+      }
     }
   }
 `
