@@ -39,7 +39,12 @@ export const exchangeBalanceStates: BalancesByUserAndToken = {
       },
     },
     [TOKEN_4]: STATE_ZERO, // 0. USDC: decimals=6
-    [TOKEN_5]: STATE_ZERO, // 0. PAX: decimals=18
+    [TOKEN_5]: {
+      // 0. PAX: decimals=18
+      balance: new BN('100144563322323'), // 50,048.29
+      pendingDeposits: createFlux(),
+      pendingWithdraws: createFlux(),
+    },
     [TOKEN_6]: {
       // 0. GUSD: decimals=2
       balance: new BN('5004829'), // 50,048.29
