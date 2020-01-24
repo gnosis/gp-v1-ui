@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/dex-react",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "",
   "main": "src/index.js",
   "scripts": {
@@ -59,7 +59,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@gnosis.pm/dapp-ui": "^0.5.3",
-    "@gnosis.pm/dex-js": "0.1.5-RC.3",
+    "@gnosis.pm/dex-js": "0.1.6",
     "@hot-loader/react-dom": "^16.8.6",
     "@types/react": "^16.9.13",
     "@types/react-select": "^3.0.5",
