@@ -1137,19 +1137,19 @@
   dependencies:
     web3connect "^1.0.0-beta.23"
 
-"@gnosis.pm/dex-contracts@^0.1.2":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-contracts/-/dex-contracts-0.1.3.tgz#8474ed83c879a3c3a22ce13741e3ad43dac6dd68"
-  integrity sha512-HRRw+AGZYe6almCQRj8pNL1AELLnkvB1jqLs20faaoISy+5f9I4nsgHbkw9qzxi/R8NQ8pAc/wIx4rvH7hSeCw==
+"@gnosis.pm/dex-contracts@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-contracts/-/dex-contracts-0.2.0.tgz#1649e2efdb818158db79569e9375d6bf9405c63f"
+  integrity sha512-9zMT7XaveDJ5L52o0RNRcFL0Vf2nOpX1lGsWimIZCZBnCL1HyvKHvX4W4mfcItkScNVNgvJ9EWSNVXQjS+pK5g==
   dependencies:
-    bn.js "^5.0.0"
+    bn.js "^5.1.1"
 
-"@gnosis.pm/dex-js@0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.6.tgz#c7d732a522ed36d36a33addb4ac727546a3c0a1e"
-  integrity sha512-KkB7qECUi5CPcQckY/wjYEL3zl2hY05hQjd7ZGArX7UvsPoeynO4droXKC/999cfBZgYEVqDxpcEfYTpZI8mAw==
+"@gnosis.pm/dex-js@0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.7.tgz#0db6dba2437a8e9bb2f192c63f86b7765d113847"
+  integrity sha512-0xM6QeFbMgjcv1zpeyOVKpP+8AosiiHeEeAX3x8xksvln9FeQK+V7rP1cej3BUPJSY4tYf1FE9+0Y3jRGNgWsQ==
   dependencies:
-    "@gnosis.pm/dex-contracts" "^0.1.2"
+    "@gnosis.pm/dex-contracts" "^0.2.0"
 
 "@hot-loader/react-dom@^16.8.6":
   version "16.11.0"
@@ -3029,7 +3029,7 @@ bn.js@4.11.8, bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.11.0, bn.js@^4.
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
   integrity sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
 
-bn.js@^5.0.0:
+bn.js@^5.0.0, bn.js@^5.1.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.1.1.tgz#48efc4031a9c4041b9c99c6941d903463ab62eb5"
   integrity sha512-IUTD/REb78Z2eodka1QZyyEk66pciRcP6Sroka0aI3tG/iwIdYLrBD62RsubR7vqdt3WyX8p4jxeatzmRSphtA==
