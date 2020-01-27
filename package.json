@@ -131,7 +131,7 @@
     "jest": "^24.9.0",
     "jest-enzyme": "^7.1.1",
     "prettier": "^1.18.2",
-    "react-dev-utils": "^9.0.1",
+    "react-dev-utils": "^10.0.0",
     "react-test-renderer": "^16.9.0",
     "rimraf": "^3.0.0",
     "style-loader": "^1.0.0",
