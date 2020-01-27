@@ -109,6 +109,7 @@
     "babel-jest": "^24.9.0",
     "babel-loader": "^8.0.6",
     "babel-plugin-styled-components": "^1.10.6",
+    "babel-plugin-transform-imports": "^2.0.0",
     "console-feed": "^2.8.11",
     "coveralls": "^3.0.6",
     "css-loader": "^3.2.0",
