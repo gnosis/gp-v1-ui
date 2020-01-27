@@ -26,8 +26,6 @@ export const BATCH_TIME = 300
 export const DEFAULT_ORDER_DURATION = 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
 // Furtherst batch id possible (uint32), must be a js Number
 export const MAX_BATCH_ID = 2 ** 32 - 1
-// How long in the future an order must be to be considered `never` expires. In minutes
-export const MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME = 60 * 24 * 365 * 100 // 100 years
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000
