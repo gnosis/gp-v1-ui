@@ -11,6 +11,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'react-toastify'
 
+import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
+
 import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
@@ -18,17 +20,8 @@ import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import {
-  safeTokenName,
-  formatAmount,
-  formatAmountFull,
-  isBatchIdFarInTheFuture,
-  formatDateFromBatchId,
-  isOrderActive,
-  formatPrice,
-} from 'utils'
+import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, isOrderActive, formatPrice } from 'utils'
 import { onErrorFactory } from 'utils/onError'
-import { MIN_UNLIMITED_SELL_ORDER } from 'const'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
 import { OrderRowWrapper } from './OrderRow.styled'
@@ -147,7 +140,7 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
     order.remainingAmount,
     sellToken.decimals,
   ])
-  const unlimited = order.priceDenominator.gt(MIN_UNLIMITED_SELL_ORDER)
+  const unlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
   return (
     <td data-label="Unfilled Amount" className={unlimited ? '' : 'sub-columns two-columns'}>
@@ -191,7 +184,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
 
 const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
-    const isNeverExpires = isBatchIdFarInTheFuture(order.validUntil)
+    const isNeverExpires = isNeverExpiresOrder(order.validUntil)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
 
     return { isNeverExpires, expiresOn }

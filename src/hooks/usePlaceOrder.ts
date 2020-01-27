@@ -2,13 +2,15 @@ import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'react-toastify'
 
+import { MAX_BATCH_ID } from '@gnosis.pm/dex-js'
+
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
 import { log } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
-import { DEFAULT_ORDER_DURATION, MAX_BATCH_ID } from 'const'
+import { DEFAULT_ORDER_DURATION } from 'const'
 import useSafeState from './useSafeState'
 
 interface PlaceOrderParams<T> {

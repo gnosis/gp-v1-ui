@@ -1,7 +1,9 @@
 import BN from 'bn.js'
 import { addDays, addMinutes, addYears } from 'date-fns'
 
-import { ALLOWANCE_MAX_VALUE, MAX_BATCH_ID } from 'const'
+import { UNLIMITED_ORDER_AMOUNT, MAX_BATCH_ID } from '@gnosis.pm/dex-js'
+
+import { ONE } from 'const'
 import { dateToBatchId } from 'utils'
 
 import { USER_1, BATCH_ID } from './basic'
@@ -20,13 +22,13 @@ export const exchangeOrders = {
       remainingAmount: new BN('1500000000000000000000'),
     },
     {
-      buyTokenId: 4, // USDC
-      sellTokenId: 5, // TUSD
+      buyTokenId: 7, // DAI
+      sellTokenId: 5, // PAX
       validFrom: BATCH_ID,
       validUntil: MAX_BATCH_ID, // as big as it gets
-      priceNumerator: new BN('12').mul(new BN(10).pow(new BN(64))), // price ~1.04
-      priceDenominator: ALLOWANCE_MAX_VALUE,
-      remainingAmount: ALLOWANCE_MAX_VALUE, // as big as it gets
+      priceNumerator: UNLIMITED_ORDER_AMOUNT, // unlimited order, spread 0.3%
+      priceDenominator: UNLIMITED_ORDER_AMOUNT.mul(new BN(997)).divRound(new BN(1000)),
+      remainingAmount: ONE, // doesn't matter
     },
     {
       buyTokenId: 7, // DAI
