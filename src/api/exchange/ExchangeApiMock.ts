@@ -3,11 +3,22 @@ import BN from 'bn.js'
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
-import { Receipt, TxOptionalParams } from 'types'
+import { Receipt } from 'types'
 import { FEE_DENOMINATOR, ONE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
-import { ExchangeApi, AuctionElement, PlaceOrderParams, Order } from './ExchangeApi'
+import {
+  ExchangeApi,
+  AuctionElement,
+  PlaceOrderParams,
+  Order,
+  CancelOrdersParams,
+  AddTokenParams,
+  GetOrdersParams,
+  GetTokenAddressByIdParams,
+  GetTokenIdByAddressParams,
+  PlaceValidFromOrdersParams,
+} from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface OrdersByUser {
@@ -45,7 +56,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     this.orders = ordersByUser
   }
 
-  public async getOrders(userAddress: string): Promise<AuctionElement[]> {
+  public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {
     this._initOrders(userAddress)
     return this.orders[userAddress].map((order, index) => ({
       ...order,
@@ -67,17 +78,17 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return FEE_DENOMINATOR
   }
 
-  public async getTokenAddressById(tokenId: number): Promise<string> {
+  public async getTokenAddressById({ tokenId }: GetTokenAddressByIdParams): Promise<string> {
     assert(typeof this.registeredTokens[tokenId] === 'string', 'Must have ID to get Address')
     return this.registeredTokens[tokenId]
   }
 
-  public async getTokenIdByAddress(tokenAddress: string): Promise<number> {
+  public async getTokenIdByAddress({ tokenAddress }: GetTokenIdByAddressParams): Promise<number> {
     assert(typeof this.tokenAddressToId[tokenAddress] === 'number', 'Must have Address to get ID')
     return this.tokenAddressToId[tokenAddress]
   }
 
-  public async addToken(tokenAddress: string, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+  public async addToken({ tokenAddress, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     await waitAndSendReceipt({ txOptionalParams })
 
     assert(typeof this.tokenAddressToId[tokenAddress] !== 'number', 'Token already registered')
@@ -88,42 +99,70 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return RECEIPT
   }
 
-  public async placeOrder(orderParams: PlaceOrderParams, txOptionalParams?: TxOptionalParams): Promise<Receipt> {
+  public async placeOrder(params: PlaceOrderParams): Promise<Receipt> {
+    const { buyTokenId, sellTokenId, validUntil, txOptionalParams } = params
     await waitAndSendReceipt({ txOptionalParams })
 
-    this._initOrders(orderParams.userAddress)
+    this._initOrders(params.userAddress)
 
-    this.orders[orderParams.userAddress].push({
-      buyTokenId: orderParams.buyTokenId,
-      sellTokenId: orderParams.sellTokenId,
+    this.orders[params.userAddress].push({
+      buyTokenId,
+      sellTokenId,
       validFrom: await this.getCurrentBatchId(),
-      validUntil: orderParams.validUntil,
-      priceNumerator: orderParams.buyAmount,
-      priceDenominator: orderParams.sellAmount,
-      remainingAmount: orderParams.sellAmount,
+      validUntil,
+      priceNumerator: params.buyAmount,
+      priceDenominator: params.sellAmount,
+      remainingAmount: params.sellAmount,
     })
 
     return RECEIPT
   }
 
-  public async cancelOrders(
-    {
-      senderAddress,
-      orderIds,
-    }: {
-      senderAddress: string
-      orderIds: number[]
-    },
-    txOptionalParams?: TxOptionalParams,
-  ): Promise<Receipt> {
+  public async placeValidFromOrders({
+    userAddress,
+    buyTokens,
+    sellTokens,
+    validFroms,
+    validUntils,
+    buyAmounts,
+    sellAmounts,
+    txOptionalParams,
+  }: PlaceValidFromOrdersParams): Promise<Receipt> {
+    const length = buyTokens.length
+    assert(
+      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every(el => el.length === length),
+      'Parameters length do not match',
+    )
+    assert(length > 0, 'At least one order required')
+
     await waitAndSendReceipt({ txOptionalParams })
 
-    this._initOrders(senderAddress)
+    this._initOrders(userAddress)
+
+    for (let i = 0; i < length; i++) {
+      this.orders[userAddress].push({
+        buyTokenId: buyTokens[i],
+        sellTokenId: sellTokens[i],
+        validFrom: validFroms[i],
+        validUntil: validUntils[i],
+        priceNumerator: buyAmounts[i],
+        priceDenominator: sellAmounts[i],
+        remainingAmount: sellAmounts[i],
+      })
+    }
+
+    return RECEIPT
+  }
+
+  public async cancelOrders({ userAddress, orderIds, txOptionalParams }: CancelOrdersParams): Promise<Receipt> {
+    await waitAndSendReceipt({ txOptionalParams })
+
+    this._initOrders(userAddress)
     const batchId = await this.getCurrentBatchId()
 
     orderIds.forEach(orderId => {
-      if (this.orders[senderAddress][orderId]) {
-        this.orders[senderAddress][orderId].validUntil = batchId - 1
+      if (this.orders[userAddress][orderId]) {
+        this.orders[userAddress][orderId].validUntil = batchId - 1
       }
     })
 

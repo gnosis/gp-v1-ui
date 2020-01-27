@@ -26,23 +26,27 @@ import {
 import { log, toBN } from 'utils'
 import { INFURA_ID } from 'const'
 
+import { subscribeToWeb3Event } from './subscriptionHelpers'
+
 export interface WalletApi {
-  isConnected(): boolean
+  isConnected(): boolean | Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
   disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
-  getWalletInfo(): WalletInfo
+  getWalletInfo(): WalletInfo | Promise<WalletInfo>
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo
+  blockchainState: BlockchainUpdatePrompt
 }
 
 export interface WalletInfo {
   isConnected: boolean
   userAddress?: string
   networkId?: number
+  blockNumber?: number
 }
 
 export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
@@ -76,30 +80,60 @@ const subscribeToBlockchainUpdate = ({
 }): BlockchainUpdatePromptCallback => {
   const subs = subscriptions || createSubscriptions(provider)
 
+  const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
+    return subscribeToWeb3Event({
+      web3,
+      callback: cb,
+      getter: web3 => web3.eth.getBlock('latest'),
+      event: 'newBlockHeaders',
+    })
+  }
+
+  let blockchainPrompt: BlockchainUpdatePrompt
+
+  const providerState = getProviderState(provider)
+
+  if (providerState) {
+    const {
+      accounts: [account],
+      chainId,
+    } = providerState
+
+    blockchainPrompt = {
+      account,
+      chainId: +chainId,
+      blockHeader: null,
+    }
+  } else {
+    blockchainPrompt = {
+      account: '',
+      chainId: 0,
+      blockHeader: null,
+    }
+  }
+
+  if (!subs || !providerState) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+    const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
+      const unsubBlock = blockUpdate(blockHeader => {
+        blockchainPrompt = { ...blockchainPrompt, blockHeader }
+        log('block changed:', blockHeader.number)
+        callback(blockchainPrompt)
+      })
+
+      return unsubBlock
+    }
+
+    return subscriptionHOC
+  }
+
   let networkUpdate: (callback: (chainId: number) => void) => Command
 
   if (isMetamaskSubscriptions(subs)) networkUpdate = (cb): Command => subs.onNetworkChanged(networkId => cb(+networkId))
   if (isWalletConnectSubscriptions(subs)) networkUpdate = subs.onChainChanged
 
   const accountsUpdate = subs.onAccountsChanged
-
-  const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
-    const blockSub = web3.eth.subscribe('newBlockHeaders').on('data', cb)
-    return (): void => {
-      blockSub.unsubscribe()
-    }
-  }
-
-  const {
-    accounts: [account],
-    chainId,
-  } = getProviderState(provider)
-
-  let blockchainPrompt: BlockchainUpdatePrompt = {
-    account,
-    chainId: +chainId,
-    blockHeader: null,
-  }
 
   const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
     const unsubNetwork = networkUpdate(chainId => {
@@ -152,6 +186,10 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const isPromise = <T>(maybePromise: any): maybePromise is Promise<T> =>
+  maybePromise instanceof Promise || ('then' in maybePromise && typeof maybePromise.then === 'function')
+
 /**
  * Basic implementation of Wallet API
  */
@@ -159,6 +197,8 @@ export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
   private _web3: Web3
+
+  public blockchainState: BlockchainUpdatePrompt
 
   private _unsubscribe: Command = () => {
     // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
@@ -169,7 +209,7 @@ export class WalletApiImpl implements WalletApi {
     this._web3 = web3
   }
 
-  public isConnected(): boolean {
+  public isConnected(): boolean | Promise<boolean> {
     return this._connected
   }
 
@@ -191,7 +231,18 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
-    await this._notifyListeners()
+    const {
+      accounts: [account],
+      chainId,
+    } = getProviderState(provider)
+
+    this.blockchainState = {
+      account,
+      chainId,
+      blockHeader: null,
+    }
+
+    await this._notifyListeners(this.blockchainState)
 
     const subscriptions = createSubscriptions(provider)
 
@@ -222,9 +273,9 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async disconnect(): Promise<void> {
-    if (isWalletConnectProvider(this._provider) && this._connected) await this._provider.close()
-
     this._unsubscribe()
+
+    if (isWalletConnectProvider(this._provider) && (await this._connected)) await this._provider.close()
 
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
@@ -234,27 +285,30 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async getAddress(): Promise<string> {
-    assert(this._connected, 'The wallet is not connected')
+    assert(await this._connected, 'The wallet is not connected')
 
     return this._user
   }
 
   public async getBalance(): Promise<BN> {
-    assert(this._connected, 'The wallet is not connected')
+    assert(await this._connected, 'The wallet is not connected')
 
     return toBN(await this._balance)
   }
 
   public async getNetworkId(): Promise<number> {
-    assert(this._connected, 'The wallet is not connected')
+    assert(await this._connected, 'The wallet is not connected')
 
     return this._networkId
   }
 
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
     this._listeners.push(callback)
-    if (trigger) {
-      callback(this.getWalletInfo())
+    const walletInfo = this.getWalletInfo()
+    // if walletInfo can only be gotten asynchronously
+    // trigger callback as soon as it becomes available
+    if (trigger || isPromise(walletInfo)) {
+      Promise.resolve(walletInfo).then(callback)
     }
 
     return (): void => this.removeOnChangeWalletInfo(callback)
@@ -268,8 +322,12 @@ export class WalletApiImpl implements WalletApi {
     return Web3Connect.getProviderInfo(this._provider)
   }
 
-  public getWalletInfo(): WalletInfo {
-    const { isConnected = false, accounts = [], chainId = 0 } = getProviderState(this._provider) || {}
+  public getWalletInfo(): WalletInfo | Promise<WalletInfo> {
+    const providerState = getProviderState(this._provider)
+
+    if (!providerState) return this._getAsyncWalletInfo()
+
+    const { isConnected = false, accounts = [], chainId = 0 } = providerState
     return {
       isConnected,
       userAddress: accounts[0],
@@ -279,26 +337,60 @@ export class WalletApiImpl implements WalletApi {
 
   /* ****************      Private Functions      **************** */
 
-  private async _notifyListeners(): Promise<void> {
-    await Promise.resolve()
-    const walletInfo: WalletInfo = this.getWalletInfo()
-    this._listeners.forEach(listener => listener(walletInfo))
+  private async _getAsyncWalletInfo(): Promise<WalletInfo> {
+    try {
+      const [[userAddress], networkId] = await Promise.all([this._web3.eth.getAccounts(), this._web3.eth.net.getId()])
+
+      return {
+        userAddress,
+        networkId,
+        isConnected: !!userAddress && !!networkId,
+      }
+    } catch (error) {
+      log('Error asynchronously getting WalletInfo', error)
+      return {
+        userAddress: '',
+        networkId: 0,
+        isConnected: false,
+      }
+    }
   }
 
-  private get _connected(): boolean {
-    return !!(getProviderState(this._provider) || {}).isConnected
+  private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
+    if (blockchainUpdate) this.blockchainState = blockchainUpdate
+
+    await Promise.resolve()
+
+    const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
+    const wInfoExtended = { ...walletInfo, blockNumber: blockchainUpdate?.blockHeader?.number }
+
+    this._listeners.forEach(listener => listener(wInfoExtended))
   }
-  private get _user(): string {
-    const { accounts: [account] = [] } = getProviderState(this._provider) || {}
-    return account
+
+  private get _connected(): boolean | Promise<boolean> {
+    const providerState = getProviderState(this._provider)
+
+    if (providerState) return providerState.isConnected
+
+    return this._getAsyncWalletInfo().then(walletInfo => walletInfo.isConnected)
+  }
+  private get _user(): string | Promise<string> {
+    const providerState = getProviderState(this._provider)
+
+    if (providerState) return providerState.accounts[0]
+
+    return this._getAsyncWalletInfo().then(walletInfo => walletInfo.userAddress || '')
   }
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
-    return this._web3.eth.getBalance(this._user)
+    return Promise.resolve(this._user).then(user => this._web3.eth.getBalance(user))
   }
-  private get _networkId(): Network {
-    const { chainId = 0 } = getProviderState(this._provider) || {}
-    return chainId
+  private get _networkId(): Network | Promise<Network> {
+    const providerState = getProviderState(this._provider)
+
+    if (providerState) return providerState.chainId || 0
+
+    return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
   }
 }
 

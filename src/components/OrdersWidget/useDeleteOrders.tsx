@@ -22,7 +22,7 @@ function extractExchangeOrderIds(orderIds: string[]): number[] {
 
 export function useDeleteOrders(): Result {
   const [deleting, setDeleting] = useSafeState<boolean>(false)
-  const { userAddress } = useWalletConnection()
+  const { userAddress, networkId } = useWalletConnection()
 
   const deleteOrders = useCallback(
     async (uiOrderIds: string[]): Promise<boolean> => {
@@ -30,13 +30,14 @@ export function useDeleteOrders(): Result {
 
       try {
         assert(userAddress, 'User address is missing. Aborting.')
+        assert(networkId, 'NetworkId is missing. Aborting.')
         assert(uiOrderIds.length > 0, 'No orders to cancel. Aborting.')
 
         setDeleting(true)
 
         const orderIds = extractExchangeOrderIds(uiOrderIds)
 
-        const receipt = await exchangeApi.cancelOrders({ senderAddress: userAddress, orderIds }, txOptionalParams)
+        const receipt = await exchangeApi.cancelOrders({ userAddress, orderIds, networkId, txOptionalParams })
 
         log(`The transaction has been mined: ${receipt.transactionHash}`)
 
@@ -53,7 +54,7 @@ export function useDeleteOrders(): Result {
         setDeleting(false)
       }
     },
-    [setDeleting, userAddress],
+    [networkId, setDeleting, userAddress],
   )
 
   return { deleteOrders, deleting }

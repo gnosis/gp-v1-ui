@@ -1,4 +1,6 @@
 import BN from 'bn.js'
+import BigNumber from 'bignumber.js'
+import { UNLIMITED_ORDER_AMOUNT } from '@gnosis.pm/dex-js'
 
 export const APP_NAME = 'fuse'
 
@@ -15,8 +17,8 @@ export const TEN = new BN(10)
 export const ALLOWANCE_MAX_VALUE = TWO.pow(new BN(256)).sub(ONE) // 115792089237316195423570985008687907853269984665640564039457584007913129639935
 // Arbitrarily big number for checking if the token is enabled
 export const ALLOWANCE_FOR_ENABLED_TOKEN = TWO.pow(new BN(128)) // 340282366920938463463374607431768211456
-// How much a sell order must be selling to be considered `unlimited`
-export const MIN_UNLIMITED_SELL_ORDER = ALLOWANCE_MAX_VALUE.div(TEN).mul(new BN(7)) // Currently set to 70% of max allowance
+
+export const UNLIMITED_ORDER_AMOUNT_BIGNUMBER = new BigNumber(UNLIMITED_ORDER_AMOUNT.toString())
 
 // Model constants
 export const FEE_DENOMINATOR = 1000 // Fee is 1/fee_denominator i.e. 1/1000 = 0.1%
@@ -24,12 +26,10 @@ export const BATCH_TIME = 300
 export const DEFAULT_ORDER_DURATION = 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
 // Furtherst batch id possible (uint32), must be a js Number
 export const MAX_BATCH_ID = 2 ** 32 - 1
-// How long in the future an order must be to be considered `never` expires. In minutes
-export const MIN_UNLIMITED_SELL_ORDER_EXPIRATION_TIME = 60 * 24 * 365 * 100 // 100 years
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000
-export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntatic sugar for displaying purposes
+export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntactic sugar for displaying purposes
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
@@ -39,20 +39,21 @@ export const LEGALDOCUMENT = {
 
 export const RESPONSIVE_SIZES = {
   // PX SIZES:
-  // MOBILE_SMALL: 320,
-  // MOBILE: 500,
-  // MOBILE_LARGE: 532,
-  // TABLET: 720,
-  // TABLET_LARGE: 866,
-  // WEB_SMALL: 1024,
+  MOBILE_SMALL_PX: 320,
+  MOBILE_PX: 500,
+  MOBILE_LARGE_PX: 532,
+  TABLET_PX: 720,
+  TABLET_LARGE_PX: 866,
+  WEB_SMALL_PX: 1024,
 
-  // REM SIZES:
+  // EM SIZES:
   MOBILE_SMALL: 20,
   MOBILE: 31.25,
   MOBILE_LARGE: 33.25,
   TABLET: 45,
   TABLET_LARGE: 54.125,
   WEB_SMALL: 64,
+  WEB: 75,
 }
 
 export const DEFAULT_DECIMALS = 4

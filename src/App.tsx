@@ -23,16 +23,23 @@ import Wallet from 'pages/Wallet'
 import SourceCode from 'pages/SourceCode'
 import NotFound from 'pages/NotFound'
 import ConnectWallet from 'pages/ConnectWallet'
-import { walletApi } from 'api'
 
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
 
+import Web3Connect from 'web3connect'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+
 const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
-  const isConnected = walletApi.isConnected()
+  const { pending, isConnected } = useWalletConnection()
 
   const { component: Component, ...rest } = props
+
+  if (pending) {
+    return <Route {...rest} render={(): null => null} />
+  }
+
   return (
     <Route
       {...rest}
@@ -66,7 +73,7 @@ const App: React.FC = () => (
         <Switch>
           <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/trade/:sell-:buy" component={Trade} />
-          <PrivateRoute path="/strategies" exact component={Strategies} />
+          <PrivateRoute path="/liquidity" exact component={Strategies} />
           <PrivateRoute path="/wallet" exact component={Wallet} />
           <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/about" exact component={About} />
@@ -77,6 +84,9 @@ const App: React.FC = () => (
         </Switch>
       </Layout>
     </Router>
+    {process.env.NODE_ENV === 'development' &&
+      Web3Connect.isMobile() &&
+      React.createElement(require('./Console').default)}
   </>
 )
 

@@ -15,6 +15,7 @@ jest.mock('api/erc20/Erc20ApiMock')
 let instance: ExchangeApi
 let mockErc20Api: Erc20Api
 const tokens = [FEE_TOKEN, TOKEN_1, TOKEN_2]
+const NETWORK_ID = 0
 
 beforeAll(() => {
   testHelpers.mockTimes()
@@ -45,20 +46,20 @@ beforeEach(() => {
 
 describe('Basic view functions', () => {
   test('fee denominator', async () => {
-    expect(await instance.getFeeDenominator()).toBe(FEE_DENOMINATOR)
+    expect(await instance.getFeeDenominator(NETWORK_ID)).toBe(FEE_DENOMINATOR)
   })
 
   test('num tokens', async () => {
-    expect(await instance.getNumTokens()).toBe(tokens.length)
+    expect(await instance.getNumTokens(NETWORK_ID)).toBe(tokens.length)
   })
 
   describe('get orders', () => {
     it('returns empty when no orders placed by user', async () => {
-      expect(await instance.getOrders(USER_2)).toHaveLength(0)
+      expect(await instance.getOrders({ userAddress: USER_2, networkId: NETWORK_ID })).toHaveLength(0)
     })
 
     it('returns all placed orders', async () => {
-      expect(await instance.getOrders(USER_1)).toHaveLength(1)
+      expect(await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })).toHaveLength(1)
     })
   })
 })
@@ -66,12 +67,12 @@ describe('Basic view functions', () => {
 describe('Token view methods', () => {
   describe('get token id by address', () => {
     it('returns correct id when found', async () => {
-      expect(await instance.getTokenIdByAddress(tokens[1])).toBe(1)
+      expect(await instance.getTokenIdByAddress({ tokenAddress: tokens[1], networkId: NETWORK_ID })).toBe(1)
     })
 
     it('throws when id not found', async () => {
       try {
-        await instance.getTokenIdByAddress(TOKEN_4)
+        await instance.getTokenIdByAddress({ tokenAddress: TOKEN_4, networkId: NETWORK_ID })
         fail('Should not reach')
       } catch (e) {
         expect(e.message).toMatch(/^Must have Address to get ID$/)
@@ -81,12 +82,12 @@ describe('Token view methods', () => {
 
   describe('get token address by id', () => {
     it('returns correct address when found', async () => {
-      expect(await instance.getTokenAddressById(0)).toBe(tokens[0])
+      expect(await instance.getTokenAddressById({ tokenId: 0, networkId: NETWORK_ID })).toBe(tokens[0])
     })
 
     it('throws when address not found', async () => {
       try {
-        await instance.getTokenAddressById(10)
+        await instance.getTokenAddressById({ tokenId: 10, networkId: NETWORK_ID })
         fail('Should not reach')
       } catch (e) {
         expect(e.message).toMatch(/^Must have ID to get Address$/)
@@ -97,18 +98,18 @@ describe('Token view methods', () => {
 
 describe('addToken', () => {
   it('adds token not registered', async () => {
-    const tokenCount = await instance.getNumTokens()
+    const tokenCount = await instance.getNumTokens(NETWORK_ID)
 
-    await instance.addToken(TOKEN_3)
+    await instance.addToken({ userAddress: USER_1, tokenAddress: TOKEN_3, networkId: NETWORK_ID })
 
-    expect(await instance.getNumTokens()).toBe(tokenCount + 1)
-    expect(await instance.getTokenIdByAddress(TOKEN_3)).toBe(tokenCount)
-    expect(await instance.getTokenAddressById(tokenCount)).toBe(TOKEN_3)
+    expect(await instance.getNumTokens(NETWORK_ID)).toBe(tokenCount + 1)
+    expect(await instance.getTokenIdByAddress({ tokenAddress: TOKEN_3, networkId: NETWORK_ID })).toBe(tokenCount)
+    expect(await instance.getTokenAddressById({ tokenId: tokenCount, networkId: NETWORK_ID })).toBe(TOKEN_3)
   })
 
   it('throws when token already registered', async () => {
     try {
-      await instance.addToken(tokens[0])
+      await instance.addToken({ userAddress: USER_1, tokenAddress: tokens[0], networkId: NETWORK_ID })
       fail('Should not reach')
     } catch (e) {
       expect(e.message).toMatch(/^Token already registered$/)
@@ -116,7 +117,7 @@ describe('addToken', () => {
   })
   it('throws when MAX_TOKENS reached', async () => {
     try {
-      await instance.addToken(TOKEN_4)
+      await instance.addToken({ userAddress: USER_1, tokenAddress: TOKEN_4, networkId: NETWORK_ID })
       fail('Should not reach')
     } catch (e) {
       expect(e.message).toMatch(/^Max tokens reached$/)
@@ -143,51 +144,118 @@ describe('placeOrder', () => {
     validUntil: expected.validUntil,
     buyAmount: expected.priceNumerator,
     sellAmount: expected.priceDenominator,
+    networkId: NETWORK_ID,
   }
 
   test('place order not first', async () => {
     params.userAddress = USER_1
     const response = await instance.placeOrder(params)
     expect(response).toBe(RECEIPT)
-    const actual = (await instance.getOrders(USER_1)).pop()
+    const actual = (await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })).pop()
     expect(actual).toEqual({ ...expected, user: USER_1, id: '1' })
   })
 
   test('place first order', async () => {
-    expect((await instance.getOrders(USER_3)).length).toBe(0)
+    expect((await instance.getOrders({ userAddress: USER_3, networkId: NETWORK_ID })).length).toBe(0)
     params.userAddress = USER_2
 
     const response = await instance.placeOrder(params)
     expect(response).toBe(RECEIPT)
-    const actual = (await instance.getOrders(USER_2)).pop()
+    const actual = (await instance.getOrders({ userAddress: USER_2, networkId: NETWORK_ID })).pop()
     expect(actual).toEqual({ ...expected, user: USER_2, id: '0' })
   })
 })
+
+describe('placeValidFromOrders', () => {
+  const baseParams = {
+    userAddress: USER_1,
+    networkId: NETWORK_ID,
+    buyTokens: [],
+    sellTokens: [],
+    validFroms: [],
+    validUntils: [],
+    buyAmounts: [],
+    sellAmounts: [],
+  }
+  test('no order data provided', async () => {
+    try {
+      await instance.placeValidFromOrders(baseParams)
+      fail('Should not reach')
+    } catch (e) {
+      expect(e.message).toMatch(/At least one order required/)
+    }
+  })
+
+  test('parameters do not align', async () => {
+    const params = { ...baseParams, buyTokens: [1] }
+
+    try {
+      await instance.placeValidFromOrders(params)
+      fail('Should not reach')
+    } catch (e) {
+      expect(e.message).toMatch(/Parameters length do not match/)
+    }
+  })
+
+  test('placing multiple orders', async () => {
+    const params = {
+      ...baseParams,
+      buyTokens: [1, 2],
+      sellTokens: [3, 1],
+      validFroms: [BATCH_ID, BATCH_ID],
+      validUntils: [BATCH_ID + 10, BATCH_ID + 101],
+      buyAmounts: [new BN(6), new BN(3)],
+      sellAmounts: [new BN(5), new BN(4)],
+    }
+
+    const response = await instance.placeValidFromOrders(params)
+    expect(response).toBe(RECEIPT)
+
+    // drop the first order, we just care about the last 2
+    const [, ...orders] = await instance.getOrders(params)
+
+    orders.forEach((order, index) => {
+      expect(order).toEqual({
+        buyTokenId: params.buyTokens[index],
+        sellTokenId: params.sellTokens[index],
+        validFrom: params.validFroms[index],
+        validUntil: params.validUntils[index],
+        priceNumerator: params.buyAmounts[index],
+        priceDenominator: params.sellAmounts[index],
+        remainingAmount: params.sellAmounts[index],
+        user: params.userAddress,
+        id: (index + 1).toString(),
+        sellTokenBalance: new BN('1500000000000000000000').add(ONE),
+      })
+    })
+  })
+})
+
 describe('cancelOrder', () => {
   test('cancel existing order', async () => {
-    const orderId = (await instance.getOrders(USER_1)).length - 1
+    const orderId = (await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })).length - 1
 
-    await instance.cancelOrders({ senderAddress: USER_1, orderIds: [orderId] })
+    await instance.cancelOrders({ userAddress: USER_1, orderIds: [orderId], networkId: NETWORK_ID })
 
-    const actual = (await instance.getOrders(USER_1))[orderId]
+    const actual = (await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID }))[orderId]
     expect(actual.validUntil).toBe(BATCH_ID - 1)
   })
 
   test('cancel non existing order does nothing', async () => {
-    const expected = await instance.getOrders(USER_1)
+    const expected = await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })
 
-    await instance.cancelOrders({ senderAddress: USER_1, orderIds: [expected.length + 1] })
+    await instance.cancelOrders({ userAddress: USER_1, orderIds: [expected.length + 1], networkId: NETWORK_ID })
 
-    const actual = await instance.getOrders(USER_1)
+    const actual = await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })
     expect(actual).toEqual(expected)
   })
 
   test('cancel non existing order, user with no orders does nothing', async () => {
-    const expected = await instance.getOrders(USER_2)
+    const expected = await instance.getOrders({ userAddress: USER_2, networkId: NETWORK_ID })
 
-    await instance.cancelOrders({ senderAddress: USER_2, orderIds: [expected.length + 1] })
+    await instance.cancelOrders({ userAddress: USER_2, orderIds: [expected.length + 1], networkId: NETWORK_ID })
 
-    const actual = await instance.getOrders(USER_2)
+    const actual = await instance.getOrders({ userAddress: USER_2, networkId: NETWORK_ID })
     expect(actual).toEqual(expected)
   })
 })

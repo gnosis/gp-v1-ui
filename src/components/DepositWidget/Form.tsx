@@ -3,13 +3,15 @@ import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { IconDefinition, faSpinner } from '@fortawesome/free-solid-svg-icons'
 
-import { DynamicWrapper, InnerWrapper, LineSeparator } from './Styled'
+import { CardDrawer } from 'components/Layout/Card'
+import { WalletDrawerInnerWrapper } from './Form.styled'
+import { LineSeparator } from './Styled'
 
 import useSafeState from 'hooks/useSafeState'
+import useScrollIntoView from 'hooks/useScrollIntoView'
 
 import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
-import useScrollIntoView from 'hooks/useScrollIntoView'
 
 export interface FormProps {
   tokenBalances: TokenBalanceDetails
@@ -88,54 +90,49 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     }
   }
 
-  const ref = useScrollIntoView<HTMLDivElement>()
+  const ref = useScrollIntoView<HTMLTableRowElement>()
 
   return (
-    <DynamicWrapper responsive={!!responsive} ref={ref}>
-      <InnerWrapper>
-        <a className="times" onClick={cancelForm}>
-          &times;
-        </a>
-        <div>
-          <h4>{title}</h4>
-          <div className="WalletItemContainer">
-            {/* Withdraw Row */}
-            <div className="wallet">
-              <p>{totalAmountLabel}</p>
-              <LineSeparator />
-              <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
-              <a
-                className="max"
-                onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}
-              >
-                <small>Use Max</small>
-              </a>
-            </div>
-            {/* Deposit Row */}
-            <div className="wallet">
-              <p>{inputLabel}</p>
-              <LineSeparator />
-              <input
-                type="text"
-                value={amountInput}
-                onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
-                placeholder={symbol + ' amount'}
-              />
-            </div>
-            {/* Error Message */}
-            <p className="error">{errors.amountInput || ''}</p>
-            {/* Submit/Cancel Buttons */}
-            <div style={{ margin: 'auto' }}>
-              <a onClick={cancelForm}>Cancel</a>
-              <button type="button" disabled={!!errors.amountInput || loading} onClick={_onClick}>
-                <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
-                &nbsp; {submitBtnLabel}
-              </button>
-            </div>
+    <CardDrawer closeDrawer={(): void => cancelForm()} responsive={!!responsive} ref={ref}>
+      <div>
+        <h4>{title}</h4>
+        <WalletDrawerInnerWrapper>
+          {/* Withdraw Row */}
+          <div className="wallet">
+            <p>{totalAmountLabel}</p>
+            <LineSeparator />
+            <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
+            <a
+              className="max"
+              onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}
+            >
+              <small>Use Max</small>
+            </a>
           </div>
-        </div>
-      </InnerWrapper>
-    </DynamicWrapper>
+          {/* Deposit Row */}
+          <div className="wallet">
+            <p>{inputLabel}</p>
+            <LineSeparator />
+            <input
+              type="text"
+              value={amountInput}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
+              placeholder={symbol + ' amount'}
+            />
+          </div>
+          {/* Error Message */}
+          <p className="error">{errors.amountInput || ''}</p>
+          {/* Submit/Cancel Buttons */}
+          <div style={{ margin: 'auto' }}>
+            <a onClick={cancelForm}>Cancel</a>
+            <button type="button" disabled={!!errors.amountInput || loading} onClick={_onClick}>
+              <FontAwesomeIcon icon={loading ? faSpinner : submitBtnIcon} spin={loading} />
+              &nbsp; {submitBtnLabel}
+            </button>
+          </div>
+        </WalletDrawerInnerWrapper>
+      </div>
+    </CardDrawer>
   )
 }
 

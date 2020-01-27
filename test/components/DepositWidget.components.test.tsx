@@ -55,9 +55,9 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}, rowProps = fakeRo
 }
 
 describe('<Row /> not enabled token', () => {
-  it('contains 6 <div> elements', () => {
+  it('contains 5 <td> elements', () => {
     const wrapper = render(_createRow())
-    expect(wrapper.find('div')).toHaveLength(6)
+    expect(wrapper.find('td')).toHaveLength(5)
   })
 
   it('contains 1 <button> (enable)', () => {
@@ -71,12 +71,36 @@ describe('<Row /> enabled token', () => {
     enabled: true,
   }
 
-  it('contains 6 <div> elements', () => {
+  it('contains 5 <td> elements', () => {
     const wrapper = render(_createRow(tokenBalanceDetails))
-    expect(wrapper.find('div')).toHaveLength(6)
+    expect(wrapper.find('td')).toHaveLength(5)
   })
 
-  it('contains 2 <button> elements (deposit and withdraw)', () => {
+  it('contains 1 <button> elements (deposit)', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
+    expect(wrapper.find('button')).toHaveLength(1)
+  })
+})
+
+describe('<Row /> enabled token and wallet balance', () => {
+  const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
+    enabled: true,
+    totalExchangeBalance: ONE,
+  }
+
+  it('contains 2 <button> elements (deposit + withdraw)', () => {
+    const wrapper = render(_createRow(tokenBalanceDetails))
+    expect(wrapper.find('button')).toHaveLength(2)
+  })
+})
+
+describe('<Row /> disabled token and wallet balance', () => {
+  const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
+    enabled: false,
+    totalExchangeBalance: ONE,
+  }
+
+  it('contains 2 <button> elements (enable + withdraw)', () => {
     const wrapper = render(_createRow(tokenBalanceDetails))
     expect(wrapper.find('button')).toHaveLength(2)
   })
@@ -86,6 +110,7 @@ describe('<Row /> claimable token', () => {
   const tokenBalanceDetails: Partial<TokenBalanceDetails> = {
     enabled: true,
     claimable: true,
+    totalExchangeBalance: ONE,
     pendingWithdraw: createFlux(ONE),
   }
 

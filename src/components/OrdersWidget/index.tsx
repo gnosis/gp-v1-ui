@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import styled from 'styled-components'
-import { faExchangeAlt, faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { faExchangeAlt, faTrashAlt, faExclamationTriangle, faChartLine } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -12,182 +11,12 @@ import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive } from 'utils'
 
-import Widget from 'components/Layout/Widget'
+import { CardTable } from 'components/Layout/Card'
 import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
+
 import { useDeleteOrders } from './useDeleteOrders'
-
-const OrdersWrapper = styled(Widget)`
-  > a {
-    margin-bottom: -2em;
-  }
-`
-
-const ButtonWithIcon = styled.button`
-  min-width: 10em;
-
-  > svg {
-    margin: 0 0.25em;
-  }
-`
-
-const CreateButtons = styled.div`
-  margin-top: 2em;
-
-  // 💙 grid
-  display: grid;
-
-  &.withOrders {
-    justify-items: start;
-    grid-gap: 0.25em 0.75em;
-    grid:
-      'tradeBtn strategyBtn'
-      '.        strategyInfo'
-      / 1fr 1fr;
-
-    .tradeBtn {
-      justify-self: end;
-    }
-  }
-
-  &.withoutOrders {
-    // adjust grid layout when no orders
-    place-items: center;
-    grid-row-gap: 1em;
-    grid:
-      'noOrdersInfo'
-      'tradeBtn'
-      'strategyBtn'
-      'strategyInfo';
-
-    button {
-      // make buttons the same width
-      width: 15em;
-    }
-  }
-
-  .noOrdersInfo {
-    grid-area: noOrdersInfo;
-  }
-  .tradeBtn {
-    grid-area: tradeBtn;
-  }
-  .strategyBtn {
-    grid-area: strategyBtn;
-  }
-  .strategyInfo {
-    grid-area: strategyInfo;
-  }
-
-  button {
-    // resetting button margins to help with alignment
-    margin: 0;
-  }
-`
-
-const OrdersForm = styled.div`
-  margin-top: 2em;
-  margin-left: 2em;
-
-  .infoContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-items: center;
-
-    margin: 1em 0;
-
-    .warning {
-      justify-self: end;
-    }
-
-    .countContainer {
-      display: grid;
-      grid: 'total active expired';
-      align-items: center;
-    }
-
-    .total {
-      grid-area: total;
-    }
-    .active {
-      grid-area: active;
-    }
-    .expired {
-      grid-area: expired;
-    }
-  }
-
-  .ordersContainer {
-    // negative left margin to better position "hidden" elements
-    margin: 2em 0 2em -3em;
-
-    display: grid;
-    // 6 columns:
-    // loading indicator | select checkbox | order details | unfilled | available | expires
-    grid-template-columns: 3em 4em minmax(20em, 1.5fr) repeat(3, 1fr);
-    grid-row-gap: 1em;
-    place-items: center;
-  }
-
-  .headerRow {
-    // make the contents of this div behave as part of the parent
-    // grid container
-    display: contents;
-
-    text-transform: uppercase;
-    font-weight: bold;
-    font-size: 0.75em;
-
-    .title {
-      // create a divider line only bellow titled columns
-      border-bottom: 0.125rem solid #ededed;
-      // push the border all the way to the bottom and extend it
-      place-self: stretch;
-
-      // align that text!
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-
-    > * {
-      // more space for the divider line
-      padding-bottom: 0.5em;
-    }
-  }
-
-  .orderRow {
-    display: contents;
-  }
-
-  .checked {
-    // pull checkbox to the left to make divider line be further away
-    justify-self: left;
-    grid-column-start: 2;
-  }
-
-  .deleteContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .hidden {
-      visibility: hidden;
-    }
-  }
-
-  .noOrders {
-    padding: 3em;
-
-    display: flex;
-    justify-content: center;
-  }
-
-  .warning {
-    color: orange;
-  }
-`
+import { OrdersWrapper, CreateButtons, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
 
 interface ShowOrdersButtonProps {
   type: 'active' | 'expired'
@@ -292,12 +121,15 @@ const OrdersWidget: React.FC = () => {
             </ButtonWithIcon>
           </Link>
           {/* TODO: enable when the strategy page is implemented */}
-          {/* <ButtonWithIcon className="danger strategyBtn">
-            <FontAwesomeIcon icon={faChartLine} /> Create new strategy
-          </ButtonWithIcon>
+          <Link to="/liquidity">
+            <ButtonWithIcon className="danger strategyBtn">
+              <FontAwesomeIcon icon={faChartLine} /> Create new liquidity
+            </ButtonWithIcon>
+          </Link>
+          {/* TODO: replace href here */}
           <a href="/" className="strategyInfo">
-            <small>Learn more about strategies</small>
-          </a> */}
+            <small>Learn more about liquidity</small>
+          </a>
         </CreateButtons>
       </div>
       {!noOrders && networkId && (
@@ -332,38 +164,43 @@ const OrdersWidget: React.FC = () => {
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">
-                <div className="headerRow">
-                  <div className="checked">
-                    <input
-                      type="checkbox"
-                      onChange={toggleSelectAll}
-                      checked={orders.length === markedForDeletion.size}
-                      disabled={deleting}
-                    />
-                  </div>
-                  <div className="title">Order details</div>
-                  <div className="title">
-                    Unfilled <br /> amount
-                  </div>
-                  <div className="title">
-                    Account <br />
-                    balance
-                  </div>
-                  <div className="title">Expires</div>
-                </div>
-
-                {orders.map(order => (
-                  <OrderRow
-                    key={order.id}
-                    order={order}
-                    networkId={networkId}
-                    isOverBalance={overBalanceOrders.has(order.id)}
-                    isMarkedForDeletion={markedForDeletion.has(order.id)}
-                    toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
-                    pending={deleting && markedForDeletion.has(order.id)}
-                    disabled={deleting}
-                  />
-                ))}
+                <CardTable
+                  $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
+                  $cellSeparation="0.2rem"
+                  $rowSeparation="0.6rem"
+                >
+                  <thead>
+                    <tr>
+                      <th className="checked">
+                        <input
+                          type="checkbox"
+                          onChange={toggleSelectAll}
+                          checked={orders.length === markedForDeletion.size}
+                          disabled={deleting}
+                        />
+                        <span>All</span>
+                      </th>
+                      <th>Order details</th>
+                      <th>Unfilled amount</th>
+                      <th>Account balance</th>
+                      <th>Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {orders.map(order => (
+                      <OrderRow
+                        key={order.id}
+                        order={order}
+                        networkId={networkId}
+                        isOverBalance={overBalanceOrders.has(order.id)}
+                        isMarkedForDeletion={markedForDeletion.has(order.id)}
+                        toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id)}
+                        pending={deleting && markedForDeletion.has(order.id)}
+                        disabled={deleting}
+                      />
+                    ))}
+                  </tbody>
+                </CardTable>
               </div>
 
               <div className="deleteContainer">

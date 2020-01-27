@@ -2,7 +2,6 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faWallet } from '@fortawesome/free-solid-svg-icons'
 
-import Wallet from 'components/UserWallet'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { Redirect } from 'react-router'
 import { History } from 'history'
@@ -23,7 +22,10 @@ const IconWallet = styled(FontAwesomeIcon)`
 
 const ConnectWallet: React.FC<ConnectWalletProps> = (props: ConnectWalletProps) => {
   const { from } = props.location.state || { from: { pathname: '/' } }
-  const { isConnected } = useWalletConnection()
+  const { isConnected, pending } = useWalletConnection()
+
+  if (pending) return null
+
   if (isConnected) {
     return <Redirect to={from} />
   }
@@ -31,9 +33,8 @@ const ConnectWallet: React.FC<ConnectWalletProps> = (props: ConnectWalletProps) 
   return (
     <Wrapper className="widget">
       <IconWallet icon={faWallet} size="6x" />
-      <h1>Connect Wallet</h1>
-      <p>Please connect your wallet first</p>
-      <Wallet />
+      <h1>Wallet Disconnected</h1>
+      <p>Please connect your wallet using the button at the top of the page 👆</p>
     </Wrapper>
   )
 }
