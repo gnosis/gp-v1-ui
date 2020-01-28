@@ -1,5 +1,6 @@
+import { assert } from '@gnosis.pm/dex-js'
+
 import { TokenBalanceDetails, TxOptionalParams, Receipt } from 'types'
-import { assert } from 'utils/miscellaneous'
 import { erc20Api, depositApi } from 'api'
 
 import useSafeState from './useSafeState'

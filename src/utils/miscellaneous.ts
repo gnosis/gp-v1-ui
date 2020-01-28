@@ -3,12 +3,6 @@ import { AssertionError } from 'assert'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
 
-export function assert<T>(val: T, message: string): asserts val is NonNullable<T> {
-  if (!val) {
-    throw new AssertionError({ message })
-  }
-}
-
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
     throw new AssertionError({ message })

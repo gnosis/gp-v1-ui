@@ -1,7 +1,10 @@
 import BN from 'bn.js'
+
+import { assert } from '@gnosis.pm/dex-js'
+
 import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
-import { log, assert } from 'utils'
+import { log } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 
 interface BaseParams {

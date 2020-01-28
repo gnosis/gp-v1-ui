@@ -1,12 +1,13 @@
 import { toast } from 'react-toastify'
 import BN from 'bn.js'
+import { assert } from '@gnosis.pm/dex-js'
 
 import { depositApi, erc20Api } from 'api'
 import { TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { formatAmount, formatAmountFull, log, getToken, assert, safeFilledToken } from 'utils'
+import { formatAmount, formatAmountFull, log, getToken, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'

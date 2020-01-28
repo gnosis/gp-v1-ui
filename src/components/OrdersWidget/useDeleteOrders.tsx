@@ -1,11 +1,12 @@
 import { toast } from 'react-toastify'
+import { assert } from '@gnosis.pm/dex-js'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { exchangeApi } from 'api'
 
-import { log, assert } from 'utils'
+import { log } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useCallback } from 'react'
 
