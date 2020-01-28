@@ -4,6 +4,7 @@ import DashboardPlugin from 'webpack-dashboard/plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import dotenv from 'dotenv'
+import path from 'path'
 
 // Setup env vars
 dotenv.config()
@@ -72,6 +73,7 @@ module.exports = ({ stats = false } = {}) => ({
   resolve: {
     alias: {
       'react-dom': '@hot-loader/react-dom',
+      'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
     },
     modules: ['src', 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
