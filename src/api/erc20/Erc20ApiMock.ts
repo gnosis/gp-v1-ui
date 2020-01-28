@@ -1,9 +1,10 @@
 import BN from 'bn.js'
+import { assert } from '@gnosis.pm/dex-js'
 
 import { Receipt } from 'types'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
-import { log, assert } from 'utils'
+import { log } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 import {
   Erc20Api,
