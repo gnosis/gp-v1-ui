@@ -146,7 +146,8 @@ const TokenRow: React.FC<Props> = ({
   )
 
   function useMax(): void {
-    setValue(inputId, formatAmountFull(balance.totalExchangeBalance, balance.decimals, false))
+    // boolean true here forces form validation
+    setValue(inputId, formatAmountFull(balance.totalExchangeBalance, balance.decimals, false), true)
   }
 
   const enforcePrecision = useCallback(() => {
