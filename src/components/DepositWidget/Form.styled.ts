@@ -45,7 +45,7 @@ export const WalletDrawerInnerWrapper = styled.div`
       width: 100%;
 
       &:disabled {
-        background-color: #6f6f6f;
+        background-color: var(--color-text-secondary);
       }
     }
   }
