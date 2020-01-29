@@ -6,6 +6,7 @@ import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { log } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
+import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
 
 interface BaseParams {
   networkId: number
@@ -13,6 +14,11 @@ interface BaseParams {
 
 export interface GetOrdersParams extends BaseParams {
   userAddress: string
+}
+
+export interface GetOrdersPaginatedParams extends GetOrdersParams {
+  offset: number
+  pageSize?: number
 }
 
 export interface GetTokenAddressByIdParams extends BaseParams {
@@ -61,6 +67,7 @@ export interface ExchangeApi extends DepositApi {
   getFeeDenominator(networkId: number): Promise<number>
 
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
+  getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
 
   getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
@@ -87,6 +94,11 @@ export interface Order {
   remainingAmount: BN
 }
 
+export interface GetOrdersPaginatedResult {
+  orders: AuctionElement[]
+  nextIndex?: number
+}
+
 /**
  * Basic implementation of Stable Coin Converter API
  */
@@ -107,6 +119,38 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     if (!encodedOrders) return []
 
     return decodeAuctionElements(encodedOrders)
+  }
+
+  public async getOrdersPaginated({
+    userAddress,
+    networkId,
+    offset,
+    pageSize,
+  }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
+    const contract = await this._getContract(networkId)
+    const _pageSize = pageSize || DEFAULT_ORDERS_PAGE_SIZE
+
+    log(
+      `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} with offset ${offset} and pageSize ${_pageSize}`,
+    )
+
+    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, _pageSize).call()
+
+    // is null if Contract returns empty bytes
+    if (!encodedOrders) return { orders: [] }
+
+    const orders = decodeAuctionElements(encodedOrders, offset)
+
+    let nextIndex: number | undefined
+    if (orders.length < _pageSize) {
+      // no more pages left, indicate by not returning `nextIndex`
+      nextIndex = undefined
+    } else {
+      // this page was full, keep going
+      nextIndex = Number(orders[orders.length - 1].id) + 1
+    }
+
+    return { orders, nextIndex }
   }
 
   public async getNumTokens(networkId: number): Promise<number> {

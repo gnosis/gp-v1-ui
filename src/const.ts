@@ -32,6 +32,9 @@ export const BATCHES_TO_WAIT = 3
 // Furtherst batch id possible (uint32), must be a js Number
 export const MAX_BATCH_ID = 2 ** 32 - 1
 
+// How many orders should we query per call, when invoking https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L479
+export const DEFAULT_ORDERS_PAGE_SIZE = 10
+
 // UI constants
 export const HIGHLIGHT_TIME = 5000
 export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntactic sugar for displaying purposes
