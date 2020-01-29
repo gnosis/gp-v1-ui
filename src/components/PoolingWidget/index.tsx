@@ -85,8 +85,10 @@ const StepDescription: React.FC = () => (
         Cancellation possible at any time
       </li>
     </ul>
-    {/* TODO: add URL */}
+    {/*
+    TODO: add URL 
     <a href="#">Learn more about liquidity provision</a>
+    */}
   </StepDescriptionWrapper>
 )
 

@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { faExchangeAlt, faTrashAlt, faExclamationTriangle, faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -16,7 +15,7 @@ import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
 
 import { useDeleteOrders } from './useDeleteOrders'
-import { OrdersWrapper, CreateButtons, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
 
 interface ShowOrdersButtonProps {
   type: 'active' | 'expired'
@@ -109,6 +108,7 @@ const OrdersWidget: React.FC = () => {
     <OrdersWrapper>
       <div>
         <h2>Your orders</h2>
+        {/*
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
             <p className="noOrdersInfo">
@@ -120,17 +120,16 @@ const OrdersWidget: React.FC = () => {
               <FontAwesomeIcon icon={faExchangeAlt} /> Trade
             </ButtonWithIcon>
           </Link>
-          {/* TODO: enable when the strategy page is implemented */}
           <Link to="/liquidity">
             <ButtonWithIcon className="danger strategyBtn">
               <FontAwesomeIcon icon={faChartLine} /> Create new liquidity
             </ButtonWithIcon>
           </Link>
-          {/* TODO: replace href here */}
           <a href="/" className="strategyInfo">
             <small>Learn more about liquidity</small>
           </a>
         </CreateButtons>
+        */}
       </div>
       {!noOrders && networkId && (
         <OrdersForm>
