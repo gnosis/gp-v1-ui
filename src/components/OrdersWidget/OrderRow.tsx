@@ -133,18 +133,18 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
 
 interface UnfilledAmountProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
+  isUnlimited: boolean
 }
 
-const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pending }) => {
+const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pending, isUnlimited }) => {
   const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
     order.remainingAmount,
     sellToken.decimals,
   ])
-  const unlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
   return (
-    <td data-label="Unfilled Amount" className={unlimited ? '' : 'sub-columns two-columns'}>
-      {unlimited ? (
+    <td data-label="Unfilled Amount" className={isUnlimited ? '' : 'sub-columns two-columns'}>
+      {isUnlimited ? (
         <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
       ) : (
         <>
@@ -160,9 +160,10 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
 
 interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
   sellToken: TokenDetails
+  isUnlimited: boolean
 }
 
-const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance }) => {
+const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
   const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
     order.sellTokenBalance,
     sellToken.decimals,
@@ -173,7 +174,7 @@ const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOve
     <td data-label="Account Balance" className="sub-columns three-columns">
       <div>{accountBalance}</div>
       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      {isOverBalance && isActive && (
+      {isOverBalance && isActive && !isUnlimited && (
         <div className="warning">
           <FontAwesomeIcon icon={faExclamationTriangle} />
         </div>
@@ -269,6 +270,8 @@ const OrderRow: React.FC<Props> = props => {
     fetchToken(order.sellTokenId, order.id, networkId, setSellToken).catch(onError)
   }, [networkId, order, setBuyToken, setSellToken])
 
+  const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
+
   return (
     sellToken &&
     buyToken && (
@@ -285,8 +288,8 @@ const OrderRow: React.FC<Props> = props => {
         )}
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        <UnfilledAmount order={order} sellToken={sellToken} />
-        <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} />
+        <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
         <Expires order={order} pending={pending} />
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
