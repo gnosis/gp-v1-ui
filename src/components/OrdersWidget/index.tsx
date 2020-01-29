@@ -15,7 +15,7 @@ import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
 
 import { useDeleteOrders } from './useDeleteOrders'
-import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
 
 interface ShowOrdersButtonProps {
   type: 'active' | 'expired'
@@ -108,28 +108,18 @@ const OrdersWidget: React.FC = () => {
     <OrdersWrapper>
       <div>
         <h2>Your orders</h2>
-        {/*
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
             <p className="noOrdersInfo">
               It appears you haven&apos;t placed any order yet. <br /> Create one!
             </p>
           )}
-          <Link to="/trade" className="tradeBtn">
-            <ButtonWithIcon>
-              <FontAwesomeIcon icon={faExchangeAlt} /> Trade
-            </ButtonWithIcon>
-          </Link>
-          <Link to="/liquidity">
-            <ButtonWithIcon className="danger strategyBtn">
-              <FontAwesomeIcon icon={faChartLine} /> Create new liquidity
-            </ButtonWithIcon>
-          </Link>
+          {/*
           <a href="/" className="strategyInfo">
             <small>Learn more about liquidity</small>
           </a>
+          */}
         </CreateButtons>
-        */}
       </div>
       {!noOrders && networkId && (
         <OrdersForm>
