@@ -24,6 +24,11 @@ export const UNLIMITED_ORDER_AMOUNT_BIGNUMBER = new BigNumber(UNLIMITED_ORDER_AM
 export const FEE_DENOMINATOR = 1000 // Fee is 1/fee_denominator i.e. 1/1000 = 0.1%
 export const BATCH_TIME = 300
 export const DEFAULT_ORDER_DURATION = 6 // every batch takes 5min, we want it to be valid for 30min, ∴ 30/5 == 6
+// Placing FROM orders with validFrom === currentBatchId can fail if there's a new batch before the tx is mined.
+// To address that, we are adding a small delay to guarantee it won't fail.
+// For more info, see the issue https://github.com/gnosis/dex-react/issues/459 and
+// the contract code https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L557
+export const BATCHES_TO_WAIT = 3
 // Furtherst batch id possible (uint32), must be a js Number
 export const MAX_BATCH_ID = 2 ** 32 - 1
 

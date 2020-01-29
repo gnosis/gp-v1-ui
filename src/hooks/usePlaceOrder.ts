@@ -10,7 +10,7 @@ import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/Ex
 import { log } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
-import { DEFAULT_ORDER_DURATION } from 'const'
+import { DEFAULT_ORDER_DURATION, BATCHES_TO_WAIT } from 'const'
 import useSafeState from './useSafeState'
 
 interface PlaceOrderParams<T> {
@@ -147,8 +147,8 @@ export const usePlaceOrder = (): Result => {
           buyTokens.push(order.buyToken)
           sellTokens.push(order.sellToken)
 
-          // if not set, order is valid from placement
-          validFroms.push(order.validFrom || currentBatchId)
+          // if not set, order is valid from placement + wait period
+          validFroms.push(order.validFrom ?? currentBatchId + BATCHES_TO_WAIT)
           // if not set, order is valid forever
           validUntils.push(order.validUntil || MAX_BATCH_ID)
 
