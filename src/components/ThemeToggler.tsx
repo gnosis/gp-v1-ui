@@ -50,6 +50,8 @@ const ThemeToggler: React.FC = () => {
     if (className) {
       document.body.classList.add(className)
       localStorage.setItem(FUSE_APP_THEME, active)
+    } else {
+      localStorage.removeItem(FUSE_APP_THEME)
     }
   }, [active])
 
