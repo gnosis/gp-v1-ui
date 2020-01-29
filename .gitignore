@@ -9,5 +9,5 @@ coverage
 .env
 package-lock.json
 # yalc
-.yalc*
+.yalc
 yalc.lock
