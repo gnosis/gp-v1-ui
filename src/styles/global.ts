@@ -172,8 +172,9 @@ const GlobalStyles = createGlobalStyle`
       border-color: var(--color-text-primary);
     }
     &:disabled {
-      background-color: #e0e0e0;
-      border-color: #ababab;
+      background-color: var(--color-text-secondary);
+      border-color: var(--color-text-secondary);
+      color: #000;
     }
   }
   
