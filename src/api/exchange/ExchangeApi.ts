@@ -125,16 +125,15 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     userAddress,
     networkId,
     offset,
-    pageSize,
+    pageSize = DEFAULT_ORDERS_PAGE_SIZE,
   }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
     const contract = await this._getContract(networkId)
-    const _pageSize = pageSize || DEFAULT_ORDERS_PAGE_SIZE
 
     log(
-      `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} with offset ${offset} and pageSize ${_pageSize}`,
+      `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} with offset ${offset} and pageSize ${pageSize}`,
     )
 
-    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, _pageSize).call()
+    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, pageSize).call()
 
     // is null if Contract returns empty bytes
     if (!encodedOrders) return { orders: [] }
@@ -142,7 +141,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const orders = decodeAuctionElements(encodedOrders, offset)
 
     let nextIndex: number | undefined
-    if (orders.length < _pageSize) {
+    if (orders.length < pageSize) {
       // no more pages left, indicate by not returning `nextIndex`
       nextIndex = undefined
     } else {
