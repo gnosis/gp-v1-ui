@@ -49,7 +49,7 @@ export interface WalletInfo {
   blockNumber?: number
 }
 
-export type ProviderInfo = ReturnType<typeof Web3Connect.getProviderInfo>
+export type ProviderInfo = Omit<ReturnType<typeof Web3Connect.getProviderInfo>, 'package'>
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
