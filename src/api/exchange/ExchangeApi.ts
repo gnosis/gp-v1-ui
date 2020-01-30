@@ -133,23 +133,23 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} with offset ${offset} and pageSize ${pageSize}`,
     )
 
-    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, pageSize).call()
+    // query 1 more than required to check whether there's a next page
+    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, pageSize + 1).call()
 
     // is null if Contract returns empty bytes
     if (!encodedOrders) return { orders: [] }
 
     const orders = decodeAuctionElements(encodedOrders, offset)
 
-    let nextIndex: number | undefined
-    if (orders.length < pageSize) {
+    if (orders.length <= pageSize) {
       // no more pages left, indicate by not returning `nextIndex`
-      nextIndex = undefined
+      return { orders }
     } else {
-      // this page was full, keep going
-      nextIndex = Number(orders[orders.length - 1].id) + 1
+      // there is at least 1 item in the next page,
+      // pop the extra element, get its id as nextIndex
+      const nextIndex = Number((orders.pop() as AuctionElement).id)
+      return { orders, nextIndex }
     }
-
-    return { orders, nextIndex }
   }
 
   public async getNumTokens(networkId: number): Promise<number> {

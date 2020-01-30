@@ -66,18 +66,17 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   public async getOrdersPaginated({
     userAddress,
     offset,
-    pageSize,
+    pageSize = DEFAULT_ORDERS_PAGE_SIZE,
   }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
     this._initOrders(userAddress)
 
-    const _pageSize = pageSize || DEFAULT_ORDERS_PAGE_SIZE
-    const nextIndex = offset + _pageSize
+    const nextIndex = offset + pageSize
 
     const orders = this.orders[userAddress]
       .slice(offset, nextIndex)
       .map((order, index) => this.orderToAuctionElement(order, index + offset, userAddress))
 
-    if (orders.length < _pageSize) {
+    if (!this.orders[userAddress][nextIndex]) {
       return { orders }
     } else {
       return { orders, nextIndex }

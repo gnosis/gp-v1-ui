@@ -88,7 +88,7 @@ describe('Basic view functions', () => {
       let ordersResult
 
       // Fetch orders, 1 by 1
-      for (let offset = 0; offset < 3; offset++) {
+      for (let offset = 0; offset < 2; offset++) {
         ordersResult = await instance.getOrdersPaginated({
           userAddress: USER_1,
           networkId: NETWORK_ID,
@@ -103,13 +103,14 @@ describe('Basic view functions', () => {
       ordersResult = await instance.getOrdersPaginated({
         userAddress: USER_1,
         networkId: NETWORK_ID,
-        offset: 3,
+        offset: 2,
         pageSize: 1,
       })
 
       // Check when no next, nextIndex is undefined
       expect(ordersResult.nextIndex).toBeUndefined()
-      expect(ordersResult.orders.length).toBe(0)
+      expect(ordersResult.orders.length).toBe(1)
+      expect(ordersResult.orders[0].id).toBe('2')
     })
   })
 })
