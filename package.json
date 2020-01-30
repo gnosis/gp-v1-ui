@@ -59,7 +59,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "@fortawesome/react-fontawesome": "^0.1.8",
     "@gnosis.pm/dapp-ui": "^0.5.3",
-    "@gnosis.pm/dex-js": "0.1.7",
+    "@gnosis.pm/dex-js": "0.1.8",
     "@hot-loader/react-dom": "^16.11.0",
     "@types/react": "^16.9.19",
     "@types/react-select": "^3.0.10",
