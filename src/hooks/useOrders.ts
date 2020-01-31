@@ -27,19 +27,62 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
   )
 }
 
-export function useOrders(): AuctionElement[] {
+interface Result {
+  orders: AuctionElement[]
+  forceOrdersRefresh: () => void
+}
+
+export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
+  const [lastSeenOrderId, setLastSeenOrderId] = useSafeState<number>(-1)
+  const [offset, setOffset] = useSafeState<number | undefined>(undefined)
+
+  /**
+   * Forces the immediate refresh of orders
+   */
+  function forceOrdersRefresh(): void {
+    // Setting `offset` to 0 triggers a new query from the start
+    setOffset(0)
+  }
+
+  useEffect(() => {
+    // whenever there's a state change (new block, network /address change),
+    // set `offset` to trigger a new query
+    setOffset(lastSeenOrderId + 1)
+  }, [blockNumber, networkId, userAddress])
 
   useEffect(() => {
     userAddress &&
-      networkId &&
-      exchangeApi
-        .getOrders({ userAddress, networkId })
-        .then(filterDeletedOrders)
-        .then(setOrders)
-    // updating list of orders on every block by listening on `blockNumber`
-  }, [networkId, setOrders, userAddress, blockNumber])
+    networkId &&
+    offset !== undefined && // stop querying for new orders when there are no more pages
+      exchangeApi.getOrdersPaginated({ userAddress, networkId, offset }).then(({ orders, nextIndex }) => {
+        if (orders.length) {
+          // Save the id of last order before filtering
+          const orderId = +orders[orders.length - 1].id
 
-  return orders
+          // Apply filters (remove deleted orders)
+          const filteredOrders = filterDeletedOrders(orders)
+
+          // Store new orders, if any
+          if (offset === 0) {
+            // fresh start/refresh: replace whatever is stored
+            setOrders(filteredOrders)
+          } else if (filteredOrders.length) {
+            // incremental update: append
+            setOrders(curr => [...curr, ...filteredOrders])
+          }
+
+          // Save the last seen order
+          setLastSeenOrderId(orderId)
+        }
+
+        // `nextIndex` can be `undefined`, which means there are no more pages
+        // and causes the querying to stop
+        setOffset(nextIndex)
+      })
+    // Update ONLY when `offset` changes
+  }, [offset])
+
+  return { orders, forceOrdersRefresh }
 }
