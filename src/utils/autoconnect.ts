@@ -4,6 +4,7 @@ import WalletConnectProvider from '@walletconnect/web3-provider'
 import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
+import Web3 from 'web3'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
   const provider = new WalletConnectProvider({
@@ -45,6 +46,31 @@ const getWCIfConnected = async (): Promise<WCProvider | null> => {
   return provider
 }
 
+declare global {
+  interface Window {
+    ethereum?: Provider & { enable(): Promise<string[]> }
+    web3?: Web3 & { currentProvider: Provider }
+  }
+}
+
+// from web3connect/providers/connectors/injected.ts
+const connectToInjected = async (): Promise<Provider> => {
+  let provider: Provider
+  if (window.ethereum) {
+    provider = window.ethereum
+    try {
+      await window.ethereum.enable()
+    } catch (error) {
+      throw new Error('User Rejected')
+    }
+  } else if (window.web3) {
+    provider = window.web3.currentProvider
+  } else {
+    throw new Error('No Web3 Provider found')
+  }
+  return provider
+}
+
 export const getLastProvider = (): Promise<Provider | null> => {
   const lastProviderName = localStorage.getItem(STORAGE_KEY_LAST_PROVIDER)
 
@@ -58,7 +84,7 @@ export const getLastProvider = (): Promise<Provider | null> => {
     // last provider is the current injected provider
     // and it's still injected
     if (injectedProviderName && injectedProviderName === lastProviderName) {
-      return Web3Connect.ConnectToInjected()
+      return connectToInjected()
     }
   } catch (error) {
     console.warn('Error connecting to last used provider', lastProviderName, error)

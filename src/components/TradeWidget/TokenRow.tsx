@@ -10,6 +10,8 @@ import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
 import { ZERO } from 'const'
 
+import { TradeFormTokenId, TradeFormData } from './'
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -105,7 +107,7 @@ interface Props {
   balance: TokenBalanceDetails
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
-  inputId: string
+  inputId: TradeFormTokenId
   isDisabled: boolean
   validateMaxAmount?: true
   tabIndex: number
@@ -122,7 +124,7 @@ const TokenRow: React.FC<Props> = ({
   validateMaxAmount,
   tabIndex,
 }) => {
-  const { register, errors, setValue, watch } = useFormContext()
+  const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
   const inputValue = watch(inputId)
 

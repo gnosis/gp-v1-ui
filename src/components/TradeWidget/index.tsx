@@ -9,7 +9,7 @@ import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
 import Widget from 'components/Layout/Widget'
 
-import useForm, { FormContext } from 'react-hook-form'
+import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
@@ -58,6 +58,15 @@ const SubmitButton = styled.button`
   }
 `
 
+export const enum TradeFormTokenId {
+  sellToken = 'sellToken',
+  receiveToken = 'receiveToken',
+}
+
+export type TradeFormData = {
+  [K in keyof typeof TradeFormTokenId]: string
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -76,10 +85,10 @@ const TradeWidget: React.FC = () => {
     () =>
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
-  const sellInputId = 'sellToken'
-  const receiveInputId = 'receiveToken'
+  const sellInputId = TradeFormTokenId.sellToken
+  const receiveInputId = TradeFormTokenId.receiveToken
 
-  const methods = useForm({
+  const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellAmount,
