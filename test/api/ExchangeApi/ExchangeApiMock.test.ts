@@ -17,6 +17,16 @@ let mockErc20Api: Erc20Api
 const tokens = [FEE_TOKEN, TOKEN_1, TOKEN_2]
 const NETWORK_ID = 0
 
+const baseOrder = {
+  buyTokenId: 1,
+  sellTokenId: 2,
+  validFrom: 0,
+  validUntil: 6,
+  priceNumerator: ONE,
+  priceDenominator: ZERO,
+  remainingAmount: ONE,
+}
+
 beforeAll(() => {
   testHelpers.mockTimes()
 })
@@ -28,17 +38,7 @@ beforeEach(() => {
     erc20Api: mockErc20Api,
     registeredTokens: tokens,
     ordersByUser: {
-      [USER_1]: [
-        {
-          buyTokenId: 1,
-          sellTokenId: 2,
-          validFrom: 0,
-          validUntil: 6,
-          priceNumerator: ONE,
-          priceDenominator: ZERO,
-          remainingAmount: ONE,
-        },
-      ],
+      [USER_1]: [baseOrder],
     },
     maxTokens: 4,
   })
@@ -60,6 +60,57 @@ describe('Basic view functions', () => {
 
     it('returns all placed orders', async () => {
       expect(await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })).toHaveLength(1)
+    })
+  })
+
+  describe('get orders paginated', () => {
+    it('paginates offset=0 pageSize=undefined', async () => {
+      const ordersResult = await instance.getOrdersPaginated({ userAddress: USER_1, networkId: NETWORK_ID, offset: 0 })
+
+      expect(ordersResult.nextIndex).toBeUndefined()
+      expect(ordersResult.orders.length).toBe(1)
+    })
+
+    it('paginates offset=0 pageSize=1', async () => {
+      const orders = [baseOrder, { ...baseOrder, id: 1 }, { ...baseOrder, id: 2 }]
+
+      instance = new ExchangeApiMock({
+        balanceStates: {},
+        erc20Api: mockErc20Api,
+        registeredTokens: tokens,
+        ordersByUser: {
+          [USER_1]: orders,
+        },
+        maxTokens: 4,
+      })
+
+      const pageSize = 1
+      let ordersResult
+
+      // Fetch orders, 1 by 1
+      for (let offset = 0; offset < 2; offset++) {
+        ordersResult = await instance.getOrdersPaginated({
+          userAddress: USER_1,
+          networkId: NETWORK_ID,
+          offset,
+          pageSize,
+        })
+
+        expect(ordersResult.nextIndex).toBe(offset + pageSize)
+        expect(ordersResult.orders.length).toBe(pageSize)
+        expect(ordersResult.orders[0].id).toBe(offset.toString())
+      }
+      ordersResult = await instance.getOrdersPaginated({
+        userAddress: USER_1,
+        networkId: NETWORK_ID,
+        offset: 2,
+        pageSize: 1,
+      })
+
+      // Check when no next, nextIndex is undefined
+      expect(ordersResult.nextIndex).toBeUndefined()
+      expect(ordersResult.orders.length).toBe(1)
+      expect(ordersResult.orders[0].id).toBe('2')
     })
   })
 })

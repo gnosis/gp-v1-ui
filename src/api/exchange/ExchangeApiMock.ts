@@ -4,7 +4,7 @@ import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
 import { Receipt } from 'types'
-import { FEE_DENOMINATOR, ONE } from 'const'
+import { FEE_DENOMINATOR, ONE, DEFAULT_ORDERS_PAGE_SIZE } from 'const'
 import { waitAndSendReceipt } from 'utils/mock'
 import { RECEIPT } from '../../../test/data'
 import {
@@ -18,6 +18,8 @@ import {
   GetTokenAddressByIdParams,
   GetTokenIdByAddressParams,
   PlaceValidFromOrdersParams,
+  GetOrdersPaginatedParams,
+  GetOrdersPaginatedResult,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
@@ -58,12 +60,27 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
 
   public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {
     this._initOrders(userAddress)
-    return this.orders[userAddress].map((order, index) => ({
-      ...order,
-      user: userAddress,
-      sellTokenBalance: new BN('1500000000000000000000').add(ONE),
-      id: index.toString(),
-    }))
+    return this.orders[userAddress].map((order, index) => this.orderToAuctionElement(order, index, userAddress))
+  }
+
+  public async getOrdersPaginated({
+    userAddress,
+    offset,
+    pageSize = DEFAULT_ORDERS_PAGE_SIZE,
+  }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
+    this._initOrders(userAddress)
+
+    const nextIndex = offset + pageSize
+
+    const orders = this.orders[userAddress]
+      .slice(offset, nextIndex)
+      .map((order, index) => this.orderToAuctionElement(order, index + offset, userAddress))
+
+    if (!this.orders[userAddress][nextIndex]) {
+      return { orders }
+    } else {
+      return { orders, nextIndex }
+    }
   }
 
   public async getNumTokens(): Promise<number> {
@@ -174,6 +191,15 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     const userOrders = this.orders[userAddress]
     if (!userOrders) {
       this.orders[userAddress] = []
+    }
+  }
+
+  private orderToAuctionElement(order: Order, index: number, userAddress: string): AuctionElement {
+    return {
+      ...order,
+      user: userAddress,
+      sellTokenBalance: new BN('1500000000000000000000').add(ONE),
+      id: index.toString(),
     }
   }
 }

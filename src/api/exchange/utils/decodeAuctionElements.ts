@@ -16,11 +16,13 @@ const orderPattern = `(${hn(ADDRESS_WIDTH)})(${hn(UINT256_WIDTH)})(${hn(UINT16_W
 )})(${hn(UINT32_WIDTH)})(${hn(UINT128_WIDTH)})(${hn(UINT128_WIDTH)})(${hn(UINT128_WIDTH)})`
 
 // decodes Orders
-export function decodeAuctionElements(bytes: string): AuctionElement[] {
+export function decodeAuctionElements(bytes: string, startingIndex?: number): AuctionElement[] {
   const result: AuctionElement[] = []
   const oneOrder = new RegExp(orderPattern, 'g')
   let order
-  let index = 0 // order ID is given by position and it's not part of the encoded data
+  // Order ID is given by position and it's not part of the encoded data
+  // Thus, we use the `startingIndex` if given, for using with paginated queries
+  let index = startingIndex || 0
 
   while ((order = oneOrder.exec(bytes))) {
     const [
