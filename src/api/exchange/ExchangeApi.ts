@@ -145,9 +145,11 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       // no more pages left, indicate by not returning `nextIndex`
       return { orders }
     } else {
-      // there is at least 1 item in the next page,
-      // pop the extra element, get its id as nextIndex
-      const nextIndex = Number((orders.pop() as AuctionElement).id)
+      // there is at least 1 item in the next page
+      // pop the extra element
+      const nextPageOrder = orders.pop() as AuctionElement
+      // get its id as nextIndex
+      const nextIndex = Number(nextPageOrder.id)
       return { orders, nextIndex }
     }
   }
