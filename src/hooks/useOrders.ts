@@ -70,7 +70,7 @@ export function useOrders(): Result {
             setOrders(filteredOrders)
           } else if (filteredOrders.length) {
             // incremental update: append
-            setOrders(curr => [...curr, ...filteredOrders])
+            setOrders(curr => curr.concat(filteredOrders))
           }
 
           // Save the last seen order
