@@ -56,13 +56,13 @@ export function useOrders(): Result {
     userAddress &&
     networkId &&
     offset !== undefined && // stop querying for new orders when there are no more pages
-      exchangeApi.getOrdersPaginated({ userAddress, networkId, offset }).then(({ orders, nextIndex }) => {
-        if (orders.length) {
+      exchangeApi.getOrdersPaginated({ userAddress, networkId, offset }).then(({ orders: newOrders, nextIndex }) => {
+        if (newOrders.length) {
           // Save the id of last order before filtering
-          const orderId = +orders[orders.length - 1].id
+          const orderId = +newOrders[newOrders.length - 1].id
 
           // Apply filters (remove deleted orders)
-          const filteredOrders = filterDeletedOrders(orders)
+          const filteredOrders = filterDeletedOrders(newOrders)
 
           // Store new orders, if any
           if (offset === 0) {
@@ -75,6 +75,9 @@ export function useOrders(): Result {
 
           // Save the last seen order
           setLastSeenOrderId(orderId)
+        } else if (offset === 0 && orders.length > 0) {
+          // there were orders. we fetched again from the beginning, and now there are none (in the first page)
+          setOrders([])
         }
 
         // `nextIndex` can be `undefined`, which means there are no more pages
