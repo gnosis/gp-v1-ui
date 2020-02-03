@@ -3,7 +3,8 @@ import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { useEffect } from 'react'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
-import { ZERO } from 'const'
+import { ZERO /* , GP_ORDER_TX_HASHES */, GP_ORDER_TX_HASHES } from 'const'
+import { StateMap } from 'components/TradeWidget'
 
 /**
  * Filter out deleted orders.
@@ -27,19 +28,32 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
   )
 }
 
-export function useOrders(): AuctionElement[] {
+export function useOrders(): { orders: AuctionElement[]; pendingOrders: any } {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
+  const [pendingOrders, setPendingOrders] = useSafeState<AuctionElement[]>([])
 
   useEffect(() => {
-    userAddress &&
-      networkId &&
+    if (userAddress && networkId) {
       exchangeApi
         .getOrders({ userAddress, networkId })
         .then(filterDeletedOrders)
         .then(setOrders)
+    }
     // updating list of orders on every block by listening on `blockNumber`
   }, [networkId, setOrders, userAddress, blockNumber])
 
-  return orders
+  useEffect(() => {
+    if (networkId) {
+      const stateCopy: StateMap = new Map(
+        localStorage.getItem(GP_ORDER_TX_HASHES[networkId])
+          ? JSON.parse(localStorage.getItem(GP_ORDER_TX_HASHES[networkId]) as string)
+          : [],
+      )
+
+      setPendingOrders()
+    }
+  }, [networkId, setPendingOrders])
+
+  return { orders, pendingOrders }
 }

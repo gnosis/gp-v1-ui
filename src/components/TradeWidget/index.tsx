@@ -22,7 +22,17 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
-import { ZERO } from 'const'
+import { ZERO, GP_ORDER_TX_HASHES } from 'const'
+
+export type StateMap = Map<
+  string,
+  {
+    buyAmount: typeof buyAmount
+    buyToken: TokenDetails
+    sellAmount: typeof buyAmount
+    sellToken: TokenDetails
+  }
+>
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -160,18 +170,47 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken) return
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
 
     if (isConnected) {
+      let pendingTxHash: string | undefined = undefined
       const { success } = await placeOrder({
         buyAmount,
         buyToken: cachedBuyToken,
         sellAmount,
         sellToken: cachedSellToken,
+        txOptionalParams: {
+          onSentTransaction: (txHash: string): void => {
+            pendingTxHash = txHash
+            if (!networkId) return
+
+            const stateCopy: StateMap = new Map(
+              localStorage.getItem(GP_ORDER_TX_HASHES[networkId])
+                ? JSON.parse(localStorage.getItem(GP_ORDER_TX_HASHES[networkId]) as string)
+                : [],
+            )
+
+            stateCopy.set(txHash, {
+              buyAmount,
+              buyToken: cachedBuyToken,
+              sellAmount,
+              sellToken: cachedSellToken,
+            })
+
+            return localStorage.setItem(GP_ORDER_TX_HASHES[networkId], JSON.stringify(Array.from(stateCopy.entries())))
+          },
+        },
       })
-      if (success) {
+      if (success && pendingTxHash) {
         // reset form on successful order placing
         reset()
+        const stateCopy: StateMap = new Map(
+          localStorage.getItem(GP_ORDER_TX_HASHES[networkId])
+            ? JSON.parse(localStorage.getItem(GP_ORDER_TX_HASHES[networkId]) as string)
+            : [],
+        )
+        stateCopy.delete(pendingTxHash)
+        return localStorage.setItem(GP_ORDER_TX_HASHES[networkId], JSON.stringify(Array.from(stateCopy.entries())))
       }
     } else {
       const from = history.location.pathname + history.location.search
