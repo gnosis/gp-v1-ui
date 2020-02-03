@@ -130,7 +130,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract(networkId)
 
     log(
-      `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} with offset ${offset} and pageSize ${pageSize}`,
+      `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} on network ${networkId} with offset ${offset} and pageSize ${pageSize}`,
     )
 
     // query 1 more than required to check whether there's a next page
