@@ -1,7 +1,8 @@
+import { useEffect, useCallback } from 'react'
+
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
-import { useEffect } from 'react'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from 'const'
 
@@ -30,39 +31,35 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
 interface Result {
   orders: AuctionElement[]
   forceOrdersRefresh: () => void
+  isLoading: boolean
 }
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
-  const [lastSeenOrderId, setLastSeenOrderId] = useSafeState<number>(-1)
-  const [offset, setOffset] = useSafeState<number | undefined>(undefined)
+  const [offset, setOffset] = useSafeState<number | undefined>(0)
+  const [isLoading, setIsLoading] = useSafeState<boolean>(false)
 
-  /**
-   * Forces the immediate refresh of orders
-   */
-  function forceOrdersRefresh(): void {
-    // Setting `offset` to 0 triggers a new query from the start
-    setOffset(0)
-  }
+  // Tracking last seen values to decide whether to update
+  const [lastBlockNumber, setLastBlockNumber] = useSafeState<number | undefined>(undefined)
+  const [lastNetworkId, setLastNetworkId] = useSafeState<number | undefined>(undefined)
+  const [lastUserAddress, setLastUserAddress] = useSafeState<string | undefined>(undefined)
 
-  useEffect(() => {
-    // whenever there's a state change (new block, network /address change),
-    // set `offset` to trigger a new query
-    setOffset(lastSeenOrderId + 1)
-  }, [blockNumber, networkId, userAddress])
+  const _fetchOrders = useCallback(
+    async (
+      userAddress: string | undefined,
+      networkId: number | undefined,
+      offset: number | undefined,
+      areThereOrders?: boolean,
+    ): Promise<void> => {
+      if (userAddress === undefined || networkId === undefined || offset === undefined) {
+        return
+      }
 
-  useEffect(() => {
-    userAddress &&
-    networkId &&
-    offset !== undefined && // stop querying for new orders when there are no more pages
-      exchangeApi.getOrdersPaginated({ userAddress, networkId, offset }).then(({ orders: newOrders, nextIndex }) => {
-        if (newOrders.length) {
-          // Save the id of last order before filtering
-          const orderId = +newOrders[newOrders.length - 1].id
-
+      await exchangeApi.getOrdersPaginated({ userAddress, networkId, offset }).then(({ orders, nextIndex }) => {
+        if (orders.length) {
           // Apply filters (remove deleted orders)
-          const filteredOrders = filterDeletedOrders(newOrders)
+          const filteredOrders = filterDeletedOrders(orders)
 
           // Store new orders, if any
           if (offset === 0) {
@@ -72,20 +69,89 @@ export function useOrders(): Result {
             // incremental update: append
             setOrders(curr => curr.concat(filteredOrders))
           }
-
-          // Save the last seen order
-          setLastSeenOrderId(orderId)
-        } else if (offset === 0 && orders.length > 0) {
-          // there were orders. we fetched again from the beginning, and now there are none (in the first page)
+        } else if (offset === 0 && areThereOrders) {
+          // There were orders. We fetched again from the beginning, and now there are none (in the first page). Set to []
+          // Example: switching network or address.
           setOrders([])
         }
 
         // `nextIndex` can be `undefined`, which means there are no more pages
-        // and causes the querying to stop
-        setOffset(nextIndex)
+        if (nextIndex) {
+          // There are more, keep going
+          _fetchOrders(userAddress, networkId, nextIndex)
+        } else {
+          // We are done, remember where we stopped for next time
+          setOffset(offset + orders.length)
+        }
       })
-    // Update ONLY when `offset` changes
-  }, [offset])
+    },
+    [],
+  )
 
-  return { orders, forceOrdersRefresh }
+  const fetchOrdersAndHandleErrors = useCallback(
+    async (
+      userAddress: string | undefined,
+      networkId: number | undefined,
+      offset: number | undefined,
+      areThereOrders?: boolean,
+    ): Promise<void> => {
+      setIsLoading(true)
+      try {
+        await _fetchOrders(userAddress, networkId, offset, areThereOrders)
+      } catch (e) {
+        console.log('Failed to fetch orders', e)
+        // TODO: inform user
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [],
+  )
+
+  useEffect(() => {
+    setLastBlockNumber(blockNumber)
+  }, [blockNumber, setLastBlockNumber])
+
+  useEffect(() => {
+    setLastNetworkId(networkId)
+  }, [networkId, setLastNetworkId])
+
+  useEffect(() => {
+    setLastUserAddress(userAddress)
+  }, [userAddress, setLastUserAddress])
+
+  useEffect(() => {
+    // whenever there's a state change (new block, network /address change)
+
+    if (!isLoading && networkId && userAddress) {
+      // should try to update orders
+      if (networkId !== lastNetworkId || userAddress !== lastUserAddress) {
+        // networkId or userAddress changed, start from 0
+        fetchOrdersAndHandleErrors(userAddress, networkId, 0, orders.length > 0)
+      } else if (blockNumber !== lastBlockNumber) {
+        // block changed, start from where we last checked
+        fetchOrdersAndHandleErrors(userAddress, networkId, offset)
+      }
+    }
+  }, [
+    blockNumber,
+    lastBlockNumber,
+    networkId,
+    lastNetworkId,
+    userAddress,
+    lastUserAddress,
+    orders,
+    fetchOrdersAndHandleErrors,
+    isLoading,
+    offset,
+  ])
+
+  /**
+   * Forces the immediate refresh of orders
+   */
+  const forceOrdersRefresh = useCallback((): void => {
+    fetchOrdersAndHandleErrors(userAddress, networkId, 0, orders.length > 0)
+  }, [fetchOrdersAndHandleErrors, userAddress, networkId, orders.length])
+
+  return { orders, forceOrdersRefresh, isLoading }
 }
