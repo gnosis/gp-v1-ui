@@ -6,6 +6,12 @@ import { exchangeApi } from 'api'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from 'const'
 
+interface Result {
+  orders: AuctionElement[]
+  forceOrdersRefresh: () => void
+  isLoading: boolean
+}
+
 /**
  * Filter out deleted orders.
  *
@@ -26,12 +32,6 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
         order.validUntil === 0
       ),
   )
-}
-
-interface Result {
-  orders: AuctionElement[]
-  forceOrdersRefresh: () => void
-  isLoading: boolean
 }
 
 export function useOrders(): Result {
