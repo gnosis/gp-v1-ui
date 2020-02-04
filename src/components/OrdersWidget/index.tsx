@@ -104,7 +104,7 @@ const OrdersWidget: React.FC = () => {
         forceOrdersRefresh()
       }
     },
-    [deleteOrders, markedForDeletion, orders, setMarkedForDeletion, setOrders],
+    [deleteOrders, forceOrdersRefresh, markedForDeletion, orders, setMarkedForDeletion, setOrders],
   )
 
   return (
