@@ -1,10 +1,16 @@
 import combineReducers from 'combine-reducers'
 import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as tokens } from './tokenRow'
+import {
+  reducer as PendingOrderReducer,
+  PendingOrdersState,
+  PendingOrdersInitialState as pendingOrders,
+} from './pendingOrders'
 
 export * from './tokenRow'
 
 export interface GlobalState {
   tokens: TokenLocalState
+  pendingOrders: PendingOrdersState
 }
 
 /**********************************
@@ -14,8 +20,12 @@ export interface GlobalState {
  * make sure the name of the state key(s) is/are the same as the reducer key(s) below
  */
 
-export const INITIAL_STATE: GlobalState = {
-  tokens,
+export const INITIAL_STATE: () => GlobalState = () => {
+  const initiatedPendingOrders = pendingOrders()
+  return {
+    tokens,
+    pendingOrders: initiatedPendingOrders,
+  }
 }
 
 /**********************************
@@ -26,4 +36,5 @@ export const INITIAL_STATE: GlobalState = {
  */
 export const rootReducer = combineReducers({
   tokens: TokenRowReducer,
+  pendingOrders: PendingOrderReducer,
 })
