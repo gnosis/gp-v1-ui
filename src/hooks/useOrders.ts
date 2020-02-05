@@ -94,7 +94,7 @@ export function useOrders(): Result {
       }
 
       await exchangeApi.getOrdersPaginated({ userAddress, networkId, offset }).then(({ orders, nextIndex }) => {
-        if (orders.length) {
+        if (orders.length > 0) {
           // Apply filters (remove deleted orders)
           const filteredOrders = filterDeletedOrders(orders)
 
@@ -102,7 +102,7 @@ export function useOrders(): Result {
           if (offset === 0) {
             // fresh start/refresh: replace whatever is stored
             setOrdersState(curr => updateOrdersState(networkId, userAddress, curr, filteredOrders, false))
-          } else if (filteredOrders.length) {
+          } else if (filteredOrders.length > 0) {
             // incremental update: append
             setOrdersState(curr => updateOrdersState(networkId, userAddress, curr, filteredOrders, true))
           }
