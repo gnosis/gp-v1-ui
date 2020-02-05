@@ -16,23 +16,15 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import useGlobalState from 'hooks/useGlobalState'
+import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
-import { ZERO, GP_ORDER_TX_HASHES } from 'const'
-
-export type StateMap = Map<
-  string,
-  {
-    buyAmount: typeof buyAmount
-    buyToken: TokenDetails
-    sellAmount: typeof buyAmount
-    sellToken: TokenDetails
-  }
->
+import { ZERO } from 'const'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -78,7 +70,9 @@ export type TradeFormData = {
 }
 
 const TradeWidget: React.FC = () => {
-  const { networkId, isConnected } = useWalletConnection()
+  const { networkId, isConnected, userAddress } = useWalletConnection()
+  const [, dispatch] = useGlobalState()
+
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
@@ -170,7 +164,7 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId || !userAddress) return
 
     if (isConnected) {
       let pendingTxHash: string | undefined = undefined
@@ -182,35 +176,32 @@ const TradeWidget: React.FC = () => {
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
             pendingTxHash = txHash
+
             if (!networkId) return
 
-            const stateCopy: StateMap = new Map(
-              localStorage.getItem(GP_ORDER_TX_HASHES[networkId])
-                ? JSON.parse(localStorage.getItem(GP_ORDER_TX_HASHES[networkId]) as string)
-                : [],
-            )
+            const newTxState = {
+              txHash,
+              id: 'PENDING ORDER',
+              buyTokenId: cachedBuyToken.id,
+              sellTokenId: cachedSellToken.id,
+              priceNumerator: sellAmount,
+              priceDenominator: buyAmount,
+              user: userAddress,
+              remainingAmount: ZERO,
+              sellTokenBalance: ZERO,
+              validFrom: 0,
+              validUntil: 0,
+            }
 
-            stateCopy.set(txHash, {
-              buyAmount,
-              buyToken: cachedBuyToken,
-              sellAmount,
-              sellToken: cachedSellToken,
-            })
-
-            return localStorage.setItem(GP_ORDER_TX_HASHES[networkId], JSON.stringify(Array.from(stateCopy.entries())))
+            return dispatch(savePendingOrdersAction({ orders: newTxState, networkId }))
           },
         },
       })
       if (success && pendingTxHash) {
         // reset form on successful order placing
         reset()
-        const stateCopy: StateMap = new Map(
-          localStorage.getItem(GP_ORDER_TX_HASHES[networkId])
-            ? JSON.parse(localStorage.getItem(GP_ORDER_TX_HASHES[networkId]) as string)
-            : [],
-        )
-        stateCopy.delete(pendingTxHash)
-        return localStorage.setItem(GP_ORDER_TX_HASHES[networkId], JSON.stringify(Array.from(stateCopy.entries())))
+        // remove pending tx
+        dispatch(removePendingOrdersAction({ networkId, pendingTxHash }))
       }
     } else {
       const from = history.location.pathname + history.location.search
