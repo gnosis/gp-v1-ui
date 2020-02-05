@@ -94,6 +94,12 @@ export interface Order {
   remainingAmount: BN
 }
 
+export interface PendingTxObj extends AuctionElement {
+  txHash: string
+}
+
+export type PendingTxArray = PendingTxObj[]
+
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
   nextIndex?: number
