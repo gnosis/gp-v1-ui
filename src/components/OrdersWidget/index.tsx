@@ -6,7 +6,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
 
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive } from 'utils'
 
@@ -37,10 +37,11 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
 }
 
 const OrdersWidget: React.FC = () => {
-  const allOrders = useOrders()
+  const { orders: allOrders, pendingOrders } = useOrders()
+  // this page is behind login wall so networkId should always be set
+  const { networkId } = useWalletConnection()
 
   const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
-
   const [showActive, setShowActive] = useSafeState<boolean>(true)
 
   const toggleShowActive = useCallback(() => {
@@ -54,12 +55,10 @@ const OrdersWidget: React.FC = () => {
   }, [allOrders, setOrders, showActive])
 
   const shownOrdersCount = orders.length
+  const pendingShownOrdersCount = pendingOrders.length
   const hiddenOrdersCount = allOrders.length - shownOrdersCount
 
   const noOrders = allOrders.length === 0
-
-  // this page is behind login wall so networkId should always be set
-  const { networkId } = useWalletConnection()
 
   const overBalanceOrders = useMemo(
     () =>
@@ -150,6 +149,50 @@ const OrdersWidget: React.FC = () => {
               </div>
             )}
           </div>
+
+          {pendingShownOrdersCount ? (
+            <form action="submit" onSubmit={onSubmit}>
+              <div className="ordersContainer">
+                <CardTable
+                  $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
+                  $cellSeparation="0.2rem"
+                  $rowSeparation="0.6rem"
+                >
+                  <thead>
+                    <tr>
+                      <th className="checked">
+                        <input
+                          type="checkbox"
+                          onChange={toggleSelectAll}
+                          checked={orders.length === markedForDeletion.size}
+                          disabled={deleting}
+                        />
+                        <span>All</span>
+                      </th>
+                      <th>Order details</th>
+                      <th>Unfilled amount</th>
+                      <th>Account balance</th>
+                      <th>Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingOrders.map((order: PendingTxObj) => (
+                      <OrderRow
+                        key={Math.random()}
+                        order={order}
+                        networkId={networkId}
+                        isOverBalance={false}
+                        pending
+                        disabled={deleting}
+                        isPendingOrder
+                      />
+                    ))}
+                  </tbody>
+                </CardTable>
+              </div>
+            </form>
+          ) : null}
+
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">

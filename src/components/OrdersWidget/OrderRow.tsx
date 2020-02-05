@@ -207,6 +207,7 @@ async function fetchToken(
   orderId: string,
   networkId: number,
   setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
+  isPendingOrder?: boolean,
 ): Promise<void> {
   const token = await getTokenFromExchangeById({ tokenId, networkId })
 
@@ -215,7 +216,7 @@ async function fetchToken(
   setFn(token)
 
   // Also, inform the user this token failed and the order is hidden.
-  if (!token) {
+  if (!token && !isPendingOrder) {
     toast.warn(
       `Token id ${tokenId} used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`,
     )
@@ -241,9 +242,10 @@ interface Props {
   networkId: number
   pending?: boolean
   transactionHash?: string
-  isMarkedForDeletion: boolean
-  toggleMarkedForDeletion: () => void
+  isMarkedForDeletion?: boolean
+  toggleMarkedForDeletion?: () => void
   disabled: boolean
+  isPendingOrder?: boolean
 }
 
 const onError = onErrorFactory('Failed to fetch token')
@@ -258,6 +260,7 @@ const OrderRow: React.FC<Props> = props => {
     isMarkedForDeletion,
     toggleMarkedForDeletion,
     disabled,
+    isPendingOrder,
   } = props
 
   // Fetching buy and sell tokens
@@ -266,9 +269,9 @@ const OrderRow: React.FC<Props> = props => {
   const [openCard, setOpenCard] = useSafeState(true)
 
   useEffect(() => {
-    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken).catch(onError)
-    fetchToken(order.sellTokenId, order.id, networkId, setSellToken).catch(onError)
-  }, [networkId, order, setBuyToken, setSellToken])
+    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken, isPendingOrder).catch(onError)
+    fetchToken(order.sellTokenId, order.id, networkId, setSellToken, isPendingOrder).catch(onError)
+  }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
   const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
