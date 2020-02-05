@@ -34,9 +34,46 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
   )
 }
 
+interface OrdersState {
+  [networkAndAddress: string]: AuctionElement[]
+}
+
+function buildKey(networkId: number, userAddress: string): string {
+  return `${networkId}${userAddress}`
+}
+
+function updateOrdersState(
+  networkId: number,
+  userAddress: string,
+  state: OrdersState,
+  orders: AuctionElement[],
+  isAppend: boolean,
+): OrdersState {
+  const key = buildKey(networkId, userAddress)
+
+  let _orders: AuctionElement[]
+  if (isAppend) {
+    _orders = (state[key] || []).concat(orders)
+  } else {
+    _orders = orders
+  }
+
+  return { ...state, [key]: _orders }
+}
+
+function areThereOrders(networkId: number | undefined, userAddress: string | undefined, state: OrdersState): boolean {
+  if (networkId === undefined || userAddress === undefined) {
+    return false
+  }
+
+  const key = buildKey(networkId, userAddress)
+
+  return state[key]?.length > 0
+}
+
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
-  const [orders, setOrders] = useSafeState<AuctionElement[]>([])
+  const [ordersState, setOrdersState] = useSafeState<OrdersState>({})
   const [offset, setOffset] = useSafeState<number | undefined>(0)
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
 
@@ -64,15 +101,15 @@ export function useOrders(): Result {
           // Store new orders, if any
           if (offset === 0) {
             // fresh start/refresh: replace whatever is stored
-            setOrders(filteredOrders)
+            setOrdersState(curr => updateOrdersState(networkId, userAddress, curr, filteredOrders, false))
           } else if (filteredOrders.length) {
             // incremental update: append
-            setOrders(curr => curr.concat(filteredOrders))
+            setOrdersState(curr => updateOrdersState(networkId, userAddress, curr, filteredOrders, true))
           }
         } else if (offset === 0 && areThereOrders) {
           // There were orders. We fetched again from the beginning, and now there are none (in the first page). Set to []
           // Example: switching network or address.
-          setOrders([])
+          setOrdersState(curr => updateOrdersState(networkId, userAddress, curr, [], false))
         }
 
         // `nextIndex` can be `undefined`, which means there are no more pages
@@ -127,7 +164,7 @@ export function useOrders(): Result {
       // should try to update orders
       if (networkId !== lastNetworkId || userAddress !== lastUserAddress) {
         // networkId or userAddress changed, start from 0
-        fetchOrdersAndHandleErrors(userAddress, networkId, 0, orders.length > 0)
+        fetchOrdersAndHandleErrors(userAddress, networkId, 0, areThereOrders(networkId, userAddress, ordersState))
       } else if (blockNumber !== lastBlockNumber) {
         // block changed, start from where we last checked
         fetchOrdersAndHandleErrors(userAddress, networkId, offset)
@@ -140,7 +177,7 @@ export function useOrders(): Result {
     lastNetworkId,
     userAddress,
     lastUserAddress,
-    orders,
+    ordersState,
     fetchOrdersAndHandleErrors,
     isLoading,
     offset,
@@ -150,8 +187,12 @@ export function useOrders(): Result {
    * Forces the immediate refresh of orders
    */
   const forceOrdersRefresh = useCallback((): void => {
-    fetchOrdersAndHandleErrors(userAddress, networkId, 0, orders.length > 0)
-  }, [fetchOrdersAndHandleErrors, userAddress, networkId, orders.length])
+    fetchOrdersAndHandleErrors(userAddress, networkId, 0, areThereOrders(networkId, userAddress, ordersState))
+  }, [fetchOrdersAndHandleErrors, userAddress, networkId, ordersState, areThereOrders])
 
-  return { orders, forceOrdersRefresh, isLoading }
+  return {
+    orders: (networkId && userAddress && ordersState[buildKey(networkId, userAddress)]) || [],
+    forceOrdersRefresh,
+    isLoading,
+  }
 }
