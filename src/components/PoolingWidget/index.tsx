@@ -30,7 +30,7 @@ import { maxAmountsForSpread, log } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Link } from 'react-router-dom'
 
-const LIQUIDITY_TOKEN_LIST = ['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI']
+const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI'])
 
 interface ProgressBarProps {
   step: number
@@ -190,7 +190,7 @@ const PoolingInterface: React.FC = () => {
       tokenListApi
         .getTokens(fallBackNetworkId)
         // Filter out the tokens not in the list
-        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.includes(symbol))
+        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
     )
   }, [fallBackNetworkId])
 
