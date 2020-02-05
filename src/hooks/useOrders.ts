@@ -2,9 +2,9 @@ import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { useEffect } from 'react'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
-import { ZERO /* , GP_ORDER_TX_HASHES */, GP_ORDER_TX_HASHES } from 'const'
-import { StateMap } from 'components/TradeWidget'
+import { AuctionElement, PendingTxArray } from 'api/exchange/ExchangeApi'
+import useGlobalState from './useGlobalState'
+import { ZERO } from 'const'
 
 /**
  * Filter out deleted orders.
@@ -28,10 +28,12 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
   )
 }
 
-export function useOrders(): { orders: AuctionElement[]; pendingOrders: any } {
+export function useOrders(): { orders: AuctionElement[]; pendingOrders: PendingTxArray } {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
+
+  const [{ pendingOrders: pendingOrdersGlobal }] = useGlobalState()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
-  const [pendingOrders, setPendingOrders] = useSafeState<AuctionElement[]>([])
+  const [pendingOrders, setPendingOrders] = useSafeState(networkId ? pendingOrdersGlobal[networkId] : [])
 
   useEffect(() => {
     if (userAddress && networkId) {
@@ -39,21 +41,10 @@ export function useOrders(): { orders: AuctionElement[]; pendingOrders: any } {
         .getOrders({ userAddress, networkId })
         .then(filterDeletedOrders)
         .then(setOrders)
+        .then(() => setPendingOrders(pendingOrdersGlobal[networkId]))
     }
     // updating list of orders on every block by listening on `blockNumber`
-  }, [networkId, setOrders, userAddress, blockNumber])
-
-  useEffect(() => {
-    if (networkId) {
-      const stateCopy: StateMap = new Map(
-        localStorage.getItem(GP_ORDER_TX_HASHES[networkId])
-          ? JSON.parse(localStorage.getItem(GP_ORDER_TX_HASHES[networkId]) as string)
-          : [],
-      )
-
-      setPendingOrders()
-    }
-  }, [networkId, setPendingOrders])
+  }, [networkId, setOrders, userAddress, blockNumber, setPendingOrders, pendingOrders, pendingOrdersGlobal])
 
   return { orders, pendingOrders }
 }
