@@ -6,48 +6,70 @@ export const enum ActionTypes {
   REMOVE_PENDING_ORDERS = 'REMOVE_PENDING_ORDERS',
 }
 
-interface Actions {
+interface Actions<T> {
   type: ActionTypes
-  payload: PendingTxObj & { pendingTxHash?: string; networkId: number }
+  payload: T
 }
 
-export const savePendingOrdersAction = (payload: PendingTxObj & { networkId: number }): Actions => ({
+export const savePendingOrdersAction = (payload: {
+  orders: PendingTxObj
+  networkId: number
+}): Actions<{
+  orders: PendingTxObj
+  networkId: number
+}> => ({
   type: ActionTypes.SAVE_PENDING_ORDERS,
   payload,
 })
 
-export const removePendingOrdersAction = (
-  payload: PendingTxObj & { pendingTxHash: string; networkId: number },
-): Actions => ({
+export const removePendingOrdersAction = (payload: {
+  networkId: number
+  pendingTxHash: string
+}): Actions<{
+  networkId: number
+  pendingTxHash: string
+}> => ({
   type: ActionTypes.REMOVE_PENDING_ORDERS,
   payload,
 })
 
 export type PendingOrdersState = typeof GP_ORDER_TX_HASHES
 
+export const EMPTY_PENDING_ORDERS_STATE = {
+  1: [],
+  4: [],
+}
+
 export const PendingOrdersInitialState: () => PendingOrdersState = () => {
   const pendingOrders: typeof GP_ORDER_TX_HASHES = localStorage.getItem('GP_ORDER_TX_HASHES')
     ? JSON.parse(localStorage.getItem('GP_ORDER_TX_HASHES') as string)
-    : []
-
-  console.debug('pendingOrders', pendingOrders)
+    : EMPTY_PENDING_ORDERS_STATE
 
   return pendingOrders
 }
 
-// export const PendingOrdersInitialState = []
-
-export const reducer = (state: PendingOrdersState, action: Actions): PendingOrdersState => {
+export const reducer = (
+  state: PendingOrdersState,
+  action: Actions<{
+    orders: PendingTxObj
+    networkId: number
+    pendingTxHash: string
+  }>,
+): PendingOrdersState => {
   switch (action.type) {
     case ActionTypes.SAVE_PENDING_ORDERS: {
-      const stateCopy = state[action.payload.networkId].slice().concat(action.payload)
+      const { networkId, orders } = action.payload
+
+      const stateSliceCopy = state[networkId].slice().concat(orders)
+      const stateCopy = { ...state, [networkId]: stateSliceCopy }
 
       return stateCopy
     }
     case ActionTypes.REMOVE_PENDING_ORDERS: {
-      const stateCopy = state[action.payload.networkId].filter(
-        ({ txHash }: { txHash: string }) => txHash !== action.payload.pendingTxHash,
-      )
+      const { networkId, pendingTxHash } = action.payload
+
+      const stateSliceCopy = state[networkId].filter(({ txHash }: { txHash: string }) => txHash !== pendingTxHash)
+      const stateCopy = { ...state, [networkId]: stateSliceCopy }
 
       return stateCopy
     }
