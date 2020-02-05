@@ -37,7 +37,7 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
 }
 
 const OrdersWidget: React.FC = () => {
-  const allOrders = useOrders()
+  const { orders: allOrders, forceOrdersRefresh } = useOrders()
 
   const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
 
@@ -99,9 +99,12 @@ const OrdersWidget: React.FC = () => {
         // reset selections
         setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
         setMarkedForDeletion(new Set<string>())
+
+        // update the list of orders
+        forceOrdersRefresh()
       }
     },
-    [deleteOrders, markedForDeletion, orders, setMarkedForDeletion, setOrders],
+    [deleteOrders, forceOrdersRefresh, markedForDeletion, orders, setMarkedForDeletion, setOrders],
   )
 
   return (
