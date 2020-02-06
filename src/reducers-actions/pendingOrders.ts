@@ -81,7 +81,6 @@ export const PendingOrdersInitialState: PendingOrdersState = localStorage.getIte
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
   switch (action.type) {
     case ActionTypes.SAVE_PENDING_ORDERS: {
-      console.error('action.payload', action.payload)
       const { networkId, orders, userAddress } = action.payload
 
       const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
