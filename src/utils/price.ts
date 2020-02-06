@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { assert } from './miscellaneous'
+import { assert } from '@gnosis.pm/dex-js'
 import { TEN, UNLIMITED_ORDER_AMOUNT_BIGNUMBER } from 'const'
 import BigNumber from 'bignumber.js'
 

@@ -43,6 +43,10 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
             &::before {
               content: none;
             }
+          }
+          > td {
+            padding: 0.7rem 0 !important;
+            margin: 0 0.6rem !important;
           } 
         }
       `}

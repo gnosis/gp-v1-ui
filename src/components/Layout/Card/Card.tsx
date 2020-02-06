@@ -185,7 +185,7 @@ export const CardTable = styled.table<{
       }
 
       // Don't highlight on hover selected rows or the drawer
-      &:not(.selected):not(${CardRowDrawer}):hover {
+      &:not(.selected):not(.highlight):not(${CardRowDrawer}):hover {
         background: var(--color-background-selected);
         border: 0.125rem solid var(--color-border);
       }

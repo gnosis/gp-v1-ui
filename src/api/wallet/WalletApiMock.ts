@@ -85,6 +85,7 @@ export class WalletApiMock implements WalletApi {
 
   public getProviderInfo(): ProviderInfo {
     return {
+      id: '',
       name: 'MockProvider',
       type: 'mock',
       logo: '',

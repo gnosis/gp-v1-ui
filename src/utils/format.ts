@@ -39,6 +39,18 @@ function _decomposeBn(amount: BN, amountPrecision: number, decimals: number): { 
 }
 
 export function formatAmount(
+  amount: BN,
+  amountPrecision: number,
+  decimals?: number,
+  thousandSeparator?: boolean,
+): string
+export function formatAmount(
+  amount: null | undefined,
+  amountPrecision: number,
+  decimals?: number,
+  thousandSeparator?: boolean,
+): null
+export function formatAmount(
   amount: BN | null | undefined,
   amountPrecision: number,
   decimals = DEFAULT_DECIMALS,
@@ -66,6 +78,8 @@ export function formatAmount(
   }
 }
 
+export function formatAmountFull(amount: BN, amountPrecision?: number, thousandSeparator?: boolean): string
+export function formatAmountFull(amount?: undefined): null
 export function formatAmountFull(
   amount?: BN,
   amountPrecision = DEFAULT_PRECISION,

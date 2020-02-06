@@ -104,11 +104,20 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
     > p {
       white-space: normal;
     }
+
+    > div {
+      > p {
+        font-size: smaller;
+      }
+    }
   }
 
   @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_LARGE}em) {
-    min-height: 10vw;
-    min-width: 72vw;
+    min-height: 10.8vw;
+    min-width: 75vw;
+    > p {
+      font-size: smaller;
+    }
   }
 
   @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_SMALL}em) {

@@ -1,12 +1,13 @@
 import { useEffect } from 'react'
 import BN from 'bn.js'
+import { assert } from '@gnosis.pm/dex-js'
 
 import { tokenListApi, erc20Api, depositApi } from 'api'
 
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, log, assert } from 'utils'
+import { formatAmount, log } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'

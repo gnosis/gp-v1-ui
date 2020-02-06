@@ -1,8 +1,12 @@
 import BN from 'bn.js'
+
+import { assert } from '@gnosis.pm/dex-js'
+
 import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
-import { log, assert } from 'utils'
+import { log } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
+import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
 
 interface BaseParams {
   networkId: number
@@ -10,6 +14,11 @@ interface BaseParams {
 
 export interface GetOrdersParams extends BaseParams {
   userAddress: string
+}
+
+export interface GetOrdersPaginatedParams extends GetOrdersParams {
+  offset: number
+  pageSize?: number
 }
 
 export interface GetTokenAddressByIdParams extends BaseParams {
@@ -58,6 +67,7 @@ export interface ExchangeApi extends DepositApi {
   getFeeDenominator(networkId: number): Promise<number>
 
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
+  getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
 
   getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
@@ -84,6 +94,11 @@ export interface Order {
   remainingAmount: BN
 }
 
+export interface GetOrdersPaginatedResult {
+  orders: AuctionElement[]
+  nextIndex?: number
+}
+
 /**
  * Basic implementation of Stable Coin Converter API
  */
@@ -104,6 +119,39 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     if (!encodedOrders) return []
 
     return decodeAuctionElements(encodedOrders)
+  }
+
+  public async getOrdersPaginated({
+    userAddress,
+    networkId,
+    offset,
+    pageSize = DEFAULT_ORDERS_PAGE_SIZE,
+  }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
+    const contract = await this._getContract(networkId)
+
+    log(
+      `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} with offset ${offset} and pageSize ${pageSize}`,
+    )
+
+    // query 1 more than required to check whether there's a next page
+    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, pageSize + 1).call()
+
+    // is null if Contract returns empty bytes
+    if (!encodedOrders) return { orders: [] }
+
+    const orders = decodeAuctionElements(encodedOrders, offset)
+
+    if (orders.length <= pageSize) {
+      // no more pages left, indicate by not returning `nextIndex`
+      return { orders }
+    } else {
+      // there is at least 1 item in the next page
+      // pop the extra element
+      const nextPageOrder = orders.pop() as AuctionElement
+      // get its id as nextIndex
+      const nextIndex = Number(nextPageOrder.id)
+      return { orders, nextIndex }
+    }
   }
 
   public async getNumTokens(networkId: number): Promise<number> {
