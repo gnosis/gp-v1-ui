@@ -33,7 +33,7 @@ export function useOrders(): { orders: AuctionElement[]; pendingOrders: PendingT
 
   const [{ pendingOrders: pendingOrdersGlobal }] = useGlobalState()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
-  const [pendingOrders, setPendingOrders] = useSafeState(networkId ? pendingOrdersGlobal[networkId] : [])
+  const [pendingOrders, setPendingOrders] = useSafeState<PendingTxArray>([])
 
   useEffect(() => {
     if (userAddress && networkId) {
@@ -41,7 +41,7 @@ export function useOrders(): { orders: AuctionElement[]; pendingOrders: PendingT
         .getOrders({ userAddress, networkId })
         .then(filterDeletedOrders)
         .then(setOrders)
-        .then(() => setPendingOrders(pendingOrdersGlobal[networkId]))
+        .then(() => setPendingOrders(pendingOrdersGlobal[networkId][userAddress] || []))
     }
     // updating list of orders on every block by listening on `blockNumber`
   }, [networkId, setOrders, userAddress, blockNumber, setPendingOrders, pendingOrders, pendingOrdersGlobal])

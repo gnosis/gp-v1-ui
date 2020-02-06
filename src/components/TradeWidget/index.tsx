@@ -191,7 +191,7 @@ const TradeWidget: React.FC = () => {
               validUntil: 0,
             }
 
-            return dispatch(savePendingOrdersAction({ orders: newTxState, networkId }))
+            return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
           },
         },
       })
@@ -199,7 +199,7 @@ const TradeWidget: React.FC = () => {
         // reset form on successful order placing
         reset()
         // remove pending tx
-        dispatch(removePendingOrdersAction({ networkId, pendingTxHash }))
+        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     } else {
       const from = history.location.pathname + history.location.search

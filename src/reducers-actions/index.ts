@@ -8,6 +8,11 @@ import {
 
 export * from './tokenRow'
 
+export interface Actions<T, P> {
+  type: T
+  payload: P
+}
+
 export interface GlobalState {
   tokens: TokenLocalState
   pendingOrders: PendingOrdersState
@@ -21,10 +26,9 @@ export interface GlobalState {
  */
 
 export const INITIAL_STATE: () => GlobalState = () => {
-  const initiatedPendingOrders = pendingOrders()
   return {
     tokens,
-    pendingOrders: initiatedPendingOrders,
+    pendingOrders,
   }
 }
 
