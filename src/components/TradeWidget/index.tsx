@@ -177,8 +177,6 @@ const TradeWidget: React.FC = () => {
           onSentTransaction: (txHash: string): void => {
             pendingTxHash = txHash
 
-            if (!networkId) return
-
             const newTxState = {
               txHash,
               id: 'PENDING ORDER',
