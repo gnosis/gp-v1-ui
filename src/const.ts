@@ -33,7 +33,7 @@ export const BATCHES_TO_WAIT = 3
 export const MAX_BATCH_ID = 2 ** 32 - 1
 
 // How many orders should we query per call, when invoking https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L479
-export const DEFAULT_ORDERS_PAGE_SIZE = 10
+export const DEFAULT_ORDERS_PAGE_SIZE = 50
 
 // UI constants
 export const HIGHLIGHT_TIME = 5000

@@ -2,9 +2,11 @@ import React, { useMemo, useCallback, useEffect } from 'react'
 import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
+import { useDeleteOrders } from './useDeleteOrders'
+import usePendingOrders from 'hooks/usePendingOrders'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
@@ -13,8 +15,6 @@ import { isOrderActive } from 'utils'
 import { CardTable } from 'components/Layout/Card'
 import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
-
-import { useDeleteOrders } from './useDeleteOrders'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
 
 interface ShowOrdersButtonProps {
@@ -37,7 +37,8 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
 }
 
 const OrdersWidget: React.FC = () => {
-  const { orders: allOrders, pendingOrders } = useOrders()
+  const { orders: allOrders, forceOrdersRefresh } = useOrders()
+  const pendingOrders = usePendingOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId } = useWalletConnection()
 
@@ -98,9 +99,12 @@ const OrdersWidget: React.FC = () => {
         // reset selections
         setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
         setMarkedForDeletion(new Set<string>())
+
+        // update the list of orders
+        forceOrdersRefresh()
       }
     },
-    [deleteOrders, markedForDeletion, orders, setMarkedForDeletion, setOrders],
+    [deleteOrders, forceOrdersRefresh, markedForDeletion, orders, setMarkedForDeletion, setOrders],
   )
 
   return (
@@ -151,7 +155,7 @@ const OrdersWidget: React.FC = () => {
           </div>
 
           {pendingShownOrdersCount ? (
-            <form action="submit" onSubmit={onSubmit}>
+            <div>
               <div className="ordersContainer">
                 <CardTable
                   $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
@@ -190,7 +194,7 @@ const OrdersWidget: React.FC = () => {
                   </tbody>
                 </CardTable>
               </div>
-            </form>
+            </div>
           ) : null}
 
           {shownOrdersCount ? (

@@ -30,6 +30,8 @@ import { maxAmountsForSpread, log } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Link } from 'react-router-dom'
 
+const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI'])
+
 interface ProgressBarProps {
   step: number
   stepArray: string[]
@@ -182,10 +184,15 @@ const PoolingInterface: React.FC = () => {
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
-  // TODO: switched to tagged tokens @anxo @leandro
-  const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId).filter(({ symbol }) => symbol !== 'WETH'), [
-    fallBackNetworkId,
-  ])
+  const tokens = useMemo(() => {
+    return (
+      // Get all the tokens for the current network
+      tokenListApi
+        .getTokens(fallBackNetworkId)
+        // Filter out the tokens not in the list
+        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
+    )
+  }, [fallBackNetworkId])
 
   const prevStep = useCallback((): void => {
     if (step == 1) return
