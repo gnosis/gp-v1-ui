@@ -25,7 +25,16 @@ module.exports = ({ stats = false } = {}) => ({
     rules: [
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: ['file-loader'],
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true,
+              disable: !isProduction,
+            },
+          },
+        ],
       },
       {
         test: /\.jsx?$/,

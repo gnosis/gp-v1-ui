@@ -128,6 +128,7 @@
     "fork-ts-checker-webpack-plugin": "^4.0.3",
     "html-webpack-plugin": "^4.0.0-beta.11",
     "husky": "^4.2.1",
+    "image-webpack-loader": "^6.0.0",
     "jest": "^25.1.0",
     "jest-enzyme": "^7.1.2",
     "prettier": "^1.19.1",
