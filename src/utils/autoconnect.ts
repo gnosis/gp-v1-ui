@@ -73,7 +73,7 @@ const connectToInjected = async (): Promise<Provider> => {
   return provider
 }
 
-export const getLastProvider = (): Promise<Provider | null> => {
+export const getLastProvider = async (): Promise<Provider | null> => {
   const lastProviderName = localStorage.getItem(STORAGE_KEY_LAST_PROVIDER)
 
   try {
@@ -81,6 +81,11 @@ export const getLastProvider = (): Promise<Provider | null> => {
     // try to reconnect
     // but account for possibly stale session
     if (lastProviderName === 'WalletConnect') return getWCIfConnected()
+
+    const { default: Web3Connect } = await import(
+      /* webpackChunkName: "@web3connect"*/
+      'web3connect'
+    )
 
     const injectedProviderName = Web3Connect.getInjectedProviderName()
     // last provider is the current injected provider
@@ -91,7 +96,7 @@ export const getLastProvider = (): Promise<Provider | null> => {
   } catch (error) {
     console.warn('Error connecting to last used provider', lastProviderName, error)
   }
-  return Promise.resolve(null)
+  return null
 }
 
 export const setupAutoconnect = async (walletApi: WalletApi): Promise<boolean> => {
