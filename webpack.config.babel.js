@@ -3,6 +3,8 @@ import webpack from 'webpack'
 import DashboardPlugin from 'webpack-dashboard/plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
+import PreloadWebpackPlugin from 'preload-webpack-plugin'
+
 import dotenv from 'dotenv'
 import path from 'path'
 
@@ -92,6 +94,11 @@ module.exports = ({ stats = false } = {}) => ({
       template: './src/html/index.html',
       title: 'dex-react',
       ipfsHack: isProduction,
+    }),
+    new PreloadWebpackPlugin({
+      rel: 'prefetch',
+      include: 'allAssets',
+      fileBlacklist: [/\.map/, /runtime~.+\.js$/],
     }),
     isProduction && new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime/]),
     new webpack.EnvironmentPlugin({
