@@ -8,7 +8,7 @@ import { formatPrice } from 'utils'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
-  font-size: 0.8em;
+  font-size: 1rem;
 
   dd {
     font-weight: bold;
