@@ -100,8 +100,7 @@ export const getLastProvider = async (): Promise<Provider | null> => {
 }
 
 export const setupAutoconnect = async (walletApi: WalletApi): Promise<boolean> => {
-  window.addEventListener('beforeunload', e => {
-    e.preventDefault()
+  window.addEventListener('beforeunload', () => {
     const { name } = walletApi.getProviderInfo()
     console.log('LAST PROVIDER NAME', name)
     localStorage.setItem(STORAGE_KEY_LAST_PROVIDER, name)
