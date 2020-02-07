@@ -7,6 +7,7 @@ import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
+import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 
 import { useForm, FormContext } from 'react-hook-form'
@@ -61,6 +62,7 @@ const SubmitButton = styled.button`
 export const enum TradeFormTokenId {
   sellToken = 'sellToken',
   receiveToken = 'receiveToken',
+  validUntil = 'validUntil',
 }
 
 export type TradeFormData = {
@@ -76,7 +78,7 @@ const TradeWidget: React.FC = () => {
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const { sellAmount, buyAmount: receiveAmount } = useQuery()
+  const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
@@ -87,17 +89,23 @@ const TradeWidget: React.FC = () => {
   )
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
+  const validUntilId = TradeFormTokenId.validUntil
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellAmount,
       [receiveInputId]: receiveAmount,
+      [validUntilId]: validUntil,
     },
   })
   const { handleSubmit, watch, reset } = methods
 
-  const searchQuery = buildSearchQuery({ sell: watch(sellInputId), buy: watch(receiveInputId) })
+  const searchQuery = buildSearchQuery({
+    sell: watch(sellInputId),
+    buy: watch(receiveInputId),
+    expires: watch(validUntilId),
+  })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url, true)
 
@@ -156,6 +164,7 @@ const TradeWidget: React.FC = () => {
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
+    const validUntil = +data[validUntilId]
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
@@ -168,6 +177,7 @@ const TradeWidget: React.FC = () => {
         buyToken: cachedBuyToken,
         sellAmount,
         sellToken: cachedSellToken,
+        validUntil,
       })
       if (success) {
         // reset form on successful order placing
@@ -208,11 +218,13 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             tabIndex={2}
           />
+          <OrderValidity inputId={validUntilId} isDisabled={isSubmitting} tabIndex={3} />
           <OrderDetails
             sellAmount={watch(sellInputId)}
             sellTokenName={safeTokenName(sellToken)}
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
+            validUntil={watch(validUntilId)}
           />
           <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}

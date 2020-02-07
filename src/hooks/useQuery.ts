@@ -6,21 +6,24 @@ import { useMemo } from 'react'
  *
  * @param value Input from URL
  */
-function sanitizeInput(value?: string | null): string {
-  return value && Number(value) ? value : '0'
+function sanitizeInput(value?: string | null, defaultValue = '0'): string {
+  return value && Number(value) ? value : defaultValue
 }
 
-export function useQuery(): { sellAmount: string; buyAmount: string } {
+export function useQuery(): { sellAmount: string; buyAmount: string; validUntil: string } {
   const query = new URLSearchParams(useLocation().search)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const sellAmount = useMemo(() => sanitizeInput(query.get('sell')), [])
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const buyAmount = useMemo(() => sanitizeInput(query.get('buy')), [])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const validUntil = useMemo(() => sanitizeInput(query.get('expires'), '30'), [])
 
   return {
     sellAmount,
     buyAmount,
+    validUntil,
   }
 }
 

@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js'
 import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
 import { formatPrice } from 'utils'
+import { leadingAndTrailingZeros, trailingZerosAfterDot } from './TokenRow'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
@@ -25,6 +26,7 @@ interface Props {
   sellTokenName: string
   receiveAmount: string
   receiveTokenName: string
+  validUntil: string
 }
 
 const OrderDetails: React.FC<Props> = ({
@@ -32,6 +34,7 @@ const OrderDetails: React.FC<Props> = ({
   sellTokenName,
   receiveAmount: receiveAmountString,
   receiveTokenName,
+  validUntil,
 }) => {
   const sellAmount = new BigNumber(sellAmountString)
   const receiveAmount = new BigNumber(receiveAmountString)
@@ -64,7 +67,14 @@ const OrderDetails: React.FC<Props> = ({
 
       <dd>Expiration date:</dd>
       <dt>
-        <Highlight>30 min</Highlight>
+        <Highlight>
+          ~
+          {(+validUntil / 60)
+            .toFixed(2)
+            .replace(leadingAndTrailingZeros, '')
+            .replace(trailingZerosAfterDot, '$1')}{' '}
+          hours
+        </Highlight>
       </dt>
     </Wrapper>
   )
