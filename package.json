@@ -10,7 +10,7 @@
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
     "lint": "eslint src --ext .ts,.tsx,.js",
     "lint:fix": "eslint --fix . --ext .ts,.tsx,.js",
-    "stats": "NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
+    "stats": "rimraf ./dist && NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "MOCK=true jest",
     "test-coverage": "MOCK=true jest --coverage && cat ./coverage/lcov.info | coveralls",
     "verify": "npm run lint && npm run test",
