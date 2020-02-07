@@ -1,12 +1,14 @@
-import Web3Connect from 'web3connect'
 import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-ui'
-import WalletConnectProvider from '@walletconnect/web3-provider'
 import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import Web3 from 'web3'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
+  const WalletConnectProvider = await import(
+    /* webpackChunkName: "@walletconnect"*/
+    '@walletconnect/web3-provider'
+  )
   const provider = new WalletConnectProvider({
     infuraId: INFURA_ID,
   })

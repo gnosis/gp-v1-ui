@@ -3,8 +3,6 @@ import BN from 'bn.js'
 import assert from 'assert'
 import { getDefaultProvider } from '..'
 
-import WalletConnectProvider from '@walletconnect/web3-provider'
-
 import Web3Connect from 'web3connect'
 
 import Web3 from 'web3'
@@ -165,8 +163,7 @@ const subscribeToBlockchainUpdate = ({
 
 // const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
 
-const wcOptions: WalletConnectInits = {
-  package: WalletConnectProvider,
+const wcOptions: Omit<WalletConnectInits, 'package'> = {
   options: {
     // TODO get infuraId from .env
     infuraId: INFURA_ID,
@@ -214,7 +211,16 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async connect(givenProvider?: Provider): Promise<boolean> {
-    const provider = givenProvider || (await getProvider(wcOptions))
+    const options: WalletConnectInits = {
+      ...wcOptions,
+      package: (
+        await import(
+          /* webpackChunkName: "@walletconnect"*/
+          '@walletconnect/web3-provider'
+        )
+      ).default,
+    }
+    const provider = givenProvider || (await getProvider(options))
 
     if (!provider) return false
 
