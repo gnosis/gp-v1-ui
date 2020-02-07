@@ -85,7 +85,7 @@ const App: React.FC = () => (
       </Layout>
     </Router>
     {process.env.NODE_ENV === 'development' &&
-      Web3Connect.isMobile() &&
+      require('web3connect').default.isMobile() &&
       React.createElement(require('./Console').default)}
   </>
 )
