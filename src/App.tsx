@@ -15,49 +15,65 @@ import 'react-toastify/dist/ReactToastify.min.css'
 import Layout from 'components/Layout'
 
 // Pages
-import About from 'pages/About'
-import Trade from 'pages/Trade'
-import Strategies from 'pages/Strategies'
-import Orders from 'pages/Orders'
-import Wallet from 'pages/Wallet'
-import SourceCode from 'pages/SourceCode'
-import NotFound from 'pages/NotFound'
-import ConnectWallet from 'pages/ConnectWallet'
+const About = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Extra_routes_chunk"*/
 
-// Global State
-import { withGlobalContext } from 'hooks/useGlobalState'
-import { rootReducer, INITIAL_STATE } from 'reducers-actions'
+    'pages/About'
+  ),
+)
+const Trade = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Trade_chunk"*/
 
-import Web3Connect from 'web3connect'
-import { useWalletConnection } from 'hooks/useWalletConnection'
+    'pages/Trade'
+  ),
+)
 
-const PrivateRoute: React.FC<RouteProps> = (props: RouteProps) => {
-  const { pending, isConnected } = useWalletConnection()
+const Strategies = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Strategies_chunk"*/
 
-  const { component: Component, ...rest } = props
+    'pages/Strategies'
+  ),
+)
 
-  if (pending) {
-    return <Route {...rest} render={(): null => null} />
-  }
+const Orders = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Orders_chunk"*/
 
-  return (
-    <Route
-      {...rest}
-      render={(props): React.ReactNode =>
-        isConnected && Component ? (
-          <Component {...props} />
-        ) : (
-          <Redirect
-            to={{
-              pathname: '/connect-wallet',
-              state: { from: props.location },
-            }}
-          />
-        )
-      }
-    />
-  )
-}
+    'pages/Orders'
+  ),
+)
+
+const Wallet = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Wallet_chunk"*/
+
+    'pages/Wallet'
+  ),
+)
+const SourceCode = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Extra_routes_chunk"*/
+
+    'pages/SourceCode'
+  ),
+)
+const NotFound = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Extra_routes_chunk"*/
+
+    'pages/NotFound'
+  ),
+)
+const ConnectWallet = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Extra_routes_chunk"*/
+
+    'pages/ConnectWallet'
+  ),
+)
 
 toast.configure({ position: toast.POSITION.BOTTOM_RIGHT, closeOnClick: false })
 
@@ -70,18 +86,19 @@ const App: React.FC = () => (
     <GlobalStyles />
     <Router basename={process.env.BASE_URL}>
       <Layout>
-        <Switch>
-          <PrivateRoute path="/orders" exact component={Orders} />
-          <Route path="/trade/:sell-:buy" component={Trade} />
-          <PrivateRoute path="/liquidity" exact component={Strategies} />
-          <PrivateRoute path="/wallet" exact component={Wallet} />
-          <PrivateRoute path="/orders" exact component={Orders} />
-          <Route path="/about" exact component={About} />
-          <Route path="/source-code" exact component={SourceCode} />
-          <Route path="/connect-wallet" exact component={ConnectWallet} />
-          <Redirect from="/" to="/trade/DAI-USDC?sell=0&buy=0" />
-          <Route component={NotFound} />
-        </Switch>
+        <React.Suspense fallback={null}>
+          <Switch>
+            <PrivateRoute path="/orders" exact component={Orders} />
+            <Route path="/trade/:sell-:buy" component={Trade} />
+            <PrivateRoute path="/liquidity" exact component={Strategies} />
+            <PrivateRoute path="/wallet" exact component={Wallet} />
+            <Route path="/about" exact component={About} />
+            <Route path="/source-code" exact component={SourceCode} />
+            <Route path="/connect-wallet" exact component={ConnectWallet} />
+            <Redirect from="/" to="/trade/DAI-USDC?sell=0&buy=0" />
+            <Route component={NotFound} />
+          </Switch>
+        </React.Suspense>
       </Layout>
     </Router>
     {process.env.NODE_ENV === 'development' &&
