@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
