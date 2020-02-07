@@ -2,7 +2,7 @@ import 'types'
 
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
-import { BrowserRouter, HashRouter, Route, Switch, RouteProps, Redirect } from 'react-router-dom'
+import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 // SCSS
 import GlobalStyles from 'styles/global'
@@ -74,6 +74,7 @@ const ConnectWallet = React.lazy(() =>
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
+import PrivateRoute from './PrivateRoute'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
