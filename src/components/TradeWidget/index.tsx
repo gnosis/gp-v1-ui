@@ -23,7 +23,7 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
-import { ZERO, MAX_BATCH_ID } from 'const'
+import { ZERO } from 'const'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
