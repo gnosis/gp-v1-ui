@@ -167,7 +167,7 @@ const TradeWidget: React.FC = () => {
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
-    const validUntil = +data[validUntilId] / 5 || MAX_BATCH_ID
+    const validUntil = +data[validUntilId] / 5
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
