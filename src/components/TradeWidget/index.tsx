@@ -23,7 +23,7 @@ import { tokenListApi } from 'api'
 import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
-import { ZERO } from 'const'
+import { ZERO, MAX_BATCH_ID } from 'const'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -164,7 +164,10 @@ const TradeWidget: React.FC = () => {
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
-    const validUntil = +data[validUntilId]
+    // Minutes - then divided by 5min for batch length to get validity time
+    // 0 validUntil time  = unlimited order
+    // TODO: review this line
+    const validUntil = +data[validUntilId] / 5 || MAX_BATCH_ID
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 

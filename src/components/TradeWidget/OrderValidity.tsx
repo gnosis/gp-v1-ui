@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useEffect, useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 
@@ -22,8 +22,22 @@ const InputBox = styled.div`
 
   margin-left: 1em;
 
+  > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    > input[type='radio'] {
+      width: 20%;
+    }
+  }
+
+  .radio-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
   input {
-    margin: 0 0 0.5em 0;
+    margin: 0;
     width: 100%;
 
     &.error {
@@ -68,7 +82,7 @@ const WalletDetail = styled.div`
 const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
 
 function validatePositive(value: string): true | string {
-  return Number(value) > 0 || 'Invalid amount'
+  return Number(value) >= 0 || 'Invalid expiration time'
 }
 
 interface Props {
@@ -77,7 +91,10 @@ interface Props {
   tabIndex: number
 }
 
+// const UNLIMITED_ORDER_VALIDITY_LENGTH = 'Infinity'
+
 const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex }) => {
+  const [unlimited, setUnlimited] = useState(false)
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
   const inputValue = watch(inputId)
@@ -96,23 +113,35 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex }) => {
     handleChange()
   }, [handleChange])
 
+  function handleUnlimitedClick(): void {
+    setUnlimited(!unlimited)
+    !unlimited && setValue(inputId, '', true)
+  }
+
   return (
     <Wrapper>
+      <h3>Expiration time:</h3>
       <InputBox>
-        <input
-          className={className}
-          placeholder="0"
-          name={inputId}
-          type="text"
-          disabled={isDisabled}
-          required
-          ref={register({
-            pattern: { value: validInputPattern, message: 'Expiration time cannot be zero' },
-            validate: { positive: validatePositive },
-          })}
-          onChange={handleChange}
-          tabIndex={tabIndex + 2}
-        />
+        <div className="main-input-container">
+          <input
+            className={className}
+            name={inputId}
+            type="number"
+            step="30"
+            disabled={isDisabled || unlimited}
+            required
+            ref={register({
+              pattern: { value: validInputPattern, message: 'Expiration time cannot be negative' },
+              validate: { positive: validatePositive },
+            })}
+            onChange={handleChange}
+            tabIndex={tabIndex + 2}
+          />
+          <div className="radio-container">
+            <input type="checkbox" onClick={handleUnlimitedClick} />
+            <small>Unlimited</small>
+          </div>
+        </div>
         {errorOrWarning}
       </InputBox>
     </Wrapper>

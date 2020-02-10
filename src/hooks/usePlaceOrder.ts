@@ -10,7 +10,7 @@ import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/Ex
 import { log } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
-import { DEFAULT_ORDER_DURATION, BATCHES_TO_WAIT } from 'const'
+import { BATCHES_TO_WAIT } from 'const'
 import useSafeState from './useSafeState'
 
 interface PlaceOrderParams<T> {
@@ -81,7 +81,8 @@ export const usePlaceOrder = (): Result => {
             userAddress,
             buyTokenId,
             sellTokenId,
-            validUntil: validUntil || batchId + DEFAULT_ORDER_DURATION,
+            // validUntil time or max time
+            validUntil: validUntil ? batchId + validUntil : MAX_BATCH_ID, //batchId + DEFAULT_ORDER_DURATION,
             buyAmount,
             sellAmount,
             networkId,

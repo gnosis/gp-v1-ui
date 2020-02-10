@@ -68,12 +68,14 @@ const OrderDetails: React.FC<Props> = ({
       <dd>Expiration date:</dd>
       <dt>
         <Highlight>
-          ~
-          {(+validUntil / 60)
+          {+validUntil == 0
+            ? 'Unlimited'
+            : `~
+          ${(+validUntil / 60)
             .toFixed(2)
             .replace(leadingAndTrailingZeros, '')
-            .replace(trailingZerosAfterDot, '$1')}{' '}
-          hours
+            .replace(trailingZerosAfterDot, '$1')}
+          hours`}
         </Highlight>
       </dt>
     </Wrapper>
