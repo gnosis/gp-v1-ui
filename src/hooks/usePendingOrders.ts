@@ -13,7 +13,6 @@ function usePendingOrders(): PendingTxArray {
 
   useEffect(() => {
     userAddress && networkId && setPendingOrders(pendingOrdersGlobal[networkId][userAddress] || [])
-    // updating list of orders on every block by listening on `blockNumber`
   }, [networkId, pendingOrdersGlobal, setPendingOrders, userAddress])
 
   return pendingOrders
