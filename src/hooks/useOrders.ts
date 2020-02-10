@@ -1,4 +1,6 @@
 import { useEffect, useCallback } from 'react'
+// eslint-disable-next-line @typescript-eslint/camelcase
+import { unstable_batchedUpdates } from 'react-dom'
 
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
@@ -69,6 +71,92 @@ function areThereOrders(networkId: number | undefined, userAddress: string | und
   const key = buildKey(networkId, userAddress)
 
   return state[key]?.length > 0
+}
+
+export function useOrders2(): Result {
+  const { userAddress, networkId, blockNumber } = useWalletConnection()
+  const [orders, setOrders] = useSafeState<AuctionElement[]>([])
+  console.log('UO::orders', orders)
+  //  consider first state to be loading
+  const [isLoading, setIsLoading] = useSafeState<boolean>(true)
+  console.log('UO::isLoading', isLoading)
+  // start fetching from 0
+  const [offset, setOffset] = useSafeState<number>(0)
+  console.log('UO::offset', offset)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const fetchOrders = async (offset: number): Promise<void> => {
+      // isLoading is the important one
+      // controls ongoing fetching chain
+      if (!userAddress || !networkId || !isLoading) return
+
+      // contract call
+      console.log('getOrdersPaginated, offste = ', offset)
+      try {
+        const { orders, nextIndex } = await exchangeApi.getOrdersPaginated({ userAddress, networkId, offset })
+        console.log('fetched orders', orders, 'nextIndex', nextIndex)
+
+        // check cancelled bool from parent scope
+        if (cancelled) return
+
+        // Apply filters (remove deleted orders)
+        const filteredOrders = filterDeletedOrders(orders)
+
+        // ensures we don't have multiple reruns for each update
+        // i.e. offset change -> render
+        //      isLoading change -> another render
+        unstable_batchedUpdates(() => {
+          // incremental update: append
+          setOrders(oldOrders => oldOrders.concat(filteredOrders))
+
+          if (!nextIndex) {
+            // no more orders left
+            // done fetching for now
+            setIsLoading(false)
+          }
+          // move offset forward, fetch new batch
+          setOffset(offset + orders.length)
+        })
+      } catch (error) {
+        console.log('Failed to fetch orders', e)
+        // TODO: inform user
+        setIsLoading(false)
+      }
+    }
+
+    fetchOrders(offset)
+
+    // if offset changed mid-fetch
+    // which happens when forceOrdersRefresh si called
+    // ignore current fetch results
+    return (): void => {
+      cancelled = true
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [offset, isLoading])
+
+  useEffect(() => {
+    // continue loading new orders
+    // from current offset
+    setIsLoading(true)
+    // whenever new block is mined
+  }, [blockNumber, setIsLoading])
+
+  // allow to fresh start/refresh on demand
+  const forceOrdersRefresh = useCallback((): void => {
+    setOffset(0)
+    setOrders([])
+  }, [setOffset, setOrders])
+
+  useEffect(() => {
+    // fresh start/refresh: replace whatever is stored
+    forceOrdersRefresh()
+    // whenever userAddress or networkId changes
+  }, [userAddress, networkId, setIsLoading, setOffset, setOrders, forceOrdersRefresh])
+
+  return { orders, isLoading, forceOrdersRefresh }
 }
 
 export function useOrders(): Result {
