@@ -45,7 +45,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
 
-  const tradePageMatch = useRouteMatch('/trade/')
+  const orderPageMatch = useRouteMatch('/order/')
 
   /***************************** */
   // EVENT HANDLERS
@@ -76,7 +76,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(null)
-      if (!tradePageMatch) {
+      if (!orderPageMatch) {
         props.history.push('/')
       }
     }

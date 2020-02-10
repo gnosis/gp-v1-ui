@@ -29,9 +29,11 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
     <HeaderWrapper>
       <nav>
         {/* LOGO */}
-        <NavLink className="logo" to="/trade">
+        {/* <NavLink className="logo" to="/order">
           {APP_NAME}
-        </NavLink>
+        </NavLink> */}
+        {/* USER WALLET */}
+        <UserWallet />
         {/* HEADER LINKS */}
         <NavigationLinks
           navigation={navigationArray}
@@ -39,8 +41,6 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
           handleOpenNav={handleOpenNav}
           showNav={openNav}
         />
-        {/* USER WALLET */}
-        <UserWallet />
       </nav>
     </HeaderWrapper>
   )

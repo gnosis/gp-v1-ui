@@ -31,7 +31,10 @@ const WrappedWidget = styled(Widget)`
 
 const WrappedForm = styled.form`
   display: flex;
-  flex-direction: column;
+  flex-flow: column wrap;
+  width: 50%;
+  padding: 1.6rem;
+  box-sizing: border-box;
 `
 
 const IconWrapper = styled.a`
@@ -50,11 +53,22 @@ const WarningLabel = styled.code`
 `
 
 const SubmitButton = styled.button`
-  margin: 2em 0 0 0;
-  line-height: 2;
+  background-color: #218DFF;
+  border-radius: 3rem;
+  font-family: var(--font-default)
+  font-size: 1.6rem;
+  color: #FFFFFF;
+  letter-spacing: .1rem;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+  line-height: 1;
+  min-width: 32rem;
 
   &:disabled {
     cursor: not-allowed;
+    opacity: .5rem;
   }
 `
 
@@ -98,7 +112,7 @@ const TradeWidget: React.FC = () => {
   const { handleSubmit, watch, reset } = methods
 
   const searchQuery = buildSearchQuery({ sell: watch(sellInputId), buy: watch(receiveInputId) })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
+  const url = `/order/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url, true)
 
   // TESTING
@@ -215,8 +229,8 @@ const TradeWidget: React.FC = () => {
             receiveTokenName={safeTokenName(receiveToken)}
           />
           <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
-            <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
-            {sameToken ? 'Please select different tokens' : 'Send limit order'}
+            <FontAwesomeIcon icon={isSubmitting ? faSpinner : ""} size="lg" spin={isSubmitting} />{' '}
+            {sameToken ? 'Please select different tokens' : 'Submit limit order'}
           </SubmitButton>
         </WrappedForm>
       </FormContext>

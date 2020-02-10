@@ -72,14 +72,14 @@ const App: React.FC = () => (
       <Layout>
         <Switch>
           <PrivateRoute path="/orders" exact component={Orders} />
-          <Route path="/trade/:sell-:buy" component={Trade} />
+          <Route path="/order/:sell-:buy" component={Trade} />
           <PrivateRoute path="/liquidity" exact component={Strategies} />
-          <PrivateRoute path="/wallet" exact component={Wallet} />
+          <PrivateRoute path="/balances" exact component={Wallet} />
           <PrivateRoute path="/orders" exact component={Orders} />
           <Route path="/about" exact component={About} />
           <Route path="/source-code" exact component={SourceCode} />
           <Route path="/connect-wallet" exact component={ConnectWallet} />
-          <Redirect from="/" to="/trade/DAI-USDC?sell=0&buy=0" />
+          <Redirect from="/" to="/order/DAI-USDC?sell=0&buy=0" />
           <Route component={NotFound} />
         </Switch>
       </Layout>

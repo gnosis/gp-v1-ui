@@ -3,32 +3,38 @@ import { RESPONSIVE_SIZES } from 'const'
 
 export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolean }>`
   display: flex;
-  justify-content: space-evenly;
+  order: 1;
+  flex: 1 1 100%;
+  margin: auto;
+  align-items: center;
+  justify-content: center;
 
-  margin: 0.5rem;
-  padding: 0.5rem;
-
-  white-space: nowrap;
-
-  a {
+  a:link {
     border: 0.125rem solid transparent;
     color: var(--color-text-secondary);
     font-weight: bolder;
-    padding: 0.35em;
     text-decoration: none;
-
-    transition: color 0.2s ease-in-out;
-
+    transition: color .2s ease-in-out, background .2s ease-in-out;
+    font-weight: var(--font-weight-medium);
+    font-size: 2.3rem;
+    padding: 2.1rem 4rem;
+    border-radius: 15rem;
+    letter-spacing: 0;
+    text-align: center;
+    box-sizing: border-box;
+    
     &:hover {
-      color: var(--color-text-primary);
+      color: var(--color-text-active);
+      background: var(--color-background-nav-active);
     }
 
     &.active {
-      color: var(--color-text-primary);
+      color: var(--color-text-active);
+      background: var(--color-background-nav-active);
 
-      @media only screen and (min-width: ${RESPONSIVE_SIZES.TABLET}em) {
+      /* @media only screen and (min-width: ${RESPONSIVE_SIZES.TABLET}em) {
         border-bottom: 0.125rem solid var(--color-text-primary);
-      }
+      } */
     }
   }
 
@@ -38,7 +44,6 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     flex-flow: column nowrap;
     align-items: center;
     justify-content: flex-start;
-    
     background: var(--color-background-pageWrapper);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -49,8 +54,11 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   `}
 `
 
-export const OrderedNavLinkDiv = styled.h3<{ $order: number }>`
+export const OrderedNavLinkDiv = styled.span<{ $order: number }>`
   order: ${({ $order }): number => $order};
   display: flex;
   align-items: center;
+  &:not(:last-of-type) {
+    margin: 0 1.6rem 0 0;
+  }
 `

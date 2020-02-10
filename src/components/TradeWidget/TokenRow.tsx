@@ -221,7 +221,7 @@ const TokenRow: React.FC<Props> = ({
         <WalletDetail>
           <div>
             <strong>
-              <LinkWithPastLocation to="/wallet" tabIndex={-1}>
+              <LinkWithPastLocation to="/balances" tabIndex={-1}>
                 Exchange wallet:
               </LinkWithPastLocation>
             </strong>{' '}

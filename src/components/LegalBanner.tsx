@@ -9,30 +9,32 @@ const Wrapper = styled.div`
   flex-flow: column;
   align-items: center;
   justify-content: center;
-
   background-color: var(--color-background-banner);
-  color: var(--color-text-banner);
-
   text-align: center;
-  font-size: 0.65rem;
-
-  @media only screen and (max-width: ${MOBILE}em) {
-    padding: 0.2rem 2rem;
-  }
+  font-size: 1.3rem;
+  
+    > p {
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+    }
+    /* @media only screen and (max-width: ${MOBILE}em) {
+      padding: 0.2rem 2rem;
+    } */
 `
 
 const Text = styled.p`
   animation-name: foldAnimation;
   animation-duration: 1.5s;
 
-  @keyframes foldAnimation {
-    from {
-      opacity: 0;
+    @keyframes foldAnimation {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
     }
-    to {
-      opacity: 1;
-    }
-  }
 `
 
 interface LegalBannerProps {
@@ -81,7 +83,7 @@ const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, useFull, title }) 
 
   return (
     <Wrapper onClick={openCloseDisclaimer}>
-      <h3>{title}</h3>
+      <p>{title}</p>
       {useFull && open && <LegalText />}
     </Wrapper>
   )
