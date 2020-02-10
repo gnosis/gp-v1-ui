@@ -35,6 +35,7 @@ const WrappedForm = styled.form`
   width: 50%;
   padding: 1.6rem;
   box-sizing: border-box;
+  
 `
 
 const IconWrapper = styled.a`
