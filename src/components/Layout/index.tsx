@@ -8,14 +8,11 @@ import LegalBanner from '../LegalBanner'
 import { RESPONSIVE_SIZES } from 'const'
 
 const Wrapper = styled.div`
-  min-height: 100vh;
   width: 100%;
-  display: grid;
-  grid-template-rows: 3.125rem 0.2fr auto min-content;
 
   main {
     flex: 1;
-    margin: 0 auto;
+    margin: 2.4rem auto 5rem;
     max-width: 85rem;
     width: 100%;
     display: flex;

@@ -2,9 +2,6 @@ import React, { useEffect, useCallback } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-
-import LinkWithPastLocation from 'components/LinkWithPastLocation'
-import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
@@ -16,35 +13,65 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  height: 6em;
-`
-
-const TokenImgWrapper = styled(TokenImg)`
-  width: 4em;
-  height: 4em;
-
-  margin-right: 1em;
+  flex-flow: column wrap;
+  
+    > div:first-of-type {
+      width: 100%;
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 0 1rem;
+      padding: 0 1rem;
+      box-sizing: border-box;
+    }
+    
+    > div > strong {
+      margin: 0 auto 0 0;
+      text-transform: capitalize;
+    }
+    
+    > div > span {
+      display: flex;
+      flex-flow: row nowrap;
+    }
+    
+    > div > span > span {
+      display: flex;
+      flex-flow: row nowrap;
+    }
 `
 
 const InputBox = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex-grow: 1;
-
-  margin-left: 1em;
+  flex-flow: row nowrap;
+  margin: 0;
+  width: 100%;
+  height: 5.6rem;
+  position: relative;
 
   input {
-    margin: 0 0 0.5em 0;
+    margin: 0;
     width: 100%;
+    background: #E7ECF3;
+    border-radius: .6rem .6rem 0 0;
+    border: 0;
+    font-size: 1.6rem;
+    line-height: 1;
+    box-sizing: border-box;
+    border-bottom: .2rem solid transparent;
+    font-weight: var(--font-weight-normal);
+    padding: 0 15rem 0 1rem;
+    
+    &:focus {
+      border-bottom: .2rem solid #218DFF;
+      border-color: #218DFF;
+      color: #218DFF;
+    }
 
     &.error {
-      // box-shadow: 0 0 0.1875rem #cc0000;
       border-color: #ff0000a3;
     }
 
     &.warning {
-      // box-shadow: 0 0 0.1875rem #ff7500;
       border-color: orange;
     }
 
@@ -191,15 +218,20 @@ const TokenRow: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
-      <TokenSelector
-        label={selectLabel}
-        isDisabled={isDisabled}
-        tokens={tokens}
-        selected={selectedToken}
-        onChange={onSelectChange}
-        tabIndex={tabIndex}
-      />
+      <div>
+        <strong>{selectLabel}</strong>
+        <span>
+          <button>+ Deposit</button>
+          <span>Balance:
+            <WalletDetail>
+            {' '}
+            {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+            {validateMaxAmount && <a onClick={useMax}>max</a>}
+            </WalletDetail>
+            <i aria-label="Tooltip"></i>
+          </span>
+        </span>
+      </div>
       <InputBox>
         <input
           className={className}
@@ -218,24 +250,20 @@ const TokenRow: React.FC<Props> = ({
           tabIndex={tabIndex + 2}
         />
         {errorOrWarning}
-        <WalletDetail>
-          <div>
-            <strong>
-              <LinkWithPastLocation to="/balances" tabIndex={-1}>
-                Exchange wallet:
-              </LinkWithPastLocation>
-            </strong>{' '}
-            <span className="success">
-              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-            </span>
-          </div>
-          {validateMaxAmount && <a onClick={useMax}>use max</a>}
-        </WalletDetail>
-        <WalletDetail>
+        {/* <WalletDetail>
           <div>
             <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
           </div>
-        </WalletDetail>
+        </WalletDetail> */}
+        {/* <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} /> */}
+        <TokenSelector
+          label={selectLabel}
+          isDisabled={isDisabled}
+          tokens={tokens}
+          selected={selectedToken}
+          onChange={onSelectChange}
+          tabIndex={tabIndex}
+        />
       </InputBox>
     </Wrapper>
   )

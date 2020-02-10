@@ -17,6 +17,8 @@ const Wrapper = styled(PageWrapper)`
   width: 100%;
   display: flex;
   flex-flow: row nowrap;
+  font-size: 1.6rem;
+  line-height: 1;
 
   /* @media only screen and (max-width: ${TABLET}em) {
     margin: 0 auto 3rem;

@@ -1,12 +1,11 @@
 import styled from 'styled-components'
 
 export const TokenSelectorWrapper = styled.div`
-  display: grid;
+  /* display: grid;
   grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   grid-gap: 1rem;
-
   justify-self: center;
-  width: 80%;
+  width: 80%; */
 `
 
 export const CheckboxWrapper = styled.div`
@@ -24,7 +23,6 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
-
   background: var(--color-background-pageWrapper);
   box-shadow: ${({ $selected }): string => ($selected ? '0 0 0 0.175rem green' : 'var(--box-shadow)')};
   border: ${({ $selected }): string =>

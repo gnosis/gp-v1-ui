@@ -12,6 +12,7 @@ const Wrapper = styled.div`
   background-color: var(--color-background-banner);
   text-align: center;
   font-size: 1.3rem;
+  padding: 1.1rem 0;
   
     > p {
       line-height: 1;

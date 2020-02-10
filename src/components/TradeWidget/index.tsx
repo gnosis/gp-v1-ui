@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import switchTokenPair from 'assets/img/switch.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useHistory } from 'react-router'
@@ -35,12 +36,18 @@ const WrappedForm = styled.form`
   width: 50%;
   padding: 1.6rem;
   box-sizing: border-box;
-  
 `
-
+// Switcharoo arrows
 const IconWrapper = styled.a`
-  margin: -0.5em 0 1.5em 1em;
-  width: 2em;
+  margin: 1rem auto;
+  
+    > img {
+      transition: opacity .2s ease-in-out;
+      opacity: .5;
+      &:hover {
+        opacity: 1;
+      }
+    }
 `
 
 const WarningLabel = styled.code`
@@ -56,7 +63,7 @@ const WarningLabel = styled.code`
 const SubmitButton = styled.button`
   background-color: #218DFF;
   border-radius: 3rem;
-  font-family: var(--font-default)
+  font-family: var(--font-default);
   font-size: 1.6rem;
   color: #FFFFFF;
   letter-spacing: .1rem;
@@ -66,6 +73,7 @@ const SubmitButton = styled.button`
   box-sizing: border-box;
   line-height: 1;
   min-width: 32rem;
+  font-weight: var(--font-weight-medium);
 
   &:disabled {
     cursor: not-allowed;
@@ -203,7 +211,7 @@ const TradeWidget: React.FC = () => {
             selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
-            selectLabel="sell"
+            selectLabel="Sell"
             onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
             inputId={sellInputId}
             isDisabled={isSubmitting}
@@ -211,13 +219,13 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
           />
           <IconWrapper onClick={swapTokens}>
-            <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
+            <img src={switchTokenPair}/>
           </IconWrapper>
           <TokenRow
             selectedToken={receiveToken}
             tokens={tokens}
             balance={receiveTokenBalance}
-            selectLabel="receive"
+            selectLabel="Receive at least"
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
