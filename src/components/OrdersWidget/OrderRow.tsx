@@ -291,9 +291,17 @@ const OrderRow: React.FC<Props> = props => {
         )}
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
-        <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
-        <Expires order={order} pending={pending} />
+        {!isPendingOrder ? (
+          <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        ) : (
+          <PendingLink />
+        )}
+        {!isPendingOrder ? (
+          <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
+        ) : (
+          <PendingLink />
+        )}
+        {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )
