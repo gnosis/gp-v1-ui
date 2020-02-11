@@ -120,7 +120,7 @@ export function useOrders2(): Result {
           setOffset(offset + orders.length)
         })
       } catch (error) {
-        console.log('Failed to fetch orders', e)
+        console.log('Failed to fetch orders', error)
         // TODO: inform user
         setIsLoading(false)
       }
