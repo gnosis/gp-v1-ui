@@ -1,4 +1,6 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
+// eslint-disable-next-line @typescript-eslint/camelcase
+import { unstable_batchedUpdates } from 'react-dom'
 import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
@@ -96,12 +98,14 @@ const OrdersWidget: React.FC = () => {
       const success = await deleteOrders(Array.from(markedForDeletion))
 
       if (success) {
-        // reset selections
-        setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
-        setMarkedForDeletion(new Set<string>())
+        unstable_batchedUpdates(() => {
+          // reset selections
+          setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
+          setMarkedForDeletion(new Set<string>())
 
-        // update the list of orders
-        forceOrdersRefresh()
+          // update the list of orders
+          forceOrdersRefresh()
+        })
       }
     },
     [deleteOrders, forceOrdersRefresh, markedForDeletion, orders, setMarkedForDeletion, setOrders],
