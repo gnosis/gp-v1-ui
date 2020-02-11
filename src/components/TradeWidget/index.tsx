@@ -16,6 +16,8 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import useGlobalState from 'hooks/useGlobalState'
+import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { tokenListApi } from 'api'
 
@@ -68,7 +70,9 @@ export type TradeFormData = {
 }
 
 const TradeWidget: React.FC = () => {
-  const { networkId, isConnected } = useWalletConnection()
+  const { networkId, isConnected, userAddress } = useWalletConnection()
+  const [, dispatch] = useGlobalState()
+
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
@@ -160,18 +164,42 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken) return
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId || !userAddress) return
 
     if (isConnected) {
+      let pendingTxHash: string | undefined = undefined
       const { success } = await placeOrder({
         buyAmount,
         buyToken: cachedBuyToken,
         sellAmount,
         sellToken: cachedSellToken,
+        txOptionalParams: {
+          onSentTransaction: (txHash: string): void => {
+            pendingTxHash = txHash
+
+            const newTxState = {
+              txHash,
+              id: 'PENDING ORDER',
+              buyTokenId: cachedBuyToken.id,
+              sellTokenId: cachedSellToken.id,
+              priceNumerator: buyAmount,
+              priceDenominator: sellAmount,
+              user: userAddress,
+              remainingAmount: ZERO,
+              sellTokenBalance: ZERO,
+              validFrom: 0,
+              validUntil: 0,
+            }
+
+            return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+          },
+        },
       })
-      if (success) {
+      if (success && pendingTxHash) {
         // reset form on successful order placing
         reset()
+        // remove pending tx
+        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     } else {
       const from = history.location.pathname + history.location.search
