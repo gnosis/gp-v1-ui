@@ -108,24 +108,8 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
   return (
     <td data-label="Price (at least)">
       <div className="order-details">
-        <div>Sell</div>
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : ''}>1</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-        </div>
-
-        <div>
-          for <strong>at least</strong>
-        </div>
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-        </div>
-      </div>
-      <div className="order-details-responsive">
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-        </div>
+        <Highlight color={pending ? 'grey' : ''}>{price}</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}/{displayTokenSymbolOrLink(buyToken)}</strong>
+        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}<strong>{displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}</strong>
       </div>
     </td>
   )

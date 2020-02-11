@@ -113,7 +113,7 @@ const OrdersWidget: React.FC = () => {
 
   return (
     <OrdersWrapper>
-      <div>
+      {noOrders && (<div>
         {/* <h2>Your orders</h2> */}
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
@@ -127,7 +127,7 @@ const OrdersWidget: React.FC = () => {
           </a>
           */}
         </CreateButtons>
-      </div>
+      </div>)}
       {!noOrders && networkId && (
         <OrdersForm>
           <div className="infoContainer">
@@ -174,7 +174,6 @@ const OrdersWidget: React.FC = () => {
                           checked={orders.length === markedForDeletion.size}
                           disabled={deleting}
                         />
-                        <span>All</span>
                       </th>
                       <th>Limit price</th>
                       <th>Filled / Total</th>
