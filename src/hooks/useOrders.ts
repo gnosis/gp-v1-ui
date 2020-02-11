@@ -39,13 +39,10 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
   const [orders, setOrders] = useSafeState<AuctionElement[]>([])
-  console.log('UO::orders', orders)
   //  consider first state to be loading
   const [isLoading, setIsLoading] = useSafeState<boolean>(true)
-  console.log('UO::isLoading', isLoading)
   // start fetching from 0
   const [offset, setOffset] = useSafeState<number>(0)
-  console.log('UO::offset', offset)
 
   useEffect(() => {
     let cancelled = false
@@ -56,10 +53,8 @@ export function useOrders(): Result {
       if (!userAddress || !networkId || !isLoading) return
 
       // contract call
-      console.log('getOrdersPaginated, offste = ', offset)
       try {
         const { orders, nextIndex } = await exchangeApi.getOrdersPaginated({ userAddress, networkId, offset })
-        console.log('fetched orders', orders, 'nextIndex', nextIndex)
 
         // check cancelled bool from parent scope
         if (cancelled) return
@@ -88,7 +83,7 @@ export function useOrders(): Result {
           setOffset(offset + orders.length)
         })
       } catch (error) {
-        console.log('Failed to fetch orders', error)
+        console.error('Failed to fetch orders', error)
         // TODO: inform user
         setIsLoading(false)
       }
