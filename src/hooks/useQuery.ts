@@ -10,7 +10,16 @@ function sanitizeInput(value?: string | null, defaultValue = '0'): string {
   return value && Number(value) ? value : defaultValue
 }
 
-export function useQuery(): { sellAmount: string; buyAmount: string; validUntil: string } {
+/**
+ * Prevents invalid NEGATIVE numbers from being inserted by hand in the URL
+ *
+ * @param value Input from URL
+ */
+function sanitizeNegativeInput(value?: string | null, defaultValue = '0'): string | null | undefined {
+  return (Number(value) === 0 && Number(value) >= 5) ?? value ? value : defaultValue
+}
+
+export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string | null } {
   const query = new URLSearchParams(useLocation().search)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -18,7 +27,7 @@ export function useQuery(): { sellAmount: string; buyAmount: string; validUntil:
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const buyAmount = useMemo(() => sanitizeInput(query.get('buy')), [])
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const validUntil = useMemo(() => sanitizeInput(query.get('expires'), '30'), [])
+  const validUntil = useMemo(() => sanitizeNegativeInput(query.get('expires'), '30'), [])
 
   return {
     sellAmount,

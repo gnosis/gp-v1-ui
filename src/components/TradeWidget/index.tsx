@@ -221,7 +221,12 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             tabIndex={2}
           />
-          <OrderValidity inputId={validUntilId} isDisabled={isSubmitting} tabIndex={3} />
+          <OrderValidity
+            inputId={validUntilId}
+            isDisabled={isSubmitting}
+            isUnlimited={!validUntil || !Number(validUntil)}
+            tabIndex={3}
+          />
           <OrderDetails
             sellAmount={watch(sellInputId)}
             sellTokenName={safeTokenName(sellToken)}

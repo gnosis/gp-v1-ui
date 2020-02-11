@@ -89,12 +89,13 @@ interface Props {
   inputId: TradeFormTokenId
   isDisabled: boolean
   tabIndex: number
+  isUnlimited: boolean
 }
 
 // const UNLIMITED_ORDER_VALIDITY_LENGTH = 'Infinity'
 
-const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex }) => {
-  const [unlimited, setUnlimited] = useState(false)
+const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlimited }) => {
+  const [unlimited, setUnlimited] = useState(isUnlimited)
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
   const inputValue = watch(inputId)
@@ -127,7 +128,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex }) => {
             className={className}
             name={inputId}
             type="number"
-            step="30"
+            step="5"
             disabled={isDisabled || unlimited}
             required
             ref={register({
@@ -138,7 +139,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex }) => {
             tabIndex={tabIndex + 2}
           />
           <div className="radio-container">
-            <input type="checkbox" onClick={handleUnlimitedClick} />
+            <input type="checkbox" defaultChecked={isUnlimited} onClick={handleUnlimitedClick} />
             <small>Unlimited</small>
           </div>
         </div>
