@@ -5,7 +5,7 @@ import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-i
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { useOrders2 as useOrders } from 'hooks/useOrders'
+import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
 
 import { AuctionElement } from 'api/exchange/ExchangeApi'
