@@ -151,11 +151,7 @@ export function useOrders2(): Result {
     setIsLoading(true)
   }, [setIsLoading, setOffset, setOrders])
 
-  useEffect(() => {
-    // fresh start/refresh: replace whatever is stored
-    forceOrdersRefresh()
-    // whenever userAddress or networkId changes
-  }, [userAddress, networkId, setIsLoading, setOffset, setOrders, forceOrdersRefresh])
+  useEffect(forceOrdersRefresh, [userAddress, networkId])
 
   return { orders, isLoading, forceOrdersRefresh }
 }
