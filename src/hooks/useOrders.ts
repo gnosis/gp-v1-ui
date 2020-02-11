@@ -2,6 +2,9 @@ import { useEffect, useCallback } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
+import useGlobalState from './useGlobalState'
+import { overwriteOrders, appendOrders, updateOffset } from 'reducers-actions/orders'
+
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
@@ -38,11 +41,16 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
-  const [orders, setOrders] = useSafeState<AuctionElement[]>([])
+  const [
+    {
+      orders: { orders, offset },
+    },
+    dispatch,
+  ] = useGlobalState()
   //  consider first state to be loading
   const [isLoading, setIsLoading] = useSafeState<boolean>(true)
   // start fetching from 0
-  const [offset, setOffset] = useSafeState<number>(0)
+  console.log('offset', offset, 'orders', orders.length)
 
   useEffect(() => {
     let cancelled = false
@@ -68,11 +76,10 @@ export function useOrders(): Result {
         unstable_batchedUpdates(() => {
           if (offset === 0) {
             // fresh start/refresh: replace whatever is stored
-            setOrders(filteredOrders)
-            // only if we have something to add
+            dispatch(overwriteOrders({ orders: filteredOrders }))
           } else if (filteredOrders.length > 0) {
             // incremental update: append
-            setOrders(oldOrders => oldOrders.concat(filteredOrders))
+            dispatch(appendOrders({ orders: filteredOrders }))
           }
 
           if (!nextIndex) {
@@ -81,7 +88,7 @@ export function useOrders(): Result {
             setIsLoading(false)
           }
           // move offset forward, fetch new batch
-          setOffset(offset + orders.length)
+          dispatch(updateOffset({ offset: offset + orders.length }))
         })
       } catch (error) {
         console.error('Failed to fetch orders', error)
@@ -110,14 +117,18 @@ export function useOrders(): Result {
 
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {
-    setOffset(0)
-    setIsLoading(true)
-  }, [setIsLoading, setOffset])
+    unstable_batchedUpdates(() => {
+      dispatch(updateOffset({ offset: 0 }))
+      setIsLoading(true)
+    })
+  }, [setIsLoading])
 
   useEffect(() => {
-    forceOrdersRefresh()
-    setOrders([])
-  }, [userAddress, networkId, forceOrdersRefresh, setOrders])
+    unstable_batchedUpdates(() => {
+      forceOrdersRefresh()
+      dispatch(overwriteOrders({ orders: [] }))
+    })
+  }, [userAddress, networkId, forceOrdersRefresh])
 
   return { orders, isLoading, forceOrdersRefresh }
 }
