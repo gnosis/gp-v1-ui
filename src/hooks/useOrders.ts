@@ -108,8 +108,13 @@ export function useOrders2(): Result {
         // i.e. offset change -> render
         //      isLoading change -> another render
         unstable_batchedUpdates(() => {
-          // incremental update: append
-          setOrders(oldOrders => oldOrders.concat(filteredOrders))
+          if (offset === 0) {
+            // fresh start/refresh: replace whatever is stored
+            setOrders(filterDeletedOrders)
+          } else {
+            // incremental update: append
+            setOrders(oldOrders => oldOrders.concat(filteredOrders))
+          }
 
           if (!nextIndex) {
             // no more orders left
@@ -147,11 +152,13 @@ export function useOrders2(): Result {
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {
     setOffset(0)
-    setOrders([])
     setIsLoading(true)
-  }, [setIsLoading, setOffset, setOrders])
+  }, [setIsLoading, setOffset])
 
-  useEffect(forceOrdersRefresh, [userAddress, networkId])
+  useEffect(() => {
+    forceOrdersRefresh()
+    setOrders([])
+  }, [userAddress, networkId, forceOrdersRefresh, setOrders])
 
   return { orders, isLoading, forceOrdersRefresh }
 }
@@ -207,7 +214,7 @@ export function useOrders(): Result {
         }
       })
     },
-    [],
+    [setOffset, setOrdersState],
   )
 
   const fetchOrdersAndHandleErrors = useCallback(
@@ -227,7 +234,7 @@ export function useOrders(): Result {
         setIsLoading(false)
       }
     },
-    [],
+    [_fetchOrders, setIsLoading],
   )
 
   useEffect(() => {
@@ -273,7 +280,7 @@ export function useOrders(): Result {
    */
   const forceOrdersRefresh = useCallback((): void => {
     fetchOrdersAndHandleErrors(userAddress, networkId, 0, areThereOrders(networkId, userAddress, ordersState))
-  }, [fetchOrdersAndHandleErrors, userAddress, networkId, ordersState, areThereOrders])
+  }, [fetchOrdersAndHandleErrors, userAddress, networkId, ordersState])
 
   return {
     orders: (networkId && userAddress && ordersState[buildKey(networkId, userAddress)]) || [],
