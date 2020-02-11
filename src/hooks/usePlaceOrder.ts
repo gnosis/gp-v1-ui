@@ -82,7 +82,7 @@ export const usePlaceOrder = (): Result => {
             buyTokenId,
             sellTokenId,
             // validUntil time or max time
-            validUntil: validUntil ? batchId + validUntil : MAX_BATCH_ID, //batchId + DEFAULT_ORDER_DURATION,
+            validUntil: validUntil ? batchId + validUntil : MAX_BATCH_ID,
             buyAmount,
             sellAmount,
             networkId,
