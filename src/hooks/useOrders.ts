@@ -110,7 +110,7 @@ export function useOrders2(): Result {
         unstable_batchedUpdates(() => {
           if (offset === 0) {
             // fresh start/refresh: replace whatever is stored
-            setOrders(filterDeletedOrders)
+            setOrders(filteredOrders)
           } else {
             // incremental update: append
             setOrders(oldOrders => oldOrders.concat(filteredOrders))
