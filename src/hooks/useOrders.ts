@@ -148,7 +148,8 @@ export function useOrders2(): Result {
   const forceOrdersRefresh = useCallback((): void => {
     setOffset(0)
     setOrders([])
-  }, [setOffset, setOrders])
+    setIsLoading(true)
+  }, [setIsLoading, setOffset, setOrders])
 
   useEffect(() => {
     // fresh start/refresh: replace whatever is stored
