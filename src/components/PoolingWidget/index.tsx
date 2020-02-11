@@ -1,4 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
+// eslint-disable-next-line @typescript-eslint/camelcase
+import { unstable_batchedUpdates } from 'react-dom'
 import { toast } from 'react-toastify'
 
 import SubComponents from './SubComponents'
@@ -224,22 +226,24 @@ const PoolingInterface: React.FC = () => {
             pendingTxHash = txHash
             setTxHash(txHash)
 
-            orders.map(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-              const newTxState = {
-                txHash,
-                id: 'PENDING ORDER',
-                buyTokenId,
-                sellTokenId,
-                priceNumerator: buyAmount,
-                priceDenominator: sellAmount,
-                user: userAddress,
-                remainingAmount: ZERO,
-                sellTokenBalance: ZERO,
-                validFrom: 0,
-                validUntil: 0,
-              }
+            unstable_batchedUpdates(() => {
+              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
+                const newTxState = {
+                  txHash,
+                  id: 'PENDING ORDER',
+                  buyTokenId,
+                  sellTokenId,
+                  priceNumerator: buyAmount,
+                  priceDenominator: sellAmount,
+                  user: userAddress,
+                  remainingAmount: ZERO,
+                  sellTokenBalance: ZERO,
+                  validFrom: 0,
+                  validUntil: 0,
+                }
 
-              return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+                dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+              })
             })
           },
         },
