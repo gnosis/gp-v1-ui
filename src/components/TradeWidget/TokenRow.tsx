@@ -27,17 +27,44 @@ const Wrapper = styled.div`
     > div > strong {
       margin: 0 auto 0 0;
       text-transform: capitalize;
+      color: #2F3E4E;
     }
     
     > div > span {
       display: flex;
       flex-flow: row nowrap;
+      font-size: 1.3rem;
+      color: #218DFF;
+      letter-spacing: -0.03rem;
+      text-align: right;
+    }
+    
+    > div > span > button {
+      background: 0;
+      font-weight: var(--font-weight-normal);
+      color: var(--color-text-active);
+      font-size: inherit;
+      margin: 0;
+      padding: 0;
+      text-decoration: underline;
+      
+        &::after {
+          content: "-";
+          margin: 0 .5rem;
+          display: inline-block;
+          color: #9FB4C9;
+          text-decoration: none;
+        }
     }
     
     > div > span > span {
       display: flex;
       flex-flow: row nowrap;
+      align-items: center;
+      justify-items: center;
+      color: #9FB4C9;
     }
+  }
 `
 
 const InputBox = styled.div`
@@ -72,7 +99,7 @@ const InputBox = styled.div`
     }
 
     &.warning {
-      border-color: orange;
+      color: #FF5722;
     }
 
     &:disabled {
@@ -84,7 +111,15 @@ const InputBox = styled.div`
 const WalletDetail = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 0.75em;
+  align-items: center;
+  font-size: inherit;
+  margin: 0 0 0 .3rem;
+  color: #476481;
+  
+  > a {
+    color: #218DFF;
+    margin: 0 0 0 .3rem;
+  }
 
   .success {
     color: green;
@@ -93,15 +128,58 @@ const WalletDetail = styled.div`
 
   &.error,
   &.warning {
-    margin: 0 0 1em 0;
+    margin: 1rem 0;
+    line-height: 1.2;
+    font-size: 1.2rem;
+    display: block;
+      > strong {color: inherit;}
   }
 
   &.error {
     color: red;
   }
   &.warning {
-    color: orange;
+    color: #476481;
+    background: #fff0eb;
+    border-radius: 0 0 .3rem .3rem;
+    padding: .5rem;
+    box-sizing: border-box;
+    margin: .3rem 0 1rem;
   }
+`
+
+const TokenBoxWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+`
+
+const TokenEnable = styled.div`
+  height: 3.8rem;
+  margin: auto -3.2rem auto 0;
+  font-size: 1.4rem;
+  color: #218DFF;
+  letter-spacing: -0.05rem;
+  text-align: center;
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  padding: 0 4.2rem 0 1.6rem;
+  box-sizing: border-box;
+  background: #DEEEFF;
+  border: .1rem solid #218DFF;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: background .2s ease-in-out, color .2s ease-in-out;
+  
+    &:hover {
+      background: #218DFF;
+      color: #FFFFFF;
+    }
 `
 
 function displayBalance<K extends keyof TokenBalanceDetails>(
@@ -169,7 +247,7 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <WalletDetail className="warning">
-        Selling {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol} over your current balance
+          <b>INFO</b>: Sell amount exceeding your balance by <strong>{formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}</strong>. This creates a standing order. <a href="#">Read more</a>.
       </WalletDetail>
     )
   )
@@ -249,22 +327,26 @@ const TokenRow: React.FC<Props> = ({
           onBlur={removeExcessZeros}
           tabIndex={tabIndex + 2}
         />
-        {errorOrWarning}
         {/* <WalletDetail>
           <div>
             <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
           </div>
         </WalletDetail> */}
         {/* <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} /> */}
-        <TokenSelector
-          label={selectLabel}
-          isDisabled={isDisabled}
-          tokens={tokens}
-          selected={selectedToken}
-          onChange={onSelectChange}
-          tabIndex={tabIndex}
-        />
+        {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
+        <TokenBoxWrapper>
+          <TokenEnable>Enable</TokenEnable>
+          <TokenSelector
+            label={selectLabel}
+            isDisabled={isDisabled}
+            tokens={tokens}
+            selected={selectedToken}
+            onChange={onSelectChange}
+            tabIndex={tabIndex}
+          />
+        </TokenBoxWrapper>
       </InputBox>
+      {errorOrWarning}
     </Wrapper>
   )
 }

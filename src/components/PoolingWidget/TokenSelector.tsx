@@ -1,5 +1,6 @@
 import React from 'react'
 
+import styled from 'styled-components'
 import TokenImg from 'components/TokenImg'
 import { ProgressStepText } from './PoolingWidget.styled'
 import { TokenSelectorWrapper, TokenBox, CheckboxWrapper } from './TokenSelector.styled'

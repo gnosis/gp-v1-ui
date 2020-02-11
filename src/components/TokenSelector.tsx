@@ -16,11 +16,6 @@ const Wrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;
-  position: absolute;
-  right: 1rem;
-  top: 0;
-  bottom: 0;
-  margin: auto;
 
   label {
     text-transform: uppercase;
@@ -96,9 +91,9 @@ const customSelectStyles = {
     borderColor: '#B8C7D7',
     borderStyle: 'solid',
     borderWidth: '.1rem',
-    background: 'transparent',
     margin: 'auto 0',
     borderRadius: '15rem',
+    background: '#e6ecf3',
     cursor: 'pointer',
     '&:hover': {
       opacity: '1',
@@ -123,7 +118,7 @@ const customSelectStyles = {
     zIndex: '20',
     width: '42rem',
     height: '30rem',
-    boxShadow: '0 100vh 0 100vw rgba(0,0,0,.3)'
+    boxShadow: '0 100vh 0 100vw rgba(47, 62, 78, 0.50)'
   }),
   input: (provided: CSSProperties): CSSProperties => ({
     ...provided,

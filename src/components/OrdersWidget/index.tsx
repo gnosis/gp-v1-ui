@@ -110,7 +110,7 @@ const OrdersWidget: React.FC = () => {
   return (
     <OrdersWrapper>
       <div>
-        <h2>Your orders</h2>
+        {/* <h2>Your orders</h2> */}
         <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
           {noOrders && (
             <p className="noOrdersInfo">
@@ -172,10 +172,10 @@ const OrdersWidget: React.FC = () => {
                         />
                         <span>All</span>
                       </th>
-                      <th>Order details</th>
-                      <th>Unfilled amount</th>
-                      <th>Account balance</th>
+                      <th>Limit price</th>
+                      <th>Filled / Total</th>
                       <th>Expires</th>
+                      <th>Status</th>
                     </tr>
                   </thead>
                   <tbody>

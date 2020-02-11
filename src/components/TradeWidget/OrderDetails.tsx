@@ -19,7 +19,6 @@ const Wrapper = styled.dl`
     margin: 0 0 0.25em 4em;
   }
 `
-
 interface Props {
   sellAmount: string
   sellTokenName: string
@@ -57,10 +56,10 @@ const OrderDetails: React.FC<Props> = ({
         Your order might be partially filled.
       </dt>
 
-      <dd>Fee:</dd>
+      {/* <dd>Fee:</dd>
       <dt>
         <Highlight>{FEE_PERCENTAGE}%</Highlight>, included already in your limit price.
-      </dt>
+      </dt> */}
 
       <dd>Expiration date:</dd>
       <dt>

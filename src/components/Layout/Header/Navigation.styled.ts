@@ -9,7 +9,8 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   align-items: center;
   justify-content: center;
 
-  a:link {
+  a:link,
+  a:visited {
     border: 0.125rem solid transparent;
     color: var(--color-text-secondary);
     font-weight: bolder;
@@ -17,11 +18,16 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     transition: color .2s ease-in-out, background .2s ease-in-out;
     font-weight: var(--font-weight-medium);
     font-size: 2.3rem;
-    padding: 2.1rem 4rem;
+    padding: 0 4rem;
     border-radius: 15rem;
     letter-spacing: 0;
     text-align: center;
     box-sizing: border-box;
+    height: 5.4rem;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     
     &:hover {
       color: var(--color-text-active);
