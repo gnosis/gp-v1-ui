@@ -279,16 +279,17 @@ const OrderRow: React.FC<Props> = props => {
     sellToken &&
     buyToken && (
       <OrderRowWrapper $color={pending ? 'grey' : 'inherit'} $open={openCard}>
-        {pending ? (
-          <PendingLink transactionHash={transactionHash} />
-        ) : (
-          <DeleteOrder
-            isMarkedForDeletion={isMarkedForDeletion}
-            toggleMarkedForDeletion={toggleMarkedForDeletion}
-            pending={pending}
-            disabled={disabled}
-          />
-        )}
+        {!isPendingOrder &&
+          (pending ? (
+            <PendingLink transactionHash={transactionHash} />
+          ) : (
+            <DeleteOrder
+              isMarkedForDeletion={isMarkedForDeletion}
+              toggleMarkedForDeletion={toggleMarkedForDeletion}
+              pending={pending}
+              disabled={disabled}
+            />
+          ))}
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         {!isPendingOrder ? (
