@@ -153,26 +153,18 @@ const OrdersWidget: React.FC = () => {
               </div>
             )}
           </div>
-
+          {/* PENDING ORDERS */}
           {pendingShownOrdersCount ? (
             <div>
+              <h3>Pending Orders</h3>
               <div className="ordersContainer">
                 <CardTable
-                  $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
+                  $columns="minmax(13.625rem, 1.3fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
                   $cellSeparation="0.2rem"
                   $rowSeparation="0.6rem"
                 >
                   <thead>
                     <tr>
-                      <th className="checked">
-                        <input
-                          type="checkbox"
-                          onChange={toggleSelectAll}
-                          checked={orders.length === markedForDeletion.size}
-                          disabled={deleting}
-                        />
-                        <span>All</span>
-                      </th>
                       <th>Order details</th>
                       <th>Unfilled amount</th>
                       <th>Account balance</th>
@@ -199,6 +191,7 @@ const OrdersWidget: React.FC = () => {
 
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
+              {pendingShownOrdersCount ? <h3>Current Orders</h3> : null}
               <div className="ordersContainer">
                 <CardTable
                   $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
