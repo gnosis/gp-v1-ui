@@ -74,44 +74,40 @@ export const usePlaceOrder = (): Result => {
           exchangeApi.getCurrentBatchId(networkId),
         ])
 
-        if (sellTokenId !== 0 || buyTokenId !== 0) {
-          log('sellTokenId, buyTokenId, batchId', sellTokenId, buyTokenId, batchId, sellToken.address, buyToken.address)
+        if (sellTokenId === buyTokenId) {
+          toast.error('Cannot place order. Tokens are the same')
+          return { success: false }
+        }
 
-          const params: ExchangeApiPlaceOrderParams = {
-            userAddress,
-            buyTokenId,
-            sellTokenId,
-            validUntil: validUntil || batchId + DEFAULT_ORDER_DURATION,
-            buyAmount,
-            sellAmount,
-            networkId,
-            txOptionalParams: txOptionalParams || defaultTxOptionalParams,
-          }
-          const receipt = await exchangeApi.placeOrder(params)
-          log(`The transaction has been mined: ${receipt.transactionHash}`)
+        log('sellTokenId, buyTokenId, batchId', sellTokenId, buyTokenId, batchId, sellToken.address, buyToken.address)
 
-          // TODO: show link to orders page?
-          toast.success(`Placed order valid for 30min`)
+        const params: ExchangeApiPlaceOrderParams = {
+          userAddress,
+          buyTokenId,
+          sellTokenId,
+          validUntil: validUntil || batchId + DEFAULT_ORDER_DURATION,
+          buyAmount,
+          sellAmount,
+          networkId,
+          txOptionalParams: txOptionalParams || defaultTxOptionalParams,
+        }
+        const receipt = await exchangeApi.placeOrder(params)
+        log(`The transaction has been mined: ${receipt.transactionHash}`)
 
-          return { success: true, receipt }
-        } else {
-          // TODO: Handle better this case
-          // TODO: Review in the contracts, cause it looks like fee token is 0, what is also used for unregistered tokens
-          // The addresses of the tokens are unknown
+        // TODO: show link to orders page?
+        toast.success(`Placed order valid for 30min`)
+
+        return { success: true, receipt }
+      } catch (e) {
+        log(`Error placing order`, e)
+
+        if (e.message.match(/Must have Address to get ID/)) {
           toast.error(
             `Error placing order: One of the selected tokens is not registered in the exchange. You should register them first`,
           )
-          console.error('At least one of the tokens has not been registered: %o', {
-            sellToken,
-            sellTokenId,
-            buyToken,
-            buyTokenId,
-          })
-          return { success: false }
+        } else {
+          toast.error(`Error placing order: ${e.message}`)
         }
-      } catch (e) {
-        log(`Error placing order`, e)
-        toast.error(`Error placing order: ${e.message}`)
 
         return { success: false }
       } finally {
