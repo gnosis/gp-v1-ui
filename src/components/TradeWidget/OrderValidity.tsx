@@ -82,7 +82,7 @@ const WalletDetail = styled.div`
 const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
 
 function validatePositive(value: string): true | string {
-  return Number(value) >= 0 || 'Invalid expiration time'
+  return Number(value) == 0 || Number(value) >= 5 || 'Invalid expiration time'
 }
 
 interface Props {

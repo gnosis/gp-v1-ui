@@ -16,7 +16,7 @@ function sanitizeInput(value?: string | null, defaultValue = '0'): string {
  * @param value Input from URL
  */
 function sanitizeNegativeInput(value?: string | null, defaultValue = '0'): string | null | undefined {
-  return (Number(value) === 0 && Number(value) >= 5) ?? value ? value : defaultValue
+  return (Number(value) === 0 || Number(value) >= 5) ?? value ? value : defaultValue
 }
 
 export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string | null } {
