@@ -7,13 +7,13 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
   justify-content: center;
   margin: 1rem;
   padding: 0.375rem 0.8125rem;
-
-  background: var(--color-background-pageWrapper);
+  /* background: var(--color-background-pageWrapper);
   border-radius: ${({ $walletOpen }): string =>
     $walletOpen ? 'var(--border-radius) var(--border-radius) 0 0' : 'var(--border-radius)'};
-  box-shadow: var(--box-shadow);
+  box-shadow: var(--box-shadow); */
   line-height: 1;
   text-align: center;
+  width: 15rem;
 `
 
 export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string }>`
@@ -23,8 +23,8 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
   align-items: center;
   justify-content: center;
   margin: auto;
-  padding: ${({ $padding = '1rem 0.2rem' }): string => $padding};
-  width: 92%;
+  /* padding: ${({ $padding = '1rem 0.2rem' }): string => $padding}; */
+  /* width: 92%; */
 
   white-space: ${({ $wordWrap = 'initial' }): string => $wordWrap};
 

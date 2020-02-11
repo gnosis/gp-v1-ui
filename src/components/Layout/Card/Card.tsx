@@ -107,6 +107,17 @@ export const CardTable = styled.table<{
   display: grid;
   grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
+  
+  > thead {
+    position: sticky;
+    top: 0;
+    background: #EDF2F7;
+    z-index: 5;
+    font-size: 1.1rem;
+    color: #2F3E4E;
+    letter-spacing: 0;
+    font-weight: var(--font-weight-medium);
+  }
 
   > thead, tbody {
     > tr:not(${CardRowDrawer}) {
@@ -119,8 +130,8 @@ export const CardTable = styled.table<{
       ${({ $gap }): string => ($gap ? `grid-gap: ${$gap};` : '')}
       align-items: ${({ $align = 'center' }): string => $align};
       justify-content: ${({ $justify = 'center' }): string => $justify};
-
-      border-radius: var(--border-radius);
+      border-bottom: .1rem solid rgba(159,180,201,0.50);
+      border-radius: 0;
 
       // How much separation between ROWS
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
@@ -144,6 +155,15 @@ export const CardTable = styled.table<{
         margin: ${({ $cellSeparation = '0 0.5rem' }): string => $cellSeparation};
       }
     }
+    
+    > tr > td[data-label="Price"] {
+      text-align: left;
+      margin: 0 auto 0 0;
+    }
+    
+    > tr > td[data-label="Unfilled Amount"] {
+      text-align: right;
+    }
 
     > ${CardRowDrawer} {
       > td {
@@ -160,23 +180,37 @@ export const CardTable = styled.table<{
       box-shadow: none;
 
       > th {
-        color: var(--color-text-deposit-primary);
-        line-height: 1.5;
-        font-size: 0.8em;
+        color: inherit;
+        line-height: 1;
+        font-size: 1rem;
         text-transform: uppercase;
         overflow-wrap: break-word;
-        padding: 0.5em;
-        font-weight: bolder;
+        text-align: left;
+        padding: 1.3rem 0;
+      }
+      
+      > th.filled {
+        text-align: right;
+        white-space: nowrap;
       }
     }
   }
 
   // Table Body
   tbody {
+    font-size: 1.1rem;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-regular);
+    color: #476481;
+    letter-spacing: -0.08rem;
+    line-height: 1.2;
+  }
+  
+  tbody {
     > tr:not(${CardRowDrawer}) {
-      background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor};
-      border: 0.125rem solid transparent;
-      box-shadow: var(--box-shadow);
+      // background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor};
+      // border: 0.125rem solid transparent;
+      // box-shadow: var(--box-shadow);
 
       > td {
         &.cardOpener {
@@ -185,10 +219,10 @@ export const CardTable = styled.table<{
       }
 
       // Don't highlight on hover selected rows or the drawer
-      &:not(.selected):not(.highlight):not(${CardRowDrawer}):hover {
-        background: var(--color-background-selected);
-        border: 0.125rem solid var(--color-border);
-      }
+      // &:not(.selected):not(.highlight):not(${CardRowDrawer}):hover {
+      //   background: var(--color-background-selected);
+      //   border: 0.125rem solid var(--color-border);
+      // }
     }
   }
 

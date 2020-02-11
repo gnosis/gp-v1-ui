@@ -132,9 +132,9 @@ const OrdersWidget: React.FC = () => {
         <OrdersForm>
           <div className="infoContainer">
             <div className="countContainer">
-              <div className="total">
+              {/* <div className="total">
                 You have <Highlight>{allOrders.length}</Highlight> standing orders:
-              </div>
+              </div> */}
               <ShowOrdersButton
                 type="active"
                 isActive={showActive}
@@ -150,20 +150,28 @@ const OrdersWidget: React.FC = () => {
                 onClick={toggleShowActive}
               />
             </div>
-            {overBalanceOrders.size > 0 && showActive && (
+            {/* {overBalanceOrders.size > 0 && showActive && (
               <div className="warning">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 <strong> Low balance</strong>
               </div>
-            )}
+            )} */}
+            <div className="deleteContainer">
+              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
+                <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
+                </ButtonWithIcon>
+              {/* <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                  Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
+                </span> */}
+            </div>
           </div>
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">
                 <CardTable
-                  $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
-                  $cellSeparation="0.2rem"
-                  $rowSeparation="0.6rem"
+                  $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
+                  $cellSeparation="0 .5rem 0 0;"
+                  $rowSeparation="0"
                 >
                   <thead>
                     <tr>
@@ -176,7 +184,7 @@ const OrdersWidget: React.FC = () => {
                         />
                       </th>
                       <th>Limit price</th>
-                      <th>Filled / Total</th>
+                      <th className="filled">Filled / Total</th>
                       <th>Expires</th>
                       <th>Status</th>
                     </tr>
@@ -196,15 +204,6 @@ const OrdersWidget: React.FC = () => {
                     ))}
                   </tbody>
                 </CardTable>
-              </div>
-
-              <div className="deleteContainer">
-                <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
-                  <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
-                </ButtonWithIcon>
-                <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
-                  Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
-                </span>
               </div>
             </form>
           ) : (

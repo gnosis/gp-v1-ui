@@ -30,6 +30,7 @@ import { ZERO } from 'const'
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
+  max-height: 54rem;
 `
 
 const WrappedForm = styled.form`
@@ -191,7 +192,8 @@ const OrdersPanel = styled.div`
       height: 100%;
       box-sizing: border-box;
       display: flex;
-      flex-flow: column wrap;
+      flex-flow: row wrap;
+      overflow-y: auto;
       border-radius: 0 .6rem .6rem 0;
     }
   

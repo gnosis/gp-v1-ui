@@ -106,10 +106,10 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
   }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
 
   return (
-    <td data-label="Price (at least)">
+    <td data-label="Price">
       <div className="order-details">
-        <Highlight color={pending ? 'grey' : ''}>{price}</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}/{displayTokenSymbolOrLink(buyToken)}</strong>
-        <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}<strong>{displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}</strong>
+        {/* <Highlight color={pending ? 'grey' : ''}></Highlight> */}
+        {price} {displayTokenSymbolOrLink(sellToken)}{'/'}{displayTokenSymbolOrLink(buyToken)}<br />{price} {displayTokenSymbolOrLink(buyToken)}{'/'}{displayTokenSymbolOrLink(sellToken)}
       </div>
     </td>
   )
@@ -129,7 +129,8 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   return (
     <td data-label="Unfilled Amount" className={isUnlimited ? '' : 'sub-columns two-columns'}>
       {isUnlimited ? (
-        <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+        // <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+        <span>no limit</span>
       ) : (
         <>
           <div>{unfilledAmount}</div>
@@ -178,9 +179,11 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
   return (
     <td data-label="Expires">
       {isNeverExpires ? (
-        <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
+        // <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
+        <span>Never</span>
       ) : (
-        <Highlight color={'inherit'}>{expiresOn}</Highlight>
+        // <Highlight color={'inherit'}>{expiresOn}</Highlight>
+        <span>{expiresOn}</span>
       )}
     </td>
   )
@@ -275,7 +278,7 @@ const OrderRow: React.FC<Props> = props => {
         <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
         <Expires order={order} pending={pending} />
         {/* <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} /> */}
-        <td>Partial Fill</td>
+        <td>Partial Fill <i>low balance</i></td>
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import styled from 'styled-components'
 
 import UserWallet from 'components/UserWallet'
 import { NavigationLinks } from './Navigation'
@@ -19,6 +20,20 @@ export interface HeaderProps {
   }[]
 }
 
+const TopWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  margin: 0 auto;
+  justify-content: center;
+  align-items: center;
+`
+
+const BatchCountDown = styled.div`
+  display: flex;
+  order: 2;
+`
+
 const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps) => {
   const { isResponsive, openNav, setOpenNav } = useOpenCloseNav()
   const navigationArray = useNavigation(initialState, isResponsive)
@@ -32,8 +47,12 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
         {/* <NavLink className="logo" to="/order">
           {APP_NAME}
         </NavLink> */}
-        {/* USER WALLET */}
-        <UserWallet />
+        <TopWrapper>
+          {/* USER WALLET */}
+          <UserWallet />
+          {/* Global Batch Countdown */}
+          <BatchCountDown>Next batch in: <strong>4m 12s</strong></BatchCountDown>
+        </TopWrapper>
         {/* HEADER LINKS */}
         <NavigationLinks
           navigation={navigationArray}

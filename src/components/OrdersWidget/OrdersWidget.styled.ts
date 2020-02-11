@@ -75,8 +75,7 @@ export const OrdersForm = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
-
-    margin: 1em 0;
+    margin: 1rem 0;
 
     @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
       grid-template-columns: 2fr 1fr;
