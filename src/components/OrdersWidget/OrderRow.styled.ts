@@ -75,7 +75,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
     // All TR row items
     > td {
       // Cancel Order Row - shown as button in responsive
-      &:first-child {
+      &:first-child:not(.order-image-row) {
         grid-row-start: 6;
 
         > img {
@@ -87,6 +87,10 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
       // First row - TokenA <-> TokenB - visible in Responsive
       &.order-image-row {
         display: initial;
+
+        &::before {
+          content: none !important;
+        }
 
         > div {
           display: flex;

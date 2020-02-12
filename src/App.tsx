@@ -94,7 +94,7 @@ export default hot(
   withGlobalContext(
     App,
     // Initial State
-    () => INITIAL_STATE,
+    INITIAL_STATE,
     rootReducer,
   ),
 )
