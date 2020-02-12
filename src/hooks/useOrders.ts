@@ -69,7 +69,8 @@ export function useOrders(): Result {
           if (offset === 0) {
             // fresh start/refresh: replace whatever is stored
             setOrders(filteredOrders)
-          } else {
+            // only if we have something to add
+          } else if (filterDeletedOrders.length > 0) {
             // incremental update: append
             setOrders(oldOrders => oldOrders.concat(filteredOrders))
           }
