@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useRef } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
@@ -121,10 +121,17 @@ export function useOrders(): Result {
     setIsLoading(true)
   }, [dispatch, setIsLoading])
 
+  const runEffect = useRef(false)
+
   useEffect(() => {
+    if (!runEffect.current) return
     forceOrdersRefresh()
     dispatch(overwriteOrders({ orders: [] }))
   }, [userAddress, networkId, forceOrdersRefresh, dispatch])
+
+  useEffect(() => {
+    runEffect.current = true
+  }, [])
 
   return { orders, isLoading, forceOrdersRefresh }
 }
