@@ -12,26 +12,28 @@ export interface OrdersState {
   offset: number
 }
 
-export const overwriteOrders = (payload: Pick<OrdersState, 'orders'>) => ({
+type UpdateOrdersActionType = Actions<ActionTypes, Pick<OrdersState, 'orders'>>
+type UpdateOffsetActionType = Actions<ActionTypes, Pick<OrdersState, 'offset'>>
+type ReducerActionType = Actions<ActionTypes, OrdersState>
+
+export const overwriteOrders = (payload: Pick<OrdersState, 'orders'>): UpdateOrdersActionType => ({
   type: ActionTypes.OVERWRITE_ORDERS,
   payload,
 })
 
-export const appendOrders = (payload: Pick<OrdersState, 'orders'>) => ({
+export const appendOrders = (payload: Pick<OrdersState, 'orders'>): UpdateOrdersActionType => ({
   type: ActionTypes.APPEND_ORDERS,
   payload,
 })
 
-export const updateOffset = (payload: Pick<OrdersState, 'offset'>) => ({
+export const updateOffset = (payload: Pick<OrdersState, 'offset'>): UpdateOffsetActionType => ({
   type: ActionTypes.UPDATE_OFFSET,
   payload,
 })
 
-type OrdersActionType = Actions<ActionTypes, OrdersState>
-
 export const INITIAL_ORDERS_STATE = { orders: [], offset: 0 }
 
-export const reducer = (state: OrdersState, action: OrdersActionType): OrdersState => {
+export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
     case ActionTypes.UPDATE_OFFSET:
     case ActionTypes.OVERWRITE_ORDERS: {
@@ -42,7 +44,8 @@ export const reducer = (state: OrdersState, action: OrdersActionType): OrdersSta
       const {
         payload: { orders },
       } = action
-      return { ...state, orders: state.orders.concat(orders) }
+      const { orders: currentOrders } = state
+      return { ...state, orders: currentOrders.concat(orders) }
     }
     default:
       return state
