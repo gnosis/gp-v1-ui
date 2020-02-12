@@ -20,20 +20,17 @@ function sanitizeNegativeInput(value?: string | null, defaultValue = '0'): strin
 }
 
 export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string } {
-  const query = new URLSearchParams(useLocation().search)
+  const { search } = useLocation()
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sellAmount = useMemo(() => sanitizeInput(query.get('sell')), [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const buyAmount = useMemo(() => sanitizeInput(query.get('buy')), [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const validUntil = useMemo(() => sanitizeNegativeInput(query.get('expires'), '30'), [])
+  return useMemo(() => {
+    const query = new URLSearchParams(search)
 
-  return {
-    sellAmount,
-    buyAmount,
-    validUntil,
-  }
+    return {
+      sellAmount: sanitizeInput(query.get('sell')),
+      buyAmount: sanitizeInput(query.get('buy')),
+      validUntil: sanitizeNegativeInput(query.get('expires'), '30'),
+    }
+  }, [search])
 }
 
 /**
