@@ -151,18 +151,31 @@ export const CardTable = styled.table<{
       }
 
       // Separation between CELLS
-      > * {
-        margin: ${({ $cellSeparation = '0 0.5rem' }): string => $cellSeparation};
+      > th,
+      > td {
+        margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
+        overflow: hidden;
+      }
+      > th.checked {
+        margin: 0;
       }
     }
     
     > tr > td[data-label="Price"] {
       text-align: left;
-      margin: 0 auto 0 0;
+      // margin: 0 auto 0 0;
+    }
+    
+    > tr > td[data-label="Expires"] {
+      text-align: left;
     }
     
     > tr > td[data-label="Unfilled Amount"] {
       text-align: right;
+    }
+    
+    .status {
+      text-align: left;
     }
 
     > ${CardRowDrawer} {
@@ -174,6 +187,7 @@ export const CardTable = styled.table<{
   
   .lowBalance {
     color: #B27800;
+    display: block;
     > img {margin: 0 0 0 .25rem;}
   }
   
@@ -278,9 +292,9 @@ export const CardTable = styled.table<{
     }
     
     // Hide Table Header on smaller sizes
-    > thead {
-      display: none;
-    }
+    // > thead {
+    //   display: none;
+    // }
 
     // Top level custom css
     ${({ $responsiveCSS }): string | undefined => $responsiveCSS}

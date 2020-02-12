@@ -10,6 +10,8 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   }
 
   .checked {
+    margin: auto;
+    > input {margin: auto;}
     > button {
       display: none;
       justify-content: center;
@@ -129,6 +131,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
           display: initial;
         }
         > input {
+          margin: auto;
           display: none;
         }
       }

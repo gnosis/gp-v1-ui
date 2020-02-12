@@ -207,8 +207,8 @@ const OrdersWidget: React.FC = () => {
               <div className="ordersContainer">
                 <CardTable
                 // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
-                  $columns="3rem minmax(auto, 2fr) minmax(auto, 2fr) 1fr 10rem"
-                $cellSeparation="0 1rem;"
+                $columns="minmax(2rem,.4fr)  minmax(11rem,1fr)  minmax(11rem,1.3fr)  minmax(5rem,.9fr)  minmax(auto,1.4fr)"
+                // $cellSeparation="0 .5rem;"
                 $rowSeparation="0"
               >
                   <thead>
@@ -224,7 +224,7 @@ const OrdersWidget: React.FC = () => {
                       <th>Limit price</th>
                       <th className="filled">Filled / Total</th>
                       <th>Expires</th>
-                      <th>Status</th>
+                      <th className="status">Status</th>
                     </tr>
                   </thead>
                   <tbody>

@@ -7,6 +7,7 @@ import { TokenSelectorWrapper, TokenBox, CheckboxWrapper } from './TokenSelector
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
+import checkIcon from 'assets/img/li-check.svg'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
@@ -28,12 +29,13 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, select
             $selected={selectedTokensMap.has(id)}
           >
             <CheckboxWrapper>
-              <FontAwesomeIcon icon={faCheckCircle} color="green" />
+              {/* <FontAwesomeIcon icon={faCheckCircle} color="green" /> */}
+              <img src={checkIcon} width="20" height="20"/>
             </CheckboxWrapper>
             <TokenImg alt={name} src={image} />
             <div>
               <ProgressStepText $bold="bold">{symbol}</ProgressStepText>
-              <ProgressStepText $bold="bold">{name}</ProgressStepText>
+              <ProgressStepText><i>{name}</i></ProgressStepText>
             </div>
           </TokenBox>
         )

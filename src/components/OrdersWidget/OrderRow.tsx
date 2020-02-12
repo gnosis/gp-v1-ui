@@ -292,7 +292,7 @@ const OrderRow: React.FC<Props> = props => {
           <PendingLink />
         )} */}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
-        <td>Partial Fill <span className="lowBalance">low balance<img src={lowBalanceIcon} /></span></td>
+        <td className="status">Partial Fill <span className="lowBalance">low balance<img src={lowBalanceIcon} /></span></td>
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

@@ -3,6 +3,8 @@ import React, { useCallback, useMemo } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 import { toast } from 'react-toastify'
 
+import styled from 'styled-components'
+
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
 import {
@@ -18,6 +20,7 @@ import {
 
 import { faCheckCircle, faSpinner, faPaperPlane, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import checkIcon from 'assets/img/li-check.svg'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -74,27 +77,23 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
   )
 }
 
-const StepDescription: React.FC = () => (
+const StepDescription: React.FC = ({ step }) => (
   <StepDescriptionWrapper>
+    <StepTitle step={step} />
+    <strong>Select at least 2 trusted stablecoins:</strong>
     <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
     <ul>
-      <li>
-        <FontAwesomeIcon icon={faCheckCircle} />
-        No maintenance needed
-      </li>
-      <li>
-        <FontAwesomeIcon icon={faCheckCircle} />
-        No gas costs for trades
-      </li>
-      <li>
-        <FontAwesomeIcon icon={faCheckCircle} />
-        Cancellation possible at any time
-      </li>
+      <li><img src={checkIcon}/>No maintenance needed</li>
+      <li><img src={checkIcon} />No gas costs for trades</li>
+      <li><img src={checkIcon} />Cancellation possible at any time</li>
     </ul>
-    {/*
-    TODO: add URL 
-    <a href="#">Learn more about liquidity provision</a>
-    */}
+    <p>
+      <a href="#" rel="noopener">Learn more about liquidity provision.</a>
+    </p>
+    <p>
+      <b>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1.</b>
+    </p>
+    
   </StepDescriptionWrapper>
 )
 
@@ -174,6 +173,12 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
 
   return orders
 }
+
+const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  flex-flow: row wrap;
+`
 
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
@@ -295,15 +300,15 @@ const PoolingInterface: React.FC = () => {
 
   return (
     <Widget>
-      <PoolingInterfaceWrapper $width="75vw">
-        <h2>New Liquidity</h2>
+      <PoolingInterfaceWrapper $width="100%">
+        <h2>New Liquidity Order</h2>
         <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
-        <StepDescription />
-        <StepTitle step={step} />
-
-        {/* Main Components here */}
-        <SubComponents step={step} {...restProps} />
-
+        
+        <ContentWrapper>
+          <StepDescription step={step} />
+          {/* Main Components here */}
+          <SubComponents step={step} {...restProps} />
+        </ContentWrapper>
         <StepButtonsWrapper>
           {/* REMOVE BACK BUTTON ON TXRECEIPT */}
           {!txReceipt && (

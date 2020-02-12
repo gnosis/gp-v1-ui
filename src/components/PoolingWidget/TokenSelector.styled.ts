@@ -6,6 +6,16 @@ export const TokenSelectorWrapper = styled.div`
   grid-gap: 1rem;
   justify-self: center;
   width: 80%; */
+  width: 50%;
+  width: calc(50% - 1.5rem);
+  padding: 0 0 5rem 0;
+  box-sizing: border-box;
+  height: 38rem;
+  overflow-y: auto;
+  border: .1rem solid #DFE6EF;
+  border-radius: .6rem;
+  margin: 0 0 4rem auto;
+  background: #FFFFFF;
 `
 
 export const CheckboxWrapper = styled.div`
@@ -22,17 +32,25 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  justify-content: center;
-  background: var(--color-background-pageWrapper);
-  box-shadow: ${({ $selected }): string => ($selected ? '0 0 0 0.175rem green' : 'var(--box-shadow)')};
-  border: ${({ $selected }): string =>
-    `0.05rem solid ${$selected ? 'transparent' : 'var(--color-background-selected-dark)'}`};
-  border-radius: var(--border-radius);
+  justify-content: flex-start;
+  background: ${({ $selected }): string => `${$selected ? 'rgba(33,141,255,0.10);' : '#ffffff;'}`};
   cursor: pointer;
-  min-height: 6rem;
+  min-height: 5.6rem;
+  font-weight: var(--font-weight-normal);
+  font-size: 1.4rem;
+  color: #2F3E4E;
+  letter-spacing: 0;
+  line-height: 1;
+  border-bottom: .2rem solid white;
+  /* background: var(--color-background-pageWrapper); */
+  /* box-shadow: ${({ $selected }): string => ($selected ? '0 0 0 0.175rem green' : 'var(--box-shadow)')}; */
+  /* border: ${({ $selected }): string =>
+    `0.05rem solid ${$selected ? 'transparent' : 'var(--color-background-selected-dark)'}`}; */
+  /* border-radius: var(--border-radius); */
 
   &:hover {
-    background: var(--color-background);
+    /* background: var(--color-background); */
+    background: rgba(33,141,255,0.10);
   }
 
   > * {
@@ -41,14 +59,19 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
 
   > img {
     height: auto;
-    width: 2.3rem;
+    width: 3.6rem;
+    height: 3.6rem;
+    object-fit: contain;
   }
 
   > ${CheckboxWrapper} {
-    margin: 0.2rem 0.4rem;
+    margin: auto 1.6rem;;
     opacity: ${({ $selected }): string => ($selected ? '1' : '0')};
     transition: inherit;
+    height: 100%;
+    display: flex;
+    align-items: center;
   }
 
-  transition: all 0.2s ease-in;
+  transition: all 0.2s ease-in-out;
 `

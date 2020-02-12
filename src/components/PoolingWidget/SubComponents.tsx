@@ -30,10 +30,10 @@ const SubComponents: React.FC<SubComponentProps> = props => {
       return (
         <>
           <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
-          <GreySubText>
+          {/* <GreySubText>
             Please select at least two tokens to continue{' '}
             {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
-          </GreySubText>
+          </GreySubText> */}
         </>
       )
     case 2:
