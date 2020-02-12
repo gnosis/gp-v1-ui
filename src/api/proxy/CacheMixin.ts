@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import NodeCache from 'node-cache'
 
-import { log } from 'utils'
-
 interface CacheOptions<T> {
   method: keyof T
   ttl?: number
@@ -74,8 +72,6 @@ export class CacheMixin {
       return
     }
 
-    // TODO: remove when done testing
-    log(`cache hit for ${hash}`)
     return obj
   }
 
