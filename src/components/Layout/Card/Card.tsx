@@ -172,6 +172,11 @@ export const CardTable = styled.table<{
     }
   }
   
+  .lowBalance {
+    color: #B27800;
+    > img {margin: 0 0 0 .25rem;}
+  }
+  
   // Table Header
   > thead {
     // No styling for table header
@@ -191,7 +196,7 @@ export const CardTable = styled.table<{
       
       > th.filled {
         text-align: right;
-        white-space: nowrap;
+        // white-space: nowrap;
       }
     }
   }

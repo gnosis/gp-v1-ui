@@ -169,10 +169,11 @@ const OrdersWidget: React.FC = () => {
             <form action="submit" onSubmit={onSubmit}>
               <div className="ordersContainer">
                 <CardTable
-                  $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
-                  $cellSeparation="0 .5rem 0 0;"
-                  $rowSeparation="0"
-                >
+                // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
+                  $columns="3rem minmax(auto, 2fr) minmax(auto, 2fr) 1fr 10rem"
+                $cellSeparation="0 1rem;"
+                $rowSeparation="0"
+              >
                   <thead>
                     <tr>
                       <th className="checked">

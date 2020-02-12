@@ -1,6 +1,8 @@
 import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import lowBalanceIcon from 'assets/img/lowBalance.svg'
+
 import {
   faExclamationTriangle,
   faSpinner,
@@ -278,7 +280,7 @@ const OrderRow: React.FC<Props> = props => {
         <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
         <Expires order={order} pending={pending} />
         {/* <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} /> */}
-        <td>Partial Fill <i>low balance</i></td>
+        <td>Partial Fill <span className="lowBalance">low balance<img src={lowBalanceIcon}/></span></td>
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

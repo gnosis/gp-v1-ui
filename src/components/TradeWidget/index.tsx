@@ -189,7 +189,7 @@ const OrdersPanel = styled.div`
     > div {
       width: 100%;
       width: calc(100% - 1.6rem);
-      height: 100%;
+      height: auto;
       box-sizing: border-box;
       display: flex;
       flex-flow: row wrap;
@@ -200,7 +200,7 @@ const OrdersPanel = styled.div`
     > div > h5 {
       width: 100%;
       margin: 0 auto;
-      padding: 1.6rem 0;
+      padding: 1.6rem 0 1rem;
       font-weight: var(--font-weight-medium);
       font-size: 1.6rem;
       color: #2F3E4E;
