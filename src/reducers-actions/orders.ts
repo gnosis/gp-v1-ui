@@ -12,17 +12,17 @@ export interface OrdersState {
   offset: number
 }
 
-export const overwriteOrders = (payload: Omit<OrdersState, 'offset'>) => ({
+export const overwriteOrders = (payload: Pick<OrdersState, 'orders'>) => ({
   type: ActionTypes.OVERWRITE_ORDERS,
   payload,
 })
 
-export const appendOrders = (payload: Omit<OrdersState, 'offset'>) => ({
+export const appendOrders = (payload: Pick<OrdersState, 'orders'>) => ({
   type: ActionTypes.APPEND_ORDERS,
   payload,
 })
 
-export const updateOffset = (payload: Omit<OrdersState, 'orders'>) => ({
+export const updateOffset = (payload: Pick<OrdersState, 'offset'>) => ({
   type: ActionTypes.UPDATE_OFFSET,
   payload,
 })
