@@ -76,10 +76,10 @@ export function useOrders(): Result {
         unstable_batchedUpdates(() => {
           if (offset === 0) {
             // fresh start/refresh: replace whatever is stored
-            dispatch(overwriteOrders({ orders: filteredOrders }))
+            dispatch(overwriteOrders(filteredOrders))
           } else if (filteredOrders.length > 0) {
             // incremental update: append
-            dispatch(appendOrders({ orders: filteredOrders }))
+            dispatch(appendOrders(filteredOrders))
           }
 
           if (!nextIndex) {
@@ -88,7 +88,7 @@ export function useOrders(): Result {
             setIsLoading(false)
           }
           // move offset forward, fetch new batch
-          dispatch(updateOffset({ offset: offset + orders.length }))
+          dispatch(updateOffset(offset + orders.length))
         })
       } catch (error) {
         console.error('Failed to fetch orders', error)
@@ -117,7 +117,7 @@ export function useOrders(): Result {
 
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {
-    dispatch(updateOffset({ offset: 0 }))
+    dispatch(updateOffset(0))
     setIsLoading(true)
   }, [dispatch, setIsLoading])
 
@@ -126,7 +126,7 @@ export function useOrders(): Result {
   useEffect(() => {
     if (!runEffect.current) return
     forceOrdersRefresh()
-    dispatch(overwriteOrders({ orders: [] }))
+    dispatch(overwriteOrders([]))
   }, [userAddress, networkId, forceOrdersRefresh, dispatch])
 
   useEffect(() => {

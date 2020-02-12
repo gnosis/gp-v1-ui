@@ -16,19 +16,19 @@ type UpdateOrdersActionType = Actions<ActionTypes, Pick<OrdersState, 'orders'>>
 type UpdateOffsetActionType = Actions<ActionTypes, Pick<OrdersState, 'offset'>>
 type ReducerActionType = Actions<ActionTypes, OrdersState>
 
-export const overwriteOrders = (payload: Pick<OrdersState, 'orders'>): UpdateOrdersActionType => ({
+export const overwriteOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
   type: ActionTypes.OVERWRITE_ORDERS,
-  payload,
+  payload: { orders },
 })
 
-export const appendOrders = (payload: Pick<OrdersState, 'orders'>): UpdateOrdersActionType => ({
+export const appendOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
   type: ActionTypes.APPEND_ORDERS,
-  payload,
+  payload: { orders },
 })
 
-export const updateOffset = (payload: Pick<OrdersState, 'offset'>): UpdateOffsetActionType => ({
+export const updateOffset = (offset: number): UpdateOffsetActionType => ({
   type: ActionTypes.UPDATE_OFFSET,
-  payload,
+  payload: { offset },
 })
 
 export const INITIAL_ORDERS_STATE = { orders: [], offset: 0 }
