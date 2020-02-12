@@ -117,18 +117,14 @@ export function useOrders(): Result {
 
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {
-    unstable_batchedUpdates(() => {
-      dispatch(updateOffset({ offset: 0 }))
-      setIsLoading(true)
-    })
-  }, [setIsLoading])
+    dispatch(updateOffset({ offset: 0 }))
+    setIsLoading(true)
+  }, [dispatch, setIsLoading])
 
   useEffect(() => {
-    unstable_batchedUpdates(() => {
-      forceOrdersRefresh()
-      dispatch(overwriteOrders({ orders: [] }))
-    })
-  }, [userAddress, networkId, forceOrdersRefresh])
+    forceOrdersRefresh()
+    dispatch(overwriteOrders({ orders: [] }))
+  }, [userAddress, networkId, forceOrdersRefresh, dispatch])
 
   return { orders, isLoading, forceOrdersRefresh }
 }
