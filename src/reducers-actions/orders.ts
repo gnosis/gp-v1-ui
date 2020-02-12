@@ -37,7 +37,6 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
   switch (action.type) {
     case ActionTypes.UPDATE_OFFSET:
     case ActionTypes.OVERWRITE_ORDERS: {
-      console.log('Type', action.type, 'payload', action.payload)
       return { ...state, ...action.payload }
     }
     case ActionTypes.APPEND_ORDERS: {

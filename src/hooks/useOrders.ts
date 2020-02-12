@@ -49,8 +49,6 @@ export function useOrders(): Result {
   ] = useGlobalState()
   //  consider first state to be loading
   const [isLoading, setIsLoading] = useSafeState<boolean>(true)
-  // start fetching from 0
-  console.log('offset', offset, 'orders', orders.length)
 
   useEffect(() => {
     let cancelled = false
