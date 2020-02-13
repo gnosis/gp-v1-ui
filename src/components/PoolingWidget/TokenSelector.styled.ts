@@ -10,7 +10,7 @@ export const TokenSelectorWrapper = styled.div`
   width: calc(50% - 1.5rem);
   padding: 0 0 5rem 0;
   box-sizing: border-box;
-  height: 38rem;
+  height: 34rem;
   overflow-y: auto;
   border: .1rem solid #DFE6EF;
   border-radius: .6rem;
@@ -53,15 +53,12 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
     background: rgba(33,141,255,0.10);
   }
 
-  > * {
-    margin: 0 0.5rem;
-  }
-
   > img {
     height: auto;
     width: 3.6rem;
     height: 3.6rem;
     object-fit: contain;
+    margin: 0 1rem 0 1.6rem;
   }
 
   > ${CheckboxWrapper} {

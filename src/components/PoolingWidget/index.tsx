@@ -52,24 +52,8 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
       <BarWrapper>
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
-            <ProgressStep
-              $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
-            >
-              <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{index + 1}</ProgressStepText>
-            </ProgressStep>
-            {index + 1 < 3 && (
-              <StepSeparator
-                $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
-              />
-            )}
-          </React.Fragment>
-        ))}
-      </BarWrapper>
-      <BarWrapper $minHeight="auto">
-        {stepArray.map((stepName, index) => (
-          <React.Fragment key={stepName}>
-            <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{stepName}</ProgressStepText>
-            {index + 1 < 3 && <p />}
+            <ProgressStep data-title={stepName} className={stepChecker(step, index) ? 'active' : ''} $bgColor={stepChecker(step, index) ? '#218DFF;' : '#9FB4C9'}><ProgressStepText>{index + 1}</ProgressStepText></ProgressStep>
+            {index + 1 < 3 && (<StepSeparator />)}
           </React.Fragment>
         ))}
       </BarWrapper>
@@ -80,20 +64,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
 const StepDescription: React.FC = ({ step }) => (
   <StepDescriptionWrapper>
     <StepTitle step={step} />
-    <strong>Select at least 2 trusted stablecoins:</strong>
-    <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
-    <ul>
-      <li><img src={checkIcon}/>No maintenance needed</li>
-      <li><img src={checkIcon} />No gas costs for trades</li>
-      <li><img src={checkIcon} />Cancellation possible at any time</li>
-    </ul>
-    <p>
-      <a href="#" rel="noopener">Learn more about liquidity provision.</a>
-    </p>
-    <p>
-      <b>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1.</b>
-    </p>
-    
   </StepDescriptionWrapper>
 )
 
@@ -102,15 +72,22 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
     switch (step) {
       case 1:
         return {
-          title: '1. Select your trusted stablecoins',
-          subtext:
-            'Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1',
+          title: '1. Select at least two of your trusted stablecoins',
+          subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
+          <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
+          <ul>
+            <li><img src=${checkIcon} />No maintenance needed</li>
+            <li><img src=${checkIcon} />No gas costs for trades</li>
+            <li><img src=${checkIcon} />Cancellation possible at any time</li>
+          </ul>
+          <p>
+            <a href="#" rel="noopener">Learn more about liquidity provision.</a>
+          </p>`
         }
       case 2:
         return {
           title: '2. Define your spread',
-          subtext:
-            'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
+          subtext: 'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
         }
       case 3:
         return { title: '3. Create liquidity', subtext: '' }
@@ -124,7 +101,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
       <ProgressStepText as="h2" $bold="bolder">
         {title}
       </ProgressStepText>
-      {subtext && <GreySubText $justify="flex-start">{subtext}</GreySubText>}
+      {subtext && <div className="liqContent" dangerouslySetInnerHTML={{ __html: subtext }} />}
     </div>
   )
 }

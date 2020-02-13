@@ -22,77 +22,7 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
 
   return (
     <SpreadInformationWrapper>
-      <CardTable
-        $columns="1fr 1fr"
-        $cellSeparation="0 1rem"
-        // TODO: change CardTable so that header row margins
-        // is a props and doesn't need !important
-        $webCSS={`
-        font-size: larger;
-        thead > tr { margin: 0 !important; };
-        tbody > tr { 
-          min-height: 3.5rem;
-        } 
-      `}
-        $responsiveCSS={`
-        tbody > tr { 
-          > td:first-child {
-            font-weight: bolder;
-            margin: auto;
-            width: 90%;
-            &::before {
-              content: none;
-            }
-          }
-          > td {
-            padding: 0.7rem 0 !important;
-            margin: 0 0.6rem !important;
-          } 
-        }
-      `}
-      >
-        <thead>
-          <tr>
-            <th>Sell Spread</th>
-            <th>Buy Spread</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="responsive-cell">{tokenSymbolsString.join(' - ')}</td>
-
-            {/* SELL SPREAD */}
-            <td data-label="Sell (at least)">
-              <div className="responsive-cell">
-                <RedBoldText as="span" $bold="normal">
-                  ${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}
-                </RedBoldText>
-              </div>
-              <div className="web-cell">
-                {tokenSymbolsString.join(', ')} for <strong>at least</strong>{' '}
-                <RedBoldText as="span" $bold="normal">
-                  ${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}
-                </RedBoldText>
-              </div>
-            </td>
-
-            {/* BUY SPREAD */}
-            <td data-label="Buy (at most)">
-              <div className="responsive-cell">
-                <RedBoldText as="span" $bold="normal">
-                  ${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}
-                </RedBoldText>
-              </div>
-              <div className="web-cell">
-                {tokenSymbolsString.join(', ')} for <strong>at most</strong>{' '}
-                <RedBoldText as="span" $bold="normal">
-                  ${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}
-                </RedBoldText>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </CardTable>
+      Test
     </SpreadInformationWrapper>
   )
 }
@@ -106,6 +36,7 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, 
 
   return (
     <DefineSpreadWrapper>
+      <strong>Spread %</strong>
       <input type="number" step="0.1" value={spread} onChange={handleSpreadChange} />
       <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
     </DefineSpreadWrapper>
