@@ -93,6 +93,18 @@ module.exports = ({ stats = false } = {}) => ({
       template: './src/html/index.html',
       title: 'dex-react',
       ipfsHack: isProduction,
+      minify: isProduction && {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
     }),
     new PreloadWebpackPlugin({
       rel: 'prefetch',
