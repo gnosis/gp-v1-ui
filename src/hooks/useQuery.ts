@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
+import { multOfFive } from 'utils'
 
 /**
  * Prevents invalid numbers from being inserted by hand in the URL
@@ -16,7 +17,7 @@ function sanitizeInput(value?: string | null, defaultValue = '0'): string {
  * @param value Input from URL
  */
 function sanitizeNegativeInput(value?: string | null, defaultValue = '0'): string {
-  return (Number(value) === 0 || Number(value) >= 5) && value ? value : defaultValue
+  return (Number(value) === 0 || Number(value) >= 5) && value ? multOfFive(value).toString() : defaultValue
 }
 
 export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string } {

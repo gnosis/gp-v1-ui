@@ -173,3 +173,22 @@ export function formatPrice(
 
   return price ? price.toFixed(decimals) : null
 }
+
+export function multOfFive(value: number | string): number {
+  const cache = {}
+  const numValue = Number(value)
+  if (!(numValue % 5) || cache[numValue]) return numValue
+
+  const remainder = numValue % 5
+
+  let finalVal
+  if (remainder > 5 / 2) {
+    cache[numValue] = numValue
+    finalVal = numValue - remainder + 5
+  } else {
+    cache[numValue] = numValue
+    finalVal = numValue - remainder
+  }
+
+  return finalVal
+}
