@@ -216,6 +216,7 @@ const TokenRow: React.FC<Props> = ({
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
           tabIndex={tabIndex + 2}
+          onFocus={(e): void => e.target.select()}
         />
         {errorOrWarning}
         <WalletDetail>
