@@ -122,14 +122,13 @@ export function useOrders(): Result {
   const runEffect = useRef(false)
 
   useEffect(() => {
-    if (!runEffect.current) return
+    if (!runEffect.current) {
+      runEffect.current = true
+      return
+    }
     forceOrdersRefresh()
     dispatch(overwriteOrders([]))
   }, [userAddress, networkId, forceOrdersRefresh, dispatch])
-
-  useEffect(() => {
-    runEffect.current = true
-  }, [])
 
   return { orders, isLoading, forceOrdersRefresh }
 }
