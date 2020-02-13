@@ -93,6 +93,7 @@ const TradeWidget: React.FC = () => {
     () =>
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
+  const [unlimited, setUnlimited] = useState(!validUntil || !Number(validUntil))
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
   const validUntilId = TradeFormTokenId.validUntil
@@ -191,6 +192,7 @@ const TradeWidget: React.FC = () => {
       if (success) {
         // reset form on successful order placing
         reset(DEFAULT_FORM_STATE)
+        setUnlimited(false)
       }
     } else {
       const from = history.location.pathname + history.location.search
@@ -230,7 +232,8 @@ const TradeWidget: React.FC = () => {
           <OrderValidity
             inputId={validUntilId}
             isDisabled={isSubmitting}
-            isUnlimited={!validUntil || !Number(validUntil)}
+            isUnlimited={unlimited}
+            setUnlimited={setUnlimited}
             tabIndex={3}
           />
           <OrderDetails

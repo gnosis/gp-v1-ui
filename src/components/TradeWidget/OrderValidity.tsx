@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useCallback, Dispatch, SetStateAction } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 
@@ -89,10 +89,10 @@ interface Props {
   isDisabled: boolean
   tabIndex: number
   isUnlimited: boolean
+  setUnlimited: Dispatch<SetStateAction<boolean>>
 }
 
-const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlimited }) => {
-  const [unlimited, setUnlimited] = useState(isUnlimited)
+const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlimited, setUnlimited }) => {
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
   const inputValue = watch(inputId)
@@ -112,8 +112,8 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
   }, [handleChange])
 
   function handleUnlimitedClick(): void {
-    setUnlimited(!unlimited)
-    !unlimited && setValue(inputId, '', true)
+    setUnlimited(!isUnlimited)
+    !isUnlimited && setValue(inputId, '', true)
   }
 
   return (
@@ -126,7 +126,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
             name={inputId}
             type="number"
             step="5"
-            disabled={isDisabled || unlimited}
+            disabled={isDisabled || isUnlimited}
             required
             ref={register({
               pattern: { value: validInputPattern, message: 'Expiration time cannot be negative' },
@@ -137,7 +137,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
             tabIndex={tabIndex + 2}
           />
           <div className="radio-container">
-            <input type="checkbox" defaultChecked={isUnlimited} onClick={handleUnlimitedClick} />
+            <input type="checkbox" disabled={isDisabled} defaultChecked={isUnlimited} onClick={handleUnlimitedClick} />
             <small>Unlimited</small>
           </div>
         </div>
