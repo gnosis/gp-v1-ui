@@ -91,8 +91,6 @@ interface Props {
   isUnlimited: boolean
 }
 
-// const UNLIMITED_ORDER_VALIDITY_LENGTH = 'Infinity'
-
 const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlimited }) => {
   const [unlimited, setUnlimited] = useState(isUnlimited)
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()

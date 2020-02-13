@@ -69,6 +69,12 @@ export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
 }
 
+const DEFAULT_FORM_STATE = {
+  sellToken: '0',
+  receiveToken: '0',
+  validUntil: '30',
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -184,7 +190,7 @@ const TradeWidget: React.FC = () => {
       })
       if (success) {
         // reset form on successful order placing
-        reset()
+        reset(DEFAULT_FORM_STATE)
       }
     } else {
       const from = history.location.pathname + history.location.search
