@@ -1,6 +1,5 @@
 import HtmlWebPackPlugin from 'html-webpack-plugin'
 import webpack from 'webpack'
-import DashboardPlugin from 'webpack-dashboard/plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import PreloadWebpackPlugin from 'preload-webpack-plugin'
@@ -16,7 +15,7 @@ const isProduction = process.env.NODE_ENV == 'production'
 const baseUrl = isProduction ? '' : '/'
 
 module.exports = ({ stats = false } = {}) => ({
-  devtool: 'eval-source-map',
+  devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
     chunkFilename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
@@ -94,6 +93,18 @@ module.exports = ({ stats = false } = {}) => ({
       template: './src/html/index.html',
       title: 'dex-react',
       ipfsHack: isProduction,
+      minify: isProduction && {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
     }),
     new PreloadWebpackPlugin({
       rel: 'prefetch',
@@ -106,7 +117,6 @@ module.exports = ({ stats = false } = {}) => ({
       BASE_URL: baseUrl,
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
-    isProduction && new DashboardPlugin(),
     // define inside one plugin instance
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),

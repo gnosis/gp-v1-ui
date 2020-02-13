@@ -3,6 +3,7 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
+import Console from './Console'
 
 // SCSS
 import GlobalStyles from 'styles/global'
@@ -14,14 +15,12 @@ import Layout from 'components/Layout'
 const About = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
-
     'pages/About'
   ),
 )
 const Trade = React.lazy(() =>
   import(
     /* webpackChunkName: "Trade_chunk"*/
-
     'pages/Trade'
   ),
 )
@@ -29,7 +28,6 @@ const Trade = React.lazy(() =>
 const Strategies = React.lazy(() =>
   import(
     /* webpackChunkName: "Strategies_chunk"*/
-
     'pages/Strategies'
   ),
 )
@@ -37,7 +35,6 @@ const Strategies = React.lazy(() =>
 const Orders = React.lazy(() =>
   import(
     /* webpackChunkName: "Orders_chunk"*/
-
     'pages/Orders'
   ),
 )
@@ -45,28 +42,24 @@ const Orders = React.lazy(() =>
 const Wallet = React.lazy(() =>
   import(
     /* webpackChunkName: "Wallet_chunk"*/
-
     'pages/Wallet'
   ),
 )
 const SourceCode = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
-
     'pages/SourceCode'
   ),
 )
 const NotFound = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
-
     'pages/NotFound'
   ),
 )
 const ConnectWallet = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
-
     'pages/ConnectWallet'
   ),
 )
@@ -100,9 +93,7 @@ const App: React.FC = () => (
         </React.Suspense>
       </Layout>
     </Router>
-    {process.env.NODE_ENV === 'development' &&
-      require('web3connect').default.isMobile() &&
-      React.createElement(require('./Console').default)}
+    {process.env.NODE_ENV === 'development' && <Console />}
   </>
 )
 
