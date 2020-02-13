@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
+import { toast } from 'toastify'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
-import { toast } from 'react-toastify'
 
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'

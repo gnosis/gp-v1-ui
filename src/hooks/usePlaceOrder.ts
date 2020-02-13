@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import BN from 'bn.js'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 import { MAX_BATCH_ID } from '@gnosis.pm/dex-js'
 

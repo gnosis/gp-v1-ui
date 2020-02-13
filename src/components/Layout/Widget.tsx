@@ -35,10 +35,18 @@ const LinkWrapper = styled(EtherscanLink)`
   display: block;
 `
 
+const EmptyLink = styled.a`
+  text-align: right;
+  margin-bottom: 2em;
+  display: block;
+`
+
 interface Props {
   children: React.ReactNode
   className?: string
 }
+
+const ViewText = <small>View verified contract</small>
 
 const Widget: React.FC<Props> = ({ children, className }) => {
   const { networkId } = useWalletConnection()
@@ -46,8 +54,10 @@ const Widget: React.FC<Props> = ({ children, className }) => {
 
   return (
     <Wrapper className={className} $bgColor="transparent" $boxShadow="none" $width="auto">
-      {contractAddress && (
-        <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
+      {contractAddress && networkId ? (
+        <LinkWrapper type="contract" identifier={contractAddress} networkId={networkId} label={ViewText} />
+      ) : (
+        <EmptyLink>{ViewText}</EmptyLink>
       )}
       {children}
     </Wrapper>

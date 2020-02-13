@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 import { assert } from '@gnosis.pm/dex-js'
 
 import useSafeState from 'hooks/useSafeState'
