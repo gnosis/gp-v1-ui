@@ -38,6 +38,7 @@ export const DEFAULT_ORDERS_PAGE_SIZE = 50
 // UI constants
 export const HIGHLIGHT_TIME = 5000
 export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntactic sugar for displaying purposes
+export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
