@@ -3,6 +3,7 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
+import Console from './Console'
 
 // SCSS
 import GlobalStyles from 'styles/global'
@@ -100,9 +101,7 @@ const App: React.FC = () => (
         </React.Suspense>
       </Layout>
     </Router>
-    {process.env.NODE_ENV === 'development' &&
-      require('web3connect').default.isMobile() &&
-      React.createElement(require('./Console').default)}
+    {process.env.NODE_ENV === 'development' && <Console />}
   </>
 )
 
