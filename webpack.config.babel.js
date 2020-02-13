@@ -15,7 +15,7 @@ const isProduction = process.env.NODE_ENV == 'production'
 const baseUrl = isProduction ? '' : '/'
 
 module.exports = ({ stats = false } = {}) => ({
-  devtool: 'eval-source-map',
+  devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
     chunkFilename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
