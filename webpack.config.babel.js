@@ -1,6 +1,5 @@
 import HtmlWebPackPlugin from 'html-webpack-plugin'
 import webpack from 'webpack'
-import DashboardPlugin from 'webpack-dashboard/plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import PreloadWebpackPlugin from 'preload-webpack-plugin'
@@ -106,7 +105,6 @@ module.exports = ({ stats = false } = {}) => ({
       BASE_URL: baseUrl,
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
-    isProduction && new DashboardPlugin(),
     // define inside one plugin instance
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
