@@ -69,6 +69,12 @@ export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
 }
 
+const DEFAULT_FORM_STATE = {
+  sellToken: '0',
+  receiveToken: '0',
+  validUntil: '30',
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -87,6 +93,7 @@ const TradeWidget: React.FC = () => {
     () =>
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
+  const [unlimited, setUnlimited] = useState(!validUntil || !Number(validUntil))
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
   const validUntilId = TradeFormTokenId.validUntil
@@ -184,7 +191,8 @@ const TradeWidget: React.FC = () => {
       })
       if (success) {
         // reset form on successful order placing
-        reset()
+        reset(DEFAULT_FORM_STATE)
+        setUnlimited(false)
       }
     } else {
       const from = history.location.pathname + history.location.search
@@ -224,7 +232,8 @@ const TradeWidget: React.FC = () => {
           <OrderValidity
             inputId={validUntilId}
             isDisabled={isSubmitting}
-            isUnlimited={!validUntil || !Number(validUntil)}
+            isUnlimited={unlimited}
+            setUnlimited={setUnlimited}
             tabIndex={3}
           />
           <OrderDetails
