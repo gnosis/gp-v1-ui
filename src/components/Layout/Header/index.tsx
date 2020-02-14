@@ -10,6 +10,8 @@ import useNavigation from './useNavigation'
 import useOpenCloseNav from './useOpenCloseNav'
 
 import { APP_NAME } from 'const'
+import { formatSecondsToMinutes } from 'utils'
+import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 
 export interface HeaderProps {
   [key: string]: {
@@ -38,6 +40,8 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
   const { isResponsive, openNav, setOpenNav } = useOpenCloseNav()
   const navigationArray = useNavigation(initialState, isResponsive)
 
+  const timeRemainingInBatch = useTimeRemainingInBatch()
+
   const handleOpenNav = (): void | false => isResponsive && setOpenNav(!openNav)
 
   return (
@@ -51,7 +55,9 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
           {/* USER WALLET */}
           <UserWallet />
           {/* Global Batch Countdown */}
-          <BatchCountDown>Next batch in: <strong>4m 12s</strong></BatchCountDown>
+          <BatchCountDown>
+            Next batch in: <strong>{formatSecondsToMinutes(timeRemainingInBatch)}</strong>
+          </BatchCountDown>
         </TopWrapper>
         {/* HEADER LINKS */}
         <NavigationLinks
