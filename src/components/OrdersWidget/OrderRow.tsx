@@ -11,7 +11,7 @@ import {
   faChevronUp,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 

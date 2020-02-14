@@ -33,7 +33,7 @@ const Layout: React.FC = ({ children }) => (
       navigation={[
         {
           label: 'Order',
-          to: '/order',
+          to: '/trade',
           order: 1,
         },
         {

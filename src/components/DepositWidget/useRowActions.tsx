@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 import BN from 'bn.js'
 import { assert } from '@gnosis.pm/dex-js'
 
