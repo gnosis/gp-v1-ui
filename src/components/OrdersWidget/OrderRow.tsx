@@ -9,7 +9,7 @@ import {
   faChevronUp,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
@@ -207,6 +207,7 @@ async function fetchToken(
   orderId: string,
   networkId: number,
   setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
+  isPendingOrder?: boolean,
 ): Promise<void> {
   const token = await getTokenFromExchangeById({ tokenId, networkId })
 
@@ -215,7 +216,7 @@ async function fetchToken(
   setFn(token)
 
   // Also, inform the user this token failed and the order is hidden.
-  if (!token) {
+  if (!token && !isPendingOrder) {
     toast.warn(
       `Token id ${tokenId} used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`,
     )
@@ -241,9 +242,10 @@ interface Props {
   networkId: number
   pending?: boolean
   transactionHash?: string
-  isMarkedForDeletion: boolean
-  toggleMarkedForDeletion: () => void
+  isMarkedForDeletion?: boolean
+  toggleMarkedForDeletion?: () => void
   disabled: boolean
+  isPendingOrder?: boolean
 }
 
 const onError = onErrorFactory('Failed to fetch token')
@@ -258,6 +260,7 @@ const OrderRow: React.FC<Props> = props => {
     isMarkedForDeletion,
     toggleMarkedForDeletion,
     disabled,
+    isPendingOrder,
   } = props
 
   // Fetching buy and sell tokens
@@ -266,9 +269,9 @@ const OrderRow: React.FC<Props> = props => {
   const [openCard, setOpenCard] = useSafeState(true)
 
   useEffect(() => {
-    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken).catch(onError)
-    fetchToken(order.sellTokenId, order.id, networkId, setSellToken).catch(onError)
-  }, [networkId, order, setBuyToken, setSellToken])
+    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken, isPendingOrder).catch(onError)
+    fetchToken(order.sellTokenId, order.id, networkId, setSellToken, isPendingOrder).catch(onError)
+  }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
   const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
@@ -276,21 +279,30 @@ const OrderRow: React.FC<Props> = props => {
     sellToken &&
     buyToken && (
       <OrderRowWrapper $color={pending ? 'grey' : 'inherit'} $open={openCard}>
-        {pending ? (
-          <PendingLink transactionHash={transactionHash} />
-        ) : (
-          <DeleteOrder
-            isMarkedForDeletion={isMarkedForDeletion}
-            toggleMarkedForDeletion={toggleMarkedForDeletion}
-            pending={pending}
-            disabled={disabled}
-          />
-        )}
+        {!isPendingOrder &&
+          (pending ? (
+            <PendingLink transactionHash={transactionHash} />
+          ) : (
+            <DeleteOrder
+              isMarkedForDeletion={isMarkedForDeletion}
+              toggleMarkedForDeletion={toggleMarkedForDeletion}
+              pending={pending}
+              disabled={disabled}
+            />
+          ))}
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
-        <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
-        <Expires order={order} pending={pending} />
+        {!isPendingOrder ? (
+          <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        ) : (
+          <PendingLink />
+        )}
+        {!isPendingOrder ? (
+          <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
+        ) : (
+          <PendingLink />
+        )}
+        {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

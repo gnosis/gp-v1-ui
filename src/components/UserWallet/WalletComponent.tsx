@@ -1,6 +1,6 @@
 import React from 'react'
 import { RouteComponentProps, useRouteMatch } from 'react-router'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

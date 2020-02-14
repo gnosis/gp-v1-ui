@@ -33,6 +33,9 @@ export const getDefaultProvider = (): string | null =>
 function createWeb3Api(): Web3 {
   // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
   const web3 = new Web3(getDefaultProvider())
+  // `handleRevert = true` makes `require` failures to throw
+  // For more details see https://github.com/gnosis/dex-react/issues/511
+  web3.eth['handleRevert'] = true
 
   if (process.env.MOCK_WEB3 === 'true') {
     // Only function that needs to be mocked so far. We can add more and add extra logic as needed

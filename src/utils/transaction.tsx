@@ -1,7 +1,7 @@
 import React from 'react'
 import { TxOptionalParams } from 'types'
 import { TxNotification } from 'components/TxNotification'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 export const txOptionalParams: TxOptionalParams = {
   onSentTransaction: (transactionHash: string): void => {

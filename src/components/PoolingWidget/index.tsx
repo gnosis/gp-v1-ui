@@ -1,5 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
+// eslint-disable-next-line @typescript-eslint/camelcase
+import { unstable_batchedUpdates } from 'react-dom'
 
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
@@ -20,10 +22,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
+import useGlobalState from 'hooks/useGlobalState'
+import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { tokenListApi } from 'api'
 
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { Network, Receipt } from 'types'
 
 import { maxAmountsForSpread, log } from 'utils'
@@ -172,6 +176,7 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
 }
 
 const PoolingInterface: React.FC = () => {
+  const [, dispatch] = useGlobalState()
   const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
   const [spread, setSpread] = useSafeState(0.2)
   const [step, setStep] = useSafeState(1)
@@ -180,7 +185,7 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
-  const { networkId } = useWalletConnection()
+  const { networkId, userAddress } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
@@ -207,24 +212,40 @@ const PoolingInterface: React.FC = () => {
 
   const { isSubmitting, placeMultipleOrders } = usePlaceOrder()
 
-  const onSentTransaction = useCallback(
-    txHash => {
-      setTxHash(txHash)
-      // nextStep()
-    },
-    [setTxHash],
-  )
-
   const sendTransaction = useCallback(async () => {
+    if (!networkId || !userAddress) return
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-
+    let pendingTxHash: string | undefined
     try {
       setTxReceipt(undefined)
 
       const { receipt } = await placeMultipleOrders({
         orders,
         txOptionalParams: {
-          onSentTransaction,
+          onSentTransaction: (txHash: string): void => {
+            pendingTxHash = txHash
+            setTxHash(txHash)
+
+            unstable_batchedUpdates(() => {
+              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
+                const newTxState = {
+                  txHash,
+                  id: 'PENDING ORDER',
+                  buyTokenId,
+                  sellTokenId,
+                  priceNumerator: buyAmount,
+                  priceDenominator: sellAmount,
+                  user: userAddress,
+                  remainingAmount: ZERO,
+                  sellTokenBalance: ZERO,
+                  validFrom: 0,
+                  validUntil: 0,
+                }
+
+                dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+              })
+            })
+          },
         },
       })
 
@@ -235,8 +256,20 @@ const PoolingInterface: React.FC = () => {
 
       // Error handle
       setTxError(e)
+    } finally {
+      pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
     }
-  }, [onSentTransaction, placeMultipleOrders, selectedTokensMap, setTxError, setTxReceipt, spread])
+  }, [
+    dispatch,
+    networkId,
+    placeMultipleOrders,
+    selectedTokensMap,
+    setTxError,
+    setTxHash,
+    setTxReceipt,
+    spread,
+    userAddress,
+  ])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {

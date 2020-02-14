@@ -38,6 +38,7 @@ export const DEFAULT_ORDERS_PAGE_SIZE = 50
 // UI constants
 export const HIGHLIGHT_TIME = 5000
 export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntactic sugar for displaying purposes
+export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
@@ -72,3 +73,8 @@ export const INFURA_ID = '8b4d9b4306294d2e92e0775ff1075066'
 export const INITIAL_INFURA_ENDPOINT = `wss://rinkeby.infura.io/ws/v3/${INFURA_ID}`
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
+
+export const GP_ORDER_TX_HASHES = {
+  1: 'GP_ORDER_TX_HASHES_1',
+  4: 'GP_ORDER_TX_HASHES_4',
+}

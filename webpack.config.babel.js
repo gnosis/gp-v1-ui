@@ -1,8 +1,9 @@
 import HtmlWebPackPlugin from 'html-webpack-plugin'
 import webpack from 'webpack'
-import DashboardPlugin from 'webpack-dashboard/plugin'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
+import PreloadWebpackPlugin from 'preload-webpack-plugin'
+
 import dotenv from 'dotenv'
 import path from 'path'
 
@@ -14,7 +15,7 @@ const isProduction = process.env.NODE_ENV == 'production'
 const baseUrl = isProduction ? '' : '/'
 
 module.exports = ({ stats = false } = {}) => ({
-  devtool: 'eval-source-map',
+  devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
     chunkFilename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
@@ -25,7 +26,16 @@ module.exports = ({ stats = false } = {}) => ({
     rules: [
       {
         test: /\.(png|svg|jpg|gif)$/,
-        use: ['file-loader'],
+        use: [
+          'file-loader',
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              bypassOnDebug: true,
+              disable: !isProduction,
+            },
+          },
+        ],
       },
       {
         test: /\.jsx?$/,
@@ -83,6 +93,23 @@ module.exports = ({ stats = false } = {}) => ({
       template: './src/html/index.html',
       title: 'dex-react',
       ipfsHack: isProduction,
+      minify: isProduction && {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true,
+      },
+    }),
+    new PreloadWebpackPlugin({
+      rel: 'prefetch',
+      include: 'allAssets',
+      fileBlacklist: [/\.map/, /runtime~.+\.js$/],
     }),
     isProduction && new InlineChunkHtmlPlugin(HtmlWebPackPlugin, [/runtime/]),
     new webpack.EnvironmentPlugin({
@@ -90,7 +117,6 @@ module.exports = ({ stats = false } = {}) => ({
       BASE_URL: baseUrl,
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
-    isProduction && new DashboardPlugin(),
     // define inside one plugin instance
     new webpack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
@@ -113,6 +139,9 @@ module.exports = ({ stats = false } = {}) => ({
   optimization: {
     splitChunks: {
       chunks: 'all',
+      minSize: 20000,
+      maxAsyncRequests: 10,
+      maxSize: 1000000,
     },
     runtimeChunk: true,
   },
