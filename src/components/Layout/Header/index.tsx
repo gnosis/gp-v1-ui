@@ -10,7 +10,7 @@ import useNavigation from './useNavigation'
 import useOpenCloseNav from './useOpenCloseNav'
 
 import { APP_NAME } from 'const'
-import { formatSecondsToMinutes } from 'utils'
+import { formatSeconds } from 'utils'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 
 export interface HeaderProps {
@@ -56,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
           <UserWallet />
           {/* Global Batch Countdown */}
           <BatchCountDown>
-            Next batch in: <strong>{formatSecondsToMinutes(timeRemainingInBatch)}</strong>
+            Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
           </BatchCountDown>
         </TopWrapper>
         {/* HEADER LINKS */}

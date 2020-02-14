@@ -43,7 +43,7 @@ export function getSecondsRemainingInBatch(): number {
   return BATCH_TIME - (getEpoch() % BATCH_TIME)
 }
 
-export function formatSecondsToMinutes(seconds: number): string {
+export function formatSeconds(seconds: number): string {
   const minutes = Math.floor(seconds / 60)
   const remainderSeconds = seconds % 60
   let s = ''
