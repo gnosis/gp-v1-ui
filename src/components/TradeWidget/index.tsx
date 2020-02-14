@@ -183,9 +183,9 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId || !userAddress) return
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
 
-    if (isConnected) {
+    if (isConnected && userAddress) {
       let pendingTxHash: string | undefined = undefined
       const { success } = await placeOrder({
         buyAmount,
