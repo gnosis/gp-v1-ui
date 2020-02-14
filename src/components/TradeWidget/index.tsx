@@ -22,7 +22,7 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 import { tokenListApi } from 'api'
 
@@ -36,7 +36,7 @@ const WrappedWidget = styled(Widget)`
   min-width: 0;
   max-height: 54rem;
 
-  @media ${RESPONSIVE_SIZES.mobile} {
+  @media ${MEDIA.mobile} {
     flex-flow: column wrap;
     max-height: initial;
     min-height: initial;
@@ -50,7 +50,7 @@ const WrappedForm = styled.form`
   padding: 1.6rem;
   box-sizing: border-box;
 
-  @media ${RESPONSIVE_SIZES.mobile} {
+  @media ${MEDIA.mobile} {
     width: 100%;
   }
 
@@ -465,7 +465,6 @@ const TradeWidget: React.FC = () => {
             receiveTokenName={safeTokenName(receiveToken)}
             validUntil={watch(validUntilId)}
           />{' '}
-          */}
           <p>This order might be partially filled.</p>
           <SubmitButton
             data-text="This order might be partially filled."

@@ -1,7 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 import fontFace from './fonts'
 import variables from './variables'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables

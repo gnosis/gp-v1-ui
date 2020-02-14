@@ -46,7 +46,7 @@ export const LEGALDOCUMENT = {
   TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
 }
 
-export const RESPONSIVE_SIZES = {
+export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',
   smallScreen: '736px',

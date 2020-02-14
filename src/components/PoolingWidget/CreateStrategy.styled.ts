@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const CreateStrategyWrapper = styled.div`
   display: flex;

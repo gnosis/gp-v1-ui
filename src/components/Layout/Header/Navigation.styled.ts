@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolean }>`
   display: flex;
@@ -9,7 +9,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   align-items: center;
   justify-content: center;
   
-    @media ${RESPONSIVE_SIZES.mobile} {
+    @media ${MEDIA.mobile} {
       flex-flow: row wrap;
       background: #dde4ed;
       border-radius: 15rem;
@@ -38,7 +38,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     justify-content: center;
     align-items: center;
     
-      @media ${RESPONSIVE_SIZES.mobile} {
+      @media ${MEDIA.mobile} {
         color: rgba(78, 106, 133, .75);
       }
     
@@ -50,7 +50,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     &.active {
       color: var(--color-text-active);
       background: var(--color-background-nav-active);
-      @media ${RESPONSIVE_SIZES.mobile} {
+      @media ${MEDIA.mobile} {
         padding: 0 1.2rem;
         font-size: 1.6rem;
         height: 4.6rem;
@@ -83,7 +83,7 @@ export const OrderedNavLinkDiv = styled.span<{ $order: number }>`
 
   &:not(:last-of-type) {
     margin: 0 1.6rem 0 0;
-    @media ${RESPONSIVE_SIZES.mobile} {
+    @media ${MEDIA.mobile} {
       margin: 0;
     }
   }

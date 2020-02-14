@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import Widget from 'components/Layout/Widget'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const OrdersWrapper = styled(Widget)`
   > a {
@@ -77,7 +77,7 @@ export const OrdersForm = styled.div`
     align-items: center;
     margin: 1rem 0;
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
+    @media ${MEDIA.tablet} {
       grid-template-columns: 2fr 1fr;
     }
 
@@ -125,7 +125,7 @@ export const OrdersForm = styled.div`
       visibility: hidden;
     }
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
+    @media ${MEDIA.tablet} {
       display: none;
     }
   }

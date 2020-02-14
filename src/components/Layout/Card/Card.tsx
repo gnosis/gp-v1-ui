@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 const CardRowDrawer = styled.tr<{ responsive: boolean }>`
   display: flex;
@@ -18,10 +18,6 @@ const CardRowDrawer = styled.tr<{ responsive: boolean }>`
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     box-shadow: var(--box-shadow);
     width: 80%;
-
-    /* @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
-      width: 95%;
-    } */
 
     > div {
       margin-top: 2rem;
@@ -248,7 +244,7 @@ export const CardTable = styled.table<{
   // Top level custom CSS
   ${({ $webCSS }): string | undefined => $webCSS}
 
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
+  @media ${MEDIA.tablet} {
     > thead, tbody {
       > tr:not(${CardRowDrawer}) {
         grid-template-columns: none;

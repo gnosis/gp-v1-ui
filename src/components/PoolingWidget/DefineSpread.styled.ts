@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { ProgressStepText } from './PoolingWidget.styled'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const DefineSpreadWrapper = styled.div`
   display: flex;

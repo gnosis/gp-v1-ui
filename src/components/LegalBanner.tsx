@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { LEGALDOCUMENT, RESPONSIVE_SIZES } from 'const'
+import { LEGALDOCUMENT, MEDIA } from 'const'
 
-// const { MOBILE } = RESPONSIVE_SIZES
+// const { MOBILE } = MEDIA
 
 const Wrapper = styled.div`
   display: flex;

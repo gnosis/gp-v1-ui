@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { NavLinksWrapper } from './Navigation.styled'
 import { UserWalletWrapper } from 'components/UserWallet/UserWallet.styled'
 
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const HeaderWrapper = styled.header`
   display: flex;
@@ -16,7 +16,7 @@ export const HeaderWrapper = styled.header`
     align-items: center;
     width: 100%;
     
-      @media ${RESPONSIVE_SIZES.mobile} {
+      @media ${MEDIA.mobile} {
         padding: 0 1.6rem;
         box-sizing: border-box;
       }

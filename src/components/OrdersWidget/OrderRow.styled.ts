@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   color: ${({ $color = '' }): string => $color};
@@ -69,7 +69,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
     }
   }
 
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
+  @media ${MEDIA.tablet} {
     &.selected {
       > td {
         border-bottom: 0.0625rem solid #ffffff40;

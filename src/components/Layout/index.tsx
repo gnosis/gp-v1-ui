@@ -5,7 +5,7 @@ import Header from './Header'
 import Footer from './Footer'
 import LegalBanner from '../LegalBanner'
 
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -20,7 +20,7 @@ const Wrapper = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 
-    @media ${RESPONSIVE_SIZES.mobile} {
+    @media ${MEDIA.mobile} {
       margin: 1.6rem auto 5rem;
     }
   }
@@ -44,7 +44,7 @@ const Layout: React.FC = ({ children }) => (
         },
         {
           label: 'Balances',
-          to: '/balances',
+          to: '/wallet',
           order: 3,
           withPastLocation: true,
         },

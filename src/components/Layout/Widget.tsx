@@ -4,9 +4,9 @@ import { depositApi } from 'api'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import PageWrapper from './PageWrapper'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
-// const { TABLET, MOBILE_LARGE } = RESPONSIVE_SIZES
+// const { TABLET, MOBILE_LARGE } = MEDIA
 
 const Wrapper = styled(PageWrapper)`
   overflow-x: visible;
@@ -50,20 +50,14 @@ const Widget: React.FC<Props> = ({ children, className }) => {
 
   return (
     <Wrapper className={className} $bgColor="transparent" $boxShadow="none" $width="auto">
-      {contractAddress && networkId ? (
+      {/* {contractAddress && networkId ? (
         <LinkWrapper type="contract" identifier={contractAddress} networkId={networkId} label={ViewText} />
       ) : (
         <EmptyLink>{ViewText}</EmptyLink>
-      )}
+      )} */}
       {children}
     </Wrapper>
   )
 }
-
-// {
-//   contractAddress && (
-//     <LinkWrapper type="contract" identifier={contractAddress} label={<small>View verified contract</small>} />
-//   )
-// }
 
 export default Widget

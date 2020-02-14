@@ -315,7 +315,7 @@ const PoolingInterface: React.FC = () => {
           ) : // STEP 3 - TXRECEIPT OR NOT?
           txReceipt ? (
             // TX RCEIPT SUCCESS
-            <Link to="/balances">
+            <Link to="/wallet">
               <button className="success">
                 <FontAwesomeIcon icon={faFlagCheckered} /> Finish and go to Balances
               </button>
