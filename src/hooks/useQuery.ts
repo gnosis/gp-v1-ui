@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
-import { multOfFive } from 'utils'
+import { makeMultipleOf } from 'utils'
 
 /**
  * Prevents invalid numbers from being inserted by hand in the URL
@@ -13,11 +13,12 @@ function sanitizeInput(value?: string | null, defaultValue = '0'): string {
 
 /**
  * Prevents invalid NEGATIVE numbers from being inserted by hand in the URL
+ * Pushes number to nearest multiple of 5 (batch time)
  *
  * @param value Input from URL
  */
 function sanitizeNegativeInput(value?: string | null, defaultValue = '0'): string {
-  return (Number(value) === 0 || Number(value) >= 5) && value ? multOfFive(value).toString() : defaultValue
+  return Number(value) >= 0 ? makeMultipleOf(5, value).toString() : defaultValue
 }
 
 export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string } {

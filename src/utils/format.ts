@@ -174,17 +174,19 @@ export function formatPrice(
   return price ? price.toFixed(decimals) : null
 }
 
-export function multOfFive(value: number | string): number {
+export function makeMultipleOf(mult = 5, value?: number | string | null): number {
   const cache = {}
   const numValue = Number(value)
-  if (!(numValue % 5) || cache[numValue]) return numValue
 
-  const remainder = numValue % 5
+  if (numValue === 0 || !value || isNaN(numValue)) return 0
+  if (!(numValue % mult) || cache[numValue]) return numValue
+
+  const remainder = numValue % mult
 
   let finalVal
-  if (remainder > 5 / 2) {
+  if (remainder > mult / 2) {
     cache[numValue] = numValue
-    finalVal = numValue - remainder + 5
+    finalVal = numValue - remainder + mult
   } else {
     cache[numValue] = numValue
     finalVal = numValue - remainder
