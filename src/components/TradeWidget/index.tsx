@@ -7,6 +7,7 @@ import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
 import OrderDetails from './OrderDetails'
+import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 
 import { useForm, FormContext } from 'react-hook-form'
@@ -63,10 +64,17 @@ const SubmitButton = styled.button`
 export const enum TradeFormTokenId {
   sellToken = 'sellToken',
   receiveToken = 'receiveToken',
+  validUntil = 'validUntil',
 }
 
 export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
+}
+
+const DEFAULT_FORM_STATE = {
+  sellToken: '0',
+  receiveToken: '0',
+  validUntil: '0',
 }
 
 const TradeWidget: React.FC = () => {
@@ -80,7 +88,7 @@ const TradeWidget: React.FC = () => {
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const { sellAmount, buyAmount: receiveAmount } = useQuery()
+  const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
@@ -89,19 +97,26 @@ const TradeWidget: React.FC = () => {
     () =>
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
+  const [unlimited, setUnlimited] = useState(!validUntil || !Number(validUntil))
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
+  const validUntilId = TradeFormTokenId.validUntil
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellAmount,
       [receiveInputId]: receiveAmount,
+      [validUntilId]: validUntil,
     },
   })
   const { handleSubmit, watch, reset } = methods
 
-  const searchQuery = buildSearchQuery({ sell: watch(sellInputId), buy: watch(receiveInputId) })
+  const searchQuery = buildSearchQuery({
+    sell: watch(sellInputId),
+    buy: watch(receiveInputId),
+    expires: watch(validUntilId),
+  })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url, true)
 
@@ -160,19 +175,24 @@ const TradeWidget: React.FC = () => {
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
+    // Minutes - then divided by 5min for batch length to get validity time
+    // 0 validUntil time  = unlimited order
+    // TODO: review this line
+    const validUntil = +data[validUntilId] / 5
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId || !userAddress) return
+    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
 
-    if (isConnected) {
+    if (isConnected && userAddress) {
       let pendingTxHash: string | undefined = undefined
       const { success } = await placeOrder({
         buyAmount,
         buyToken: cachedBuyToken,
         sellAmount,
         sellToken: cachedSellToken,
+        validUntil,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
             pendingTxHash = txHash
@@ -197,7 +217,8 @@ const TradeWidget: React.FC = () => {
       })
       if (success && pendingTxHash) {
         // reset form on successful order placing
-        reset()
+        reset(DEFAULT_FORM_STATE)
+        setUnlimited(false)
         // remove pending tx
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
@@ -236,11 +257,19 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             tabIndex={2}
           />
+          <OrderValidity
+            inputId={validUntilId}
+            isDisabled={isSubmitting}
+            isUnlimited={unlimited}
+            setUnlimited={setUnlimited}
+            tabIndex={3}
+          />
           <OrderDetails
             sellAmount={watch(sellInputId)}
             sellTokenName={safeTokenName(sellToken)}
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
+            validUntil={watch(validUntilId)}
           />
           <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}

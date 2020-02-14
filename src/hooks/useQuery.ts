@@ -1,27 +1,19 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
+import { sanitizeInput, sanitizeNegativeAndMakeMultipleOf } from 'utils'
 
-/**
- * Prevents invalid numbers from being inserted by hand in the URL
- *
- * @param value Input from URL
- */
-function sanitizeInput(value?: string | null): string {
-  return value && Number(value) ? value : '0'
-}
+export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string } {
+  const { search } = useLocation()
 
-export function useQuery(): { sellAmount: string; buyAmount: string } {
-  const query = new URLSearchParams(useLocation().search)
+  return useMemo(() => {
+    const query = new URLSearchParams(search)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const sellAmount = useMemo(() => sanitizeInput(query.get('sell')), [])
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const buyAmount = useMemo(() => sanitizeInput(query.get('buy')), [])
-
-  return {
-    sellAmount,
-    buyAmount,
-  }
+    return {
+      sellAmount: sanitizeInput(query.get('sell')),
+      buyAmount: sanitizeInput(query.get('buy')),
+      validUntil: sanitizeNegativeAndMakeMultipleOf(query.get('expires'), '30'),
+    }
+  }, [search])
 }
 
 /**

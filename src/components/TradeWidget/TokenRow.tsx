@@ -7,7 +7,16 @@ import LinkWithPastLocation from 'components/LinkWithPastLocation'
 import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
+import {
+  formatAmount,
+  formatAmountFull,
+  parseAmount,
+  adjustPrecision,
+  validInputPattern,
+  leadingAndTrailingZeros,
+  trailingZerosAfterDot,
+  validatePositive,
+} from 'utils'
 import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
@@ -87,18 +96,10 @@ function displayBalance<K extends keyof TokenBalanceDetails>(
   return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
-const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
-const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
-const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
-
 function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (!validInputPattern.test(event.currentTarget.value + event.key)) {
     event.preventDefault()
   }
-}
-
-function validatePositive(value: string): true | string {
-  return Number(value) > 0 || 'Invalid amount'
 }
 
 interface Props {
