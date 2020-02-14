@@ -74,7 +74,7 @@ export type TradeFormData = {
 const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
-  validUntil: '30',
+  validUntil: '0',
 }
 
 const TradeWidget: React.FC = () => {

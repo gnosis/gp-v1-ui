@@ -113,7 +113,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
 
   function handleUnlimitedClick(): void {
     setUnlimited(!isUnlimited)
-    !isUnlimited && setValue(inputId, '', true)
+    !isUnlimited ? setValue(inputId, '', true) : setValue(inputId, '30', true)
   }
 
   return (
