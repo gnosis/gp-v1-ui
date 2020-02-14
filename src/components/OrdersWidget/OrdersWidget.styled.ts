@@ -77,7 +77,7 @@ export const OrdersForm = styled.div`
     align-items: center;
     margin: 1rem 0;
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
       grid-template-columns: 2fr 1fr;
     }
 
@@ -125,7 +125,7 @@ export const OrdersForm = styled.div`
       visibility: hidden;
     }
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
       display: none;
     }
   }

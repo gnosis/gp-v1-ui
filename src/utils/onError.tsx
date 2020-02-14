@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 export function onErrorFactory(msg?: string): (error: any) => Promise<void> {
   const errorMsg = msg ? msg : 'An error has occurred'

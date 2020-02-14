@@ -38,6 +38,7 @@ export const DEFAULT_ORDERS_PAGE_SIZE = 50
 // UI constants
 export const HIGHLIGHT_TIME = 5000
 export const FEE_PERCENTAGE = (1 / FEE_DENOMINATOR) * 100 // syntactic sugar for displaying purposes
+export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
@@ -46,22 +47,46 @@ export const LEGALDOCUMENT = {
 }
 
 export const RESPONSIVE_SIZES = {
-  // PX SIZES:
-  MOBILE_SMALL_PX: 320,
-  MOBILE_PX: 500,
-  MOBILE_LARGE_PX: 532,
-  TABLET_PX: 720,
-  TABLET_LARGE_PX: 866,
-  WEB_SMALL_PX: 1024,
-
-  // EM SIZES:
-  MOBILE_SMALL: 20,
-  MOBILE: 31.25,
-  MOBILE_LARGE: 33.25,
-  TABLET: 45,
-  TABLET_LARGE: 54.125,
-  WEB_SMALL: 64,
-  WEB: 75,
+  MOBILE_LARGE_PX: 500,
+  tinyScreen: '320px',
+  smallScreen: '736px',
+  smallScreenUp: '737px',
+  mediumScreenSmall: '850px',
+  mediumEnd: '1024px',
+  desktopScreen: '1025px',
+  get tinyDown(): string {
+    return `only screen and (max-width : ${this.tinyScreen})`
+  },
+  get mobile(): string {
+    return `only screen and (max-width : ${this.smallScreen})`
+  },
+  get mediumUp(): string {
+    return `only screen and (min-width : ${this.smallScreenUp})`
+  },
+  get mediumDown(): string {
+    return `only screen and (max-width : ${this.mediumEnd})`
+  },
+  get mediumOnly(): string {
+    return `only screen and (min-width : ${this.smallScreenUp}) and (max-width : ${this.mediumEnd})`
+  },
+  get desktop(): string {
+    return `only screen and (min-width : ${this.desktopScreen})`
+  },
+  get tabletPortrait(): string {
+    return `(min-device-width: ${this.smallScreenUp}) and (max-device-width: ${this.mediumEnd}) and (orientation: portrait)`
+  },
+  get tabletLandscape(): string {
+    return `(min-device-width: ${this.smallScreenUp}) and (max-device-width: ${this.mediumEnd}) and (orientation: landscape)`
+  },
+  get tablet(): string {
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd})}, ${this.tabletPortrait}}, ${this.tabletLandscape}`
+  },
+  get tabletNoPortrait(): string {
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd})}, ${this.tabletLandscape}`
+  },
+  get tabletSmall(): string {
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumScreenSmall})`
+  },
 }
 
 export const DEFAULT_DECIMALS = 4

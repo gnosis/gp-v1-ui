@@ -71,15 +71,9 @@ const GlobalStyles = createGlobalStyle`
   }
   h1 {
     font-size: 3rem;
-    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}em) {
-      font-size: 2.4rem;
-    }    
   }
   h2 {
     font-size: 2rem;
-    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}em) {
-      font-size: 1.4rem;
-    }
   }
 
   #root {

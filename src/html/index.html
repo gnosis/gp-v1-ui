@@ -3,24 +3,23 @@
 
 <head>
   <%if (htmlWebpackPlugin.options.ipfsHack) { %>
+  <base href="/">
   <script>
     (function () {
       const { pathname, hostname } = window.location
       const ipfsMatch = /.*\/Qm\w{44}/.exec(pathname)
-      const base = document.createElement('base')
-      let baseHref
-      if (ipfsMatch) {
 
-        baseHref = ipfsMatch[0]
-        if (!baseHref.endsWith('/')) baseHref += '/'        
-      } else {
-        baseHref = '/'
+      if (ipfsMatch) {
+        const base = document.querySelector('base')
+
+        let baseHref = ipfsMatch[0]
+        if (!baseHref.endsWith('/')) baseHref += '/'
+
+        base.href = baseHref
       }
 
       window.IS_IPFS = !!ipfsMatch || hostname.endsWith('.eth.link')
 
-      base.href = baseHref
-      document.head.append(base)
     })();
   </script>
   <% } %>

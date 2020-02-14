@@ -19,9 +19,9 @@ const CardRowDrawer = styled.tr<{ responsive: boolean }>`
     box-shadow: var(--box-shadow);
     width: 80%;
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    /* @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
       width: 95%;
-    }
+    } */
 
     > div {
       margin-top: 2rem;
@@ -248,7 +248,7 @@ export const CardTable = styled.table<{
   // Top level custom CSS
   ${({ $webCSS }): string | undefined => $webCSS}
 
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
     > thead, tbody {
       > tr:not(${CardRowDrawer}) {
         grid-template-columns: none;

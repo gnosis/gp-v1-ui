@@ -13,10 +13,6 @@ export const WalletDrawerInnerWrapper = styled.div`
   padding: 0.375rem;
   width: 80%;
 
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    width: 95%;
-  }
-
   p.error {
     color: red;
     padding: 0 0.5rem 0.5rem;
@@ -46,7 +42,7 @@ export const WalletDrawerInnerWrapper = styled.div`
 
       &:disabled {
         /* background-color: var(--color-text-secondary); */
-        opacity: .5;
+        opacity: 0.5;
       }
     }
   }

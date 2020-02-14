@@ -11,7 +11,7 @@ import {
   faChevronUp,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons'
-import { toast } from 'react-toastify'
+import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
@@ -111,7 +111,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
     <td data-label="Price">
       <div className="order-details">
         {/* <Highlight color={pending ? 'grey' : ''}></Highlight> */}
-        {price} {displayTokenSymbolOrLink(sellToken)}{'/'}{displayTokenSymbolOrLink(buyToken)}<br />{price} {displayTokenSymbolOrLink(buyToken)}{'/'}{displayTokenSymbolOrLink(sellToken)}
+        {price} {displayTokenSymbolOrLink(sellToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(buyToken)}
+        <br />
+        {price} {displayTokenSymbolOrLink(buyToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(sellToken)}
       </div>
     </td>
   )
@@ -292,7 +298,13 @@ const OrderRow: React.FC<Props> = props => {
           <PendingLink />
         )} */}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
-        <td className="status">Partial Fill <span className="lowBalance">low balance<img src={lowBalanceIcon} /></span></td>
+        <td className="status">
+          Partial Fill{' '}
+          <span className="lowBalance">
+            low balance
+            <img src={lowBalanceIcon} />
+          </span>
+        </td>
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

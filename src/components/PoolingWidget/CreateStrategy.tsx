@@ -36,12 +36,9 @@ export const CreateStrategy: React.FC<CreateStrategyProps> = ({
       ) : (
         <>
           <p>
-            Once the transaction is sent and mined,{' '}
-            <BlueBoldText $bold="none" as="span">
-              {ordersCount} orders
-        </BlueBoldText>{' '}
-            will be created.
-      </p>
+            Once the transaction is sent and mined, <BlueBoldText as="span">{ordersCount} orders</BlueBoldText> will be
+            created.
+          </p>
         </>
       )}
       <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />

@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { RESPONSIVE_SIZES } from 'const'
 
-const { TABLET } = RESPONSIVE_SIZES
+// const { TABLET } = RESPONSIVE_SIZES
 
 export const ModalBodyWrapper = styled.div`
   div > p {
@@ -49,7 +49,7 @@ export const TokenRow = styled.tr`
     border-bottom-color: #b9b9b9;
   }
 
-  @media only screen and (max-width: ${TABLET}em) {
+  /* @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
     > td {
       // Each item in each cell
       > * {
@@ -80,7 +80,7 @@ export const TokenRow = styled.tr`
         border-bottom: 0.0625rem solid #ffffff40;
       }
     }
-  }
+  } */
 `
 
 export const RowClaimButton = styled.button`

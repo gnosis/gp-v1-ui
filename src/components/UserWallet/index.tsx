@@ -1,16 +1,26 @@
 import React, { Suspense } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 
-import { walletApi } from 'api'
-
-import { setupAutoconnect } from 'utils'
-import UserWallet from './WalletComponent'
 import { UserWalletWrapper } from './UserWallet.styled'
 
 const LazyUserWallet = React.lazy(async () => {
+  const UserWalletProm = import(
+    /* webpackChunkName: "WalletComponet_chunk"*/
+    './WalletComponent'
+  )
+  const [{ setupAutoconnect }, { walletApi }] = await Promise.all([
+    import(
+      /* webpackChunkName: "autoconnect_chunk"*/
+      'utils/autoconnect'
+    ),
+    import(
+      /* webpackChunkName: "API_chunk"*/
+      'api'
+    ),
+  ])
   await setupAutoconnect(walletApi)
 
-  return { default: UserWallet }
+  return UserWalletProm
 })
 
 const SuspendedWallet: React.FC<RouteComponentProps> = props => (

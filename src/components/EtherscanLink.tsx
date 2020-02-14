@@ -8,6 +8,7 @@ type EtherscanLinkType = 'tx' | 'address' | 'contract' | 'token'
 export interface EtherscanLinkProps {
   type: EtherscanLinkType
   identifier: string
+  networkId?: number
   label?: string | ReactElement | void
   className?: string // to allow subclassing styles with styled-components
 }
@@ -29,8 +30,14 @@ function getEtherscanDomainSuffix(type: EtherscanLinkType, identifier: string): 
   }
 }
 
-export const EtherscanLink: React.FC<EtherscanLinkProps> = ({ type, identifier, label, className }) => {
-  const { networkId } = useWalletConnection()
+export const EtherscanLink: React.FC<EtherscanLinkProps> = ({
+  type,
+  identifier,
+  label,
+  className,
+  networkId: netId,
+}) => {
+  const { networkId = netId } = useWalletConnection()
 
   if (!networkId || !identifier) {
     return null

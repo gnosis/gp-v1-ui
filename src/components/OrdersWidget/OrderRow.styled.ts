@@ -11,7 +11,9 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
 
   .checked {
     margin: auto;
-    > input {margin: auto;}
+    > input {
+      margin: auto;
+    }
     > button {
       display: none;
       justify-content: center;
@@ -67,7 +69,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
     }
   }
 
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+  @media only screen and (max-width: ${RESPONSIVE_SIZES.tablet}em) {
     &.selected {
       > td {
         border-bottom: 0.0625rem solid #ffffff40;

@@ -4,7 +4,16 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount, adjustPrecision } from 'utils'
+import {
+  formatAmount,
+  formatAmountFull,
+  parseAmount,
+  adjustPrecision,
+  validInputPattern,
+  leadingAndTrailingZeros,
+  trailingZerosAfterDot,
+  validatePositive,
+} from 'utils'
 import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
@@ -78,20 +87,20 @@ const InputBox = styled.div`
   input {
     margin: 0;
     width: 100%;
-    background: #E7ECF3;
-    border-radius: .6rem .6rem 0 0;
+    background: #e7ecf3;
+    border-radius: 0.6rem 0.6rem 0 0;
     border: 0;
     font-size: 1.6rem;
     line-height: 1;
     box-sizing: border-box;
-    border-bottom: .2rem solid transparent;
+    border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 15rem 0 1rem;
-    
+
     &:focus {
-      border-bottom: .2rem solid #218DFF;
-      border-color: #218DFF;
-      color: #218DFF;
+      border-bottom: 0.2rem solid #218dff;
+      border-color: #218dff;
+      color: #218dff;
     }
 
     &.error {
@@ -99,7 +108,7 @@ const InputBox = styled.div`
     }
 
     &.warning {
-      color: #FF5722;
+      color: #ff5722;
     }
 
     &:disabled {
@@ -113,12 +122,12 @@ const WalletDetail = styled.div`
   justify-content: space-between;
   align-items: center;
   font-size: inherit;
-  margin: 0 0 0 .3rem;
+  margin: 0 0 0 0.3rem;
   color: #476481;
-  
+
   > a {
-    color: #218DFF;
-    margin: 0 0 0 .3rem;
+    color: #218dff;
+    margin: 0 0 0 0.3rem;
   }
 
   .success {
@@ -132,7 +141,9 @@ const WalletDetail = styled.div`
     line-height: 1.2;
     font-size: 1.2rem;
     display: block;
-      > strong {color: inherit;}
+    > strong {
+      color: inherit;
+    }
   }
 
   &.error {
@@ -141,10 +152,10 @@ const WalletDetail = styled.div`
   &.warning {
     color: #476481;
     background: #fff0eb;
-    border-radius: 0 0 .3rem .3rem;
-    padding: .5rem;
+    border-radius: 0 0 0.3rem 0.3rem;
+    padding: 0.5rem;
     box-sizing: border-box;
-    margin: .3rem 0 1rem;
+    margin: 0.3rem 0 1rem;
   }
 `
 
@@ -162,7 +173,7 @@ const TokenEnable = styled.div`
   height: 3.8rem;
   margin: auto -3.2rem auto 0;
   font-size: 1.4rem;
-  color: #218DFF;
+  color: #218dff;
   letter-spacing: -0.05rem;
   text-align: center;
   font-weight: var(--font-weight-medium);
@@ -170,16 +181,16 @@ const TokenEnable = styled.div`
   align-items: center;
   padding: 0 4.2rem 0 1.6rem;
   box-sizing: border-box;
-  background: #DEEEFF;
-  border: .1rem solid #218DFF;
+  background: #deeeff;
+  border: 0.1rem solid #218dff;
   border-radius: 2rem;
   cursor: pointer;
-  transition: background .2s ease-in-out, color .2s ease-in-out;
-  
-    &:hover {
-      background: #218DFF;
-      color: #FFFFFF;
-    }
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+
+  &:hover {
+    background: #218dff;
+    color: #ffffff;
+  }
 `
 
 function displayBalance<K extends keyof TokenBalanceDetails>(
@@ -192,18 +203,10 @@ function displayBalance<K extends keyof TokenBalanceDetails>(
   return formatAmount(balance[key] as BN, balance.decimals) || '0'
 }
 
-const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
-const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
-const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
-
 function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (!validInputPattern.test(event.currentTarget.value + event.key)) {
     event.preventDefault()
   }
-}
-
-function validatePositive(value: string): true | string {
-  return Number(value) > 0 || 'Invalid amount'
 }
 
 interface Props {
@@ -247,7 +250,11 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <WalletDetail className="warning">
-          <b>INFO</b>: Sell amount exceeding your balance by <strong>{formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}</strong>. This creates a standing order. <a href="#">Read more</a>.
+        <b>INFO</b>: Sell amount exceeding your balance by{' '}
+        <strong>
+          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}
+        </strong>
+        . This creates a standing order. <a href="#">Read more</a>.
       </WalletDetail>
     )
   )
@@ -300,11 +307,12 @@ const TokenRow: React.FC<Props> = ({
         <strong>{selectLabel}</strong>
         <span>
           <button>+ Deposit</button>
-          <span>Balance:
+          <span>
+            Balance:
             <WalletDetail>
-            {' '}
-            {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-            {validateMaxAmount && <a onClick={useMax}>max</a>}
+              {' '}
+              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+              {validateMaxAmount && <a onClick={useMax}>max</a>}
             </WalletDetail>
             <i aria-label="Tooltip"></i>
           </span>
@@ -326,6 +334,7 @@ const TokenRow: React.FC<Props> = ({
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
           tabIndex={tabIndex + 2}
+          onFocus={(e): void => e.target.select()}
         />
         {/* <WalletDetail>
           <div>

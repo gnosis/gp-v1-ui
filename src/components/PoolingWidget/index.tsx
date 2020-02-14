@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react'
+import { toast } from 'toastify'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
-import { toast } from 'react-toastify'
 
 import styled from 'styled-components'
 
@@ -52,8 +52,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
       <BarWrapper>
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
-            <ProgressStep data-title={stepName} className={stepChecker(step, index) ? 'active' : ''} $bgColor={stepChecker(step, index) ? '#218DFF;' : '#9FB4C9'}><ProgressStepText>{index + 1}</ProgressStepText></ProgressStep>
-            {index + 1 < 3 && (<StepSeparator />)}
+            <ProgressStep
+              data-title={stepName}
+              className={stepChecker(step, index) ? 'active' : ''}
+              $bgColor={stepChecker(step, index) ? '#218DFF;' : '#9FB4C9'}
+            >
+              <ProgressStepText>{index + 1}</ProgressStepText>
+            </ProgressStep>
+            {index + 1 < 3 && <StepSeparator />}
           </React.Fragment>
         ))}
       </BarWrapper>
@@ -61,7 +67,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
   )
 }
 
-const StepDescription: React.FC = ({ step }) => (
+const StepDescription: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => (
   <StepDescriptionWrapper>
     <StepTitle step={step} />
   </StepDescriptionWrapper>
@@ -82,7 +88,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
           </ul>
           <p>
             <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
-          </p>`
+          </p>`,
         }
       case 2:
         return {
@@ -92,14 +98,15 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
           `,
         }
       case 3:
-        return { 
-          title: '3. New liquidity summary:', 
+        return {
+          title: '3. New liquidity summary:',
           subtext: `
             <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
             <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
             <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
             <p><b>The exchange only uses your fully available exchange balance to execute trades.</b></p>
-          ` }
+          `,
+        }
       default:
         return { title: 'An error occurred, please try again' }
     }
@@ -107,9 +114,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
 
   return (
     <div>
-      <ProgressStepText as="h2" $bold="bolder">
-        {title}
-      </ProgressStepText>
+      <ProgressStepText as="h2">{title}</ProgressStepText>
       {subtext && <div className="liqContent" dangerouslySetInnerHTML={{ __html: subtext }} />}
     </div>
   )
@@ -289,7 +294,7 @@ const PoolingInterface: React.FC = () => {
       <PoolingInterfaceWrapper $width="100%">
         <h2>New Liquidity Order</h2>
         <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
-        
+
         <ContentWrapper>
           <StepDescription step={step} />
           {/* Main Components here */}
@@ -318,7 +323,7 @@ const PoolingInterface: React.FC = () => {
           ) : (
             // NOT YET SUBMITTED TX
             <button className="success" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
-                  <FontAwesomeIcon icon={!isSubmitting ? "" : faSpinner} spin={isSubmitting} /> Submit transaction
+              {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
             </button>
           )}
         </StepButtonsWrapper>

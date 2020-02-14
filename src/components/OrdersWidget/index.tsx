@@ -113,21 +113,23 @@ const OrdersWidget: React.FC = () => {
 
   return (
     <OrdersWrapper>
-      {noOrders && (<div>
-        {/* <h2>Your orders</h2> */}
-        <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
-          {noOrders && (
-            <p className="noOrdersInfo">
-              It appears you haven&apos;t placed any order yet. <br /> Create one!
-            </p>
-          )}
-          {/*
+      {noOrders && (
+        <div>
+          {/* <h2>Your orders</h2> */}
+          <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
+            {noOrders && (
+              <p className="noOrdersInfo">
+                It appears you haven&apos;t placed any order yet. <br /> Create one!
+              </p>
+            )}
+            {/*
           <a href="/" className="strategyInfo">
             <small>Learn more about liquidity</small>
           </a>
           */}
-        </CreateButtons>
-      </div>)}
+          </CreateButtons>
+        </div>
+      )}
       {!noOrders && networkId && (
         <OrdersForm>
           <div className="infoContainer">
@@ -159,7 +161,7 @@ const OrdersWidget: React.FC = () => {
             <div className="deleteContainer">
               <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
                 <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
-                </ButtonWithIcon>
+              </ButtonWithIcon>
               {/* <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
                   Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
                 </span> */}
@@ -206,11 +208,11 @@ const OrdersWidget: React.FC = () => {
               {pendingShownOrdersCount ? <h3>Current Orders</h3> : null}
               <div className="ordersContainer">
                 <CardTable
-                // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
-                $columns="minmax(2rem,.4fr)  minmax(11rem,1fr)  minmax(11rem,1.3fr)  minmax(5rem,.9fr)  minmax(auto,1.4fr)"
-                // $cellSeparation="0 .5rem;"
-                $rowSeparation="0"
-              >
+                  // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
+                  $columns="minmax(2rem,.4fr)  minmax(11rem,1fr)  minmax(11rem,1.3fr)  minmax(5rem,.9fr)  minmax(auto,1.4fr)"
+                  // $cellSeparation="0 .5rem;"
+                  $rowSeparation="0"
+                >
                   <thead>
                     <tr>
                       <th className="checked">

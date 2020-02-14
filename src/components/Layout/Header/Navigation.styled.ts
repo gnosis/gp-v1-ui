@@ -8,6 +8,15 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   margin: auto;
   align-items: center;
   justify-content: center;
+  
+    @media ${RESPONSIVE_SIZES.mobile} {
+      flex-flow: row wrap;
+      background: #dde4ed;
+      border-radius: 15rem;
+      width: 100%;
+      margin: 0 auto;
+      justify-content: space-between;
+    }
 
   a:link,
   a:visited {
@@ -29,6 +38,10 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     justify-content: center;
     align-items: center;
     
+      @media ${RESPONSIVE_SIZES.mobile} {
+        color: rgba(78, 106, 133, .75);
+      }
+    
     &:hover {
       color: var(--color-text-active);
       background: var(--color-background-nav-active);
@@ -37,14 +50,17 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     &.active {
       color: var(--color-text-active);
       background: var(--color-background-nav-active);
-
-      /* @media only screen and (min-width: ${RESPONSIVE_SIZES.TABLET}em) {
-        border-bottom: 0.125rem solid var(--color-text-primary);
-      } */
+      @media ${RESPONSIVE_SIZES.mobile} {
+        padding: 0 1.2rem;
+        font-size: 1.6rem;
+        height: 4.6rem;
+        background: #208dff;
+        color: #ffffff;
+      }
     }
   }
 
-  ${({ $responsive, $open }): string | false =>
+  /* ${({ $responsive, $open }): string | false =>
     $responsive &&
     `
     flex-flow: column nowrap;
@@ -57,14 +73,18 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     height: ${$open ? 'auto' : '3.9375rem'};
     overflow: hidden;
     padding: 0;
-  `}
+  `} */
 `
 
 export const OrderedNavLinkDiv = styled.span<{ $order: number }>`
   order: ${({ $order }): number => $order};
   display: flex;
   align-items: center;
+
   &:not(:last-of-type) {
     margin: 0 1.6rem 0 0;
+    @media ${RESPONSIVE_SIZES.mobile} {
+      margin: 0;
+    }
   }
 `

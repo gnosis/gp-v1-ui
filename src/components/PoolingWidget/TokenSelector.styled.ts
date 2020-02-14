@@ -12,10 +12,10 @@ export const TokenSelectorWrapper = styled.div`
   box-sizing: border-box;
   height: 34rem;
   overflow-y: auto;
-  border: .1rem solid #DFE6EF;
-  border-radius: .6rem;
+  border: 0.1rem solid #dfe6ef;
+  border-radius: 0.6rem;
   margin: 0 0 4rem auto;
-  background: #FFFFFF;
+  background: #ffffff;
 `
 
 export const CheckboxWrapper = styled.div`
