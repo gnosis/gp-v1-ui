@@ -10,6 +10,11 @@ export const DefineSpreadWrapper = styled.div`
   padding: 0;
   box-sizing: border-box;
   
+  > strong {
+    margin: 0 0 1rem 0;
+    color: #2F3E4E;
+  }
+  
   > input {
     margin: 0 0 2.4rem 0;
     width: auto;
@@ -73,9 +78,24 @@ export const SpreadInformationWrapper = styled.div`
   display: flex;
   flex-flow: column wrap;
   width: 100%;
+  > strong {
+    margin: 0 0 1rem 0;
+    color: #2F3E4E;
+  }
+  > p {
+    margin: 0 0 2.4rem;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
   
+  > p > i {
+    font-style: normal;
+    color: #218DFF;
+    font-weight: var(--font-weight-medium);
+  }
 `
 
-export const RedBoldText = styled(ProgressStepText)`
-  color: red;
+export const BlueBoldText = styled(ProgressStepText)`
+  color: #218DFF;
+  font-weight: var(--font-weight-medium)
 `

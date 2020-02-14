@@ -22,7 +22,10 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
 
   return (
     <SpreadInformationWrapper>
-      Test
+      <strong>Sell Spread</strong>
+      <p>{tokenSymbolsString.join(', ')} for <b>at least</b>{' '}< br /><i>${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}</i></p>
+      <strong>Buy Spread</strong>
+      <p>{tokenSymbolsString.join(', ')} for <b>at most</b>{' '}< br /><i>${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}</i></p>
     </SpreadInformationWrapper>
   )
 }

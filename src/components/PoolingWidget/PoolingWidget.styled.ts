@@ -152,6 +152,10 @@ export const StepButtonsWrapper = styled.div`
     color: #FFFFFF;
     text-transform: uppercase;
     font-size: 1.4rem;
+      
+      > svg {
+        margin: 0 .8rem 0 0;
+      }
     
       &:hover {
         background: #0B66C6;
@@ -214,13 +218,14 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
 
 export const StepDescriptionWrapper = styled.div`
   width: 50%;
-  padding: 0 1.5rem 0 0;
+  padding: 0 2.4rem 0 0;
   box-sizing: border-box;
 
   .liqContent {
     color: #456483;
     font-size: 1.4rem;
     line-height: 1.4;
+    margin: 1.6rem 0 0;
 
     > ul {
       list-style: none;

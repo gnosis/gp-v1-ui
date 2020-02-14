@@ -81,16 +81,25 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             <li><img src=${checkIcon} />Cancellation possible at any time</li>
           </ul>
           <p>
-            <a href="#" rel="noopener">Learn more about liquidity provision.</a>
+            <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
           </p>`
         }
       case 2:
         return {
           title: '2. Define your spread',
-          subtext: 'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
+          subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
+          <p><a href="#" target="_blank" rel="noopener">Learn more about the spread.</a></p>
+          `,
         }
       case 3:
-        return { title: '3. Create liquidity', subtext: '' }
+        return { 
+          title: '3. New liquidity summary:', 
+          subtext: `
+            <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
+            <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
+            <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
+            <p><b>The exchange only uses your fully available exchange balance to execute trades.</b></p>
+          ` }
       default:
         return { title: 'An error occurred, please try again' }
     }
@@ -309,7 +318,7 @@ const PoolingInterface: React.FC = () => {
           ) : (
             // NOT YET SUBMITTED TX
             <button className="success" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
-              <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} spin={isSubmitting} /> Send transaction
+                  <FontAwesomeIcon icon={!isSubmitting ? "" : faSpinner} spin={isSubmitting} /> Submit transaction
             </button>
           )}
         </StepButtonsWrapper>
