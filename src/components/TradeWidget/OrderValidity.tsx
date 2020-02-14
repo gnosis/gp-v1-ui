@@ -118,7 +118,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
 
   return (
     <Wrapper>
-      <h3>Expiration time:</h3>
+      <h3>Expiration time (in min):</h3>
       <InputBox>
         <div className="main-input-container">
           <input
@@ -138,7 +138,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
           />
           <div className="radio-container">
             <input type="checkbox" disabled={isDisabled} defaultChecked={isUnlimited} onClick={handleUnlimitedClick} />
-            <small>Unlimited</small>
+            <small>Never</small>
           </div>
         </div>
         {errorOrWarning}
