@@ -51,7 +51,9 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
           {/* USER WALLET */}
           <UserWallet />
           {/* Global Batch Countdown */}
-          <BatchCountDown>Next batch in: <strong>4m 12s</strong></BatchCountDown>
+          <BatchCountDown>
+            Next batch in: <strong>4m 12s</strong>
+          </BatchCountDown>
         </TopWrapper>
         {/* HEADER LINKS */}
         <NavigationLinks

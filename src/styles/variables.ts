@@ -86,7 +86,7 @@ const variables = css`
   :root {
     ${AllColors}
   }
-  
+
   :root,
   body.light-theme {
     // ------------------------------

@@ -2,7 +2,7 @@ import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { CardTable } from 'components/Layout/Card'
-import { SpreadInformationWrapper, DefineSpreadWrapper, RedBoldText } from './DefineSpread.styled'
+import { SpreadInformationWrapper, DefineSpreadWrapper, BlueBoldText } from './DefineSpread.styled'
 
 import { DEFAULT_DECIMALS } from 'const'
 
@@ -23,9 +23,15 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
   return (
     <SpreadInformationWrapper>
       <strong>Sell Spread</strong>
-      <p>{tokenSymbolsString.join(', ')} for <b>at least</b>{' '}< br /><i>${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}</i></p>
+      <p>
+        {tokenSymbolsString.join(', ')} for <b>at least</b> <br />
+        <i>${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}</i>
+      </p>
       <strong>Buy Spread</strong>
-      <p>{tokenSymbolsString.join(', ')} for <b>at most</b>{' '}< br /><i>${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}</i></p>
+      <p>
+        {tokenSymbolsString.join(', ')} for <b>at most</b> <br />
+        <i>${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}</i>
+      </p>
     </SpreadInformationWrapper>
   )
 }

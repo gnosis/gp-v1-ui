@@ -19,14 +19,9 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
     text-align: center;
     font-weight: var(--font-weight-medium);
     font-size: 2rem;
-    color: #2F3E4E;
+    color: #2f3e4e;
     letter-spacing: 0;
   }
-
-  /* @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_LARGE}em) {
-    padding: 1.5rem;
-    width: auto;
-  } */
 `
 
 export const ProgressStep = styled.div<{ $bgColor?: string }>`
@@ -49,15 +44,15 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     letter-spacing: 0;
     text-align: center;
     background: ${({ $bgColor = 'var(--color-background)' }): string => $bgColor};
-    margin: 0 .5rem 0 0;
+    margin: 0 0.5rem 0 0;
   }
 
   &[data-title]::after {
     display: inline-block;
     content: attr(data-title);
     font-weight: var(--font-weight-normal);
-    font-size: 1.4rem;;
-    color: #2F3E4E;
+    font-size: 1.4rem;
+    color: #2f3e4e;
     letter-spacing: 0;
   }
 
@@ -69,22 +64,22 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
   }
 `
 
-export const ProgressStepText = styled.p<{ $bold: string }>`
-  font-weight: ${({ $bold }): string => $bold};
+export const ProgressStepText = styled.p`
+  font-weight: var(--font-weight-medium);
   margin: 0;
-  color: #2F3E4E;
+  color: #2f3e4e;
   font-size: 1.6rem;
-  
-    > i {
-      color: #476481;
-      font-style: normal;
-    }
+
+  > i {
+    color: #476481;
+    font-style: normal;
+  }
 `
 
 export const GreySubText = styled.p<{ $justify?: string }>`
   display: flex;
   align-items: flex-start;
-  justify-content: ${({ $justify = 'flex-start' }): string => $justify}
+  justify-content: ${({ $justify = 'flex-start' }): string => $justify};
 `
 
 export const StepSeparator = styled.div<{ $bgColor?: string }>`
@@ -103,72 +98,72 @@ export const StepButtonsWrapper = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
-  border-top: .1rem solid #DFE6EF;
+  border-top: 0.1rem solid #dfe6ef;
   justify-content: space-between;
   align-items: center;
 
   > button {
     margin: 0 1.6rem;
-    border-radius: .6rem;
+    border-radius: 0.6rem;
     outline: 0;
     height: 3.6rem;
     box-sizing: border-box;
-    letter-spacing: .03rem;
+    letter-spacing: 0.03rem;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   > button:first-of-type {
     font-weight: var(--font-weight-medium);
     text-transform: uppercase;
     font-size: 1.4rem;
-    color: #218DFF;
+    color: #218dff;
     letter-spacing: 0;
     line-height: 1;
-    transition: color .2s ease-in-out;
-    
-      &:hover {
-        background: 0;
-        color: #0B66C6;
-      }
-    
-      &::before {
-        content: "";
-        background: url(${arrowBlue}) no-repeat center/contain;
-        width: 0.7rem;
-        height: 1.2rem;
-        display: inline-block;
-        margin: 0 .8rem 0 0;
-      }
+    transition: color 0.2s ease-in-out;
+
+    &:hover {
+      background: 0;
+      color: #0b66c6;
+    }
+
+    &::before {
+      content: '';
+      background: url(${arrowBlue}) no-repeat center/contain;
+      width: 0.7rem;
+      height: 1.2rem;
+      display: inline-block;
+      margin: 0 0.8rem 0 0;
+    }
   }
-  
+
   > button:last-of-type {
-    background: #218DFF;
-    border-radius: .6rem;
+    background: #218dff;
+    border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;
     font-weight: var(--font-weight-medium);
-    color: #FFFFFF;
+    color: #ffffff;
     text-transform: uppercase;
     font-size: 1.4rem;
-      
-      > svg {
-        margin: 0 .8rem 0 0;
-      }
-    
-      &:hover {
-        background: #0B66C6;
-      }
-    
-      &::after {
-        content: "";
-        background: url(${arrowWhite}) no-repeat center/contain;
-        width: 0.7rem;
-        height: 1.2rem;
-        display: inline-block;
-        margin: 0 0 0 .8rem;
-      }
+
+    > svg {
+      margin: 0 0.8rem 0 0;
+    }
+
+    &:hover {
+      background: #0b66c6;
+    }
+
+    &::after {
+      content: '';
+      background: url(${arrowWhite}) no-repeat center/contain;
+      width: 0.7rem;
+      height: 1.2rem;
+      display: inline-block;
+      margin: 0 0 0 0.8rem;
+    }
   }
 `
 
@@ -180,40 +175,9 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
   margin: 1rem auto 4rem;
   width: 100%;
 
-  > ${ProgressStep}, 
-  ${StepSeparator}, 
-  ${ProgressStepText}, 
-  ${StepButtonsWrapper} {
-    transition: background .7s ease-in-out;
+  > ${ProgressStep}, ${StepSeparator}, ${ProgressStepText}, ${StepButtonsWrapper} {
+    transition: background 0.7s ease-in-out;
   }
-
-  /* @media only screen and (max-width: ${RESPONSIVE_SIZES.WEB}em) {
-    min-height: 7.143vw;
-    min-width: 50vw;
-
-    > p {
-      white-space: normal;
-    }
-
-    > div {
-      > p {
-        font-size: smaller;
-      }
-    }
-  } */
-
-  /* @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_LARGE}em) {
-    min-height: 10.8vw;
-    min-width: 75vw;
-    > p {
-      font-size: smaller;
-    }
-  } */
-
-  /* @media only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE_SMALL}em) {
-    margin: 0;
-    width: 90%;
-  } */
 `
 
 export const StepDescriptionWrapper = styled.div`
@@ -234,11 +198,11 @@ export const StepDescriptionWrapper = styled.div`
     }
 
     > ul > li {
-      margin: 0 0 .5rem;
+      margin: 0 0 0.5rem;
     }
 
     > ul > li > img {
-      margin: 0 .5rem 0 0;
+      margin: 0 0.5rem 0 0;
     }
   }
 `

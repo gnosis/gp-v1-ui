@@ -4,8 +4,6 @@ import { UserWalletWrapper } from 'components/UserWallet/UserWallet.styled'
 
 import { RESPONSIVE_SIZES } from 'const'
 
-const { TABLET, WEB_SMALL, TABLET_LARGE } = RESPONSIVE_SIZES
-
 export const HeaderWrapper = styled.header`
   display: flex;
   align-items: flex-start;
@@ -17,6 +15,11 @@ export const HeaderWrapper = styled.header`
     flex-flow: column wrap;
     align-items: center;
     width: 100%;
+    
+      @media ${RESPONSIVE_SIZES.mobile} {
+        padding: 0 1.6rem;
+        box-sizing: border-box;
+      }
   }
   
   ${UserWalletWrapper} {
@@ -63,36 +66,4 @@ export const HeaderWrapper = styled.header`
     font-size: 2.2rem;
     margin: 0;
   }
-
-  /* @media only screen and (max-width: ${WEB_SMALL}em) {
-    .logo {
-      display: none;
-    }
-  } */
-
-  /* @media only screen and (max-width: ${TABLET_LARGE}em) {
-    nav {
-      flex-flow: row wrap;
-    }
-    ${UserWalletWrapper} {
-      margin: 1rem auto;
-    }
-  } */
-
-  /* @media only screen and (max-width: ${TABLET}em) {
-    .logo,
-    .nav-links,
-    ${UserWalletWrapper} {
-      padding: 0.25rem;
-    }
-
-    ${NavLinksWrapper} {
-      flex: 1 1 100%;
-      order: 1;
-
-      a {
-        padding: 0.3125rem;
-      }
-    }
-  } */
 `

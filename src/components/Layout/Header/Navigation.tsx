@@ -42,12 +42,12 @@ const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({
       <NavLink to={to}>{label}</NavLink>
     )}
     {/* Only show chevron in responsive mode when label is top */}
-    {responsive && order === 0 && (
+    {/* {responsive && order === 0 && (
       <FontAwesomeIcon
         icon={showLinkSelector ? faChevronCircleUp : faChevronCircleDown}
         style={{ cursor: 'pointer', marginLeft: 10, width: '0.5em' }}
       />
-    )}
+    )} */}
   </OrderedNavLinkDiv>
 )
 

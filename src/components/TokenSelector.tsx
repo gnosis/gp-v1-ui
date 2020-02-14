@@ -6,12 +6,6 @@ import { TokenDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
-const TokenImgWrapper = styled(TokenImg)`
-  width: 4em;
-  height: 4em;
-  margin-right: 0.25em 2em 0.25em 1em;
-`
-
 const Wrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
@@ -41,13 +35,13 @@ const Wrapper = styled.div`
 const TokenImgWrapper = styled(TokenImg)`
   width: 2.4rem;
   height: 2.4rem;
-  margin: 0 .5rem 0 0;
+  margin: 0 0.5rem 0 0;
 `
 
 const StyledSelect = styled(Select)`
   display: flex;
   align-items: center;
-`;
+`
 
 const SelectedTokenWrapper = styled.span`
   display: flex;
@@ -56,10 +50,10 @@ const SelectedTokenWrapper = styled.span`
   color: #476481;
   letter-spacing: -0.05rem;
   text-align: right;
-  
-    > strong {
-      font-weight: var(--font-weight-medium);
-    }
+
+  > strong {
+    font-weight: var(--font-weight-medium);
+  }
 `
 
 function renderOptionLabel(token: TokenDetails): React.ReactNode {
@@ -82,7 +76,16 @@ function formatOptionLabel(
 ): React.ReactNode {
   const { token } = options
   const { context } = labelMeta
-  return context === 'value' ? <span><SelectedTokenWrapper><TokenImgWrapper src={token.image} alt={token.name} /><strong>{token.symbol}</strong></SelectedTokenWrapper></span> : renderOptionLabel(token)
+  return context === 'value' ? (
+    <span>
+      <SelectedTokenWrapper>
+        <TokenImgWrapper src={token.image} alt={token.name} />
+        <strong>{token.symbol}</strong>
+      </SelectedTokenWrapper>
+    </span>
+  ) : (
+    renderOptionLabel(token)
+  )
 }
 
 const customSelectStyles = {
@@ -95,14 +98,14 @@ const customSelectStyles = {
     borderRadius: '15rem',
     background: '#e6ecf3',
     cursor: 'pointer',
-    '&:hover': {
-      opacity: '1',
-      borderColor: '#476481',
-    },
-    '>div': {
-      padding: '0 0 0 1rem',
-      overflow: 'visible'
-    }
+    // '&:hover': {
+    //   opacity: '1',
+    //   borderColor: '#476481',
+    // },
+    // '>div': {
+    //   padding: '0 0 0 1rem',
+    //   overflow: 'visible',
+    // },
   }),
   menu: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -118,7 +121,7 @@ const customSelectStyles = {
     zIndex: '20',
     width: '42rem',
     height: '30rem',
-    boxShadow: '0 100vh 0 100vw rgba(47, 62, 78, 0.50)'
+    boxShadow: '0 100vh 0 100vw rgba(47, 62, 78, 0.50)',
   }),
   input: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -140,7 +143,7 @@ const customSelectStyles = {
   }),
   indicatorSeparator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
-    display: 'none'
+    display: 'none',
   }),
   dropdownIndicator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -149,7 +152,7 @@ const customSelectStyles = {
     '&:hover': {
       opacity: '1',
       color: '#476481',
-    }
+    },
   }),
   singleValue: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -159,7 +162,7 @@ const customSelectStyles = {
     display: `flex`,
     alignItems: `center`,
     transform: `none`,
-    top: `initial`
+    top: `initial`,
   }),
 }
 

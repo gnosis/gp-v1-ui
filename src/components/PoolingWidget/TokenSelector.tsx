@@ -30,12 +30,14 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, select
           >
             <CheckboxWrapper>
               {/* <FontAwesomeIcon icon={faCheckCircle} color="green" /> */}
-              <img src={checkIcon} width="20" height="20"/>
+              <img src={checkIcon} width="20" height="20" />
             </CheckboxWrapper>
             <TokenImg alt={name} src={image} />
             <div>
               <ProgressStepText $bold="bold">{symbol}</ProgressStepText>
-              <ProgressStepText><i>{name}</i></ProgressStepText>
+              <ProgressStepText>
+                <i>{name}</i>
+              </ProgressStepText>
             </div>
           </TokenBox>
         )

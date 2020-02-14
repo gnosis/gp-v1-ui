@@ -20,9 +20,9 @@ const Wrapper = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 
-    /* @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-      width: 100%;
-    } */
+    @media ${RESPONSIVE_SIZES.mobile} {
+      margin: 1.6rem auto 5rem;
+    }
   }
 `
 
@@ -47,7 +47,7 @@ const Layout: React.FC = ({ children }) => (
           to: '/balances',
           order: 3,
           withPastLocation: true,
-        }
+        },
       ]}
     />
     <main>{children}</main>

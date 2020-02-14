@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { LEGALDOCUMENT, RESPONSIVE_SIZES } from 'const'
 
-const { MOBILE } = RESPONSIVE_SIZES
+// const { MOBILE } = RESPONSIVE_SIZES
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,29 +13,26 @@ const Wrapper = styled.div`
   text-align: center;
   font-size: 1.3rem;
   padding: 1.1rem 0;
-  
-    > p {
-      line-height: 1;
-      padding: 0;
-      margin: 0;
-    }
-    /* @media only screen and (max-width: ${MOBILE}em) {
-      padding: 0.2rem 2rem;
-    } */
+
+  > p {
+    line-height: 1;
+    padding: 0;
+    margin: 0;
+  }
 `
 
 const Text = styled.p`
   animation-name: foldAnimation;
   animation-duration: 1.5s;
 
-    @keyframes foldAnimation {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+  @keyframes foldAnimation {
+    from {
+      opacity: 0;
     }
+    to {
+      opacity: 1;
+    }
+  }
 `
 
 interface LegalBannerProps {
