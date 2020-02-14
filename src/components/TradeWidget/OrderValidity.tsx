@@ -6,6 +6,7 @@ import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
 import { adjustPrecision } from '@gnosis.pm/dex-js'
+import { validInputPattern } from 'utils'
 
 const Wrapper = styled.div`
   display: flex;
@@ -79,8 +80,6 @@ const WalletDetail = styled.div`
   }
 `
 
-const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
-
 function validatePositive(value: string): true | string {
   return Number(value) == 0 || Number(value) >= 5 || 'Invalid expiration time'
 }
@@ -136,6 +135,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
               validate: { positive: validatePositive },
             })}
             onChange={handleChange}
+            onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex + 2}
           />
           <div className="radio-container">

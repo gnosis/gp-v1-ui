@@ -213,3 +213,22 @@ export function sanitizeInput(value?: string | null, defaultValue = '0'): string
 export function sanitizeNegativeAndMakeMultipleOf(value?: string | null, defaultValue = '0'): string {
   return Number(value) >= 0 ? makeMultipleOf(5, value).toString() : defaultValue
 }
+
+export function validatePositive(value: string): true | string {
+  return Number(value) > 0 || 'Invalid amount'
+}
+export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
+export const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
+export const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
+
+export const formatValidity = (validTime: string | number): string =>
+  +validTime == 0
+    ? 'Unlimited'
+    : +validTime < 0
+    ? 'Invalid time - time cannot be negative'
+    : `~
+${(+validTime / 60)
+  .toFixed(2)
+  .replace(leadingAndTrailingZeros, '')
+  .replace(trailingZerosAfterDot, '$1')}
+hours`

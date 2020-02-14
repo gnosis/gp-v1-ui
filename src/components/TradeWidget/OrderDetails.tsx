@@ -4,8 +4,7 @@ import BigNumber from 'bignumber.js'
 
 import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
-import { formatPrice } from 'utils'
-import { leadingAndTrailingZeros, trailingZerosAfterDot } from './TokenRow'
+import { formatPrice, formatValidity } from 'utils'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
@@ -67,16 +66,7 @@ const OrderDetails: React.FC<Props> = ({
 
       <dd>Expiration date:</dd>
       <dt>
-        <Highlight>
-          {+validUntil == 0
-            ? 'Unlimited'
-            : `~
-          ${(+validUntil / 60)
-            .toFixed(2)
-            .replace(leadingAndTrailingZeros, '')
-            .replace(trailingZerosAfterDot, '$1')}
-          hours`}
-        </Highlight>
+        <Highlight>{formatValidity(validUntil)}</Highlight>
       </dt>
     </Wrapper>
   )
