@@ -9,3 +9,62 @@ export {
   calculatePriceBigNumber,
   formatPrice,
 } from '@gnosis.pm/dex-js'
+
+export function makeMultipleOf(mult = 5, value?: number | string | null): number {
+  const cache = {}
+  const numValue = Number(value)
+
+  if (numValue === 0 || !value || isNaN(numValue)) return 0
+  if (!(numValue % mult) || cache[numValue]) return numValue
+
+  const remainder = numValue % mult
+
+  let finalVal
+  if (remainder > mult / 2) {
+    cache[numValue] = numValue
+    finalVal = numValue - remainder + mult
+  } else {
+    cache[numValue] = numValue
+    finalVal = numValue - remainder
+  }
+
+  return finalVal
+}
+
+/**
+ * Prevents invalid numbers from being inserted by hand in the URL
+ *
+ * @param value Input from URL
+ */
+export function sanitizeInput(value?: string | null, defaultValue = '0'): string {
+  return value && Number(value) ? value : defaultValue
+}
+
+/**
+ * Prevents invalid NEGATIVE numbers from being inserted by hand in the URL
+ * Pushes number to nearest multiple of 5 (batch time)
+ *
+ * @param value Input from URL
+ */
+export function sanitizeNegativeAndMakeMultipleOf(value?: string | null, defaultValue = '0'): string {
+  return Number(value) >= 0 ? makeMultipleOf(5, value).toString() : defaultValue
+}
+
+export function validatePositive(value: string): true | string {
+  return Number(value) > 0 || 'Invalid amount'
+}
+export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
+export const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
+export const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
+
+export const formatValidity = (validTime: string | number): string =>
+  +validTime == 0
+    ? 'Unlimited'
+    : +validTime < 0
+    ? 'Invalid time - time cannot be negative'
+    : `~
+${(+validTime / 60)
+  .toFixed(2)
+  .replace(leadingAndTrailingZeros, '')
+  .replace(trailingZerosAfterDot, '$1')}
+hours`
