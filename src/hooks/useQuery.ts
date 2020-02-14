@@ -1,25 +1,6 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
-import { makeMultipleOf } from 'utils'
-
-/**
- * Prevents invalid numbers from being inserted by hand in the URL
- *
- * @param value Input from URL
- */
-function sanitizeInput(value?: string | null, defaultValue = '0'): string {
-  return value && Number(value) ? value : defaultValue
-}
-
-/**
- * Prevents invalid NEGATIVE numbers from being inserted by hand in the URL
- * Pushes number to nearest multiple of 5 (batch time)
- *
- * @param value Input from URL
- */
-function sanitizeNegativeInput(value?: string | null, defaultValue = '0'): string {
-  return Number(value) >= 0 ? makeMultipleOf(5, value).toString() : defaultValue
-}
+import { sanitizeInput, sanitizeNegativeAndMakeMultipleOf } from 'utils'
 
 export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string } {
   const { search } = useLocation()
@@ -30,7 +11,7 @@ export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?
     return {
       sellAmount: sanitizeInput(query.get('sell')),
       buyAmount: sanitizeInput(query.get('buy')),
-      validUntil: sanitizeNegativeInput(query.get('expires'), '30'),
+      validUntil: sanitizeNegativeAndMakeMultipleOf(query.get('expires'), '30'),
     }
   }, [search])
 }

@@ -194,3 +194,22 @@ export function makeMultipleOf(mult = 5, value?: number | string | null): number
 
   return finalVal
 }
+
+/**
+ * Prevents invalid numbers from being inserted by hand in the URL
+ *
+ * @param value Input from URL
+ */
+export function sanitizeInput(value?: string | null, defaultValue = '0'): string {
+  return value && Number(value) ? value : defaultValue
+}
+
+/**
+ * Prevents invalid NEGATIVE numbers from being inserted by hand in the URL
+ * Pushes number to nearest multiple of 5 (batch time)
+ *
+ * @param value Input from URL
+ */
+export function sanitizeNegativeAndMakeMultipleOf(value?: string | null, defaultValue = '0'): string {
+  return Number(value) >= 0 ? makeMultipleOf(5, value).toString() : defaultValue
+}
