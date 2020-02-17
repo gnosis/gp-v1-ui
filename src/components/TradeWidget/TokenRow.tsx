@@ -112,6 +112,7 @@ interface Props {
   isDisabled: boolean
   validateMaxAmount?: true
   tabIndex: number
+  readOnly: boolean
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -124,6 +125,7 @@ const TokenRow: React.FC<Props> = ({
   isDisabled,
   validateMaxAmount,
   tabIndex,
+  readOnly = false,
 }) => {
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
@@ -207,7 +209,8 @@ const TokenRow: React.FC<Props> = ({
           placeholder="0"
           name={inputId}
           type="text"
-          disabled={isDisabled}
+          disabled={isDisabled || readOnly}
+          readOnly={readOnly}
           required
           ref={register({
             pattern: { value: validInputPattern, message: 'Invalid amount' },
