@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Hook, Unhook, Console, Message, Decode } from 'console-feed'
 import styled from 'styled-components'
+import Web3Connect from 'web3connect'
 
 const ConsoleWrapper = styled.div`
   position: fixed;
@@ -117,4 +118,10 @@ const ConsoleFrame: React.FC = () => {
   )
 }
 
-export default ConsoleFrame
+const MobileConsole: React.FC = () => {
+  if (!Web3Connect.isMobile()) return null
+
+  return <ConsoleFrame />
+}
+
+export default MobileConsole

@@ -4,11 +4,11 @@ import BigNumber from 'bignumber.js'
 
 import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
-import { formatPrice } from 'utils'
+import { formatPrice, formatValidity } from 'utils'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
-  font-size: 0.8em;
+  font-size: 1rem;
 
   dd {
     font-weight: bold;
@@ -25,6 +25,7 @@ interface Props {
   sellTokenName: string
   receiveAmount: string
   receiveTokenName: string
+  validUntil: string
 }
 
 const OrderDetails: React.FC<Props> = ({
@@ -32,6 +33,7 @@ const OrderDetails: React.FC<Props> = ({
   sellTokenName,
   receiveAmount: receiveAmountString,
   receiveTokenName,
+  validUntil,
 }) => {
   const sellAmount = new BigNumber(sellAmountString)
   const receiveAmount = new BigNumber(receiveAmountString)
@@ -64,7 +66,7 @@ const OrderDetails: React.FC<Props> = ({
 
       <dd>Expiration date:</dd>
       <dt>
-        <Highlight>30 min</Highlight>
+        <Highlight>{formatValidity(validUntil)}</Highlight>
       </dt>
     </Wrapper>
   )

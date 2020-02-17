@@ -1,20 +1,22 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
+// eslint-disable-next-line @typescript-eslint/camelcase
+import { unstable_batchedUpdates } from 'react-dom'
 import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
-import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
+import { useDeleteOrders } from './useDeleteOrders'
+import usePendingOrders from 'hooks/usePendingOrders'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive } from 'utils'
 
 import { CardTable } from 'components/Layout/Card'
 import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
-
-import { useDeleteOrders } from './useDeleteOrders'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
 
 interface ShowOrdersButtonProps {
@@ -37,10 +39,12 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
 }
 
 const OrdersWidget: React.FC = () => {
-  const allOrders = useOrders()
+  const { orders: allOrders, forceOrdersRefresh } = useOrders()
+  const pendingOrders = usePendingOrders()
+  // this page is behind login wall so networkId should always be set
+  const { networkId } = useWalletConnection()
 
   const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
-
   const [showActive, setShowActive] = useSafeState<boolean>(true)
 
   const toggleShowActive = useCallback(() => {
@@ -54,12 +58,10 @@ const OrdersWidget: React.FC = () => {
   }, [allOrders, setOrders, showActive])
 
   const shownOrdersCount = orders.length
+  const pendingShownOrdersCount = pendingOrders.length
   const hiddenOrdersCount = allOrders.length - shownOrdersCount
 
   const noOrders = allOrders.length === 0
-
-  // this page is behind login wall so networkId should always be set
-  const { networkId } = useWalletConnection()
 
   const overBalanceOrders = useMemo(
     () =>
@@ -96,12 +98,17 @@ const OrdersWidget: React.FC = () => {
       const success = await deleteOrders(Array.from(markedForDeletion))
 
       if (success) {
-        // reset selections
-        setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
-        setMarkedForDeletion(new Set<string>())
+        unstable_batchedUpdates(() => {
+          // reset selections
+          setOrders(orders.filter(order => !markedForDeletion.has(order.id)))
+          setMarkedForDeletion(new Set<string>())
+
+          // update the list of orders
+          forceOrdersRefresh()
+        })
       }
     },
-    [deleteOrders, markedForDeletion, orders, setMarkedForDeletion, setOrders],
+    [deleteOrders, forceOrdersRefresh, markedForDeletion, orders, setMarkedForDeletion, setOrders],
   )
 
   return (
@@ -150,8 +157,45 @@ const OrdersWidget: React.FC = () => {
               </div>
             )}
           </div>
+          {/* PENDING ORDERS */}
+          {pendingShownOrdersCount ? (
+            <div>
+              <h3>Pending Orders</h3>
+              <div className="ordersContainer">
+                <CardTable
+                  $columns="minmax(13.625rem, 1.3fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
+                  $cellSeparation="0.2rem"
+                  $rowSeparation="0.6rem"
+                >
+                  <thead>
+                    <tr>
+                      <th>Order details</th>
+                      <th>Unfilled amount</th>
+                      <th>Account balance</th>
+                      <th>Expires</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingOrders.map((order: PendingTxObj) => (
+                      <OrderRow
+                        key={Math.random()}
+                        order={order}
+                        networkId={networkId}
+                        isOverBalance={false}
+                        pending
+                        disabled={deleting}
+                        isPendingOrder
+                      />
+                    ))}
+                  </tbody>
+                </CardTable>
+              </div>
+            </div>
+          ) : null}
+
           {shownOrdersCount ? (
             <form action="submit" onSubmit={onSubmit}>
+              {pendingShownOrdersCount ? <h3>Current Orders</h3> : null}
               <div className="ordersContainer">
                 <CardTable
                   $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"

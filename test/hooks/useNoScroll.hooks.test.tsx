@@ -7,7 +7,7 @@ import useWindowSizes from 'hooks/useWindowSizes'
 
 const TestScrollComponent: React.FC = () => {
   const { innerWidth } = useWindowSizes()
-  let activateNoScroll = !!innerWidth && innerWidth < 500
+  const activateNoScroll = !!innerWidth && innerWidth < 500
 
   useNoScroll(activateNoScroll)
 
@@ -19,7 +19,7 @@ const TestScrollComponent: React.FC = () => {
 }
 
 let container: HTMLDivElement
-let { classList } = document.body
+const { classList } = document.body
 
 beforeEach(() => {
   container = document.createElement('div')

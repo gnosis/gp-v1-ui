@@ -22,6 +22,7 @@ import {
   GetOrdersPaginatedResult,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
+import { wait } from 'utils'
 
 export interface OrdersByUser {
   [userAddress: string]: Order[]
@@ -69,6 +70,8 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     pageSize = DEFAULT_ORDERS_PAGE_SIZE,
   }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
     this._initOrders(userAddress)
+
+    await wait(5000)
 
     const nextIndex = offset + pageSize
 
