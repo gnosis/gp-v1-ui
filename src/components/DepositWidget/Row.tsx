@@ -9,7 +9,7 @@ import { TokenRow, RowClaimButton, RowClaimLink } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
-import { ZERO, RESPONSIVE_SIZES } from 'const'
+import { ZERO, MEDIA } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 import { TokenLocalState } from 'reducers-actions'
@@ -54,7 +54,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
 
   // Checks innerWidth
-  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE_PX
+  const showResponsive = !!innerWidth && innerWidth < MEDIA.MOBILE_LARGE_PX
   useNoScroll(!!visibleForm && showResponsive)
 
   let className

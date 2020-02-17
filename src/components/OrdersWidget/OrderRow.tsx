@@ -1,26 +1,21 @@
 import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faExclamationTriangle,
-  faSpinner,
-  faTrashAlt,
-  faExchangeAlt,
-  faChevronUp,
-  faChevronDown,
-} from '@fortawesome/free-solid-svg-icons'
+import lowBalanceIcon from 'assets/img/lowBalance.svg'
+
+import { faSpinner, faTrashAlt, faExchangeAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
-import Highlight from 'components/Highlight'
+// import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, isOrderActive, formatPrice } from 'utils'
+import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, formatPrice } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
@@ -97,7 +92,7 @@ const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = 
   )
 }
 
-const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order, pending }) => {
+const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
   const price = useMemo(() => {
     const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
     const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
@@ -106,26 +101,16 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order,
   }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
 
   return (
-    <td data-label="Price (at least)">
+    <td data-label="Price">
       <div className="order-details">
-        <div>Sell</div>
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : ''}>1</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-        </div>
-
-        <div>
-          for <strong>at least</strong>
-        </div>
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-        </div>
-      </div>
-      <div className="order-details-responsive">
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-        </div>
+        {/* <Highlight color={pending ? 'grey' : ''}></Highlight> */}
+        {price} {displayTokenSymbolOrLink(sellToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(buyToken)}
+        <br />
+        {price} {displayTokenSymbolOrLink(buyToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(sellToken)}
       </div>
     </td>
   )
@@ -136,7 +121,7 @@ interface UnfilledAmountProps extends Pick<Props, 'order' | 'pending'> {
   isUnlimited: boolean
 }
 
-const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pending, isUnlimited }) => {
+const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, isUnlimited }) => {
   const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
     order.remainingAmount,
     sellToken.decimals,
@@ -145,7 +130,8 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   return (
     <td data-label="Unfilled Amount" className={isUnlimited ? '' : 'sub-columns two-columns'}>
       {isUnlimited ? (
-        <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+        // <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+        <span>no limit</span>
       ) : (
         <>
           <div>{unfilledAmount}</div>
@@ -158,32 +144,33 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   )
 }
 
-interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
-  sellToken: TokenDetails
-  isUnlimited: boolean
-}
+//TODO: no longer needed? remove
+// interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
+//   sellToken: TokenDetails
+//   isUnlimited: boolean
+// }
 
-const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
-  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
-    order.sellTokenBalance,
-    sellToken.decimals,
-  ])
-  const isActive = isOrderActive(order, new Date())
+// const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
+//   const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
+//     order.sellTokenBalance,
+//     sellToken.decimals,
+//   ])
+//   const isActive = isOrderActive(order, new Date())
 
-  return (
-    <td data-label="Account Balance" className="sub-columns three-columns">
-      <div>{accountBalance}</div>
-      <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      {isOverBalance && isActive && !isUnlimited && (
-        <div className="warning">
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-        </div>
-      )}
-    </td>
-  )
-}
+//   return (
+//     <td data-label="Account Balance" className="sub-columns three-columns">
+//       <div>{accountBalance}</div>
+//       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+//       {isOverBalance && isActive && !isUnlimited && (
+//         <div className="warning">
+//           <FontAwesomeIcon icon={faExclamationTriangle} />
+//         </div>
+//       )}
+//     </td>
+//   )
+// }
 
-const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending }) => {
+const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
     const isNeverExpires = isNeverExpiresOrder(order.validUntil)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
@@ -194,9 +181,11 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending })
   return (
     <td data-label="Expires">
       {isNeverExpires ? (
-        <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
+        // <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
+        <span>Never</span>
       ) : (
-        <Highlight color={'inherit'}>{expiresOn}</Highlight>
+        // <Highlight color={'inherit'}>{expiresOn}</Highlight>
+        <span>{expiresOn}</span>
       )}
     </td>
   )
@@ -253,7 +242,6 @@ const onError = onErrorFactory('Failed to fetch token')
 const OrderRow: React.FC<Props> = props => {
   const {
     order,
-    isOverBalance,
     networkId,
     pending = false,
     transactionHash,
@@ -297,12 +285,19 @@ const OrderRow: React.FC<Props> = props => {
         ) : (
           <PendingLink />
         )}
-        {!isPendingOrder ? (
+        {/* {!isPendingOrder ? (
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
         ) : (
           <PendingLink />
-        )}
+        )} */}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
+        <td className="status">
+          Partial Fill{' '}
+          <span className="lowBalance">
+            low balance
+            <img src={lowBalanceIcon} />
+          </span>
+        </td>
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

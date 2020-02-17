@@ -82,7 +82,7 @@ const DepositWidget: React.FC = () => {
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
         ) : (
-          <CardTable $columns="var(--grid-row-size-walletPage)">
+          <CardTable>
             <thead>
               <tr>
                 <th>Token</th>

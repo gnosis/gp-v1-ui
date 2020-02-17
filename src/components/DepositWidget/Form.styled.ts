@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
 
 export const WalletDrawerInnerWrapper = styled.div`
   display: grid;
@@ -12,10 +11,6 @@ export const WalletDrawerInnerWrapper = styled.div`
   margin: auto;
   padding: 0.375rem;
   width: 80%;
-
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    width: 95%;
-  }
 
   p.error {
     color: red;
@@ -45,7 +40,8 @@ export const WalletDrawerInnerWrapper = styled.div`
       width: 100%;
 
       &:disabled {
-        background-color: var(--color-text-secondary);
+        /* background-color: var(--color-text-secondary); */
+        opacity: 0.5;
       }
     }
   }

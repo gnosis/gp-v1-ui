@@ -5,22 +5,27 @@ import Header from './Header'
 import Footer from './Footer'
 import LegalBanner from '../LegalBanner'
 
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
-  min-height: 100vh;
   width: 100%;
-
-  display: grid;
-  grid-template-rows: 3.125rem 0.2fr auto min-content;
 
   main {
     flex: 1;
-    margin: auto;
-    min-width: 40vw;
+    margin: 2.4rem auto 5rem;
+    max-width: 85rem;
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    > section {
       width: 100%;
+    }
+
+    @media ${MEDIA.mobile} {
+      margin: 1.6rem auto 5rem;
     }
   }
 `
@@ -31,26 +36,20 @@ const Layout: React.FC = ({ children }) => (
     <Header
       navigation={[
         {
-          label: 'Trade',
+          label: 'Order',
           to: '/trade',
           order: 1,
         },
         {
-          label: 'Wallet',
-          to: '/wallet',
+          label: 'Liquidity',
+          to: '/liquidity',
           order: 2,
           withPastLocation: true,
         },
         {
-          label: 'Orders',
-          to: '/orders',
+          label: 'Balances',
+          to: '/wallet',
           order: 3,
-          withPastLocation: true,
-        },
-        {
-          label: 'Liquidity',
-          to: '/liquidity',
-          order: 4,
           withPastLocation: true,
         },
       ]}
@@ -59,5 +58,12 @@ const Layout: React.FC = ({ children }) => (
     <Footer />
   </Wrapper>
 )
+
+// {
+//   label: 'Orders',
+//   to: '/orders',
+//   order: 3,
+//   withPastLocation: true,
+// },
 
 export default Layout

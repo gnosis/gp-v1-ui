@@ -1,24 +1,15 @@
 import React, { CSSProperties, useMemo } from 'react'
 import styled from 'styled-components'
-import Select from 'react-select'
+import Select, { ActionMeta } from 'react-select'
 
 import { TokenDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
-const TokenImgWrapper = styled(TokenImg)`
-  width: 4em;
-  height: 4em;
-
-  margin-right: 0.25em 2em 0.25em 1em;
-`
-
 const Wrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-
-  margin: 0em 1em;
+  flex-flow: row nowrap;
+  margin: 0;
 
   label {
     text-transform: uppercase;
@@ -36,8 +27,32 @@ const Wrapper = styled.div`
     > div {
       display: flex;
       flex-direction: column;
-      margin-left: 1em;
+      margin-left: 1rem;
     }
+  }
+`
+
+const TokenImgWrapper = styled(TokenImg)`
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0 0.5rem 0 0;
+`
+
+const StyledSelect = styled(Select)`
+  display: flex;
+  align-items: center;
+`
+
+const SelectedTokenWrapper = styled.span`
+  display: flex;
+  align-items: center;
+  font-size: 1.4rem;
+  color: #476481;
+  letter-spacing: -0.05rem;
+  text-align: right;
+
+  > strong {
+    font-weight: var(--font-weight-medium);
   }
 `
 
@@ -61,20 +76,58 @@ function formatOptionLabel(
 ): React.ReactNode {
   const { token } = options
   const { context } = labelMeta
-  return context === 'value' ? <strong>{token.symbol}</strong> : renderOptionLabel(token)
+  return context === 'value' ? (
+    <span>
+      <SelectedTokenWrapper>
+        <TokenImgWrapper src={token.image} alt={token.name} />
+        <strong>{token.symbol}</strong>
+      </SelectedTokenWrapper>
+    </span>
+  ) : (
+    renderOptionLabel(token)
+  )
 }
 
 const customSelectStyles = {
   control: (provided: CSSProperties): CSSProperties => ({
     ...provided,
-    border: 'none',
-    background: 'var(--color-background-pageWrapper)',
+    borderColor: '#B8C7D7',
+    borderStyle: 'solid',
+    borderWidth: '.1rem',
+    margin: 'auto 0',
+    borderRadius: '15rem',
+    background: '#e6ecf3',
+    cursor: 'pointer',
+    // '&:hover': {
+    //   opacity: '1',
+    //   borderColor: '#476481',
+    // },
+    // '>div': {
+    //   padding: '0 0 0 1rem',
+    //   overflow: 'visible',
+    // },
   }),
   menu: (provided: CSSProperties): CSSProperties => ({
     ...provided,
-    minWidth: '300px',
+    minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',
+    position: 'fixed',
+    left: '0',
+    right: '0',
+    top: '0',
+    bottom: '0',
+    margin: 'auto',
+    zIndex: 20,
+    width: '42rem',
+    height: '30rem',
+    boxShadow: '0 100vh 0 100vw rgba(47, 62, 78, 0.50)',
+  }),
+  input: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    width: '100%',
+    position: 'absolute',
+    zIndex: -1,
   }),
   option: (provided: CSSProperties): CSSProperties & { '&:hover': CSSProperties } => ({
     ...provided,
@@ -86,11 +139,31 @@ const customSelectStyles = {
   }),
   valueContainer: (provided: CSSProperties): CSSProperties => ({
     ...provided,
-    minWidth: '4.5em',
+    minWidth: '4.5rem',
+  }),
+  indicatorSeparator: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    display: 'none',
+  }),
+  dropdownIndicator: (provided: CSSProperties): CSSProperties => ({
+    ...provided,
+    color: '#476481',
+    opacity: '1',
+    //TODO: `hover` is not supported by default, we need a custom solution/CSS https://stackoverflow.com/questions/28365233/inline-css-styles-in-react-how-to-implement-ahover
+    // '&:hover': {
+    //   opacity: '1',
+    //   color: '#476481',
+    // },
   }),
   singleValue: (provided: CSSProperties): CSSProperties => ({
     ...provided,
     color: 'var(--color-text-primary)',
+    maxWidth: `initial`,
+    position: `relative`,
+    display: `flex`,
+    alignItems: `center`,
+    transform: `none`,
+    top: `initial`,
   }),
 }
 
@@ -103,21 +176,21 @@ interface Props {
   tabIndex?: number
 }
 
-const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
+const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
   return (
     <Wrapper>
-      {label && <label>{label}</label>}
-      <Select
+      <StyledSelect
         isSearchable
         isDisabled={isDisabled}
         styles={customSelectStyles}
+        className="tokenSelectBox"
         noOptionsMessage={(): string => 'No results'}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
-        onChange={(selected, { action }): void => {
+        onChange={(selected: { token: TokenDetails }, { action }: ActionMeta): void => {
           if (selected && action === 'select-option' && 'token' in selected) {
             onChange(selected.token)
           }

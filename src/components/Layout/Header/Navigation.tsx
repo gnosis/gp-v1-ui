@@ -1,7 +1,5 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronCircleUp, faChevronCircleDown } from '@fortawesome/free-solid-svg-icons'
 
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
 import { OrderedNavLinkDiv, NavLinksWrapper } from './Navigation.styled'
@@ -32,8 +30,6 @@ const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({
   withPastLocation = false,
   label,
   order,
-  responsive,
-  showLinkSelector,
 }: HeaderNavLinksProps) => (
   <OrderedNavLinkDiv $order={order}>
     {withPastLocation ? (
@@ -42,12 +38,12 @@ const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({
       <NavLink to={to}>{label}</NavLink>
     )}
     {/* Only show chevron in responsive mode when label is top */}
-    {responsive && order === 0 && (
+    {/* {responsive && order === 0 && (
       <FontAwesomeIcon
         icon={showLinkSelector ? faChevronCircleUp : faChevronCircleDown}
         style={{ cursor: 'pointer', marginLeft: 10, width: '0.5em' }}
       />
-    )}
+    )} */}
   </OrderedNavLinkDiv>
 )
 

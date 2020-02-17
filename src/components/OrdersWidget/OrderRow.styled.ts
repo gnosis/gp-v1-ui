@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   color: ${({ $color = '' }): string => $color};
@@ -10,6 +10,10 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   }
 
   .checked {
+    margin: auto;
+    > input {
+      margin: auto;
+    }
     > button {
       display: none;
       justify-content: center;
@@ -65,7 +69,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
     }
   }
 
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+  @media ${MEDIA.tablet} {
     &.selected {
       > td {
         border-bottom: 0.0625rem solid #ffffff40;
@@ -129,6 +133,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
           display: initial;
         }
         > input {
+          margin: auto;
           display: none;
         }
       }

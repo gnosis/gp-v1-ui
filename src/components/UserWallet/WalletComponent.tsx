@@ -4,20 +4,13 @@ import { toast } from 'toastify'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faSpinner,
-  faSignOutAlt,
-  faSignInAlt,
-  faCopy,
-  faCheck,
-  faChevronCircleDown,
-  faChevronCircleUp,
-} from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
 
 import { EtherscanLink } from '../EtherscanLink'
 import {
   UserWalletItem,
   UserWalletWrapper,
+  UserAddress,
   NetworkTitle,
   UserWalletToggler,
   EtherImage,
@@ -45,7 +38,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
 
-  const tradePageMatch = useRouteMatch('/trade/')
+  const orderPageMatch = useRouteMatch('/order/')
 
   /***************************** */
   // EVENT HANDLERS
@@ -76,7 +69,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       toast.error('Error disconnecting wallet')
     } finally {
       setLoadingLabel(null)
-      if (!tradePageMatch) {
+      if (!orderPageMatch) {
         props.history.push('/')
       }
     }
@@ -110,7 +103,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     } else {
       onClick = connectWallet
       content = (
-        <UserWalletItem $padding="0px" $wordWrap="nowrap">
+        <UserWalletItem>
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
         </UserWalletItem>
@@ -130,15 +123,16 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     <UserWalletWrapper $walletOpen={!!(showWallet && userAddress)}>
       {userAddress ? (
         <>
-          {/* Network */}
-          <UserWalletItem $padding="0.375rem">
-            <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
-          </UserWalletItem>
           {/* Wallet logo + address + chevron */}
-          <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)}>
+          <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)} className={showWallet ? 'visible' : ''}>
             <EtherImage src={WalletImg} />
-            <div>{userAddress && abbreviateString(userAddress, 6, 4)}</div>
-            <FontAwesomeIcon icon={showWallet ? faChevronCircleUp : faChevronCircleDown} size="xs" />
+            <UserAddress>
+              {userAddress && abbreviateString(userAddress, 6, 4)}
+              {/* Network */}
+              <UserWalletItem>
+                <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
+              </UserWalletItem>
+            </UserAddress>
           </UserWalletToggler>
         </>
       ) : (

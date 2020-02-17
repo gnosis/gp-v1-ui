@@ -1,7 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 import fontFace from './fonts'
 import variables from './variables'
-import { RESPONSIVE_SIZES } from 'const'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables
@@ -23,17 +22,19 @@ const GlobalStyles = createGlobalStyle`
   }
 
   html, body {  
-    min-height: 100vh;
-    min-width: 320px;
+    width: 100%;
+    height: auto;
     margin: 0;
-    font-size: 16px;
-    font-family: "Averta", Arial, Helvetica Neue, Helvetica, sans-serif;
-    
-    line-height: 1.5;
-    
+    font-size: 62.5%;
+    line-height: 10px;
+    font-family: var(--font-default);
     background-color: var(--color-background);
     color: var(--color-text-primary);
     box-sizing: border-box;
+    scroll-behavior: smooth;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   *, *:before, *:after {
     box-sizing: inherit;
@@ -41,45 +42,37 @@ const GlobalStyles = createGlobalStyle`
   a {   
     text-decoration: underline;
     cursor: pointer;
-    &, &:link, &:visited {
-      color: var(--color-text-primary);
-    }
-    :hover {
-      color: var(--color-text-secondary);
-    }
+      &:link, 
+      &:visited {
+        color: var(--color-text-active);
+      }
   }
 
   body::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
     background-color: var(--color-background);
   }
 
   body::-webkit-scrollbar {
-    width: 12px;
+    width: 1.2rem;
     background-color: var(--color-background);
   }
 
   body::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    border-radius: 1rem;
+    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
     background-color: var(--color-background-pageWrapper);
   }
 
   h1, h2, h3 {
     margin: 0;
-    margin: 0.5em 0;
+    margin: 0.5rem 0;
   }
   h1 {
     font-size: 3rem;
-    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}em) {
-      font-size: 2.4rem;
-    }    
   }
   h2 {
     font-size: 2rem;
-    @media  only screen and (max-width: ${RESPONSIVE_SIZES.MOBILE}em) {
-      font-size: 1.4rem;
-    }
   }
 
   #root {
@@ -87,32 +80,19 @@ const GlobalStyles = createGlobalStyle`
   }
 
   button {
-    background-color: var(--color-background-pageWrapper);
-    color: var(--color-button-primary);
-    border: 0.125rem solid var(--color-button-primary);
-    border-radius: var(--border-radius);
-
     font-family: inherit;
-    font-size: 100%;
-    font-weight: bolder;
     cursor: pointer;
-
-    padding: 0.33rem 0.5rem;
-    margin: 0.5rem;
-        
     transition: all 0.2s ease-in-out;
+    border: 0;
+    font-weight: var(--font-weight-medium);
 
     :hover {
-      background-color: var(--color-button-primary);
-      border-color: var(--color-button-primary);
-      color: var(--color-background-pageWrapper);
+      background-color: #0B66C6;
     }
 
     &:disabled,
     &[disabled]{
-      background-color: var(--color-button-disabled) !important;
-      border-color: var(--color-button-disabled) !important;
-      color: var(--color-background-pageWrapper) !important;
+      opacity: .5;
       pointer-events: none;
     }
     &.success {
@@ -142,12 +122,12 @@ const GlobalStyles = createGlobalStyle`
       }
     }
     &.big {
-      font-size: 1.2em;
-      padding: 0.65em 1em;
+      font-size: 1.2rem;
+      padding: 0.65rem 1rem;
     }
     &.small {
-      font-size: 0.6em;
-      padding: 0.3em 0.5em;
+      font-size: 0.6rem;
+      padding: 0.3rem 0.5rem;
     }
   }
 
@@ -162,8 +142,8 @@ const GlobalStyles = createGlobalStyle`
     font-size: 0.75rem;
     font-weight: bold;
     
-    padding: 0.65em;
-    margin: 0.4em 0.85em;
+    padding: 0.65rem;
+    margin: 0.4rem 0.85rem;
     width: 100%;
 
     transition: all 0.2s ease-in-out;
@@ -172,9 +152,7 @@ const GlobalStyles = createGlobalStyle`
       border-color: var(--color-text-primary);
     }
     &:disabled {
-      background-color: var(--color-text-secondary);
-      border-color: var(--color-text-secondary);
-      color: #000;
+      opacity: .5;
     }
   }
   
