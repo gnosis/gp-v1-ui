@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
 import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FieldValues } from 'react-hook-form/dist/types'
@@ -26,6 +26,7 @@ import { Network, TokenDetails } from 'types'
 
 import { getToken, safeTokenName, parseAmount } from 'utils'
 import { ZERO } from 'const'
+import Price, { parseBigNumber } from './Price'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -65,6 +66,8 @@ export const enum TradeFormTokenId {
   sellToken = 'sellToken',
   receiveToken = 'receiveToken',
   validUntil = 'validUntil',
+  price = 'price',
+  priceInverse = 'priceInverse',
 }
 
 export type TradeFormData = {
@@ -85,10 +88,16 @@ const TradeWidget: React.FC = () => {
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
+  const sellInputId = TradeFormTokenId.sellToken
+  const receiveInputId = TradeFormTokenId.receiveToken
+  const priceInputId = TradeFormTokenId.price
+  const priceInverseInputId = TradeFormTokenId.priceInverse
+  const validUntilId = TradeFormTokenId.validUntil
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
   const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
+  // TODO: Get price from query params
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
@@ -98,9 +107,6 @@ const TradeWidget: React.FC = () => {
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const [unlimited, setUnlimited] = useState(!validUntil || !Number(validUntil))
-  const sellInputId = TradeFormTokenId.sellToken
-  const receiveInputId = TradeFormTokenId.receiveToken
-  const validUntilId = TradeFormTokenId.validUntil
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
@@ -108,14 +114,41 @@ const TradeWidget: React.FC = () => {
       [sellInputId]: sellAmount,
       [receiveInputId]: receiveAmount,
       [validUntilId]: validUntil,
+      [priceInputId]: '',
+      [priceInverseInputId]: '',
     },
   })
-  const { handleSubmit, watch, reset } = methods
+  const { handleSubmit, watch, reset, setValue } = methods
+
+  const priceValue = watch(priceInputId)
+  const priceInverseValue = watch(priceInverseInputId)
+  const sellValue = watch(sellInputId)
+  const receiveValue = watch(receiveInputId)
+  const validUntilValue = watch(validUntilId)
+
+  useEffect(() => {
+    let receiveAmount: string | undefined
+    if (priceValue && sellValue) {
+      const sellAmount = parseBigNumber(sellValue)
+      const price = parseBigNumber(priceValue)
+      console.log(
+        'sellAmount x price',
+        sellAmount?.toString(),
+        price?.toString(),
+        sellAmount && price && sellAmount.multipliedBy(price).toString(),
+      )
+
+      if (sellAmount && price) {
+        receiveAmount = sellAmount.multipliedBy(price).toString()
+      }
+    }
+    setValue(receiveInputId, receiveAmount || '')
+  }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
   const searchQuery = buildSearchQuery({
-    sell: watch(sellInputId),
-    buy: watch(receiveInputId),
-    expires: watch(validUntilId),
+    sell: sellValue,
+    buy: receiveValue,
+    expires: validUntilValue,
   })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url, true)
@@ -243,10 +276,17 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             validateMaxAmount
             tabIndex={1}
+            readOnly={false}
           />
           <IconWrapper onClick={swapTokens}>
             <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
           </IconWrapper>
+          <Price
+            priceInputId={priceInputId}
+            priceInverseInputId={priceInverseInputId}
+            sellToken={sellToken}
+            receiveToken={receiveToken}
+          />
           <TokenRow
             selectedToken={receiveToken}
             tokens={tokens}
@@ -256,6 +296,7 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
+            readOnly={true}
           />
           <OrderValidity
             inputId={validUntilId}
@@ -265,11 +306,11 @@ const TradeWidget: React.FC = () => {
             tabIndex={3}
           />
           <OrderDetails
-            sellAmount={watch(sellInputId)}
+            sellAmount={sellValue}
             sellTokenName={safeTokenName(sellToken)}
-            receiveAmount={watch(receiveInputId)}
+            receiveAmount={receiveValue}
             receiveTokenName={safeTokenName(receiveToken)}
-            validUntil={watch(validUntilId)}
+            validUntil={validUntilValue}
           />
           <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
