@@ -1,6 +1,6 @@
 import React, { CSSProperties, useMemo } from 'react'
 import styled from 'styled-components'
-import Select from 'react-select'
+import Select, { ActionMeta } from 'react-select'
 
 import { TokenDetails } from 'types'
 import TokenImg from './TokenImg'
@@ -118,7 +118,7 @@ const customSelectStyles = {
     top: '0',
     bottom: '0',
     margin: 'auto',
-    zIndex: '20',
+    zIndex: 20,
     width: '42rem',
     height: '30rem',
     boxShadow: '0 100vh 0 100vw rgba(47, 62, 78, 0.50)',
@@ -127,7 +127,7 @@ const customSelectStyles = {
     ...provided,
     width: '100%',
     position: 'absolute',
-    zIndex: '-1',
+    zIndex: -1,
   }),
   option: (provided: CSSProperties): CSSProperties & { '&:hover': CSSProperties } => ({
     ...provided,
@@ -149,10 +149,11 @@ const customSelectStyles = {
     ...provided,
     color: '#476481',
     opacity: '1',
-    '&:hover': {
-      opacity: '1',
-      color: '#476481',
-    },
+    //TODO: `hover` is not supported by default, we need a custom solution/CSS https://stackoverflow.com/questions/28365233/inline-css-styles-in-react-how-to-implement-ahover
+    // '&:hover': {
+    //   opacity: '1',
+    //   color: '#476481',
+    // },
   }),
   singleValue: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -175,7 +176,7 @@ interface Props {
   tabIndex?: number
 }
 
-const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
+const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
   return (
@@ -189,7 +190,7 @@ const TokenSelector: React.FC<Props> = ({ label, isDisabled, tokens, selected, o
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
-        onChange={(selected, { action }): void => {
+        onChange={(selected: { token: TokenDetails }, { action }: ActionMeta): void => {
           if (selected && action === 'select-option' && 'token' in selected) {
             onChange(selected.token)
           }

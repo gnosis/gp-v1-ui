@@ -73,16 +73,13 @@ export const UserWalletSlideWrapper = styled.div`
 `
 
 export const NetworkTitle = styled.div`
-  /* color: ${({ color = 'var(--color-text-primary)' }): string => color};
-  font-size: ${({ $fontSize = '1rem' }): string => $fontSize};
-  font-weight: bolder; */
   color: inherit;
   position: absolute;
   text-transform: uppercase;
-  font-size: .9rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: .3rem;
-  top: -.6rem;
+  letter-spacing: 0.3rem;
+  top: -0.6rem;
 `
 
 export const MonospaceAddress = styled(NetworkTitle)`

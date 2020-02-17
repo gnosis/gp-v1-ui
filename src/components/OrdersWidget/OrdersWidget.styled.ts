@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import Widget from 'components/Layout/Widget'
 import { MEDIA } from 'const'
 
 export const OrdersWrapper = styled.div`

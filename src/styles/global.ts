@@ -1,7 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
 import fontFace from './fonts'
 import variables from './variables'
-import { MEDIA } from 'const'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables

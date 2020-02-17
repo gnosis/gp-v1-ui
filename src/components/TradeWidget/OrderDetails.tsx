@@ -37,8 +37,8 @@ const OrderDetails: React.FC<Props> = ({
   const sellAmount = new BigNumber(sellAmountString)
   const receiveAmount = new BigNumber(receiveAmountString)
 
-  // const price = formatPrice(sellAmount, receiveAmount)
-  const price = '10'
+  const price = formatPrice(sellAmount, receiveAmount)
+  // const price = '10'
 
   if (!price) {
     return null

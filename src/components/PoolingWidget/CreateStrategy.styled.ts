@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { MEDIA } from 'const'
 
 export const CreateStrategyWrapper = styled.div`
   display: flex;

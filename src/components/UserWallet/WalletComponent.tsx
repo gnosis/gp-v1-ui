@@ -4,15 +4,7 @@ import { toast } from 'toastify'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faSpinner,
-  faSignOutAlt,
-  faSignInAlt,
-  faCopy,
-  faCheck,
-  faChevronCircleDown,
-  faChevronCircleUp,
-} from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
 
 import { EtherscanLink } from '../EtherscanLink'
 import {
@@ -111,7 +103,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     } else {
       onClick = connectWallet
       content = (
-        <UserWalletItem $padding="0px" $wordWrap="nowrap">
+        <UserWalletItem>
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
         </UserWalletItem>

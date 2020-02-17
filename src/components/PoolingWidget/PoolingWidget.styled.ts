@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import PageWrapper from 'components/Layout/PageWrapper'
-import { MEDIA } from 'const'
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
 

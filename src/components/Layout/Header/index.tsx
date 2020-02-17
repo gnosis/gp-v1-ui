@@ -1,5 +1,4 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import UserWallet from 'components/UserWallet'
@@ -9,7 +8,6 @@ import { HeaderWrapper } from './Header.styled'
 import useNavigation from './useNavigation'
 import useOpenCloseNav from './useOpenCloseNav'
 
-import { APP_NAME } from 'const'
 import { formatSeconds } from 'utils'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 

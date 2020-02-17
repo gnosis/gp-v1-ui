@@ -1,7 +1,4 @@
 import styled from 'styled-components'
-import { MEDIA } from 'const'
-
-// const { TABLET } = MEDIA
 
 export const ModalBodyWrapper = styled.div`
   div > p {

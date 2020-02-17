@@ -1,12 +1,8 @@
 import React from 'react'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
-
 import TokenSelector from './TokenSelector'
 import { TokenSelectorProps } from './TokenSelector'
 import DefineSpread from './DefineSpread'
-import { GreySubText } from './PoolingWidget.styled'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'

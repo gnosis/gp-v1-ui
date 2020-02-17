@@ -15,7 +15,7 @@ import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, isOrderActive, formatPrice } from 'utils'
+import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, formatPrice } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
@@ -92,7 +92,7 @@ const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = 
   )
 }
 
-const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order, pending }) => {
+const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
   const price = useMemo(() => {
     const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
     const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
@@ -121,7 +121,7 @@ interface UnfilledAmountProps extends Pick<Props, 'order' | 'pending'> {
   isUnlimited: boolean
 }
 
-const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pending, isUnlimited }) => {
+const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, isUnlimited }) => {
   const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
     order.remainingAmount,
     sellToken.decimals,
@@ -144,32 +144,33 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   )
 }
 
-interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
-  sellToken: TokenDetails
-  isUnlimited: boolean
-}
+//TODO: no longer needed? remove
+// interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
+//   sellToken: TokenDetails
+//   isUnlimited: boolean
+// }
 
-const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
-  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
-    order.sellTokenBalance,
-    sellToken.decimals,
-  ])
-  const isActive = isOrderActive(order, new Date())
+// const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
+//   const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
+//     order.sellTokenBalance,
+//     sellToken.decimals,
+//   ])
+//   const isActive = isOrderActive(order, new Date())
 
-  return (
-    <td data-label="Account Balance" className="sub-columns three-columns">
-      <div>{accountBalance}</div>
-      <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      {isOverBalance && isActive && !isUnlimited && (
-        <div className="warning">
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-        </div>
-      )}
-    </td>
-  )
-}
+//   return (
+//     <td data-label="Account Balance" className="sub-columns three-columns">
+//       <div>{accountBalance}</div>
+//       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+//       {isOverBalance && isActive && !isUnlimited && (
+//         <div className="warning">
+//           <FontAwesomeIcon icon={faExclamationTriangle} />
+//         </div>
+//       )}
+//     </td>
+//   )
+// }
 
-const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending }) => {
+const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
     const isNeverExpires = isNeverExpiresOrder(order.validUntil)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
@@ -241,7 +242,6 @@ const onError = onErrorFactory('Failed to fetch token')
 const OrderRow: React.FC<Props> = props => {
   const {
     order,
-    isOverBalance,
     networkId,
     pending = false,
     transactionHash,

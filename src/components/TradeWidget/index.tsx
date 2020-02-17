@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
-import OrderDetails from './OrderDetails'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
@@ -28,7 +27,7 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, safeTokenName, parseAmount } from 'utils'
+import { getToken, parseAmount } from 'utils'
 import { ZERO } from 'const'
 
 const WrappedWidget = styled(Widget)`
@@ -477,7 +476,7 @@ const TradeWidget: React.FC = () => {
         </WrappedForm>
       </FormContext>
       <OrdersPanel>
-        {/* Toggle panel visiblity (arrow) */}
+        {/* Toggle panel visibility (arrow) */}
         <button></button>
         {/* Actual orders content */}
         <div>

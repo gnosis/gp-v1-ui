@@ -15,10 +15,9 @@ import {
   ProgressStepText,
   StepDescriptionWrapper,
   StepButtonsWrapper,
-  GreySubText,
 } from './PoolingWidget.styled'
 
-import { faCheckCircle, faSpinner, faPaperPlane, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import checkIcon from 'assets/img/li-check.svg'
 

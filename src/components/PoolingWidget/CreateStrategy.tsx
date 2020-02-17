@@ -1,12 +1,10 @@
 import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartArea } from '@fortawesome/free-solid-svg-icons'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { BlueBoldText } from './DefineSpread.styled'
 import { GreySubText } from './PoolingWidget.styled'
 import { SpreadInformation } from './DefineSpread'
-import { CreateStrategyWrapper, StrategyDetailsWrapper, UnderlinedText } from './CreateStrategy.styled'
+import { CreateStrategyWrapper } from './CreateStrategy.styled'
 import AddFunding from './AddFunding'
 import { Receipt } from 'types'
 

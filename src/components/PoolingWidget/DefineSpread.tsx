@@ -1,8 +1,7 @@
 import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
-import { CardTable } from 'components/Layout/Card'
-import { SpreadInformationWrapper, DefineSpreadWrapper, BlueBoldText } from './DefineSpread.styled'
+import { SpreadInformationWrapper, DefineSpreadWrapper } from './DefineSpread.styled'
 
 import { DEFAULT_DECIMALS } from 'const'
 
