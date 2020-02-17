@@ -103,7 +103,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   return (
     <td data-label="Price">
       <div className="order-details">
-        {/* <Highlight color={pending ? 'grey' : ''}></Highlight> */}
+        {/* <Highlight color={pending ? 'grey' : ''} /> */}
         {price} {displayTokenSymbolOrLink(sellToken)}
         {'/'}
         {displayTokenSymbolOrLink(buyToken)}
