@@ -18,6 +18,7 @@ import { EtherscanLink } from '../EtherscanLink'
 import {
   UserWalletItem,
   UserWalletWrapper,
+  UserAddress,
   NetworkTitle,
   UserWalletToggler,
   EtherImage,
@@ -133,13 +134,13 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
           {/* Wallet logo + address + chevron */}
           <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)} className={showWallet ? 'visible' : ''}>
             <EtherImage src={WalletImg} />
-            <div>
+            <UserAddress>
               {userAddress && abbreviateString(userAddress, 6, 4)}
               {/* Network */}
               <UserWalletItem>
                 <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
               </UserWalletItem>
-            </div>
+            </UserAddress>
           </UserWalletToggler>
         </>
       ) : (

@@ -25,18 +25,21 @@ export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string
   white-space: ${({ $wordWrap = 'initial' }): string => $wordWrap};
   font-family: var(--font-mono);
   letter-spacing: 0;
-
-  > div {
-    font-weight: var(--font-weight-medium);
-    font-size: 1.6rem;
-    color: #476481;
-    letter-spacing: 0;
-  }
+  font-weight: var(--font-weight-medium);
+  color: #476481;
+  letter-spacing: 0;
 
   > svg {
     width: 70%;
     height: auto;
   }
+`
+
+export const UserAddress = styled.div`
+  font-weight: var(--font-weight-medium);
+  font-size: 1.6rem;
+  color: #476481;
+  letter-spacing: 0;
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`
@@ -77,7 +80,7 @@ export const UserWalletSlideWrapper = styled.div`
   z-index: 2;
 `
 
-export const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
+export const NetworkTitle = styled.div`
   /* color: ${({ color = 'var(--color-text-primary)' }): string => color};
   font-size: ${({ $fontSize = '1rem' }): string => $fontSize};
   font-weight: bolder; */
