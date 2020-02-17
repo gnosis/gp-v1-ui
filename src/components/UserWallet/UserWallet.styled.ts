@@ -10,29 +10,22 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
     $walletOpen ? 'var(--border-radius) var(--border-radius) 0 0' : 'var(--border-radius)'};
   box-shadow: var(--box-shadow); */
   line-height: 1;
-  text-align: center;
-  width: 15rem;
+  text-align: left;
   position: relative;
-  margin: 0 3rem 0 0;
 `
 
-export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string }>`
+export const UserWalletItem = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-start;
   margin: auto;
-  white-space: ${({ $wordWrap = 'initial' }): string => $wordWrap};
+  white-space: initial;
   font-family: var(--font-mono);
   letter-spacing: 0;
   font-weight: var(--font-weight-medium);
   color: #476481;
   letter-spacing: 0;
-
-  > svg {
-    width: 70%;
-    height: auto;
-  }
 `
 
 export const UserAddress = styled.div`
@@ -44,11 +37,12 @@ export const UserAddress = styled.div`
 
 export const UserWalletToggler = styled(UserWalletItem)`
   cursor: pointer;
-  font-size: 0.8rem;
-  padding: 0.375rem;
+  margin: 0 3rem 0 0;
 `
 export const EtherImage = styled.img`
-  max-width: 5%;
+  width: 2.6rem;
+  height: 2.6rem;
+  object-fit: contain;
 
   @media (prefers-color-scheme: dark) {
     body:not(.light-theme) & {
@@ -64,8 +58,6 @@ export const EtherImage = styled.img`
 export const CopyDiv = styled.div`
   background: #90ee90ad;
   border-radius: var(--border-radius);
-  font-size: 75%;
-  padding: 0.375rem;
   width: 60%;
 `
 
