@@ -5,17 +5,17 @@ import ThemeToggler from 'components/ThemeToggler'
 
 const Wrapper = styled.footer`
   position: relative;
-
   display: flex;
   flex-flow: row wrap;
   align-items: center;
   justify-content: center;
   padding: 1.3rem;
   text-align: center;
-
-  background: var(--color-background);
+  background: transparent;
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
+  font-size: 1.3rem;
+  max-width: 85rem;
+  margin: 0 auto;
 
   > div {
     margin: 0.2rem auto;

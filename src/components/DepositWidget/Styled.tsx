@@ -1,7 +1,4 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
-
-const { TABLET } = RESPONSIVE_SIZES
 
 export const ModalBodyWrapper = styled.div`
   div > p {
@@ -47,39 +44,6 @@ export const TokenRow = styled.tr`
   &.loading {
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
-  }
-
-  @media only screen and (max-width: ${TABLET}em) {
-    > td {
-      // Each item in each cell
-      > * {
-        margin-left: 0.625rem;
-      }
-      // Token
-      &:first-child {
-        grid-template-columns: 1fr max-content auto;
-
-        > img {
-          order: 2;
-          margin-right: -0.5rem;
-        }
-      }
-      // Actions
-      &:last-child {
-        border: none;
-        flex-flow: row nowrap;
-        padding: 0.7rem 0 0.7rem 0.7rem;
-
-        > button:last-child {
-          border-radius: 0 var(--border-radius) var(--border-radius);
-        }
-      }
-    }
-    &.selected {
-      > div {
-        border-bottom: 0.0625rem solid #ffffff40;
-      }
-    }
   }
 `
 

@@ -1,25 +1,29 @@
 import styled from 'styled-components'
-import Widget from 'components/Layout/Widget'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
-export const OrdersWrapper = styled(Widget)`
+export const OrdersWrapper = styled.div`
+  width: 100%;
+
+  > div {
+    width: 100%;
+  }
+
   > a {
     margin-bottom: -2em;
   }
 `
 
 export const ButtonWithIcon = styled.button`
-  min-width: 10em;
+  min-width: 10rem;
+  width: 100%;
 
   > svg {
-    margin: 0 0.25em;
+    margin: 0 0.25rem;
   }
 `
 
 export const CreateButtons = styled.div`
-  margin-top: 2em;
-
-  // 💙 grid
+  margin: 2rem 0 0;
   display: grid;
 
   &.withOrders {
@@ -75,10 +79,9 @@ export const OrdersForm = styled.div`
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
+    margin: 1rem 0;
 
-    margin: 1em 0;
-
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    @media ${MEDIA.tablet} {
       grid-template-columns: 2fr 1fr;
     }
 
@@ -126,7 +129,7 @@ export const OrdersForm = styled.div`
       visibility: hidden;
     }
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    @media ${MEDIA.tablet} {
       display: none;
     }
   }

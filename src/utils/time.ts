@@ -35,6 +35,32 @@ export function formatDateFromBatchId(batchId: number): string {
   return formatDistanceToNow(date, { addSuffix: true })
 }
 
+/**
+ * Calculates seconds remaining in current batch
+ * Assumes local time is accurate and can be used as source of truth
+ */
+export function getSecondsRemainingInBatch(): number {
+  return BATCH_TIME - (getEpoch() % BATCH_TIME)
+}
+
+export function formatSeconds(seconds: number): string {
+  const minutes = Math.floor(seconds / 60)
+  const remainderSeconds = seconds % 60
+  let s = ''
+
+  if (minutes > 0) {
+    s += `${minutes}m `
+  }
+  if (remainderSeconds > 0) {
+    s += `${remainderSeconds}s`
+  }
+  if (minutes === 0 && remainderSeconds === 0) {
+    s = '0s'
+  }
+
+  return s
+}
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
 async function noop(_milliseconds = 0): Promise<void> {}
 

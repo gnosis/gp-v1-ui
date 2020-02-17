@@ -1,23 +1,21 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { LEGALDOCUMENT, RESPONSIVE_SIZES } from 'const'
-
-const { MOBILE } = RESPONSIVE_SIZES
+import { LEGALDOCUMENT } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
   flex-flow: column;
   align-items: center;
   justify-content: center;
-
   background-color: var(--color-background-banner);
-  color: var(--color-text-banner);
-
   text-align: center;
-  font-size: 0.65rem;
+  font-size: 1.3rem;
+  padding: 1.1rem 0;
 
-  @media only screen and (max-width: ${MOBILE}em) {
-    padding: 0.2rem 2rem;
+  > p {
+    line-height: 1;
+    padding: 0;
+    margin: 0;
   }
 `
 
@@ -81,7 +79,7 @@ const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, useFull, title }) 
 
   return (
     <Wrapper onClick={openCloseDisclaimer}>
-      <h3>{title}</h3>
+      <p>{title}</p>
       {useFull && open && <LegalText />}
     </Wrapper>
   )

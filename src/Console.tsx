@@ -27,9 +27,9 @@ const ButtonGroup = styled.div`
 
 const InputGroup = styled.div`
   position: sticky;
-  bottom: 0.4em;
+  bottom: 0.4rem;
   margin: 0;
-  margin-top: 5px;
+  margin-top: 0.5rem;
   display: flex;
 
   input:focus {

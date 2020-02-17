@@ -1,14 +1,16 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
-import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import switchTokenPair from 'assets/img/switch.svg'
+import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useHistory } from 'react-router'
 
 import TokenRow from './TokenRow'
-import OrderDetails from './OrderDetails'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
+import OrdersWidget from 'components/OrdersWidget'
 
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -19,27 +21,56 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { MEDIA } from 'const'
 
 import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, safeTokenName, parseAmount } from 'utils'
+import { getToken, parseAmount } from 'utils'
 import { ZERO } from 'const'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
+
+  @media ${MEDIA.mobile} {
+    flex-flow: column wrap;
+    max-height: initial;
+    min-height: initial;
+  }
 `
 
 const WrappedForm = styled.form`
   display: flex;
-  flex-direction: column;
-`
+  flex-flow: column wrap;
+  width: 50%;
+  padding: 1.6rem;
+  box-sizing: border-box;
 
+  @media ${MEDIA.mobile} {
+    width: 100%;
+  }
+
+  > p {
+    font-size: 1.3rem;
+    color: #476481;
+    letter-spacing: 0;
+    text-align: center;
+    margin: 1.6rem 0 0;
+  }
+`
+// Switcharoo arrows
 const IconWrapper = styled.a`
-  margin: -0.5em 0 1.5em 1em;
-  width: 2em;
+  margin: 1rem auto;
+
+  > img {
+    transition: opacity 0.2s ease-in-out;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
+  }
 `
 
 const WarningLabel = styled.code`
@@ -53,11 +84,155 @@ const WarningLabel = styled.code`
 `
 
 const SubmitButton = styled.button`
-  margin: 2em 0 0 0;
-  line-height: 2;
+  background-color: #218dff;
+  border-radius: 3rem;
+  font-family: var(--font-default);
+  font-size: 1.6rem;
+  color: #ffffff;
+  letter-spacing: 0.1rem;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 1rem 2rem;
+  box-sizing: border-box;
+  line-height: 1;
+  width: 100%;
+  font-weight: var(--font-weight-medium);
+  height: 4.6rem;
+  margin: 1rem auto;
+  max-width: 32rem;
 
   &:disabled {
     cursor: not-allowed;
+    opacity: 0.5rem;
+  }
+`
+
+const PriceWrapper = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  width: 100%;
+  margin: 2.4rem 0 0;
+  justify-content: space-between;
+
+  > strong {
+    text-transform: capitalize;
+    color: #2f3e4e;
+    width: 100%;
+    margin: 0 0 1rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+`
+
+const PriceInputBox = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 0;
+  width: 50%;
+  width: calc(50% - 0.8rem);
+  height: 5.6rem;
+  position: relative;
+
+  label {
+    display: flex;
+    width: auto;
+    max-width: 100%;
+    position: relative;
+  }
+
+  label > small {
+    position: absolute;
+    right: 1rem;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    opacity: 0.75;
+    font-size: 1.2rem;
+    color: #476481;
+    letter-spacing: -0.05rem;
+    text-align: right;
+    font-weight: var(--font-weight-medium);
+  }
+
+  input {
+    margin: 0;
+    width: auto;
+    max-width: 100%;
+    background: #e7ecf3;
+    border-radius: 0.6rem 0.6rem 0 0;
+    border: 0;
+    font-size: 1.6rem;
+    line-height: 1;
+    box-sizing: border-box;
+    border-bottom: 0.2rem solid transparent;
+    font-weight: var(--font-weight-normal);
+    padding: 0 7rem 0 1rem;
+
+    &:focus {
+      border-bottom: 0.2rem solid #218dff;
+      border-color: #218dff;
+      color: #218dff;
+    }
+
+    &.error {
+      border-color: #ff0000a3;
+    }
+
+    &.warning {
+      border-color: orange;
+    }
+
+    &:disabled {
+      box-shadow: none;
+    }
+  }
+`
+
+const OrdersPanel = styled.div`
+  display: flex;
+  flex-flow: column wrap;
+  width: 50%;
+  background: #edf2f7;
+  border-radius: 0 0.6rem 0.6rem 0;
+  box-sizing: border-box;
+
+  > div {
+    width: 100%;
+    width: calc(100% - 1.6rem);
+    height: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-flow: row wrap;
+    overflow-y: auto;
+    border-radius: 0 0.6rem 0.6rem 0;
+  }
+
+  > div > h5 {
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.6rem 0 1rem;
+    font-weight: var(--font-weight-medium);
+    font-size: 1.6rem;
+    color: #2f3e4e;
+    letter-spacing: 0.03rem;
+    text-align: center;
+    box-sizing: border-box;
+    text-align: center;
+  }
+
+  > button {
+    width: 1.6rem;
+    height: 100%;
+    border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
+    background: #ecf2f7 url(${arrow}) no-repeat center/1.2rem 1rem;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+    &:hover {
+      background-color: #ecf2f7;
+    }
   }
 `
 
@@ -237,7 +412,7 @@ const TradeWidget: React.FC = () => {
             selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
-            selectLabel="sell"
+            selectLabel="Sell"
             onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
             inputId={sellInputId}
             isDisabled={isSubmitting}
@@ -245,18 +420,35 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
           />
           <IconWrapper onClick={swapTokens}>
-            <FontAwesomeIcon icon={faExchangeAlt} rotation={90} size="2x" />
+            <img src={switchTokenPair} />
           </IconWrapper>
           <TokenRow
             selectedToken={receiveToken}
             tokens={tokens}
             balance={receiveTokenBalance}
-            selectLabel="receive"
+            selectLabel="Receive at least"
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
           />
+          {/* Refactor these price input fields */}
+          <PriceWrapper>
+            <strong>Min. sell price</strong>
+            <PriceInputBox>
+              <label>
+                <input placeholder="0" value="146.666" type="text" required />
+                <small>WETH/DAI</small>
+              </label>
+            </PriceInputBox>
+            <PriceInputBox>
+              <label>
+                <input placeholder="0" value="0.00682" type="text" required />
+                <small>DAI/WETH</small>
+              </label>
+            </PriceInputBox>
+          </PriceWrapper>
+          {/* Refactor these price input fields */}
           <OrderValidity
             inputId={validUntilId}
             isDisabled={isSubmitting}
@@ -264,19 +456,34 @@ const TradeWidget: React.FC = () => {
             setUnlimited={setUnlimited}
             tabIndex={3}
           />
-          <OrderDetails
+          {/* <OrderDetails
             sellAmount={watch(sellInputId)}
             sellTokenName={safeTokenName(sellToken)}
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
             validUntil={watch(validUntilId)}
-          />
-          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
-            <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
-            {sameToken ? 'Please select different tokens' : 'Send limit order'}
+          />{' '} */}
+          <p>This order might be partially filled.</p>
+          <SubmitButton
+            data-text="This order might be partially filled."
+            type="submit"
+            disabled={!methods.formState.isValid || isSubmitting}
+            tabIndex={5}
+          >
+            {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}
+            {sameToken ? 'Please select different tokens' : 'Submit limit order'}
           </SubmitButton>
         </WrappedForm>
       </FormContext>
+      <OrdersPanel>
+        {/* Toggle panel visibility (arrow) */}
+        <button></button>
+        {/* Actual orders content */}
+        <div>
+          <h5>Your orders</h5>
+          <OrdersWidget></OrdersWidget>
+        </div>
+      </OrdersPanel>
     </WrappedWidget>
   )
 }

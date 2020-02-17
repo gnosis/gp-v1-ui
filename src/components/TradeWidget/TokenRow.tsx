@@ -2,9 +2,6 @@ import React, { useEffect, useCallback } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-
-import LinkWithPastLocation from 'components/LinkWithPastLocation'
-import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import {
@@ -25,36 +22,92 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  height: 6em;
-`
+  flex-flow: column wrap;
 
-const TokenImgWrapper = styled(TokenImg)`
-  width: 4em;
-  height: 4em;
+  > div:first-of-type {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0 0 1rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-  margin-right: 1em;
+  > div > strong {
+    margin: 0 auto 0 0;
+    text-transform: capitalize;
+    color: #2f3e4e;
+  }
+
+  > div > span {
+    display: flex;
+    flex-flow: row nowrap;
+    font-size: 1.3rem;
+    color: #218dff;
+    letter-spacing: -0.03rem;
+    text-align: right;
+  }
+
+  > div > span > button {
+    background: 0;
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-active);
+    font-size: inherit;
+    margin: 0;
+    padding: 0;
+    text-decoration: underline;
+
+    &::after {
+      content: '-';
+      margin: 0 0.5rem;
+      display: inline-block;
+      color: #9fb4c9;
+      text-decoration: none;
+    }
+  }
+
+  > div > span > span {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-items: center;
+    color: #9fb4c9;
+  }
 `
 
 const InputBox = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex-grow: 1;
-
-  margin-left: 1em;
+  flex-flow: row nowrap;
+  margin: 0;
+  width: 100%;
+  height: 5.6rem;
+  position: relative;
 
   input {
-    margin: 0 0 0.5em 0;
+    margin: 0;
     width: 100%;
+    background: #e7ecf3;
+    border-radius: 0.6rem 0.6rem 0 0;
+    border: 0;
+    font-size: 1.6rem;
+    line-height: 1;
+    box-sizing: border-box;
+    border-bottom: 0.2rem solid transparent;
+    font-weight: var(--font-weight-normal);
+    padding: 0 15rem 0 1rem;
+
+    &:focus {
+      border-bottom: 0.2rem solid #218dff;
+      border-color: #218dff;
+      color: #218dff;
+    }
 
     &.error {
-      // box-shadow: 0 0 0.1875rem #cc0000;
       border-color: #ff0000a3;
     }
 
     &.warning {
-      // box-shadow: 0 0 0.1875rem #ff7500;
-      border-color: orange;
+      color: #ff5722;
     }
 
     &:disabled {
@@ -66,7 +119,15 @@ const InputBox = styled.div`
 const WalletDetail = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 0.75em;
+  align-items: center;
+  font-size: inherit;
+  margin: 0 0 0 0.3rem;
+  color: #476481;
+
+  > a {
+    color: #218dff;
+    margin: 0 0 0 0.3rem;
+  }
 
   .success {
     color: green;
@@ -75,26 +136,71 @@ const WalletDetail = styled.div`
 
   &.error,
   &.warning {
-    margin: 0 0 1em 0;
+    margin: 1rem 0;
+    line-height: 1.2;
+    font-size: 1.2rem;
+    display: block;
+    > strong {
+      color: inherit;
+    }
   }
 
   &.error {
     color: red;
   }
   &.warning {
-    color: orange;
+    color: #476481;
+    background: #fff0eb;
+    border-radius: 0 0 0.3rem 0.3rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    margin: 0.3rem 0 1rem;
   }
 `
 
-function displayBalance<K extends keyof TokenBalanceDetails>(
-  balance: TokenBalanceDetails | undefined | null,
-  key: K,
-): string {
-  if (!balance) {
-    return '0'
+const TokenBoxWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+`
+
+const TokenEnable = styled.div`
+  height: 3.8rem;
+  margin: auto -3.2rem auto 0;
+  font-size: 1.4rem;
+  color: #218dff;
+  letter-spacing: -0.05rem;
+  text-align: center;
+  font-weight: var(--font-weight-medium);
+  display: flex;
+  align-items: center;
+  padding: 0 4.2rem 0 1.6rem;
+  box-sizing: border-box;
+  background: #deeeff;
+  border: 0.1rem solid #218dff;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+
+  &:hover {
+    background: #218dff;
+    color: #ffffff;
   }
-  return formatAmount(balance[key] as BN, balance.decimals) || '0'
-}
+`
+
+// function displayBalance<K extends keyof TokenBalanceDetails>(
+//   balance: TokenBalanceDetails | undefined | null,
+//   key: K,
+// ): string {
+//   if (!balance) {
+//     return '0'
+//   }
+//   return formatAmount(balance[key] as BN, balance.decimals) || '0'
+// }
 
 function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (!validInputPattern.test(event.currentTarget.value + event.key)) {
@@ -143,7 +249,11 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <WalletDetail className="warning">
-        Selling {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol} over your current balance
+        <b>INFO</b>: Sell amount exceeding your balance by{' '}
+        <strong>
+          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}
+        </strong>
+        . This creates a standing order. <a href="#">Read more</a>.
       </WalletDetail>
     )
   )
@@ -192,15 +302,21 @@ const TokenRow: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
-      <TokenSelector
-        label={selectLabel}
-        isDisabled={isDisabled}
-        tokens={tokens}
-        selected={selectedToken}
-        onChange={onSelectChange}
-        tabIndex={tabIndex}
-      />
+      <div>
+        <strong>{selectLabel}</strong>
+        <span>
+          <button>+ Deposit</button>
+          <span>
+            Balance:
+            <WalletDetail>
+              {' '}
+              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+              {validateMaxAmount && <a onClick={useMax}>max</a>}
+            </WalletDetail>
+            <i aria-label="Tooltip"></i>
+          </span>
+        </span>
+      </div>
       <InputBox>
         <input
           className={className}
@@ -219,26 +335,26 @@ const TokenRow: React.FC<Props> = ({
           tabIndex={tabIndex + 2}
           onFocus={(e): void => e.target.select()}
         />
-        {errorOrWarning}
-        <WalletDetail>
-          <div>
-            <strong>
-              <LinkWithPastLocation to="/wallet" tabIndex={-1}>
-                Exchange wallet:
-              </LinkWithPastLocation>
-            </strong>{' '}
-            <span className="success">
-              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-            </span>
-          </div>
-          {validateMaxAmount && <a onClick={useMax}>use max</a>}
-        </WalletDetail>
-        <WalletDetail>
+        {/* <WalletDetail>
           <div>
             <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
           </div>
-        </WalletDetail>
+        </WalletDetail> */}
+        {/* <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} /> */}
+        {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
+        <TokenBoxWrapper>
+          <TokenEnable>Enable</TokenEnable>
+          <TokenSelector
+            label={selectLabel}
+            isDisabled={isDisabled}
+            tokens={tokens}
+            selected={selectedToken}
+            onChange={onSelectChange}
+            tabIndex={tabIndex}
+          />
+        </TokenBoxWrapper>
       </InputBox>
+      {errorOrWarning}
     </Wrapper>
   )
 }

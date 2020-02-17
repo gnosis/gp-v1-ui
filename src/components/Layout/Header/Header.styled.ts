@@ -2,38 +2,43 @@ import styled from 'styled-components'
 import { NavLinksWrapper } from './Navigation.styled'
 import { UserWalletWrapper } from 'components/UserWallet/UserWallet.styled'
 
-import { RESPONSIVE_SIZES } from 'const'
-
-const { TABLET, WEB_SMALL, TABLET_LARGE } = RESPONSIVE_SIZES
+import { MEDIA } from 'const'
 
 export const HeaderWrapper = styled.header`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 1rem 1.2rem;
+  padding: 0;
 
   nav {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: column wrap;
     align-items: center;
-    width: 92%;
+    width: 100%;
+    
+      @media ${MEDIA.mobile} {
+        padding: 0 1.6rem;
+        box-sizing: border-box;
+      }
   }
-
-  .logo,
+  
   ${UserWalletWrapper} {
-    flex: 0 1 16rem;
+    order: 1;
+    margin: 2rem 0;
   }
 
-  .logo {
+  /* .logo, ${UserWalletWrapper} {
+    flex: 0 1 16rem;
+  } */
+
+  /* .logo {
     // TODO: remove when we have logo
     visibility: hidden;
     order: 1;
-
     font-size: 1.8rem;
     text-align: center;
     text-decoration: none;
     vertical-align: middle;
-
     padding: 0.5rem;
     margin: 0.5rem;
 
@@ -41,17 +46,10 @@ export const HeaderWrapper = styled.header`
       color: var(--color-text-secondary);
       cursor: pointer;
     }
-  }
+  } */
 
-  ${NavLinksWrapper} {
-    order: 2;
-    flex: 0 1 45%;
-    margin: auto;
-  }
-
-  ${UserWalletWrapper} {
-    order: 3;
-  }
+  /* ${NavLinksWrapper} {
+  } */
 
   .header-title {
     margin: 0 auto;
@@ -67,37 +65,5 @@ export const HeaderWrapper = styled.header`
   h3 {
     font-size: 2.2rem;
     margin: 0;
-  }
-
-  @media only screen and (max-width: ${WEB_SMALL}em) {
-    .logo {
-      display: none;
-    }
-  }
-
-  @media only screen and (max-width: ${TABLET_LARGE}em) {
-    nav {
-      flex-flow: row wrap;
-    }
-    ${UserWalletWrapper} {
-      margin: 1rem auto;
-    }
-  }
-
-  @media only screen and (max-width: ${TABLET}em) {
-    .logo,
-    .nav-links,
-    ${UserWalletWrapper} {
-      padding: 0.25rem;
-    }
-
-    ${NavLinksWrapper} {
-      flex: 1 1 100%;
-      order: 1;
-
-      a {
-        padding: 0.3125rem;
-      }
-    }
   }
 `

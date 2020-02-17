@@ -1,12 +1,8 @@
 import React from 'react'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons'
-
 import TokenSelector from './TokenSelector'
 import { TokenSelectorProps } from './TokenSelector'
 import DefineSpread from './DefineSpread'
-import { GreySubText } from './PoolingWidget.styled'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
@@ -30,10 +26,10 @@ const SubComponents: React.FC<SubComponentProps> = props => {
       return (
         <>
           <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
-          <GreySubText>
+          {/* <GreySubText>
             Please select at least two tokens to continue{' '}
             {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
-          </GreySubText>
+          </GreySubText> */}
         </>
       )
     case 2:
@@ -48,11 +44,6 @@ const SubComponents: React.FC<SubComponentProps> = props => {
             txReceipt={txReceipt}
             txError={txError}
           />
-          <GreySubText>
-            {txReceipt
-              ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
-              : 'Review your liquidity summary above and then send your transaction'}
-          </GreySubText>
         </>
       )
     default:

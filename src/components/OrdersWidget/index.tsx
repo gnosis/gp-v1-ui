@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
-import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useOrders } from 'hooks/useOrders'
@@ -113,28 +113,30 @@ const OrdersWidget: React.FC = () => {
 
   return (
     <OrdersWrapper>
-      <div>
-        <h2>Your orders</h2>
-        <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
-          {noOrders && (
-            <p className="noOrdersInfo">
-              It appears you haven&apos;t placed any order yet. <br /> Create one!
-            </p>
-          )}
-          {/*
+      {noOrders && (
+        <div>
+          {/* <h2>Your orders</h2> */}
+          <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
+            {noOrders && (
+              <p className="noOrdersInfo">
+                It appears you haven&apos;t placed any order yet. <br /> Create one!
+              </p>
+            )}
+            {/*
           <a href="/" className="strategyInfo">
             <small>Learn more about liquidity</small>
           </a>
           */}
-        </CreateButtons>
-      </div>
+          </CreateButtons>
+        </div>
+      )}
       {!noOrders && networkId && (
         <OrdersForm>
           <div className="infoContainer">
             <div className="countContainer">
-              <div className="total">
+              {/* <div className="total">
                 You have <Highlight>{allOrders.length}</Highlight> standing orders:
-              </div>
+              </div> */}
               <ShowOrdersButton
                 type="active"
                 isActive={showActive}
@@ -150,12 +152,20 @@ const OrdersWidget: React.FC = () => {
                 onClick={toggleShowActive}
               />
             </div>
-            {overBalanceOrders.size > 0 && showActive && (
+            {/* {overBalanceOrders.size > 0 && showActive && (
               <div className="warning">
                 <FontAwesomeIcon icon={faExclamationTriangle} />
                 <strong> Low balance</strong>
               </div>
-            )}
+            )} */}
+            <div className="deleteContainer">
+              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
+                <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
+              </ButtonWithIcon>
+              {/* <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+                  Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
+                </span> */}
+            </div>
           </div>
           {/* PENDING ORDERS */}
           {pendingShownOrdersCount ? (
@@ -198,9 +208,10 @@ const OrdersWidget: React.FC = () => {
               {pendingShownOrdersCount ? <h3>Current Orders</h3> : null}
               <div className="ordersContainer">
                 <CardTable
-                  $columns="minmax(5rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 0.6fr)"
-                  $cellSeparation="0.2rem"
-                  $rowSeparation="0.6rem"
+                  // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
+                  $columns="minmax(2rem,.4fr)  minmax(11rem,1fr)  minmax(11rem,1.3fr)  minmax(5rem,.9fr)  minmax(auto,1.4fr)"
+                  // $cellSeparation="0 .5rem;"
+                  $rowSeparation="0"
                 >
                   <thead>
                     <tr>
@@ -211,12 +222,11 @@ const OrdersWidget: React.FC = () => {
                           checked={orders.length === markedForDeletion.size}
                           disabled={deleting}
                         />
-                        <span>All</span>
                       </th>
-                      <th>Order details</th>
-                      <th>Unfilled amount</th>
-                      <th>Account balance</th>
+                      <th>Limit price</th>
+                      <th className="filled">Filled / Total</th>
                       <th>Expires</th>
+                      <th className="status">Status</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -234,15 +244,6 @@ const OrdersWidget: React.FC = () => {
                     ))}
                   </tbody>
                 </CardTable>
-              </div>
-
-              <div className="deleteContainer">
-                <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
-                  <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
-                </ButtonWithIcon>
-                <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
-                  Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
-                </span>
               </div>
             </form>
           ) : (
