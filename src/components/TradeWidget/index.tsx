@@ -108,89 +108,6 @@ const SubmitButton = styled.button`
   }
 `
 
-const PriceWrapper = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  width: 100%;
-  margin: 2.4rem 0 0;
-  justify-content: space-between;
-
-  > strong {
-    text-transform: capitalize;
-    color: #2f3e4e;
-    width: 100%;
-    margin: 0 0 1rem;
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
-`
-
-const PriceInputBox = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  margin: 0;
-  width: 50%;
-  width: calc(50% - 0.8rem);
-  height: 5.6rem;
-  position: relative;
-
-  label {
-    display: flex;
-    width: auto;
-    max-width: 100%;
-    position: relative;
-  }
-
-  label > small {
-    position: absolute;
-    right: 1rem;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    opacity: 0.75;
-    font-size: 1.2rem;
-    color: #476481;
-    letter-spacing: -0.05rem;
-    text-align: right;
-    font-weight: var(--font-weight-medium);
-  }
-
-  input {
-    margin: 0;
-    width: auto;
-    max-width: 100%;
-    background: #e7ecf3;
-    border-radius: 0.6rem 0.6rem 0 0;
-    border: 0;
-    font-size: 1.6rem;
-    line-height: 1;
-    box-sizing: border-box;
-    border-bottom: 0.2rem solid transparent;
-    font-weight: var(--font-weight-normal);
-    padding: 0 7rem 0 1rem;
-
-    &:focus {
-      border-bottom: 0.2rem solid #218dff;
-      border-color: #218dff;
-      color: #218dff;
-    }
-
-    &.error {
-      border-color: #ff0000a3;
-    }
-
-    &.warning {
-      border-color: orange;
-    }
-
-    &:disabled {
-      box-shadow: none;
-    }
-  }
-`
-
 const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
@@ -474,23 +391,6 @@ const TradeWidget: React.FC = () => {
             sellToken={sellToken}
             receiveToken={receiveToken}
           />
-          {/* Refactor these price input fields */}
-          {/* <PriceWrapper>
-            <strong>Min. sell price</strong>
-            <PriceInputBox>
-              <label>
-                <input placeholder="0" value="146.666" type="text" required />
-                <small>WETH/DAI</small>
-              </label>
-            </PriceInputBox>
-            <PriceInputBox>
-              <label>
-                <input placeholder="0" value="0.00682" type="text" required />
-                <small>DAI/WETH</small>
-              </label>
-            </PriceInputBox>
-          </PriceWrapper> */}
-          {/* Refactor these price input fields */}
           <OrderValidity
             inputId={validUntilId}
             isDisabled={isSubmitting}
