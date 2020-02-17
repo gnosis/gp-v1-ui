@@ -71,10 +71,11 @@ export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
 }
 
-const DEFAULT_FORM_STATE = {
+export const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
-  validUntil: '0',
+  // 2 days
+  validUntil: '2880',
 }
 
 const TradeWidget: React.FC = () => {
