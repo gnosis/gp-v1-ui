@@ -313,7 +313,7 @@ const TokenRow: React.FC<Props> = ({
               {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
               {validateMaxAmount && <a onClick={useMax}>max</a>}
             </WalletDetail>
-            <i aria-label="Tooltip"></i>
+            <i aria-label="Tooltip" />
           </span>
         </span>
       </div>

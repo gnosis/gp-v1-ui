@@ -478,11 +478,11 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button></button>
+        <button />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget></OrdersWidget>
+          <OrdersWidget />
         </div>
       </OrdersPanel>
     </WrappedWidget>
