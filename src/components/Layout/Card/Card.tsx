@@ -6,7 +6,6 @@ const CardRowDrawer = styled.tr<{ responsive: boolean }>`
   display: flex;
   justify-content: center;
   align-items: center;
-
   background-color: transparent;
   box-shadow: none;
 
@@ -131,7 +130,6 @@ export const CardTable = styled.table<{
 
       // How much separation between ROWS
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
-
       text-align: center;
       transition: all 0.2s ease-in-out;
       z-index: 1;
@@ -286,11 +284,6 @@ export const CardTable = styled.table<{
         }
       }
     }
-    
-    // Hide Table Header on smaller sizes
-    // > thead {
-    //   display: none;
-    // }
 
     // Top level custom css
     ${({ $responsiveCSS }): string | undefined => $responsiveCSS}

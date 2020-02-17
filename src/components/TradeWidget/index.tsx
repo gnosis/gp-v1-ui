@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import styled from 'styled-components'
-import { faExchangeAlt, faPaperPlane, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import switchTokenPair from 'assets/img/switch.svg'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
@@ -34,7 +34,6 @@ import { ZERO } from 'const'
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
-  max-height: 54rem;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
@@ -113,7 +112,7 @@ const PriceWrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
-  margin: 2.4rem 0;
+  margin: 2.4rem 0 0;
   justify-content: space-between;
 
   > strong {
@@ -458,13 +457,13 @@ const TradeWidget: React.FC = () => {
             setUnlimited={setUnlimited}
             tabIndex={3}
           />
-          <OrderDetails
+          {/* <OrderDetails
             sellAmount={watch(sellInputId)}
             sellTokenName={safeTokenName(sellToken)}
             receiveAmount={watch(receiveInputId)}
             receiveTokenName={safeTokenName(receiveToken)}
             validUntil={watch(validUntilId)}
-          />{' '}
+          />{' '} */}
           <p>This order might be partially filled.</p>
           <SubmitButton
             data-text="This order might be partially filled."

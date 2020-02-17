@@ -3,19 +3,12 @@ import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
-import {
-  faExclamationTriangle,
-  faSpinner,
-  faTrashAlt,
-  faExchangeAlt,
-  faChevronUp,
-  faChevronDown,
-} from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faTrashAlt, faExchangeAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
-import Highlight from 'components/Highlight'
+// import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { getTokenFromExchangeById } from 'services'

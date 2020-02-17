@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
-import { faTrashAlt, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { useOrders } from 'hooks/useOrders'

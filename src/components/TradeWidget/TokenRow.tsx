@@ -23,56 +23,55 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   flex-flow: column wrap;
-  
-    > div:first-of-type {
-      width: 100%;
-      display: flex;
-      flex-flow: row nowrap;
-      margin: 0 0 1rem;
-      padding: 0 1rem;
-      box-sizing: border-box;
+
+  > div:first-of-type {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0 0 1rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
+
+  > div > strong {
+    margin: 0 auto 0 0;
+    text-transform: capitalize;
+    color: #2f3e4e;
+  }
+
+  > div > span {
+    display: flex;
+    flex-flow: row nowrap;
+    font-size: 1.3rem;
+    color: #218dff;
+    letter-spacing: -0.03rem;
+    text-align: right;
+  }
+
+  > div > span > button {
+    background: 0;
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-active);
+    font-size: inherit;
+    margin: 0;
+    padding: 0;
+    text-decoration: underline;
+
+    &::after {
+      content: '-';
+      margin: 0 0.5rem;
+      display: inline-block;
+      color: #9fb4c9;
+      text-decoration: none;
     }
-    
-    > div > strong {
-      margin: 0 auto 0 0;
-      text-transform: capitalize;
-      color: #2F3E4E;
-    }
-    
-    > div > span {
-      display: flex;
-      flex-flow: row nowrap;
-      font-size: 1.3rem;
-      color: #218DFF;
-      letter-spacing: -0.03rem;
-      text-align: right;
-    }
-    
-    > div > span > button {
-      background: 0;
-      font-weight: var(--font-weight-normal);
-      color: var(--color-text-active);
-      font-size: inherit;
-      margin: 0;
-      padding: 0;
-      text-decoration: underline;
-      
-        &::after {
-          content: "-";
-          margin: 0 .5rem;
-          display: inline-block;
-          color: #9FB4C9;
-          text-decoration: none;
-        }
-    }
-    
-    > div > span > span {
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: center;
-      justify-items: center;
-      color: #9FB4C9;
-    }
+  }
+
+  > div > span > span {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-items: center;
+    color: #9fb4c9;
   }
 `
 
@@ -193,15 +192,15 @@ const TokenEnable = styled.div`
   }
 `
 
-function displayBalance<K extends keyof TokenBalanceDetails>(
-  balance: TokenBalanceDetails | undefined | null,
-  key: K,
-): string {
-  if (!balance) {
-    return '0'
-  }
-  return formatAmount(balance[key] as BN, balance.decimals) || '0'
-}
+// function displayBalance<K extends keyof TokenBalanceDetails>(
+//   balance: TokenBalanceDetails | undefined | null,
+//   key: K,
+// ): string {
+//   if (!balance) {
+//     return '0'
+//   }
+//   return formatAmount(balance[key] as BN, balance.decimals) || '0'
+// }
 
 function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (!validInputPattern.test(event.currentTarget.value + event.key)) {

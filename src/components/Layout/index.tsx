@@ -20,6 +20,10 @@ const Wrapper = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 
+    > section {
+      width: 100%;
+    }
+
     @media ${MEDIA.mobile} {
       margin: 1.6rem auto 5rem;
     }

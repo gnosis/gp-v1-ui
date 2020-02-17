@@ -6,13 +6,50 @@ import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
 import { adjustPrecision } from '@gnosis.pm/dex-js'
-import { validInputPattern } from 'utils'
+import arrow from 'assets/img/arrow.svg'
 
 const Wrapper = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: flex-start;
-  height: 6em;
+  width: 100%;
+  flex-flow: row wrap;
+  border-bottom: 0.1rem solid #dfe6ef;
+
+  > button {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    font-weight: var(--font-weight-normal);
+    font-size: 1.4rem;
+    color: #476481;
+    letter-spacing: -0.03rem;
+    height: 5.6rem;
+    position: relative;
+    outline: 0;
+
+    &:hover {
+      background: transparent;
+    }
+
+    &::after {
+      content: '';
+      background: url(${arrow}) no-repeat center/contain;
+      width: 1rem;
+      height: 1.1rem;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      margin: auto;
+      transform: rotate(90deg);
+    }
+  }
+
+  > button > b {
+    color: #218dff;
+    margin: 0 0.4rem;
+  }
 `
 
 const InputBox = styled.div`
@@ -118,8 +155,10 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
 
   return (
     <Wrapper>
-      <h3>Expiration time (in min):</h3>
-      <InputBox>
+      <button>
+        Order starts: <b>ASAP</b> - expires in: <b>30 minutes</b>
+      </button>
+      {/* <InputBox>
         <div className="main-input-container">
           <input
             className={className}
@@ -142,7 +181,7 @@ const OrderValidity: React.FC<Props> = ({ inputId, isDisabled, tabIndex, isUnlim
           </div>
         </div>
         {errorOrWarning}
-      </InputBox>
+      </InputBox> */}
     </Wrapper>
   )
 }
