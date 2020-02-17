@@ -5,8 +5,6 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-  margin: 1rem;
-  padding: 0.375rem 0.8125rem;
   /* background: var(--color-background-pageWrapper);
   border-radius: ${({ $walletOpen }): string =>
     $walletOpen ? 'var(--border-radius) var(--border-radius) 0 0' : 'var(--border-radius)'};
@@ -14,22 +12,25 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
   line-height: 1;
   text-align: center;
   width: 15rem;
+  position: relative;
+  margin: 0 3rem 0 0;
 `
 
 export const UserWalletItem = styled.div<{ $padding?: string; $wordWrap?: string }>`
-  color: var(--color-text-primary);
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   margin: auto;
-  /* padding: ${({ $padding = '1rem 0.2rem' }): string => $padding}; */
-  /* width: 92%; */
-
   white-space: ${({ $wordWrap = 'initial' }): string => $wordWrap};
+  font-family: var(--font-mono);
+  letter-spacing: 0;
 
-  > * {
-    margin: 0 0.375rem;
+  > div {
+    font-weight: var(--font-weight-medium);
+    font-size: 1.6rem;
+    color: #476481;
+    letter-spacing: 0;
   }
 
   > svg {
@@ -77,9 +78,16 @@ export const UserWalletSlideWrapper = styled.div`
 `
 
 export const NetworkTitle = styled.div<{ $color?: string; $fontSize?: string }>`
-  color: ${({ color = 'var(--color-text-primary)' }): string => color};
+  /* color: ${({ color = 'var(--color-text-primary)' }): string => color};
   font-size: ${({ $fontSize = '1rem' }): string => $fontSize};
-  font-weight: bolder;
+  font-weight: bolder; */
+  color: inherit;
+  position: absolute;
+  text-transform: uppercase;
+  font-size: .9rem;
+  text-transform: uppercase;
+  letter-spacing: .3rem;
+  top: -.6rem;
 `
 
 export const MonospaceAddress = styled(NetworkTitle)`

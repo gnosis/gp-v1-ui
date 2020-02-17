@@ -34,6 +34,15 @@ const TopWrapper = styled.div`
 const BatchCountDown = styled.div`
   display: flex;
   order: 2;
+  font-family: var(--font-mono);
+  font-size: 1.2rem;
+  color: #476481;
+  width: 16rem;
+  letter-spacing: 0;
+
+  > strong {
+    color: #218dff;
+  }
 `
 
 const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps) => {
