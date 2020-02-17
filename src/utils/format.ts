@@ -47,7 +47,9 @@ export function sanitizeInput(value?: string | null, defaultValue = '0'): string
  * @param value Input from URL
  */
 export function sanitizeNegativeAndMakeMultipleOf(value?: string | null, defaultValue = '0'): string {
-  return Number(value) >= 0 ? makeMultipleOf(5, value).toString() : defaultValue
+  return typeof value === 'number' || (typeof value === 'string' && Number(value) >= 0)
+    ? makeMultipleOf(5, value).toString()
+    : defaultValue
 }
 
 export function validatePositive(value: string): true | string {
