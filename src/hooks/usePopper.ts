@@ -1,0 +1,129 @@
+import { useRef, useEffect, RefObject, useState, useMemo, useLayoutEffect } from 'react'
+import { createPopper, Instance, Options, State, Placement } from '@popperjs/core'
+
+const defaultConfig: Partial<Options> & Pick<Options, 'modifiers'> = {
+  // default tooltip placement
+  placement: 'top',
+  modifiers: [
+    {
+      // move slightly to make space for the arrow element
+      name: 'offset',
+      options: {
+        offset: [0, 8],
+      },
+    },
+  ],
+}
+
+const createConfig = (
+  config: Partial<Options> | undefined | null,
+  setState: (state: State) => void,
+): Partial<Options> => {
+  const finalConfig = {
+    ...defaultConfig,
+    ...config,
+  }
+
+  // applyStyles delegates styling to react
+  finalConfig.modifiers.push({
+    name: 'applyStyles',
+    fn: ({ state }) => {
+      // popper.state is mutable, need a new instance
+      setState({ ...state })
+    },
+  })
+
+  return finalConfig
+}
+
+interface PopperHookResult<T extends HTMLElement, U extends HTMLElement = HTMLDivElement> {
+  show(): void
+  hide(): void
+  target: RefObject<T>
+  ref: RefObject<U>
+  isShown: boolean
+  state: State | {}
+}
+
+const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement>(
+  config?: Partial<Options>,
+): PopperHookResult<T, U> => {
+  const [isShown, setIsShown] = useState(false)
+  const popupRef = useRef<U>(null)
+  const targetRef = useRef<T>(null)
+  const popperRef = useRef<Instance | null>(null)
+  const [state, setState] = useState<State | {}>({})
+
+  useEffect(() => {
+    if (!targetRef.current || !popupRef.current) return
+
+    const popper = createPopper(targetRef.current, popupRef.current, createConfig(config, setState))
+
+    popperRef.current = popper
+
+    return (): void => {
+      popper.destroy()
+    }
+  }, [config])
+
+  // memoize what doesn't change between rerenders
+  const stableProps = useMemo(
+    () => ({
+      show: (): void => setIsShown(true),
+      hide: (): void => setIsShown(false),
+      target: targetRef,
+      ref: popupRef,
+    }),
+    [],
+  )
+
+  // LayoutEffect gets applied before browser paint
+  // avoids unnecessary restyling
+  useLayoutEffect(() => {
+    isShown && popperRef.current && popperRef.current.forceUpdate()
+  }, [isShown])
+
+  return useMemo(
+    () => ({
+      ...stableProps,
+      isShown,
+      state,
+    }),
+    [isShown, state, stableProps],
+  )
+}
+
+interface PopperDefaultHookResult<T extends HTMLElement> {
+  // default triggers for the tooltip
+  // can spread over target element
+  targetProps: {
+    onMouseEnter: PopperHookResult<T>['show']
+    onMouseLeave: PopperHookResult<T>['hide']
+    onFocus: PopperHookResult<T>['show']
+    onBlur: PopperHookResult<T>['hide']
+    ref: PopperHookResult<T>['target']
+  }
+  // tooltip state
+  // can spread over Tooltip component
+  tooltipProps: Pick<PopperHookResult<T>, 'ref' | 'isShown' | 'state'>
+}
+
+// Popper hook using default triggers
+export const usePopperDefault = <T extends HTMLElement>(placement?: Placement): PopperDefaultHookResult<T> => {
+  const { target, show, hide, ...tooltipProps } = usePopper<T>({
+    placement,
+  })
+
+  const targetProps = {
+    onMouseEnter: show,
+    onMouseLeave: hide,
+    onFocus: show,
+    onBlur: hide,
+    ref: target,
+  }
+
+  return {
+    targetProps,
+    tooltipProps,
+  }
+}
