@@ -1,31 +1,71 @@
 import React, { ReactNode, CSSProperties } from 'react'
 import Portal from './Portal'
-import { usePopperDefault } from 'hooks/usePopper'
+import { usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 import { State, Placement } from '@popperjs/core'
+import styled from 'styled-components'
+
+const TooltipOuter = styled.div<Pick<TooltipBaseProps, 'isShown'>>`
+  visibility: ${(props): string | false => !props.isShown && 'hidden'};
+`
+
+const TooltipArrow = styled.div`
+  &,
+  ::before {
+    position: absolute;
+    width: ${TOOLTIP_OFFSET}px;
+    height: ${TOOLTIP_OFFSET}px;
+    z-index: -1;
+  }
+
+  ::before {
+    content: '';
+    transform: rotate(45deg);
+    background: #333;
+  }
+`
+
+const TooltipInner = styled.div`
+  background: #333;
+  color: white;
+  font-weight: bold;
+  padding: 4px 8px;
+  font-size: 13px;
+  border-radius: 4px;
+
+  &[data-popper-placement^='top'] > ${TooltipArrow} {
+    bottom: -${TOOLTIP_OFFSET / 2}px;
+  }
+
+  &[data-popper-placement^='bottom'] > ${TooltipArrow} {
+    top: -${TOOLTIP_OFFSET / 2}px;
+  }
+
+  &[data-popper-placement^='left'] > ${TooltipArrow} {
+    right: -${TOOLTIP_OFFSET / 2}px;
+  }
+
+  &[data-popper-placement^='right'] > ${TooltipArrow} {
+    left: -${TOOLTIP_OFFSET / 2}px;
+  }
+`
 
 interface TooltipBaseProps {
   isShown: boolean
   state: Partial<Pick<State, 'placement' | 'styles'>>
 }
 
-const TooltipBase: React.FC<TooltipProps> = ({ children, isShown, state }, ref) => {
+const TooltipBase: React.FC<TooltipBaseProps> = ({ children, isShown, state }, ref) => {
   const { placement, styles = {} } = state
 
   return (
     // Portal isolates popup styles from the App styles
     <Portal>
-      <div style={isShown ? undefined : { visibility: 'hidden' }}>
-        <div
-          className="tooltip"
-          role="tooltip"
-          ref={ref}
-          style={styles.popper as CSSProperties}
-          data-popper-placement={placement}
-        >
-          <div className="arrow" data-popper-arrow style={styles.arrow as CSSProperties} />
+      <TooltipOuter isShown={isShown}>
+        <TooltipInner role="tooltip" ref={ref} style={styles.popper as CSSProperties} data-popper-placement={placement}>
+          <TooltipArrow data-popper-arrow style={styles.arrow as CSSProperties} />
           {isShown && children}
-        </div>
-      </div>
+        </TooltipInner>
+      </TooltipOuter>
     </Portal>
   )
 }

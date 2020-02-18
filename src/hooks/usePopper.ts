@@ -1,6 +1,8 @@
 import { useRef, useEffect, RefObject, useState, useMemo, useLayoutEffect } from 'react'
 import { createPopper, Instance, Options, State, Placement } from '@popperjs/core'
 
+export const TOOLTIP_OFFSET = 8 // px
+
 const defaultConfig: Partial<Options> & Pick<Options, 'modifiers'> = {
   // default tooltip placement
   placement: 'top',
