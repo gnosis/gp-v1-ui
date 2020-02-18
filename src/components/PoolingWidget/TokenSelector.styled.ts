@@ -40,19 +40,14 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   min-height: 5.6rem;
   font-weight: var(--font-weight-normal);
   font-size: 1.4rem;
-  color: #2F3E4E;
+  color: #2f3e4e;
   letter-spacing: 0;
   line-height: 1;
-  border-bottom: .2rem solid white;
-  /* background: var(--color-background-pageWrapper); */
-  /* box-shadow: ${({ $selected }): string => ($selected ? '0 0 0 0.175rem green' : 'var(--box-shadow)')}; */
-  /* border: ${({ $selected }): string =>
-    `0.05rem solid ${$selected ? 'transparent' : 'var(--color-background-selected-dark)'}`}; */
-  /* border-radius: var(--border-radius); */
+  border-bottom: 0.2rem solid white;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    /* background: var(--color-background); */
-    background: rgba(33,141,255,0.10);
+    background: rgba(33, 141, 255, 0.1);
   }
 
   > img {
@@ -64,13 +59,11 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   }
 
   > ${CheckboxWrapper} {
-    margin: auto 1.6rem;;
+    margin: auto 1.6rem;
     opacity: ${({ $selected }): string => ($selected ? '1' : '0')};
     transition: inherit;
     height: 100%;
     display: flex;
     align-items: center;
   }
-
-  transition: all 0.2s ease-in-out;
 `

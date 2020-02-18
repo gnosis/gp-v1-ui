@@ -8,15 +8,15 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   margin: auto;
   align-items: center;
   justify-content: center;
-  
-    @media ${MEDIA.mobile} {
-      flex-flow: row wrap;
-      background: #dde4ed;
-      border-radius: 15rem;
-      width: 100%;
-      margin: 0 auto;
-      justify-content: space-between;
-    }
+
+  @media ${MEDIA.mobile} {
+    flex-flow: row wrap;
+    background: #dde4ed;
+    border-radius: 15rem;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: space-between;
+  }
 
   a:link,
   a:visited {
@@ -24,7 +24,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     color: var(--color-text-secondary);
     font-weight: bolder;
     text-decoration: none;
-    transition: color .2s ease-in-out, background .2s ease-in-out;
+    transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
     font-weight: var(--font-weight-medium);
     font-size: 2.3rem;
     padding: 0 4rem;
@@ -38,15 +38,15 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     justify-content: center;
     align-items: center;
 
-      @media ${MEDIA.mobile} {
-        color: rgba(78, 106, 133, .75);
-        margin: 0;
-        padding: 0;
-        font-size: 1.3rem;
-        width: 100%;
-        height: 4rem;
-      }
-    
+    @media ${MEDIA.mobile} {
+      color: rgba(78, 106, 133, 0.75);
+      margin: 0;
+      padding: 0;
+      font-size: 1.3rem;
+      width: 100%;
+      height: 4rem;
+    }
+
     &:hover {
       color: var(--color-text-active);
       background: var(--color-background-nav-active);
@@ -56,29 +56,11 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
       color: var(--color-text-active);
       background: var(--color-background-nav-active);
       @media ${MEDIA.mobile} {
-        /* padding: 0 1.2rem;
-        font-size: 1.6rem;
-        height: 4.6rem; */
         background: #208dff;
         color: #ffffff;
       }
     }
   }
-
-  /* ${({ $responsive, $open }): string | false =>
-    $responsive &&
-    `
-    flex-flow: column nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    background: var(--color-background-pageWrapper);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    cursor: pointer;
-    height: ${$open ? 'auto' : '3.9375rem'};
-    overflow: hidden;
-    padding: 0;
-  `} */
 `
 
 export const OrderedNavLinkDiv = styled.span`

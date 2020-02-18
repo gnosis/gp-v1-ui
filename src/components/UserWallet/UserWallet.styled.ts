@@ -213,15 +213,13 @@ export const UserWalletSlideWrapper = styled.div`
 `
 
 export const NetworkTitle = styled.div`
-  /* color: ${({ color = 'var(--color-text-primary)' }): string => color};
-  font-weight: bolder; */
   color: inherit;
   position: absolute;
   text-transform: uppercase;
-  font-size: .9rem;
+  font-size: 0.9rem;
   text-transform: uppercase;
-  letter-spacing: .3rem;
-  top: -.6rem;
+  letter-spacing: 0.3rem;
+  top: -0.6rem;
   white-space: nowrap;
 `
 
@@ -234,7 +232,7 @@ export const MonospaceAddress = styled.div`
   line-height: 1.4;
 
   @media ${MEDIA.mobile} {
-    border: solid 1px #dfe6ef;
+    border: solid 0.1rem #dfe6ef;
     border-radius: 0.6rem 0.6rem 0 0;
     padding: 1rem;
     box-sizing: border-box;

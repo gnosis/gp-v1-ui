@@ -94,11 +94,10 @@ export const GreySubText = styled.p<{ $justify?: string }>`
 `
 
 export const StepSeparator = styled.div<{ $bgColor?: string }>`
-  height: .1rem;
+  height: 0.1rem;
   width: 13rem;
   margin: 0 1rem;
-  background: #DFE6EF;
-  /* background: ${({ $bgColor = 'lightgrey' }): string => $bgColor}; */
+  background: #dfe6ef;
 `
 
 export const StepButtonsWrapper = styled.div`
