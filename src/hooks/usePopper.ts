@@ -66,7 +66,8 @@ const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement
     return (): void => {
       popper.destroy()
     }
-  }, [config])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // memoize what doesn't change between rerenders
   const stableProps = useMemo(
@@ -111,7 +112,7 @@ interface PopperDefaultHookResult<T extends HTMLElement> {
 }
 
 // Popper hook using default triggers
-export const usePopperDefault = <T extends HTMLElement>(placement?: Placement): PopperDefaultHookResult<T> => {
+export const usePopperDefault = <T extends HTMLElement>(placement: Placement = 'top'): PopperDefaultHookResult<T> => {
   const { target, show, hide, ...tooltipProps } = usePopper<T>({
     placement,
   })
