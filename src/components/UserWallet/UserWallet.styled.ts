@@ -7,17 +7,13 @@ export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-  /* background: var(--color-background-pageWrapper);
-  border-radius: ${({ $walletOpen }): string =>
-    $walletOpen ? 'var(--border-radius) var(--border-radius) 0 0' : 'var(--border-radius)'};
-  box-shadow: var(--box-shadow); */
   line-height: 1;
   text-align: left;
   position: relative;
-  
-    .QRCode {
-      margin: 0 auto;
-    }
+
+  .QRCode {
+    margin: 0 auto;
+  }
 `
 
 export const UserWalletItem = styled.div`
@@ -35,10 +31,6 @@ export const UserWalletItem = styled.div`
   flex: 1 1 auto;
   padding: 0;
   box-sizing: border-box;
-
-  @media ${MEDIA.mobile} {
-    /* padding: 0 1.6rem 1.6rem; */
-  }
 
   > a {
     line-height: 1;
@@ -173,10 +165,11 @@ export const UserWalletSlideWrapper = styled.div`
   padding: 1.6rem;
   box-sizing: border-box;
   z-index: 10;
+  flex-flow: column wrap;
   top: 100%;
   margin: 1rem 0 0;
   box-shadow: 0 -1rem 4rem 0 rgba(0,0,0,0.05), rgba(0,0,0,0.02) 0 0.276726rem 0.221381rem 0, rgba(0,0,0,0.027) 0 0.666501rem 0.532008rem 0, rgba(0,0,0,0.035) 0 1.25216rem 1.0172rem 0, rgba(0,0,0,0.043) 0 2.23363rem 1.7869rem 0, rgba(0,0,0,0.05) 0 4.17776rem 3.34221rem 0, rgba(0,0,0,0.07) 0 10rem 8rem 0;
-  
+    
     @media ${MEDIA.mobile} {
       width: 100%;
       position: fixed;
@@ -186,7 +179,6 @@ export const UserWalletSlideWrapper = styled.div`
       box-sizing: border-box;
       box-shadow: 0 -90vh 0 100vw rgba(47, 62, 78, 0.50);
       border-radius: 1.2rem;
-      flex-flow: column wrap;
       padding: 0 0 2.4rem;
     }
     
@@ -198,6 +190,10 @@ export const UserWalletSlideWrapper = styled.div`
       height: 5.4rem;
       align-items: center;
       padding: 0 1.6rem;
+      
+      @media ${MEDIA.mediumUp} {
+        display: none;
+      }
     }
     
     > button > b {
@@ -226,6 +222,7 @@ export const NetworkTitle = styled.div`
   text-transform: uppercase;
   letter-spacing: .3rem;
   top: -.6rem;
+  white-space: nowrap;
 `
 
 export const MonospaceAddress = styled.div`

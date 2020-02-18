@@ -131,7 +131,14 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
             <UserAddress>
               {userAddress && abbreviateString(userAddress, 6, 4)}
               {/* Network */}
-              <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
+              <NetworkTitle>
+                {/* Don't output MAINNET, only other networks. */}
+                {networkId
+                  ? getNetworkFromId(networkId) === 'Mainnet'
+                    ? ''
+                    : getNetworkFromId(networkId)
+                  : 'Unknown Network'}
+              </NetworkTitle>
             </UserAddress>
           </UserWalletToggler>
         </>

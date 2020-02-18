@@ -1,11 +1,7 @@
 import styled from 'styled-components'
+import { MEDIA } from 'const'
 
 export const TokenSelectorWrapper = styled.div`
-  /* display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  grid-gap: 1rem;
-  justify-self: center;
-  width: 80%; */
   width: 50%;
   width: calc(50% - 1.5rem);
   padding: 0 0 5rem 0;
@@ -16,6 +12,12 @@ export const TokenSelectorWrapper = styled.div`
   border-radius: 0.6rem;
   margin: 0 0 4rem auto;
   background: #ffffff;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    margin: 1.6rem auto 2.4rem;
+    height: 29rem;
+  }
 `
 
 export const CheckboxWrapper = styled.div`

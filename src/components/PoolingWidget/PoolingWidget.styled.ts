@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import PageWrapper from 'components/Layout/PageWrapper'
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
+import { MEDIA } from 'const'
 
 export const PoolingInterfaceWrapper = styled(PageWrapper)`
   display: flex;
@@ -11,6 +12,12 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
   align-items: flex-start;
   align-content: flex-start;
   position: relative;
+
+  @media ${MEDIA.mobile} {
+    flex-flow: column wrap;
+    padding: 1.6rem 1.6rem 0;
+    width: 100%;
+  }
 
   > h2 {
     margin: 1rem auto 2.4rem;
@@ -53,6 +60,11 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     font-size: 1.4rem;
     color: #2f3e4e;
     letter-spacing: 0;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.2rem;
+      margin: 1rem 0 0;
+    }
   }
 
   &.active {
@@ -101,6 +113,11 @@ export const StepButtonsWrapper = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  @media ${MEDIA.mobile} {
+    position: relative;
+    height: auto;
+  }
+
   > button {
     margin: 0 1.6rem;
     border-radius: 0.6rem;
@@ -116,11 +133,16 @@ export const StepButtonsWrapper = styled.div`
   > button:first-of-type {
     font-weight: var(--font-weight-medium);
     text-transform: uppercase;
+    background: transparent;
     font-size: 1.4rem;
     color: #218dff;
     letter-spacing: 0;
     line-height: 1;
     transition: color 0.2s ease-in-out;
+
+    @media ${MEDIA.mobile} {
+      margin: 1.6rem 1.6rem 1.6rem 0;
+    }
 
     &:hover {
       background: 0;
@@ -146,6 +168,10 @@ export const StepButtonsWrapper = styled.div`
     color: #ffffff;
     text-transform: uppercase;
     font-size: 1.4rem;
+
+    @media ${MEDIA.mobile} {
+      margin: 1.6rem 0 1.6rem 1.6rem;
+    }
 
     > svg {
       margin: 0 0.8rem 0 0;
@@ -173,9 +199,33 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
   justify-content: center;
   margin: 1rem auto 4rem;
   width: 100%;
+  white-space: nowrap;
+
+  @media ${MEDIA.mobile} {
+    margin: 0 auto 3rem;
+  }
 
   > ${ProgressStep}, ${StepSeparator}, ${ProgressStepText}, ${StepButtonsWrapper} {
     transition: background 0.7s ease-in-out;
+  }
+
+  > ${ProgressStepText} {
+    @media ${MEDIA.mobile} {
+      margin: 0;
+    }
+  }
+
+  > ${StepButtonsWrapper} {
+    @media ${MEDIA.mobile} {
+      position: relative;
+      height: auto;
+    }
+  }
+
+  > ${StepSeparator} {
+    @media ${MEDIA.mobile} {
+      margin: 0 0 2.1rem;
+    }
   }
 `
 
@@ -183,6 +233,11 @@ export const StepDescriptionWrapper = styled.div`
   width: 50%;
   padding: 0 2.4rem 0 0;
   box-sizing: border-box;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    padding: 0;
+  }
 
   .liqContent {
     color: #456483;

@@ -154,6 +154,11 @@ const PriceInputBox = styled.div`
     letter-spacing: -0.05rem;
     text-align: right;
     font-weight: var(--font-weight-medium);
+
+    @media ${MEDIA.mobile} {
+      font-size: 1rem;
+      letter-spacing: 0.03rem;
+    }
   }
 
   input {
@@ -169,6 +174,10 @@ const PriceInputBox = styled.div`
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 7rem 0 1rem;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
 
     &:focus {
       border-bottom: 0.2rem solid #218dff;
