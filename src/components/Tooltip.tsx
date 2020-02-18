@@ -74,7 +74,7 @@ interface TooltipProps extends TooltipBaseProps {
   children?: ReactNode
 }
 
-export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(TooltipBase)
+export const Tooltip = React.memo(React.forwardRef<HTMLDivElement, TooltipProps>(TooltipBase))
 
 interface WrapperProps {
   tooltip: ReactNode
@@ -91,3 +91,9 @@ export const TooltipWrapper: React.FC<WrapperProps> = ({ children, tooltip, plac
     </div>
   )
 }
+
+interface MemoizedWrapperProps extends WrapperProps {
+  children?: ReactNode
+}
+
+export const TooltipWrapper = React.memo<MemoizedWrapperProps>(Wrapper)
