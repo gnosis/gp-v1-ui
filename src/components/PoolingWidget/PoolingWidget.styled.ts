@@ -117,7 +117,8 @@ export const StepButtonsWrapper = styled.div`
     height: auto;
   }
 
-  > button {
+  > button,
+  > a {
     margin: 0 1.6rem;
     border-radius: 0.6rem;
     outline: 0;
@@ -127,6 +128,7 @@ export const StepButtonsWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
   }
 
   > button:first-of-type {
@@ -158,7 +160,8 @@ export const StepButtonsWrapper = styled.div`
     }
   }
 
-  > button:last-of-type {
+  > button:last-of-type,
+  > a.finish {
     background: #218dff;
     border-radius: 0.6rem;
     min-width: 14rem;
@@ -167,6 +170,7 @@ export const StepButtonsWrapper = styled.div`
     color: #ffffff;
     text-transform: uppercase;
     font-size: 1.4rem;
+    margin: 0 1.6rem 0 auto;
 
     @media ${MEDIA.mobile} {
       margin: 1.6rem 0 1.6rem 1.6rem;

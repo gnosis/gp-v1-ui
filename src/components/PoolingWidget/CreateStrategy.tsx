@@ -39,12 +39,7 @@ export const CreateStrategy: React.FC<CreateStrategyProps> = ({
           </p>
         </>
       )}
-      <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
-      <GreySubText>
-        {txReceipt
-          ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
-          : 'Review your liquidity summary above and then send your transaction'}
-      </GreySubText>
+      {txIdentifier ? '' : <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />}
     </CreateStrategyWrapper>
   )
 }
