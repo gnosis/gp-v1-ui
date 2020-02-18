@@ -18,6 +18,8 @@ import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
 
+import { TooltipWrapper } from 'components/Tooltip'
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -305,36 +307,42 @@ const TokenRow: React.FC<Props> = ({
       <div>
         <strong>{selectLabel}</strong>
         <span>
-          <button>+ Deposit</button>
+          <TooltipWrapper as="button" tooltip="Deposit">
+            + Deposit
+          </TooltipWrapper>
+          {/* <button>+ Deposit</button> */}
           <span>
             Balance:
-            <WalletDetail>
+            <TooltipWrapper as={WalletDetail} tooltip="Fill maximum">
               {' '}
               {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
               {validateMaxAmount && <a onClick={useMax}>max</a>}
-            </WalletDetail>
+            </TooltipWrapper>
             <i aria-label="Tooltip"></i>
           </span>
         </span>
       </div>
       <InputBox>
-        <input
-          className={className}
-          placeholder="0"
-          name={inputId}
-          type="text"
-          disabled={isDisabled}
-          required
-          ref={register({
-            pattern: { value: validInputPattern, message: 'Invalid amount' },
-            validate: { positive: validatePositive },
-          })}
-          onKeyPress={onKeyPress}
-          onChange={enforcePrecision}
-          onBlur={removeExcessZeros}
-          tabIndex={tabIndex + 2}
-          onFocus={(e): void => e.target.select()}
-        />
+        <TooltipWrapper tooltip="input amount">
+          <input
+            className={className}
+            placeholder="0"
+            name={inputId}
+            type="text"
+            disabled={isDisabled}
+            required
+            ref={register({
+              pattern: { value: validInputPattern, message: 'Invalid amount' },
+              validate: { positive: validatePositive },
+            })}
+            onKeyPress={onKeyPress}
+            onChange={enforcePrecision}
+            onBlur={removeExcessZeros}
+            tabIndex={tabIndex + 2}
+            onFocus={(e): void => e.target.select()}
+          />
+        </TooltipWrapper>
+
         {/* <WalletDetail>
           <div>
             <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
