@@ -1,5 +1,5 @@
 import { useRef, useEffect, RefObject, useState, useMemo, useLayoutEffect } from 'react'
-import { createPopper, Instance, Options, State, Placement } from '@popperjs/core'
+import { Instance, Options, State, Placement } from '@popperjs/core'
 
 export const TOOLTIP_OFFSET = 8 // px
 
@@ -59,12 +59,16 @@ const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement
   useEffect(() => {
     if (!targetRef.current || !popupRef.current) return
 
-    const popper = createPopper(targetRef.current, popupRef.current, createConfig(config, setState))
-
-    popperRef.current = popper
+    import(
+      /* webpackChunkName: "popper_chunk"*/
+      '@popperjs/core'
+    ).then(({ createPopper }) => {
+      if (!targetRef.current || !popupRef.current) return
+      popperRef.current = createPopper(targetRef.current, popupRef.current, createConfig(config, setState))
+    })
 
     return (): void => {
-      popper.destroy()
+      popperRef.current?.destroy()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -83,7 +87,7 @@ const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement
   // LayoutEffect gets applied before browser paint
   // avoids unnecessary restyling
   useLayoutEffect(() => {
-    isShown && popperRef.current && popperRef.current.forceUpdate()
+    isShown && popperRef.current?.forceUpdate()
   }, [isShown])
 
   return useMemo(
