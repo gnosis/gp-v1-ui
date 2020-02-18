@@ -6,7 +6,7 @@
   "sideEffects": false,
   "scripts": {
     "start": "NODE_ENV=development webpack-dev-server --mode development --hot",
-    "mock": "NODE_ENV=development MOCK=true webpack-dashboard -- webpack-dev-server --mode development --hot",
+    "mock": "MOCK=true yarn start",
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
     "lint": "eslint src --ext .ts,.tsx,.js",
     "lint:fix": "eslint --fix . --ext .ts,.tsx,.js",
