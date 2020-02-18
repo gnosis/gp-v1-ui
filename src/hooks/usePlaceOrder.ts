@@ -124,7 +124,6 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      setIsSubmitting(true)
       log(`Placing ${orders.length} orders at once`)
 
       try {
