@@ -197,6 +197,7 @@ const OrdersPanel = styled.div`
   background: #edf2f7;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
+  }
 
   > div {
     width: 100%;
@@ -207,6 +208,18 @@ const OrdersPanel = styled.div`
     flex-flow: row wrap;
     overflow-y: auto;
     border-radius: 0 0.6rem 0.6rem 0;
+      @media ${MEDIA.mobile} {
+        display: none;
+          &.visible {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+          }
+      }
   }
 
   > div > h5 {
@@ -220,6 +233,13 @@ const OrdersPanel = styled.div`
     text-align: center;
     box-sizing: border-box;
     text-align: center;
+  }
+  
+  > div > h5 > a {
+    font-size: 1.3rem;
+    font-weight: var(--font-weight-normal);
+    color: #218dff;
+    text-decoration: underline;
   }
 
   > button {
@@ -480,7 +500,9 @@ const TradeWidget: React.FC = () => {
         <button></button>
         {/* Actual orders content */}
         <div>
-          <h5>Your orders</h5>
+          <h5>
+            Your orders - <a href="/orders">Full view</a>
+          </h5>
           <OrdersWidget></OrdersWidget>
         </div>
       </OrdersPanel>

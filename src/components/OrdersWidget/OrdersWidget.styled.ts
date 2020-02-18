@@ -40,23 +40,12 @@ export const CreateButtons = styled.div`
   }
 
   &.withoutOrders {
-    // adjust grid layout when no orders
-    place-items: center;
-    grid-row-gap: 1em;
-    grid:
-      'noOrdersInfo'
-      'tradeBtn'
-      'strategyBtn'
-      'strategyInfo';
-
-    button {
-      // make buttons the same width
-      width: 15em;
-    }
   }
 
   .noOrdersInfo {
-    grid-area: noOrdersInfo;
+    line-height: 1.4;
+    text-align: center;
+    font-size: 1.4rem;
   }
   .tradeBtn {
     grid-area: tradeBtn;

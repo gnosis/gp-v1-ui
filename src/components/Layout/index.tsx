@@ -36,20 +36,25 @@ const Layout: React.FC = ({ children }) => (
     <Header
       navigation={[
         {
-          label: 'Order',
+          label: 'Trade',
           to: '/trade',
           order: 1,
         },
         {
+          label: 'Orders',
+          to: '/orders',
+          order: 2,
+        },
+        {
           label: 'Liquidity',
           to: '/liquidity',
-          order: 2,
+          order: 3,
           withPastLocation: true,
         },
         {
           label: 'Balances',
           to: '/wallet',
-          order: 3,
+          order: 4,
           withPastLocation: true,
         },
       ]}

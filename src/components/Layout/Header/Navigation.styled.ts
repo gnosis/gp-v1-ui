@@ -37,9 +37,14 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
       @media ${MEDIA.mobile} {
         color: rgba(78, 106, 133, .75);
+        margin: 0;
+        padding: 0;
+        font-size: 1.3rem;
+        width: 100%;
+        height: 4rem;
       }
     
     &:hover {
@@ -51,9 +56,9 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
       color: var(--color-text-active);
       background: var(--color-background-nav-active);
       @media ${MEDIA.mobile} {
-        padding: 0 1.2rem;
+        /* padding: 0 1.2rem;
         font-size: 1.6rem;
-        height: 4.6rem;
+        height: 4.6rem; */
         background: #208dff;
         color: #ffffff;
       }
@@ -76,10 +81,15 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   `} */
 `
 
-export const OrderedNavLinkDiv = styled.span<{ $order: number }>`
-  order: ${({ $order }): number => $order};
+export const OrderedNavLinkDiv = styled.span`
   display: flex;
   align-items: center;
+  flex: 1 1 auto;
+
+  @media ${MEDIA.mobile} {
+    justify-content: center;
+    flex: 1 1 25%;
+  }
 
   &:not(:last-of-type) {
     margin: 0 1.6rem 0 0;

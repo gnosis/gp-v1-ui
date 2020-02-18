@@ -25,6 +25,7 @@ const Wrapper = styled.div`
     height: 5.6rem;
     position: relative;
     outline: 0;
+    background: transparent;
 
     &:hover {
       background: transparent;
