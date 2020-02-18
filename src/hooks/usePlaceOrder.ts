@@ -7,7 +7,7 @@ import { MAX_BATCH_ID } from '@gnosis.pm/dex-js'
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { log } from 'utils'
+import { log, formatValidity } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
@@ -95,7 +95,11 @@ export const usePlaceOrder = (): Result => {
         log(`The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: show link to orders page?
-        toast.success(`Placed order valid for 30min`)
+        if (validUntil) {
+          toast.success(`Placed order valid for ${formatValidity(validUntil)}`)
+        } else {
+          toast.success(`Placed a standing order`)
+        }
 
         return { success: true, receipt }
       } catch (e) {
