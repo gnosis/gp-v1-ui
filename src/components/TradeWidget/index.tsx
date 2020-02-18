@@ -113,7 +113,7 @@ const TradeWidget: React.FC = () => {
       [validUntilId]: validUntil,
     },
   })
-  const { handleSubmit, watch } = methods
+  const { handleSubmit, reset, watch } = methods
 
   const searchQuery = buildSearchQuery({
     sell: watch(sellInputId),
@@ -201,6 +201,9 @@ const TradeWidget: React.FC = () => {
         validUntil,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
+            // reset form on successful order placing
+            reset(DEFAULT_FORM_STATE)
+            setUnlimited(false)
             // unblock form
             setIsSubmitting(false)
 
@@ -226,6 +229,7 @@ const TradeWidget: React.FC = () => {
         },
       })
       if (success && pendingTxHash) {
+        // remove pending tx
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     } else {
