@@ -63,7 +63,7 @@ const OrderDetails: React.FC<Props> = ({
             </li>
           </ul>
         </Highlight>{' '}
-        Your order might be partially filled.
+        Your order may be partially filled
       </dt>
 
       <dd>Fee:</dd>
