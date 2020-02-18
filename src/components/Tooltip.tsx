@@ -5,10 +5,11 @@ import { State, Placement } from '@popperjs/core'
 import styled from 'styled-components'
 import { isElement, isFragment } from 'react-is'
 
+// visibility necessary for correct boundingRect calculation by popper
 const TooltipOuter = styled.div<Pick<TooltipBaseProps, 'isShown'>>`
-  visibility: ${(props): string | false => !props.isShown && 'hidden'};
+  visibility: ${(props): 'hidden' | false => !props.isShown && 'hidden'};
 `
-
+// can style anything but TOOLTIP_OFFSET fields, position and transform: rotate
 const TooltipArrow = styled.div`
   &,
   ::before {
