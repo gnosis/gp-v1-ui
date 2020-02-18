@@ -38,7 +38,8 @@ const OrderDetails: React.FC<Props> = ({
   const sellAmount = new BigNumber(sellAmountString)
   const receiveAmount = new BigNumber(receiveAmountString)
 
-  const price = formatPrice(sellAmount, receiveAmount)
+  const price = formatPrice(receiveAmount, sellAmount)
+  const priceInverse = formatPrice(sellAmount, receiveAmount)
   if (!price) {
     return null
   }
@@ -51,11 +52,17 @@ const OrderDetails: React.FC<Props> = ({
         <Highlight>
           {sellAmountString} {sellTokenName}
         </Highlight>{' '}
-        at a price{' '}
+        at the <strong>following price or better</strong>:
         <Highlight>
-          1 {sellTokenName} = {price} {receiveTokenName}
+          <ul>
+            <li>
+              1 {sellTokenName} = {price} {receiveTokenName}
+            </li>
+            <li>
+              1 {receiveTokenName} = {priceInverse} {sellTokenName}
+            </li>
+          </ul>
         </Highlight>{' '}
-        or better. <br />
         Your order might be partially filled.
       </dt>
 
