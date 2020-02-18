@@ -226,12 +226,6 @@ const TradeWidget: React.FC = () => {
         },
       })
       if (success && pendingTxHash) {
-        // Following 2 fns: Commented out for testing consecutive txs
-        // reset form on successful order placing
-        // reset(DEFAULT_FORM_STATE)
-        // setUnlimited(false)
-
-        // remove pending tx
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     } else {
