@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'toastify'
 
-import { MAX_BATCH_ID } from '@gnosis.pm/dex-js'
+import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
@@ -96,7 +96,11 @@ export const usePlaceOrder = (): Result => {
 
         // TODO: show link to orders page?
         if (validUntil) {
-          toast.success(`Placed order valid for ${formatValidity(validUntil)}`)
+          // Get batch time in minutes
+          //  In reality, no need to ceil cause we know batch time is 300, but it was done to avoid relying on knowing
+          //  the actual value of the constant
+          const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
+          toast.success(`Placed order valid for ${formatValidity(validityInMinutes)}`)
         } else {
           toast.success(`Placed a standing order`)
         }
