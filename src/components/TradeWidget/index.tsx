@@ -510,9 +510,7 @@ const TradeWidget: React.FC = () => {
         <button></button>
         {/* Actual orders content */}
         <div>
-          <h5>
-            Your orders - <a href="/orders">Full view</a>
-          </h5>
+          <h5>Your orders</h5>
           <OrdersWidget></OrdersWidget>
         </div>
       </OrdersPanel>

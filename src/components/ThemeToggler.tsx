@@ -1,11 +1,15 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
+import { MEDIA } from 'const'
 
 const FUSE_APP_THEME = 'FUSE_APP_THEME'
 
 const TogglerWrapper = styled.div`
-  font-size: 70%;
+  font-size: inherit;
+  @media ${MEDIA.mobile} {
+    margin: 2.4rem 0;
+  }
 `
 
 const ToggleLabel = styled.label<{ selected: boolean }>`

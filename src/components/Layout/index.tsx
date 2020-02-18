@@ -41,15 +41,15 @@ const Layout: React.FC = ({ children }) => (
           order: 1,
         },
         {
-          label: 'Orders',
-          to: '/orders',
-          order: 2,
-        },
-        {
           label: 'Liquidity',
           to: '/liquidity',
-          order: 3,
+          order: 2,
           withPastLocation: true,
+        },
+        {
+          label: 'Orders',
+          to: '/orders',
+          order: 3,
         },
         {
           label: 'Balances',
