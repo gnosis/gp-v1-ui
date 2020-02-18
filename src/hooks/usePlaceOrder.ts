@@ -35,6 +35,7 @@ interface Result {
   placeOrder: (params: PlaceOrderParams<TokenDetails>) => Promise<PlaceOrderResult>
   placeMultipleOrders: (params: PlaceMultipleOrdersParams) => Promise<PlaceOrderResult>
   isSubmitting: boolean
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface PlaceOrderResult {
@@ -60,7 +61,6 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      setIsSubmitting(true)
       log(
         `Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
           sellToken.symbol
@@ -132,7 +132,6 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      setIsSubmitting(true)
       log(`Placing ${orders.length} orders at once`)
 
       try {
@@ -192,5 +191,5 @@ export const usePlaceOrder = (): Result => {
     [networkId, setIsSubmitting, userAddress],
   )
 
-  return { placeOrder, isSubmitting, placeMultipleOrders }
+  return { placeOrder, isSubmitting, setIsSubmitting, placeMultipleOrders }
 }
