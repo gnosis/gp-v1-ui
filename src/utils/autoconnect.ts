@@ -5,7 +5,7 @@ import { WalletApi } from 'api/wallet/WalletApi'
 import Web3 from 'web3'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
-  const WalletConnectProvider = await import(
+  const { default: WalletConnectProvider } = await import(
     /* webpackChunkName: "@walletconnect"*/
     '@walletconnect/web3-provider'
   )
