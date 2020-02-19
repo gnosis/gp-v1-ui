@@ -225,7 +225,7 @@ const OrdersWidget: React.FC = () => {
                       </th>
                       <th>Limit price</th>
                       <th className="filled">Filled / Total</th>
-                      <th>Expires</th>
+                      <th data-label="Expires">Expires</th>
                       <th className="status">Status</th>
                     </tr>
                   </thead>

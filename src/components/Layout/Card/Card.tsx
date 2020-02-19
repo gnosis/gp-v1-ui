@@ -222,6 +222,12 @@ export const CardTable = styled.table<{
         text-overflow: ellipsis;
         overflow: hidden;
       }
+
+      > th[data-label="Expires"] {
+        text-align: left;
+        padding: 0 .75rem;
+      }
+
       > th.checked,
       > td.checked {
         margin: 0;
