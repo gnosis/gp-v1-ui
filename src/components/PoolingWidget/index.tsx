@@ -205,13 +205,14 @@ const PoolingInterface: React.FC = () => {
     return setStep(step + 1)
   }, [setStep, step])
 
-  const { isSubmitting, placeMultipleOrders } = usePlaceOrder()
+  const { isSubmitting, setIsSubmitting, placeMultipleOrders } = usePlaceOrder()
 
   const sendTransaction = useCallback(async () => {
     if (!networkId || !userAddress) return
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
     let pendingTxHash: string | undefined
     try {
+      setIsSubmitting(true)
       setTxReceipt(undefined)
 
       const { receipt } = await placeMultipleOrders({
@@ -219,6 +220,7 @@ const PoolingInterface: React.FC = () => {
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
             pendingTxHash = txHash
+
             setTxHash(txHash)
 
             unstable_batchedUpdates(() => {
@@ -237,6 +239,7 @@ const PoolingInterface: React.FC = () => {
                   validUntil: 0,
                 }
 
+                setIsSubmitting(false)
                 dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
               })
             })
@@ -259,6 +262,7 @@ const PoolingInterface: React.FC = () => {
     networkId,
     placeMultipleOrders,
     selectedTokensMap,
+    setIsSubmitting,
     setTxError,
     setTxHash,
     setTxReceipt,

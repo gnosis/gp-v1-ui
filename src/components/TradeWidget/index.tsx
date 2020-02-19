@@ -6,11 +6,13 @@ import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { useHistory } from 'react-router'
+import { toast } from 'toastify'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
+import { TxNotification } from 'components/TxNotification'
 
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -315,7 +317,7 @@ const TradeWidget: React.FC = () => {
       [validUntilId]: validUntil,
     },
   })
-  const { handleSubmit, watch, reset } = methods
+  const { handleSubmit, reset, watch } = methods
 
   const searchQuery = buildSearchQuery({
     sell: watch(sellInputId),
@@ -351,7 +353,7 @@ const TradeWidget: React.FC = () => {
     [NULL_BALANCE_TOKEN, balances, receiveToken],
   )
 
-  const { isSubmitting, placeOrder } = usePlaceOrder()
+  const { placeOrder, isSubmitting, setIsSubmitting } = usePlaceOrder()
   const history = useHistory()
 
   const swapTokens = useCallback((): void => {
@@ -392,6 +394,9 @@ const TradeWidget: React.FC = () => {
 
     if (isConnected && userAddress) {
       let pendingTxHash: string | undefined = undefined
+      // block form
+      setIsSubmitting(true)
+
       const { success } = await placeOrder({
         buyAmount,
         buyToken: cachedBuyToken,
@@ -400,7 +405,14 @@ const TradeWidget: React.FC = () => {
         validUntil,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
+            // reset form on successful order placing
+            reset(DEFAULT_FORM_STATE)
+            setUnlimited(false)
+            // unblock form
+            setIsSubmitting(false)
+
             pendingTxHash = txHash
+            toast.info(<TxNotification txHash={txHash} />)
 
             const newTxState = {
               txHash,
@@ -421,9 +433,6 @@ const TradeWidget: React.FC = () => {
         },
       })
       if (success && pendingTxHash) {
-        // reset form on successful order placing
-        reset(DEFAULT_FORM_STATE)
-        setUnlimited(false)
         // remove pending tx
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
@@ -507,11 +516,11 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button></button>
+        <button />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget></OrdersWidget>
+          <OrdersWidget />
         </div>
       </OrdersPanel>
     </WrappedWidget>
