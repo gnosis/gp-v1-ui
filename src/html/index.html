@@ -14,7 +14,7 @@
         changeBaseHref(ipfsMatch)
       } else {
         // (*.)?arweave.net/<hash> detection
-        arweaveMatch = /(\w+.)?arweave\.net/.test(hostname) && /\/\w{43}($|\/)/.exec(pathname)
+        arweaveMatch = /(\w+.)?arweave\.net/.test(hostname) && /\/.{43}($|\/)/.exec(pathname)
         if (arweaveMatch) {
           changeBaseHref(arweaveMatch)
         }
