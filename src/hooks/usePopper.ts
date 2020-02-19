@@ -38,7 +38,7 @@ const createConfig = (
   return finalConfig
 }
 
-interface PopperHookResult<T extends HTMLElement, U extends HTMLElement = HTMLDivElement> {
+interface Result<T extends HTMLElement, U extends HTMLElement = HTMLDivElement> {
   show(): void
   hide(): void
   target: RefObject<T>
@@ -49,7 +49,7 @@ interface PopperHookResult<T extends HTMLElement, U extends HTMLElement = HTMLDi
 
 const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement>(
   config?: Partial<Options>,
-): PopperHookResult<T, U> => {
+): Result<T, U> => {
   const [isShown, setIsShown] = useState(false)
   const popupRef = useRef<U>(null)
   const targetRef = useRef<T>(null)
@@ -104,15 +104,15 @@ interface PopperDefaultHookResult<T extends HTMLElement> {
   // default triggers for the tooltip
   // can spread over target element
   targetProps: {
-    onMouseEnter: PopperHookResult<T>['show']
-    onMouseLeave: PopperHookResult<T>['hide']
-    onFocus: PopperHookResult<T>['show']
-    onBlur: PopperHookResult<T>['hide']
-    ref: PopperHookResult<T>['target']
+    onMouseEnter: Result<T>['show']
+    onMouseLeave: Result<T>['hide']
+    onFocus: Result<T>['show']
+    onBlur: Result<T>['hide']
+    ref: Result<T>['target']
   }
   // tooltip state
   // can spread over Tooltip component
-  tooltipProps: Pick<PopperHookResult<T>, 'ref' | 'isShown' | 'state'>
+  tooltipProps: Pick<Result<T>, 'ref' | 'isShown' | 'state'>
 }
 
 // Popper hook using default triggers
