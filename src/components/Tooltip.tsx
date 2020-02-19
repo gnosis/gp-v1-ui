@@ -90,8 +90,13 @@ interface WrapperProps<C> {
 type WrapperPropsAll<T extends keyof JSX.IntrinsicElements | React.ComponentType = 'div'> = WrapperProps<T> &
   React.ComponentProps<T>
 
-// using StyledComponent type since it properly types as={Component}
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// can be used as
+// <Wrapper tooltip={}><button onClick={handler}/></Wrapper>
+// <Wrapper as="button" onClick={handler} tooltip={}><button/></Wrapper>
+// <Wrapper tooltip={} focus={false}><input onFocus={special_handler}/></Wrapper> --> don't touch onFocus
+// single child component gets cloned and ref assigned
+// <Wrapper onClick={handler} tooltip={}><button/><span/></Wrapper>
+// multiple children get wrapped in div
 const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = 'div'>({
   children,
   tooltip,
@@ -100,8 +105,7 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
   focus = true,
   hover = true,
   ...props
-}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
+}: WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
 
   const childrenNumber = React.Children.count(children)
@@ -113,6 +117,7 @@ WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
       | typeof targetProps
       | Omit<typeof targetProps, 'onMouseEnter' | 'onMouseLeave'>
       | Omit<typeof targetProps, 'onFocus' | 'onBlur'>
+      | {} = {}
     if (focus && hover) {
       // pass all targetProps by default
       finalTargetProps = targetProps
@@ -148,6 +153,7 @@ WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
   const TargetComponent = (as || 'div') as keyof JSX.IntrinsicElements | React.ComponentType<any>
 
   return (
+    // extra props on <TooltipWrapper {...props}/> get passed onto TargteComponent
     <TargetComponent {...targetProps} {...props}>
       {children}
       <Tooltip {...tooltipProps}>{tooltip}</Tooltip>
