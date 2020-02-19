@@ -115,7 +115,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled ? (
-            <button className="depositToken" onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}><img src={minus} /></button>
+            <button className="depositToken" onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
+              <img src={minus} />
+            </button>
           ) : (
             <>
               <button className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
@@ -125,15 +127,19 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                     Enabling {symbol}
                   </>
                 ) : (
-                  <>
-                    Enable {symbol}
-                  </>
+                  <>Enable {symbol}</>
                 )}
               </button>
             </>
           )}
           {!totalExchangeBalance.isZero() && (
-            <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="withdrawToken"><img src={plus} /></button>
+            <button
+              onClick={(): void => showForm('withdraw')}
+              disabled={isWithdrawFormVisible}
+              className="withdrawToken"
+            >
+              <img src={plus} />
+            </button>
           )}
         </td>
       </TokenRow>
