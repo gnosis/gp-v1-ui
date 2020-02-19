@@ -83,9 +83,11 @@ interface WrapperProps {
   placement?: Placement
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   as?: keyof JSX.IntrinsicElements | React.ComponentType<any>
+  focus?: boolean
+  hover?: boolean
 }
 
-const Wrapper: React.FC<WrapperProps> = ({ children, tooltip, placement, as }) => {
+const Wrapper: React.FC<WrapperProps> = ({ children, tooltip, placement, as, focus = true, hover = true }) => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
 
   const chilrenNumber = React.Children.count(children)
@@ -93,7 +95,26 @@ const Wrapper: React.FC<WrapperProps> = ({ children, tooltip, placement, as }) =
   // can attach ref to element
   // if children is a single element, not just text, and `as` tag|Component not specified
   if (chilrenNumber === 1 && typeof as === 'undefined' && isElement(children) && !isFragment(children)) {
-    const TargetComponent = React.cloneElement(children, targetProps)
+    let finalTargetProps
+    if (focus && hover) {
+      // pass all targetProps by default
+      finalTargetProps = targetProps
+    } else if (focus) {
+      // <TooltipWrapper hover={false}> --> only show tooltip on focus
+      finalTargetProps = {
+        onFocus: targetProps.onFocus,
+        onBlur: targetProps.onBlur,
+      }
+    } else if (hover) {
+      // <TooltipWrapper focus={false}> --> only show tooltip on hover
+      // useful when onFocus is already taken
+      // in that case may be better to use the hook and compose onFocus handler
+      finalTargetProps = {
+        onMouseEnter: targetProps.onMouseEnter,
+        onMouseLeave: targetProps.onMouseLeave,
+      }
+    }
+    const TargetComponent = React.cloneElement(children, finalTargetProps)
     return (
       <>
         {TargetComponent}
