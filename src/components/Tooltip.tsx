@@ -2,7 +2,7 @@ import React, { ReactNode, CSSProperties } from 'react'
 import Portal from './Portal'
 import { usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 import { State, Placement } from '@popperjs/core'
-import styled from 'styled-components'
+import styled, { StyledComponent, StyledComponentProps } from 'styled-components'
 import { isElement, isFragment } from 'react-is'
 
 // visibility necessary for correct boundingRect calculation by popper
@@ -81,13 +81,22 @@ export const Tooltip = React.memo(React.forwardRef<HTMLDivElement, TooltipProps>
 interface WrapperProps {
   tooltip: ReactNode
   placement?: Placement
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  as?: keyof JSX.IntrinsicElements | React.ComponentType<any>
   focus?: boolean
   hover?: boolean
 }
 
-const Wrapper: React.FC<WrapperProps> = ({ children, tooltip, placement, as, focus = true, hover = true }) => {
+// using StyledComponent type since it properly types as={Component}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Wrapper: StyledComponent<'div', any, WrapperProps> = (({
+  children,
+  tooltip,
+  placement,
+  as,
+  focus = true,
+  hover = true,
+  ...props
+}: // eslint-disable-next-line @typescript-eslint/no-explicit-any
+WrapperProps & StyledComponentProps<'div', any, {}, any>): any => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
 
   const chilrenNumber = React.Children.count(children)
@@ -128,15 +137,12 @@ const Wrapper: React.FC<WrapperProps> = ({ children, tooltip, placement, as, foc
   const TargetComponent = as || 'div'
 
   return (
-    <TargetComponent {...targetProps}>
+    <TargetComponent {...targetProps} {...props}>
       {children}
       <Tooltip {...tooltipProps}>{tooltip}</Tooltip>
     </TargetComponent>
   )
-}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}) as StyledComponent<'div', any, WrapperProps>
 
-interface MemoizedWrapperProps extends WrapperProps {
-  children?: ReactNode
-}
-
-export const TooltipWrapper = React.memo<MemoizedWrapperProps>(Wrapper)
+export const TooltipWrapper = (React.memo(Wrapper) as unknown) as typeof Wrapper

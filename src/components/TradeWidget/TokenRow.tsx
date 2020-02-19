@@ -307,7 +307,8 @@ const TokenRow: React.FC<Props> = ({
       <div>
         <strong>{selectLabel}</strong>
         <span>
-          <TooltipWrapper as="button" tooltip="Deposit">
+          {/* can pass props to as={Component} */}
+          <TooltipWrapper as="a" tooltip="Deposit" onClick={console.log}>
             + Deposit
           </TooltipWrapper>
           {/* <button>+ Deposit</button> */}
