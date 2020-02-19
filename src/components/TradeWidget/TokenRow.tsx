@@ -323,7 +323,8 @@ const TokenRow: React.FC<Props> = ({
         </span>
       </div>
       <InputBox>
-        <TooltipWrapper tooltip="input amount">
+        {/* focus = false as we already do stuff onFocus; to combine tooltips better use hook */}
+        <TooltipWrapper tooltip="input amount" focus={false}>
           <input
             className={className}
             placeholder="0"
