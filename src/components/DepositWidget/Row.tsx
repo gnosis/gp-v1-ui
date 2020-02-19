@@ -150,7 +150,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               Deposit <strong>{symbol}</strong> in Exchange Wallet
             </span>
           }
-          totalAmountLabel="Wallet balance"
+          totalAmountLabel="wallet balance"
           totalAmount={walletBalance}
           inputLabel="Deposit amount"
           tokenBalances={tokenBalances}

@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { MEDIA } from 'const'
 
 export const OrdersWrapper = styled.div`
   width: 100%;

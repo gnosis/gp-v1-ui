@@ -15,7 +15,7 @@ const CardRowDrawer = styled.tr`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   z-index: 9999;
   width: 50rem;
-  height: 40rem;
+  height: 42rem;
   border-radius: 0.6rem;
   background: #ffffff;
 
@@ -23,6 +23,7 @@ const CardRowDrawer = styled.tr`
     width: 100%;
     bottom: 0;
     top: initial;
+    height: 80vh;
   }
 
   // Inner td wrapper
@@ -121,6 +122,7 @@ export const CardTable = styled.table<{
   &.balancesOverview {
     width: 100%;
     display: table;
+    padding: 0 0 2.4rem;
   }
 
   &.balancesOverview > tbody {
