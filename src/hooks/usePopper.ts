@@ -11,7 +11,7 @@ const defaultConfig: Partial<Options> & Pick<Options, 'modifiers'> = {
       // move slightly to make space for the arrow element
       name: 'offset',
       options: {
-        offset: [0, 8],
+        offset: [0, TOOLTIP_OFFSET],
       },
     },
   ],
