@@ -7,6 +7,7 @@ const FUSE_APP_THEME = 'FUSE_APP_THEME'
 
 const TogglerWrapper = styled.div`
   font-size: inherit;
+  margin: 0 6rem 0 0;
   @media ${MEDIA.mobile} {
     margin: 2.4rem 0;
   }
