@@ -104,11 +104,11 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
 WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
 
-  const chilrenNumber = React.Children.count(children)
+  const childrenNumber = React.Children.count(children)
 
   // can attach ref to element
   // if children is a single element, not just text, and `as` tag|Component not specified
-  if (chilrenNumber === 1 && typeof as === 'undefined' && isElement(children) && !isFragment(children)) {
+  if (childrenNumber === 1 && typeof as === 'undefined' && isElement(children) && !isFragment(children)) {
     let finalTargetProps:
       | typeof targetProps
       | Omit<typeof targetProps, 'onMouseEnter' | 'onMouseLeave'>
