@@ -2,7 +2,7 @@ import React, { ReactNode, CSSProperties } from 'react'
 import Portal from './Portal'
 import { usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 import { State, Placement } from '@popperjs/core'
-import styled, { StyledComponent, StyledComponentProps } from 'styled-components'
+import styled from 'styled-components'
 import { isElement, isFragment } from 'react-is'
 
 // visibility necessary for correct boundingRect calculation by popper
@@ -58,6 +58,7 @@ interface TooltipBaseProps {
 
 const TooltipBase: React.FC<TooltipBaseProps> = ({ children, isShown, state }, ref) => {
   const { placement, styles = {} } = state
+  console.log('styles', styles)
 
   return (
     // Portal isolates popup styles from the App styles
@@ -78,16 +79,20 @@ interface TooltipProps extends TooltipBaseProps {
 
 export const Tooltip = React.memo(React.forwardRef<HTMLDivElement, TooltipProps>(TooltipBase))
 
-interface WrapperProps {
+interface WrapperProps<C> {
   tooltip: ReactNode
   placement?: Placement
   focus?: boolean
   hover?: boolean
+  as?: C
 }
+
+type WrapperPropsAll<T extends keyof JSX.IntrinsicElements | React.ComponentType = 'div'> = WrapperProps<T> &
+  React.ComponentProps<T>
 
 // using StyledComponent type since it properly types as={Component}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Wrapper: StyledComponent<'div', any, WrapperProps> = (({
+const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = 'div'>({
   children,
   tooltip,
   placement,
@@ -96,7 +101,7 @@ const Wrapper: StyledComponent<'div', any, WrapperProps> = (({
   hover = true,
   ...props
 }: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-WrapperProps & StyledComponentProps<'div', any, {}, any>): any => {
+WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
 
   const chilrenNumber = React.Children.count(children)
@@ -134,7 +139,8 @@ WrapperProps & StyledComponentProps<'div', any, {}, any>): any => {
 
   //  if as not provided and can't clone single element
   //  use div
-  const TargetComponent = as || 'div'
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const TargetComponent = (as || 'div') as keyof JSX.IntrinsicElements | React.ComponentType<any>
 
   return (
     <TargetComponent {...targetProps} {...props}>
@@ -142,7 +148,6 @@ WrapperProps & StyledComponentProps<'div', any, {}, any>): any => {
       <Tooltip {...tooltipProps}>{tooltip}</Tooltip>
     </TargetComponent>
   )
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-}) as StyledComponent<'div', any, WrapperProps>
+}
 
 export const TooltipWrapper = (React.memo(Wrapper) as unknown) as typeof Wrapper
