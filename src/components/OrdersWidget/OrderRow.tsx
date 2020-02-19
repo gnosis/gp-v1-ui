@@ -116,27 +116,33 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   )
 }
 
-interface UnfilledAmountProps extends Pick<Props, 'order' | 'pending'> {
+interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
   isUnlimited: boolean
 }
 
-const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, isUnlimited }) => {
-  const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
-    order.remainingAmount,
+const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
+  const unfilledAmount = useMemo(() => {
+    const filledAmount = order.priceDenominator.sub(order.remainingAmount)
+
+    return formatAmount(filledAmount, sellToken.decimals) || '0'
+  }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
+
+  const totalAmount = useMemo(() => formatAmount(order.priceDenominator, sellToken.decimals) || '0', [
+    order.priceDenominator,
     sellToken.decimals,
   ])
 
   return (
-    <td data-label="Unfilled Amount" className={isUnlimited ? '' : 'sub-columns two-columns'}>
+    <td data-label="Unfilled Amount">
       {isUnlimited ? (
-        // <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
         <span>no limit</span>
       ) : (
         <>
-          <div>{unfilledAmount}</div>
-          <div>
-            <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+          <div className="amounts">
+            {unfilledAmount} {displayTokenSymbolOrLink(sellToken)}
+            <br />
+            {totalAmount} {displayTokenSymbolOrLink(sellToken)}
           </div>
         </>
       )}
@@ -178,17 +184,7 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
     return { isNeverExpires, expiresOn }
   }, [order.validUntil])
 
-  return (
-    <td data-label="Expires">
-      {isNeverExpires ? (
-        // <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
-        <span>Never</span>
-      ) : (
-        // <Highlight color={'inherit'}>{expiresOn}</Highlight>
-        <span>{expiresOn}</span>
-      )}
-    </td>
-  )
+  return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
 
 async function fetchToken(
@@ -280,11 +276,7 @@ const OrderRow: React.FC<Props> = props => {
           ))}
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        {!isPendingOrder ? (
-          <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
-        ) : (
-          <PendingLink />
-        )}
+        {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
         {/* {!isPendingOrder ? (
           <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
         ) : (

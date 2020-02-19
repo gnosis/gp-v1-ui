@@ -30,10 +30,10 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
     display: none;
   }
 
-  .order-details {
+  .order-details,
+  .amounts {
     display: grid;
     grid-template-columns: max-content max-content;
-    grid-gap: 0 1rem;
     text-align: left;
     justify-content: space-evenly;
 
@@ -43,6 +43,11 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
       grid-gap: 0 0.5rem;
       justify-content: space-between;
     }
+  }
+
+  .amounts {
+    text-align: right;
+    justify-content: right;
   }
 
   .sub-columns {
