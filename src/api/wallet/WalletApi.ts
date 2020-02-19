@@ -211,6 +211,7 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async connect(givenProvider?: Provider): Promise<boolean> {
+    console.log('Connect wallet', givenProvider)
     const options: WalletConnectInits = {
       ...wcOptions,
       package: (
@@ -311,6 +312,7 @@ export class WalletApiImpl implements WalletApi {
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
     this._listeners.push(callback)
     const walletInfo = this.getWalletInfo()
+    console.log('addOnChangeWalletInfo', walletInfo)
     // if walletInfo can only be gotten asynchronously
     // trigger callback as soon as it becomes available
     if (trigger || isPromise(walletInfo)) {
@@ -370,6 +372,7 @@ export class WalletApiImpl implements WalletApi {
     const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
     const wInfoExtended = { ...walletInfo, blockNumber: blockchainUpdate?.blockHeader?.number }
 
+    console.log('_notifyListeners', walletInfo)
     this._listeners.forEach(listener => listener(wInfoExtended))
   }
 

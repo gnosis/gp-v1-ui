@@ -15,6 +15,7 @@ export const useWalletConnection = (): (WalletInfo & { pending: false }) | typeo
   const [walletInfo, setWalletInfo] = useSafeState(() => walletApi.getWalletInfo())
 
   useEffect((): Command => {
+    console.log('[useWalletConnection] Registering to walletApi.addOnChangeWalletInfo')
     return walletApi.addOnChangeWalletInfo(setWalletInfo)
   }, [setWalletInfo])
 
