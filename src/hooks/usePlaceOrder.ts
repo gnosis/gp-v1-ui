@@ -2,12 +2,12 @@ import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'toastify'
 
-import { MAX_BATCH_ID } from '@gnosis.pm/dex-js'
+import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { log } from 'utils'
+import { log, formatValidity } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
@@ -35,6 +35,7 @@ interface Result {
   placeOrder: (params: PlaceOrderParams<TokenDetails>) => Promise<PlaceOrderResult>
   placeMultipleOrders: (params: PlaceMultipleOrdersParams) => Promise<PlaceOrderResult>
   isSubmitting: boolean
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface PlaceOrderResult {
@@ -60,7 +61,6 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      setIsSubmitting(true)
       log(
         `Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
           sellToken.symbol
@@ -95,7 +95,15 @@ export const usePlaceOrder = (): Result => {
         log(`The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: show link to orders page?
-        toast.success(`Placed order valid for 30min`)
+        if (validUntil) {
+          // Get batch time in minutes
+          //  In reality, no need to ceil cause we know batch time is 300, but it was done to avoid relying on knowing
+          //  the actual value of the constant
+          const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
+          toast.success(`Transaction mined! Succesfully placed order valid for ${formatValidity(validityInMinutes)}`)
+        } else {
+          toast.success(`Transaction mined! Succesfully placed standing order`)
+        }
 
         return { success: true, receipt }
       } catch (e) {
@@ -124,7 +132,6 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      setIsSubmitting(true)
       log(`Placing ${orders.length} orders at once`)
 
       try {
@@ -169,7 +176,7 @@ export const usePlaceOrder = (): Result => {
         log(`The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: link to orders page?
-        toast.success(`Placed ${orders.length} orders`)
+        toast.success(`Transactions mined! Succesfully placed ${orders.length} orders`)
 
         return { success: true, receipt }
       } catch (e) {
@@ -184,5 +191,5 @@ export const usePlaceOrder = (): Result => {
     [networkId, setIsSubmitting, userAddress],
   )
 
-  return { placeOrder, isSubmitting, placeMultipleOrders }
+  return { placeOrder, isSubmitting, setIsSubmitting, placeMultipleOrders }
 }

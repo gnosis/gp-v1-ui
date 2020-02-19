@@ -91,7 +91,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
-      title: 'dex-react',
+      title: 'dFusion',
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
