@@ -82,17 +82,17 @@ const VerifiedContractLink = styled.div`
   justify-content: center;
   padding: 0;
 
-    > a:link,
-    > a:visited {
-      color: #29A745;
-      transition: border-color .2s ease-in-out;
-    }
+  > a:link,
+  > a:visited {
+    color: #29a745;
+    transition: border-color 0.2s ease-in-out;
+  }
 `
 
 const LinkWrapper = styled(EtherscanLink)`
   margin: 0;
   text-align: center;
-  border: .1rem solid #c5d3e0;
+  border: 0.1rem solid #c5d3e0;
   font-weight: var(--font-weight-medium);
   font-size: 13px;
   color: inherit;
@@ -105,18 +105,18 @@ const LinkWrapper = styled(EtherscanLink)`
   justify-content: center;
   align-items: center;
 
-    &:hover {
-      border: .1rem solid #29A745;
-    }
+  &:hover {
+    border: 0.1rem solid #29a745;
+  }
 
-    &::before {
-      content: "";
-      background: url(${verified}) no-repeat center/contain;
-      height: 1.6rem;
-      width: 1.6rem;
-      display: block;
-      margin: 0 .5rem 0 0;
-    }
+  &::before {
+    content: '';
+    background: url(${verified}) no-repeat center/contain;
+    height: 1.6rem;
+    width: 1.6rem;
+    display: block;
+    margin: 0 0.5rem 0 0;
+  }
 `
 
 const VerifiedText = 'View verified contract'
@@ -150,10 +150,10 @@ const Footer: React.FC = () => {
         </a>
       </div>
       <VerifiedContractLink>
-      {contractAddress && networkId ? (
+        {contractAddress && networkId ? (
           <LinkWrapper type="contract" identifier={contractAddress} networkId={networkId} label={VerifiedText} />
         ) : (
-         ""
+          ''
         )}
       </VerifiedContractLink>
     </Wrapper>
