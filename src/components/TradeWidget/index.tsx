@@ -29,9 +29,9 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount } from 'utils'
+import { getToken, parseAmount, parseBigNumber } from 'utils'
 import { ZERO } from 'const'
-import Price, { parseBigNumber } from './Price'
+import Price from './Price'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -175,6 +175,21 @@ export const DEFAULT_FORM_STATE = {
   validUntil: '2880',
 }
 
+function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): string {
+  const sellAmount = parseBigNumber(sellValue)
+
+  if (!sellAmount || sellAmount.isZero()) {
+    return 'First input the sell amount'
+  }
+
+  const receiveAmount = parseBigNumber(receiveValue)
+  if (!receiveAmount || receiveAmount.isZero()) {
+    return 'Input the price to get the receive tokens'
+  } else {
+    return 'Minimum amount of tokens you will receive if you fully execute the order at the given price'
+  }
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
   const [, dispatch] = useGlobalState()
@@ -191,8 +206,7 @@ const TradeWidget: React.FC = () => {
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
-  // TODO: Get price from query params
+  const { sellAmount: sellParam, price: priceParam, validUntil: validUntilParam } = useQuery()
 
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
@@ -201,15 +215,15 @@ const TradeWidget: React.FC = () => {
     () =>
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
-  const [unlimited, setUnlimited] = useState(!validUntil || !Number(validUntil))
+  const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
-      [sellInputId]: sellAmount,
-      [receiveInputId]: receiveAmount,
-      [validUntilId]: validUntil,
-      [priceInputId]: '',
+      [sellInputId]: sellParam,
+      [receiveInputId]: '',
+      [validUntilId]: validUntilParam,
+      [priceInputId]: priceParam,
       [priceInverseInputId]: '',
     },
   })
@@ -218,20 +232,16 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
+
   const receiveValue = watch(receiveInputId)
   const validUntilValue = watch(validUntilId)
 
+  // Update receive amount
   useEffect(() => {
     let receiveAmount: string | undefined
     if (priceValue && sellValue) {
       const sellAmount = parseBigNumber(sellValue)
       const price = parseBigNumber(priceValue)
-      console.log(
-        'sellAmount x price',
-        sellAmount?.toString(),
-        price?.toString(),
-        sellAmount && price && sellAmount.multipliedBy(price).toString(),
-      )
 
       if (sellAmount && price) {
         receiveAmount = sellAmount.multipliedBy(price).toString()
@@ -242,7 +252,7 @@ const TradeWidget: React.FC = () => {
 
   const searchQuery = buildSearchQuery({
     sell: sellValue,
-    buy: receiveValue,
+    price: priceValue,
     expires: validUntilValue,
   })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
@@ -363,6 +373,11 @@ const TradeWidget: React.FC = () => {
     }
   }
 
+  const receiveTokenTooltipText = useMemo(() => _getReceiveTokenTooltipText(sellValue, receiveValue), [
+    sellValue,
+    receiveValue,
+  ])
+
   return (
     <WrappedWidget>
       <FormContext {...methods}>
@@ -379,6 +394,7 @@ const TradeWidget: React.FC = () => {
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
+            tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
             <img src={switchTokenPair} />
@@ -393,6 +409,7 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             tabIndex={2}
             readOnly={true}
+            tooltipText={receiveTokenTooltipText}
           />
           <Price
             priceInputId={priceInputId}

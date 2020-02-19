@@ -3,8 +3,11 @@ import styled from 'styled-components'
 import { TokenDetails } from 'types'
 import { useFormContext } from 'react-hook-form'
 import { TradeFormData } from '.'
-// import { parseAmount, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 import BigNumber from 'bignumber.js'
+import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
+import FormMessage from './FormMessage'
+import { useNumberInput } from './useNumberInput'
+import { DEFAULT_PRECISION } from '../../../test/data'
 
 const Wrapper = styled.div`
   display: flex;
@@ -96,31 +99,37 @@ interface Props {
   priceInverseInputId: string
 }
 
-// TODO: Move to utils
-export function parseBigNumber(value: string): BigNumber | null {
-  const bigNumber = new BigNumber(value)
-  return bigNumber.isNaN() ? null : bigNumber
-}
-
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
-  const { register, errors, setValue } = useFormContext<TradeFormData>()
+  const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   // const priceInput = watch(priceInputId)
   // const priceInverseInput = watch(priceInverseInputId)
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
-
-  // TODO: Show error
-  if (errorPrice || errorPriceInverse) {
-    console.log('TODO: Show error', { errorPrice, errorPriceInverse })
-  }
+  const isError = errorPrice || errorPriceInverse
 
   const onChangePrice = (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
     const priceValue = event.target.value
     const price = parseBigNumber(priceValue)
-    console.log('price: ', priceValue, price)
     setValue(inverseInputId, price ? new BigNumber(1).div(price).toString() : '')
   }
+
+  const {
+    onKeyPress: onKeyPressPrice,
+    enforcePrecision: enforcePrecisionPrice,
+    removeExcessZeros: removeExcessZerosPrice,
+  } = useNumberInput({
+    inputId: priceInputId,
+    precision: DEFAULT_PRECISION,
+  })
+  const {
+    onKeyPress: onKeyPressPriceInverse,
+    enforcePrecision: enforcePrecisionPriceInverse,
+    removeExcessZeros: removeExcessZerosPriceInverse,
+  } = useNumberInput({
+    inputId: priceInputId,
+    precision: DEFAULT_PRECISION,
+  })
 
   return (
     <Wrapper>
@@ -128,14 +137,21 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
       <PriceInputBox>
         <label>
           <input
+            className={isError ? 'error' : ''}
             name={priceInputId}
             type="text"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => onChangePrice(priceInverseInputId, e)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
+              enforcePrecisionPrice(e)
+              onChangePrice(priceInverseInputId, e)
+            }}
             ref={register({
-              // pattern: { value: validInputPattern, message: 'Invalid amount' },
-              // validate: { positive: validatePositive },
-              required: true,
+              pattern: { value: validInputPattern, message: 'Invalid price' },
+              validate: { positive: validatePositive },
+              required: 'The price is required',
+              min: 0,
             })}
+            onKeyPress={onKeyPressPrice}
+            onBlur={removeExcessZerosPrice}
           ></input>
           <small>
             {sellToken.symbol}/{receiveToken.symbol}
@@ -146,19 +162,27 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
         <label>
           <input
             name={priceInverseInputId}
+            className={isError ? 'error' : ''}
             type="text"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => onChangePrice(priceInputId, e)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
+              enforcePrecisionPriceInverse(e)
+              onChangePrice(priceInputId, e)
+            }}
             ref={register({
-              // pattern: { value: validInputPattern, message: 'Invalid amount' },
-              // validate: { positive: validatePositive },
+              pattern: { value: validInputPattern, message: 'Invalid price' },
+              validate: { positive: validatePositive },
               required: true,
             })}
+            onKeyPress={onKeyPressPriceInverse}
+            onBlur={removeExcessZerosPriceInverse}
           ></input>
           <small>
             {receiveToken.symbol}/{sellToken.symbol}
           </small>
         </label>
       </PriceInputBox>
+      {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
+      {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
     </Wrapper>
   )
 }
