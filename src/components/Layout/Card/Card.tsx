@@ -2,79 +2,95 @@ import React from 'react'
 import styled from 'styled-components'
 import { MEDIA } from 'const'
 
-const CardRowDrawer = styled.tr<{ responsive: boolean }>`
+const CardRowDrawer = styled.tr`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: transparent;
-  box-shadow: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
+  z-index: 9999;
+  width: 50rem;
+  height: 40rem;
+  border-radius: 0.6rem;
+  background: #ffffff;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    bottom: 0;
+    top: initial;
+  }
 
   // Inner td wrapper
   > td {
     position: relative;
-    background-color: var(--color-background-selected-dark);
-    border-bottom: 0.125rem solid #0000000f;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-    box-shadow: var(--box-shadow);
-    width: 80%;
+    background: transparent;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.14);
+    border-radius: 6px;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 
     > div {
-      margin-top: 2rem;
+      margin: 0;
     }
 
     span.symbol {
       color: #b02ace;
     }
 
-    h4 {
-      margin: 2.5rem 1rem 1rem;
-      font-size: 1.3em;
-      font-weight: normal;
-      text-align: center;
+    > div > h4 {
+      height: 5.6rem;
+      padding: 0 1.6rem;
+      box-sizing: border-box;
+      letter-spacing: 0;
+      font-size: 1.6rem;
+      text-align: left;
+      color: #2f3e4e;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      font-family: var(--font-default);
+      font-weight: var(--font-weight-regular);
+      border-bottom: 0.1rem solid #dfe6ef;
     }
 
     .times {
     }
   }
-
-  ${(props): string | false =>
-    props.responsive &&
-    `
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background: #000000b5;
-      z-index: 99;
-
-      > td {
-        border-radius: var(--border-radius);
-      }
-  `}
 `
 const CardDrawerCloser = styled.a`
   position: absolute;
-  display: inline-block;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 0 0.5em 0 0;
-  font-size: 2em;
+  right: 1.6rem;
+  top: 0.8rem;
   text-decoration: none;
+  font-size: 4rem;
+  line-height: 1;
+  color: #526877;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
 `
 
 interface CardDrawerProps {
   children: React.ReactNode
   closeDrawer: () => void
-  responsive: boolean
 }
 
 export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>(function ReffedCardDrawer(
-  { children, closeDrawer, responsive },
+  { children, closeDrawer },
   ref,
 ) {
   return (
-    <CardRowDrawer ref={ref} responsive={responsive}>
+    <CardRowDrawer ref={ref}>
       <td>
         <CardDrawerCloser onClick={closeDrawer}>&times;</CardDrawerCloser>
         {children}
@@ -96,7 +112,6 @@ export const CardTable = styled.table<{
   $align?: string
   $justify?: string
 
-  $responsiveCSS?: string
   $webCSS?: string
 }>`
   display: grid;
@@ -230,11 +245,12 @@ export const CardTable = styled.table<{
       text-align: left;
     }
 
-    > ${CardRowDrawer} {
-      > td {
-        margin-top: ${({ $rowSeparation = '1rem' }): string => `-${Number($rowSeparation.split('rem')[0]) * 2.2}rem`};
-      }
-    }
+    // > ${CardRowDrawer} {
+    //   > td {
+    //     margin-top: ${({ $rowSeparation = '1rem' }): string =>
+      `-${Number($rowSeparation.split('rem')[0]) * 2.2}rem`};
+    //   }
+    // }
   }
   
   .lowBalance {

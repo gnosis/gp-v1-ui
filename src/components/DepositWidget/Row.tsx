@@ -146,9 +146,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isDepositFormVisible && (
         <Form
           title={
-            <p>
+            <span>
               Deposit <strong>{symbol}</strong> in Exchange Wallet
-            </p>
+            </span>
           }
           totalAmountLabel="Wallet balance"
           totalAmount={walletBalance}
@@ -164,9 +164,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isWithdrawFormVisible && (
         <Form
           title={
-            <p>
+            <span>
               Withdraw <strong>{symbol}</strong> from Exchange Wallet
-            </p>
+            </span>
           }
           totalAmountLabel="Exchange wallet"
           totalAmount={totalExchangeBalance}

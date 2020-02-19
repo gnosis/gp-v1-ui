@@ -92,7 +92,7 @@ const GlobalStyles = createGlobalStyle`
 
     &:disabled,
     &[disabled]{
-      opacity: .5;
+      opacity: .7;
       pointer-events: none;
     }
     &.success {

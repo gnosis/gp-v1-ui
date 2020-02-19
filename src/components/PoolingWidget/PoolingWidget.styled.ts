@@ -143,6 +143,8 @@ export const StepButtonsWrapper = styled.div`
 
     @media ${MEDIA.mobile} {
       margin: 1.6rem 1.6rem 1.6rem 0;
+      font-size: 1.3rem;
+      padding: 0 1rem 0 0;
     }
 
     &:hover {
@@ -174,6 +176,8 @@ export const StepButtonsWrapper = styled.div`
 
     @media ${MEDIA.mobile} {
       margin: 1.6rem 0 1.6rem 1.6rem;
+      font-size: 1.3rem;
+      padding: 0 1rem;
     }
 
     > svg {

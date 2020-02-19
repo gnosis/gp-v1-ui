@@ -60,6 +60,10 @@ export const TokenRow = styled.tr`
     cursor: pointer;
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
+    > svg {
+      margin: 0 0.5rem 0 0;
+    }
+
     &:hover {
       background: #218dff;
       color: #ffffff;

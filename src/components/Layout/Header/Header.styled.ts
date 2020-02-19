@@ -26,7 +26,7 @@ export const HeaderWrapper = styled.header`
     margin: 3.2rem 3rem 3.2rem 0;
 
     @media ${MEDIA.mobile} {
-      margin: 2rem 2rem 2rem 0;
+      margin: 2rem 1rem 2rem 0;
     }
   }
 
