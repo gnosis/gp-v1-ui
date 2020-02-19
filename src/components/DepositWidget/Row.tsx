@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import minus from 'assets/img/minus.svg'
+import plus from 'assets/img/plus.svg'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
@@ -113,32 +115,25 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled ? (
-            <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
-              <FontAwesomeIcon icon={faPlus} />
-              &nbsp; Deposit
-            </button>
+            <button className="depositToken" onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}><img src={minus} /></button>
           ) : (
             <>
-              <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
+              <button className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
                 {enabling.has(address) ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
-                    &nbsp; Enabling {symbol}
+                    Enabling {symbol}
                   </>
                 ) : (
                   <>
-                    <FontAwesomeIcon icon={faCheck} />
-                    &nbsp; Enable {symbol}
+                    Enable {symbol}
                   </>
                 )}
               </button>
             </>
           )}
           {!totalExchangeBalance.isZero() && (
-            <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
-              <FontAwesomeIcon icon={faMinus} />
-              &nbsp; Withdraw
-            </button>
+            <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="withdrawToken"><img src={plus} /></button>
           )}
         </td>
       </TokenRow>

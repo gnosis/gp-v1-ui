@@ -31,17 +31,18 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   }
 
   .order-details {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    grid-gap: 0 1rem;
-    text-align: left;
-    justify-content: space-evenly;
+    // display: grid;
+    // grid-template-columns: max-content max-content;
+    // grid-gap: 0 1rem;
+    // text-align: left;
+    // justify-content: space-evenly;
+    white-space: nowrap;
 
     .order-details-subgrid {
-      display: grid;
-      grid-template-columns: min-content minmax(5.6rem, max-content);
-      grid-gap: 0 0.5rem;
-      justify-content: space-between;
+      // display: grid;
+      // grid-template-columns: min-content minmax(5.6rem, max-content);
+      // grid-gap: 0 0.5rem;
+      // justify-content: space-between;
     }
   }
 

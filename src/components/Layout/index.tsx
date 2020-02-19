@@ -47,14 +47,9 @@ const Layout: React.FC = ({ children }) => (
           withPastLocation: true,
         },
         {
-          label: 'Orders',
-          to: '/orders',
-          order: 3,
-        },
-        {
           label: 'Balances',
           to: '/wallet',
-          order: 4,
+          order: 3,
           withPastLocation: true,
         },
       ]}

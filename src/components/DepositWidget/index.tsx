@@ -82,13 +82,13 @@ const DepositWidget: React.FC = () => {
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
         ) : (
-          <CardTable>
+          <CardTable className="balancesOverview">
             <thead>
               <tr>
                 <th>Token</th>
-                <th>Exchange wallet</th>
-                <th>Pending withdrawals</th>
-                <th>Wallet</th>
+                <th>Exchange Balance</th>
+                <th>Pending Withdrawals</th>
+                <th>Wallet Balance</th>
                 <th>Actions</th>
               </tr>
             </thead>

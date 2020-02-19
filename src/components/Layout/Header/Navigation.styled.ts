@@ -70,7 +70,7 @@ export const OrderedNavLinkDiv = styled.span`
 
   @media ${MEDIA.mobile} {
     justify-content: center;
-    flex: 1 1 25%;
+    flex: 1 1 33.33%;
   }
 
   &:not(:last-of-type) {

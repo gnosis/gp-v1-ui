@@ -102,11 +102,64 @@ export const CardTable = styled.table<{
   display: grid;
   grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
+
+  &.balancesOverview {
+    width: 100%;
+    display: table;
+  }
+
+  &.balancesOverview > tbody {
+    font-size: 1.3rem;
+  }
+
+  &.balancesOverview > thead {
+    background: #FFFFFF;
+  }
+
+  &.balancesOverview > thead > tr:not(${CardRowDrawer}),
+  &.balancesOverview > tbody > tr:not(${CardRowDrawer}) {
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr) );
+    min-height: 5.4rem;
+    text-align: right;
+    padding: 0 .8rem;
+    margin: 0;
+    justify-content: flex-start;
+  }
+
+  &.balancesOverview > thead > tr:not(${CardRowDrawer}) >  th {
+    font-size: 1.1rem;
+    color: #2F3E4E;
+    letter-spacing: 0;
+    text-align: right;
+    padding: 0 .5rem;
+
+      &:first-of-type {
+        text-align: left;
+      }
+  }
+
+  &.balancesOverview > tbody > tr:not(${CardRowDrawer}) > td {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    padding: 0 .5rem;
+    text-align: right;
+    justify-content: flex-end;
+
+    // &[data-label=Actions] {
+    //   flex-flow: row nowrap;
+    // }
+
+    &:first-of-type {
+      text-align: left;
+      justify-content: flex-start;
+    }
+  }
   
   > thead {
     position: sticky;
     top: 0;
-    background: #EDF2F7;
+    // background: #EDF2F7;
     z-index: 5;
     font-size: 1.1rem;
     color: #2F3E4E;
@@ -118,7 +171,8 @@ export const CardTable = styled.table<{
     > tr:not(${CardRowDrawer}) {
       position: relative;
       display: grid;
-      grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
+      // grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
+      grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
       // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       // grid-gap
@@ -147,11 +201,14 @@ export const CardTable = styled.table<{
       // Separation between CELLS
       > th,
       > td {
-        margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
+        // margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
+        text-overflow: ellipsis;
         overflow: hidden;
       }
-      > th.checked {
+      > th.checked,
+      > td.checked {
         margin: 0;
+        width: 2.4rem;
       }
     }
     
@@ -162,6 +219,7 @@ export const CardTable = styled.table<{
     
     > tr > td[data-label="Expires"] {
       text-align: left;
+      padding: 0 .75rem;
     }
     
     > tr > td[data-label="Unfilled Amount"] {
@@ -241,51 +299,4 @@ export const CardTable = styled.table<{
 
   // Top level custom CSS
   ${({ $webCSS }): string | undefined => $webCSS}
-
-  @media ${MEDIA.tablet} {
-    > thead, tbody {
-      > tr:not(${CardRowDrawer}) {
-        grid-template-columns: none;
-        grid-template-rows: auto;
-
-        align-items: center;
-        justify-content: stretch;
-        padding: 0 0.7rem;
-        
-        > td {
-          display: flex;
-          flex-flow: row;
-          align-items: center;
-          border-bottom: 0.0625rem solid #00000024;
-          padding: 0.7rem;
-
-          &:last-child {
-            border: none;
-          }
-
-          &.cardOpener {
-            cursor: pointer;
-            display: initial;
-          }
-
-          &::before {
-            content: attr(data-label);
-            margin-right: auto;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.7rem;
-          }
-        }
-
-        &.selected {
-          > td:not(:last-child) {
-            border-bottom: 0.0625rem solid #ffffff40;
-          }
-        }
-      }
-    }
-
-    // Top level custom css
-    ${({ $responsiveCSS }): string | undefined => $responsiveCSS}
-  }
 `

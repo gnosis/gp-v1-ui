@@ -70,10 +70,6 @@ export const OrdersForm = styled.div`
     align-items: center;
     margin: 1rem 0;
 
-    @media ${MEDIA.tablet} {
-      grid-template-columns: 2fr 1fr;
-    }
-
     .warning {
       justify-self: end;
     }
@@ -117,15 +113,10 @@ export const OrdersForm = styled.div`
     .hidden {
       visibility: hidden;
     }
-
-    @media ${MEDIA.tablet} {
-      display: none;
-    }
   }
 
   .noOrders {
     padding: 3em;
-
     display: flex;
     justify-content: center;
   }

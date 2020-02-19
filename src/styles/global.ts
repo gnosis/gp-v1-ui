@@ -48,21 +48,21 @@ const GlobalStyles = createGlobalStyle`
       }
   }
 
-  body::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-    background-color: var(--color-background);
-  }
+  // body::-webkit-scrollbar-track {
+  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
+  //   background-color: var(--color-background);
+  // }
 
-  body::-webkit-scrollbar {
-    width: 1.2rem;
-    background-color: var(--color-background);
-  }
+  // body::-webkit-scrollbar {
+  //   width: 1.2rem;
+  //   background-color: var(--color-background);
+  // }
 
-  body::-webkit-scrollbar-thumb {
-    border-radius: 1rem;
-    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-    background-color: var(--color-background-pageWrapper);
-  }
+  // body::-webkit-scrollbar-thumb {
+  //   border-radius: 1rem;
+  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
+  //   background-color: var(--color-background-pageWrapper);
+  // }
 
   h1, h2, h3 {
     margin: 0;

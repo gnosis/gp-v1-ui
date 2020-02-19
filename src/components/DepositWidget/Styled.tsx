@@ -10,36 +10,85 @@ export const ModalBodyWrapper = styled.div`
 
 export const TokenRow = styled.tr`
   // Each cell wrapper (td)
-  > * {
-    margin: 0.1rem;
-    padding: 0.7rem;
+  // > * {
+  //   margin: 0.1rem;
+  //   padding: 0.7rem;
+  //   text-align: center;
+  //   transition: all 0.5s ease;
+
+  //   > button {
+  //     margin: 0.2rem;
+  //   }
+
+  //   &:first-child {
+  //     display: grid;
+  //     grid-template-columns: min-content max-content;
+  //     grid-gap: 1em;
+  //     align-items: center;
+
+  //     > * {
+  //       margin: 0.375rem;
+  //     }
+
+  //     > div:last-child {
+  //       text-align: initial;
+  //     }
+  //   }
+
+  //   &:last-child {
+  //     display: flex;
+  //     flex-flow: column;
+  //   }
+  // }
+
+  .enableToken {
+    height: auto;
+    outline: 0;
+    margin: 0;
+    font-size: 1.3rem;
+    color: #218dff;
+    letter-spacing: -0.03rem;
     text-align: center;
-    transition: all 0.5s ease;
-
-    > button {
-      margin: 0.2rem;
-    }
-
-    &:first-child {
-      display: grid;
-      grid-template-columns: min-content max-content;
-      grid-gap: 1em;
-      align-items: center;
-
-      > * {
-        margin: 0.375rem;
-      }
-
-      > div:last-child {
-        text-align: initial;
-      }
-    }
-
-    &:last-child {
-      display: flex;
-      flex-flow: column;
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
+    padding: .4rem 1.2rem;
+    box-sizing: border-box;
+    background: #deeeff;
+    border: 0.1rem solid #218dff;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+  
+    &:hover {
+      background: #218dff;
+      color: #ffffff;
     }
   }
+
+  .withdrawToken,
+  .depositToken {
+    outline: 0;
+    background: #218DFF;
+    border-radius: 2.8rem;
+    height: 2.8rem;
+    width: 2.8rem;
+    margin: 0 0 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+  } 
+
+  .withdrawToken {
+    background: #218DFF;
+  }
+
+  .depositToken {
+    background: #DFE6EF;
+  }
+
 
   &.loading {
     background-color: #f7f7f7;
@@ -63,6 +112,7 @@ export const RowClaimLink = styled.a`
     opacity: 0.5;
   }
 `
+
 export const LineSeparator = styled.div`
   border: 0.03125rem solid var(--color-text-primary);
   margin: auto;
