@@ -109,7 +109,10 @@ WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
   // can attach ref to element
   // if children is a single element, not just text, and `as` tag|Component not specified
   if (chilrenNumber === 1 && typeof as === 'undefined' && isElement(children) && !isFragment(children)) {
-    let finalTargetProps
+    let finalTargetProps:
+      | typeof targetProps
+      | Omit<typeof targetProps, 'onMouseEnter' | 'onMouseLeave'>
+      | Omit<typeof targetProps, 'onFocus' | 'onBlur'>
     if (focus && hover) {
       // pass all targetProps by default
       finalTargetProps = targetProps
@@ -118,6 +121,7 @@ WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
       finalTargetProps = {
         onFocus: targetProps.onFocus,
         onBlur: targetProps.onBlur,
+        ref: targetProps.ref,
       }
     } else if (hover) {
       // <TooltipWrapper focus={false}> --> only show tooltip on hover
@@ -126,6 +130,7 @@ WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
       finalTargetProps = {
         onMouseEnter: targetProps.onMouseEnter,
         onMouseLeave: targetProps.onMouseLeave,
+        ref: targetProps.ref,
       }
     }
     const TargetComponent = React.cloneElement(children, finalTargetProps)
