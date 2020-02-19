@@ -2,7 +2,6 @@ import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { BlueBoldText } from './DefineSpread.styled'
-import { GreySubText } from './PoolingWidget.styled'
 import { SpreadInformation } from './DefineSpread'
 import { CreateStrategyWrapper } from './CreateStrategy.styled'
 import AddFunding from './AddFunding'

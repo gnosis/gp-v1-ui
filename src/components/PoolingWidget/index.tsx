@@ -17,7 +17,7 @@ import {
   StepButtonsWrapper,
 } from './PoolingWidget.styled'
 
-import { faSpinner, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import checkIcon from 'assets/img/li-check.svg'
 
