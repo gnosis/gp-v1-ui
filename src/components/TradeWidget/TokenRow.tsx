@@ -211,7 +211,7 @@ const TokenRow: React.FC<Props> = ({
   }
 
   // Form validation
-  const inputRef = isEditable
+  const inputRef = !readOnly
     ? register({
         pattern: { value: validInputPattern, message: 'Invalid amount' },
         validate: { positive: validatePositive },
