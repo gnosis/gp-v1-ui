@@ -31,7 +31,7 @@ interface ShowOrdersButtonProps {
 
 const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
   <button className={type} disabled={isActive} onClick={onClick}>
-    {!isActive ? <Highlight>{count}</Highlight> : { count }} {type}
+    {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>} {type}
   </button>
 )
 
