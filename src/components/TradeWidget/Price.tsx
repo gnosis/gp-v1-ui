@@ -150,6 +150,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             })}
             onKeyPress={onKeyPressPrice}
             onBlur={removeExcessZerosPrice}
+            onFocus={(e): void => e.target.select()}
           ></input>
           <small>
             {sellToken.symbol}/{receiveToken.symbol}
@@ -173,6 +174,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             })}
             onKeyPress={onKeyPressPriceInverse}
             onBlur={removeExcessZerosPriceInverse}
+            onFocus={(e): void => e.target.select()}
           ></input>
           <small>
             {receiveToken.symbol}/{sellToken.symbol}
