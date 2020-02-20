@@ -15,7 +15,6 @@ import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 import { isOrderActive } from 'utils'
 
 import { CardTable } from 'components/Layout/Card'
-import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
 
@@ -31,9 +30,9 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, sho
   const count = isActive ? shownCount : hiddenCount
 
   return (
-    <button className={type} disabled={isActive} onClick={onClick}>
-      {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>}
-      <> {type}</>
+    <button className={!isActive ? 'selected' : ''} onClick={onClick}>
+      {type} <i>{count}</i>
+      {/* <> {!isActive ? <Highlight><i>{count}</i></Highlight> : <><i>{count}</i></>}</> */}
     </button>
   )
 }
@@ -47,6 +46,7 @@ const OrdersWidget: React.FC = () => {
   const [orders, setOrders] = useSafeState<AuctionElement[]>(allOrders)
   const [showActive, setShowActive] = useSafeState<boolean>(true)
 
+  // !NEEDS FIX! Instead of toggling the class on click of a button, we need to set the clicked button isActive (don't toggle on repeated click)
   const toggleShowActive = useCallback(() => {
     setShowActive(isActive => !isActive)
   }, [setShowActive])
@@ -158,14 +158,17 @@ const OrdersWidget: React.FC = () => {
                 <strong> Low balance</strong>
               </div>
             )} */}
-            <div className="deleteContainer">
-              <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
+          </div>
+          <div className="deleteContainer">
+            <ButtonWithIcon disabled={markedForDeletion.size == 0 || deleting}>
+              <b>↴</b>
+              <strong>
                 <FontAwesomeIcon icon={faTrashAlt} /> {showActive ? 'Cancel' : 'Delete'} orders
-              </ButtonWithIcon>
-              {/* <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
+              </strong>
+            </ButtonWithIcon>
+            {/* <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
                   Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
                 </span> */}
-            </div>
           </div>
           {/* PENDING ORDERS */}
           {pendingShownOrdersCount ? (

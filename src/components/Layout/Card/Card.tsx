@@ -215,8 +215,8 @@ export const CardTable = styled.table<{
   
   > thead {
     position: sticky;
+    background: #ecf2f7;
     top: 0;
-    // background: #EDF2F7;
     z-index: 5;
     font-size: 1.1rem;
     color: #2F3E4E;
@@ -245,6 +245,10 @@ export const CardTable = styled.table<{
       text-align: center;
       transition: all 0.2s ease-in-out;
       z-index: 1;
+
+      &:hover {
+        background: #deeeff;
+      }
       
       &.highlight {
         background-color: var(--color-background-highlighted);
