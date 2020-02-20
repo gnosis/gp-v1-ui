@@ -58,7 +58,6 @@ interface TooltipBaseProps {
 
 const TooltipBase: React.FC<TooltipBaseProps> = ({ children, isShown, state }, ref) => {
   const { placement, styles = {} } = state
-  console.log('styles', styles)
 
   return (
     // Portal isolates popup styles from the App styles
