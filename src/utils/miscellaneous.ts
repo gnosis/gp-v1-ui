@@ -15,6 +15,9 @@ function noop(..._args: any[]): void {}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const log = process.env.NODE_ENV === 'test' ? noop : (...args: any[]): void => console.log(...args)
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const debug = process.env.NODE_ENV === 'development' ? noop : (...args: any[]): void => console.log(...args)
+
 export function getToken<T extends TokenDetails, K extends keyof T>(
   key: K,
   value: string | number | undefined = '',

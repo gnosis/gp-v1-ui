@@ -3,6 +3,7 @@ import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import Web3 from 'web3'
+import { debug } from './miscellaneous'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
   const { default: WalletConnectProvider } = await import(
@@ -102,14 +103,13 @@ export const getLastProvider = async (): Promise<Provider | null> => {
 export const setupAutoconnect = async (walletApi: WalletApi): Promise<boolean> => {
   window.addEventListener('beforeunload', () => {
     const { name } = walletApi.getProviderInfo()
-    console.log('LAST PROVIDER NAME', name)
+    debug('[autoconnect] Storing last provider name', name)
     localStorage.setItem(STORAGE_KEY_LAST_PROVIDER, name)
   })
 
   const provider = await getLastProvider()
 
-  console.log('Connecting to last provider if any', provider)
-
+  debug('[autoconnect] Connecting to last provider if any', provider)
   if (provider) return walletApi.connect(provider)
   return false
 }
