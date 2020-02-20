@@ -121,8 +121,10 @@ export const CardTable = styled.table<{
 
   &.balancesOverview {
     width: 100%;
-    display: table;
+    // display: table;
     padding: 0 0 2.4rem;
+    min-width: 85rem;
+    max-width: 140rem;
   }
 
   &.balancesOverview > tbody {
@@ -189,7 +191,8 @@ export const CardTable = styled.table<{
       position: relative;
       display: grid;
       // grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
-      grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
+      // grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
+      grid-template-columns: 2.4rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem);
       // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       // grid-gap
@@ -211,8 +214,7 @@ export const CardTable = styled.table<{
       }
 
       &.selected {
-        background-color: var(--color-button-disabled);
-        color: #fff;
+        background-color: rgba(159,180,201,0.50);
       }
 
       // Separation between CELLS
@@ -221,10 +223,10 @@ export const CardTable = styled.table<{
         // margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
         text-overflow: ellipsis;
         overflow: hidden;
+        text-align: left;
       }
 
       > th[data-label="Expires"] {
-        text-align: left;
         padding: 0 .75rem;
       }
 
@@ -236,21 +238,16 @@ export const CardTable = styled.table<{
     }
     
     > tr > td[data-label="Price"] {
-      text-align: left;
-      // margin: 0 auto 0 0;
     }
     
     > tr > td[data-label="Expires"] {
-      text-align: left;
       padding: 0 .75rem;
     }
     
     > tr > td[data-label="Unfilled Amount"] {
-      text-align: right;
     }
     
     .status {
-      text-align: left;
     }
 
     // > ${CardRowDrawer} {
@@ -285,8 +282,6 @@ export const CardTable = styled.table<{
       }
       
       > th.filled {
-        text-align: right;
-        // white-space: nowrap;
       }
     }
   }

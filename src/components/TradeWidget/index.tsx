@@ -35,6 +35,10 @@ import { ZERO } from 'const'
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
+  width: 80vw;
+  margin: 0 auto;
+  max-width: 160rem;
+  max-height: 56rem;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
@@ -46,9 +50,24 @@ const WrappedWidget = styled(Widget)`
 const WrappedForm = styled.form`
   display: flex;
   flex-flow: column wrap;
-  width: 50%;
+  // width: 50%;
+  flex: 1 0 42rem;
+  max-width: 50rem;
   padding: 1.6rem;
   box-sizing: border-box;
+  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  opacity: 1;
+  // position: sticky;
+  // top: 0;
+  // height: 100%;
+
+  .expanded & {
+    width: 0;
+    overflow: hidden;
+    flex: none;
+    padding: 0;
+    opacity: 0;
+  }
 
   @media ${MEDIA.mobile} {
     width: 100%;
@@ -204,10 +223,19 @@ const PriceInputBox = styled.div`
 const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
-  width: 50%;
+  // width: 50%;
+  // width: auto;
+  flex: 1 1 auto;
+  max-width: 100%;
   background: #edf2f7;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
+  transition: flex .2s ease-in-out;
+  }
+
+  .expanded & {
+    flex: 1 1 100%;
+    min-width: 85rem;
   }
 
   > div {
@@ -217,8 +245,8 @@ const OrdersPanel = styled.div`
     box-sizing: border-box;
     display: flex;
     flex-flow: row wrap;
-    overflow-y: auto;
     border-radius: 0 0.6rem 0.6rem 0;
+    overflow-y: auto;
       @media ${MEDIA.mobile} {
         display: none;
           &.visible {
@@ -257,13 +285,34 @@ const OrdersPanel = styled.div`
     width: 1.6rem;
     height: 100%;
     border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-    background: #ecf2f7 url(${arrow}) no-repeat center/1.2rem 1rem;
+    background: #ecf2f7;
     padding: 0;
     margin: 0;
     outline: 0;
+
+    @media ${MEDIA.mobile} {
+      display: none;
+    }
+
+    &::before {
+      display: block;
+      content: " ";
+      background: url(${arrow}) no-repeat center/contain;
+      transform: rotate(180deg);
+      height: 1.2rem;
+      width: 1.6rem;
+      margin: 0;
+    }
+
     &:hover {
       background-color: #ecf2f7;
     }
+  }
+
+  .expanded & {
+   > button::before {
+    transform: rotate(-180deg);
+   }   
   }
 `
 
@@ -444,6 +493,7 @@ const TradeWidget: React.FC = () => {
 
   return (
     <WrappedWidget>
+      {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)}>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}

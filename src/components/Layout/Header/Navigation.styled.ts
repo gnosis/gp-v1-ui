@@ -68,9 +68,17 @@ export const OrderedNavLinkDiv = styled.span`
   align-items: center;
   flex: 1 1 auto;
 
+  // Hide 'ORDERS' tab on desktop/tablet (until we decide to show it for all devices...)
+  &:nth-of-type(3) {
+    display: none;
+    @media ${MEDIA.mobile} {
+      display: flex;
+    }
+  }
+
   @media ${MEDIA.mobile} {
     justify-content: center;
-    flex: 1 1 33.33%;
+    flex: 1 1 25%;
   }
 
   &:not(:last-of-type) {

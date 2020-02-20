@@ -9,12 +9,16 @@ import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   width: 100%;
+  display: flex;
+  flex-flow: column wrap;
 
   main {
     flex: 1;
     margin: 2.4rem auto 5rem;
-    max-width: 85rem;
-    width: 100%;
+    // max-width: 85rem;
+    // width: 100%;
+    // width: auto;
+    // width: 100%;
     display: flex;
     flex-flow: row wrap;
     align-items: flex-start;
@@ -47,9 +51,15 @@ const Layout: React.FC = ({ children }) => (
           withPastLocation: true,
         },
         {
+          label: 'Orders',
+          to: '/orders',
+          order: 3,
+          withPastLocation: true,
+        },
+        {
           label: 'Balances',
           to: '/wallet',
-          order: 3,
+          order: 4,
           withPastLocation: true,
         },
       ]}

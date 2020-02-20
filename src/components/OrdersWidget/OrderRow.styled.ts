@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
+import checkWhite from 'assets/img/check-white.svg'
 
 export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   color: ${({ $color = '' }): string => $color};
@@ -10,10 +11,27 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   }
 
   .checked {
-    margin: auto;
+    margin: 0;
+
     > input {
-      margin: auto;
+      margin: 0 auto;
+      background: #ecf2f7;
+      -webkit-appearance: none;
+      appearance: none;
+      border: 0.2rem solid #9fb4c9;
+      border-radius: 0.3rem;
+      box-sizing: border-box;
+      height: 1.4rem;
+      width: 1.4rem;
+      padding: 0;
+      cursor: pointer;
     }
+
+    > input:checked {
+      background: #218dff url(${checkWhite}) no-repeat center/.85rem;
+      border: 0.2rem solid transparent;
+    }
+
     > button {
       display: none;
       justify-content: center;

@@ -100,7 +100,7 @@ export const OrdersForm = styled.div`
     align-items: center;
 
     > input {
-      width: auto;
+      // width: auto;
     }
   }
 

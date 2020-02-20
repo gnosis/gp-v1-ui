@@ -12,6 +12,7 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
   align-items: flex-start;
   align-content: flex-start;
   position: relative;
+  max-width: 85rem;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;

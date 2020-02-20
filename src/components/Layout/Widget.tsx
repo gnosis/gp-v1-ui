@@ -11,7 +11,8 @@ const Wrapper = styled(PageWrapper)`
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
     rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
   border-radius: 0.6rem;
-  width: 100%;
+  // width: 100%;
+  margin: 0 auto;
   min-height: 54rem;
   display: flex;
   flex-flow: row nowrap;

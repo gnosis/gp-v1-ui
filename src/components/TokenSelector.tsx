@@ -110,6 +110,7 @@ const customSelectStyles = {
   menu: (provided: CSSProperties): CSSProperties => ({
     ...provided,
     height: '50vh',
+    minHeight: '30rem',
     position: 'fixed',
     left: '0',
     right: '0',
