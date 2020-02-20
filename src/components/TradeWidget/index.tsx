@@ -82,7 +82,6 @@ export const DEFAULT_FORM_STATE = {
 
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
-  console.log('Render TradeWidget. networkId = ', networkId)
   const [, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -175,11 +174,8 @@ const TradeWidget: React.FC = () => {
   )
 
   const sameToken = sellToken === receiveToken
-  console.log({ networkId, isValid: !methods.formState.isValid, isSubmitting })
-  const submitDisabled = !methods.formState.isValid || isSubmitting
 
   async function onSubmit(data: FieldValues): Promise<void> {
-    console.log('onSubmit 1')
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     // Minutes - then divided by 5min for batch length to get validity time
@@ -188,14 +184,11 @@ const TradeWidget: React.FC = () => {
     const validUntil = +data[validUntilId] / 5
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
-    console.log({ buyAmount, sellAmount, cachedBuyToken, cachedSellToken, networkId })
 
     // Do not let potential null values through
     if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
-    console.log('onSubmit 2')
 
     if (isConnected && userAddress) {
-      console.log('placeOrder')
       let pendingTxHash: string | undefined = undefined
       // block form
       setIsSubmitting(true)
@@ -288,7 +281,7 @@ const TradeWidget: React.FC = () => {
             receiveTokenName={safeTokenName(receiveToken)}
             validUntil={watch(validUntilId)}
           />
-          <SubmitButton type="submit" disabled={submitDisabled} tabIndex={5}>
+          <SubmitButton type="submit" disabled={!methods.formState.isValid || isSubmitting} tabIndex={5}>
             <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} size="lg" spin={isSubmitting} />{' '}
             {sameToken ? 'Please select different tokens' : 'Send limit order'}
           </SubmitButton>
