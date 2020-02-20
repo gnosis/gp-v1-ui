@@ -360,6 +360,7 @@ const TradeWidget: React.FC = () => {
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
   const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
 
+  const [ordersVisible, setOrdersVisible] = useState(true)
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
@@ -506,7 +507,7 @@ const TradeWidget: React.FC = () => {
   }
 
   return (
-    <WrappedWidget>
+    <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)}>
@@ -580,7 +581,7 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button />
+        <button onClick={(): void => setOrdersVisible(!ordersVisible)} />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
