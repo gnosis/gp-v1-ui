@@ -136,17 +136,13 @@ const GlobalStyles = createGlobalStyle`
     border: 0.11rem solid transparent;
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
-    outline: none;
-
+    outline: none
     font-family: inherit;
     font-size: 0.75rem;
-    font-weight: bold;
-    
+    font-weight: var(--font-weight-bold);
     padding: 0.65rem;
     margin: 0.4rem 0.85rem;
     width: 100%;
-
-    transition: all 0.2s ease-in-out;
 
     &:focus {
       border-color: var(--color-text-primary);

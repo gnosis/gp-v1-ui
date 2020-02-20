@@ -39,6 +39,16 @@ const WrappedWidget = styled(Widget)`
   margin: 0 auto;
   max-width: 160rem;
   max-height: 56rem;
+  background: #ffffff;
+  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  border-radius: 0.6rem;
+  margin: 0 auto;
+  min-height: 54rem;
+  font-size: 1.6rem;
+  line-height: 1;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;

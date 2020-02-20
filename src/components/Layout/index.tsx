@@ -18,7 +18,7 @@ const Wrapper = styled.div`
     // max-width: 85rem;
     // width: 100%;
     // width: auto;
-    // width: 100%;
+    width: 100%;
     display: flex;
     flex-flow: row wrap;
     align-items: flex-start;

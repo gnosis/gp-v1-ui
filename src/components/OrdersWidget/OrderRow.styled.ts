@@ -1,47 +1,20 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
-import checkWhite from 'assets/img/check-white.svg'
 
 export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   color: ${({ $color = '' }): string => $color};
   min-height: 4rem;
 
-  .order-image-row {
-    display: none;
+  &.pending {
+    background: rgba(33, 141, 255, 0.1);
   }
 
-  .checked {
-    margin: 0;
+  &.scheduled {
+    background: rgba(0, 201, 167, 0.08);
+  }
 
-    > input {
-      margin: 0 auto;
-      background: #ecf2f7;
-      -webkit-appearance: none;
-      appearance: none;
-      border: 0.2rem solid #9fb4c9;
-      border-radius: 0.3rem;
-      box-sizing: border-box;
-      height: 1.4rem;
-      width: 1.4rem;
-      padding: 0;
-      cursor: pointer;
-    }
-
-    > input:checked {
-      background: #218dff url(${checkWhite}) no-repeat center/.85rem;
-      border: 0.2rem solid transparent;
-    }
-
-    > button {
-      display: none;
-      justify-content: center;
-      align-items: center;
-
-      margin: 0 0 0 auto;
-      > * {
-        margin: 0 0.5rem;
-      }
-    }
+  .order-image-row {
+    display: none;
   }
 
   .order-details-responsive {
@@ -67,15 +40,11 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   .sub-columns {
     display: flex;
     flex-flow: row wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 
-    div:first-child {
-      justify-self: end;
-    }
-
-    > *:not(:last-child) {
-      margin: 0 0.3rem;
+    > div:not(:last-child) {
+      margin: 0 0.3rem 0 0;
     }
   }
 

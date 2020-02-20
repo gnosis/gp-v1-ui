@@ -102,17 +102,19 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <b>Exchange Balance</b>
             <div>
               <i>{symbol}</i>
-              <input type="text" value="33333333333" disabled />
+              <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
             </div>
           </div>
           {/* Deposit Row */}
           <div className="wallet">
+            {/* Output this <span> and parse the abbreviated wallet address here ONLY for DEPOSITS */}
             <span>
-              <b>{/* Parse the abbreviated wallet address here */}0x4423...egs1</b> {totalAmountLabel}:
+              <b>0x4423...egs1</b> {totalAmountLabel}:
               <p onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}>
                 {formatAmountFull(totalAmount, decimals) || ''} {symbol}
               </p>
             </span>
+
             <b>{inputLabel}</b>
             <div>
               <i>{symbol}</i>

@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import { MEDIA } from 'const'
+import checkWhite from 'assets/img/check-white.svg'
 
 const CardRowDrawer = styled.tr`
   display: flex;
@@ -116,15 +117,51 @@ export const CardTable = styled.table<{
   $webCSS?: string
 }>`
   display: grid;
-  grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
+  // grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
 
+  .checked {
+    margin: 0;
+    outline: 0;
+
+    > input {
+      margin: 0 auto;
+      background: #ecf2f7;
+      -webkit-appearance: none;
+      appearance: none;
+      border: 0.2rem solid #9fb4c9;
+      border-radius: 0.3rem;
+      box-sizing: border-box;
+      height: 1.4rem;
+      width: 1.4rem;
+      padding: 0;
+      cursor: pointer;
+      outline: 0;
+    }
+
+    > input:checked {
+      background: #218dff url(${checkWhite}) no-repeat center/.85rem;
+      border: 0.2rem solid transparent;
+    }
+  }
+
+
   &.balancesOverview {
-    width: 100%;
+    width: 90%;
     // display: table;
     padding: 0 0 2.4rem;
     min-width: 85rem;
     max-width: 140rem;
+    background: #ffffff;
+    box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+      rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+      rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+      rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+    border-radius: 0.6rem;
+    margin: 0 auto;
+    min-height: 54rem;
+    font-size: 1.6rem;
+    line-height: 1;
   }
 
   &.balancesOverview > tbody {
@@ -133,6 +170,7 @@ export const CardTable = styled.table<{
 
   &.balancesOverview > thead {
     background: #FFFFFF;
+    border-radius: .6rem;
   }
 
   &.balancesOverview > thead > tr:not(${CardRowDrawer}),
@@ -192,7 +230,7 @@ export const CardTable = styled.table<{
       display: grid;
       // grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
       // grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
-      grid-template-columns: 2.4rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem);
+      grid-template-columns: 3.2rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem);
       // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       // grid-gap
@@ -225,37 +263,7 @@ export const CardTable = styled.table<{
         overflow: hidden;
         text-align: left;
       }
-
-      > th[data-label="Expires"] {
-        padding: 0 .75rem;
-      }
-
-      > th.checked,
-      > td.checked {
-        margin: 0;
-        width: 2.4rem;
-      }
     }
-    
-    > tr > td[data-label="Price"] {
-    }
-    
-    > tr > td[data-label="Expires"] {
-      padding: 0 .75rem;
-    }
-    
-    > tr > td[data-label="Unfilled Amount"] {
-    }
-    
-    .status {
-    }
-
-    // > ${CardRowDrawer} {
-    //   > td {
-    //     margin-top: ${({ $rowSeparation = '1rem' }): string =>
-      `-${Number($rowSeparation.split('rem')[0]) * 2.2}rem`};
-    //   }
-    // }
   }
   
   .lowBalance {
@@ -274,10 +282,7 @@ export const CardTable = styled.table<{
       > th {
         color: inherit;
         line-height: 1;
-        font-size: 1rem;
-        text-transform: uppercase;
-        overflow-wrap: break-word;
-        text-align: left;
+        font-size: 1.1rem;
         padding: 1.3rem 0;
       }
       
@@ -292,7 +297,7 @@ export const CardTable = styled.table<{
     font-family: var(--font-mono);
     font-weight: var(--font-weight-regular);
     color: #476481;
-    letter-spacing: -0.08rem;
+    letter-spacing: -0.085rem;
     line-height: 1.2;
   }
   
