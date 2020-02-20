@@ -6,7 +6,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { exchangeApi } from 'api'
 
-import { log } from 'utils'
+import { debug } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 import { useCallback } from 'react'
 
@@ -27,7 +27,7 @@ export function useDeleteOrders(): Result {
 
   const deleteOrders = useCallback(
     async (uiOrderIds: string[]): Promise<boolean> => {
-      log(`Trying to cancel the orderIds ${uiOrderIds} for user ${userAddress}`)
+      debug(`[OrdersWidget:useDeleteOrders] Trying to cancel the orderIds ${uiOrderIds} for user ${userAddress}`)
 
       try {
         assert(userAddress, 'User address is missing. Aborting.')
@@ -40,7 +40,7 @@ export function useDeleteOrders(): Result {
 
         const receipt = await exchangeApi.cancelOrders({ userAddress, orderIds, networkId, txOptionalParams })
 
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
+        debug(`[OrdersWidget:useDeleteOrders] The transaction has been mined: ${receipt.transactionHash}`)
 
         toast.success('The selected orders have been cancelled')
 

@@ -13,7 +13,7 @@ import { useDepositModals } from './useDepositModals'
 import useSafeState from 'hooks/useSafeState'
 import useWindowSizes from 'hooks/useWindowSizes'
 
-import { log, getToken } from 'utils'
+import { debug, getToken } from 'utils'
 import { ZERO } from 'const'
 import { TokenBalanceDetails } from 'types'
 
@@ -55,7 +55,7 @@ const DepositWidget: React.FC = () => {
       symbol,
     } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
 
-    log(`Confirm withdraw for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
+    debug(`[DepositWidget] Confirm withdraw for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
 
     if (!withdrawingBalance.isZero()) {
       // Storing current values before displaying modal

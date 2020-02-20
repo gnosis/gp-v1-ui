@@ -24,8 +24,9 @@ declare global {
   }
 }
 
-window.toggleDebug = (): void => {
+window.toggleDebug = (): boolean => {
   debugEnabled = !debugEnabled
+  return debugEnabled
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
