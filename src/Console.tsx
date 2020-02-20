@@ -15,13 +15,24 @@ const ConsoleWrapper = styled.div`
 `
 const ButtonGroup = styled.div`
   position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 2em;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  padding: 0;
   pointer-events: none;
 
-  > * {
+  > button {
     pointer-events: initial;
+    padding: 1.6rem;
+    box-sizing: border-box;
+    border-radius: 6rem;
+    background: #dde4ed;
+    color: rgba(78, 106, 133, 0.75);
+    outline: 0;
+  }
+
+  > button:hover {
+    background: #208dff;
+    color: #ffffff;
   }
 `
 
@@ -112,7 +123,7 @@ const ConsoleFrame: React.FC = () => {
       )}
       <ButtonGroup>
         {showConsole && logs.length > 0 && <button onClick={(): void => setLogs([])}>clear</button>}
-        <button onClick={(): void => setShowConsole(on => !on)}>{showConsole ? 'x' : '^'}</button>
+        <button onClick={(): void => setShowConsole(on => !on)}>{showConsole ? 'x' : 'console'}</button>
       </ButtonGroup>
     </ConsoleWrapper>
   )

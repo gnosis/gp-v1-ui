@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
-import { faSpinner, faTrashAlt, faExchangeAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faExchangeAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
@@ -41,9 +41,9 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
-    <button className="danger" onClick={toggleMarkedForDeletion}>
+    {/* <button className="danger" onClick={toggleMarkedForDeletion}>
       Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
-    </button>
+    </button> */}
   </td>
 )
 
@@ -262,7 +262,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper $color={pending ? 'grey' : 'inherit'} $open={openCard}>
+      <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
         {!isPendingOrder &&
           (pending ? (
             <PendingLink transactionHash={transactionHash} />

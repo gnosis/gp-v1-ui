@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import { MEDIA } from 'const'
 
 export const OrdersWrapper = styled.div`
   width: 100%;
@@ -40,23 +39,12 @@ export const CreateButtons = styled.div`
   }
 
   &.withoutOrders {
-    // adjust grid layout when no orders
-    place-items: center;
-    grid-row-gap: 1em;
-    grid:
-      'noOrdersInfo'
-      'tradeBtn'
-      'strategyBtn'
-      'strategyInfo';
-
-    button {
-      // make buttons the same width
-      width: 15em;
-    }
   }
 
   .noOrdersInfo {
-    grid-area: noOrdersInfo;
+    line-height: 1.4;
+    text-align: center;
+    font-size: 1.4rem;
   }
   .tradeBtn {
     grid-area: tradeBtn;
@@ -80,10 +68,6 @@ export const OrdersForm = styled.div`
     grid-template-columns: repeat(2, 1fr);
     align-items: center;
     margin: 1rem 0;
-
-    @media ${MEDIA.tablet} {
-      grid-template-columns: 2fr 1fr;
-    }
 
     .warning {
       justify-self: end;
@@ -116,7 +100,7 @@ export const OrdersForm = styled.div`
     align-items: center;
 
     > input {
-      width: auto;
+      // width: auto;
     }
   }
 
@@ -128,15 +112,10 @@ export const OrdersForm = styled.div`
     .hidden {
       visibility: hidden;
     }
-
-    @media ${MEDIA.tablet} {
-      display: none;
-    }
   }
 
   .noOrders {
     padding: 3em;
-
     display: flex;
     justify-content: center;
   }

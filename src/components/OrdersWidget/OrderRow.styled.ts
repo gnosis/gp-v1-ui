@@ -5,63 +5,37 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   color: ${({ $color = '' }): string => $color};
   min-height: 4rem;
 
-  .order-image-row {
-    display: none;
+  &.pending {
+    background: rgba(33, 141, 255, 0.1);
   }
 
-  .checked {
-    margin: auto;
-    > input {
-      margin: auto;
-    }
-    > button {
-      display: none;
-      justify-content: center;
-      align-items: center;
+  &.scheduled {
+    background: rgba(0, 201, 167, 0.08);
+  }
 
-      margin: 0 0 0 auto;
-      > * {
-        margin: 0 0.5rem;
-      }
-    }
+  .order-image-row {
+    display: none;
   }
 
   .order-details-responsive {
     display: none;
   }
 
-  .order-details,
-  .amounts {
-    display: grid;
-    grid-template-columns: max-content max-content;
-    text-align: left;
-    justify-content: space-evenly;
+  .order-details {
+    white-space: nowrap;
 
     .order-details-subgrid {
-      display: grid;
-      grid-template-columns: min-content minmax(5.6rem, max-content);
-      grid-gap: 0 0.5rem;
-      justify-content: space-between;
     }
-  }
-
-  .amounts {
-    text-align: right;
-    justify-content: right;
   }
 
   .sub-columns {
     display: flex;
     flex-flow: row wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 
-    div:first-child {
-      justify-self: end;
-    }
-
-    > *:not(:last-child) {
-      margin: 0 0.3rem;
+    > div:not(:last-child) {
+      margin: 0 0.3rem 0 0;
     }
   }
 

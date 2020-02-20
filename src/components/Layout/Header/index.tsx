@@ -10,6 +10,7 @@ import useOpenCloseNav from './useOpenCloseNav'
 
 import { formatSeconds } from 'utils'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
+import { MEDIA } from 'const'
 
 export interface HeaderProps {
   [key: string]: {
@@ -27,6 +28,10 @@ const TopWrapper = styled.div`
   margin: 0 auto;
   justify-content: center;
   align-items: center;
+
+  @media ${MEDIA.mobile} {
+    justify-content: space-between;
+  }
 `
 
 const BatchCountDown = styled.div`
@@ -37,6 +42,12 @@ const BatchCountDown = styled.div`
   color: #476481;
   width: 16rem;
   letter-spacing: 0;
+
+  @media ${MEDIA.mobile} {
+    flex-flow: row wrap;
+    line-height: 1.2;
+    width: auto;
+  }
 
   > strong {
     color: #218dff;

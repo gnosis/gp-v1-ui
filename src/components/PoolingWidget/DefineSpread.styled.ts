@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { ProgressStepText } from './PoolingWidget.styled'
+import { MEDIA } from 'const'
 
 export const DefineSpreadWrapper = styled.div`
   display: flex;
@@ -8,6 +9,10 @@ export const DefineSpreadWrapper = styled.div`
   width: calc(50% - 1.5rem);
   padding: 0;
   box-sizing: border-box;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+  }
 
   > strong {
     margin: 0 0 1rem 0;
