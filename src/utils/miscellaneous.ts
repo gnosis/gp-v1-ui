@@ -16,7 +16,24 @@ function noop(..._args: any[]): void {}
 export const log = process.env.NODE_ENV === 'test' ? noop : (...args: any[]): void => console.log(...args)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const debug = process.env.NODE_ENV === 'development' ? noop : (...args: any[]): void => console.log(...args)
+let debugEnabled = process.env.NODE_ENV === 'development'
+
+declare global {
+  interface Window {
+    toggleDebug: () => void
+  }
+}
+
+window.toggleDebug = (): void => {
+  debugEnabled = !debugEnabled
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const debug = (...args: any[]): void => {
+  if (debugEnabled) {
+    console.log(...args)
+  }
+}
 
 export function getToken<T extends TokenDetails, K extends keyof T>(
   key: K,
