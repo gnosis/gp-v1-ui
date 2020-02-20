@@ -3,7 +3,7 @@ import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import Web3 from 'web3'
-import { debug } from './miscellaneous'
+import { debug } from 'utils'
 
 const getWCIfConnected = async (): Promise<WCProvider | null> => {
   const { default: WalletConnectProvider } = await import(
