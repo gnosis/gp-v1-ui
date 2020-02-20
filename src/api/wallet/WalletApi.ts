@@ -309,12 +309,22 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
-    this._listeners.push(callback)
+    // cancell possible promise if any
+    let promiseIsStale = false
+    const cancellableCallback: OnChangeWalletInfo = newWalletInfo => {
+      promiseIsStale = true
+      callback(newWalletInfo)
+    }
+    this._listeners.push(cancellableCallback)
     const walletInfo = this.getWalletInfo()
     // if walletInfo can only be gotten asynchronously
     // trigger callback as soon as it becomes available
+    // unless there's been a newer WalletInfo since promise initialization
     if (trigger || isPromise(walletInfo)) {
-      Promise.resolve(walletInfo).then(callback)
+      Promise.resolve(walletInfo).then(newWalletInfo => {
+        if (promiseIsStale) return
+        callback(newWalletInfo)
+      })
     }
 
     return (): void => this.removeOnChangeWalletInfo(callback)
