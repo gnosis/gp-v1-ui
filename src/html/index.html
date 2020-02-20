@@ -8,17 +8,28 @@
     (function () {
       const { pathname, hostname } = window.location
       const ipfsMatch = /.*\/Qm\w{44}/.exec(pathname)
+      let arweaveMatch = false
 
       if (ipfsMatch) {
+        changeBaseHref(ipfsMatch)
+      } else {
+        // (*.)?arweave.net/<hash> detection
+        arweaveMatch = /(\w+.)?arweave\.net/.test(hostname) && /\/.{43}($|\/)/.exec(pathname)
+        if (arweaveMatch) {
+          changeBaseHref(arweaveMatch)
+        }
+      }
+
+      window.IS_IPFS = !!ipfsMatch || hostname.endsWith('.eth.link') || !!arweaveMatch
+
+      function changeBaseHref(match) {
         const base = document.querySelector('base')
 
-        let baseHref = ipfsMatch[0]
+        let baseHref = match[0]
         if (!baseHref.endsWith('/')) baseHref += '/'
 
         base.href = baseHref
       }
-
-      window.IS_IPFS = !!ipfsMatch || hostname.endsWith('.eth.link')
 
     })();
   </script>
