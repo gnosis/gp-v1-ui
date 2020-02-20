@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 
 import { TokenDetails } from 'types'
-import { getImageUrl, debug, getToken } from 'utils'
+import { getImageUrl, logDebug, getToken } from 'utils'
 
 import { getErc20Info } from '../helpers'
 import { Erc20Api } from 'api/erc20/Erc20Api'
@@ -22,7 +22,7 @@ async function getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenDet
   // Get base info from the ERC20 contract
   const erc20Info = await getErc20Info(params)
   if (!erc20Info) {
-    debug('[services:factories:getTokenFromExchange] Could not get details for token token (%s)', tokenAddress)
+    logDebug('[services:factories:getTokenFromExchange] Could not get details for token token (%s)', tokenAddress)
     return null
   }
 

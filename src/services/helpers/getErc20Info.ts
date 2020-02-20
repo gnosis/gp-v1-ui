@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 
 import { MinimalTokenDetails } from 'types'
-import { debug } from 'utils'
+import { logDebug } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 
@@ -36,7 +36,7 @@ export async function getErc20Info({
   // First check whether given address is a contract
   const code = await web3.eth.getCode(tokenAddress)
   if (code === '0x') {
-    debug('[services:helpers:getErc20Info] Address %s does not contain a contract', tokenAddress)
+    logDebug('[services:helpers:getErc20Info] Address %s does not contain a contract', tokenAddress)
     return null
   }
 
@@ -46,7 +46,7 @@ export async function getErc20Info({
     // if the call succeeds, we assume it's compliant
     await erc20Api.totalSupply({ tokenAddress, networkId })
   } catch (e) {
-    debug('[services:helpers:getErc20Info] Address %s is not ERC20 compliant', tokenAddress, e)
+    logDebug('[services:helpers:getErc20Info] Address %s is not ERC20 compliant', tokenAddress, e)
     return null
   }
 

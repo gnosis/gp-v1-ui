@@ -7,7 +7,7 @@ import { tokenListApi, erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, debug } from 'utils'
+import { formatAmount, logDebug } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
@@ -94,7 +94,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
     walletInfo.isConnected &&
       _getBalances(walletInfo)
         .then(balances => {
-          debug(
+          logDebug(
             '[useTokenBalances] Wallet balances',
             balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
           )

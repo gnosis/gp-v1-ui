@@ -7,7 +7,7 @@ import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { debug, formatValidity } from 'utils'
+import { logDebug, formatValidity } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
@@ -61,7 +61,7 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      debug(
+      logDebug(
         `[usePlaceOrder] Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
           sellToken.symbol
         }`,
@@ -79,7 +79,7 @@ export const usePlaceOrder = (): Result => {
           return { success: false }
         }
 
-        debug(
+        logDebug(
           '[usePlaceOrder] sellTokenId, buyTokenId, batchId',
           sellTokenId,
           buyTokenId,
@@ -99,7 +99,7 @@ export const usePlaceOrder = (): Result => {
           txOptionalParams: txOptionalParams || defaultTxOptionalParams,
         }
         const receipt = await exchangeApi.placeOrder(params)
-        debug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: show link to orders page?
         if (validUntil) {
@@ -139,7 +139,7 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      debug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
+      logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
       try {
         const buyTokens: number[] = []
@@ -180,7 +180,7 @@ export const usePlaceOrder = (): Result => {
 
         const receipt = await exchangeApi.placeValidFromOrders(params)
 
-        debug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: link to orders page?
         toast.success(`Transactions mined! Succesfully placed ${orders.length} orders`)

@@ -4,7 +4,7 @@ import { BlockHeader, Syncing } from 'web3-eth'
 import { LogsOptions, Log } from 'web3-core'
 import { Subscription } from 'web3-core-subscriptions'
 
-import { debug } from 'utils'
+import { logDebug } from 'utils'
 
 const DEFAULT_BLOCK_INTERVAL = 10000 //ms
 
@@ -53,7 +53,7 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
       .on('connected', id => {
         // called with subscription id
         // if subscribtion was created successfully
-        debug('[subscriptionHelpers] Subscription id for', event, id)
+        logDebug('[subscriptionHelpers] Subscription id for', event, id)
         resolve(sub)
       })
       // immediate reject on error
@@ -132,7 +132,7 @@ export const subscribeToWeb3Event = <T extends SubscribeEvent>(options: Subscrib
   // first checks if possible to get native subscribtion (provider supports the event)
   const subscriptionPromise = createWeb3Subscription(options).catch(error => {
     // if subscription isn't supported
-    debug('[subscriptionHelpers] Error subscribing to', options.event, 'event:', error)
+    logDebug('[subscriptionHelpers] Error subscribing to', options.event, 'event:', error)
 
     // check on interval
     // substituted in place of web3 subscription
@@ -142,7 +142,7 @@ export const subscribeToWeb3Event = <T extends SubscribeEvent>(options: Subscrib
       condition: checkIfBlockChangedFactory(web3),
       callback: blockNumber => {
         // only called if condition returns true
-        debug('[subscriptionHelpers] polled new block', blockNumber)
+        logDebug('[subscriptionHelpers] polled new block', blockNumber)
         getter(web3).then(callback)
       },
     })

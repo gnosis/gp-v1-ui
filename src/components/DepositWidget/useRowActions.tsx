@@ -7,7 +7,7 @@ import { TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { formatAmount, formatAmountFull, debug, getToken, safeFilledToken } from 'utils'
+import { formatAmount, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'
@@ -55,7 +55,7 @@ export const useRowActions = (params: Params): Result => {
         amount: ALLOWANCE_MAX_VALUE,
         txOptionalParams,
       })
-      debug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
     } catch (error) {
@@ -78,9 +78,9 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      debug(`[DepositWidget:useRowActions] Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+      logDebug(`[DepositWidget:useRowActions] Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.deposit({ userAddress, tokenAddress, networkId, amount, txOptionalParams })
-      debug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -103,9 +103,9 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      debug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+      logDebug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      debug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+      logDebug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.requestWithdraw({
         userAddress,
         tokenAddress,
@@ -113,7 +113,7 @@ export const useRowActions = (params: Params): Result => {
         amount,
         txOptionalParams,
       })
-      debug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
@@ -140,7 +140,7 @@ export const useRowActions = (params: Params): Result => {
 
       const receipt = await depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
 
-      debug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
       toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
     } catch (error) {
       console.error('[DepositWidget:useRowActions] Error executing the withdraw request', error)
