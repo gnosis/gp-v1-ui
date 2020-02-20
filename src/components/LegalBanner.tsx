@@ -85,15 +85,15 @@ const LegalText: React.FC = () => (
 const DISCLAIMER = 'GP_DISCLAIMER'
 
 const LegalBanner: React.FC<LegalBannerProps> = ({ useFull, title }) => {
-  const [open, setOpen] = useState(JSON.parse(localStorage.getItem(DISCLAIMER) as string))
+  const [open, setOpen] = useState(localStorage.getItem(DISCLAIMER) || 'OPEN')
 
   useEffect(() => {
-    open ? localStorage.setItem(DISCLAIMER, 'true') : localStorage.removeItem(DISCLAIMER)
+    open === 'OPEN' ? localStorage.setItem(DISCLAIMER, 'OPEN') : localStorage.setItem(DISCLAIMER, 'CLOSED')
   }, [open])
 
-  const openCloseDisclaimer = (): void => setOpen(!open)
+  const openCloseDisclaimer = (): void => setOpen(open === 'OPEN' ? 'CLOSED' : 'OPEN')
 
-  return open ? (
+  return open === 'OPEN' ? (
     <Wrapper>
       <BannerCloser onClick={openCloseDisclaimer} />
       <p>{title}</p>
