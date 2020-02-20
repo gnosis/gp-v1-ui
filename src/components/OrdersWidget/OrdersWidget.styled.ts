@@ -136,8 +136,9 @@ export const OrdersForm = styled.div`
         display: flex;
         width: 100%;
         justify-content: center;
-        transition: none;
+        transition: border 0.2s ease-in-out;
         align-items: center;
+        border-bottom: 0.3rem solid transparent;
       }
 
       > button > i {
