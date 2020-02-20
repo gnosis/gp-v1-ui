@@ -144,7 +144,7 @@ export const useRowActions = (params: Params): Result => {
       toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
     } catch (error) {
       console.error('[DepositWidget:useRowActions] Error executing the withdraw request', error)
-      toast.error(`[DepositWidget:useRowActions] Error executing the withdraw request: ${error.message}`)
+      toast.error(`Error executing the withdraw request: ${error.message}`)
     } finally {
       dispatch(setHighlightAndClaimingAction(tokenAddress))
     }
