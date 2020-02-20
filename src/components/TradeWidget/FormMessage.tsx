@@ -47,10 +47,13 @@ interface Props {
   className?: string
 }
 
-// TODO: I might need to change this into a normal component because of the tooltip wrapper:
-//    Function components cannot be given refs
-const FormMessage: React.FC<Props> = ({ className = 'error', children }) => {
-  return <Wrapper className={className}>{children}</Wrapper>
+const FormMessage: React.FC<Props> = ({ className = 'error', children }, ref) => {
+  return (
+    <Wrapper ref={ref} className={className}>
+      {children}
+    </Wrapper>
+  )
 }
 
-export default FormMessage
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export default React.forwardRef<any, Props>(FormMessage)
