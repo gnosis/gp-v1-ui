@@ -12,6 +12,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
+import InputWithTooltip from './InputWithTooltip'
 
 const Wrapper = styled.div`
   display: flex;
@@ -242,9 +243,9 @@ const TokenRow: React.FC<Props> = ({
       <InputBox>
         {/* focus = false as we already do stuff onFocus; to combine tooltips better use hook */}
         {/* <TooltipWrapper tooltip={tooltipText} focus={false}> */}
-        <input
+        <InputWithTooltip
           className={className}
-          title={tooltipText}
+          tooltip={tooltipText}
           placeholder="0"
           name={inputId}
           type="text"
