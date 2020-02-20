@@ -241,8 +241,6 @@ const TokenRow: React.FC<Props> = ({
         </span>
       </div>
       <InputBox>
-        {/* focus = false as we already do stuff onFocus; to combine tooltips better use hook */}
-        {/* <TooltipWrapper tooltip={tooltipText} focus={false}> */}
         <InputWithTooltip
           className={className}
           tooltip={tooltipText}
@@ -259,7 +257,6 @@ const TokenRow: React.FC<Props> = ({
           tabIndex={tabIndex + 2}
           onFocus={(e): void => e.target.select()}
         />
-        {/* </TooltipWrapper> */}
 
         {/*
         <FormMessage>
