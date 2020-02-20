@@ -12,7 +12,7 @@ async function wrapPromise<T>(promise: Promise<T>): Promise<T | undefined> {
   try {
     return await promise
   } catch (e) {
-    console.error('Failed to get ERC20 detail', e)
+    console.error('[services:helpers:getErc20Info] Failed to get ERC20 detail', e)
     return
   }
 }

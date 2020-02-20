@@ -57,7 +57,11 @@ export function addTokenToExchangeFactory(
       // TODO: cache new token
       logDebug('[services:factories:addTokenToExchange] New token: ', token)
     } catch (e) {
-      console.error('Failed to add new token (%s) to local list of tokens', tokenAddress, e)
+      console.error(
+        '[services:factories:addTokenToExchange] Failed to add new token (%s) to local list of tokens',
+        tokenAddress,
+        e,
+      )
       return false
     }
 

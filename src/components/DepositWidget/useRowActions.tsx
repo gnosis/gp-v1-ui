@@ -59,7 +59,7 @@ export const useRowActions = (params: Params): Result => {
 
       toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
     } catch (error) {
-      console.error('Error enabling the token', error)
+      console.error('DepositWidget:useRowActions] Error enabling the token', error)
       toast.error('Error enabling the token')
     } finally {
       dispatch(setEnablingAction(tokenAddress))
@@ -84,7 +84,7 @@ export const useRowActions = (params: Params): Result => {
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
-      console.error('Error depositing', error)
+      console.error('DepositWidget:useRowActions] Error depositing', error)
       toast.error(`Error depositing: ${error.message}`)
     } finally {
       dispatch(setHighlightAction(tokenAddress))
@@ -117,7 +117,7 @@ export const useRowActions = (params: Params): Result => {
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
-      console.error('Error requesting withdraw', error)
+      console.error('DepositWidget:useRowActions] Error requesting withdraw', error)
       toast.error(`Error requesting withdraw: ${error.message}`)
     } finally {
       dispatch(setHighlightAction(tokenAddress))

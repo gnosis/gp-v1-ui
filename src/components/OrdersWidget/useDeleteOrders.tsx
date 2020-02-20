@@ -46,7 +46,7 @@ export function useDeleteOrders(): Result {
 
         return true
       } catch (e) {
-        console.error(`Failed to cancel orders ${uiOrderIds} for user ${userAddress}`, e)
+        console.error(`[OrdersWidget:useDeleteOrders] Failed to cancel orders ${uiOrderIds} for user ${userAddress}`, e)
 
         toast.error('Failed to cancel selected orders')
 

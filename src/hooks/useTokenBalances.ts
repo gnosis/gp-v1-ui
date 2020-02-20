@@ -102,7 +102,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           setError(false)
         })
         .catch(error => {
-          console.error('Error loading balances', error)
+          console.error('[useTokenBalances] Error loading balances', error)
           setError(true)
         })
   }, [setBalances, setError, walletInfo])
