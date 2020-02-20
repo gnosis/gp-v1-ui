@@ -75,8 +75,8 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
     fetchBalancesForToken(token, userAddress, contractAddress, networkId).catch(e => {
-      console.error('[useTokenBalances] Error for', token, userAddress, contractAddress)
-      console.error(e)
+      console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
+
       return null
     }),
   )
