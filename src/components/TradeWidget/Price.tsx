@@ -141,7 +141,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             name={priceInputId}
             type="text"
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-              enforcePrecisionPrice(e)
+              enforcePrecisionPrice()
               onChangePrice(priceInverseInputId, e)
             }}
             ref={register({
@@ -165,7 +165,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             className={isError ? 'error' : ''}
             type="text"
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-              enforcePrecisionPriceInverse(e)
+              enforcePrecisionPriceInverse()
               onChangePrice(priceInputId, e)
             }}
             ref={register({
