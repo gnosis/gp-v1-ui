@@ -100,9 +100,7 @@ interface Props {
 }
 
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
-  const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
-  // const priceInput = watch(priceInputId)
-  // const priceInverseInput = watch(priceInverseInputId)
+  const { register, errors, setValue } = useFormContext<TradeFormData>()
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
