@@ -122,7 +122,7 @@ interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
-  const unfilledAmount = useMemo(() => {
+  const filledAmount = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
     return formatAmount(filledAmount, sellToken.decimals) || '0'
@@ -140,7 +140,7 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
       ) : (
         <>
           <div className="amounts">
-            {unfilledAmount} {displayTokenSymbolOrLink(sellToken)}
+            {filledAmount} {displayTokenSymbolOrLink(sellToken)}
             <br />
             {totalAmount} {displayTokenSymbolOrLink(sellToken)}
           </div>
