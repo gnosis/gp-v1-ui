@@ -16,7 +16,7 @@ export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN }
 // Will divide the total sell amount by this factor.
 // E.g.: Sell = 500; ORDER_FILLED_FACTOR = 100 (1%) => 500/100 => 5
 // ∴ when the amount is < 5 the order will be considered filled.
-export const ORDER_FILLED_FACTOR = new BN(10000) // 0.01%
+export const ORDER_FILLED_FACTOR = new BN(1000000) // 0.0001%
 
 export const APP_NAME = 'fuse'
 
