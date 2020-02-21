@@ -223,10 +223,6 @@ export const OrdersForm = styled.div`
       padding: 0 0.9rem;
       opacity: 0;
     }
-
-    .hidden {
-      visibility: hidden;
-    }
   }
 
   .noOrders {
