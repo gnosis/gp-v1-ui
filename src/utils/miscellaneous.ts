@@ -2,7 +2,7 @@ import { TokenDetails } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
-import { ONE_HUNDRED } from 'const'
+import { ORDER_FILLED_FACTOR } from 'const'
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -54,7 +54,7 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
 export const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now
 
 export function isOrderFilled(order: AuctionElement): boolean {
-  // consider an oder filled when 99% or more is matched
-  const onePercent = order.priceDenominator.divRound(ONE_HUNDRED)
-  return !order.remainingAmount.gte(onePercent)
+  // consider an oder filled when less than `negligibleAmount` is left
+  const negligibleAmount = order.priceDenominator.divRound(ORDER_FILLED_FACTOR)
+  return !order.remainingAmount.gte(negligibleAmount)
 }
