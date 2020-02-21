@@ -7,7 +7,7 @@ import BigNumber from 'bignumber.js'
 import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import { DEFAULT_PRECISION } from '../../../test/data'
+import { DEFAULT_PRECISION } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
