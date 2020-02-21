@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 import { UNLIMITED_ORDER_AMOUNT } from '@gnosis.pm/dex-js'
 export {
   UNLIMITED_ORDER_AMOUNT,
@@ -10,6 +11,9 @@ export {
   DEFAULT_PRECISION,
 } from '@gnosis.pm/dex-js'
 export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
+
+export const ONE_HUNDRED = new BN(100)
+
 export const APP_NAME = 'fuse'
 
 export const ETHER_PNG =
