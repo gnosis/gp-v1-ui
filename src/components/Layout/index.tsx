@@ -29,7 +29,7 @@ const Wrapper = styled.div`
     }
 
     @media ${MEDIA.mobile} {
-      margin: 1.6rem auto 5rem;
+      margin: 1.6rem auto 3.2rem;
     }
   }
 `

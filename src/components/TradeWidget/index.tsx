@@ -38,7 +38,7 @@ const WrappedWidget = styled(Widget)`
   width: 80vw;
   margin: 0 auto;
   max-width: 160rem;
-  max-height: 56rem;
+  height: 58rem;
   background: #ffffff;
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
@@ -54,6 +54,8 @@ const WrappedWidget = styled(Widget)`
     flex-flow: column wrap;
     max-height: initial;
     min-height: initial;
+    width: 100%;
+    height: initial;
   }
 `
 
@@ -81,6 +83,8 @@ const WrappedForm = styled.form`
 
   @media ${MEDIA.mobile} {
     width: 100%;
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 
   > p {
@@ -129,20 +133,20 @@ const SubmitButton = styled.button`
   width: 100%;
   font-weight: var(--font-weight-medium);
   height: 4.6rem;
-  margin: 1rem auto;
+  margin: 1rem auto 0;
   max-width: 32rem;
 
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5rem;
-  }
+  // &:disabled {
+  //   cursor: not-allowed;
+  //   opacity: 0.5;
+  // }
 `
 
 const PriceWrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
-  margin: 2.4rem 0 0;
+  margin: 1.6rem 0 0;
   justify-content: space-between;
 
   > strong {
@@ -163,6 +167,7 @@ const PriceInputBox = styled.div`
   width: calc(50% - 0.8rem);
   height: 5.6rem;
   position: relative;
+  outline: 0;
 
   label {
     display: flex;
@@ -233,15 +238,14 @@ const PriceInputBox = styled.div`
 const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
-  // width: 50%;
-  // width: auto;
   flex: 1 1 auto;
   max-width: 100%;
   background: #edf2f7;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
-  transition: flex .2s ease-in-out;
-  }
+  transition: flex 0.2s ease-in-out;
+  align-items: flex-start;
+  align-content: flex-start;
 
   .expanded & {
     flex: 1 1 100%;
@@ -251,24 +255,24 @@ const OrdersPanel = styled.div`
   > div {
     width: 100%;
     width: calc(100% - 1.6rem);
-    height: auto;
     box-sizing: border-box;
     display: flex;
     flex-flow: row wrap;
     border-radius: 0 0.6rem 0.6rem 0;
     overflow-y: auto;
-      @media ${MEDIA.mobile} {
-        display: none;
-          &.visible {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-          }
+
+    @media ${MEDIA.mobile} {
+      display: none;
+      &.visible {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
       }
+    }
   }
 
   > div > h5 {
@@ -283,7 +287,14 @@ const OrdersPanel = styled.div`
     box-sizing: border-box;
     text-align: center;
   }
-  
+
+  > div > h5 > a {
+    font-size: 1.3rem;
+    font-weight: var(--font-weight-normal);
+    color: #218dff;
+    text-decoration: underline;
+  }
+
   > div > h5 > a {
     font-size: 1.3rem;
     font-weight: var(--font-weight-normal);
@@ -306,7 +317,7 @@ const OrdersPanel = styled.div`
 
     &::before {
       display: block;
-      content: " ";
+      content: ' ';
       background: url(${arrow}) no-repeat center/contain;
       transform: rotate(180deg);
       height: 1.2rem;
@@ -320,9 +331,9 @@ const OrdersPanel = styled.div`
   }
 
   .expanded & {
-   > button::before {
-    transform: rotate(-180deg);
-   }   
+    > button::before {
+      transform: rotate(-180deg);
+    }
   }
 `
 
@@ -356,6 +367,7 @@ const TradeWidget: React.FC = () => {
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
   const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
 
+  const [ordersVisible, setOrdersVisible] = useState(true)
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
@@ -502,7 +514,7 @@ const TradeWidget: React.FC = () => {
   }
 
   return (
-    <WrappedWidget>
+    <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)}>
@@ -576,7 +588,7 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button />
+        <button onClick={(): void => setOrdersVisible(!ordersVisible)} />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>

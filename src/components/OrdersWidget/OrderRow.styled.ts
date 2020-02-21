@@ -40,7 +40,9 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   }
 
   .pendingCell {
-    place-items: center;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 
     a {
       top: 100%;

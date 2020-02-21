@@ -9,8 +9,6 @@ import { MEDIA } from 'const'
 type ConnectWalletProps = History<{ from: string }>
 
 const Wrapper = styled.div`
-  overflow-x: visible;
-  min-width: 0;
   background: #ffffff;
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
@@ -29,6 +27,8 @@ const Wrapper = styled.div`
   justify-content: center;
   padding: 1.6rem;
   box-sizing: border-box;
+  max-width: 85rem;
+  margin: 0 auto;
 
   @media ${MEDIA.mobile} {
     width: calc(100% - 2.4rem);

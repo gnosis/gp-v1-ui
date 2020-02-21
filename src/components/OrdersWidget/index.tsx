@@ -16,7 +16,6 @@ import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 import { isOrderActive } from 'utils'
 
 import { CardTable } from 'components/Layout/Card'
-import Highlight from 'components/Highlight'
 import OrderRow from './OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
 
@@ -30,8 +29,9 @@ interface ShowOrdersButtonProps {
 }
 
 const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
-  <button className={type} disabled={isActive} onClick={onClick}>
-    {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>} {type}
+  <button className={isActive ? 'selected' : ''} onClick={onClick}>
+    {type} <i>{count}</i>
+    {/* {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>} {type} */}
   </button>
 )
 
@@ -231,15 +231,13 @@ const OrdersWidget: React.FC = () => {
                   <strong> Low balance</strong>
                 </div>
               )} */}
-              <div className="deleteContainer">
-                <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting}>
-                  <FontAwesomeIcon icon={faTrashAlt} />{' '}
-                  {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
-                </ButtonWithIcon>
-                {/* <span className={markedForDeletion.size == 0 ? '' : 'hidden'}>
-                    Select first the order(s) you want to {showActive ? 'cancel' : 'delete'}
-                  </span> */}
-              </div>
+            </div>
+            <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
+              <b>↴</b>
+              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting}>
+                <FontAwesomeIcon icon={faTrashAlt} />{' '}
+                {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
+              </ButtonWithIcon>
             </div>
             {/* PENDING ORDERS */}
             {pendingShownOrdersCount ? (

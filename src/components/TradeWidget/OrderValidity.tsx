@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form'
 
 import { TradeFormTokenId, TradeFormData } from './'
 import { adjustPrecision } from '@gnosis.pm/dex-js'
-import arrow from 'assets/img/arrow.svg'
+import cog from 'assets/img/cog.svg'
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,6 +26,7 @@ const Wrapper = styled.div`
     position: relative;
     outline: 0;
     background: transparent;
+    align-items: center;
 
     &:hover {
       background: transparent;
@@ -33,14 +34,20 @@ const Wrapper = styled.div`
 
     &::after {
       content: '';
-      background: url(${arrow}) no-repeat center/contain;
-      width: 1rem;
-      height: 1.1rem;
+      background: url(${cog}) no-repeat center/contain;
+      width: 1.3rem;
+      height: 1.3rem;
       position: absolute;
       right: 0;
       top: 0;
       bottom: 0;
       margin: auto;
+      opacity: 0.5;
+      transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    }
+
+    &:hover::after {
+      opacity: 1;
       transform: rotate(90deg);
     }
   }
