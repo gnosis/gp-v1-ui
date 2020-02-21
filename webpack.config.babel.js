@@ -108,7 +108,7 @@ module.exports = ({ stats = false } = {}) => ({
       },
     }),
     new FaviconsWebpackPlugin({
-      logo: './src/assets/img/logo.png',
+      logo: './src/assets/img/logo.svg',
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
