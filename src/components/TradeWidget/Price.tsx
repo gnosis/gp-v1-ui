@@ -110,7 +110,8 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
       const price = parseBigNumber(priceValue)
-      setValue(inverseInputId, price ? new BigNumber(1).div(price).toString() : '')
+      const priceInverseValue = price ? new BigNumber(1).div(price).toString() : ''
+      setValue(inverseInputId, priceInverseValue, true)
     },
     [setValue],
   )
