@@ -17,7 +17,7 @@ import { isOrderActive } from 'utils'
 
 import { CardTable } from 'components/Layout/Card'
 import OrderRow from './OrderRow'
-import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
 
 type OrderTabs = 'active' | 'liquidity' | 'expired'
 
@@ -192,13 +192,11 @@ const OrdersWidget: React.FC = () => {
     <OrdersWrapper>
       {noOrders && (
         <div>
-          <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
             {noOrders && (
               <p className="noOrdersInfo">
                 It appears you haven&apos;t placed any order yet. <br /> Create one!
               </p>
             )}
-          </CreateButtons>
         </div>
       )}
       {!noOrders && networkId && (

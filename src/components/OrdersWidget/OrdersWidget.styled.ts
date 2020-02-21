@@ -48,47 +48,6 @@ export const ButtonWithIcon = styled.button`
   }
 `
 
-export const CreateButtons = styled.div`
-  margin: 2rem 0 0;
-  display: grid;
-
-  &.withOrders {
-    justify-items: start;
-    grid-gap: 0.25em 0.75em;
-    grid:
-      'tradeBtn strategyBtn'
-      '.        strategyInfo'
-      / 1fr 1fr;
-
-    .tradeBtn {
-      justify-self: end;
-    }
-  }
-
-  &.withoutOrders {
-  }
-
-  .noOrdersInfo {
-    line-height: 1.4;
-    text-align: center;
-    font-size: 1.4rem;
-  }
-  .tradeBtn {
-    grid-area: tradeBtn;
-  }
-  .strategyBtn {
-    grid-area: strategyBtn;
-  }
-  .strategyInfo {
-    grid-area: strategyInfo;
-  }
-
-  button {
-    // resetting button margins to help with alignment
-    margin: 0;
-  }
-`
-
 export const OrdersForm = styled.div`
   .infoContainer {
     margin: 1rem auto 0;
