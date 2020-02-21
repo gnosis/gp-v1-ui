@@ -15,7 +15,15 @@ import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, formatPrice } from 'utils'
+import {
+  safeTokenName,
+  formatAmount,
+  formatAmountFull,
+  formatDateFromBatchId,
+  formatPrice,
+  batchIdToDate,
+  isOrderFilled,
+} from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
@@ -161,6 +169,72 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
 
+const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
+  order,
+  isOverBalance,
+  isPendingOrder,
+  transactionHash,
+}) => {
+  const now = new Date()
+
+  const isExpiredOrder = batchIdToDate(order.validUntil) <= now
+  const isScheduled = batchIdToDate(order.validFrom) > now
+  const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
+    order.priceDenominator,
+    order.priceNumerator,
+  ])
+  const isActive = useMemo(() => order.remainingAmount.eq(order.priceDenominator), [
+    order.priceDenominator,
+    order.remainingAmount,
+  ])
+  const isFilled = useMemo(() => isOrderFilled(order), [order])
+  // Display isLowBalance warning only for active and partial fill orders
+  const isLowBalance = isOverBalance && !isUnlimited && !isFilled && !isScheduled && !isPendingOrder && !isExpiredOrder
+
+  const pending = useMemo(
+    () =>
+      isPendingOrder && (
+        <>
+          Pending...
+          <br />
+          <PendingLink transactionHash={transactionHash} />
+        </>
+      ),
+    [isPendingOrder, transactionHash],
+  )
+
+  return (
+    <td className="status">
+      {pending ? (
+        pending
+      ) : isExpiredOrder ? (
+        'Expired'
+      ) : isScheduled ? (
+        <>
+          Scheduled
+          <br />
+          {formatDateFromBatchId(order.validFrom)}
+        </>
+      ) : isFilled ? (
+        'Filled'
+      ) : isActive ? (
+        'Active'
+      ) : (
+        'Partial Fill'
+      )}
+      {isLowBalance && (
+        <>
+          <br />
+          <span className="lowBalance">
+            low balance
+            <img src={lowBalanceIcon} />
+          </span>
+        </>
+      )}
+    </td>
+  )
+}
+
 async function fetchToken(
   tokenId: number,
   orderId: string,
@@ -219,6 +293,7 @@ const OrderRow: React.FC<Props> = props => {
     toggleMarkedForDeletion,
     disabled,
     isPendingOrder,
+    isOverBalance,
   } = props
 
   // Fetching buy and sell tokens
@@ -252,13 +327,12 @@ const OrderRow: React.FC<Props> = props => {
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
-        <td className="status">
-          Partial Fill{' '}
-          <span className="lowBalance">
-            low balance
-            <img src={lowBalanceIcon} />
-          </span>
-        </td>
+        <Status
+          order={order}
+          isOverBalance={isOverBalance}
+          isPendingOrder={isPendingOrder}
+          transactionHash={transactionHash}
+        />
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )
