@@ -238,24 +238,14 @@ const PriceInputBox = styled.div`
 const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
-<<<<<<< HEAD
-=======
-  // width: 50%;
-  // width: auto;
->>>>>>> fa2952418334ea36c694d463b591df07ee179148
   flex: 1 1 auto;
   max-width: 100%;
   background: #edf2f7;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
-<<<<<<< HEAD
   transition: flex 0.2s ease-in-out;
   align-items: flex-start;
   align-content: flex-start;
-=======
-  transition: flex .2s ease-in-out;
-  }
->>>>>>> fa2952418334ea36c694d463b591df07ee179148
 
   .expanded & {
     flex: 1 1 100%;
@@ -270,7 +260,6 @@ const OrdersPanel = styled.div`
     flex-flow: row wrap;
     border-radius: 0 0.6rem 0.6rem 0;
     overflow-y: auto;
-<<<<<<< HEAD
 
     @media ${MEDIA.mobile} {
       display: none;
@@ -284,20 +273,6 @@ const OrdersPanel = styled.div`
         overflow-y: scroll;
       }
     }
-=======
-      @media ${MEDIA.mobile} {
-        display: none;
-          &.visible {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-          }
-      }
->>>>>>> fa2952418334ea36c694d463b591df07ee179148
   }
 
   > div > h5 {
@@ -312,7 +287,7 @@ const OrdersPanel = styled.div`
     box-sizing: border-box;
     text-align: center;
   }
-  
+
   > div > h5 > a {
     font-size: 1.3rem;
     font-weight: var(--font-weight-normal);
@@ -342,11 +317,7 @@ const OrdersPanel = styled.div`
 
     &::before {
       display: block;
-<<<<<<< HEAD
       content: ' ';
-=======
-      content: " ";
->>>>>>> fa2952418334ea36c694d463b591df07ee179148
       background: url(${arrow}) no-repeat center/contain;
       transform: rotate(180deg);
       height: 1.2rem;
@@ -360,15 +331,9 @@ const OrdersPanel = styled.div`
   }
 
   .expanded & {
-<<<<<<< HEAD
     > button::before {
       transform: rotate(-180deg);
     }
-=======
-   > button::before {
-    transform: rotate(-180deg);
-   }   
->>>>>>> fa2952418334ea36c694d463b591df07ee179148
   }
 `
 
