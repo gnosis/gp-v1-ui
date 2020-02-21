@@ -150,32 +150,6 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
   )
 }
 
-//TODO: no longer needed? remove
-// interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
-//   sellToken: TokenDetails
-//   isUnlimited: boolean
-// }
-
-// const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
-//   const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
-//     order.sellTokenBalance,
-//     sellToken.decimals,
-//   ])
-//   const isActive = isOrderActive(order, new Date())
-
-//   return (
-//     <td data-label="Account Balance" className="sub-columns three-columns">
-//       <div>{accountBalance}</div>
-//       <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-//       {isOverBalance && isActive && !isUnlimited && (
-//         <div className="warning">
-//           <FontAwesomeIcon icon={faExclamationTriangle} />
-//         </div>
-//       )}
-//     </td>
-//   )
-// }
-
 const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
     const isNeverExpires = isNeverExpiresOrder(order.validUntil)
@@ -277,11 +251,6 @@ const OrderRow: React.FC<Props> = props => {
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
-        {/* {!isPendingOrder ? (
-          <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
-        ) : (
-          <PendingLink />
-        )} */}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
         <td className="status">
           Partial Fill{' '}
