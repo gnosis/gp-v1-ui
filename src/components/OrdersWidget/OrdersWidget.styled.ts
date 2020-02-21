@@ -30,23 +30,15 @@ export const OrdersWrapper = styled.div`
 `
 
 export const ButtonWithIcon = styled.button`
-  min-width: 10rem;
-  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 6rem;
+  border: 0.1rem solid #a71409;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
+  background: transparent;
+  color: #a71409;
+  outline: 0;
 
-  > b {
-    margin: 0 1rem 0 0;
-    font-weight: var(--font-weight-bold);
-    font-family: initial;
-  }
-
-  > strong {
-    padding: 0.5rem 1rem;
-    border-radius: 6rem;
-    border: 0.1rem solid #a71409;
-    transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
-  }
-
-  > strong:hover {
+  &:hover {
     background: #a71409;
     color: #ffffff;
   }
@@ -198,30 +190,32 @@ export const OrdersForm = styled.div`
     position: sticky;
     top: 4rem;
     z-index: 10;
-    display: flex;
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;
+    background: #ffd4d1;
+    color: #a71409;
+    height: 4rem;
+    text-align: left;
+    padding: 0 0.9rem;
+    opacity: 1;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    transition: height 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    outline: 0;
+    flex-flow: row nowrap;
 
-    > button {
-      background: #ffd4d1;
-      color: #a71409;
-      height: 4.2rem;
-      text-align: left;
-      padding: 0 0.9rem;
-      opacity: 1;
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05rem;
-      transition: height 0.2s ease-in-out, opacity 0.2s ease-in-out;
-      outline: 0;
-    }
-
-    > button:disabled,
-    > button[disabled] {
+    &[data-disabled='true'] {
       height: 0;
       overflow: hidden;
       padding: 0 0.9rem;
       opacity: 0;
+    }
+
+    > b {
+      margin: 0 1rem 0 0;
+      font-weight: var(--font-weight-bold);
+      font-family: initial;
     }
   }
 
