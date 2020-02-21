@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import styled from 'styled-components'
 import { TokenDetails } from 'types'
 import { useFormContext } from 'react-hook-form'
@@ -106,11 +106,14 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   const errorPriceInverse = errors[priceInverseInputId]
   const isError = errorPrice || errorPriceInverse
 
-  const onChangePrice = (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
-    const priceValue = event.target.value
-    const price = parseBigNumber(priceValue)
-    setValue(inverseInputId, price ? new BigNumber(1).div(price).toString() : '')
-  }
+  const updateInversePrice = useCallback(
+    (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
+      const priceValue = event.target.value
+      const price = parseBigNumber(priceValue)
+      setValue(inverseInputId, price ? new BigNumber(1).div(price).toString() : '')
+    },
+    [setValue],
+  )
 
   const {
     onKeyPress: onKeyPressPrice,
@@ -129,6 +132,22 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     precision: DEFAULT_PRECISION,
   })
 
+  const onChangePrice = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      enforcePrecisionPrice()
+      updateInversePrice(priceInverseInputId, e)
+    },
+    [enforcePrecisionPrice, updateInversePrice, priceInverseInputId],
+  )
+
+  const onChangePriceInverse = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      enforcePrecisionPriceInverse()
+      updateInversePrice(priceInputId, e)
+    },
+    [enforcePrecisionPriceInverse, updateInversePrice, priceInputId],
+  )
+
   return (
     <Wrapper>
       <strong>Min. sell price</strong>
@@ -138,10 +157,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             className={isError ? 'error' : ''}
             name={priceInputId}
             type="text"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-              enforcePrecisionPrice()
-              onChangePrice(priceInverseInputId, e)
-            }}
+            onChange={onChangePrice}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
               validate: { positive: validatePositive },
@@ -163,10 +179,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             name={priceInverseInputId}
             className={isError ? 'error' : ''}
             type="text"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => {
-              enforcePrecisionPriceInverse()
-              onChangePrice(priceInputId, e)
-            }}
+            onChange={onChangePriceInverse}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
               validate: { positive: validatePositive },
