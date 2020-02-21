@@ -192,11 +192,11 @@ const OrdersWidget: React.FC = () => {
     <OrdersWrapper>
       {noOrders && (
         <div>
-            {noOrders && (
-              <p className="noOrdersInfo">
-                It appears you haven&apos;t placed any order yet. <br /> Create one!
-              </p>
-            )}
+          {noOrders && (
+            <p className="noOrdersInfo">
+              It appears you haven&apos;t placed any order yet. <br /> Create one!
+            </p>
+          )}
         </div>
       )}
       {!noOrders && networkId && (
