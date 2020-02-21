@@ -1,7 +1,8 @@
-import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.div`
+const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
+  className: props.className ? undefined : 'error',
+}))`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -42,18 +43,5 @@ const Wrapper = styled.div`
     margin: 0.3rem 0 1rem;
   }
 `
-interface Props {
-  children: React.ReactNode
-  className?: string
-}
 
-const FormMessage: React.FC<Props> = ({ className = 'error', children }, ref) => {
-  return (
-    <Wrapper ref={ref} className={className}>
-      {children}
-    </Wrapper>
-  )
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default React.forwardRef<any, Props>(FormMessage)
+export default FormMessage
