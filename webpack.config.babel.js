@@ -3,6 +3,7 @@ import webpack from 'webpack'
 import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import PreloadWebpackPlugin from 'preload-webpack-plugin'
+import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
 
 import dotenv from 'dotenv'
 import path from 'path'
@@ -104,6 +105,23 @@ module.exports = ({ stats = false } = {}) => ({
         minifyJS: true,
         minifyCSS: true,
         minifyURLs: true,
+      },
+    }),
+    new FaviconsWebpackPlugin({
+      logo: './src/assets/img/logo.svg',
+      mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
+      devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
+      favicons: {
+        appName: 'dFusion',
+        appDescription: 'dFusion',
+        developerName: 'dFusion',
+        developerURL: null, // prevent retrieving from the nearest package.json
+        background: '#dfe6ef',
+        themeColor: '#476481',
+        icons: {
+          coast: false,
+          yandex: false,
+        },
       },
     }),
     new PreloadWebpackPlugin({
