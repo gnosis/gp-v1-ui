@@ -36,7 +36,7 @@ const Wrapper = styled.div`
 
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
-    <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
+    <LegalBanner useFull={false} title="💀 This project is in beta. Use at your own risk." />
     <Header
       navigation={[
         {
@@ -68,12 +68,5 @@ const Layout: React.FC = ({ children }) => (
     <Footer />
   </Wrapper>
 )
-
-// {
-//   label: 'Orders',
-//   to: '/orders',
-//   order: 3,
-//   withPastLocation: true,
-// },
 
 export default Layout
