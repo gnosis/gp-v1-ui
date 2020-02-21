@@ -92,7 +92,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
-      title: 'Gnosis Protocol',
+      title: 'dFusion',
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
@@ -112,9 +112,9 @@ module.exports = ({ stats = false } = {}) => ({
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
-        appName: 'Gnosis Protocol',
-        appDescription: 'Gnosis Protocol',
-        developerName: 'Gnosis Protocol',
+        appName: 'dFusion',
+        appDescription: 'dFusion',
+        developerName: 'dFusion',
         developerURL: null, // prevent retrieving from the nearest package.json
         background: '#dfe6ef',
         themeColor: '#476481',
