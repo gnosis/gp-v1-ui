@@ -188,7 +188,7 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
   if (!receiveAmount || receiveAmount.isZero()) {
     return 'Input the price to get the receive tokens'
   } else {
-    return 'Minimum amount of tokens you will receive if you fully execute the order at the given price'
+    return 'Minimum amount of tokens you will receive if the order is fully executed at the given price'
   }
 }
 
