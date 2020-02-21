@@ -92,7 +92,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
-      title: 'dFusion',
+      title: 'Gnosis Protocol',
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
