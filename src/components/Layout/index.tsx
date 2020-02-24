@@ -31,7 +31,7 @@ const Wrapper = styled.div`
       width: 100%;
       @media ${MEDIA.mobile} {
         width: 100%;
-        overflow-x: auto;
+        overflow: initial;
       }
     }
 

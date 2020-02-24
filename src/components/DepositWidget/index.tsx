@@ -44,6 +44,10 @@ const BalanceTools = styled.div`
     background: transparent;
     transition: text-decoration 0.2s ease-in-out;
 
+    @media ${MEDIA.mobile} {
+      padding: 0;
+    }
+
     &:hover {
       text-decoration: underline;
     }
@@ -59,6 +63,10 @@ const BalanceTools = styled.div`
     margin: 0 2rem 0 auto;
     cursor: pointer;
 
+    @media ${MEDIA.mobile} {
+      margin: 0 1.6rem 0 0;
+    }
+
     > b {
       font-weight: inherit;
       margin: 0 0 0 0.5rem;
@@ -71,6 +79,12 @@ const BalanceTools = styled.div`
     max-width: 100%;
     position: relative;
     height: 5.6rem;
+
+    @media ${MEDIA.mobile} {
+      width: 100%;
+      height: 4.6rem;
+      margin: 0 0 2.4rem;
+    }
 
     > input {
       margin: 0;
@@ -89,6 +103,7 @@ const BalanceTools = styled.div`
 
       @media ${MEDIA.mobile} {
         font-size: 1.3rem;
+        width: 100%;
       }
 
       &::placeholder {

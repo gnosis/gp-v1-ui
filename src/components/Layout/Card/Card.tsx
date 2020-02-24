@@ -126,9 +126,7 @@ export const CardTable = styled.table<{
 
 
   &.balancesOverview {
-    // width: 90%;
     width: auto;
-    // display: table;
     padding: 0 0 2.4rem;
     min-width: 85rem;
     max-width: 140rem;
@@ -142,16 +140,43 @@ export const CardTable = styled.table<{
     min-height: 54rem;
     font-size: 1.6rem;
     line-height: 1;
+
+    @media ${MEDIA.tablet} {
+      min-width: 100vw;
+      min-width: calc(100vw - 4.8rem);
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    @media ${MEDIA.mobile} {
+      max-width: 100%;
+      min-width: initial;
+      width: 100%;
+      
+      > div {
+        flex-flow: row wrap;
+      }
+    }
   }
 
   &.balancesOverview > tbody {
     font-size: 1.3rem;
     line-height: 1;
+    
+      @media ${MEDIA.mobile} {
+        display: flex;
+        flex-flow: column wrap;
+        width: 100%;
+      }
   }
 
   &.balancesOverview > thead {
     background: #FFFFFF;
     border-radius: .6rem;
+    
+      @media ${MEDIA.mobile} {
+        display: none;
+      }
   }
 
   &.balancesOverview > thead > tr:not(${CardRowDrawer}),
@@ -164,6 +189,10 @@ export const CardTable = styled.table<{
     
       @media ${MEDIA.mobile} {
         padding: 1.6rem .8rem;
+        display: table;
+        flex-flow: column wrap;
+        width: 100%;
+        border-bottom: .2rem solid rgba(159,180,201,0.50);
       }
   }
 
@@ -189,6 +218,17 @@ export const CardTable = styled.table<{
     justify-content: flex-end;
     word-break: break-all;
     white-space: normal;
+    
+    @media ${MEDIA.mobile} {
+      width: 100%;
+      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+      padding: 1rem .5rem;
+      flex-flow: row nowrap;
+      
+        &:last-of-type {
+          border: 0;
+        }
+    }
 
     &:first-of-type {
       text-align: left;
@@ -205,6 +245,27 @@ export const CardTable = styled.table<{
     &[data-label=Token] > div > b {
       display: block;
       color: #2F3E4E;
+    }
+    
+    &::before {
+      @media ${MEDIA.mobile} {
+        content: attr(data-label);
+        margin-right: auto;
+        font-weight: var(--font-weight-medium);
+        text-transform: uppercase;
+        font-size: 1rem;
+        font-family: var(--font-default);
+        letter-spacing: -.03rem;
+        white-space: nowrap;
+        padding: 0 .5rem 0 0;
+        color: #2F3E4E;
+      }
+    }
+    
+    > div {
+      @media ${MEDIA.mobile} {
+        text-align: right;
+      }
     }
   }
   
