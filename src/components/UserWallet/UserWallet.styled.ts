@@ -101,7 +101,7 @@ export const UserWalletToggler = styled(UserWalletItem)`
   cursor: pointer;
   margin: 0;
   flex-flow: row nowrap;
-  
+
   &::after {
     content: '';
     background: url(${arrow}) no-repeat center/contain;
@@ -114,11 +114,10 @@ export const UserWalletToggler = styled(UserWalletItem)`
     align-content: center;
     margin: 0 0 0 0.7rem;
     opacity: 0.5;
-    transition: transform .2s ease-in-out;
+    transition: transform 0.2s ease-in-out;
   }
   &.visible::after {
-      transform: rotate(-90deg);
-    }
+    transform: rotate(-90deg);
   }
 `
 
@@ -168,48 +167,50 @@ export const UserWalletSlideWrapper = styled.div`
   flex-flow: column wrap;
   top: 100%;
   margin: 1rem 0 0;
-  box-shadow: 0 -1rem 4rem 0 rgba(0,0,0,0.05), rgba(0,0,0,0.02) 0 0.276726rem 0.221381rem 0, rgba(0,0,0,0.027) 0 0.666501rem 0.532008rem 0, rgba(0,0,0,0.035) 0 1.25216rem 1.0172rem 0, rgba(0,0,0,0.043) 0 2.23363rem 1.7869rem 0, rgba(0,0,0,0.05) 0 4.17776rem 3.34221rem 0, rgba(0,0,0,0.07) 0 10rem 8rem 0;
-    
-    @media ${MEDIA.mobile} {
-      width: 100%;
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      top: initial;
-      box-sizing: border-box;
-      box-shadow: 0 -90vh 0 100vw rgba(47, 62, 78, 0.50);
-      border-radius: 1.2rem;
-      padding: 0 0 2.4rem;
+  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    top: initial;
+    box-sizing: border-box;
+    box-shadow: 0 -90vh 0 100vw rgba(47, 62, 78, 0.5);
+    border-radius: 1.2rem;
+    padding: 0 0 2.4rem;
+  }
+
+  > button {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background: transparent;
+    height: 5.4rem;
+    align-items: center;
+    padding: 0 1.6rem;
+
+    @media ${MEDIA.mediumUp} {
+      display: none;
     }
-    
-    > button {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      background: transparent;
-      height: 5.4rem;
-      align-items: center;
-      padding: 0 1.6rem;
-      
-      @media ${MEDIA.mediumUp} {
-        display: none;
-      }
-    }
-    
-    > button > b {
-      color: #2F3E4E;
+  }
+
+  > button > b {
+    color: #2f3e4e;
     font-size: 1.6rem;
-    }
-    
-    > button > i {
-      font-style: normal;
-      font-size: 4rem;
-      font-family: Arial;
-      color: #526877;
-      font-weight: lighter;
-      opacity: 0.5;
-    }
-}
+  }
+
+  > button > i {
+    font-style: normal;
+    font-size: 4rem;
+    font-family: Arial;
+    color: #526877;
+    font-weight: lighter;
+    opacity: 0.5;
+  }
 `
 
 export const NetworkTitle = styled.div`

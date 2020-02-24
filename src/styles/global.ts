@@ -136,7 +136,7 @@ const GlobalStyles = createGlobalStyle`
     border: 0.11rem solid transparent;
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
-    outline: none
+    outline: none;
     font-family: inherit;
     font-size: 0.75rem;
     font-weight: var(--font-weight-bold);
