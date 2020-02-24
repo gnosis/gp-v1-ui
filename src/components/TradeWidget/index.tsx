@@ -5,7 +5,6 @@ import switchTokenPair from 'assets/img/switch.svg'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useHistory } from 'react-router'
 import { toast } from 'toastify'
 
 import TokenRow from './TokenRow'
@@ -35,6 +34,7 @@ import { Network, TokenDetails } from 'types'
 import { getToken, parseAmount, parseBigNumber } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPrice } from './Price'
+import { useConnectWallet } from 'hooks/useConnectWallet'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -307,6 +307,7 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
 
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
+  const { connectWallet } = useConnectWallet()
   const [, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -410,7 +411,6 @@ const TradeWidget: React.FC = () => {
   )
 
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
-  const history = useHistory()
 
   const swapTokens = useCallback((): void => {
     setSellToken(receiveToken)
@@ -541,8 +541,8 @@ const TradeWidget: React.FC = () => {
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     } else {
-      const from = history.location.pathname + history.location.search
-      history.push('/connect-wallet', { from })
+      // Not connected. Prompt user to connect his wallet
+      await connectWallet()
     }
   }
 
