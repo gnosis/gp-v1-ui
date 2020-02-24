@@ -6,7 +6,6 @@ import { MEDIA } from 'const'
 import { TokenDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
-import { red } from 'bn.js'
 
 const Wrapper = styled.div`
   display: flex;
@@ -122,7 +121,7 @@ function formatOptionLabel(
 }
 
 const customSelectStyles = {
-  control: (provided: CSSProperties): CSSProperties & { '&:hover': CSSProperties } => ({
+  control: (): CSSProperties & { '&:hover': CSSProperties } => ({
     borderColor: '#B8C7D7',
     borderStyle: 'solid',
     borderWidth: '.1rem',
@@ -154,7 +153,7 @@ const customSelectStyles = {
     boxShadow: '0 999vh 0 999vw rgba(47, 62, 78, 0.50)',
     borderRadius: '0.6rem',
   }),
-  menuList: (provided: CSSProperties): CSSProperties => ({
+  menuList: (): CSSProperties => ({
     height: '100%',
     overflow: 'auto',
     borderRadius: '0.6rem',
