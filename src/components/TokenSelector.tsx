@@ -3,7 +3,9 @@ import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
-import { TokenDetails } from 'types'
+import { formatAmount } from '@gnosis.pm/dex-js'
+
+import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
@@ -104,7 +106,7 @@ const SelectedTokenWrapper = styled.span`
   text-align: right;
 `
 
-function renderOptionLabel(token: TokenDetails): React.ReactNode {
+function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.ReactNode {
   return (
     <div className="optionItem">
       <TokenImgWrapper src={token.image} alt={token.name} />
@@ -113,6 +115,7 @@ function renderOptionLabel(token: TokenDetails): React.ReactNode {
           <strong>{token.symbol}</strong>
         </div>
         <div>{token.name}</div>
+        {'totalExchangeBalance' in token && <div>{formatAmount(token.totalExchangeBalance, token.decimals)}</div>}
       </div>
     </div>
   )
