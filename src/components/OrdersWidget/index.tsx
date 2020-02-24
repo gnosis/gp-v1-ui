@@ -17,7 +17,8 @@ import { isOrderActive } from 'utils'
 
 import { CardTable } from 'components/Layout/Card'
 import OrderRow from './OrderRow'
-import { OrdersWrapper, ButtonWithIcon, OrdersForm, CreateButtons } from './OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
+import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 
 type OrderTabs = 'active' | 'liquidity' | 'expired'
 
@@ -51,7 +52,7 @@ const OrdersWidget: React.FC = () => {
   const { orders: allOrders, forceOrdersRefresh } = useOrders()
   const pendingOrders = usePendingOrders()
   // this page is behind login wall so networkId should always be set
-  const { networkId } = useWalletConnection()
+  const { networkId, isConnected } = useWalletConnection()
 
   // allOrders and markedForDeletion, split by tab
   const [filteredOrders, setFilteredOrders] = useSafeState<FilteredOrdersState>(emptyState())
@@ -190,16 +191,14 @@ const OrdersWidget: React.FC = () => {
 
   return (
     <OrdersWrapper>
-      {noOrders && (
-        <div>
-          <CreateButtons className={noOrders ? 'withoutOrders' : 'withOrders'}>
-            {noOrders && (
-              <p className="noOrdersInfo">
-                It appears you haven&apos;t placed any order yet. <br /> Create one!
-              </p>
-            )}
-          </CreateButtons>
-        </div>
+      {!isConnected ? (
+        <ConnectWalletBanner />
+      ) : (
+        noOrders && (
+          <p className="noOrdersInfo">
+            It appears you haven&apos;t placed any order yet. <br /> Create one!
+          </p>
+        )
       )}
       {!noOrders && networkId && (
         <OrdersForm>
