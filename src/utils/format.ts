@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 export {
   formatAmount,
   formatAmountFull,
@@ -9,6 +11,8 @@ export {
   calculatePriceBigNumber,
   formatPrice,
 } from '@gnosis.pm/dex-js'
+
+// TODO: Move utils to dex-utils
 
 export function makeMultipleOf(mult = 5, value?: number | string | null): number {
   const cache = {}
@@ -70,3 +74,8 @@ ${(+validTime / 60)
   .replace(leadingAndTrailingZeros, '')
   .replace(trailingZerosAfterDot, '$1')}
 hours`
+
+export function parseBigNumber(value: string): BigNumber | null {
+  const bigNumber = new BigNumber(value)
+  return bigNumber.isNaN() ? null : bigNumber
+}

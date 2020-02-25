@@ -121,13 +121,16 @@ export const usePopperDefault = <T extends HTMLElement>(placement: Placement = '
     placement,
   })
 
-  const targetProps = {
-    onMouseEnter: show,
-    onMouseLeave: hide,
-    onFocus: show,
-    onBlur: hide,
-    ref: target,
-  }
+  const targetProps = useMemo(
+    () => ({
+      onMouseEnter: show,
+      onMouseLeave: hide,
+      onFocus: show,
+      onBlur: hide,
+      ref: target,
+    }),
+    [hide, show, target],
+  )
 
   return {
     targetProps,
