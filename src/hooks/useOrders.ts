@@ -97,7 +97,7 @@ export function useOrders(): Result {
           dispatch(updateOffset(offset + orders.length))
         })
       } catch (error) {
-        console.error('Failed to fetch orders', error)
+        console.error('[useOrders] Failed to fetch orders', error)
         // TODO: inform user
         setIsLoading(false)
       }

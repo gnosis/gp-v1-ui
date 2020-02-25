@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { assert } from '@gnosis.pm/dex-js'
 
-import { log, toBN } from 'utils'
+import { logDebug, toBN } from 'utils'
 import { ZERO } from 'const'
 
 import { BatchExchangeContract, batchExchangeAbi } from '@gnosis.pm/dex-js'
@@ -150,7 +150,7 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
+    logDebug(`[DepositApiImpl] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 
@@ -171,7 +171,9 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
+    logDebug(
+      `[DepositApiImpl] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`,
+    )
     return tx
   }
 
@@ -185,7 +187,7 @@ export class DepositApiImpl implements DepositApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[DepositApiImpl] Withdraw for token ${tokenAddress}. User ${userAddress}`)
+    logDebug(`[DepositApiImpl] Withdraw for token ${tokenAddress}. User ${userAddress}`)
     return tx
   }
 

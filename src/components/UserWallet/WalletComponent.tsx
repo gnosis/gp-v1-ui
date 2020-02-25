@@ -55,7 +55,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
 
       toast.success('Wallet connected')
     } catch (error) {
-      console.error('error', error)
+      console.error('[WalletComponent] Connect wallet error', error)
       toast.error('Error connecting wallet')
     } finally {
       setLoadingLabel(null)

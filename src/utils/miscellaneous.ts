@@ -14,7 +14,28 @@ export function assertNonNull<T>(val: T, message: string): asserts val is NonNul
 function noop(..._args: any[]): void {}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const log = process.env.NODE_ENV === 'test' ? noop : (...args: any[]): void => console.log(...args)
+export const logInfo = process.env.NODE_ENV === 'test' ? noop : (...args: any[]): void => console.log(...args)
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let debugEnabled = process.env.NODE_ENV === 'development'
+
+declare global {
+  interface Window {
+    toggleDebug: () => void
+  }
+}
+
+window.toggleDebug = (): boolean => {
+  debugEnabled = !debugEnabled
+  return debugEnabled
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const logDebug = (...args: any[]): void => {
+  if (debugEnabled) {
+    console.log(...args)
+  }
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const debug = process.env.NODE_ENV === 'development' ? noop : (...args: any[]): void => console.log(...args)

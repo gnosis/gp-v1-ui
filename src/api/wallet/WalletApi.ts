@@ -21,7 +21,7 @@ import {
   Subscriptions,
 } from '@gnosis.pm/dapp-ui'
 
-import { log, toBN } from 'utils'
+import { logDebug, toBN } from 'utils'
 import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
@@ -116,7 +116,7 @@ const subscribeToBlockchainUpdate = ({
     const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
       const unsubBlock = blockUpdate(blockHeader => {
         blockchainPrompt = { ...blockchainPrompt, blockHeader }
-        log('block changed:', blockHeader.number)
+        logDebug('[WalletApiImpl] New block:', blockHeader.number)
         callback(blockchainPrompt)
       })
 
@@ -136,18 +136,18 @@ const subscribeToBlockchainUpdate = ({
   const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
     const unsubNetwork = networkUpdate(chainId => {
       blockchainPrompt = { ...blockchainPrompt, chainId }
-      log('chainId changed:', chainId)
+      logDebug('[WalletApiImpl] chainId changed:', chainId)
       callback(blockchainPrompt)
     })
     const unsubAccounts = accountsUpdate(([account]) => {
       blockchainPrompt = { ...blockchainPrompt, account }
-      log('accounts changed:', account)
+      logDebug('[WalletApiImpl] accounts changed:', account)
       callback(blockchainPrompt)
     })
 
     const unsubBlock = blockUpdate(blockHeader => {
       blockchainPrompt = { ...blockchainPrompt, blockHeader }
-      log('block changed:', blockHeader.number)
+      logDebug('[WalletApiImpl] block changed:', blockHeader.number)
       callback(blockchainPrompt)
     })
 
@@ -232,7 +232,7 @@ export class WalletApiImpl implements WalletApi {
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(provider as any)
-    log('[WalletApi] Connected')
+    logDebug('[WalletApiImpl] Connected')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
@@ -286,7 +286,7 @@ export class WalletApiImpl implements WalletApi {
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
 
-    log('[WalletApi] Disconnected')
+    logDebug('[WalletApiImpl] Disconnected')
     await this._notifyListeners()
   }
 
@@ -363,7 +363,7 @@ export class WalletApiImpl implements WalletApi {
         isConnected: !!userAddress && !!networkId,
       }
     } catch (error) {
-      log('Error asynchronously getting WalletInfo', error)
+      console.error('[WalletApiImpl] Error asynchronously getting WalletInfo', error)
       return {
         userAddress: '',
         networkId: 0,
