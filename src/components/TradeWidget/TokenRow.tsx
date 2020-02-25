@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -213,12 +213,17 @@ const TokenRow: React.FC<Props> = ({
   }
 
   // Form validation
-  const inputRef = !readOnly
-    ? register({
-        pattern: { value: validInputPattern, message: 'Invalid amount' },
-        validate: { positive: validatePositive },
-      })
-    : register
+  const inputRef = useMemo(
+    () =>
+      !readOnly
+        ? register({
+            pattern: { value: validInputPattern, message: 'Invalid amount' },
+            validate: { positive: validatePositive },
+          })
+        : register,
+    // eslint-disable don't-remember-what
+    [readOnly, register],
+  )
 
   return (
     <Wrapper>
