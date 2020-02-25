@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { LEGALDOCUMENT } from 'const'
 
@@ -33,8 +33,18 @@ const Text = styled.p`
   }
 `
 
+const BannerCloser = styled.span`
+  &:before {
+    content: 'X';
+  }
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+
+  cursor: pointer;
+`
+
 interface LegalBannerProps {
-  startOpen: boolean
   title: string
   useFull: boolean
 }
@@ -72,17 +82,24 @@ const LegalText: React.FC = () => (
   </Text>
 )
 
-const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, useFull, title }) => {
-  const [open, setOpen] = useState(startOpen)
+const DISCLAIMER = 'GP_DISCLAIMER'
 
-  const openCloseDisclaimer = (): void => setOpen(!open)
+const LegalBanner: React.FC<LegalBannerProps> = ({ useFull, title }) => {
+  const [open, setOpen] = useState(localStorage.getItem(DISCLAIMER) || 'OPEN')
 
-  return (
-    <Wrapper onClick={openCloseDisclaimer}>
+  useEffect(() => {
+    open === 'OPEN' ? localStorage.setItem(DISCLAIMER, 'OPEN') : localStorage.setItem(DISCLAIMER, 'CLOSED')
+  }, [open])
+
+  const openCloseDisclaimer = (): void => setOpen(open === 'OPEN' ? 'CLOSED' : 'OPEN')
+
+  return open === 'OPEN' ? (
+    <Wrapper>
+      <BannerCloser onClick={openCloseDisclaimer} />
       <p>{title}</p>
-      {useFull && open && <LegalText />}
+      {useFull && <LegalText />}
     </Wrapper>
-  )
+  ) : null
 }
 
 export default LegalBanner

@@ -35,23 +35,58 @@ import { ZERO } from 'const'
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
+  margin: 0 auto;
+  max-width: 160rem;
+  height: 58rem;
+  width: auto;
+  flex-flow: row nowrap;
+  display: flex;
+  background: #ffffff;
+  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  border-radius: 0.6rem;
+  margin: 0 auto;
+  min-height: 54rem;
+  font-size: 1.6rem;
+  line-height: 1;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
     max-height: initial;
     min-height: initial;
+    width: 100%;
+    height: initial;
   }
 `
 
 const WrappedForm = styled.form`
   display: flex;
   flex-flow: column wrap;
-  width: 50%;
+  // width: 50%;
+  flex: 1 0 42rem;
+  max-width: 50rem;
   padding: 1.6rem;
   box-sizing: border-box;
+  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  opacity: 1;
+  // position: sticky;
+  // top: 0;
+  // height: 100%;
+
+  .expanded & {
+    width: 0;
+    overflow: hidden;
+    flex: none;
+    padding: 0;
+    opacity: 0;
+  }
 
   @media ${MEDIA.mobile} {
     width: 100%;
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 
   > p {
@@ -100,20 +135,20 @@ const SubmitButton = styled.button`
   width: 100%;
   font-weight: var(--font-weight-medium);
   height: 4.6rem;
-  margin: 1rem auto;
+  margin: 1rem auto 0;
   max-width: 32rem;
 
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5rem;
-  }
+  // &:disabled {
+  //   cursor: not-allowed;
+  //   opacity: 0.5;
+  // }
 `
 
 const PriceWrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
-  margin: 2.4rem 0 0;
+  margin: 1.6rem 0 0;
   justify-content: space-between;
 
   > strong {
@@ -134,6 +169,7 @@ const PriceInputBox = styled.div`
   width: calc(50% - 0.8rem);
   height: 5.6rem;
   position: relative;
+  outline: 0;
 
   label {
     display: flex;
@@ -156,6 +192,11 @@ const PriceInputBox = styled.div`
     letter-spacing: -0.05rem;
     text-align: right;
     font-weight: var(--font-weight-medium);
+
+    @media ${MEDIA.mobile} {
+      font-size: 1rem;
+      letter-spacing: 0.03rem;
+    }
   }
 
   input {
@@ -171,6 +212,11 @@ const PriceInputBox = styled.div`
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 7rem 0 1rem;
+    outline: 0;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
 
     &:focus {
       border-bottom: 0.2rem solid #218dff;
@@ -195,20 +241,42 @@ const PriceInputBox = styled.div`
 const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
-  width: 50%;
+  flex: 1;
+  min-width: 48rem;
+  max-width: 100%;
   background: #edf2f7;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
+  transition: flex 0.2s ease-in-out;
+  align-items: flex-start;
+  align-content: flex-start;
+
+  .expanded & {
+    flex: 1 1 100%;
+    min-width: 85rem;
+  }
 
   > div {
     width: 100%;
     width: calc(100% - 1.6rem);
-    height: auto;
     box-sizing: border-box;
     display: flex;
     flex-flow: row wrap;
-    overflow-y: auto;
     border-radius: 0 0.6rem 0.6rem 0;
+    overflow-y: auto;
+
+    @media ${MEDIA.mobile} {
+      display: none;
+      &.visible {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow-y: scroll;
+      }
+    }
   }
 
   > div > h5 {
@@ -224,16 +292,51 @@ const OrdersPanel = styled.div`
     text-align: center;
   }
 
+  > div > h5 > a {
+    font-size: 1.3rem;
+    font-weight: var(--font-weight-normal);
+    color: #218dff;
+    text-decoration: underline;
+  }
+
+  > div > h5 > a {
+    font-size: 1.3rem;
+    font-weight: var(--font-weight-normal);
+    color: #218dff;
+    text-decoration: underline;
+  }
+
   > button {
     width: 1.6rem;
     height: 100%;
     border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-    background: #ecf2f7 url(${arrow}) no-repeat center/1.2rem 1rem;
+    background: #ecf2f7;
     padding: 0;
     margin: 0;
     outline: 0;
+
+    @media ${MEDIA.mobile} {
+      display: none;
+    }
+
+    &::before {
+      display: block;
+      content: ' ';
+      background: url(${arrow}) no-repeat center/contain;
+      transform: rotate(180deg);
+      height: 1.2rem;
+      width: 1.6rem;
+      margin: 0;
+    }
+
     &:hover {
       background-color: #ecf2f7;
+    }
+  }
+
+  .expanded & {
+    > button::before {
+      transform: rotate(-180deg);
     }
   }
 `
@@ -268,6 +371,7 @@ const TradeWidget: React.FC = () => {
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
   const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
 
+  const [ordersVisible, setOrdersVisible] = useState(true)
   const [sellToken, setSellToken] = useState(
     () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
@@ -414,7 +518,8 @@ const TradeWidget: React.FC = () => {
   }
 
   return (
-    <WrappedWidget>
+    <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
+      {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)}>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
@@ -487,7 +592,7 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button />
+        <button onClick={(): void => setOrdersVisible(!ordersVisible)} />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>

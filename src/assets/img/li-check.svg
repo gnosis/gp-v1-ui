@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="12px" height="12px" viewBox="0 0 12 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: Sketch 63 (92445) - https://sketch.com -->
-    <title>li-check</title>
-    <desc>Created with Sketch.</desc>
-    <g id="UI" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="GnosisProtocol---v2.3---4_NewLiquidity" transform="translate(-319.000000, -423.000000)" fill="#218DFF" fill-rule="nonzero">
-            <path d="M325,423 C321.7,423 319,425.7 319,429 C319,432.3 321.7,435 325,435 C328.3,435 331,432.3 331,429 C331,425.7 328.3,423 325,423 M323.8,432 L320.8,429 L321.646,428.154 L323.8,430.302 L328.354,425.748 L329.2,426.6 L323.8,432 Z" id="li-check"></path>
-        </g>
-    </g>
-</svg>
+<svg height="12" viewBox="0 0 12 12" width="12" xmlns="http://www.w3.org/2000/svg"><path d="m325 423c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6m-1.2 9-3-3 .846-.846 2.154 2.148 4.554-4.554.846.852z" fill="#218dff" transform="translate(-319 -423)"/></svg>

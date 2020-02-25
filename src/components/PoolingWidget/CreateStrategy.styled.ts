@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { MEDIA } from 'const'
 
 export const CreateStrategyWrapper = styled.div`
   display: flex;
@@ -11,6 +12,11 @@ export const CreateStrategyWrapper = styled.div`
   border-radius: 0.6rem;
   padding: 1.6rem 1.6rem 0;
   box-sizing: border-box;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    margin: 0 0 1.6rem;
+  }
 
   > strong {
     margin: 0 0 1rem 0;

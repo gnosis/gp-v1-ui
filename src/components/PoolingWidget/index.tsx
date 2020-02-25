@@ -17,7 +17,7 @@ import {
   StepButtonsWrapper,
 } from './PoolingWidget.styled'
 
-import { faSpinner, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import checkIcon from 'assets/img/li-check.svg'
 
@@ -318,14 +318,12 @@ const PoolingInterface: React.FC = () => {
           ) : // STEP 3 - TXRECEIPT OR NOT?
           txReceipt ? (
             // TX RCEIPT SUCCESS
-            <Link to="/wallet">
-              <button className="success">
-                <FontAwesomeIcon icon={faFlagCheckered} /> Finish and go to Balances
-              </button>
+            <Link to="/wallet" className="finish">
+              Finish and go to Balances
             </Link>
           ) : (
             // NOT YET SUBMITTED TX
-            <button className="success" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
+            <button className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
               {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
             </button>
           )}

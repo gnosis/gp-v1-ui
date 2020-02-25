@@ -1,16 +1,13 @@
 import styled from 'styled-components'
+import { MEDIA } from 'const'
 
 export const WalletDrawerInnerWrapper = styled.div`
-  display: grid;
-  grid-template-rows: repeat(2, auto) 1.25rem auto;
-  justify-content: stretch;
-  align-items: center;
-
-  font-weight: bolder;
-
-  margin: auto;
-  padding: 0.375rem;
-  width: 80%;
+  display: flex;
+  width: 100%;
+  flex-flow: column wrap;
+  margin: 0;
+  padding: 2.4rem 0;
+  box-sizing: border-box;
 
   p.error {
     color: red;
@@ -20,30 +17,191 @@ export const WalletDrawerInnerWrapper = styled.div`
 
   div.wallet {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(6.3125rem, 7.25rem) minmax(1.5625rem, 0.3fr) minmax(3.375rem, 0.6fr) 4.0625rem;
+    display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    &:last-child {
-      margin: auto;
-      width: 80%;
-      text-align: center;
-    }
-    > p {
-      text-align: right;
-    }
-    > input {
-      background-color: #fff;
-      color: #000;
-      margin: 0;
-      width: 100%;
+    margin: 0 0 2.4rem;
+    padding: 0 2.4rem;
+    flex-flow: row wrap;
+    box-sizing: border-box;
+    width: 100%;
 
-      &:disabled {
-        /* background-color: var(--color-text-secondary); */
-        opacity: 0.5;
-      }
+    @media ${MEDIA.mobile} {
+      padding: 0 1.6rem;
     }
+
+      > span {
+        margin: .8rem 0 1.6rem;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        flex-flow: row wrap;
+
+          > b {margin: 0 .5rem 0 0;}
+          > p {
+            font-size: 1.3rem;
+            color: #2F3E4E;
+            letter-spacing: -0.3px;
+            text-align: right;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            cursor: pointer;
+            text-decoration: underline;
+          }
+      }
+
+      > b {
+        font-family: var(--font-default);
+        font-size: 1.3rem;
+        color: #2F3E4E;
+        letter-spacing: 0;
+        text-align: right;
+        padding: 0;
+        margin: 0 1.6rem 0 0;
+        width: 6rem;
+        flex: none;
+
+        @media ${MEDIA.mobile} {
+          width: 100%;
+          padding: 0 0 1rem;
+          text-align: left;
+          margin: 0;
+        }
+      }
+
+      > div {
+        width: auto;
+        flex: 1 1 auto;
+        position: relative;
+      }
+
+      > div > i {
+        position: absolute;
+        right: 1rem;
+        top: 0;
+        bottom: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-style: normal;
+        font-family: var(--font-default);
+        color: #476481;
+        letter-spacing: -0.05rem;
+        text-align: right;
+        font-weight: var(--font-weight-medium);
+        font-size: 1.2rem;
+      }
+
+      > div > input {
+        margin: 0;
+        max-width: 100%;
+        background: #e7ecf3;
+        border-radius: 0.6rem 0.6rem 0 0;
+        border: 0;
+        font-size: 1.6rem;
+        line-height: 1;
+        box-sizing: border-box;
+        border-bottom: 0.2rem solid transparent;
+        font-weight: var(--font-weight-normal);
+        padding: 0 6rem 0 1rem;
+        outline: none;
+        height: 5.6rem;
+        width: 100%;
+        font-family: var(--font-mono);
+        font-size: 1.6rem;
+        color: #476481;
+        letter-spacing: -0.08rem;
+
+        &::placeholder {
+          color: inherit;
+          font-size: inherit;
+        }
+
+        &:focus {
+          border-bottom: 0.2rem solid #218dff;
+          border-color: #218dff;
+          color: #218dff;
+        }
+    
+        &.error {
+          border-color: #ff0000a3;
+        }
+    
+        &.warning {
+          color: #ff5722;
+        }
+
+        &:disabled {
+          opacity: 1;
+          background: rgba(230, 236, 243, .7);
+        }
+      }
+  }
+
+  .actions {
+    margin: auto;
+    height: 5.6rem;
+    border-top: .1rem solid #DFE6EF;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0 1.6rem;
+    box-sizing: border-box;
+
+      > button,
+      > a {
+        margin: 0
+        border-radius: 0.6rem;
+        outline: 0;
+        height: 3.6rem;
+        box-sizing: border-box;
+        letter-spacing: 0.03rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+
+      > a {
+        font-size: 1.4rem;
+        font-weight: var(--font-weight-medium);
+      }
+
+      > button {
+        background: #218dff;
+        border-radius: 0.6rem;
+        min-width: 14rem;
+        padding: 0 1.6rem;
+        font-weight: var(--font-weight-medium);
+        color: #ffffff;
+        text-transform: uppercase;
+        font-size: 1.4rem;
+        margin: 0;
+
+        @media ${MEDIA.mobile} {
+          margin: 1.6rem 0 1.6rem 1.6rem;
+          font-size: 1.3rem;
+          padding: 0 1rem;
+        }
+
+        > img,
+        > svg {
+          margin: 0 0 0 0.8rem;
+        }
+
+        &:hover {
+          background: #0b66c6;
+        }
+      }
   }
 
   .buttons {

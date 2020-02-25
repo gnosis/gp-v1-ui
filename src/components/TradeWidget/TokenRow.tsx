@@ -97,6 +97,7 @@ const InputBox = styled.div`
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 15rem 0 1rem;
+    outline: 0;
 
     &:focus {
       border-bottom: 0.2rem solid #218dff;

@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 import fontFace from './fonts'
 import variables from './variables'
+import checkWhite from 'assets/img/check-white.svg'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables
@@ -48,21 +49,21 @@ const GlobalStyles = createGlobalStyle`
       }
   }
 
-  body::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-    background-color: var(--color-background);
-  }
+  // body::-webkit-scrollbar-track {
+  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
+  //   background-color: var(--color-background);
+  // }
 
-  body::-webkit-scrollbar {
-    width: 1.2rem;
-    background-color: var(--color-background);
-  }
+  // body::-webkit-scrollbar {
+  //   width: 1.2rem;
+  //   background-color: var(--color-background);
+  // }
 
-  body::-webkit-scrollbar-thumb {
-    border-radius: 1rem;
-    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-    background-color: var(--color-background-pageWrapper);
-  }
+  // body::-webkit-scrollbar-thumb {
+  //   border-radius: 1rem;
+  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
+  //   background-color: var(--color-background-pageWrapper);
+  // }
 
   h1, h2, h3 {
     margin: 0;
@@ -92,7 +93,7 @@ const GlobalStyles = createGlobalStyle`
 
     &:disabled,
     &[disabled]{
-      opacity: .5;
+      opacity: .7;
       pointer-events: none;
     }
     &.success {
@@ -137,16 +138,38 @@ const GlobalStyles = createGlobalStyle`
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
     outline: none;
-
     font-family: inherit;
     font-size: 0.75rem;
-    font-weight: bold;
-    
+    font-weight: var(--font-weight-bold);
     padding: 0.65rem;
     margin: 0.4rem 0.85rem;
     width: 100%;
-
-    transition: all 0.2s ease-in-out;
+    line-height: 1;
+    
+    &::placeholder {
+      color: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+    
+    &[type=checkbox] {
+      margin: 0 auto;
+      background: transparent;
+      appearance: none;
+      border: 0.2rem solid #9fb4c9;
+      border-radius: 0.3rem;
+      box-sizing: border-box;
+      height: 1.4rem;
+      width: 1.4rem;
+      padding: 0;
+      cursor: pointer;
+      outline: 0;
+      
+        &:checked {
+          background: #218dff url(${checkWhite}) no-repeat center/.85rem;
+          border: 0.2rem solid transparent;
+        }
+    }
 
     &:focus {
       border-color: var(--color-text-primary);
