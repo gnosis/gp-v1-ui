@@ -1,5 +1,3 @@
-// import 'react-toastify/dist/ReactToastify.min.css'
-import 'assets/css/ReactToastifyCustom.scss'
 import { toast } from 'react-toastify'
 
 import { TOAST_NOTIFICATION_DURATION } from 'const'
