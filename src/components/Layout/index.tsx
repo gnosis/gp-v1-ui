@@ -17,15 +17,22 @@ const Wrapper = styled.div`
     margin: 2.4rem auto 5rem;
     // max-width: 85rem;
     // width: 100%;
-    // width: auto;
-    width: 100%;
+    width: auto;
     display: flex;
     flex-flow: row wrap;
     align-items: flex-start;
     justify-content: flex-start;
 
+    @media ${MEDIA.mobile} {
+      width: 100%;
+    }
+
     > section {
       width: 100%;
+      @media ${MEDIA.mobile} {
+        width: 100%;
+        overflow: initial;
+      }
     }
 
     @media ${MEDIA.mobile} {

@@ -79,10 +79,10 @@ export const MEDIA = {
     return `(min-device-width: ${this.smallScreenUp}) and (max-device-width: ${this.mediumEnd}) and (orientation: landscape)`
   },
   get tablet(): string {
-    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd})}, ${this.tabletPortrait}}, ${this.tabletLandscape}`
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd}), ${this.tabletPortrait}, ${this.tabletLandscape}`
   },
   get tabletNoPortrait(): string {
-    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd})}, ${this.tabletLandscape}`
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd}), ${this.tabletLandscape}`
   },
   get tabletSmall(): string {
     return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumScreenSmall})`

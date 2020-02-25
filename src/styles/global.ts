@@ -1,6 +1,7 @@
 import { createGlobalStyle } from 'styled-components'
 import fontFace from './fonts'
 import variables from './variables'
+import checkWhite from 'assets/img/check-white.svg'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables
@@ -136,13 +137,39 @@ const GlobalStyles = createGlobalStyle`
     border: 0.11rem solid transparent;
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
-    outline: none
+    outline: none;
     font-family: inherit;
     font-size: 0.75rem;
     font-weight: var(--font-weight-bold);
     padding: 0.65rem;
     margin: 0.4rem 0.85rem;
     width: 100%;
+    line-height: 1;
+    
+    &::placeholder {
+      color: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
+    
+    &[type=checkbox] {
+      margin: 0 auto;
+      background: transparent;
+      appearance: none;
+      border: 0.2rem solid #9fb4c9;
+      border-radius: 0.3rem;
+      box-sizing: border-box;
+      height: 1.4rem;
+      width: 1.4rem;
+      padding: 0;
+      cursor: pointer;
+      outline: 0;
+      
+        &:checked {
+          background: #218dff url(${checkWhite}) no-repeat center/.85rem;
+          border: 0.2rem solid transparent;
+        }
+    }
 
     &:focus {
       border-color: var(--color-text-primary);

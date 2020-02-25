@@ -45,14 +45,15 @@ export const TokenRow = styled.tr`
     height: auto;
     outline: 0;
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     color: #218dff;
     letter-spacing: -0.03rem;
     text-align: center;
+    font-family: var(--font-default);
     font-weight: var(--font-weight-medium);
     display: flex;
     align-items: center;
-    padding: 0.4rem 1.2rem;
+    padding: 0.4rem 1rem;
     box-sizing: border-box;
     background: #deeeff;
     border: 0.1rem solid #218dff;
@@ -74,9 +75,9 @@ export const TokenRow = styled.tr`
   .depositToken {
     outline: 0;
     background: #218dff;
-    border-radius: 2.8rem;
-    height: 2.8rem;
-    width: 2.8rem;
+    border-radius: 2.4rem;
+    height: 2.4rem;
+    width: 2.4rem;
     margin: 0 0 0 1rem;
     display: flex;
     align-items: center;

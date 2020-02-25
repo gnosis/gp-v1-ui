@@ -76,7 +76,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
           <TokenImg src={image} alt={name} />
-          <div>{name}</div>
+          <div>
+            <b>{symbol}</b>
+            {name}
+          </div>
         </td>
         <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
           {formatAmount(totalExchangeBalance, decimals)}

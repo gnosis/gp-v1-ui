@@ -77,6 +77,7 @@ const PriceInputBox = styled.div`
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 7rem 0 1rem;
+    outline: 0;
 
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
