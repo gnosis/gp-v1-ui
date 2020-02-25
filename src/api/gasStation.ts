@@ -55,7 +55,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
       return gasPrice
     }
   } catch (error) {
-    console.error('Error fetching gasPrice from', gasStationURL, error)
+    console.error('[api:gasStation] Error fetching gasPrice from', gasStationURL, error)
   }
   return undefined
 }
