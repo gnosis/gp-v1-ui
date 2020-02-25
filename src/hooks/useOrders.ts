@@ -56,7 +56,11 @@ export function useOrders(): Result {
     const fetchOrders = async (offset: number): Promise<void> => {
       // isLoading is the important one
       // controls ongoing fetching chain
-      if (!userAddress || !networkId || !isLoading) return
+      if (!userAddress || !networkId || !isLoading) {
+        // next isLoading = true will be when userAddress and networkId are valid
+        setIsLoading(false)
+        return
+      }
 
       // contract call
       try {
