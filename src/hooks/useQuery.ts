@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { sanitizeInput, sanitizeNegativeAndMakeMultipleOf } from 'utils'
 import { DEFAULT_FORM_STATE } from 'components/TradeWidget'
 
-export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?: string } {
+export function useQuery(): { sellAmount: string; buyAmount: string; validFrom?: string; validUntil?: string } {
   const { search } = useLocation()
 
   return useMemo(() => {
@@ -12,6 +12,7 @@ export function useQuery(): { sellAmount: string; buyAmount: string; validUntil?
     return {
       sellAmount: sanitizeInput(query.get('sell')),
       buyAmount: sanitizeInput(query.get('buy')),
+      validFrom: sanitizeNegativeAndMakeMultipleOf(query.get('from'), DEFAULT_FORM_STATE.validFrom),
       validUntil: sanitizeNegativeAndMakeMultipleOf(query.get('expires'), DEFAULT_FORM_STATE.validUntil),
     }
   }, [search])
