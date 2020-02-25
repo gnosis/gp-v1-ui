@@ -109,6 +109,11 @@ interface Props {
   priceInverseInputId: string
 }
 
+export function invertPrice(priceValue: string): string {
+  const price = parseBigNumber(priceValue)
+  return price ? new BigNumber(1).div(price).toString() : ''
+}
+
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
@@ -119,8 +124,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   const updateInversePrice = useCallback(
     (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
-      const price = parseBigNumber(priceValue)
-      const priceInverseValue = price ? new BigNumber(1).div(price).toString() : ''
+      const priceInverseValue = invertPrice(priceValue)
       setValue(inverseInputId, priceInverseValue, true)
     },
     [setValue],

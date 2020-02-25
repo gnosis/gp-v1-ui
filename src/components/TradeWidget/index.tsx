@@ -31,7 +31,7 @@ import { Network, TokenDetails } from 'types'
 
 import { getToken, parseAmount, parseBigNumber } from 'utils'
 import { ZERO } from 'const'
-import Price from './Price'
+import Price, { invertPrice } from './Price'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -316,7 +316,7 @@ const TradeWidget: React.FC = () => {
       [receiveInputId]: '',
       [validUntilId]: validUntilParam,
       [priceInputId]: priceParam,
-      [priceInverseInputId]: '',
+      [priceInverseInputId]: invertPrice(priceParam),
     },
   })
   const { handleSubmit, reset, watch, setValue } = methods
