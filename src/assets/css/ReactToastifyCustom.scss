@@ -2,7 +2,7 @@ $images: '../img/';
 
 .Toastify__toast-container {
   z-index: 9999;
-  -webkit-transform: translate3d(0, 0, 999rem);
+  transform: translate3d(0, 0, 999rem);
   position: fixed;
   padding: .4rem;
   width: 40rem;
@@ -77,9 +77,7 @@ $images: '../img/';
   box-sizing: border-box;
   margin: 0 0 1.6rem;
   padding: 0 .8rem 0 0;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-pack: justify;
   justify-content: space-between;
   max-height: 80rem;
   overflow: hidden;
@@ -98,8 +96,8 @@ $images: '../img/';
   direction: rtl;
 }
 
-.Toastify__toast--default {
-}
+// .Toastify__toast--default {
+// }
 
 .Toastify__toast--info::before {
   content: "";
@@ -181,7 +179,6 @@ $images: '../img/';
   cursor: pointer;
   opacity: .7;
   transition: .3s ease;
-  -ms-flex-item-align: start;
   align-self: flex-start;
   order: 5;
   color: #476480;
@@ -679,5 +676,3 @@ $images: '../img/';
 .Toastify__slide-exit--bottom-center {
   animation-name: Toastify__slideOutDown;
 }
-
-/*# sourceMappingURL=ReactToastify.css.map */

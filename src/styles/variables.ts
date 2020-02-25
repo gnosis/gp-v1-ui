@@ -2,7 +2,7 @@ import { css } from 'styled-components'
 
 const AllColors = `
   // FONTS
-  --font-default: "Averta", "Helvetica Neue", Helvetica, sans-serif;
+  --font-default: "Inter", "Helvetica Neue", Helvetica, sans-serif;
   --font-mono: "Roboto Mono", monospace;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
