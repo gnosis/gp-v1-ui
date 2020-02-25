@@ -221,7 +221,7 @@ export const CardTable = styled.table<{
     font-size: 1.1rem;
     color: #2F3E4E;
     letter-spacing: 0;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
   }
 
   > thead, tbody {

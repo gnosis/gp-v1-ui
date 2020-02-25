@@ -1,4 +1,5 @@
 import { toast } from 'toastify'
+import greenCheck from 'assets/img/check-green.svg'
 import BN from 'bn.js'
 import { assert } from '@gnosis.pm/dex-js'
 

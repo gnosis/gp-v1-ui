@@ -25,7 +25,7 @@ export const UserWalletItem = styled.div`
   white-space: initial;
   font-family: var(--font-mono);
   letter-spacing: 0;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   color: #476481;
   letter-spacing: 0;
   flex: 1 1 auto;
@@ -70,7 +70,7 @@ export const LogInOutButton = styled.div`
   margin: 0;
   font-family: var(--font-mono);
   letter-spacing: 0;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   color: #476481;
   letter-spacing: 0;
   font-size: 1.1rem;
@@ -83,7 +83,7 @@ export const LogInOutButton = styled.div`
 `
 
 export const UserAddress = styled.div`
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   font-size: 1.6rem;
   color: #476481;
   letter-spacing: 0;

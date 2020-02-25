@@ -74,11 +74,11 @@ export const SpreadInformationWrapper = styled.div`
   > p > i {
     font-style: normal;
     color: #218dff;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
   }
 `
 
 export const BlueBoldText = styled(ProgressStepText)`
   color: #218dff;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
 `

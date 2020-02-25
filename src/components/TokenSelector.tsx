@@ -52,7 +52,7 @@ const SelectedTokenWrapper = styled.span`
   text-align: right;
 
   > strong {
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
   }
 `
 

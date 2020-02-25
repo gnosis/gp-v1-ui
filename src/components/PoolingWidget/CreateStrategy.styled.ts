@@ -31,7 +31,7 @@ export const CreateStrategyWrapper = styled.div`
   > p > i {
     font-style: normal;
     color: #218dff;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
   }
 `
 

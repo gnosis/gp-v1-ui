@@ -84,7 +84,7 @@ const GlobalStyles = createGlobalStyle`
     cursor: pointer;
     transition: all 0.2s ease-in-out;
     border: 0;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
 
     :hover {
       background-color: #0B66C6;
@@ -136,7 +136,7 @@ const GlobalStyles = createGlobalStyle`
     border: 0.11rem solid transparent;
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
-    outline: none
+    outline: none;
     font-family: inherit;
     font-size: 0.75rem;
     font-weight: var(--font-weight-bold);

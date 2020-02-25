@@ -93,7 +93,7 @@ const LinkWrapper = styled(EtherscanLink)`
   margin: 0;
   text-align: center;
   border: 0.1rem solid #c5d3e0;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   font-size: 13px;
   color: inherit;
   letter-spacing: 0;

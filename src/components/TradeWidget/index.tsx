@@ -131,7 +131,7 @@ const SubmitButton = styled.button`
   box-sizing: border-box;
   line-height: 1;
   width: 100%;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
@@ -189,7 +189,7 @@ const PriceInputBox = styled.div`
     color: #476481;
     letter-spacing: -0.05rem;
     text-align: right;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
 
     @media ${MEDIA.mobile} {
       font-size: 1rem;
@@ -279,7 +279,7 @@ const OrdersPanel = styled.div`
     width: 100%;
     margin: 0 auto;
     padding: 1.6rem 0 1rem;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     font-size: 1.6rem;
     color: #2f3e4e;
     letter-spacing: 0.03rem;
