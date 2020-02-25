@@ -32,9 +32,7 @@ export function useNumberInput(params: Params): Result {
     }
   }, [inputId, inputValue, precision, setValue])
 
-  useEffect(() => {
-    enforcePrecision()
-  }, [enforcePrecision])
+  useEffect(enforcePrecision, [enforcePrecision])
 
   const removeExcessZeros = useCallback(
     (event: React.SyntheticEvent<HTMLInputElement>): void => {
