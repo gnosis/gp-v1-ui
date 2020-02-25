@@ -35,10 +35,12 @@ import { ZERO } from 'const'
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
-  width: 80vw;
   margin: 0 auto;
   max-width: 160rem;
   height: 58rem;
+  width: auto;
+  flex-flow: row nowrap;
+  display: flex;
   background: #ffffff;
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
@@ -210,6 +212,7 @@ const PriceInputBox = styled.div`
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 7rem 0 1rem;
+    outline: 0;
 
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
@@ -238,7 +241,8 @@ const PriceInputBox = styled.div`
 const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
-  flex: 1 1 auto;
+  flex: 1;
+  min-width: 48rem;
   max-width: 100%;
   background: #edf2f7;
   border-radius: 0 0.6rem 0.6rem 0;
