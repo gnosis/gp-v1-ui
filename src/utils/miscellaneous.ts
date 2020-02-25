@@ -2,6 +2,7 @@ import { TokenDetails } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
+import { ORDER_FILLED_FACTOR } from 'const'
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -14,6 +15,9 @@ function noop(..._args: any[]): void {}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const log = process.env.NODE_ENV === 'test' ? noop : (...args: any[]): void => console.log(...args)
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const debug = process.env.NODE_ENV === 'development' ? noop : (...args: any[]): void => console.log(...args)
 
 export function getToken<T extends TokenDetails, K extends keyof T>(
   key: K,
@@ -48,3 +52,9 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
 }
 
 export const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now
+
+export function isOrderFilled(order: AuctionElement): boolean {
+  // consider an oder filled when less than `negligibleAmount` is left
+  const negligibleAmount = order.priceDenominator.divRound(ORDER_FILLED_FACTOR)
+  return !order.remainingAmount.gte(negligibleAmount)
+}

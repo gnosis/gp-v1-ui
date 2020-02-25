@@ -9,11 +9,15 @@ import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   width: 100%;
+  display: flex;
+  flex-flow: column wrap;
 
   main {
     flex: 1;
     margin: 2.4rem auto 5rem;
-    max-width: 85rem;
+    // max-width: 85rem;
+    // width: 100%;
+    // width: auto;
     width: 100%;
     display: flex;
     flex-flow: row wrap;
@@ -25,18 +29,18 @@ const Wrapper = styled.div`
     }
 
     @media ${MEDIA.mobile} {
-      margin: 1.6rem auto 5rem;
+      margin: 1.6rem auto 3.2rem;
     }
   }
 `
 
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
-    <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
+    <LegalBanner useFull={false} title="💀 This project is in beta. Use at your own risk." />
     <Header
       navigation={[
         {
-          label: 'Order',
+          label: 'Trade',
           to: '/trade',
           order: 1,
         },
@@ -47,9 +51,15 @@ const Layout: React.FC = ({ children }) => (
           withPastLocation: true,
         },
         {
+          label: 'Orders',
+          to: '/orders',
+          order: 3,
+          withPastLocation: true,
+        },
+        {
           label: 'Balances',
           to: '/wallet',
-          order: 3,
+          order: 4,
           withPastLocation: true,
         },
       ]}
@@ -58,12 +68,5 @@ const Layout: React.FC = ({ children }) => (
     <Footer />
   </Wrapper>
 )
-
-// {
-//   label: 'Orders',
-//   to: '/orders',
-//   order: 3,
-//   withPastLocation: true,
-// },
 
 export default Layout

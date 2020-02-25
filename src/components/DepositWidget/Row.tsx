@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import minus from 'assets/img/minus.svg'
+import plus from 'assets/img/plus.svg'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
@@ -113,31 +115,30 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled ? (
-            <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
-              <FontAwesomeIcon icon={faPlus} />
-              &nbsp; Deposit
+            <button className="withdrawToken" onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
+              <img src={plus} />
             </button>
           ) : (
             <>
-              <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
+              <button className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
                 {enabling.has(address) ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
-                    &nbsp; Enabling {symbol}
+                    Enabling {symbol}
                   </>
                 ) : (
-                  <>
-                    <FontAwesomeIcon icon={faCheck} />
-                    &nbsp; Enable {symbol}
-                  </>
+                  <>Enable {symbol}</>
                 )}
               </button>
             </>
           )}
           {!totalExchangeBalance.isZero() && (
-            <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
-              <FontAwesomeIcon icon={faMinus} />
-              &nbsp; Withdraw
+            <button
+              onClick={(): void => showForm('withdraw')}
+              disabled={isWithdrawFormVisible}
+              className="depositToken"
+            >
+              <img src={minus} />
             </button>
           )}
         </td>
@@ -145,11 +146,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isDepositFormVisible && (
         <Form
           title={
-            <p>
+            <span>
               Deposit <strong>{symbol}</strong> in Exchange Wallet
-            </p>
+            </span>
           }
-          totalAmountLabel="Wallet balance"
+          totalAmountLabel="wallet balance"
           totalAmount={walletBalance}
           inputLabel="Deposit amount"
           tokenBalances={tokenBalances}
@@ -163,9 +164,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isWithdrawFormVisible && (
         <Form
           title={
-            <p>
+            <span>
               Withdraw <strong>{symbol}</strong> from Exchange Wallet
-            </p>
+            </span>
           }
           totalAmountLabel="Exchange wallet"
           totalAmount={totalExchangeBalance}

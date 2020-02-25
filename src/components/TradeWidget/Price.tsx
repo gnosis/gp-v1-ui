@@ -7,13 +7,13 @@ import BigNumber from 'bignumber.js'
 import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import { DEFAULT_PRECISION } from 'const'
+import { DEFAULT_PRECISION, MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
   width: 100%;
-  margin: 2.4rem 0 0;
+  margin: 1.6rem 0 0;
   justify-content: space-between;
 
   > strong {
@@ -34,6 +34,7 @@ const PriceInputBox = styled.div`
   width: calc(50% - 0.8rem);
   height: 5.6rem;
   position: relative;
+  outline: 0;
 
   label {
     display: flex;
@@ -56,6 +57,11 @@ const PriceInputBox = styled.div`
     letter-spacing: -0.05rem;
     text-align: right;
     font-weight: var(--font-weight-medium);
+
+    @media ${MEDIA.mobile} {
+      font-size: 1rem;
+      letter-spacing: 0.03rem;
+    }
   }
 
   input {
@@ -71,6 +77,10 @@ const PriceInputBox = styled.div`
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
     padding: 0 7rem 0 1rem;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
 
     &:focus {
       border-bottom: 0.2rem solid #218dff;

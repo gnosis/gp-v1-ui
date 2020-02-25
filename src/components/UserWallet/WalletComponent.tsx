@@ -17,6 +17,8 @@ import {
   UserWalletSlideWrapper,
   CopyDiv,
   MonospaceAddress,
+  ConnectWallet,
+  LogInOutButton,
 } from './UserWallet.styled'
 
 import { walletApi } from 'api'
@@ -25,7 +27,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
-import WalletImg from 'assets/img/black_eth_diamond.png'
+import WalletImg from 'assets/img/eth-network.svg'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string
@@ -103,19 +105,19 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     } else {
       onClick = connectWallet
       content = (
-        <UserWalletItem>
+        <ConnectWallet className="connectWallet">
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
-        </UserWalletItem>
+        </ConnectWallet>
       )
     }
 
     return (
-      <UserWalletItem>
+      <LogInOutButton>
         <a onClick={onClick} className={props.className}>
           {content}
         </a>
-      </UserWalletItem>
+      </LogInOutButton>
     )
   }
 
@@ -129,9 +131,14 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
             <UserAddress>
               {userAddress && abbreviateString(userAddress, 6, 4)}
               {/* Network */}
-              <UserWalletItem>
-                <NetworkTitle>{(networkId && getNetworkFromId(networkId)) || 'Unknown Network'}</NetworkTitle>
-              </UserWalletItem>
+              <NetworkTitle>
+                {/* Don't output MAINNET, only other networks. */}
+                {networkId
+                  ? getNetworkFromId(networkId) === 'Mainnet'
+                    ? ''
+                    : getNetworkFromId(networkId)
+                  : 'Unknown Network'}
+              </NetworkTitle>
             </UserAddress>
           </UserWalletToggler>
         </>
@@ -141,9 +148,10 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
       {userAddress && showWallet && (
         <UserWalletSlideWrapper>
-          <UserWalletItem>
-            <QRCode value={userAddress} renderAs="svg" />
-          </UserWalletItem>
+          <button onClick={(): void => setShowWallet(!showWallet)}>
+            <b>Wallet</b>
+            <i>×</i>
+          </button>
           <UserWalletItem>
             {/* Copy Confirmation */}
             {copiedToClipboard ? (
@@ -151,29 +159,34 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                 <FontAwesomeIcon color="#ff62a2;" icon={faCheck} /> <span>Copied!</span>
               </CopyDiv>
             ) : (
-              // Address and copy button
-              <>
-                <MonospaceAddress>{userAddress} </MonospaceAddress>
-                <CopyToClipboard text={userAddress} onCopy={handleCopyToClipBoard}>
-                  <FontAwesomeIcon
-                    color="#ff62a2;"
-                    icon={faCopy}
-                    style={{ cursor: 'pointer' }}
-                    title="Copy address to clipboard"
-                  />
-                </CopyToClipboard>
-              </>
+              ''
             )}
+            {/* // Address and copy button */}
+            <MonospaceAddress>
+              <b>{userAddress && userAddress.substring(0, 6)}</b>
+              {userAddress.substring(6, userAddress.length - 4)}
+              <b>{userAddress.slice(-4)}</b>
+              <CopyToClipboard text={userAddress} onCopy={handleCopyToClipBoard}>
+                <FontAwesomeIcon
+                  color="#ff62a2;"
+                  icon={faCopy}
+                  style={{ cursor: 'pointer' }}
+                  title="Copy address to clipboard"
+                />
+              </CopyToClipboard>
+            </MonospaceAddress>
+            <QRCode className="QRCode" value={userAddress} renderAs="svg" />
+            {/* Etherscan Link */}
+            {/* TODO: add network specific */}
+            <EtherscanLink
+              className="etherscanLink"
+              type="address"
+              identifier={userAddress}
+              label="View on Etherscan"
+            />
+            {/* Log In/Out Button */}
+            {renderLogInOutButton()}
           </UserWalletItem>
-          {/* Etherscan Link */}
-          {
-            <UserWalletItem>
-              {/* TODO: add network specific */}
-              <EtherscanLink type="address" identifier={userAddress} label="View on Etherscan" />
-            </UserWalletItem>
-          }
-          {/* Log In/Out Button */}
-          {renderLogInOutButton()}
         </UserWalletSlideWrapper>
       )}
     </UserWalletWrapper>

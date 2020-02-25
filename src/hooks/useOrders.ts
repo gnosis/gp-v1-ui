@@ -47,8 +47,9 @@ export function useOrders(): Result {
     },
     dispatch,
   ] = useGlobalState()
-  //  consider first state to be loading
-  const [isLoading, setIsLoading] = useSafeState<boolean>(true)
+
+  // can only start loading when connection is ready. Keep it `false` until then
+  const [isLoading, setIsLoading] = useSafeState<boolean>(false)
 
   useEffect(() => {
     let cancelled = false
@@ -56,7 +57,14 @@ export function useOrders(): Result {
     const fetchOrders = async (offset: number): Promise<void> => {
       // isLoading is the important one
       // controls ongoing fetching chain
-      if (!userAddress || !networkId || !isLoading) return
+      if (!userAddress || !networkId || !isLoading) {
+        // It can happen that `userAddress` || `networkId` are falsy. In that case, `isLoading` can remain `true` blocking the cycle.
+        // Thus, turn `isLoading` off on exit if not off already
+        if (isLoading) {
+          setIsLoading(false)
+        }
+        return
+      }
 
       // contract call
       try {

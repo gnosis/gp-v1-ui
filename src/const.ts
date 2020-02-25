@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 import { UNLIMITED_ORDER_AMOUNT } from '@gnosis.pm/dex-js'
 export {
   UNLIMITED_ORDER_AMOUNT,
@@ -10,6 +11,13 @@ export {
   DEFAULT_PRECISION,
 } from '@gnosis.pm/dex-js'
 export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
+
+// How much of the order needs to be matched to consider it filled
+// Will divide the total sell amount by this factor.
+// E.g.: Sell = 500; ORDER_FILLED_FACTOR = 100 (1%) => 500/100 => 5
+// ∴ when the amount is < 5 the order will be considered filled.
+export const ORDER_FILLED_FACTOR = new BN(1000000) // 0.0001%
+
 export const APP_NAME = 'fuse'
 
 export const ETHER_PNG =

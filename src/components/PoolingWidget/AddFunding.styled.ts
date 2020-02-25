@@ -2,22 +2,36 @@ import styled from 'styled-components'
 import { HighlightDiv } from './PoolingWidget.styled'
 
 export const AddFundingWrapper = styled.div`
-  display: grid;
-  grid-template-rows: repeat(auto-fit, minmax(2rem, 1fr));
-  grid-gap: 0.2rem 0rem;
+  display: flex;
+  flex-flow: column wrap;
 
-  > *:not(:nth-child(2)) {
-    padding: 0 0.8rem;
+  > p {
+    margin: 0 0 2.4rem;
+    font-size: 1.5rem;
+    line-height: 1.4;
+  }
+
+  > ul {
+    margin: 0 0 2.4rem;
   }
 
   ${HighlightDiv} {
     border-radius: var(--border-radius);
-    padding: 0.8rem;
+    padding: 1rem 1rem 0;
+    box-sizing: border-box;
+    margin: 0 0 1.6rem;
+
     > span {
-      margin: 0 0.5rem;
+      padding: 0 1rem;
+      box-sizing: border-box;
+      font-size: 1.5rem;
+      line-height: 1.4;
+
       // Etherscan link
       a {
         word-break: break-all;
+        display: block;
+        font-size: 1.3rem;
       }
     }
   }

@@ -25,13 +25,8 @@ interface HeaderNavLinksProps extends HeaderNavLinksInterface, BaseNavigationPro
   showLinkSelector: boolean
 }
 
-const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({
-  to,
-  withPastLocation = false,
-  label,
-  order,
-}: HeaderNavLinksProps) => (
-  <OrderedNavLinkDiv $order={order}>
+const HeaderNavLink: React.FC<HeaderNavLinksProps> = ({ to, withPastLocation = false, label }: HeaderNavLinksProps) => (
+  <OrderedNavLinkDiv>
     {withPastLocation ? (
       <LinkWithPastLocation to={to}>{label}</LinkWithPastLocation>
     ) : (

@@ -1,11 +1,7 @@
 import styled from 'styled-components'
+import { MEDIA } from 'const'
 
 export const TokenSelectorWrapper = styled.div`
-  /* display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  grid-gap: 1rem;
-  justify-self: center;
-  width: 80%; */
   width: 50%;
   width: calc(50% - 1.5rem);
   padding: 0 0 5rem 0;
@@ -16,6 +12,12 @@ export const TokenSelectorWrapper = styled.div`
   border-radius: 0.6rem;
   margin: 0 0 4rem auto;
   background: #ffffff;
+
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    margin: 1.6rem auto 2.4rem;
+    height: 29rem;
+  }
 `
 
 export const CheckboxWrapper = styled.div`
@@ -38,19 +40,14 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   min-height: 5.6rem;
   font-weight: var(--font-weight-normal);
   font-size: 1.4rem;
-  color: #2F3E4E;
+  color: #2f3e4e;
   letter-spacing: 0;
   line-height: 1;
-  border-bottom: .2rem solid white;
-  /* background: var(--color-background-pageWrapper); */
-  /* box-shadow: ${({ $selected }): string => ($selected ? '0 0 0 0.175rem green' : 'var(--box-shadow)')}; */
-  /* border: ${({ $selected }): string =>
-    `0.05rem solid ${$selected ? 'transparent' : 'var(--color-background-selected-dark)'}`}; */
-  /* border-radius: var(--border-radius); */
+  border-bottom: 0.2rem solid white;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
-    /* background: var(--color-background); */
-    background: rgba(33,141,255,0.10);
+    background: rgba(33, 141, 255, 0.1);
   }
 
   > img {
@@ -62,13 +59,11 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   }
 
   > ${CheckboxWrapper} {
-    margin: auto 1.6rem;;
+    margin: auto 1.6rem;
     opacity: ${({ $selected }): string => ($selected ? '1' : '0')};
     transition: inherit;
     height: 100%;
     display: flex;
     align-items: center;
   }
-
-  transition: all 0.2s ease-in-out;
 `

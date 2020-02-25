@@ -48,21 +48,21 @@ const GlobalStyles = createGlobalStyle`
       }
   }
 
-  body::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-    background-color: var(--color-background);
-  }
+  // body::-webkit-scrollbar-track {
+  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
+  //   background-color: var(--color-background);
+  // }
 
-  body::-webkit-scrollbar {
-    width: 1.2rem;
-    background-color: var(--color-background);
-  }
+  // body::-webkit-scrollbar {
+  //   width: 1.2rem;
+  //   background-color: var(--color-background);
+  // }
 
-  body::-webkit-scrollbar-thumb {
-    border-radius: 1rem;
-    -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-    background-color: var(--color-background-pageWrapper);
-  }
+  // body::-webkit-scrollbar-thumb {
+  //   border-radius: 1rem;
+  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
+  //   background-color: var(--color-background-pageWrapper);
+  // }
 
   h1, h2, h3 {
     margin: 0;
@@ -92,7 +92,7 @@ const GlobalStyles = createGlobalStyle`
 
     &:disabled,
     &[disabled]{
-      opacity: .5;
+      opacity: .7;
       pointer-events: none;
     }
     &.success {
@@ -136,17 +136,13 @@ const GlobalStyles = createGlobalStyle`
     border: 0.11rem solid transparent;
     border-radius: var(--border-radius);
     color: var(--color-text-primary);
-    outline: none;
-
+    outline: none
     font-family: inherit;
     font-size: 0.75rem;
-    font-weight: bold;
-    
+    font-weight: var(--font-weight-bold);
     padding: 0.65rem;
     margin: 0.4rem 0.85rem;
     width: 100%;
-
-    transition: all 0.2s ease-in-out;
 
     &:focus {
       border-color: var(--color-text-primary);

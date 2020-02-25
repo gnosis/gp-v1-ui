@@ -2,7 +2,6 @@ import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { BlueBoldText } from './DefineSpread.styled'
-import { GreySubText } from './PoolingWidget.styled'
 import { SpreadInformation } from './DefineSpread'
 import { CreateStrategyWrapper } from './CreateStrategy.styled'
 import AddFunding from './AddFunding'
@@ -39,12 +38,7 @@ export const CreateStrategy: React.FC<CreateStrategyProps> = ({
           </p>
         </>
       )}
-      <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
-      <GreySubText>
-        {txReceipt
-          ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
-          : 'Review your liquidity summary above and then send your transaction'}
-      </GreySubText>
+      {txIdentifier ? '' : <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />}
     </CreateStrategyWrapper>
   )
 }
