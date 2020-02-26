@@ -4,6 +4,7 @@ const AllColors = `
   // FONTS
   --font-default: "Inter", "Helvetica Neue", Helvetica, sans-serif;
   --font-mono: "Roboto Mono", monospace;
+  --font-arial: Arial, Helvetica, sans-serif;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 700;

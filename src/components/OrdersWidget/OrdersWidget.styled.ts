@@ -27,6 +27,11 @@ export const OrdersWrapper = styled.div`
   > a {
     margin-bottom: -2em;
   }
+
+  .noOrdersInfo {
+    text-align: center;
+    line-height: 1.4;
+  }
 `
 
 export const ButtonWithIcon = styled.button`

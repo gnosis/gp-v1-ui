@@ -22,17 +22,18 @@ const TooltipArrow = styled.div`
   ::before {
     content: '';
     transform: rotate(45deg);
-    background: #333;
+    background: #2f3e4e;
   }
 `
 
 const TooltipInner = styled.div`
-  background: #333;
+  background: #2f3e4e;
   color: white;
-  font-weight: bold;
-  padding: 4px 8px;
-  font-size: 13px;
-  border-radius: 4px;
+  font-weight: var(--font-weight-normal);
+  padding: 0.8rem 1rem;
+  font-size: 1.2rem;
+  border-radius: 0.6rem;
+  letter-spacing: 0.03rem;
 
   &[data-popper-placement^='top'] > ${TooltipArrow} {
     bottom: -${TOOLTIP_OFFSET / 2}px;

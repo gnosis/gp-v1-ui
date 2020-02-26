@@ -39,7 +39,7 @@ export const UserWalletItem = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
   }
 
   > a > svg {
@@ -73,12 +73,12 @@ export const LogInOutButton = styled.div`
   font-weight: var(--font-weight-bold);
   color: #476481;
   letter-spacing: 0;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   padding: 0;
 
   > a {
     width: 100%;
-    font-size: 1.1rem;
+    font-size: inherit;
   }
 `
 
