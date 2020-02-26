@@ -1,26 +1,26 @@
 import { css } from 'styled-components'
 
-import AvertaRegular from '../assets/fonts/Averta-Regular.otf'
-import AvertaBold from '../assets/fonts/Averta-Bold.otf'
-import AvertaExtraBold from '../assets/fonts/Averta-Extrabold.otf'
+import InterRegular from '../assets/fonts/Inter-Regular.woff2'
+import InterBold from '../assets/fonts/Inter-Bold.woff2'
+import RobotoMono from '../assets/fonts/RobotoMono-Regular.woff2'
 
 const fontFace = css`
   @font-face {
-    font-family: 'Averta';
-    src: url(${AvertaRegular}) format('opentype');
-    font-weight: 500;
+    font-family: 'Inter';
+    src: url(${InterRegular}) format('woff2');
+    font-weight: 400;
     font-style: normal;
   }
   @font-face {
-    font-family: 'Averta';
-    src: url(${AvertaBold}) format('opentype');
+    font-family: 'Inter';
+    src: url(${InterBold}) format('woff2');
     font-weight: 700;
     font-style: normal;
   }
-  @font-face {
-    font-family: 'Averta';
-    src: url(${AvertaExtraBold}) format('opentype');
-    font-weight: 900;
+  font-face {
+    font-family: 'Roboto Mono';
+    src: url(${RobotoMono}) format('woff2');
+    font-weight: 400;
     font-style: normal;
   }
 `

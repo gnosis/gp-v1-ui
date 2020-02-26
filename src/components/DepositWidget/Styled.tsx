@@ -50,7 +50,7 @@ export const TokenRow = styled.tr`
     letter-spacing: -0.03rem;
     text-align: center;
     font-family: var(--font-default);
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     display: flex;
     align-items: center;
     padding: 0.4rem 1rem;

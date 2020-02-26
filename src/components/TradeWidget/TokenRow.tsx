@@ -130,7 +130,7 @@ const TokenEnable = styled.div`
   color: #218dff;
   letter-spacing: -0.05rem;
   text-align: center;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   display: flex;
   align-items: center;
   padding: 0 4.2rem 0 1.6rem;

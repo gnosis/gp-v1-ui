@@ -74,7 +74,7 @@ export const OrdersForm = styled.div`
       align-items: center;
 
       > button {
-        font-weight: var(--font-weight-medium);
+        font-weight: var(--font-weight-bold);
         font-size: 1.5rem;
         color: #9fb4c9;
         letter-spacing: 0;

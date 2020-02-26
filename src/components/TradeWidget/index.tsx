@@ -65,16 +65,12 @@ const WrappedWidget = styled(Widget)`
 const WrappedForm = styled.form`
   display: flex;
   flex-flow: column wrap;
-  // width: 50%;
   flex: 1 0 42rem;
   max-width: 50rem;
   padding: 1.6rem;
   box-sizing: border-box;
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 1;
-  // position: sticky;
-  // top: 0;
-  // height: 100%;
 
   .expanded & {
     width: 0;
@@ -134,15 +130,10 @@ const SubmitButton = styled.button`
   box-sizing: border-box;
   line-height: 1;
   width: 100%;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
-
-  // &:disabled {
-  //   cursor: not-allowed;
-  //   opacity: 0.5;
-  // }
 `
 
 const OrdersPanel = styled.div`
@@ -190,7 +181,7 @@ const OrdersPanel = styled.div`
     width: 100%;
     margin: 0 auto;
     padding: 1.6rem 0 1rem;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     font-size: 1.6rem;
     color: #2f3e4e;
     letter-spacing: 0.03rem;
