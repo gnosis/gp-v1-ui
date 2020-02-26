@@ -163,9 +163,9 @@ export const usePlaceOrder = (): Result => {
           sellTokens.push(order.sellToken)
 
           // if not set, order is valid from placement + wait period
-          validFroms.push(order.validFrom ?? currentBatchId + BATCHES_TO_WAIT)
+          validFroms.push(order.validFrom ? currentBatchId + order.validFrom : currentBatchId + BATCHES_TO_WAIT)
           // if not set, order is valid forever
-          validUntils.push(order.validUntil || MAX_BATCH_ID)
+          validUntils.push(order.validUntil ? currentBatchId + order.validUntil : MAX_BATCH_ID)
 
           buyAmounts.push(order.buyAmount)
           sellAmounts.push(order.sellAmount)

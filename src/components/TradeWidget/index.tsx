@@ -427,6 +427,7 @@ const TradeWidget: React.FC = () => {
       setIsSubmitting(true)
 
       let success: boolean
+      // ASAP ORDER
       if (validFrom === 0) {
         // ; for destructure reassign format
         ;({ success } = await placeOrder({

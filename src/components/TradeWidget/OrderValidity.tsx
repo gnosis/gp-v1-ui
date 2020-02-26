@@ -180,7 +180,13 @@ const OrderValidity: React.FC<Props> = ({
   //   <WalletDetail className="error">{validUntilError.message}</WalletDetail>
   // )
 
-  const handleShowConfig = (): void => setShowOrderConfig(!showOrderConfig)
+  const handleShowConfig = useCallback((e): void => (e.preventDefault(), setShowOrderConfig(!showOrderConfig)), [
+    setShowOrderConfig,
+    showOrderConfig,
+  ])
+  const handleShowOrderConfig = useCallback((e): void => (e.preventDefault(), setShowOrderConfig(false)), [
+    setShowOrderConfig,
+  ])
 
   const handleValidFromChange = useCallback(() => {
     const newValue = adjustPrecision(validFromInputValue, 0)
@@ -279,7 +285,7 @@ const OrderValidity: React.FC<Props> = ({
             {/* {validUntilErrorComp} */}
           </label>
         </OrderValidityBox>
-        <button onClick={(e): void => (e.preventDefault(), setShowOrderConfig(false))}>Set order parameters</button>
+        <button onClick={handleShowOrderConfig}>Set order parameters</button>
       </OrderValidityInputsWrapper>
     </Wrapper>
   )
