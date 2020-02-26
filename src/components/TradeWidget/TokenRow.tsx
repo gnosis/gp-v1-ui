@@ -265,19 +265,17 @@ const TokenRow: React.FC<Props> = ({
         />
 
         {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
-        {!readOnly && (
-          <TokenBoxWrapper>
-            <TokenEnable>Enable</TokenEnable>
-            <TokenSelector
-              label={selectLabel}
-              isDisabled={isDisabled}
-              tokens={tokens}
-              selected={selectedToken}
-              onChange={onSelectChange}
-              tabIndex={tabIndex}
-            />
-          </TokenBoxWrapper>
-        )}
+        <TokenBoxWrapper>
+          {!readOnly && <TokenEnable>Enable</TokenEnable>}
+          <TokenSelector
+            label={selectLabel}
+            isDisabled={isDisabled}
+            tokens={tokens}
+            selected={selectedToken}
+            onChange={onSelectChange}
+            tabIndex={tabIndex}
+          />
+        </TokenBoxWrapper>
       </InputBox>
       {errorOrWarning}
     </Wrapper>
