@@ -213,7 +213,7 @@ const OrderValidity: React.FC<Props> = ({
   return (
     <Wrapper>
       <button type="button" onClick={handleShowConfig}>
-        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires in: <b>{formatValidity(validUntil, '-')}</b>
+        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires: <b>{formatValidity(validUntil, 'never')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
