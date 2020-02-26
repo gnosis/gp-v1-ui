@@ -83,7 +83,7 @@ const Wrapper = styled.div`
 `
 
 const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
-  opacity: ${({ $visible }): string => ($visible ? '1' : '0')};
+  visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
   position: fixed;
 
   left: 0;
