@@ -7,7 +7,7 @@ import { tokenListApi, erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, log } from 'utils'
+import { formatAmount, logDebug } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
@@ -75,8 +75,8 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
     fetchBalancesForToken(token, userAddress, contractAddress, networkId).catch(e => {
-      log('Error for', token, userAddress, contractAddress)
-      log(e)
+      console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
+
       return null
     }),
   )
@@ -94,7 +94,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
     walletInfo.isConnected &&
       _getBalances(walletInfo)
         .then(balances => {
-          log(
+          logDebug(
             '[useTokenBalances] Wallet balances',
             balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
           )
@@ -102,7 +102,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           setError(false)
         })
         .catch(error => {
-          console.error('Error loading balances', error)
+          console.error('[useTokenBalances] Error loading balances', error)
           setError(true)
         })
   }, [setBalances, setError, walletInfo])

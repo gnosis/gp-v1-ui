@@ -7,7 +7,7 @@ import { TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { formatAmount, formatAmountFull, log, getToken, safeFilledToken } from 'utils'
+import { formatAmount, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'
@@ -55,11 +55,11 @@ export const useRowActions = (params: Params): Result => {
         amount: ALLOWANCE_MAX_VALUE,
         txOptionalParams,
       })
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
     } catch (error) {
-      console.error('Error enabling the token', error)
+      console.error('DepositWidget:useRowActions] Error enabling the token', error)
       toast.error('Error enabling the token')
     } finally {
       dispatch(setEnablingAction(tokenAddress))
@@ -78,13 +78,13 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+      logDebug(`[DepositWidget:useRowActions] Processing deposit of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.deposit({ userAddress, tokenAddress, networkId, amount, txOptionalParams })
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
-      console.error('Error depositing', error)
+      console.error('DepositWidget:useRowActions] Error depositing', error)
       toast.error(`Error depositing: ${error.message}`)
     } finally {
       dispatch(setHighlightAction(tokenAddress))
@@ -103,9 +103,9 @@ export const useRowActions = (params: Params): Result => {
 
       const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+      logDebug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+      logDebug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
       const receipt = await depositApi.requestWithdraw({
         userAddress,
         tokenAddress,
@@ -113,11 +113,11 @@ export const useRowActions = (params: Params): Result => {
         amount,
         txOptionalParams,
       })
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
       toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
     } catch (error) {
-      console.error('Error requesting withdraw', error)
+      console.error('DepositWidget:useRowActions] Error requesting withdraw', error)
       toast.error(`Error requesting withdraw: ${error.message}`)
     } finally {
       dispatch(setHighlightAction(tokenAddress))
@@ -140,10 +140,10 @@ export const useRowActions = (params: Params): Result => {
 
       const receipt = await depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
 
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+      logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
       toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
     } catch (error) {
-      console.error('Error executing the withdraw request', error)
+      console.error('[DepositWidget:useRowActions] Error executing the withdraw request', error)
       toast.error(`Error executing the withdraw request: ${error.message}`)
     } finally {
       dispatch(setHighlightAndClaimingAction(tokenAddress))

@@ -34,7 +34,7 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
     margin: 1rem auto 2.4rem;
     width: 100%;
     text-align: center;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     font-size: 2rem;
     color: #2f3e4e;
     letter-spacing: 0;
@@ -81,13 +81,13 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
   &.active {
     > p,
     &[data-title]::after {
-      font-weight: var(--font-weight-medium);
+      font-weight: var(--font-weight-bold);
     }
   }
 `
 
 export const ProgressStepText = styled.p`
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-bold);
   margin: 0;
   color: #2f3e4e;
   font-size: 1.6rem;
@@ -143,7 +143,7 @@ export const StepButtonsWrapper = styled.div`
   }
 
   > button:first-of-type {
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     background: transparent;
     font-size: 1.4rem;
@@ -179,7 +179,7 @@ export const StepButtonsWrapper = styled.div`
     border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
     color: #ffffff;
     text-transform: uppercase;
     font-size: 1.4rem;

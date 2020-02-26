@@ -4,7 +4,7 @@ import { assert } from '@gnosis.pm/dex-js'
 import { Receipt } from 'types'
 import { ZERO, ALLOWANCE_MAX_VALUE } from 'const'
 import { RECEIPT } from '../../../test/data'
-import { log } from 'utils'
+import { logDebug } from 'utils'
 import { waitAndSendReceipt } from 'utils/mock'
 import {
   Erc20Api,
@@ -90,8 +90,8 @@ export class Erc20ApiMock implements Erc20Api {
     return erc20Info.decimals
   }
 
-  public async totalSupply({ tokenAddress }: TotalSupplyParams): Promise<BN> {
-    log("Don't care about %s, just making TS shut up", tokenAddress)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async totalSupply(_params: TotalSupplyParams): Promise<BN> {
     return this._totalSupply
   }
 
@@ -121,7 +121,7 @@ export class Erc20ApiMock implements Erc20Api {
 
     this._initAllowances({ userAddress, tokenAddress, spenderAddress })
     this._allowances[userAddress][tokenAddress][spenderAddress] = amount
-    log(
+    logDebug(
       `[Erc20ApiMock] Approved ${amount} for the spender ${spenderAddress} on the token ${tokenAddress}. User ${userAddress}`,
     )
 
@@ -154,7 +154,7 @@ export class Erc20ApiMock implements Erc20Api {
     this._balances[userAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
-    log(
+    logDebug(
       `[Erc20ApiMock:transfer] Transferred ${amount} of the token ${tokenAddress} from ${userAddress} to ${toAddress}`,
     )
 
@@ -193,14 +193,14 @@ export class Erc20ApiMock implements Erc20Api {
     )
     const allowance = this._allowances[fromAddress][tokenAddress][userAddress]
     this._allowances[fromAddress][tokenAddress][userAddress] = allowance.sub(amount)
-    log(
+    logDebug(
       `[Erc20ApiMock:transferFrom] Updated allowance: ${allowance} => ${this._allowances[fromAddress][tokenAddress][userAddress]}`,
     )
 
     this._balances[fromAddress][tokenAddress] = balance.sub(amount)
     this._balances[toAddress][tokenAddress] = this._balances[toAddress][tokenAddress].add(amount)
 
-    log(
+    logDebug(
       `[Erc20ApiMock:transferFrom] Transferred ${amount} of the token ${tokenAddress} from ${fromAddress} to ${toAddress} by the spender ${userAddress}`,
     )
 

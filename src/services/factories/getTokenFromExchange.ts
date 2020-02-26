@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 
 import { TokenDetails } from 'types'
-import { getImageUrl, log, getToken } from 'utils'
+import { getImageUrl, logDebug, getToken } from 'utils'
 
 import { getErc20Info } from '../helpers'
 import { Erc20Api } from 'api/erc20/Erc20Api'
@@ -22,7 +22,7 @@ async function getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenDet
   // Get base info from the ERC20 contract
   const erc20Info = await getErc20Info(params)
   if (!erc20Info) {
-    log('Could not get details for token token (%s)', tokenAddress)
+    logDebug('[services:factories:getTokenFromExchange] Could not get details for token token (%s)', tokenAddress)
     return null
   }
 
@@ -72,7 +72,11 @@ function getTokenFromExchangeByAddressFactory(
     try {
       tokenId = await exchangeApi.getTokenIdByAddress({ tokenAddress, networkId })
     } catch (e) {
-      log('Token with address %s not registered on contract', tokenAddress, e)
+      console.error(
+        '[services:factories:getTokenFromExchange] Token with address %s not registered on contract',
+        tokenAddress,
+        e,
+      )
       return null
     }
 
@@ -116,7 +120,7 @@ function getTokenFromExchangeByIdFactory(
     try {
       tokenAddress = await exchangeApi.getTokenAddressById({ tokenId, networkId })
     } catch (e) {
-      log('Token with id %d not registered on contract', tokenId, e)
+      console.error('[services:factories:getTokenFromExchange] Token with id %d not registered on contract', tokenId, e)
       return null
     }
 

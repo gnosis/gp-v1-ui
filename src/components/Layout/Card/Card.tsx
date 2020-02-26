@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 import { MEDIA } from 'const'
-import checkWhite from 'assets/img/check-white.svg'
 
 const CardRowDrawer = styled.tr`
   display: flex;
@@ -123,94 +122,6 @@ export const CardTable = styled.table<{
   .checked {
     margin: 0;
     outline: 0;
-
-    > input {
-      margin: 0 auto;
-      background: #ecf2f7;
-      -webkit-appearance: none;
-      appearance: none;
-      border: 0.2rem solid #9fb4c9;
-      border-radius: 0.3rem;
-      box-sizing: border-box;
-      height: 1.4rem;
-      width: 1.4rem;
-      padding: 0;
-      cursor: pointer;
-      outline: 0;
-    }
-
-    > input:checked {
-      background: #218dff url(${checkWhite}) no-repeat center/.85rem;
-      border: 0.2rem solid transparent;
-    }
-  }
-
-
-  &.balancesOverview {
-    width: 90%;
-    // display: table;
-    padding: 0 0 2.4rem;
-    min-width: 85rem;
-    max-width: 140rem;
-    background: #ffffff;
-    box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-      rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-      rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-      rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
-    border-radius: 0.6rem;
-    margin: 0 auto;
-    min-height: 54rem;
-    font-size: 1.6rem;
-    line-height: 1;
-  }
-
-  &.balancesOverview > tbody {
-    font-size: 1.3rem;
-  }
-
-  &.balancesOverview > thead {
-    background: #FFFFFF;
-    border-radius: .6rem;
-  }
-
-  &.balancesOverview > thead > tr:not(${CardRowDrawer}),
-  &.balancesOverview > tbody > tr:not(${CardRowDrawer}) {
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr) );
-    min-height: 5.4rem;
-    text-align: right;
-    padding: 0 .8rem;
-    margin: 0;
-    justify-content: flex-start;
-  }
-
-  &.balancesOverview > thead > tr:not(${CardRowDrawer}) >  th {
-    font-size: 1.1rem;
-    color: #2F3E4E;
-    letter-spacing: 0;
-    text-align: right;
-    padding: 0 .5rem;
-
-      &:first-of-type {
-        text-align: left;
-      }
-  }
-
-  &.balancesOverview > tbody > tr:not(${CardRowDrawer}) > td {
-    display: flex;
-    flex-flow: row wrap;
-    align-items: center;
-    padding: 0 .5rem;
-    text-align: right;
-    justify-content: flex-end;
-
-    // &[data-label=Actions] {
-    //   flex-flow: row nowrap;
-    // }
-
-    &:first-of-type {
-      text-align: left;
-      justify-content: flex-start;
-    }
   }
   
   > thead {
@@ -221,7 +132,7 @@ export const CardTable = styled.table<{
     font-size: 1.1rem;
     color: #2F3E4E;
     letter-spacing: 0;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
   }
 
   > thead, tbody {
@@ -307,9 +218,6 @@ export const CardTable = styled.table<{
   
   tbody {
     > tr:not(${CardRowDrawer}) {
-      // background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor};
-      // border: 0.125rem solid transparent;
-      // box-shadow: var(--box-shadow);
 
       > td {
         &.cardOpener {
@@ -317,11 +225,6 @@ export const CardTable = styled.table<{
         }
       }
 
-      // Don't highlight on hover selected rows or the drawer
-      // &:not(.selected):not(.highlight):not(${CardRowDrawer}):hover {
-      //   background: var(--color-background-selected);
-      //   border: 0.125rem solid var(--color-border);
-      // }
     }
   }
 

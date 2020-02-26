@@ -2,7 +2,7 @@
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { getEpoch, log } from 'utils'
+import { getEpoch, logDebug } from 'utils'
 import { ZERO, BATCH_TIME } from 'const'
 import { CONTRACT, RECEIPT, createFlux } from '../../../test/data'
 
@@ -114,7 +114,7 @@ export class DepositApiMock implements DepositApi {
       networkId,
     })
 
-    log(`[DepositApiMock] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
+    logDebug(`[DepositApiMock] Deposited ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 
@@ -134,7 +134,9 @@ export class DepositApiMock implements DepositApi {
       batchId: currentBatchId,
     }
 
-    log(`[DepositApiMock] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
+    logDebug(
+      `[DepositApiMock] Requested withdraw of ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`,
+    )
     return RECEIPT
   }
 
@@ -165,7 +167,7 @@ export class DepositApiMock implements DepositApi {
       networkId,
     })
 
-    log(`[DepositApiMock] Withdraw ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
+    logDebug(`[DepositApiMock] Withdraw ${amount.toString()} for token ${tokenAddress}. User ${userAddress}`)
     return RECEIPT
   }
 

@@ -6,6 +6,7 @@ const Wrapper = styled(PageWrapper)`
   display: flex;
   justify-content: center;
   width: 100%;
+  flex-flow: column wrap;
 `
 
 interface Props {

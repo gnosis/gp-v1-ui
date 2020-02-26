@@ -47,8 +47,16 @@ export function useOrders(): Result {
     },
     dispatch,
   ] = useGlobalState()
-  //  consider first state to be loading
-  const [isLoading, setIsLoading] = useSafeState<boolean>(true)
+
+  // can only start loading when connection is ready. Keep it `false` until then
+  const [isLoading, setIsLoading] = useSafeState<boolean>(false)
+
+  useEffect(() => {
+    // continue loading new orders
+    // from current offset
+    setIsLoading(true)
+    // whenever new block is mined
+  }, [blockNumber, setIsLoading])
 
   useEffect(() => {
     let cancelled = false
@@ -56,7 +64,11 @@ export function useOrders(): Result {
     const fetchOrders = async (offset: number): Promise<void> => {
       // isLoading is the important one
       // controls ongoing fetching chain
-      if (!userAddress || !networkId || !isLoading) return
+      if (!userAddress || !networkId || !isLoading) {
+        // next isLoading = true will be when userAddress and networkId are valid
+        setIsLoading(false)
+        return
+      }
 
       // contract call
       try {
@@ -89,7 +101,7 @@ export function useOrders(): Result {
           dispatch(updateOffset(offset + orders.length))
         })
       } catch (error) {
-        console.error('Failed to fetch orders', error)
+        console.error('[useOrders] Failed to fetch orders', error)
         // TODO: inform user
         setIsLoading(false)
       }
@@ -105,13 +117,6 @@ export function useOrders(): Result {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset, isLoading])
-
-  useEffect(() => {
-    // continue loading new orders
-    // from current offset
-    setIsLoading(true)
-    // whenever new block is mined
-  }, [blockNumber, setIsLoading])
 
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {

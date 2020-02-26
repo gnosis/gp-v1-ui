@@ -2,7 +2,7 @@ import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 
-import { log, wait, toWei } from 'utils'
+import { logDebug, wait, toWei } from 'utils'
 import { USER_1, USER_2 } from '../../../test/data'
 import { WalletApi, WalletInfo, ProviderInfo } from './WalletApi'
 
@@ -39,7 +39,7 @@ export class WalletApiMock implements WalletApi {
   public async connect(): Promise<boolean> {
     await wait(1000)
     this._connected = true
-    log('[WalletApiMock] Connected')
+    logDebug('[WalletApiMock] Connected')
     await this._notifyListeners()
 
     return true
@@ -48,7 +48,7 @@ export class WalletApiMock implements WalletApi {
   public async disconnect(): Promise<void> {
     await wait(1000)
     this._connected = false
-    log('[WalletApiMock] Disconnected')
+    logDebug('[WalletApiMock] Disconnected')
     await this._notifyListeners()
   }
 

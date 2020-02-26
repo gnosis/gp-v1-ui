@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/dex-react",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "description": "",
   "main": "src/index.js",
   "sideEffects": false,
@@ -144,7 +144,7 @@
     "ts-jest": "^25.1.0",
     "ts-loader": "^6.2.1",
     "typescript": "^3.7.5",
-    "webpack": "^4.41.5",
+    "webpack": "^4.41.6",
     "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.10.1"
