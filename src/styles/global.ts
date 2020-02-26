@@ -13,15 +13,109 @@ const GlobalStyles = createGlobalStyle`
   // Web3Connect styling
   // SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
   // or am i missing something?
-  #WEB3_CONNECT_MODAL_ID > div > div > div:nth-child(2) {
-    background: transparent;
-    grid-gap: 0.4rem;
-    div {
-      background: var(--color-background);
+  #WEB3_CONNECT_MODAL_ID > div > div > div:last-child {
+      display: flex;
+      width: 100%;
+      max-width: 60rem;
+      background: #ffffff;
+      flex-flow: column wrap;
+      margin: 0;
+      padding: 0 1.6rem 1.6rem;
+      
+      &::before {
+        content: "Connect A Wallet";
+        width: 100%;
+        display: block;
+        font-size: 1.6rem;
+        line-height: 1;
+        padding: 2.4rem 0;
+        box-sizing: border-box;
+        color: #2f3e4e;
+        font-weight: var(--font-weight-bold);
+      }
+    
+    // Individual outer container
+    > div {
+      background: #ffffff;
       border-radius: var(--border-radius);
       color: var(--color-text-primary);
+      display: flex;
+      flex-flow: row wrap;
+      flex: 1 1 100%;
+      border: 0;
+    }
+    
+    // Individual inner container
+    > div > div {
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 0;
+      opacity: 1;
+      width: 100%;
+      outline: none;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      border: 0.1rem solid #dfe6ef;
+      flex-flow: row nowrap;
+      transition: border .2s ease-in-out;
+      min-height: 5.6rem;
+      
+        &:hover {
+          border: 0.1rem solid #218dff;
+        }
+    }
+    
+    // Provider image
+    > div > div > div:nth-of-type(1) {
+      background: 0;
+      box-shadow: none;
+      width: 2.4rem;
+      height: 2.4rem;
+      display: block;
+      overflow: visible;
+        > img {
+          display: block;
+          width: 2.4rem;
+          height: 2.4rem;
+          object-fit: contain;
+        }
+    }
+    
+    // Client name
+    > div > div > div:nth-of-type(2) {
+      font-size: 1.5rem;
+      text-align: left;
+      padding: 0 1.2rem;
+      margin: 0;
+      color: #2f3e4e;
+    }
+    
+    // Client description
+    > div > div > div:nth-of-type(3) {
+      font-size: 1.5rem;
+      color: #476481;
+      white-space: nowrap;
     }
   }
+  // End WEB3 connect
+  
+  // Start WalletConnect Modal
+  #walletconnect-qrcode-modal {
+    .walletconnect-modal__headerLogo {
+      max-width: 24rem;
+      height: auto;
+      margin: 5rem auto 2.4rem;
+    }
+  }
+  #walletconnect-qrcode-text {
+    font-size: 1.8rem;
+    line-height: 1.2;
+    padding: 0 2rem;
+    color: #476481;
+  }
+  // End WalletConnect Modal
 
   html, body {  
     width: 100%;

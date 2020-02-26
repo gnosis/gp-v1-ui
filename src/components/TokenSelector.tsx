@@ -25,10 +25,30 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
 
+    img {
+      width: 3.6rem;
+      height: 3.6rem;
+      object-fit: contain;
+      margin: 0;
+    }
+
     > div {
       display: flex;
       flex-direction: column;
       margin-left: 1rem;
+    }
+
+    > div > div {
+      font-weight: var(--font-weight-normal);
+      font-size: 1.3rem;
+      color: #476481;
+      line-height: 1.1;
+    }
+
+    > div > div > strong {
+      font-weight: var(--font-weight-bold);
+      margin: 0;
+      font-size: 1.6rem;
     }
   }
 
@@ -82,10 +102,6 @@ const SelectedTokenWrapper = styled.span`
   color: #476481;
   letter-spacing: -0.05rem;
   text-align: right;
-
-  > strong {
-    font-weight: var(--font-weight-bold);
-  }
 `
 
 function renderOptionLabel(token: TokenDetails): React.ReactNode {
@@ -172,13 +188,16 @@ const customSelectStyles = {
     borderBottom: '0.1rem solid #dfe6ef',
     display: 'flex',
     alignItems: 'center',
+    minHeight: '5.6rem',
+    transition: 'background .2s ease-in-out',
     '&:hover': {
-      background: 'var(--color-background)',
+      background: 'rgba(33,141,255,0.1);',
     },
   }),
   valueContainer: (provided: CSSProperties): CSSProperties => ({
     ...provided,
     minWidth: '4.5rem',
+    padding: '.2rem 0 .2rem .8rem',
   }),
   indicatorSeparator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -188,11 +207,6 @@ const customSelectStyles = {
     ...provided,
     color: '#476481',
     opacity: '1',
-    //TODO: `hover` is not supported by default, we need a custom solution/CSS https://stackoverflow.com/questions/28365233/inline-css-styles-in-react-how-to-implement-ahover
-    // '&:hover': {
-    //   opacity: '1',
-    //   color: '#476481',
-    // },
   }),
   singleValue: (provided: CSSProperties): CSSProperties => ({
     ...provided,

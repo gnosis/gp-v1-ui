@@ -56,7 +56,7 @@ const PriceInputBox = styled.div`
     color: #476481;
     letter-spacing: -0.05rem;
     text-align: right;
-    font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-bold);
 
     @media ${MEDIA.mobile} {
       font-size: 1rem;

@@ -91,10 +91,13 @@ export const ProgressStepText = styled.p`
   margin: 0;
   color: #2f3e4e;
   font-size: 1.6rem;
+  line-height: 1.1;
 
   > i {
     color: #476481;
     font-style: normal;
+    font-weight: var(--font-weight-normal);
+    font-size: 1.3rem;
   }
 `
 

@@ -243,7 +243,7 @@ const BalanceTools = styled.div`
 
     > input {
       margin: 0;
-      width: 26.6rem;
+      width: 28rem;
       max-width: 100%;
       background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
@@ -253,7 +253,7 @@ const BalanceTools = styled.div`
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;
       font-weight: var(--font-weight-normal);
-      padding: 0 1rem 0 4.8rem;
+      padding: 0 1.6rem 0 4.8rem;
       outline: 0;
 
       @media ${MEDIA.mobile} {
