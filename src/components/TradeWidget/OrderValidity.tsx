@@ -1,12 +1,15 @@
 import React, { useEffect, useCallback, Dispatch, SetStateAction } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-
-import { TradeFormTokenId, TradeFormData, PriceInputBox } from './'
 import { adjustPrecision, ZERO } from '@gnosis.pm/dex-js'
-import cog from 'assets/img/cog.svg'
+
+import { TradeFormTokenId, TradeFormData } from './'
+import { PriceInputBox } from './Price'
+
 import useSafeState from 'hooks/useSafeState'
 import { validInputPattern, validatePositive, formatValidity } from 'utils'
+
+import cog from 'assets/img/cog.svg'
 
 const Wrapper = styled.div`
   display: flex;
@@ -95,13 +98,14 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
   max-width: 50rem;
   min-width: 30rem;
-  height: 12.7rem;
-  padding: 1rem 4rem;
+  height: 18rem;
+  padding: 2.7rem;
   border-radius: 0.8rem;
 
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
+  align-items: space-between;
 
   transition: all 0.5s ease-in-out;
   > strong {
@@ -115,80 +119,28 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   > button {
     background: #218dff;
     border-radius: 3rem;
-    padding: 0.6rem 1.2rem;
+    padding: 0.8rem 2rem;
     color: white;
-    margin: 1rem auto;
+    margin: auto;
   }
 `
 
-// const InputBox = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   align-items: stretch;
-//   flex-grow: 1;
+const OrderValidityBox = styled(PriceInputBox)`
+  flex-flow: column nowrap;
+  height: 7rem;
 
-//   margin-left: 1em;
+  strong {
+    margin-bottom: 1rem;
+  }
 
-//   > div {
-//     display: flex;
-//     justify-content: center;
-//     align-items: center;
-//     > input[type='radio'] {
-//       width: 20%;
-//     }
-//   }
+  label {
+    height: 100%;
+  }
 
-//   .radio-container {
-//     display: grid;
-//     grid-template-columns: 1fr 1fr;
-//   }
-
-//   input {
-//     margin: 0;
-//     width: 100%;
-
-//     &.error {
-//       // box-shadow: 0 0 0.1875rem #cc0000;
-//       border-color: #ff0000a3;
-//     }
-
-//     &.warning {
-//       // box-shadow: 0 0 0.1875rem #ff7500;
-//       border-color: orange;
-//     }
-
-//     &:disabled {
-//       box-shadow: none;
-//     }
-//   }
-// `
-
-// const WalletDetail = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   font-size: 0.75em;
-
-//   .success {
-//     color: green;
-//     text-decoration: none;
-//   }
-
-//   &.error,
-//   &.warning {
-//     margin: 0 0 1em 0;
-//   }
-
-//   &.error {
-//     color: red;
-//   }
-//   &.warning {
-//     color: orange;
-//   }
-// `
-
-// function validatePositive(value: string): true | string {
-//   return Number(value) == 0 || Number(value) >= 5 || 'Invalid expiration time'
-// }
+  input[type='checkbox'] {
+    margin: auto;
+  }
+`
 
 interface Props {
   validFromInputId: TradeFormTokenId
@@ -265,12 +217,11 @@ const OrderValidity: React.FC<Props> = ({
   return (
     <Wrapper>
       <button onClick={handleShowConfig}>
-        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires in:{' '}
-        <b>{formatValidity(validUntil, 'Never')}</b>
+        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires in: <b>{formatValidity(validUntil, '-')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
-        <PriceInputBox>
+        <OrderValidityBox>
           <strong>Order starts in (min)</strong>
           <label>
             <input
@@ -297,8 +248,8 @@ const OrderValidity: React.FC<Props> = ({
             </div>
             {/* {validFromErrorComp} */}
           </label>
-        </PriceInputBox>
-        <PriceInputBox>
+        </OrderValidityBox>
+        <OrderValidityBox>
           <strong>Order expires in (min)</strong>
           <label>
             <input
@@ -327,8 +278,8 @@ const OrderValidity: React.FC<Props> = ({
             </div>
             {/* {validUntilErrorComp} */}
           </label>
-        </PriceInputBox>
-        <button onClick={(): void => setShowOrderConfig(false)}>Set order parameters</button>
+        </OrderValidityBox>
+        <button onClick={(e): void => (e.preventDefault(), setShowOrderConfig(false))}>Set order parameters</button>
       </OrderValidityInputsWrapper>
     </Wrapper>
   )
