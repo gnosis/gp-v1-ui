@@ -8,6 +8,7 @@ import { formatAmount } from '@gnosis.pm/dex-js'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
+import { menuListFactory } from './TokenSelectorComponents'
 
 const Wrapper = styled.div`
   display: flex;
@@ -261,6 +262,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         classNamePrefix="react-select"
         noOptionsMessage={(): string => 'No results'}
         formatOptionLabel={formatOptionLabel}
+        // menuIsOpen={true}  // uncomment to be able to interact with menu styles
         options={options}
         value={{ token: selected }}
         onChange={(selected: { token: TokenDetails }, { action }: ActionMeta): void => {
@@ -269,6 +271,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
           }
         }}
         tabIndex={tabIndex.toString()}
+        components={{ MenuList: menuListFactory() }}
       />
     </Wrapper>
   )
