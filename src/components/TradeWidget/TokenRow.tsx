@@ -231,7 +231,10 @@ const TokenRow: React.FC<Props> = ({
         <strong>{selectLabel}</strong>
         <span>
           {!readOnly && (
+            // TODO: Implement deposit in Trade widget
+            //  https://github.com/gnosis/dex-react/issues/610
             <TooltipWrapper
+              className="not-implemented"
               as="button"
               type="button"
               tooltip="Deposit"
@@ -283,7 +286,9 @@ const TokenRow: React.FC<Props> = ({
 
         {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
         <TokenBoxWrapper>
-          {!readOnly && <TokenEnable>Enable</TokenEnable>}
+          {/* TODO: Implement enable token in Trade widget */}
+          {/*   https://github.com/gnosis/dex-react/issues/611 */}
+          {!readOnly && <TokenEnable className="not-implemented">Enable</TokenEnable>}
           <TokenSelector
             label={selectLabel}
             isDisabled={isDisabled}
