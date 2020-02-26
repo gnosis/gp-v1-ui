@@ -175,16 +175,7 @@ const OrderValidity: React.FC<Props> = ({
   const validFromClassName = validFromError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
   const validUntilClassName = validUntilError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
-  // const validFromErrorComp = validFromError && <WalletDetail className="error">{validFromError.message}</WalletDetail>
-  // const validUntilErrorComp = validUntilError && (
-  //   <WalletDetail className="error">{validUntilError.message}</WalletDetail>
-  // )
-
-  const handleShowConfig = useCallback((e): void => (e.preventDefault(), setShowOrderConfig(!showOrderConfig)), [
-    setShowOrderConfig,
-    showOrderConfig,
-  ])
-  const handleShowOrderConfig = useCallback((e): void => (e.preventDefault(), setShowOrderConfig(false)), [
+  const handleShowConfig = useCallback((): void => setShowOrderConfig(showOrderConfig => !showOrderConfig), [
     setShowOrderConfig,
   ])
 
@@ -211,18 +202,17 @@ const OrderValidity: React.FC<Props> = ({
   }, [handleValidUntilChange])
 
   function handleUnlimitedClick(): void {
-    setUnlimited(!isUnlimited)
+    setUnlimited(isUnlimited => !isUnlimited)
     !isUnlimited ? setValue(validUntilInputId, '', true) : setValue(validUntilInputId, '30', true)
   }
   function handleASAPClick(): void {
-    setAsap(!isAsap)
+    setAsap(isAsap => !isAsap)
     !isAsap ? setValue(validFromInputId, '', true) : setValue(validFromInputId, '30', true)
   }
 
-  //TODO: re-enable input logic
   return (
     <Wrapper>
-      <button onClick={handleShowConfig}>
+      <button type="button" onClick={handleShowConfig}>
         Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires in: <b>{formatValidity(validUntil, '-')}</b>
       </button>
 
@@ -252,7 +242,6 @@ const OrderValidity: React.FC<Props> = ({
               <input type="checkbox" disabled={isDisabled} defaultChecked={isAsap} onClick={handleASAPClick} />
               <small>ASAP</small>
             </div>
-            {/* {validFromErrorComp} */}
           </label>
         </OrderValidityBox>
         <OrderValidityBox>
@@ -282,10 +271,11 @@ const OrderValidity: React.FC<Props> = ({
               />
               <small>Never</small>
             </div>
-            {/* {validUntilErrorComp} */}
           </label>
         </OrderValidityBox>
-        <button onClick={handleShowOrderConfig}>Set order parameters</button>
+        <button type="button" onClick={handleShowConfig}>
+          Set order parameters
+        </button>
       </OrderValidityInputsWrapper>
     </Wrapper>
   )
