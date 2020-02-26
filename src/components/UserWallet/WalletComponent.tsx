@@ -110,7 +110,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   }, [connectWallet, disconnectWallet, isConnected, loadingLabel, props.className])
 
   return (
-    <UserWalletWrapper $walletOpen={!!(showWallet && userAddress)}>
+    <UserWalletWrapper>
       {userAddress ? (
         <>
           {/* Wallet logo + address + chevron */}
