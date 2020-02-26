@@ -100,7 +100,12 @@ export const usePlaceOrder = (): Result => {
           //  In reality, no need to ceil cause we know batch time is 300, but it was done to avoid relying on knowing
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
-          toast.success(`Transaction mined! Succesfully placed order valid for ${formatValidity(validityInMinutes)}`)
+          toast.success(
+            `Transaction mined! Succesfully placed order valid for ${formatValidity(
+              validityInMinutes,
+              'an unlimited amount of time',
+            )}`,
+          )
         } else {
           toast.success(`Transaction mined! Succesfully placed standing order`)
         }

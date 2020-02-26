@@ -67,7 +67,7 @@ const OrderDetails: React.FC<Props> = ({
 
       <dd>Expiration date:</dd>
       <dt>
-        <Highlight>{formatValidity(validUntil)}</Highlight>
+        <Highlight>{formatValidity(validUntil, 'Never')}</Highlight>
       </dt>
     </Wrapper>
   )
