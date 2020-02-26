@@ -162,7 +162,7 @@ const OrderValidity: React.FC<Props> = ({ inputId }) => {
   //TODO: re-enable input logic
   return (
     <Wrapper>
-      <button>
+      <button type="button">
         Order starts: <b>ASAP</b> - expires in: <b>30 minutes</b>
       </button>
       {/* <InputBox>
