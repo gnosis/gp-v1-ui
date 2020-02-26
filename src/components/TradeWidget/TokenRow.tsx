@@ -230,11 +230,11 @@ const TokenRow: React.FC<Props> = ({
       <div>
         <strong>{selectLabel}</strong>
         <span>
-          {/* can pass props to as={Component} */}
-          <TooltipWrapper as="button" tooltip="Deposit" onClick={console.log}>
-            + Deposit
-          </TooltipWrapper>
-          {/* <button>+ Deposit</button> */}
+          {!readOnly && (
+            <TooltipWrapper as="button" tooltip="Deposit" onClick={(): void => alert('Not implemented yet!')}>
+              + Deposit
+            </TooltipWrapper>
+          )}
           <span>
             Balance:
             <TooltipWrapper as={FormMessage} tooltip="Fill maximum">
@@ -264,26 +264,20 @@ const TokenRow: React.FC<Props> = ({
           onFocus={(e): void => e.target.select()}
         />
 
-        {/*
-        <FormMessage>
-          <div>
-            <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
-          </div>
-        </FormMessage>
-        */}
-        {/* <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} /> */}
         {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
-        <TokenBoxWrapper>
-          <TokenEnable>Enable</TokenEnable>
-          <TokenSelector
-            label={selectLabel}
-            isDisabled={isDisabled}
-            tokens={tokens}
-            selected={selectedToken}
-            onChange={onSelectChange}
-            tabIndex={tabIndex}
-          />
-        </TokenBoxWrapper>
+        {!readOnly && (
+          <TokenBoxWrapper>
+            <TokenEnable>Enable</TokenEnable>
+            <TokenSelector
+              label={selectLabel}
+              isDisabled={isDisabled}
+              tokens={tokens}
+              selected={selectedToken}
+              onChange={onSelectChange}
+              tabIndex={tabIndex}
+            />
+          </TokenBoxWrapper>
+        )}
       </InputBox>
       {errorOrWarning}
     </Wrapper>
