@@ -231,7 +231,12 @@ const TokenRow: React.FC<Props> = ({
         <strong>{selectLabel}</strong>
         <span>
           {!readOnly && (
-            <TooltipWrapper as="button" tooltip="Deposit" onClick={(): void => alert('Not implemented yet!')}>
+            <TooltipWrapper
+              as="button"
+              type="button"
+              tooltip="Deposit"
+              onClick={(): void => alert('Not implemented yet!')}
+            >
               + Deposit
             </TooltipWrapper>
           )}

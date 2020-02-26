@@ -30,7 +30,7 @@ interface ShowOrdersButtonProps {
 }
 
 const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
-  <button className={isActive ? 'selected' : ''} onClick={onClick}>
+  <button type="button" className={isActive ? 'selected' : ''} onClick={onClick}>
     {type} <i>{count}</i>
     {/* {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>} {type} */}
   </button>
@@ -233,7 +233,7 @@ const OrdersWidget: React.FC = () => {
             </div>
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
               <b>↴</b>
-              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting}>
+              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="button">
                 <FontAwesomeIcon icon={faTrashAlt} />{' '}
                 {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
               </ButtonWithIcon>

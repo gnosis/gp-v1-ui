@@ -13,6 +13,7 @@ import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
 import { TxNotification } from 'components/TxNotification'
+import { Wrapper } from 'components/ConnectWalletBanner'
 
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -152,6 +153,12 @@ const OrdersPanel = styled.div`
   .expanded & {
     flex: 1 1 100%;
     min-width: 85rem;
+  }
+
+  // Connect Wallet banner in the orders panel
+  ${Wrapper} {
+    background: transparent;
+    box-shadow: none;
   }
 
   > div {
@@ -525,7 +532,7 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button onClick={(): void => setOrdersVisible(!ordersVisible)} />
+        <button type="button" onClick={(): void => setOrdersVisible(!ordersVisible)} />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>

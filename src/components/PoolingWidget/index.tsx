@@ -306,13 +306,17 @@ const PoolingInterface: React.FC = () => {
         <StepButtonsWrapper>
           {/* REMOVE BACK BUTTON ON TXRECEIPT */}
           {!txReceipt && (
-            <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
+            <button
+              type="button"
+              disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting}
+              onClick={(): void => prevStep()}
+            >
               Back
             </button>
           )}
           {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
           {step !== 3 ? (
-            <button disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+            <button type="button" disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
               Continue
             </button>
           ) : // STEP 3 - TXRECEIPT OR NOT?
@@ -323,7 +327,7 @@ const PoolingInterface: React.FC = () => {
             </Link>
           ) : (
             // NOT YET SUBMITTED TX
-            <button className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
+            <button type="button" className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
               {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
             </button>
           )}

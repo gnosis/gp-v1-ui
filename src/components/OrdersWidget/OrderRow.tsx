@@ -49,7 +49,7 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
-    {/* <button className="danger" onClick={toggleMarkedForDeletion}>
+    {/* <button className="danger" type="button" onClick={toggleMarkedForDeletion}>
       Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
     </button> */}
   </td>
