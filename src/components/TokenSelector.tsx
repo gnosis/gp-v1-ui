@@ -1,6 +1,7 @@
 import React, { CSSProperties, useMemo } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
+import { MEDIA } from 'const'
 
 import { TokenDetails } from 'types'
 import TokenImg from './TokenImg'
@@ -28,6 +29,37 @@ const Wrapper = styled.div`
       display: flex;
       flex-direction: column;
       margin-left: 1rem;
+    }
+  }
+
+  .tokenSelectBox {
+    position: relative;
+    .react-select__menu {
+      &::before {
+        @media ${MEDIA.mediumUp} {
+          content: '';
+          display: block;
+          position: absolute;
+          top: 0;
+          left: 0;
+          box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.14);
+          border-radius: 0.6rem;
+          z-index: -1;
+          width: 100%;
+          height: 100%;
+        }
+      }
+
+      @media ${MEDIA.mobile} {
+        top: initial;
+        height: 75vh;
+        box-shadow: 0 0 0 999vw rgba(47, 62, 78, 0.5);
+      }
+    }
+    .react-select__option {
+      @media ${MEDIA.mobile} {
+        height: 5.6rem;
+      }
     }
   }
 `
@@ -89,8 +121,7 @@ function formatOptionLabel(
 }
 
 const customSelectStyles = {
-  control: (provided: CSSProperties): CSSProperties => ({
-    ...provided,
+  control: (): CSSProperties & { '&:hover': CSSProperties } => ({
     borderColor: '#B8C7D7',
     borderStyle: 'solid',
     borderWidth: '.1rem',
@@ -98,19 +129,16 @@ const customSelectStyles = {
     borderRadius: '15rem',
     background: '#e6ecf3',
     cursor: 'pointer',
-    // '&:hover': {
-    //   opacity: '1',
-    //   borderColor: '#476481',
-    // },
-    // '>div': {
-    //   padding: '0 0 0 1rem',
-    //   overflow: 'visible',
-    // },
+    display: 'flex',
+    flexFlow: 'row nowrap',
+    '&:hover': {
+      opacity: '1',
+      borderColor: '#476481',
+    },
   }),
   menu: (provided: CSSProperties): CSSProperties => ({
     ...provided,
     height: '50vh',
-    minHeight: '30rem',
     position: 'fixed',
     left: '0',
     right: '0',
@@ -121,9 +149,15 @@ const customSelectStyles = {
     minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',
-    zIndex: 200,
+    zIndex: 9999,
     boxShadow: '0 999vh 0 999vw rgba(47, 62, 78, 0.50)',
     borderRadius: '0.6rem',
+  }),
+  menuList: (): CSSProperties => ({
+    height: '100%',
+    overflow: 'auto',
+    borderRadius: '0.6rem',
+    padding: '0 0 5rem 0',
   }),
   input: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -135,6 +169,9 @@ const customSelectStyles = {
     ...provided,
     background: 'none',
     cursor: 'pointer',
+    borderBottom: '0.1rem solid #dfe6ef',
+    display: 'flex',
+    alignItems: 'center',
     '&:hover': {
       background: 'var(--color-background)',
     },
@@ -188,6 +225,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         isDisabled={isDisabled}
         styles={customSelectStyles}
         className="tokenSelectBox"
+        classNamePrefix="react-select"
         noOptionsMessage={(): string => 'No results'}
         formatOptionLabel={formatOptionLabel}
         options={options}

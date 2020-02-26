@@ -32,7 +32,7 @@ import { tokenListApi } from 'api'
 import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { Network, Receipt } from 'types'
 
-import { maxAmountsForSpread, log } from 'utils'
+import { maxAmountsForSpread } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Link } from 'react-router-dom'
 
@@ -249,7 +249,7 @@ const PoolingInterface: React.FC = () => {
 
       setTxReceipt(receipt)
     } catch (e) {
-      log('Failed to place orders for strategy', e)
+      console.error('[PoolingWidget] Failed to place orders for strategy', e)
       toast.error('Not able to create your orders, please try again')
 
       // Error handle

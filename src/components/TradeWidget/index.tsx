@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import switchTokenPair from 'assets/img/switch.svg'
@@ -29,8 +29,9 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount } from 'utils'
+import { getToken, parseAmount, parseBigNumber } from 'utils'
 import { ZERO } from 'const'
+import Price, { invertPrice } from './Price'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -64,16 +65,12 @@ const WrappedWidget = styled(Widget)`
 const WrappedForm = styled.form`
   display: flex;
   flex-flow: column wrap;
-  // width: 50%;
   flex: 1 0 42rem;
   max-width: 50rem;
   padding: 1.6rem;
   box-sizing: border-box;
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 1;
-  // position: sticky;
-  // top: 0;
-  // height: 100%;
 
   .expanded & {
     width: 0;
@@ -137,105 +134,6 @@ const SubmitButton = styled.button`
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
-
-  // &:disabled {
-  //   cursor: not-allowed;
-  //   opacity: 0.5;
-  // }
-`
-
-const PriceWrapper = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  width: 100%;
-  margin: 1.6rem 0 0;
-  justify-content: space-between;
-
-  > strong {
-    text-transform: capitalize;
-    color: #2f3e4e;
-    width: 100%;
-    margin: 0 0 1rem;
-    padding: 0 1rem;
-    box-sizing: border-box;
-  }
-`
-
-const PriceInputBox = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  margin: 0;
-  width: 50%;
-  width: calc(50% - 0.8rem);
-  height: 5.6rem;
-  position: relative;
-  outline: 0;
-
-  label {
-    display: flex;
-    width: auto;
-    max-width: 100%;
-    position: relative;
-  }
-
-  label > small {
-    position: absolute;
-    right: 1rem;
-    top: 0;
-    bottom: 0;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    opacity: 0.75;
-    font-size: 1.2rem;
-    color: #476481;
-    letter-spacing: -0.05rem;
-    text-align: right;
-    font-weight: var(--font-weight-bold);
-
-    @media ${MEDIA.mobile} {
-      font-size: 1rem;
-      letter-spacing: 0.03rem;
-    }
-  }
-
-  input {
-    margin: 0;
-    width: auto;
-    max-width: 100%;
-    background: #e7ecf3;
-    border-radius: 0.6rem 0.6rem 0 0;
-    border: 0;
-    font-size: 1.6rem;
-    line-height: 1;
-    box-sizing: border-box;
-    border-bottom: 0.2rem solid transparent;
-    font-weight: var(--font-weight-normal);
-    padding: 0 7rem 0 1rem;
-    outline: 0;
-
-    @media ${MEDIA.mobile} {
-      font-size: 1.3rem;
-    }
-
-    &:focus {
-      border-bottom: 0.2rem solid #218dff;
-      border-color: #218dff;
-      color: #218dff;
-    }
-
-    &.error {
-      border-color: #ff0000a3;
-    }
-
-    &.warning {
-      border-color: orange;
-    }
-
-    &:disabled {
-      box-shadow: none;
-    }
-  }
 `
 
 const OrdersPanel = styled.div`
@@ -345,6 +243,8 @@ export const enum TradeFormTokenId {
   sellToken = 'sellToken',
   receiveToken = 'receiveToken',
   validUntil = 'validUntil',
+  price = 'price',
+  priceInverse = 'priceInverse',
 }
 
 export type TradeFormData = {
@@ -354,8 +254,25 @@ export type TradeFormData = {
 export const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
+  price: '0',
+
   // 2 days
   validUntil: '2880',
+}
+
+function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): string {
+  const sellAmount = parseBigNumber(sellValue)
+
+  if (!sellAmount || sellAmount.isZero()) {
+    return 'First input the sell amount'
+  }
+
+  const receiveAmount = parseBigNumber(receiveValue)
+  if (!receiveAmount || receiveAmount.isZero()) {
+    return 'Input the price to get the receive tokens'
+  } else {
+    return 'Minimum amount of tokens you will receive if the order is fully executed at the given price'
+  }
 }
 
 const TradeWidget: React.FC = () => {
@@ -366,10 +283,15 @@ const TradeWidget: React.FC = () => {
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
   const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
+  const sellInputId = TradeFormTokenId.sellToken
+  const receiveInputId = TradeFormTokenId.receiveToken
+  const priceInputId = TradeFormTokenId.price
+  const priceInverseInputId = TradeFormTokenId.priceInverse
+  const validUntilId = TradeFormTokenId.validUntil
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const { sellAmount, buyAmount: receiveAmount, validUntil } = useQuery()
+  const { sellAmount: sellParam, price: priceParam, validUntil: validUntilParam } = useQuery()
 
   const [ordersVisible, setOrdersVisible] = useState(true)
   const [sellToken, setSellToken] = useState(
@@ -379,25 +301,45 @@ const TradeWidget: React.FC = () => {
     () =>
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
-  const [unlimited, setUnlimited] = useState(!validUntil || !Number(validUntil))
-  const sellInputId = TradeFormTokenId.sellToken
-  const receiveInputId = TradeFormTokenId.receiveToken
-  const validUntilId = TradeFormTokenId.validUntil
+  const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
-      [sellInputId]: sellAmount,
-      [receiveInputId]: receiveAmount,
-      [validUntilId]: validUntil,
+      [sellInputId]: sellParam,
+      [receiveInputId]: '',
+      [validUntilId]: validUntilParam,
+      [priceInputId]: priceParam,
+      [priceInverseInputId]: invertPrice(priceParam),
     },
   })
-  const { handleSubmit, reset, watch } = methods
+  const { handleSubmit, reset, watch, setValue } = methods
+
+  const priceValue = watch(priceInputId)
+  const priceInverseValue = watch(priceInverseInputId)
+  const sellValue = watch(sellInputId)
+
+  const receiveValue = watch(receiveInputId)
+  const validUntilValue = watch(validUntilId)
+
+  // Update receive amount
+  useEffect(() => {
+    let receiveAmount: string | undefined
+    if (priceValue && sellValue) {
+      const sellAmount = parseBigNumber(sellValue)
+      const price = parseBigNumber(priceValue)
+
+      if (sellAmount && price) {
+        receiveAmount = sellAmount.multipliedBy(price).toString(10)
+      }
+    }
+    setValue(receiveInputId, receiveAmount || '')
+  }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
   const searchQuery = buildSearchQuery({
-    sell: watch(sellInputId),
-    buy: watch(receiveInputId),
-    expires: watch(validUntilId),
+    sell: sellValue,
+    price: priceValue,
+    expires: validUntilValue,
   })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
   useURLParams(url, true)
@@ -517,6 +459,11 @@ const TradeWidget: React.FC = () => {
     }
   }
 
+  const receiveTokenTooltipText = useMemo(() => _getReceiveTokenTooltipText(sellValue, receiveValue), [
+    sellValue,
+    receiveValue,
+  ])
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
@@ -533,6 +480,8 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             validateMaxAmount
             tabIndex={1}
+            readOnly={false}
+            tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
             <img src={switchTokenPair} />
@@ -546,24 +495,15 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
+            readOnly={true}
+            tooltipText={receiveTokenTooltipText}
           />
-          {/* Refactor these price input fields */}
-          <PriceWrapper>
-            <strong>Min. sell price</strong>
-            <PriceInputBox>
-              <label>
-                <input placeholder="0" value="146.666" type="text" required />
-                <small>WETH/DAI</small>
-              </label>
-            </PriceInputBox>
-            <PriceInputBox>
-              <label>
-                <input placeholder="0" value="0.00682" type="text" required />
-                <small>DAI/WETH</small>
-              </label>
-            </PriceInputBox>
-          </PriceWrapper>
-          {/* Refactor these price input fields */}
+          <Price
+            priceInputId={priceInputId}
+            priceInverseInputId={priceInverseInputId}
+            sellToken={sellToken}
+            receiveToken={receiveToken}
+          />
           <OrderValidity
             inputId={validUntilId}
             isDisabled={isSubmitting}
@@ -571,13 +511,6 @@ const TradeWidget: React.FC = () => {
             setUnlimited={setUnlimited}
             tabIndex={3}
           />
-          {/* <OrderDetails
-            sellAmount={watch(sellInputId)}
-            sellTokenName={safeTokenName(sellToken)}
-            receiveAmount={watch(receiveInputId)}
-            receiveTokenName={safeTokenName(receiveToken)}
-            validUntil={watch(validUntilId)}
-          />{' '} */}
           <p>This order might be partially filled.</p>
           <SubmitButton
             data-text="This order might be partially filled."

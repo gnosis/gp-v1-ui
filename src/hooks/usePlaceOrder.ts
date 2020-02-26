@@ -7,7 +7,7 @@ import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { log, formatValidity } from 'utils'
+import { logDebug, formatValidity } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
@@ -61,8 +61,8 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      log(
-        `Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
+      logDebug(
+        `[usePlaceOrder] Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
           sellToken.symbol
         }`,
       )
@@ -79,7 +79,14 @@ export const usePlaceOrder = (): Result => {
           return { success: false }
         }
 
-        log('sellTokenId, buyTokenId, batchId', sellTokenId, buyTokenId, batchId, sellToken.address, buyToken.address)
+        logDebug(
+          '[usePlaceOrder] sellTokenId, buyTokenId, batchId',
+          sellTokenId,
+          buyTokenId,
+          batchId,
+          sellToken.address,
+          buyToken.address,
+        )
 
         const params: ExchangeApiPlaceOrderParams = {
           userAddress,
@@ -92,7 +99,7 @@ export const usePlaceOrder = (): Result => {
           txOptionalParams: txOptionalParams || defaultTxOptionalParams,
         }
         const receipt = await exchangeApi.placeOrder(params)
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: show link to orders page?
         if (validUntil) {
@@ -107,7 +114,7 @@ export const usePlaceOrder = (): Result => {
 
         return { success: true, receipt }
       } catch (e) {
-        log(`Error placing order`, e)
+        console.error(`[usePlaceOrder] Error placing order`, e)
 
         if (e.message.match(/Must have Address to get ID/)) {
           toast.error(
@@ -132,7 +139,7 @@ export const usePlaceOrder = (): Result => {
         return { success: false }
       }
 
-      log(`Placing ${orders.length} orders at once`)
+      logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
       try {
         const buyTokens: number[] = []
@@ -173,14 +180,14 @@ export const usePlaceOrder = (): Result => {
 
         const receipt = await exchangeApi.placeValidFromOrders(params)
 
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: link to orders page?
         toast.success(`Transactions mined! Succesfully placed ${orders.length} orders`)
 
         return { success: true, receipt }
       } catch (e) {
-        log(`Error placing orders`, e)
+        console.error(`[usePlaceOrder] Error placing orders`, e)
         toast.error(`Error placing orders: ${e.message}`)
 
         return { success: false }
