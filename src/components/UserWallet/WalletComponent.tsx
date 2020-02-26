@@ -51,7 +51,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     await _connectWallet()
 
     setLoadingLabel(null)
-  }, [_connectWallet, setLoadingLabel])
+    setShowWallet(false)
+  }, [_connectWallet, setLoadingLabel, setShowWallet])
 
   const disconnectWallet = useCallback(async (): Promise<void> => {
     setLoadingLabel('Disconnecting...')
@@ -59,11 +60,12 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     await _disconnectWallet()
 
     setLoadingLabel(null)
+    setShowWallet(false)
 
     if (!orderPageMatch) {
       props.history.push('/')
     }
-  }, [_disconnectWallet, orderPageMatch, props.history, setLoadingLabel])
+  }, [_disconnectWallet, orderPageMatch, props.history, setLoadingLabel, setShowWallet])
 
   const handleCopyToClipBoard = useCallback((): NodeJS.Timeout => {
     setCopiedToClipboard(true)
@@ -136,7 +138,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
       {userAddress && showWallet && (
         <UserWalletSlideWrapper>
-          <button type="button" onClick={(): void => setShowWallet(!showWallet)}>
+          <button type="button" onClick={(): void => setShowWallet(false)}>
             <b>Wallet</b>
             <i>×</i>
           </button>
