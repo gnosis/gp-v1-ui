@@ -184,6 +184,10 @@ const GlobalStyles = createGlobalStyle`
     overflow: hidden;
   }
 
+  .not-implemented {
+    display: none !important
+  }
+
   /* Toastify custom styling */
   .Toastify__toast-container {
     z-index: 9999;

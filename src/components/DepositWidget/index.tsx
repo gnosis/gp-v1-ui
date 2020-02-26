@@ -346,14 +346,14 @@ const DepositWidget: React.FC = () => {
     <section>
       <BalancesWidget>
         <BalanceTools>
-          <label className="balances-searchTokens">
+          <label className="balances-searchTokens not-implemented">
             <input placeholder="Search token by Name, Symbol" type="text" required />
           </label>
-          <label className="balances-hideZero">
+          <label className="balances-hideZero not-implemented">
             <input type="checkbox" />
             <b>Hide zero balances</b>
           </label>
-          <button type="button" className="balances-manageTokens">
+          <button type="button" className="balances-manageTokens not-implemented">
             Manage Tokens
           </button>
         </BalanceTools>
