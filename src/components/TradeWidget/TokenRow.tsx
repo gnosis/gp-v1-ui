@@ -231,10 +231,10 @@ const TokenRow: React.FC<Props> = ({
         <strong>{selectLabel}</strong>
         <span>
           {/* can pass props to as={Component} */}
-          <TooltipWrapper as="button" tooltip="Deposit" onClick={console.log}>
+          <TooltipWrapper as="button" tooltip="Deposit" type="button" onClick={console.log}>
             + Deposit
           </TooltipWrapper>
-          {/* <button>+ Deposit</button> */}
+          {/* <button type="button">+ Deposit</button> */}
           <span>
             Balance:
             <TooltipWrapper as={FormMessage} tooltip="Fill maximum">

@@ -148,7 +148,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
       {userAddress && showWallet && (
         <UserWalletSlideWrapper>
-          <button onClick={(): void => setShowWallet(!showWallet)}>
+          <button type="button" onClick={(): void => setShowWallet(!showWallet)}>
             <b>Wallet</b>
             <i>×</i>
           </button>

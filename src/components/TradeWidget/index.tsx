@@ -525,7 +525,7 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button onClick={(): void => setOrdersVisible(!ordersVisible)} />
+        <button type="button" onClick={(): void => setOrdersVisible(!ordersVisible)} />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
