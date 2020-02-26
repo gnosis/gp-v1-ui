@@ -117,13 +117,21 @@ const ConsoleFrame: React.FC = () => {
           <Console logs={logs} variant="dark" />
           <InputGroup>
             <input type="text" onKeyPress={handleCommand} ref={input} />
-            <button onClick={handleClick}>{'>>'}</button>
+            <button type="button" onClick={handleClick}>
+              {'>>'}
+            </button>
           </InputGroup>
         </>
       )}
       <ButtonGroup>
-        {showConsole && logs.length > 0 && <button onClick={(): void => setLogs([])}>clear</button>}
-        <button onClick={(): void => setShowConsole(on => !on)}>{showConsole ? 'x' : 'console'}</button>
+        {showConsole && logs.length > 0 && (
+          <button type="button" onClick={(): void => setLogs([])}>
+            clear
+          </button>
+        )}
+        <button type="button" onClick={(): void => setShowConsole(on => !on)}>
+          {showConsole ? 'x' : 'console'}
+        </button>
       </ButtonGroup>
     </ConsoleWrapper>
   )

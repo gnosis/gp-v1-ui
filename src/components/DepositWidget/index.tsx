@@ -353,7 +353,9 @@ const DepositWidget: React.FC = () => {
             <input type="checkbox" />
             <b>Hide zero balances</b>
           </label>
-          <button className="balances-manageTokens">Manage Tokens</button>
+          <button type="button" className="balances-manageTokens">
+            Manage Tokens
+          </button>
         </BalanceTools>
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />

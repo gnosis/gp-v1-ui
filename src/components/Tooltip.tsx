@@ -90,11 +90,11 @@ type WrapperPropsAll<T extends keyof JSX.IntrinsicElements | React.ComponentType
   React.ComponentProps<T>
 
 // can be used as
-// <Wrapper tooltip={}><button onClick={handler}/></Wrapper>
-// <Wrapper as="button" onClick={handler} tooltip={}><button/></Wrapper>
+// <Wrapper tooltip={}><button type="button" onClick={handler}/></Wrapper>
+// <Wrapper as="button" type="button" onClick={handler} tooltip={}><span/></Wrapper>
 // <Wrapper tooltip={} focus={false}><input onFocus={special_handler}/></Wrapper> --> don't touch onFocus
 // single child component gets cloned and ref assigned
-// <Wrapper onClick={handler} tooltip={}><button/><span/></Wrapper>
+// <Wrapper onClick={handler} tooltip={}><button type="button"/><span/></Wrapper>
 // multiple children get wrapped in div
 const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = 'div'>({
   children,
