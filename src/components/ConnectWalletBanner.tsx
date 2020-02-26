@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import iconWallet from 'assets/img/wallet.svg'
 import { MEDIA } from 'const'
 
-const Wrapper = styled.div`
+export const Wrapper = styled.div`
   background: #ffffff;
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
