@@ -237,15 +237,19 @@ export class WalletApiImpl implements WalletApi {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
-    const {
-      accounts: [account],
-      chainId,
-    } = getProviderState(provider)
+    const providerState = getProviderState(provider)
 
-    this.blockchainState = {
-      account,
-      chainId,
-      blockHeader: null,
+    if (providerState) {
+      const {
+        accounts: [account],
+        chainId,
+      } = providerState
+
+      this.blockchainState = {
+        account,
+        chainId,
+        blockHeader: null,
+      }
     }
 
     await this._notifyListeners(this.blockchainState)
