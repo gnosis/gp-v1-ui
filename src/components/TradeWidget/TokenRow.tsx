@@ -237,12 +237,24 @@ const TokenRow: React.FC<Props> = ({
           )}
           <span>
             Balance:
-            <TooltipWrapper as={FormMessage} tooltip="Fill maximum">
-              {' '}
-              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-              {validateMaxAmount && <a onClick={useMax}>max</a>}
-            </TooltipWrapper>
-            <i aria-label="Tooltip"></i>
+            {readOnly ? (
+              <FormMessage> {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}</FormMessage>
+            ) : (
+              <>
+                <FormMessage>
+                  {' '}
+                  {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                  {validateMaxAmount && (
+                    <>
+                      <TooltipWrapper tooltip="Fill maximum">
+                        <a onClick={useMax}>max</a>
+                      </TooltipWrapper>
+                      <i aria-label="Tooltip"></i>
+                    </>
+                  )}
+                </FormMessage>
+              </>
+            )}
           </span>
         </span>
       </div>
