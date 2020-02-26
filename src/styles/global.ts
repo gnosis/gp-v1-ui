@@ -339,8 +339,9 @@ const GlobalStyles = createGlobalStyle`
     margin: auto 0;
     -ms-flex: 1;
     flex: 1;
-    padding: 0.8rem 0 0.8rem 0.8rem;
+    padding: 1.6rem 0 1.6rem 0.8rem;
     order: 3;
+    line-height: 1.2;
 
     > div {
       line-height: 1.2;
