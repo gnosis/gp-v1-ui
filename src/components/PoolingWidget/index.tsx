@@ -76,6 +76,8 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
   const { title, subtext }: { title: string; subtext?: string } = useMemo(() => {
     switch (step) {
       case 1:
+        // TODO: Add Link
+        // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '1. Select at least two of your trusted stablecoins',
           subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
@@ -85,19 +87,19 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             <li><img src=${checkIcon} />No gas costs for trades</li>
             <li><img src=${checkIcon} />Cancellation possible at any time</li>
           </ul>
-          <p class="not-implemented">
-            // TODO: Add Link
-            // https://github.com/gnosis/dex-react/issues/615
+          <p class="not-implemented">            
             <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
           </p>`,
         }
       case 2:
+        // TODO: Add Link
+        // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '2. Define your spread',
           subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
-          // TODO: Add Link
-          // https://github.com/gnosis/dex-react/issues/615
-          <p class="not-implemented><a href="#" target="_blank" rel="noopener">Learn more about the spread.</a></p>
+          <p class="not-implemented">            
+            <a href="#" target="_blank" rel="noopener">Learn more about the spread.</a>
+          </p>
           `,
         }
       case 3:
