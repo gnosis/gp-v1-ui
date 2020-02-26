@@ -26,13 +26,14 @@ const Wrapper = styled.div`
   }
 `
 
-const PriceInputBox = styled.div`
+export const PriceInputBox = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;
   width: 50%;
   width: calc(50% - 0.8rem);
   height: 5.6rem;
+
   position: relative;
   outline: 0;
 
@@ -64,7 +65,7 @@ const PriceInputBox = styled.div`
     }
   }
 
-  input {
+  input:not([type='checkbox']) {
     margin: 0;
     width: auto;
     max-width: 100%;
