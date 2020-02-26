@@ -221,8 +221,8 @@ const TokenRow: React.FC<Props> = ({
             validate: { positive: validatePositive },
           })
         : register,
-    // eslint-disable don't-remember-what
-    [readOnly, register],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [register],
   )
 
   return (
