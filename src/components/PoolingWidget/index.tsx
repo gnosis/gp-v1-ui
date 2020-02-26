@@ -85,7 +85,9 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             <li><img src=${checkIcon} />No gas costs for trades</li>
             <li><img src=${checkIcon} />Cancellation possible at any time</li>
           </ul>
-          <p>
+          <p class="not-implemented">
+            // TODO: Add Link
+            // https://github.com/gnosis/dex-react/issues/615
             <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
           </p>`,
         }
@@ -93,7 +95,9 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
         return {
           title: '2. Define your spread',
           subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
-          <p><a href="#" target="_blank" rel="noopener">Learn more about the spread.</a></p>
+          // TODO: Add Link
+          // https://github.com/gnosis/dex-react/issues/615
+          <p class="not-implemented><a href="#" target="_blank" rel="noopener">Learn more about the spread.</a></p>
           `,
         }
       case 3:
