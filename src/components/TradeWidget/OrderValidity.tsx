@@ -7,7 +7,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { PriceInputBox } from './Price'
 
 import useSafeState from 'hooks/useSafeState'
-import { validInputPattern, validatePositive, formatValidity } from 'utils'
+import { validInputPattern, validatePositive, formatValidity, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
 
@@ -180,16 +180,16 @@ const OrderValidity: React.FC<Props> = ({
   ])
 
   const handleValidFromChange = useCallback(() => {
-    const newValue = adjustPrecision(validFromInputValue, 0)
+    const newValue = makeMultipleOf(5, adjustPrecision(validFromInputValue, 0)).toString()
     if (validFromInputValue !== newValue) {
       setValue(validFromInputId, newValue, true)
     }
   }, [validFromInputValue, setValue, validFromInputId])
 
   const handleValidUntilChange = useCallback(() => {
-    const newValue = adjustPrecision(validUntilInputValue, 0)
+    const newValue = makeMultipleOf(5, adjustPrecision(validUntilInputValue, 0)).toString()
     if (validUntilInputValue !== newValue) {
-      setValue(validUntilInputId, newValue, true)
+      setValue(validUntilInputId, makeMultipleOf(5, newValue).toString(), true)
     }
   }, [validUntilInputValue, setValue, validUntilInputId])
 
