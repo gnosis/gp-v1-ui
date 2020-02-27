@@ -12,6 +12,8 @@ import { DepositApiProxy } from './deposit/DepositApiProxy'
 import { ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiProxy } from './exchange/ExchangeApiProxy'
+import { PendingApi, PendingApiImpl } from './pending/PendingApi'
+import { PendingApiMock } from './pending/PendingApiMock'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -19,6 +21,7 @@ import {
   erc20Allowances,
   FEE_TOKEN,
   exchangeOrders,
+  pendingOrders,
   unregisteredTokens,
   TOKEN_8,
 } from '../../test/data'
@@ -108,6 +111,19 @@ function createTokenListApi(): TokenList {
   return tokenListApi
 }
 
+function createPendingApi(): PendingApi {
+  let pendingApi
+  if (process.env.MOCK_WALLET === 'true') {
+    pendingApi = new PendingApiMock({
+      ordersByUser: pendingOrders,
+    })
+  } else {
+    pendingApi = new PendingApiImpl()
+  }
+  window['pendingApi'] = pendingApi // register for convenience
+  return pendingApi
+}
+
 // Build APIs
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
@@ -121,3 +137,4 @@ export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
 export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDependencies)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()
+export const pendingApi: PendingApi = createPendingApi()

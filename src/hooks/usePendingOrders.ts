@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
-import { PendingTxArray } from 'api/exchange/ExchangeApi'
+import { pendingApi } from 'api'
 
 import useGlobalState from './useGlobalState'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
+import { PendingTxArray } from 'api/pending/PendingApi'
 
 function usePendingOrders(): PendingTxArray {
   const { userAddress, networkId } = useWalletConnection()
@@ -12,7 +13,17 @@ function usePendingOrders(): PendingTxArray {
   const [pendingOrders, setPendingOrders] = useSafeState<PendingTxArray>([])
 
   useEffect(() => {
-    userAddress && networkId && setPendingOrders(pendingOrdersGlobal[networkId][userAddress] || [])
+    if (userAddress && networkId) {
+      pendingApi
+        .getOrders({ userAddress, networkId })
+        .then(pendingOrders => {
+          setPendingOrders(pendingOrders)
+        })
+        .catch(error => {
+          // TODO: Handle error when
+          console.error('[usePendingOrders] Error getting pending orders', error)
+        })
+    }
   }, [networkId, pendingOrdersGlobal, setPendingOrders, userAddress])
 
   return pendingOrders
