@@ -39,7 +39,7 @@ export function useNumberInput(params: Params): Result {
       // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
 
       const { value } = event.currentTarget
-      const newValue = value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
+      const newValue = formatPartialNumber(value)
 
       if (value != newValue) {
         setValue(inputId, newValue, true)
