@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
-import { faSpinner, faExchangeAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
@@ -26,7 +26,7 @@ import {
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
-import TokenImg from 'components/TokenImg'
+
 import { OrderRowWrapper } from './OrderRow.styled'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
@@ -78,26 +78,6 @@ function calculatePrice(numeratorString?: string | null, denominatorString?: str
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
   sellToken: TokenDetails
-}
-
-const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = ({ buyToken, sellToken }) => {
-  return (
-    <td className="order-image-row">
-      <div>
-        {/* e.g SELL DAI <-> BUY TUSD */}
-        <div>
-          <TokenImg src={sellToken.image} alt={sellToken.addressMainnet} />{' '}
-          <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-        </div>
-        {/* Switcher icon */}
-        <FontAwesomeIcon icon={faExchangeAlt} size="lg" />
-        <div>
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>{' '}
-          <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
-        </div>
-      </div>
-    </td>
-  )
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
@@ -323,7 +303,6 @@ const OrderRow: React.FC<Props> = props => {
               disabled={disabled}
             />
           ))}
-        <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
