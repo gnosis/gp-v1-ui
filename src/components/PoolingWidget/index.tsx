@@ -298,8 +298,9 @@ const PoolingInterface: React.FC = () => {
       txHash,
       txReceipt,
       txError,
+      nextStep,
     }),
-    [handleTokenSelect, selectedTokensMap, setSpread, spread, tokens, txError, txHash, txReceipt],
+    [handleTokenSelect, nextStep, selectedTokensMap, setSpread, spread, tokens, txError, txHash, txReceipt],
   )
 
   return (

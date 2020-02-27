@@ -16,10 +16,22 @@ interface SubComponentProps extends TokenSelectorProps {
   txHash: string
   txReceipt?: Receipt
   txError?: Error
+  nextStep: () => void
 }
 
 const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash, txReceipt, txError } = props
+  const {
+    step,
+    handleTokenSelect,
+    selectedTokensMap,
+    tokens,
+    spread,
+    setSpread,
+    txHash,
+    txReceipt,
+    txError,
+    nextStep,
+  } = props
 
   switch (step) {
     case 1:
@@ -33,7 +45,9 @@ const SubComponents: React.FC<SubComponentProps> = props => {
         </>
       )
     case 2:
-      return <DefineSpread selectedTokensMap={selectedTokensMap} spread={spread} setSpread={setSpread} />
+      return (
+        <DefineSpread selectedTokensMap={selectedTokensMap} spread={spread} setSpread={setSpread} nextStep={nextStep} />
+      )
     case 3:
       return (
         <>

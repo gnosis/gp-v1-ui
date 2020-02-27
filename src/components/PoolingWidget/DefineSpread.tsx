@@ -10,9 +10,11 @@ interface DefineSpreadProps {
 
   spread: number
   setSpread: React.Dispatch<React.SetStateAction<number>>
+
+  nextStep: () => void
 }
 
-type SpreadInformationProps = Omit<DefineSpreadProps, 'setSpread'>
+type SpreadInformationProps = Omit<DefineSpreadProps, 'setSpread' | 'nextStep'>
 
 export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
   const tokenSymbolsString = React.useMemo(() => Array.from(selectedTokensMap.values()).map(token => token.symbol), [
@@ -35,9 +37,9 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
   )
 }
 
-const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, setSpread }) => {
   const handleSpreadChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>): void => {
     if (+value < 0 || +value >= 100) return
+const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, setSpread, nextStep }) => {
 
     setSpread(+value)
   }
