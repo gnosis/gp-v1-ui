@@ -503,7 +503,7 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
-            readOnly={true}
+            readOnly
             tooltipText={receiveTokenTooltipText}
           />
           <Price
