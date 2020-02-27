@@ -3,6 +3,8 @@ import { TokenDetails, adjustPrecision } from '@gnosis.pm/dex-js'
 
 import { SpreadInformationWrapper, DefineSpreadWrapper } from './DefineSpread.styled'
 
+import InputWithTooltip from '../InputWithTooltip'
+
 import { DEFAULT_DECIMALS } from 'const'
 import { formatPartialNumber, preventInvalidChars } from 'utils'
 
@@ -76,7 +78,15 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, 
   return (
     <DefineSpreadWrapper>
       <strong>Spread %</strong>
-      <input type="number" step="0.1" value={spread} onChange={onChange} onBlur={onBlur} onKeyPress={onKeyPress} />
+      <InputWithTooltip
+        type="number"
+        step="0.1"
+        value={spread}
+        onChange={onChange}
+        onBlur={onBlur}
+        onKeyPress={onKeyPress}
+        tooltip={'Value between 0 and 100, not inclusive'}
+      />
       <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
     </DefineSpreadWrapper>
   )
