@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useCallback } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -264,7 +264,7 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
-          ref={useMemo(
+          ref={useCallback(
             (e: HTMLInputElement): void => {
               inputRef.current = e
               if (readOnly) {
