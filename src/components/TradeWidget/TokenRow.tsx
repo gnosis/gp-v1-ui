@@ -190,8 +190,9 @@ const TokenRow: React.FC<Props> = ({
     const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
     overMax = value.gt(max) ? value.sub(max) : ZERO
   }
-
-  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
+  const overMaxError = overMax.gt(ZERO)
+  const balanceError = !error && overMaxError
+  const className = error ? 'error' : overMaxError ? 'warning' : ''
 
   const errorOrWarning = error ? (
     <FormMessage className="error">{error.message}</FormMessage>
@@ -246,10 +247,13 @@ const TokenRow: React.FC<Props> = ({
           <span>
             Balance:
             {readOnly ? (
-              <FormMessage> {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}</FormMessage>
+              <FormMessage className={balanceError ? 'error' : 'success'}>
+                {' '}
+                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+              </FormMessage>
             ) : (
               <>
-                <FormMessage>
+                <FormMessage className={balanceError ? 'error' : 'success'}>
                   {' '}
                   {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
                   {validateMaxAmount && (
