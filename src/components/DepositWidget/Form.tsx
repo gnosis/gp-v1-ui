@@ -12,6 +12,7 @@ import useScrollIntoView from 'hooks/useScrollIntoView'
 
 import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount } from 'utils'
+import useKeyPress from 'hooks/useKeyDown'
 
 export interface FormProps {
   tokenBalances: TokenBalanceDetails
@@ -62,6 +63,8 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     setAmountInput('')
     props.onClose()
   }
+
+  useKeyPress('Escape', cancelForm)
 
   useEffect(() => {
     if (validatorActive) {
