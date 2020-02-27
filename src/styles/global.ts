@@ -10,113 +10,6 @@ const GlobalStyles = createGlobalStyle`
   // Import font faces
   ${fontFace}
 
-  // Web3Connect styling
-  // SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
-  // or am i missing something?
-  #WEB3_CONNECT_MODAL_ID > div > div > div:last-child {
-      display: flex;
-      width: 100%;
-      max-width: 60rem;
-      background: #ffffff;
-      flex-flow: column wrap;
-      margin: 0;
-      padding: 0 1.6rem 1.6rem;
-      
-      &::before {
-        content: "Connect A Wallet";
-        width: 100%;
-        display: block;
-        font-size: 1.6rem;
-        line-height: 1;
-        padding: 2.4rem 0;
-        box-sizing: border-box;
-        color: #2f3e4e;
-        font-weight: var(--font-weight-bold);
-      }
-    
-    // Individual outer container
-    > div {
-      background: #ffffff;
-      border-radius: var(--border-radius);
-      color: var(--color-text-primary);
-      display: flex;
-      flex-flow: row wrap;
-      flex: 1 1 100%;
-      border: 0;
-    }
-    
-    // Individual inner container
-    > div > div {
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      margin: 0;
-      opacity: 1;
-      width: 100%;
-      outline: none;
-      border-radius: 1.2rem;
-      padding: 1rem;
-      border: 0.1rem solid #dfe6ef;
-      flex-flow: row nowrap;
-      transition: border .2s ease-in-out;
-      min-height: 5.6rem;
-      
-        &:hover {
-          border: 0.1rem solid #218dff;
-        }
-    }
-    
-    // Provider image
-    > div > div > div:nth-of-type(1) {
-      background: 0;
-      box-shadow: none;
-      width: 2.4rem;
-      height: 2.4rem;
-      display: block;
-      overflow: visible;
-        > img {
-          display: block;
-          width: 2.4rem;
-          height: 2.4rem;
-          object-fit: contain;
-        }
-    }
-    
-    // Client name
-    > div > div > div:nth-of-type(2) {
-      font-size: 1.5rem;
-      text-align: left;
-      padding: 0 1.2rem;
-      margin: 0;
-      color: #2f3e4e;
-    }
-    
-    // Client description
-    > div > div > div:nth-of-type(3) {
-      font-size: 1.5rem;
-      color: #476481;
-      white-space: nowrap;
-    }
-  }
-  // End WEB3 connect
-  
-  // Start WalletConnect Modal
-  #walletconnect-qrcode-modal {
-    .walletconnect-modal__headerLogo {
-      max-width: 24rem;
-      height: auto;
-      margin: 5rem auto 2.4rem;
-    }
-  }
-  #walletconnect-qrcode-text {
-    font-size: 1.8rem;
-    line-height: 1.2;
-    padding: 0 2rem;
-    color: #476481;
-  }
-  // End WalletConnect Modal
-
   html, body {  
     width: 100%;
     height: auto;
@@ -144,22 +37,6 @@ const GlobalStyles = createGlobalStyle`
       }
   }
 
-  // body::-webkit-scrollbar-track {
-  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-  //   background-color: var(--color-background);
-  // }
-
-  // body::-webkit-scrollbar {
-  //   width: 1.2rem;
-  //   background-color: var(--color-background);
-  // }
-
-  // body::-webkit-scrollbar-thumb {
-  //   border-radius: 1rem;
-  //   -webkit-box-shadow: inset 0 0 .6rem rgba(0,0,0,.3);
-  //   background-color: var(--color-background-pageWrapper);
-  // }
-
   h1, h2, h3 {
     margin: 0;
     margin: 0.5rem 0;
@@ -173,6 +50,7 @@ const GlobalStyles = createGlobalStyle`
 
   #root {
     min-height: 100vh;
+    font-size: 1.3rem;
   }
 
   button {
@@ -181,6 +59,7 @@ const GlobalStyles = createGlobalStyle`
     transition: all 0.2s ease-in-out;
     border: 0;
     font-weight: var(--font-weight-bold);
+    outline: 0;
 
     :hover {
       background-color: #0B66C6;
@@ -188,7 +67,7 @@ const GlobalStyles = createGlobalStyle`
 
     &:disabled,
     &[disabled]{
-      opacity: .7;
+      opacity: .8;
       pointer-events: none;
     }
     &.success {
@@ -247,6 +126,10 @@ const GlobalStyles = createGlobalStyle`
       line-height: inherit;
     }
     
+    &:focus::placeholder {
+      color: transparent;
+    }
+    
     &[type=checkbox] {
       margin: 0 auto;
       background: transparent;
@@ -270,7 +153,7 @@ const GlobalStyles = createGlobalStyle`
       border-color: var(--color-text-primary);
     }
     &:disabled {
-      opacity: .5;
+      opacity: .8;
     }
   }
   
@@ -587,15 +470,15 @@ const GlobalStyles = createGlobalStyle`
 
     60% {
       opacity: 1;
-      transform: translate3d(25px, 0, 0);
+      transform: translate3d(2.5rem, 0, 0);
     }
 
     75% {
-      transform: translate3d(-10px, 0, 0);
+      transform: translate3d(-1rem, 0, 0);
     }
 
     90% {
-      transform: translate3d(5px, 0, 0);
+      transform: translate3d(.5rem, 0, 0);
     }
 
     to {
@@ -606,12 +489,12 @@ const GlobalStyles = createGlobalStyle`
   @keyframes Toastify__bounceOutLeft {
     20% {
       opacity: 1;
-      transform: translate3d(20px, 0, 0);
+      transform: translate3d(2rem, 0, 0);
     }
 
     to {
       opacity: 0;
-      transform: translate3d(-2000px, 0, 0);
+      transform: translate3d(-200rem, 0, 0);
     }
   }
 
@@ -626,20 +509,20 @@ const GlobalStyles = createGlobalStyle`
 
     from {
       opacity: 0;
-      transform: translate3d(0, 3000px, 0);
+      transform: translate3d(0, 300rem, 0);
     }
 
     60% {
       opacity: 1;
-      transform: translate3d(0, -20px, 0);
+      transform: translate3d(0, -2rem, 0);
     }
 
     75% {
-      transform: translate3d(0, 10px, 0);
+      transform: translate3d(0, 1rem, 0);
     }
 
     90% {
-      transform: translate3d(0, -5px, 0);
+      transform: translate3d(0, -.5rem, 0);
     }
 
     to {
@@ -649,18 +532,18 @@ const GlobalStyles = createGlobalStyle`
 
   @keyframes Toastify__bounceOutUp {
     20% {
-      transform: translate3d(0, -10px, 0);
+      transform: translate3d(0, -1rem, 0);
     }
 
     40%,
     45% {
       opacity: 1;
-      transform: translate3d(0, 20px, 0);
+      transform: translate3d(0, 2rem, 0);
     }
 
     to {
       opacity: 0;
-      transform: translate3d(0, -2000px, 0);
+      transform: translate3d(0, -200rem, 0);
     }
   }
 
@@ -675,20 +558,20 @@ const GlobalStyles = createGlobalStyle`
 
     0% {
       opacity: 0;
-      transform: translate3d(0, -3000px, 0);
+      transform: translate3d(0, -300rem, 0);
     }
 
     60% {
       opacity: 1;
-      transform: translate3d(0, 25px, 0);
+      transform: translate3d(0, 2.5rem, 0);
     }
 
     75% {
-      transform: translate3d(0, -10px, 0);
+      transform: translate3d(0, -1rem, 0);
     }
 
     90% {
-      transform: translate3d(0, 5px, 0);
+      transform: translate3d(0, .5rem, 0);
     }
 
     to {
@@ -698,18 +581,18 @@ const GlobalStyles = createGlobalStyle`
 
   @keyframes Toastify__bounceOutDown {
     20% {
-      transform: translate3d(0, 10px, 0);
+      transform: translate3d(0, 1rem, 0);
     }
 
     40%,
     45% {
       opacity: 1;
-      transform: translate3d(0, -20px, 0);
+      transform: translate3d(0, -2rem, 0);
     }
 
     to {
       opacity: 0;
-      transform: translate3d(0, 2000px, 0);
+      transform: translate3d(0, 200rem, 0);
     }
   }
 
@@ -785,42 +668,42 @@ const GlobalStyles = createGlobalStyle`
 
   @keyframes Toastify__flipIn {
     from {
-      transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+      transform: perspective(40rem) rotate3d(1, 0, 0, 90deg);
       animation-timing-function: ease-in;
       opacity: 0;
     }
 
     40% {
-      transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+      transform: perspective(40rem) rotate3d(1, 0, 0, -20deg);
       animation-timing-function: ease-in;
     }
 
     60% {
-      transform: perspective(400px) rotate3d(1, 0, 0, 10deg);
+      transform: perspective(40rem) rotate3d(1, 0, 0, 10deg);
       opacity: 1;
     }
 
     80% {
-      transform: perspective(400px) rotate3d(1, 0, 0, -5deg);
+      transform: perspective(40rem) rotate3d(1, 0, 0, -5deg);
     }
 
     to {
-      transform: perspective(400px);
+      transform: perspective(40rem);
     }
   }
 
   @keyframes Toastify__flipOut {
     from {
-      transform: perspective(400px);
+      transform: perspective(40rem);
     }
 
     30% {
-      transform: perspective(400px) rotate3d(1, 0, 0, -20deg);
+      transform: perspective(40rem) rotate3d(1, 0, 0, -20deg);
       opacity: 1;
     }
 
     to {
-      transform: perspective(400px) rotate3d(1, 0, 0, 90deg);
+      transform: perspective(40rem) rotate3d(1, 0, 0, 90deg);
       opacity: 0;
     }
   }
@@ -906,7 +789,7 @@ const GlobalStyles = createGlobalStyle`
 
     to {
       visibility: hidden;
-      transform: translate3d(0, 500px, 0);
+      transform: translate3d(0, 50rem, 0);
     }
   }
 
@@ -917,7 +800,7 @@ const GlobalStyles = createGlobalStyle`
 
     to {
       visibility: hidden;
-      transform: translate3d(0, -500px, 0);
+      transform: translate3d(0, -50rem, 0);
     }
   }
 
@@ -957,6 +840,221 @@ const GlobalStyles = createGlobalStyle`
     animation-name: Toastify__slideOutDown;
   }
   /* END Toastify custom styling */
+  
+  // Web3Connect styling
+  // SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
+  // or am i missing something?
+  #WEB3_CONNECT_MODAL_ID > div > div > div:last-child {
+      display: flex;
+      width: 100%;
+      max-width: 60rem;
+      background: #ffffff;
+      flex-flow: column wrap;
+      margin: 0;
+      padding: 0 1.6rem 1.6rem;
+      
+      &::before {
+        content: "Connect A Wallet";
+        width: 100%;
+        display: block;
+        font-size: 1.6rem;
+        line-height: 1;
+        padding: 2.4rem 0;
+        box-sizing: border-box;
+        color: #2f3e4e;
+        font-weight: var(--font-weight-bold);
+      }
+    
+    // Individual outer container
+    > div {
+      background: #ffffff;
+      border-radius: var(--border-radius);
+      color: var(--color-text-primary);
+      display: flex;
+      flex-flow: row wrap;
+      flex: 1 1 100%;
+      border: 0;
+    }
+    
+    // Individual inner container
+    > div > div {
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin: 0;
+      opacity: 1;
+      width: 100%;
+      outline: none;
+      border-radius: 1.2rem;
+      padding: 1rem;
+      border: 0.1rem solid #dfe6ef;
+      flex-flow: row nowrap;
+      transition: border .2s ease-in-out;
+      min-height: 5.6rem;
+      
+        &:hover {
+          border: 0.1rem solid #218dff;
+        }
+    }
+    
+    // Provider image
+    > div > div > div:nth-of-type(1) {
+      background: 0;
+      box-shadow: none;
+      width: 2.4rem;
+      height: 2.4rem;
+      display: block;
+      overflow: visible;
+        > img {
+          display: block;
+          width: 2.4rem;
+          height: 2.4rem;
+          object-fit: contain;
+        }
+    }
+    
+    // Client name
+    > div > div > div:nth-of-type(2) {
+      font-size: 1.5rem;
+      text-align: left;
+      padding: 0 1.2rem;
+      margin: 0;
+      color: #2f3e4e;
+    }
+    
+    // Client description
+    > div > div > div:nth-of-type(3) {
+      font-size: 1.5rem;
+      color: #476481;
+      white-space: nowrap;
+    }
+  }
+  // End WEB3 connect
+  
+  // Start WalletConnect Modal
+  #walletconnect-qrcode-modal {
+    .walletconnect-modal__headerLogo {
+      max-width: 24rem;
+      height: auto;
+      margin: 5rem auto 2.4rem;
+    }
+  }
+  #walletconnect-qrcode-text {
+    font-size: 1.8rem;
+    line-height: 1.2;
+    padding: 0 2rem;
+    color: #476481;
+  }
+  // End WalletConnect Modal
+  
+  .modali-open .modali-overlay {
+    background-color: rgba(47,62,78,0.5);
+    opacity: 1;
+  }
+  
+  .modali-open .modali-wrapper-centered .modali {
+    box-shadow: 0 .2rem .4rem 0 rgba(0,0,0,0.14);
+    border-radius: .6rem;
+    border: 0;
+    margin: 0 auto;
+    
+    .modali-header {
+      height: 5.6rem;
+      padding: 0 1.6rem;
+      box-sizing: border-box;
+      letter-spacing: 0;
+      font-size: 1.6rem;
+      text-align: left;
+      color: #2f3e4e;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      font-family: var(--font-default);
+      font-weight: var(--font-weight-regular);
+      border-bottom: 0.1rem solid #dfe6ef;
+    }
+    
+    .modali-header .modali-title {
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: 1;
+    }
+    
+    .modali-header .modali-close-button {
+      font-size: 4rem;
+      line-height: 1;
+      color: #526877;
+      font-weight: normal;
+      opacity: .5;
+      padding: 0;
+      margin: auto 0 auto auto;
+      
+        &:hover {
+          background: transparent;
+          opacity: 1;
+        }
+    }
+    
+    .modali-body {
+      font-size: 1.4rem;
+      line-height: 1.3;
+      color: #476481;
+    }
+    
+    .modali-footer {
+      margin: 1.6rem auto 0;
+      height: 5.6rem;
+      border-top: 0.1rem solid #dfe6ef;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 1.6rem;
+      box-sizing: border-box;
+      font-family: var(--font-mono);
+
+      .modali-button.modali-button-default {
+        margin: 0;
+        border-radius: 0.6rem;
+        outline: 0;
+        height: 3.6rem;
+        box-sizing: border-box;
+        letter-spacing: 0.03rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        background: #218dff;
+        border-radius: 0.6rem;
+        min-width: 14rem;
+        padding: 0 1.6rem;
+        font-weight: var(--font-weight-bold);
+        color: #ffffff;
+        text-transform: uppercase;
+        font-size: 1.4rem;
+        margin: 0;
+      }
+      
+      .modali-button.modali-button-cancel {
+        margin: 0;
+        border-radius: 0.6rem;
+        outline: 0;
+        height: 3.6rem;
+        box-sizing: border-box;
+        letter-spacing: 0.03rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        text-transform: uppercase;
+        font-size: 1.4rem;
+        font-weight: var(--font-weight-bold);
+        color: #476481;
+      }
+    }
+  }
 `
 
 export default GlobalStyles

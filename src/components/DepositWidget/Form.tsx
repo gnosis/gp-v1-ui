@@ -125,9 +125,9 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
                 placeholder="0"
               />
             </div>
+            {/* Error Message */}
+            <p className="error">{errors.amountInput || ''}</p>
           </div>
-          {/* Error Message */}
-          <p className="error">{errors.amountInput || ''}</p>
           {/* Submit/Cancel Buttons */}
           <div className="actions">
             <a onClick={cancelForm}>Cancel</a>

@@ -26,7 +26,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     text-decoration: none;
     transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
     font-weight: var(--font-weight-bold);
-    font-size: 2.3rem;
+    font-size: 2.1rem;
     padding: 0 4rem;
     border-radius: 15rem;
     letter-spacing: 0;

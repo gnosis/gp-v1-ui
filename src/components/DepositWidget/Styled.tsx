@@ -2,45 +2,13 @@ import styled from 'styled-components'
 
 export const ModalBodyWrapper = styled.div`
   div > p {
-    padding: 0 1em;
-    color: #828282;
-    font-size: 0.85em;
+    font-size: inherit;
+    color: inherit;
+    padding: 0;
   }
 `
 
 export const TokenRow = styled.tr`
-  // Each cell wrapper (td)
-  // > * {
-  //   margin: 0.1rem;
-  //   padding: 0.7rem;
-  //   text-align: center;
-  //   transition: all 0.5s ease;
-
-  //   > button {
-  //     margin: 0.2rem;
-  //   }
-
-  //   &:first-child {
-  //     display: grid;
-  //     grid-template-columns: min-content max-content;
-  //     grid-gap: 1em;
-  //     align-items: center;
-
-  //     > * {
-  //       margin: 0.375rem;
-  //     }
-
-  //     > div:last-child {
-  //       text-align: initial;
-  //     }
-  //   }
-
-  //   &:last-child {
-  //     display: flex;
-  //     flex-flow: column;
-  //   }
-  // }
-
   .enableToken {
     height: auto;
     outline: 0;
@@ -102,18 +70,54 @@ export const TokenRow = styled.tr`
 
 export const RowClaimButton = styled.button`
   margin-bottom: 0;
-`
-
-export const RowClaimLink = styled.a`
-  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  font-size: inherit;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
 
   &.success {
     color: #63ab52;
+    background: transparent;
+
+    &:hover {
+      background: transparent;
+      color: #63ab52;
+    }
   }
   &.disabled {
     color: currentColor;
     cursor: not-allowed;
     opacity: 0.5;
+  }
+`
+
+export const RowClaimLink = styled.a`
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+
+  &::after {
+    content: 'Claim';
+    display: block;
+    line-height: inherit;
+    border: 0.1rem solid #63ab52;
+    border-radius: 2rem;
+    background: transparent;
+    color: #63ab52;
+    padding: 0.4rem 1rem;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    box-sizing: border-box;
+    margin: 0 0 0 0.5rem;
+  }
+
+  &:hover::after {
+    background: var(--color-button-success);
+    color: white;
   }
 `
 

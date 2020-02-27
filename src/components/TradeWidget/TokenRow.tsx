@@ -13,6 +13,7 @@ import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from './InputWithTooltip'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,9 +31,13 @@ const Wrapper = styled.div`
   }
 
   > div > strong {
-    margin: 0 auto 0 0;
+    margin: 0 auto 0 0.5rem;
     text-transform: capitalize;
     color: #2f3e4e;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
   }
 
   > div > span {
@@ -199,11 +204,11 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
-        <b>INFO</b>: Sell amount exceeding your balance by{' '}
+        <b>INFO</b>: Sell amount exceeding your balance by
         <strong>
-          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}
+          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
         </strong>
-        . This creates a standing order. <a href="#">Read more</a>.
+        {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
   )

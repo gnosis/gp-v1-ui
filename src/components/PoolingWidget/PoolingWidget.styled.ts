@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import PageWrapper from 'components/Layout/PageWrapper'
+import { PageWrapper } from 'components/Layout/PageWrapper'
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
 import { MEDIA } from 'const'
@@ -21,13 +21,14 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
   border-radius: 0.6rem;
   margin: 0 auto;
   min-height: 54rem;
-  font-size: 1.6rem;
-  line-height: 1;
+  font-size: 1.4rem;
+  line-height: 1.4;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
     padding: 1.6rem 1.6rem 0;
     width: 100%;
+    font-size: 1.3rem;
   }
 
   > h2 {
@@ -57,7 +58,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     border-radius: 2.5rem;
     color: #ffffff;
     font-weight: var(--font-weight-normal);
-    font-size: 1.4rem;
+    font-size: inherit;
     letter-spacing: 0;
     text-align: center;
     background: ${({ $bgColor = 'var(--color-background)' }): string => $bgColor};
@@ -68,7 +69,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     display: inline-block;
     content: attr(data-title);
     font-weight: var(--font-weight-normal);
-    font-size: 1.4rem;
+    font-size: inherit;
     color: #2f3e4e;
     letter-spacing: 0;
 
@@ -90,14 +91,14 @@ export const ProgressStepText = styled.p`
   font-weight: var(--font-weight-bold);
   margin: 0;
   color: #2f3e4e;
-  font-size: 1.6rem;
-  line-height: 1.1;
+  font-size: inherit;
+  line-height: inherit;
 
   > i {
     color: #476481;
     font-style: normal;
     font-weight: var(--font-weight-normal);
-    font-size: 1.3rem;
+    font-size: inherit;
   }
 `
 
@@ -262,8 +263,8 @@ export const StepDescriptionWrapper = styled.div`
 
   .liqContent {
     color: #456483;
-    font-size: 1.4rem;
-    line-height: 1.4;
+    font-size: inherit;
+    line-height: inherit;
     margin: 1.6rem 0 0;
 
     > ul {

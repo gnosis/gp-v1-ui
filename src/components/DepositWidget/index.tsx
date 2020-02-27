@@ -169,12 +169,6 @@ const BalancesWidget = styled(Widget)`
         color: #2f3e4e;
       }
     }
-
-    > div {
-      @media ${MEDIA.mobile} {
-        text-align: right;
-      }
-    }
   }
 `
 
@@ -183,7 +177,7 @@ const BalanceTools = styled.div`
   width: 100%;
   justify-content: space-between;
   margin: 0;
-  padding: 1.6rem;
+  padding: 0;
   box-sizing: border-box;
   align-items: center;
   order: 1;
@@ -198,6 +192,8 @@ const BalanceTools = styled.div`
     outline: 0;
     background: transparent;
     transition: text-decoration 0.2s ease-in-out;
+    padding: 0;
+    margin: 0 1.6rem;
 
     @media ${MEDIA.mobile} {
       padding: 0;
@@ -234,6 +230,7 @@ const BalanceTools = styled.div`
     max-width: 100%;
     position: relative;
     height: 5.6rem;
+    margin: 1.6rem;
 
     @media ${MEDIA.mobile} {
       width: 100%;
