@@ -264,17 +264,20 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
-          ref={(e: HTMLInputElement): void => {
-            inputRef.current = e
-            if (readOnly) {
-              register(e)
-            } else {
-              register({
-                pattern: { value: validInputPattern, message: 'Invalid amount' },
-                validate: { positive: validatePositive },
-              })
-            }
-          }}
+          ref={useMemo(
+            (e: HTMLInputElement): void => {
+              inputRef.current = e
+              if (readOnly) {
+                register(e)
+              } else {
+                register({
+                  pattern: { value: validInputPattern, message: 'Invalid amount' },
+                  validate: { positive: validatePositive },
+                })
+              }
+            },
+            [readOnly, register],
+          )}
           className={className}
           tooltip={tooltipText}
           placeholder="0"
