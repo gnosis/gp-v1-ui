@@ -270,7 +270,7 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
-          autoFocus={autoFocus}
+          autoFocus={!readOnly && autoFocus}
           className={className}
           tooltip={tooltipText}
           placeholder="0"
