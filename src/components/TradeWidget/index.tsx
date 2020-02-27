@@ -489,6 +489,7 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
             readOnly={false}
             tooltipText="Maximum amount of tokens you want to sell"
+            autofocus={true}
           />
           <IconWrapper onClick={swapTokens}>
             <img src={switchTokenPair} />

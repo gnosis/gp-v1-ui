@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useEffect, useRef } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -159,6 +159,7 @@ interface Props {
   tabIndex: number
   readOnly: boolean
   tooltipText: string
+  autofocus?: boolean
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -173,11 +174,13 @@ const TokenRow: React.FC<Props> = ({
   tabIndex,
   readOnly = false,
   tooltipText,
+  autofocus = false,
 }) => {
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
   const inputValue = watch(inputId)
+  const inputRef = useRef<HTMLInputElement>()
 
   const { onKeyPress, enforcePrecision, removeExcessZeros } = useNumberInput({
     inputId,
@@ -212,18 +215,11 @@ const TokenRow: React.FC<Props> = ({
     setValue(inputId, formatAmountFull(balance.totalExchangeBalance, balance.decimals, false), true)
   }
 
-  // Form validation
-  const inputRef = useMemo(
-    () =>
-      !readOnly
-        ? register({
-            pattern: { value: validInputPattern, message: 'Invalid amount' },
-            validate: { positive: validatePositive },
-          })
-        : register,
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [register],
-  )
+  useEffect(() => {
+    if (autofocus && inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [autofocus])
 
   return (
     <Wrapper>
@@ -268,6 +264,17 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
+          ref={(e: HTMLInputElement): void => {
+            inputRef.current = e
+            if (readOnly) {
+              register(e)
+            } else {
+              register({
+                pattern: { value: validInputPattern, message: 'Invalid amount' },
+                validate: { positive: validatePositive },
+              })
+            }
+          }}
           className={className}
           tooltip={tooltipText}
           placeholder="0"
@@ -276,7 +283,6 @@ const TokenRow: React.FC<Props> = ({
           disabled={isEditable}
           readOnly={readOnly}
           required
-          ref={inputRef}
           onKeyPress={onKeyPress}
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
