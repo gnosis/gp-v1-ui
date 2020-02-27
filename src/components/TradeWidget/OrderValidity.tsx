@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, Dispatch, SetStateAction } from 'react'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { adjustPrecision, ZERO } from '@gnosis.pm/dex-js'
@@ -175,21 +176,40 @@ const OrderValidity: React.FC<Props> = ({
   const validFromClassName = validFromError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
   const validUntilClassName = validUntilError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
-  const handleShowConfig = useCallback((): void => setShowOrderConfig(showOrderConfig => !showOrderConfig), [
+  const handleShowConfig = useCallback((): void => {
+    if (showOrderConfig) {
+      // sanitize inputs as multiples of 5
+      const sanitizedFromValue = makeMultipleOf(5, validFromInputValue).toString()
+      const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue).toString()
+
+      batchedUpdates(() => {
+        setValue(validFromInputId, sanitizedFromValue, true)
+        setValue(validUntilInputId, sanitizedUntilValue, true)
+      })
+    }
+
+    setShowOrderConfig(showOrderConfig => !showOrderConfig)
+  }, [
     setShowOrderConfig,
+    setValue,
+    showOrderConfig,
+    validFromInputId,
+    validFromInputValue,
+    validUntilInputId,
+    validUntilInputValue,
   ])
 
   const handleValidFromChange = useCallback(() => {
-    const newValue = makeMultipleOf(5, adjustPrecision(validFromInputValue, 0)).toString()
+    const newValue = adjustPrecision(validFromInputValue, 0)
     if (validFromInputValue !== newValue) {
       setValue(validFromInputId, newValue, true)
     }
   }, [validFromInputValue, setValue, validFromInputId])
 
   const handleValidUntilChange = useCallback(() => {
-    const newValue = makeMultipleOf(5, adjustPrecision(validUntilInputValue, 0)).toString()
+    const newValue = adjustPrecision(validUntilInputValue, 0)
     if (validUntilInputValue !== newValue) {
-      setValue(validUntilInputId, makeMultipleOf(5, newValue).toString(), true)
+      setValue(validUntilInputId, newValue, true)
     }
   }, [validUntilInputValue, setValue, validUntilInputId])
 
