@@ -23,6 +23,9 @@ const Wrapper = styled.div`
     margin: 0 0 1rem;
     padding: 0 1rem;
     box-sizing: border-box;
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
   }
 `
 
@@ -36,11 +39,20 @@ const PriceInputBox = styled.div`
   position: relative;
   outline: 0;
 
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    margin: 0 0 1.6rem;
+  }
+
   label {
     display: flex;
     width: auto;
     max-width: 100%;
     position: relative;
+
+    @media ${MEDIA.mobile} {
+      width: 100%;
+    }
   }
 
   label > small {
@@ -81,12 +93,17 @@ const PriceInputBox = styled.div`
 
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
+      width: 100%;
     }
 
     &:focus {
       border-bottom: 0.2rem solid #218dff;
       border-color: #218dff;
       color: #218dff;
+    }
+
+    &:focus::placeholder {
+      color: transparent;
     }
 
     &.error {

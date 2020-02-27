@@ -27,6 +27,7 @@ const Wrapper = styled.div`
     outline: 0;
     background: transparent;
     align-items: center;
+    flex-flow: row wrap;
 
     &:hover {
       background: transparent;

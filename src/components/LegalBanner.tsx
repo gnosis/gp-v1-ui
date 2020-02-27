@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { LEGALDOCUMENT } from 'const'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -16,6 +17,9 @@ const Wrapper = styled.div`
     line-height: 1;
     padding: 0;
     margin: 0;
+    @media ${MEDIA.mobile} {
+      font-size: 1.2rem;
+    }
   }
 `
 

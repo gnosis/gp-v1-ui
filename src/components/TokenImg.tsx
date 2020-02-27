@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { MEDIA } from 'const'
 import unknownTokenImg from 'assets/img/unknown-token.png'
 
 function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
@@ -14,9 +13,4 @@ export default styled.img.attrs(() => ({ onError: _loadFallbackTokenImage }))`
   border-radius: 3.6rem;
   object-fit: contain;
   margin: 0 1rem 0 0;
-
-  @media ${MEDIA.mobile} {
-    order: 3;
-    margin: 0 0 0 1rem;
-  }
 `

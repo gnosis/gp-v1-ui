@@ -174,6 +174,8 @@ const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
   flex-flow: row wrap;
+  font-size: inherit;
+  line-height: inherit;
 `
 
 const PoolingInterface: React.FC = () => {
