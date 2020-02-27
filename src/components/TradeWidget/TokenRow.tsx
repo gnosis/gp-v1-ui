@@ -12,7 +12,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import InputWithTooltip from './InputWithTooltip'
+import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
