@@ -143,7 +143,6 @@ export const usePlaceOrder = (): Result => {
         toast.error('Wallet is not connected!')
         return { success: false }
       }
-
       logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
       try {
@@ -186,9 +185,21 @@ export const usePlaceOrder = (): Result => {
         const receipt = await exchangeApi.placeValidFromOrders(params)
 
         logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
-
-        // TODO: link to orders page?
-        toast.success(`Transactions mined! Succesfully placed ${orders.length} orders`)
+        if (orders.length === 1 && orders[0].validUntil && orders[0].validFrom) {
+          const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+          const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+          // TODO: link to orders page?
+          toast.success(
+            `Transaction mined! Succesfully placed order valid in ${formatValidity(
+              validityFromInMinutes,
+              'ASAP',
+            )} and valid for ${formatValidity(validityUntilInMinutes, 'an unlimited amount of time')}`,
+          )
+        } else {
+          toast.success(
+            `Transaction mined! Succesfully placed ${orders.length} orders. Please check the orders page for their respective validity times.`,
+          )
+        }
 
         return { success: true, receipt }
       } catch (e) {
