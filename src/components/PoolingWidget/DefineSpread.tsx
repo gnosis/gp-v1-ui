@@ -85,7 +85,7 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, 
         onChange={onChange}
         onBlur={onBlur}
         onKeyPress={onKeyPress}
-        tooltip={'Value between 0 and 100, not inclusive'}
+        tooltip="Value between 0 and 100, not inclusive"
       />
       <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
     </DefineSpreadWrapper>
