@@ -1,13 +1,14 @@
 import { walletApi } from 'api'
 import { toast } from 'toastify'
+import { WalletInfo } from 'api/wallet/WalletApi'
 
 interface Result {
-  connectWallet: () => Promise<boolean>
+  connectWallet: () => Promise<WalletInfo | false>
   disconnectWallet: () => Promise<boolean>
 }
 
 export function useConnectWallet(): Result {
-  const connectWallet = async (): Promise<boolean> => {
+  const connectWallet = async (): Promise<WalletInfo | false> => {
     try {
       const success = await walletApi.connect()
 
@@ -18,7 +19,7 @@ export function useConnectWallet(): Result {
 
       toast.success('Wallet connected')
 
-      return true
+      return walletApi.getWalletInfo()
     } catch (error) {
       console.error('[WalletComponent] Connect wallet error', error)
       toast.error('Error connecting wallet')
