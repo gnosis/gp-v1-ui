@@ -224,6 +224,8 @@ const PoolingInterface: React.FC = () => {
       setTxReceipt(undefined)
 
       const { receipt } = await placeMultipleOrders({
+        networkId,
+        userAddress,
         orders,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {

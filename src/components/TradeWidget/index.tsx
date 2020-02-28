@@ -488,6 +488,8 @@ const TradeWidget: React.FC = () => {
       if (validFrom === 0) {
         // ; for destructure reassign format
         ;({ success } = await placeOrder({
+          networkId,
+          userAddress,
           buyAmount,
           buyToken,
           sellAmount,
@@ -510,6 +512,8 @@ const TradeWidget: React.FC = () => {
       } else {
         // ; for destructure reassign format
         ;({ success } = await placeMultipleOrders({
+          networkId,
+          userAddress,
           orders: [
             {
               buyAmount,
