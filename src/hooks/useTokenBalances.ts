@@ -37,7 +37,7 @@ async function fetchBalancesForToken(
     exchangeBalance,
     pendingDeposit,
     pendingWithdraw,
-    currentBachId,
+    currentBatchId,
     walletBalance,
     allowance,
   ] = await Promise.all([
@@ -53,10 +53,10 @@ async function fetchBalancesForToken(
     ...token,
     decimals: token.decimals,
     exchangeBalance,
-    totalExchangeBalance: calculateTotalBalance(exchangeBalance, currentBachId, pendingDeposit),
+    totalExchangeBalance: calculateTotalBalance(exchangeBalance, currentBatchId, pendingDeposit),
     pendingDeposit,
     pendingWithdraw,
-    claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBachId,
+    claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBatchId,
     walletBalance,
     enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
   }
