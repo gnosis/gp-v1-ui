@@ -63,7 +63,6 @@ export const usePlaceOrder = (): Result => {
       networkId,
     }: PlaceOrderParams<TokenDetails>): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
-        console.log('wallet not connected?', userAddress, networkId)
         toast.error('Wallet is not connected!')
         return { success: false }
       }
@@ -152,7 +151,6 @@ export const usePlaceOrder = (): Result => {
       networkId,
     }: PlaceMultipleOrdersParams): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
-        console.log('wallet not connected?', userAddress, networkId)
         toast.error('Wallet is not connected!')
         return { success: false }
       }
