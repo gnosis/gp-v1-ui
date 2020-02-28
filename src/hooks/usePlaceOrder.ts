@@ -20,6 +20,8 @@ interface PlaceOrderParams<T> {
   sellToken: T
   validUntil?: number
   txOptionalParams?: TxOptionalParams
+  userAddress?: string
+  networkId?: number
 }
 
 export interface MultipleOrdersOrder extends Omit<PlaceOrderParams<number>, 'txOptionalParams'> {
@@ -55,8 +57,12 @@ export const usePlaceOrder = (): Result => {
       sellToken,
       validUntil,
       txOptionalParams,
+      networkId: networkIdFinal,
+      userAddress: userAddressFinal,
     }: PlaceOrderParams<TokenDetails>): Promise<PlaceOrderResult> => {
-      if (!userAddress || !networkId) {
+      networkIdFinal = networkIdFinal || networkId
+      userAddressFinal = userAddressFinal || userAddress
+      if (!userAddressFinal || !networkIdFinal) {
         toast.error('Wallet is not connected!')
         return { success: false }
       }
@@ -69,9 +75,9 @@ export const usePlaceOrder = (): Result => {
 
       try {
         const [sellTokenId, buyTokenId, batchId] = await Promise.all([
-          exchangeApi.getTokenIdByAddress({ tokenAddress: sellToken.address, networkId }),
-          exchangeApi.getTokenIdByAddress({ tokenAddress: buyToken.address, networkId }),
-          exchangeApi.getCurrentBatchId(networkId),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: sellToken.address, networkId: networkIdFinal }),
+          exchangeApi.getTokenIdByAddress({ tokenAddress: buyToken.address, networkId: networkIdFinal }),
+          exchangeApi.getCurrentBatchId(networkIdFinal),
         ])
 
         if (sellTokenId === buyTokenId) {
@@ -89,13 +95,13 @@ export const usePlaceOrder = (): Result => {
         )
 
         const params: ExchangeApiPlaceOrderParams = {
-          userAddress,
+          userAddress: userAddressFinal,
           buyTokenId,
           sellTokenId,
           validUntil: validUntil ? batchId + validUntil : MAX_BATCH_ID,
           buyAmount,
           sellAmount,
-          networkId,
+          networkId: networkIdFinal,
           txOptionalParams: txOptionalParams || defaultTxOptionalParams,
         }
         const receipt = await exchangeApi.placeOrder(params)
