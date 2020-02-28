@@ -947,6 +947,23 @@ const GlobalStyles = createGlobalStyle`
     color: #476481;
   }
   // End WalletConnect Modal
+
+  /* Hack to fix Modali screen flash */
+  .modali-overlay {
+    display: none
+  }
+
+  body.modali-open::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    content: "";
+    background-color: rgba(47,62,78,0.5);
+    z-index: 1040;
+  }
+  /* End hack */
   
   .modali-open .modali-overlay {
     background-color: rgba(47,62,78,0.5);
