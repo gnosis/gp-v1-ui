@@ -6,7 +6,6 @@ import { SpreadInformationWrapper, DefineSpreadWrapper } from './DefineSpread.st
 import InputWithTooltip from '../InputWithTooltip'
 
 import { DEFAULT_DECIMALS } from 'const'
-import { formatPartialNumber, preventInvalidChars } from 'utils'
 
 interface DefineSpreadProps {
   selectedTokensMap: Map<number, TokenDetails>
@@ -43,11 +42,11 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
 const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, setSpread, nextStep }) => {
   const onChange = useCallback(
     ({ currentTarget: { value } }: React.SyntheticEvent<HTMLInputElement>): void => {
-      if (isNaN(+value) || +value <= 0 || +value >= 100) {
-        return
-      }
-
-      const newValue = formatPartialNumber(value)
+      const newValue = value
+        // put a `0` at the start, if starting with `.`
+        .replace(/^(\..*)$/, '0$1')
+        // remove extra decimal places, if present and more than 1
+        .replace(/^(.*\.\d{0,1}).*$/, '$1')
 
       setSpread(Number(newValue))
     },
@@ -56,7 +55,18 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, 
 
   const onBlur = useCallback(
     ({ currentTarget: { value } }: React.SyntheticEvent<HTMLInputElement>): void => {
-      const newValue = adjustPrecision(value, 1)
+      let newValue
+
+      // Adjust amount in case invalid
+      if (isNaN(+value) || +value <= 0) {
+        // set min value
+        newValue = '0.1'
+      } else if (+value >= 100) {
+        // set max value
+        newValue = '99.9'
+      } else {
+        newValue = adjustPrecision(value, 1)
+      }
 
       setSpread(Number(newValue))
     },
@@ -68,8 +78,13 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, 
       if (event.key === 'Enter') {
         onBlur(event)
         nextStep()
-      } else {
-        preventInvalidChars(event)
+      } else if (
+        // allow to remove chars and add numbers and a dot
+        !event.key.match(/(Backspace|Delete|\.|[0-9])/) ||
+        // do not allow a second dot
+        (event.key === '.' && event.currentTarget.value.match(/\./))
+      ) {
+        event.preventDefault()
       }
     },
     [nextStep, onBlur],
