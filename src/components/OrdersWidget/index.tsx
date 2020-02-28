@@ -20,7 +20,7 @@ import OrderRow from './OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 
-type OrderTabs = 'active' | 'liquidity' | 'expired'
+type OrderTabs = 'active' | 'liquidity' | 'closed'
 
 interface ShowOrdersButtonProps {
   type: OrderTabs
@@ -43,7 +43,7 @@ type FilteredOrdersState = {
 function emptyState(): FilteredOrdersState {
   return {
     active: { orders: [], markedForDeletion: new Set() },
-    expired: { orders: [], markedForDeletion: new Set() },
+    closed: { orders: [], markedForDeletion: new Set() },
     liquidity: { orders: [], markedForDeletion: new Set() },
   }
 }
@@ -88,7 +88,7 @@ const OrdersWidget: React.FC = () => {
 
     allOrders.forEach(order => {
       if (!isOrderActive(order, now)) {
-        filteredOrders.expired.orders.push(order)
+        filteredOrders.closed.orders.push(order)
       } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
         filteredOrders.liquidity.orders.push(order)
       } else {
@@ -218,10 +218,10 @@ const OrdersWidget: React.FC = () => {
                   onClick={setSelectedTabFactory('liquidity')}
                 />
                 <ShowOrdersButton
-                  type="expired"
-                  isActive={selectedTab === 'expired'}
-                  count={filteredOrders.expired.orders.length}
-                  onClick={setSelectedTabFactory('expired')}
+                  type="closed"
+                  isActive={selectedTab === 'closed'}
+                  count={filteredOrders.closed.orders.length}
+                  onClick={setSelectedTabFactory('closed')}
                 />
               </div>
               {/* {overBalanceOrders.size > 0 && showActive && (

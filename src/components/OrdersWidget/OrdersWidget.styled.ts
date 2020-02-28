@@ -138,12 +138,6 @@ export const OrdersForm = styled.div`
         background: #218dff;
       }
     }
-
-    .total {
-    }
-
-    .expired {
-    }
   }
 
   .ordersContainer {
