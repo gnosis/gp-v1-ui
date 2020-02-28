@@ -570,7 +570,19 @@ const TradeWidget: React.FC = () => {
       })
     } else {
       // Not connected. Prompt user to connect his wallet
-      await connectWallet()
+      const success = await connectWallet()
+      if (success) {
+        await _placeOrder({
+          validFrom,
+          validUntil,
+          sellAmount,
+          buyAmount,
+          sellToken: cachedSellToken,
+          buyToken: cachedBuyToken,
+          networkId,
+          userAddress,
+        })
+      }
     }
   }
 
