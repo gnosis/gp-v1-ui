@@ -3,13 +3,13 @@ import { useEffect } from 'react'
 import useGlobalState from './useGlobalState'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
-import { PendingTxArray } from 'api/exchange/ExchangeApi'
+import { PendingTxObj } from 'api/exchange/ExchangeApi'
 
-function usePendingOrders(): PendingTxArray {
+function usePendingOrders(): PendingTxObj[] {
   const { userAddress, networkId } = useWalletConnection()
 
   const [{ pendingOrders: pendingOrdersGlobal }] = useGlobalState()
-  const [pendingOrders, setPendingOrders] = useSafeState<PendingTxArray>([])
+  const [pendingOrders, setPendingOrders] = useSafeState<PendingTxObj[]>([])
 
   useEffect(() => {
     if (userAddress && networkId) {

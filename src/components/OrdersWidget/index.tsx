@@ -39,16 +39,16 @@ type FilteredOrdersStateKeys = OrderTabs
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
     orders: AuctionElement[]
-    pendingOrders: AuctionElement[]
+    pendingOrders: PendingTxObj[]
     markedForDeletion: Set<string>
   }
 }
 
 function emptyState(): FilteredOrdersState {
   return {
-    active: { orders: [], pendingOrders: new Set(), markedForDeletion: new Set() },
-    closed: { orders: [], pendingOrders: new Set(), markedForDeletion: new Set() },
-    liquidity: { orders: [], pendingOrders: new Set(), markedForDeletion: new Set() },
+    active: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
+    closed: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
+    liquidity: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
   }
 }
 
