@@ -7,13 +7,17 @@ import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { log, formatValidity } from 'utils'
+import { logDebug, formatTimeInHours } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
-import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
 import useSafeState from './useSafeState'
 
-interface PlaceOrderParams<T> {
+interface ConnectionParams {
+  userAddress: string
+  networkId: number
+}
+
+interface PlaceOrderParams<T> extends ConnectionParams {
   buyAmount: BN
   buyToken: T
   sellAmount: BN
@@ -22,11 +26,12 @@ interface PlaceOrderParams<T> {
   txOptionalParams?: TxOptionalParams
 }
 
-export interface MultipleOrdersOrder extends Omit<PlaceOrderParams<number>, 'txOptionalParams'> {
+export interface MultipleOrdersOrder
+  extends Omit<PlaceOrderParams<number>, 'txOptionalParams' | 'userAddress' | 'networkId'> {
   validFrom?: number
 }
 
-interface PlaceMultipleOrdersParams {
+interface PlaceMultipleOrdersParams extends ConnectionParams {
   orders: MultipleOrdersOrder[]
   txOptionalParams?: TxOptionalParams
 }
@@ -45,7 +50,6 @@ export interface PlaceOrderResult {
 
 export const usePlaceOrder = (): Result => {
   const [isSubmitting, setIsSubmitting] = useSafeState(false)
-  const { userAddress, networkId } = useWalletConnection()
 
   const placeOrder = useCallback(
     async ({
@@ -55,14 +59,16 @@ export const usePlaceOrder = (): Result => {
       sellToken,
       validUntil,
       txOptionalParams,
+      userAddress,
+      networkId,
     }: PlaceOrderParams<TokenDetails>): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
         return { success: false }
       }
 
-      log(
-        `Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
+      logDebug(
+        `[usePlaceOrder] Placing order: buy ${buyAmount.toString()} ${buyToken.symbol} sell ${sellAmount.toString()} ${
           sellToken.symbol
         }`,
       )
@@ -79,7 +85,14 @@ export const usePlaceOrder = (): Result => {
           return { success: false }
         }
 
-        log('sellTokenId, buyTokenId, batchId', sellTokenId, buyTokenId, batchId, sellToken.address, buyToken.address)
+        logDebug(
+          '[usePlaceOrder] sellTokenId, buyTokenId, batchId',
+          sellTokenId,
+          buyTokenId,
+          batchId,
+          sellToken.address,
+          buyToken.address,
+        )
 
         const params: ExchangeApiPlaceOrderParams = {
           userAddress,
@@ -92,7 +105,7 @@ export const usePlaceOrder = (): Result => {
           txOptionalParams: txOptionalParams || defaultTxOptionalParams,
         }
         const receipt = await exchangeApi.placeOrder(params)
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
 
         // TODO: show link to orders page?
         if (validUntil) {
@@ -100,14 +113,19 @@ export const usePlaceOrder = (): Result => {
           //  In reality, no need to ceil cause we know batch time is 300, but it was done to avoid relying on knowing
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
-          toast.success(`Transaction mined! Succesfully placed order valid for ${formatValidity(validityInMinutes)}`)
+          toast.success(
+            `Transaction mined! Successfully placed order valid ASAP and expiring ${formatTimeInHours(
+              validityInMinutes,
+              'never',
+            )}`,
+          )
         } else {
-          toast.success(`Transaction mined! Succesfully placed standing order`)
+          toast.success(`Transaction mined! Successfully placed order valid ASAP and never expiring`)
         }
 
         return { success: true, receipt }
       } catch (e) {
-        log(`Error placing order`, e)
+        console.error(`[usePlaceOrder] Error placing order`, e)
 
         if (e.message.match(/Must have Address to get ID/)) {
           toast.error(
@@ -122,17 +140,21 @@ export const usePlaceOrder = (): Result => {
         setIsSubmitting(false)
       }
     },
-    [networkId, setIsSubmitting, userAddress],
+    [setIsSubmitting],
   )
 
   const placeMultipleOrders = useCallback(
-    async ({ orders, txOptionalParams }: PlaceMultipleOrdersParams): Promise<PlaceOrderResult> => {
+    async ({
+      orders,
+      txOptionalParams,
+      userAddress,
+      networkId,
+    }: PlaceMultipleOrdersParams): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
         return { success: false }
       }
-
-      log(`Placing ${orders.length} orders at once`)
+      logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
       try {
         const buyTokens: number[] = []
@@ -151,9 +173,9 @@ export const usePlaceOrder = (): Result => {
           sellTokens.push(order.sellToken)
 
           // if not set, order is valid from placement + wait period
-          validFroms.push(order.validFrom ?? currentBatchId + BATCHES_TO_WAIT)
+          validFroms.push(currentBatchId + (order.validFrom ? order.validFrom : BATCHES_TO_WAIT))
           // if not set, order is valid forever
-          validUntils.push(order.validUntil || MAX_BATCH_ID)
+          validUntils.push(order.validUntil ? currentBatchId + order.validUntil : MAX_BATCH_ID)
 
           buyAmounts.push(order.buyAmount)
           sellAmounts.push(order.sellAmount)
@@ -173,14 +195,49 @@ export const usePlaceOrder = (): Result => {
 
         const receipt = await exchangeApi.placeValidFromOrders(params)
 
-        log(`The transaction has been mined: ${receipt.transactionHash}`)
-
-        // TODO: link to orders page?
-        toast.success(`Transactions mined! Succesfully placed ${orders.length} orders`)
+        logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
+        // placeMultipleOrders is the only way to use validFrom
+        // right now app doesn't support multiple orders with different validFrom times
+        // Liquidity creates multiple orders but with same order times
+        if (orders.length === 1) {
+          if (orders[0].validUntil && orders[0].validFrom) {
+            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
+                validityFromInMinutes,
+                'ASAP',
+              )} and expiring ${formatTimeInHours(validityUntilInMinutes, 'never')}`,
+            )
+          } else if (orders[0].validUntil) {
+            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
+                validityUntilInMinutes,
+                'never',
+              )}`,
+            )
+          } else if (orders[0].validFrom) {
+            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
+                validityFromInMinutes,
+                'ASAP',
+              )} and never expiring`,
+            )
+          }
+        } else {
+          toast.success(
+            `Transaction mined! Succesfully placed ${orders.length} orders. Please check the orders page for their respective validity times.`,
+          )
+        }
 
         return { success: true, receipt }
       } catch (e) {
-        log(`Error placing orders`, e)
+        console.error(`[usePlaceOrder] Error placing orders`, e)
         toast.error(`Error placing orders: ${e.message}`)
 
         return { success: false }
@@ -188,7 +245,7 @@ export const usePlaceOrder = (): Result => {
         setIsSubmitting(false)
       }
     },
-    [networkId, setIsSubmitting, userAddress],
+    [setIsSubmitting],
   )
 
   return { placeOrder, isSubmitting, setIsSubmitting, placeMultipleOrders }

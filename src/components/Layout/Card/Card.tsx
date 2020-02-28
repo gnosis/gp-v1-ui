@@ -1,85 +1,97 @@
 import React from 'react'
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
-const CardRowDrawer = styled.tr<{ responsive: boolean }>`
+const CardRowDrawer = styled.tr`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
+  z-index: 9999;
+  width: 50rem;
+  height: 42rem;
+  border-radius: 0.6rem;
+  background: #ffffff;
 
-  background-color: transparent;
-  box-shadow: none;
+  @media ${MEDIA.mobile} {
+    width: 100%;
+    bottom: 0;
+    top: initial;
+    height: 80vh;
+  }
 
   // Inner td wrapper
   > td {
     position: relative;
-    background-color: var(--color-background-selected-dark);
-    border-bottom: 0.125rem solid #0000000f;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-    box-shadow: var(--box-shadow);
-    width: 80%;
-
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-      width: 95%;
-    }
+    background: transparent;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.14);
+    border-radius: 6px;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 
     > div {
-      margin-top: 2rem;
+      margin: 0;
     }
 
     span.symbol {
       color: #b02ace;
     }
 
-    h4 {
-      margin: 2.5rem 1rem 1rem;
-      font-size: 1.3em;
-      font-weight: normal;
-      text-align: center;
+    > div > h4 {
+      height: 5.6rem;
+      padding: 0 1.6rem;
+      box-sizing: border-box;
+      letter-spacing: 0;
+      font-size: 1.6rem;
+      text-align: left;
+      color: #2f3e4e;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      font-family: var(--font-default);
+      font-weight: var(--font-weight-regular);
+      border-bottom: 0.1rem solid #dfe6ef;
     }
 
     .times {
     }
   }
-
-  ${(props): string | false =>
-    props.responsive &&
-    `
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      background: #000000b5;
-      z-index: 99;
-
-      > td {
-        border-radius: var(--border-radius);
-      }
-  `}
 `
 const CardDrawerCloser = styled.a`
   position: absolute;
-  display: inline-block;
-  top: 0.5rem;
-  right: 0.5rem;
-  padding: 0 0.5em 0 0;
-  font-size: 2em;
+  right: 1.6rem;
+  top: 0.8rem;
   text-decoration: none;
+  font-size: 4rem;
+  line-height: 1;
+  color: #526877;
+  opacity: 0.5;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
 `
 
 interface CardDrawerProps {
   children: React.ReactNode
   closeDrawer: () => void
-  responsive: boolean
 }
 
 export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>(function ReffedCardDrawer(
-  { children, closeDrawer, responsive },
+  { children, closeDrawer },
   ref,
 ) {
   return (
-    <CardRowDrawer ref={ref} responsive={responsive}>
+    <CardRowDrawer ref={ref}>
       <td>
         <CardDrawerCloser onClick={closeDrawer}>&times;</CardDrawerCloser>
         {children}
@@ -101,33 +113,53 @@ export const CardTable = styled.table<{
   $align?: string
   $justify?: string
 
-  $responsiveCSS?: string
   $webCSS?: string
 }>`
   display: grid;
-  grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
+  // grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
+
+  .checked {
+    margin: 0;
+    outline: 0;
+  }
+  
+  > thead {
+    position: sticky;
+    background: #ecf2f7;
+    top: 0;
+    z-index: 5;
+    font-size: 1.1rem;
+    color: #2F3E4E;
+    letter-spacing: 0;
+    font-weight: var(--font-weight-bold);
+  }
 
   > thead, tbody {
     > tr:not(${CardRowDrawer}) {
       position: relative;
       display: grid;
-      grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
+      // grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
+      // grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
+      grid-template-columns: 3.2rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem);
       // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       // grid-gap
       ${({ $gap }): string => ($gap ? `grid-gap: ${$gap};` : '')}
       align-items: ${({ $align = 'center' }): string => $align};
       justify-content: ${({ $justify = 'center' }): string => $justify};
-
-      border-radius: var(--border-radius);
+      border-bottom: .1rem solid rgba(159,180,201,0.50);
+      border-radius: 0;
 
       // How much separation between ROWS
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
-
       text-align: center;
       transition: all 0.2s ease-in-out;
       z-index: 1;
+
+      &:hover {
+        background: #deeeff;
+      }
       
       &.highlight {
         background-color: var(--color-background-highlighted);
@@ -135,21 +167,24 @@ export const CardTable = styled.table<{
       }
 
       &.selected {
-        background-color: var(--color-button-disabled);
-        color: #fff;
+        background-color: rgba(159,180,201,0.50);
       }
 
       // Separation between CELLS
-      > * {
-        margin: ${({ $cellSeparation = '0 0.5rem' }): string => $cellSeparation};
-      }
-    }
-
-    > ${CardRowDrawer} {
+      > th,
       > td {
-        margin-top: ${({ $rowSeparation = '1rem' }): string => `-${Number($rowSeparation.split('rem')[0]) * 2.2}rem`};
+        // margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-align: left;
       }
     }
+  }
+  
+  .lowBalance {
+    color: #B27800;
+    display: block;
+    > img {margin: 0 0 0 .25rem;}
   }
   
   // Table Header
@@ -160,23 +195,29 @@ export const CardTable = styled.table<{
       box-shadow: none;
 
       > th {
-        color: var(--color-text-deposit-primary);
-        line-height: 1.5;
-        font-size: 0.8em;
-        text-transform: uppercase;
-        overflow-wrap: break-word;
-        padding: 0.5em;
-        font-weight: bolder;
+        color: inherit;
+        line-height: 1;
+        font-size: 1.1rem;
+        padding: 1.3rem 0;
+      }
+      
+      > th.filled {
       }
     }
   }
 
   // Table Body
   tbody {
+    font-size: 1.1rem;
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-regular);
+    color: #476481;
+    letter-spacing: -0.085rem;
+    line-height: 1.2;
+  }
+  
+  tbody {
     > tr:not(${CardRowDrawer}) {
-      background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor};
-      border: 0.125rem solid transparent;
-      box-shadow: var(--box-shadow);
 
       > td {
         &.cardOpener {
@@ -184,66 +225,9 @@ export const CardTable = styled.table<{
         }
       }
 
-      // Don't highlight on hover selected rows or the drawer
-      &:not(.selected):not(.highlight):not(${CardRowDrawer}):hover {
-        background: var(--color-background-selected);
-        border: 0.125rem solid var(--color-border);
-      }
     }
   }
 
   // Top level custom CSS
   ${({ $webCSS }): string | undefined => $webCSS}
-
-  @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
-    > thead, tbody {
-      > tr:not(${CardRowDrawer}) {
-        grid-template-columns: none;
-        grid-template-rows: auto;
-
-        align-items: center;
-        justify-content: stretch;
-        padding: 0 0.7rem;
-        
-        > td {
-          display: flex;
-          flex-flow: row;
-          align-items: center;
-          border-bottom: 0.0625rem solid #00000024;
-          padding: 0.7rem;
-
-          &:last-child {
-            border: none;
-          }
-
-          &.cardOpener {
-            cursor: pointer;
-            display: initial;
-          }
-
-          &::before {
-            content: attr(data-label);
-            margin-right: auto;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.7rem;
-          }
-        }
-
-        &.selected {
-          > td:not(:last-child) {
-            border-bottom: 0.0625rem solid #ffffff40;
-          }
-        }
-      }
-    }
-    
-    // Hide Table Header on smaller sizes
-    > thead {
-      display: none;
-    }
-
-    // Top level custom css
-    ${({ $responsiveCSS }): string | undefined => $responsiveCSS}
-  }
 `

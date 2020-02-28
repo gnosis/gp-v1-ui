@@ -1,97 +1,92 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
-
-const { TABLET } = RESPONSIVE_SIZES
 
 export const ModalBodyWrapper = styled.div`
   div > p {
-    padding: 0 1em;
-    color: #828282;
-    font-size: 0.85em;
+    font-size: inherit;
+    color: inherit;
+    padding: 0;
   }
 `
 
 export const TokenRow = styled.tr`
-  // Each cell wrapper (td)
-  > * {
-    margin: 0.1rem;
-    padding: 0.7rem;
+  .enableToken {
+    height: auto;
+    outline: 0;
+    margin: 0;
+    font-size: 1.2rem;
+    color: #218dff;
+    letter-spacing: -0.03rem;
     text-align: center;
-    transition: all 0.5s ease;
+    font-family: var(--font-default);
+    font-weight: var(--font-weight-bold);
+    display: flex;
+    align-items: center;
+    padding: 0.4rem 1rem;
+    box-sizing: border-box;
+    background: #deeeff;
+    border: 0.1rem solid #218dff;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
-    > button {
-      margin: 0.2rem;
+    > svg {
+      margin: 0 0.5rem 0 0;
     }
 
-    &:first-child {
-      display: grid;
-      grid-template-columns: min-content max-content;
-      grid-gap: 1em;
-      align-items: center;
-
-      > * {
-        margin: 0.375rem;
-      }
-
-      > div:last-child {
-        text-align: initial;
-      }
+    &:hover {
+      background: #218dff;
+      color: #ffffff;
     }
+  }
 
-    &:last-child {
-      display: flex;
-      flex-flow: column;
-    }
+  .withdrawToken,
+  .depositToken {
+    outline: 0;
+    background: #218dff;
+    border-radius: 2.4rem;
+    height: 2.4rem;
+    width: 2.4rem;
+    margin: 0 0 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+  }
+
+  .withdrawToken {
+    background: #218dff;
+  }
+
+  .depositToken {
+    background: #dfe6ef;
   }
 
   &.loading {
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
   }
-
-  @media only screen and (max-width: ${TABLET}em) {
-    > td {
-      // Each item in each cell
-      > * {
-        margin-left: 0.625rem;
-      }
-      // Token
-      &:first-child {
-        grid-template-columns: 1fr max-content auto;
-
-        > img {
-          order: 2;
-          margin-right: -0.5rem;
-        }
-      }
-      // Actions
-      &:last-child {
-        border: none;
-        flex-flow: row nowrap;
-        padding: 0.7rem 0 0.7rem 0.7rem;
-
-        > button:last-child {
-          border-radius: 0 var(--border-radius) var(--border-radius);
-        }
-      }
-    }
-    &.selected {
-      > div {
-        border-bottom: 0.0625rem solid #ffffff40;
-      }
-    }
-  }
 `
 
 export const RowClaimButton = styled.button`
   margin-bottom: 0;
-`
-
-export const RowClaimLink = styled.a`
-  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+  font-size: inherit;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
 
   &.success {
     color: #63ab52;
+    background: transparent;
+
+    &:hover {
+      background: transparent;
+      color: #63ab52;
+    }
   }
   &.disabled {
     color: currentColor;
@@ -99,6 +94,33 @@ export const RowClaimLink = styled.a`
     opacity: 0.5;
   }
 `
+
+export const RowClaimLink = styled.a`
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+
+  &::after {
+    content: 'Claim';
+    display: block;
+    line-height: inherit;
+    border: 0.1rem solid #63ab52;
+    border-radius: 2rem;
+    background: transparent;
+    color: #63ab52;
+    padding: 0.4rem 1rem;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    box-sizing: border-box;
+    margin: 0 0 0 0.5rem;
+  }
+
+  &:hover::after {
+    background: var(--color-button-success);
+    color: white;
+  }
+`
+
 export const LineSeparator = styled.div`
   border: 0.03125rem solid var(--color-text-primary);
   margin: auto;

@@ -1,3 +1,5 @@
+import BigNumber from 'bignumber.js'
+
 export {
   formatAmount,
   formatAmountFull,
@@ -9,6 +11,8 @@ export {
   calculatePriceBigNumber,
   formatPrice,
 } from '@gnosis.pm/dex-js'
+
+// TODO: Move utils to dex-utils
 
 export function makeMultipleOf(mult = 5, value?: number | string | null): number {
   const cache = {}
@@ -52,21 +56,30 @@ export function sanitizeNegativeAndMakeMultipleOf(value?: string | null, default
     : defaultValue
 }
 
-export function validatePositive(value: string): true | string {
-  return Number(value) > 0 || 'Invalid amount'
+export function validatePositive(value: string, constraint = 0): true | string {
+  return Number(value) > constraint || 'Invalid amount'
 }
 export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
 export const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
 export const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
 
-export const formatValidity = (validTime: string | number): string =>
+export const formatTimeInHours = (
+  validTime: string | number,
+  matchedConstraintText: string,
+  errorText = 'Invalid time - time cannot be negative',
+): string =>
   +validTime == 0
-    ? 'Unlimited'
+    ? matchedConstraintText
     : +validTime < 0
-    ? 'Invalid time - time cannot be negative'
-    : `~
+    ? errorText
+    : `in ~
 ${(+validTime / 60)
   .toFixed(2)
   .replace(leadingAndTrailingZeros, '')
   .replace(trailingZerosAfterDot, '$1')}
 hours`
+
+export function parseBigNumber(value: string): BigNumber | null {
+  const bigNumber = new BigNumber(value)
+  return bigNumber.isNaN() ? null : bigNumber
+}

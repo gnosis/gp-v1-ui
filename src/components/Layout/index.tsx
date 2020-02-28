@@ -5,56 +5,72 @@ import Header from './Header'
 import Footer from './Footer'
 import LegalBanner from '../LegalBanner'
 
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
-  min-height: 100vh;
   width: 100%;
-
-  display: grid;
-  grid-template-rows: 3.125rem 0.2fr auto min-content;
+  display: flex;
+  flex-flow: column wrap;
 
   main {
     flex: 1;
-    margin: auto;
-    min-width: 40vw;
+    margin: 2.4rem auto 5rem;
+    width: auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    font-size: 1.3rem;
+    line-height: 1.2;
 
-    @media only screen and (max-width: ${RESPONSIVE_SIZES.TABLET}em) {
+    @media ${MEDIA.mobile} {
       width: 100%;
+    }
+
+    > section {
+      width: 100%;
+      @media ${MEDIA.mobile} {
+        width: 100%;
+        overflow: initial;
+      }
+    }
+
+    @media ${MEDIA.mobile} {
+      margin: 1.6rem auto 3.2rem;
     }
   }
 `
 
+const navigation = [
+  {
+    label: 'Trade',
+    to: '/trade',
+    order: 1,
+  },
+  {
+    label: 'Liquidity',
+    to: '/liquidity',
+    order: 2,
+    withPastLocation: true,
+  },
+  {
+    label: 'Orders',
+    to: '/orders',
+    order: 3,
+    withPastLocation: true,
+  },
+  {
+    label: 'Balances',
+    to: '/wallet',
+    order: 4,
+    withPastLocation: true,
+  },
+]
+
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
-    <LegalBanner startOpen={false} useFull={false} title="💀 This project is in beta. Use at your own risk." />
-    <Header
-      navigation={[
-        {
-          label: 'Trade',
-          to: '/trade',
-          order: 1,
-        },
-        {
-          label: 'Wallet',
-          to: '/wallet',
-          order: 2,
-          withPastLocation: true,
-        },
-        {
-          label: 'Orders',
-          to: '/orders',
-          order: 3,
-          withPastLocation: true,
-        },
-        {
-          label: 'Liquidity',
-          to: '/liquidity',
-          order: 4,
-          withPastLocation: true,
-        },
-      ]}
-    />
+    <LegalBanner useFull={false} title="💀 This project is in beta. Use at your own risk." />
+    <Header navigation={navigation} />
     <main>{children}</main>
     <Footer />
   </Wrapper>

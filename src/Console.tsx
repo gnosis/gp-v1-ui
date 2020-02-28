@@ -15,21 +15,32 @@ const ConsoleWrapper = styled.div`
 `
 const ButtonGroup = styled.div`
   position: fixed;
-  bottom: 0;
-  right: 0;
-  padding: 2em;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  padding: 0;
   pointer-events: none;
 
-  > * {
+  > button {
     pointer-events: initial;
+    padding: 1.6rem;
+    box-sizing: border-box;
+    border-radius: 6rem;
+    background: #dde4ed;
+    color: rgba(78, 106, 133, 0.75);
+    outline: 0;
+  }
+
+  > button:hover {
+    background: #208dff;
+    color: #ffffff;
   }
 `
 
 const InputGroup = styled.div`
   position: sticky;
-  bottom: 0.4em;
+  bottom: 0.4rem;
   margin: 0;
-  margin-top: 5px;
+  margin-top: 0.5rem;
   display: flex;
 
   input:focus {
@@ -106,13 +117,21 @@ const ConsoleFrame: React.FC = () => {
           <Console logs={logs} variant="dark" />
           <InputGroup>
             <input type="text" onKeyPress={handleCommand} ref={input} />
-            <button onClick={handleClick}>{'>>'}</button>
+            <button type="button" onClick={handleClick}>
+              {'>>'}
+            </button>
           </InputGroup>
         </>
       )}
       <ButtonGroup>
-        {showConsole && logs.length > 0 && <button onClick={(): void => setLogs([])}>clear</button>}
-        <button onClick={(): void => setShowConsole(on => !on)}>{showConsole ? 'x' : '^'}</button>
+        {showConsole && logs.length > 0 && (
+          <button type="button" onClick={(): void => setLogs([])}>
+            clear
+          </button>
+        )}
+        <button type="button" onClick={(): void => setShowConsole(on => !on)}>
+          {showConsole ? 'x' : 'console'}
+        </button>
       </ButtonGroup>
     </ConsoleWrapper>
   )

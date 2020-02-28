@@ -1,56 +1,90 @@
 import styled from 'styled-components'
-import { RESPONSIVE_SIZES } from 'const'
+import { MEDIA } from 'const'
 
 export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolean }>`
   display: flex;
-  justify-content: space-evenly;
+  order: 1;
+  flex: 1 1 100%;
+  margin: auto;
+  align-items: center;
+  justify-content: center;
 
-  margin: 0.5rem;
-  padding: 0.5rem;
+  @media ${MEDIA.mobile} {
+    flex-flow: row wrap;
+    background: #dde4ed;
+    border-radius: 15rem;
+    width: 100%;
+    margin: 0 auto;
+    justify-content: space-between;
+  }
 
-  white-space: nowrap;
-
-  a {
+  a:link,
+  a:visited {
     border: 0.125rem solid transparent;
     color: var(--color-text-secondary);
     font-weight: bolder;
-    padding: 0.35em;
     text-decoration: none;
+    transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
+    font-weight: var(--font-weight-bold);
+    font-size: 2.1rem;
+    padding: 0 4rem;
+    border-radius: 15rem;
+    letter-spacing: 0;
+    text-align: center;
+    box-sizing: border-box;
+    height: 5.4rem;
+    line-height: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    transition: color 0.2s ease-in-out;
+    @media ${MEDIA.mobile} {
+      color: rgba(78, 106, 133, 0.75);
+      margin: 0;
+      padding: 0;
+      font-size: 1.3rem;
+      width: 100%;
+      height: 4rem;
+    }
 
     &:hover {
-      color: var(--color-text-primary);
+      color: var(--color-text-active);
+      background: var(--color-background-nav-active);
     }
 
     &.active {
-      color: var(--color-text-primary);
-
-      @media only screen and (min-width: ${RESPONSIVE_SIZES.TABLET}em) {
-        border-bottom: 0.125rem solid var(--color-text-primary);
+      color: var(--color-text-active);
+      background: var(--color-background-nav-active);
+      @media ${MEDIA.mobile} {
+        background: #208dff;
+        color: #ffffff;
       }
     }
   }
-
-  ${({ $responsive, $open }): string | false =>
-    $responsive &&
-    `
-    flex-flow: column nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    
-    background: var(--color-background-pageWrapper);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    cursor: pointer;
-    height: ${$open ? 'auto' : '3.9375rem'};
-    overflow: hidden;
-    padding: 0;
-  `}
 `
 
-export const OrderedNavLinkDiv = styled.h3<{ $order: number }>`
-  order: ${({ $order }): number => $order};
+export const OrderedNavLinkDiv = styled.span`
   display: flex;
   align-items: center;
+  flex: 1 1 auto;
+
+  // Hide 'ORDERS' tab on desktop/tablet (until we decide to show it for all devices...)
+  &:nth-of-type(3) {
+    display: none;
+    @media ${MEDIA.mobile} {
+      display: flex;
+    }
+  }
+
+  @media ${MEDIA.mobile} {
+    justify-content: center;
+    flex: 1 1 25%;
+  }
+
+  &:not(:last-of-type) {
+    margin: 0 1.6rem 0 0;
+    @media ${MEDIA.mobile} {
+      margin: 0;
+    }
+  }
 `

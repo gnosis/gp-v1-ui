@@ -36,7 +36,6 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
   // only fetch new gasPrice when chainId or blockNumber changed
   const key = constructKey({ chainId, blockNumber: blockHeader && blockHeader.number })
   if (key === cacheKey) {
-    console.log('gasPrice from cache', cachedGasPrice)
     return cachedGasPrice
   }
 
@@ -52,12 +51,11 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
     if (gasPrice) {
       cacheKey = key
       cachedGasPrice = gasPrice
-      console.log('new gasPrice', gasPrice)
 
       return gasPrice
     }
   } catch (error) {
-    console.error('Error fetching gasPrice from', gasStationURL, error)
+    console.error('[api:gasStation] Error fetching gasPrice from', gasStationURL, error)
   }
   return undefined
 }

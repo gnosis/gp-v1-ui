@@ -29,7 +29,7 @@ export const TestComponent: React.FC<TestComponentI> = ({ safeUpdate }) => {
 
   return (
     <div>
-      <button id="buttonTest" onClick={_handleClick}></button>
+      <button type="button" id="buttonTest" onClick={_handleClick}></button>
       <h1>{withoutSafe || withSafe}</h1>
     </div>
   )

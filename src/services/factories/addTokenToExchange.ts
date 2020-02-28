@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 
-import { log, getImageUrl } from 'utils'
+import { logDebug, getImageUrl } from 'utils'
 
 import { getErc20Info } from '../helpers'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
@@ -32,14 +32,14 @@ export function addTokenToExchangeFactory(
     const erc20Info = getErc20Info({ ...factoryParams, tokenAddress, networkId })
 
     if (!erc20Info) {
-      log('Address %s does not contain a valid ERC20 token', tokenAddress)
+      logDebug('[services:factories:addTokenToExchange] Address %s does not contain a valid ERC20 token', tokenAddress)
       return false
     }
 
     try {
       await exchangeApi.addToken({ userAddress, tokenAddress, networkId })
     } catch (e) {
-      log('Failed to add token (%s) to exchange', tokenAddress)
+      console.error('[services:factories:addTokenToExchange] Failed to add token (%s) to exchange', tokenAddress)
       return false
     }
 
@@ -55,9 +55,13 @@ export function addTokenToExchangeFactory(
       }
 
       // TODO: cache new token
-      log('new token: ', token)
+      logDebug('[services:factories:addTokenToExchange] New token: ', token)
     } catch (e) {
-      log('Failed to add new token (%s) to local list of tokens', tokenAddress, e)
+      console.error(
+        '[services:factories:addTokenToExchange] Failed to add new token (%s) to local list of tokens',
+        tokenAddress,
+        e,
+      )
       return false
     }
 

@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 import { UNLIMITED_ORDER_AMOUNT } from '@gnosis.pm/dex-js'
 export {
   UNLIMITED_ORDER_AMOUNT,
@@ -10,6 +11,13 @@ export {
   DEFAULT_PRECISION,
 } from '@gnosis.pm/dex-js'
 export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
+
+// How much of the order needs to be matched to consider it filled
+// Will divide the total sell amount by this factor.
+// E.g.: Sell = 500; ORDER_FILLED_FACTOR = 100 (1%) => 500/100 => 5
+// ∴ when the amount is < 5 the order will be considered filled.
+export const ORDER_FILLED_FACTOR = new BN(1000000) // 0.0001%
+
 export const APP_NAME = 'fuse'
 
 export const ETHER_PNG =
@@ -38,23 +46,47 @@ export const LEGALDOCUMENT = {
   TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
 }
 
-export const RESPONSIVE_SIZES = {
-  // PX SIZES:
-  MOBILE_SMALL_PX: 320,
-  MOBILE_PX: 500,
-  MOBILE_LARGE_PX: 532,
-  TABLET_PX: 720,
-  TABLET_LARGE_PX: 866,
-  WEB_SMALL_PX: 1024,
-
-  // EM SIZES:
-  MOBILE_SMALL: 20,
-  MOBILE: 31.25,
-  MOBILE_LARGE: 33.25,
-  TABLET: 45,
-  TABLET_LARGE: 54.125,
-  WEB_SMALL: 64,
-  WEB: 75,
+export const MEDIA = {
+  MOBILE_LARGE_PX: 500,
+  tinyScreen: '320px',
+  smallScreen: '736px',
+  smallScreenUp: '737px',
+  mediumScreenSmall: '850px',
+  mediumEnd: '1024px',
+  desktopScreen: '1025px',
+  get tinyDown(): string {
+    return `only screen and (max-width : ${this.tinyScreen})`
+  },
+  get mobile(): string {
+    return `only screen and (max-width : ${this.smallScreen})`
+  },
+  get mediumUp(): string {
+    return `only screen and (min-width : ${this.smallScreenUp})`
+  },
+  get mediumDown(): string {
+    return `only screen and (max-width : ${this.mediumEnd})`
+  },
+  get mediumOnly(): string {
+    return `only screen and (min-width : ${this.smallScreenUp}) and (max-width : ${this.mediumEnd})`
+  },
+  get desktop(): string {
+    return `only screen and (min-width : ${this.desktopScreen})`
+  },
+  get tabletPortrait(): string {
+    return `(min-device-width: ${this.smallScreenUp}) and (max-device-width: ${this.mediumEnd}) and (orientation: portrait)`
+  },
+  get tabletLandscape(): string {
+    return `(min-device-width: ${this.smallScreenUp}) and (max-device-width: ${this.mediumEnd}) and (orientation: landscape)`
+  },
+  get tablet(): string {
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd}), ${this.tabletPortrait}, ${this.tabletLandscape}`
+  },
+  get tabletNoPortrait(): string {
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumEnd}), ${this.tabletLandscape}`
+  },
+  get tabletSmall(): string {
+    return `(min-width: ${this.smallScreenUp}) and (max-width: ${this.mediumScreenSmall})`
+  },
 }
 
 export const ELLIPSIS = '...'

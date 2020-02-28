@@ -1,10 +1,21 @@
 import { css } from 'styled-components'
 
+const AllColors = `
+  // FONTS
+  --font-default: "Inter", "Helvetica Neue", Helvetica, sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+  --font-arial: Arial, Helvetica, sans-serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  // ------------------------------
+`
+
 const LightColors = `
   // Background
   --color-background-lighter: #f7f7f7;
-  --color-background: #eee;
-  --color-background-pageWrapper: #fff;
+  --color-background: #EDF2F7;
+  --color-background-pageWrapper: #ffffff;
   --color-background-actionCards: #bbfdbb;
   --color-background-highlighted: #fcfde0;
   --color-background-selected: ##d9d9d9;
@@ -16,9 +27,9 @@ const LightColors = `
   --color-border: transparent;
 
   // Text
-  // --color-text-primary: #3d414c;
-  --color-text-primary: #000;
-  --color-text-secondary: #8c8c8c;
+  --color-text-primary: #476481;
+  --color-text-secondary: #9FB4C9;
+  --color-text-active: #218DFF;
 
   // Buttons
   --color-button-primary: #000;
@@ -27,10 +38,10 @@ const LightColors = `
   --color-button-danger: #e55353;
 
   // Components
-  --color-background-banner: #272727;
-  --color-text-banner: wheat;
+  --color-background-banner: #DFE6EF;
   --color-text-wallet: #000;
   --color-text-deposit-header: #000000;
+  --color-background-nav-active: #DFE6EF;
 
   // Shadow
   --shadow-color: #00000047;
@@ -72,6 +83,11 @@ const DarkColors = `
 `
 
 const variables = css`
+  // General styles for all themes
+  :root {
+    ${AllColors}
+  }
+
   :root,
   body.light-theme {
     // ------------------------------

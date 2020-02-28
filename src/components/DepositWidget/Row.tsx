@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faCheck, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import minus from 'assets/img/minus.svg'
+import plus from 'assets/img/plus.svg'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
@@ -9,7 +11,7 @@ import { TokenRow, RowClaimButton, RowClaimLink } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
-import { ZERO, RESPONSIVE_SIZES } from 'const'
+import { ZERO, MEDIA } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 import { TokenLocalState } from 'reducers-actions'
@@ -54,7 +56,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
 
   // Checks innerWidth
-  const showResponsive = !!innerWidth && innerWidth < RESPONSIVE_SIZES.MOBILE_LARGE_PX
+  const showResponsive = !!innerWidth && innerWidth < MEDIA.MOBILE_LARGE_PX
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
@@ -74,7 +76,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
           <TokenImg src={image} alt={name} />
-          <div>{name}</div>
+          <div>
+            <b>{symbol}</b>
+            {name}
+          </div>
         </td>
         <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
           {formatAmount(totalExchangeBalance, decimals)}
@@ -85,19 +90,17 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
                 {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
                 {formatAmount(pendingWithdraw.amount, decimals)}
+                <div>
+                  <RowClaimLink
+                    className={claiming.has(address) ? 'disabled' : 'success'}
+                    onClick={(): void => {
+                      if (!claiming) {
+                        onClaim()
+                      }
+                    }}
+                  ></RowClaimLink>
+                </div>
               </RowClaimButton>
-              <div>
-                <RowClaimLink
-                  className={claiming.has(address) ? 'disabled' : 'success'}
-                  onClick={(): void => {
-                    if (!claiming) {
-                      onClaim()
-                    }
-                  }}
-                >
-                  <small>Claim</small>
-                </RowClaimLink>
-              </div>
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
@@ -113,31 +116,36 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled ? (
-            <button onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
-              <FontAwesomeIcon icon={faPlus} />
-              &nbsp; Deposit
+            <button
+              type="button"
+              className="withdrawToken"
+              onClick={(): void => showForm('deposit')}
+              disabled={isDepositFormVisible}
+            >
+              <img src={plus} />
             </button>
           ) : (
             <>
-              <button className="success" onClick={onEnableToken} disabled={enabling.has(address)}>
+              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
                 {enabling.has(address) ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
-                    &nbsp; Enabling {symbol}
+                    Enabling {symbol}
                   </>
                 ) : (
-                  <>
-                    <FontAwesomeIcon icon={faCheck} />
-                    &nbsp; Enable {symbol}
-                  </>
+                  <>Enable {symbol}</>
                 )}
               </button>
             </>
           )}
           {!totalExchangeBalance.isZero() && (
-            <button onClick={(): void => showForm('withdraw')} disabled={isWithdrawFormVisible} className="danger">
-              <FontAwesomeIcon icon={faMinus} />
-              &nbsp; Withdraw
+            <button
+              type="button"
+              onClick={(): void => showForm('withdraw')}
+              disabled={isWithdrawFormVisible}
+              className="depositToken"
+            >
+              <img src={minus} />
             </button>
           )}
         </td>
@@ -145,11 +153,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isDepositFormVisible && (
         <Form
           title={
-            <p>
+            <span>
               Deposit <strong>{symbol}</strong> in Exchange Wallet
-            </p>
+            </span>
           }
-          totalAmountLabel="Wallet balance"
+          totalAmountLabel="wallet balance"
           totalAmount={walletBalance}
           inputLabel="Deposit amount"
           tokenBalances={tokenBalances}
@@ -163,9 +171,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
       {isWithdrawFormVisible && (
         <Form
           title={
-            <p>
+            <span>
               Withdraw <strong>{symbol}</strong> from Exchange Wallet
-            </p>
+            </span>
           }
           totalAmountLabel="Exchange wallet"
           totalAmount={totalExchangeBalance}

@@ -1,60 +1,115 @@
-import React, { useEffect, useCallback } from 'react'
+import React, { useMemo } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-
-import LinkWithPastLocation from 'components/LinkWithPastLocation'
-import TokenImg from 'components/TokenImg'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import {
-  formatAmount,
-  formatAmountFull,
-  parseAmount,
-  adjustPrecision,
-  validInputPattern,
-  leadingAndTrailingZeros,
-  trailingZerosAfterDot,
-  validatePositive,
-} from 'utils'
+import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositive } from 'utils'
 import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
+
+import { TooltipWrapper } from 'components/Tooltip'
+import FormMessage from './FormMessage'
+import { useNumberInput } from './useNumberInput'
+import InputWithTooltip from './InputWithTooltip'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  height: 6em;
-`
+  flex-flow: column wrap;
 
-const TokenImgWrapper = styled(TokenImg)`
-  width: 4em;
-  height: 4em;
+  > div:first-of-type {
+    width: 100%;
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0 0 1rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
+  }
 
-  margin-right: 1em;
+  > div > strong {
+    margin: 0 auto 0 0.5rem;
+    text-transform: capitalize;
+    color: #2f3e4e;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
+  }
+
+  > div > span {
+    display: flex;
+    flex-flow: row nowrap;
+    font-size: 1.3rem;
+    color: #218dff;
+    letter-spacing: -0.03rem;
+    text-align: right;
+  }
+
+  > div > span > button {
+    background: 0;
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text-active);
+    font-size: inherit;
+    margin: 0;
+    padding: 0;
+    text-decoration: underline;
+
+    &::after {
+      content: '-';
+      margin: 0 0.5rem;
+      display: inline-block;
+      color: #9fb4c9;
+      text-decoration: none;
+    }
+  }
+
+  > div > span > span {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-items: center;
+    color: #9fb4c9;
+  }
 `
 
 const InputBox = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex-grow: 1;
-
-  margin-left: 1em;
+  flex-flow: row nowrap;
+  margin: 0;
+  width: 100%;
+  height: 5.6rem;
+  position: relative;
 
   input {
-    margin: 0 0 0.5em 0;
+    margin: 0;
     width: 100%;
+    background: #e7ecf3;
+    border-radius: 0.6rem 0.6rem 0 0;
+    border: 0;
+    font-size: 1.6rem;
+    line-height: 1;
+    box-sizing: border-box;
+    border-bottom: 0.2rem solid transparent;
+    font-weight: var(--font-weight-normal);
+    padding: 0 15rem 0 1rem;
+    outline: 0;
+
+    &:focus {
+      border-bottom: 0.2rem solid #218dff;
+      border-color: #218dff;
+      color: #218dff;
+    }
 
     &.error {
-      // box-shadow: 0 0 0.1875rem #cc0000;
       border-color: #ff0000a3;
     }
 
     &.warning {
-      // box-shadow: 0 0 0.1875rem #ff7500;
-      border-color: orange;
+      color: #ff5722;
     }
 
     &:disabled {
@@ -63,44 +118,39 @@ const InputBox = styled.div`
   }
 `
 
-const WalletDetail = styled.div`
+const TokenBoxWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
-  font-size: 0.75em;
-
-  .success {
-    color: green;
-    text-decoration: none;
-  }
-
-  &.error,
-  &.warning {
-    margin: 0 0 1em 0;
-  }
-
-  &.error {
-    color: red;
-  }
-  &.warning {
-    color: orange;
-  }
+  flex-flow: row nowrap;
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  bottom: 0;
+  margin: auto;
 `
 
-function displayBalance<K extends keyof TokenBalanceDetails>(
-  balance: TokenBalanceDetails | undefined | null,
-  key: K,
-): string {
-  if (!balance) {
-    return '0'
-  }
-  return formatAmount(balance[key] as BN, balance.decimals) || '0'
-}
+const TokenEnable = styled.div`
+  height: 3.8rem;
+  margin: auto -3.2rem auto 0;
+  font-size: 1.4rem;
+  color: #218dff;
+  letter-spacing: -0.05rem;
+  text-align: center;
+  font-weight: var(--font-weight-bold);
+  display: flex;
+  align-items: center;
+  padding: 0 4.2rem 0 1.6rem;
+  box-sizing: border-box;
+  background: #deeeff;
+  border: 0.1rem solid #218dff;
+  border-radius: 2rem;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
-function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
-  if (!validInputPattern.test(event.currentTarget.value + event.key)) {
-    event.preventDefault()
+  &:hover {
+    background: #218dff;
+    color: #ffffff;
   }
-}
+`
 
 interface Props {
   selectedToken: TokenDetails
@@ -112,6 +162,9 @@ interface Props {
   isDisabled: boolean
   validateMaxAmount?: true
   tabIndex: number
+  readOnly: boolean
+  tooltipText: string
+  autoFocus?: boolean
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -124,10 +177,19 @@ const TokenRow: React.FC<Props> = ({
   isDisabled,
   validateMaxAmount,
   tabIndex,
+  readOnly = false,
+  tooltipText,
+  autoFocus,
 }) => {
+  const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
   const inputValue = watch(inputId)
+
+  const { onKeyPress, enforcePrecision, removeExcessZeros } = useNumberInput({
+    inputId,
+    precision: selectedToken.decimals,
+  })
 
   let overMax = ZERO
   if (balance && validateMaxAmount) {
@@ -135,16 +197,21 @@ const TokenRow: React.FC<Props> = ({
     const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
     overMax = value.gt(max) ? value.sub(max) : ZERO
   }
-
-  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
+  const sellAmountOverMax = overMax.gt(ZERO)
+  const balanceClassName = !error && sellAmountOverMax ? 'warning' : 'success'
+  const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
   const errorOrWarning = error ? (
-    <WalletDetail className="error">{error.message}</WalletDetail>
+    <FormMessage className="error">{error.message}</FormMessage>
   ) : (
     overMax.gt(ZERO) && (
-      <WalletDetail className="warning">
-        Selling {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol} over your current balance
-      </WalletDetail>
+      <FormMessage className="warning">
+        <b>INFO</b>: Sell amount exceeding your balance by
+        <strong>
+          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
+        </strong>
+        {/* This creates a standing order. <a href="#">Read more</a>. */}
+      </FormMessage>
     )
   )
 
@@ -153,92 +220,98 @@ const TokenRow: React.FC<Props> = ({
     setValue(inputId, formatAmountFull(balance.totalExchangeBalance, balance.decimals, false), true)
   }
 
-  const enforcePrecision = useCallback(() => {
-    const newValue = adjustPrecision(inputValue, selectedToken.decimals)
-    if (inputValue !== newValue) {
-      setValue(inputId, newValue, true)
-    }
-  }, [inputValue, selectedToken.decimals, setValue, inputId])
-
-  useEffect(() => {
-    enforcePrecision()
-  }, [enforcePrecision])
-
-  const removeExcessZeros = useCallback(
-    (event: React.SyntheticEvent<HTMLInputElement>): void => {
-      // Q: Why do we need this function instead of relying on `preventInvalidChars` or `enforcePrecision`?
-      // A: Because on those functions we still want the user to be able to input partial values. E.g.:
-      //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
-      //    When losing focus though (`onBlur`), we remove everything that's redundant, such as leading zeros,
-      //    trailing dots and/or zeros
-      // Q: Why not use formatAmount/parseAmount that already take care of this?
-      // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
-
-      const { value } = event.currentTarget
-      const newValue = value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
-
-      if (value != newValue) {
-        setValue(inputId, newValue, true)
-      }
-    },
-    [inputId, setValue],
-  )
-
-  const onKeyPress = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>): void =>
-      event.key === 'Enter' ? removeExcessZeros(event) : preventInvalidChars(event),
-    [removeExcessZeros],
+  // Form validation
+  const inputRef = useMemo(
+    () =>
+      !readOnly
+        ? register({
+            pattern: { value: validInputPattern, message: 'Invalid amount' },
+            validate: { positive: validatePositive },
+          })
+        : register,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [register],
   )
 
   return (
     <Wrapper>
-      <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} />
-      <TokenSelector
-        label={selectLabel}
-        isDisabled={isDisabled}
-        tokens={tokens}
-        selected={selectedToken}
-        onChange={onSelectChange}
-        tabIndex={tabIndex}
-      />
+      <div>
+        <strong>{selectLabel}</strong>
+        <span>
+          {!readOnly && (
+            // TODO: Implement deposit in Trade widget
+            //  https://github.com/gnosis/dex-react/issues/610
+            <TooltipWrapper
+              className="not-implemented"
+              as="button"
+              type="button"
+              tooltip="Deposit"
+              onClick={(): void => alert('Not implemented yet!')}
+            >
+              + Deposit
+            </TooltipWrapper>
+          )}
+          <span>
+            Balance:
+            {readOnly ? (
+              <FormMessage className={balanceClassName}>
+                {' '}
+                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+              </FormMessage>
+            ) : (
+              <>
+                <FormMessage className={balanceClassName}>
+                  {' '}
+                  {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                  {validateMaxAmount && (
+                    <>
+                      <TooltipWrapper tooltip="Fill maximum">
+                        <a onClick={useMax}>max</a>
+                      </TooltipWrapper>
+                      <i aria-label="Tooltip"></i>
+                    </>
+                  )}
+                </FormMessage>
+              </>
+            )}
+          </span>
+        </span>
+      </div>
       <InputBox>
-        <input
-          className={className}
+        <InputWithTooltip
+          autoFocus={!readOnly && autoFocus}
+          className={inputClassName}
+          tooltip={tooltipText}
           placeholder="0"
           name={inputId}
           type="text"
-          disabled={isDisabled}
+          disabled={isEditable}
+          readOnly={readOnly}
           required
-          ref={register({
-            pattern: { value: validInputPattern, message: 'Invalid amount' },
-            validate: { positive: validatePositive },
-          })}
+          ref={inputRef}
           onKeyPress={onKeyPress}
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
           tabIndex={tabIndex + 2}
           onFocus={(e): void => e.target.select()}
         />
-        {errorOrWarning}
-        <WalletDetail>
-          <div>
-            <strong>
-              <LinkWithPastLocation to="/wallet" tabIndex={-1}>
-                Exchange wallet:
-              </LinkWithPastLocation>
-            </strong>{' '}
-            <span className="success">
-              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-            </span>
-          </div>
-          {validateMaxAmount && <a onClick={useMax}>use max</a>}
-        </WalletDetail>
-        <WalletDetail>
-          <div>
-            <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
-          </div>
-        </WalletDetail>
+
+        {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
+        <TokenBoxWrapper>
+          {/* TODO: Implement enable token in Trade widget */}
+          {/*   https://github.com/gnosis/dex-react/issues/611 */}
+          {!readOnly && <TokenEnable className="not-implemented">Enable</TokenEnable>}
+          <TokenSelector
+            label={selectLabel}
+            isDisabled={isDisabled}
+            tokens={tokens}
+            selected={selectedToken}
+            onChange={onSelectChange}
+            tabIndex={tabIndex}
+          />
+        </TokenBoxWrapper>
       </InputBox>
+      {errorOrWarning}
     </Wrapper>
   )
 }

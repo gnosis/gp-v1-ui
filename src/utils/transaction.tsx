@@ -8,7 +8,7 @@ export const txOptionalParams: TxOptionalParams = {
     if (transactionHash) {
       toast.info(<TxNotification txHash={transactionHash} />)
     } else {
-      console.error(`Failed to get notification for tx ${transactionHash}`)
+      console.error(`[utils:transaction] Failed to get notification for tx ${transactionHash}`)
     }
   },
 }

@@ -1,37 +1,42 @@
 import React, { useMemo, useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-  faExclamationTriangle,
-  faSpinner,
-  faTrashAlt,
-  faExchangeAlt,
-  faChevronUp,
-  faChevronDown,
-} from '@fortawesome/free-solid-svg-icons'
+import lowBalanceIcon from 'assets/img/lowBalance.svg'
+
+import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
-import Highlight from 'components/Highlight'
+// import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import { safeTokenName, formatAmount, formatAmountFull, formatDateFromBatchId, isOrderActive, formatPrice } from 'utils'
+import {
+  safeTokenName,
+  formatAmount,
+  formatAmountFull,
+  formatDateFromBatchId,
+  formatPrice,
+  batchIdToDate,
+  isOrderFilled,
+} from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
-import TokenImg from 'components/TokenImg'
+
 import { OrderRowWrapper } from './OrderRow.styled'
 
-const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
+const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
+  const { transactionHash } = props
   return (
-    <td className="pendingCell" data-label="Actions">
-      <FontAwesomeIcon icon={faSpinner} size="lg" spin />
-      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
-    </td>
+    <>
+      <FontAwesomeIcon icon={faSpinner} size="sm" spin /> Pending...
+      <br />
+      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
+    </>
   )
 }
 
@@ -46,9 +51,6 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
-    <button className="danger" onClick={toggleMarkedForDeletion}>
-      Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
-    </button>
   </td>
 )
 
@@ -77,80 +79,59 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
 }
 
-const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = ({ buyToken, sellToken }) => {
-  return (
-    <td className="order-image-row">
-      <div>
-        {/* e.g SELL DAI <-> BUY TUSD */}
-        <div>
-          <TokenImg src={sellToken.image} alt={sellToken.addressMainnet} />{' '}
-          <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-        </div>
-        {/* Switcher icon */}
-        <FontAwesomeIcon icon={faExchangeAlt} size="lg" />
-        <div>
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>{' '}
-          <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
-        </div>
-      </div>
-    </td>
-  )
-}
-
-const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order, pending }) => {
-  const price = useMemo(() => {
+const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
+  const [price, priceInverse] = useMemo((): string[] => {
     const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
     const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
+    const priceFmt = calculatePrice(numeratorString, denominatorString)
+    const priceInverseFmt = calculatePrice(denominatorString, numeratorString)
 
-    return calculatePrice(numeratorString, denominatorString)
+    return [priceFmt, priceInverseFmt]
   }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
 
   return (
-    <td data-label="Price (at least)">
+    <td data-label="Price">
       <div className="order-details">
-        <div>Sell</div>
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : ''}>1</Highlight> <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-        </div>
-
-        <div>
-          for <strong>at least</strong>
-        </div>
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-        </div>
-      </div>
-      <div className="order-details-responsive">
-        <div className="order-details-subgrid">
-          <Highlight color={pending ? 'grey' : 'red'}>{price}</Highlight>{' '}
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>
-        </div>
+        {/* <Highlight color={pending ? 'grey' : ''} /> */}
+        {price} {displayTokenSymbolOrLink(sellToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(buyToken)}
+        <br />
+        {priceInverse} {displayTokenSymbolOrLink(buyToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(sellToken)}
       </div>
     </td>
   )
 }
 
-interface UnfilledAmountProps extends Pick<Props, 'order' | 'pending'> {
+interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
   isUnlimited: boolean
 }
 
-const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pending, isUnlimited }) => {
-  const unfilledAmount = useMemo(() => formatAmount(order.remainingAmount, sellToken.decimals) || '0', [
-    order.remainingAmount,
+const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
+  const filledAmount = useMemo(() => {
+    const filledAmount = order.priceDenominator.sub(order.remainingAmount)
+
+    return formatAmount(filledAmount, sellToken.decimals) || '0'
+  }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
+
+  const totalAmount = useMemo(() => formatAmount(order.priceDenominator, sellToken.decimals) || '0', [
+    order.priceDenominator,
     sellToken.decimals,
   ])
 
   return (
-    <td data-label="Unfilled Amount" className={isUnlimited ? '' : 'sub-columns two-columns'}>
+    <td data-label="Unfilled Amount">
       {isUnlimited ? (
-        <Highlight color={pending ? 'grey' : ''}>no limit</Highlight>
+        <span>no limit</span>
       ) : (
         <>
-          <div>{unfilledAmount}</div>
-          <div>
-            <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
+          <div className="amounts">
+            {filledAmount} {displayTokenSymbolOrLink(sellToken)}
+            <br />
+            {totalAmount} {displayTokenSymbolOrLink(sellToken)}
           </div>
         </>
       )}
@@ -158,45 +139,71 @@ const UnfilledAmount: React.FC<UnfilledAmountProps> = ({ sellToken, order, pendi
   )
 }
 
-interface AccountBalanceProps extends Pick<Props, 'order' | 'isOverBalance'> {
-  sellToken: TokenDetails
-  isUnlimited: boolean
-}
-
-const AccountBalance: React.FC<AccountBalanceProps> = ({ sellToken, order, isOverBalance, isUnlimited }) => {
-  const accountBalance = useMemo(() => formatAmount(order.sellTokenBalance, sellToken.decimals) || '0', [
-    order.sellTokenBalance,
-    sellToken.decimals,
-  ])
-  const isActive = isOrderActive(order, new Date())
-
-  return (
-    <td data-label="Account Balance" className="sub-columns three-columns">
-      <div>{accountBalance}</div>
-      <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-      {isOverBalance && isActive && !isUnlimited && (
-        <div className="warning">
-          <FontAwesomeIcon icon={faExclamationTriangle} />
-        </div>
-      )}
-    </td>
-  )
-}
-
-const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order, pending }) => {
+const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = ({ order, isPendingOrder }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
-    const isNeverExpires = isNeverExpiresOrder(order.validUntil)
+    const isNeverExpires = isNeverExpiresOrder(order.validUntil) || (isPendingOrder && order.validUntil === 0)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
 
     return { isNeverExpires, expiresOn }
-  }, [order.validUntil])
+  }, [isPendingOrder, order.validUntil])
+
+  return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
+}
+
+const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
+  order,
+  isOverBalance,
+  isPendingOrder,
+  transactionHash,
+}) => {
+  const now = new Date()
+
+  const isExpiredOrder = batchIdToDate(order.validUntil) <= now
+  const isScheduled = batchIdToDate(order.validFrom) > now
+  const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
+    order.priceDenominator,
+    order.priceNumerator,
+  ])
+  const isActive = useMemo(() => order.remainingAmount.eq(order.priceDenominator), [
+    order.priceDenominator,
+    order.remainingAmount,
+  ])
+  const isFilled = useMemo(() => isOrderFilled(order), [order])
+  // Display isLowBalance warning only for active and partial fill orders
+  const isLowBalance = isOverBalance && !isUnlimited && !isFilled && !isScheduled && !isPendingOrder && !isExpiredOrder
+
+  const pending = useMemo(() => isPendingOrder && <PendingLink transactionHash={transactionHash} />, [
+    isPendingOrder,
+    transactionHash,
+  ])
 
   return (
-    <td data-label="Expires">
-      {isNeverExpires ? (
-        <Highlight color={pending ? 'grey' : ''}>Never</Highlight>
+    <td className="status">
+      {pending ? (
+        pending
+      ) : isExpiredOrder ? (
+        'Expired'
+      ) : isScheduled ? (
+        <>
+          Scheduled
+          <br />
+          {formatDateFromBatchId(order.validFrom)}
+        </>
+      ) : isFilled ? (
+        'Filled'
+      ) : isActive ? (
+        'Active'
       ) : (
-        <Highlight color={'inherit'}>{expiresOn}</Highlight>
+        'Partial Fill'
+      )}
+      {isLowBalance && (
+        <>
+          <br />
+          <span className="lowBalance">
+            low balance
+            <img src={lowBalanceIcon} />
+          </span>
+        </>
       )}
     </td>
   )
@@ -253,7 +260,6 @@ const onError = onErrorFactory('Failed to fetch token')
 const OrderRow: React.FC<Props> = props => {
   const {
     order,
-    isOverBalance,
     networkId,
     pending = false,
     transactionHash,
@@ -261,6 +267,7 @@ const OrderRow: React.FC<Props> = props => {
     toggleMarkedForDeletion,
     disabled,
     isPendingOrder,
+    isOverBalance,
   } = props
 
   // Fetching buy and sell tokens
@@ -278,31 +285,22 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper $color={pending ? 'grey' : 'inherit'} $open={openCard}>
-        {!isPendingOrder &&
-          (pending ? (
-            <PendingLink transactionHash={transactionHash} />
-          ) : (
-            <DeleteOrder
-              isMarkedForDeletion={isMarkedForDeletion}
-              toggleMarkedForDeletion={toggleMarkedForDeletion}
-              pending={pending}
-              disabled={disabled}
-            />
-          ))}
-        <OrderImage sellToken={sellToken} buyToken={buyToken} />
+      <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
+        <DeleteOrder
+          isMarkedForDeletion={isMarkedForDeletion}
+          toggleMarkedForDeletion={toggleMarkedForDeletion}
+          pending={pending}
+          disabled={disabled || isPendingOrder || pending}
+        />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        {!isPendingOrder ? (
-          <UnfilledAmount order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
-        ) : (
-          <PendingLink />
-        )}
-        {!isPendingOrder ? (
-          <AccountBalance order={order} isOverBalance={isOverBalance} sellToken={sellToken} isUnlimited={isUnlimited} />
-        ) : (
-          <PendingLink />
-        )}
-        {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
+        <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
+        <Status
+          order={order}
+          isOverBalance={isOverBalance}
+          isPendingOrder={isPendingOrder}
+          transactionHash={transactionHash}
+        />
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )

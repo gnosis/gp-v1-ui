@@ -1,23 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { LEGALDOCUMENT, RESPONSIVE_SIZES } from 'const'
-
-const { MOBILE } = RESPONSIVE_SIZES
+import { LEGALDOCUMENT } from 'const'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
-  flex-flow: column;
+  flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
-
   background-color: var(--color-background-banner);
-  color: var(--color-text-banner);
-
   text-align: center;
-  font-size: 0.65rem;
+  font-size: 1.3rem;
+  padding: 1.1rem 0;
 
-  @media only screen and (max-width: ${MOBILE}em) {
-    padding: 0.2rem 2rem;
+  > p {
+    line-height: 1;
+    padding: 0;
+    margin: 0;
+    @media ${MEDIA.mobile} {
+      font-size: 1.2rem;
+    }
   }
 `
 
@@ -35,8 +37,21 @@ const Text = styled.p`
   }
 `
 
+const BannerCloser = styled.span`
+  cursor: pointer;
+  font-family: var(--font-arial);
+  font-weight: bold;
+  font-size: 1.4rem;
+  margin: 0 0 0 1.2rem;
+  opacity: .7;
+  transition: opacity .2s ease-in-out;
+    &:hover {
+      opacity: 1;
+    }
+}
+`
+
 interface LegalBannerProps {
-  startOpen: boolean
   title: string
   useFull: boolean
 }
@@ -74,17 +89,24 @@ const LegalText: React.FC = () => (
   </Text>
 )
 
-const LegalBanner: React.FC<LegalBannerProps> = ({ startOpen, useFull, title }) => {
-  const [open, setOpen] = useState(startOpen)
+const DISCLAIMER = 'GP_DISCLAIMER'
 
-  const openCloseDisclaimer = (): void => setOpen(!open)
+const LegalBanner: React.FC<LegalBannerProps> = ({ useFull, title }) => {
+  const [open, setOpen] = useState(localStorage.getItem(DISCLAIMER) || 'OPEN')
 
-  return (
-    <Wrapper onClick={openCloseDisclaimer}>
-      <h3>{title}</h3>
-      {useFull && open && <LegalText />}
+  useEffect(() => {
+    open === 'OPEN' ? localStorage.setItem(DISCLAIMER, 'OPEN') : localStorage.setItem(DISCLAIMER, 'CLOSED')
+  }, [open])
+
+  const openCloseDisclaimer = (): void => setOpen(open === 'OPEN' ? 'CLOSED' : 'OPEN')
+
+  return open === 'OPEN' ? (
+    <Wrapper>
+      <p>{title}</p>
+      {useFull && <LegalText />}
+      <BannerCloser onClick={openCloseDisclaimer}>✕</BannerCloser>
     </Wrapper>
-  )
+  ) : null
 }
 
 export default LegalBanner

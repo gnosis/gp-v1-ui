@@ -7,11 +7,12 @@ import { TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { formatAmount, formatAmountFull, log, getToken, safeFilledToken } from 'utils'
+import { formatAmount, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'
 import { TokenLocalState, setHighlightAction, setEnablingAction, setHighlightAndClaimingAction } from 'reducers-actions'
+import { useMemo } from 'react'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
 
@@ -32,131 +33,141 @@ export const useRowActions = (params: Params): Result => {
   const [{ tokens: state }, dispatch] = useGlobalState()
 
   const { userAddress, networkId } = useWalletConnection()
-  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
-  async function enableToken(tokenAddress: string): Promise<void> {
-    try {
-      assert(userAddress, 'User address missing. Aborting.')
-      assert(networkId, 'NetworkId missing. Aborting.')
-      assert(contractAddress, 'Contract address missing. Aborting.')
+  const methods = useMemo(() => {
+    const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
-      const token = getToken('address', tokenAddress, balances)
-      assert(token, 'No token, aborting.')
+    async function enableToken(tokenAddress: string): Promise<void> {
+      try {
+        assert(userAddress, 'User address missing. Aborting.')
+        assert(networkId, 'NetworkId missing. Aborting.')
+        assert(contractAddress, 'Contract address missing. Aborting.')
 
-      dispatch(setEnablingAction(tokenAddress))
+        const token = getToken('address', tokenAddress, balances)
+        assert(token, 'No token, aborting.')
 
-      const { symbol: tokenDisplayName } = safeFilledToken(token)
+        dispatch(setEnablingAction(tokenAddress))
 
-      const receipt = await erc20Api.approve({
-        userAddress,
-        tokenAddress,
-        spenderAddress: contractAddress,
-        networkId,
-        amount: ALLOWANCE_MAX_VALUE,
-        txOptionalParams,
-      })
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+        const { symbol: tokenDisplayName } = safeFilledToken(token)
 
-      toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-    } catch (error) {
-      console.error('Error enabling the token', error)
-      toast.error('Error enabling the token')
-    } finally {
-      dispatch(setEnablingAction(tokenAddress))
+        const receipt = await erc20Api.approve({
+          userAddress,
+          tokenAddress,
+          spenderAddress: contractAddress,
+          networkId,
+          amount: ALLOWANCE_MAX_VALUE,
+          txOptionalParams,
+        })
+        logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
+
+        toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
+      } catch (error) {
+        console.error('DepositWidget:useRowActions] Error enabling the token', error)
+        toast.error('Error enabling the token')
+      } finally {
+        dispatch(setEnablingAction(tokenAddress))
+      }
     }
-  }
 
-  async function depositToken(amount: BN, tokenAddress: string): Promise<void> {
-    try {
-      assert(userAddress, ON_ERROR_MESSAGE)
-      assert(networkId, ON_ERROR_MESSAGE)
+    async function depositToken(amount: BN, tokenAddress: string): Promise<void> {
+      try {
+        assert(userAddress, ON_ERROR_MESSAGE)
+        assert(networkId, ON_ERROR_MESSAGE)
 
-      const token = getToken('address', tokenAddress, balances)
-      assert(token, 'No token')
+        const token = getToken('address', tokenAddress, balances)
+        assert(token, 'No token')
 
-      dispatch(setHighlightAction(tokenAddress))
+        dispatch(setHighlightAction(tokenAddress))
 
-      const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+        const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      log(`Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-      const receipt = await depositApi.deposit({ userAddress, tokenAddress, networkId, amount, txOptionalParams })
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[DepositWidget:useRowActions] Processing deposit of ${amount} ${symbol} from ${userAddress}`)
+        const receipt = await depositApi.deposit({ userAddress, tokenAddress, networkId, amount, txOptionalParams })
+        logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
-      toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
-    } catch (error) {
-      console.error('Error depositing', error)
-      toast.error(`Error depositing: ${error.message}`)
-    } finally {
-      dispatch(setHighlightAction(tokenAddress))
+        toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
+      } catch (error) {
+        console.error('DepositWidget:useRowActions] Error depositing', error)
+        toast.error(`Error depositing: ${error.message}`)
+      } finally {
+        dispatch(setHighlightAction(tokenAddress))
+      }
     }
-  }
 
-  async function requestWithdrawToken(amount: BN, tokenAddress: string): Promise<void> {
-    try {
-      assert(userAddress, ON_ERROR_MESSAGE)
-      assert(networkId, ON_ERROR_MESSAGE)
+    async function requestWithdrawToken(amount: BN, tokenAddress: string): Promise<void> {
+      try {
+        assert(userAddress, ON_ERROR_MESSAGE)
+        assert(networkId, ON_ERROR_MESSAGE)
 
-      const token = getToken('address', tokenAddress, balances)
-      assert(token, 'No token')
+        const token = getToken('address', tokenAddress, balances)
+        assert(token, 'No token')
 
-      dispatch(setHighlightAction(tokenAddress))
+        dispatch(setHighlightAction(tokenAddress))
 
-      const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+        const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+        logDebug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
 
-      log(`Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
-      const receipt = await depositApi.requestWithdraw({
-        userAddress,
-        tokenAddress,
-        networkId,
-        amount,
-        txOptionalParams,
-      })
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
+        logDebug(`[DepositWidget:useRowActions] Processing withdraw request of ${amount} ${symbol} from ${userAddress}`)
+        const receipt = await depositApi.requestWithdraw({
+          userAddress,
+          tokenAddress,
+          networkId,
+          amount,
+          txOptionalParams,
+        })
+        logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
-      toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
-    } catch (error) {
-      console.error('Error requesting withdraw', error)
-      toast.error(`Error requesting withdraw: ${error.message}`)
-    } finally {
-      dispatch(setHighlightAction(tokenAddress))
+        toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+      } catch (error) {
+        console.error('DepositWidget:useRowActions] Error requesting withdraw', error)
+        toast.error(`Error requesting withdraw: ${error.message}`)
+      } finally {
+        dispatch(setHighlightAction(tokenAddress))
+      }
     }
-  }
 
-  async function claimToken(tokenAddress: string): Promise<void> {
-    try {
-      assert(userAddress, ON_ERROR_MESSAGE)
-      assert(networkId, ON_ERROR_MESSAGE)
+    async function claimToken(tokenAddress: string): Promise<void> {
+      try {
+        assert(userAddress, ON_ERROR_MESSAGE)
+        assert(networkId, ON_ERROR_MESSAGE)
 
-      const token = getToken('address', tokenAddress, balances)
-      assert(token, 'No token')
+        const token = getToken('address', tokenAddress, balances)
+        assert(token, 'No token')
 
-      const { pendingWithdraw, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
+        const { pendingWithdraw, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-      console.debug(`Starting the withdraw for ${formatAmountFull(pendingWithdraw.amount, decimals)} of ${symbol}`)
+        console.debug(`Starting the withdraw for ${formatAmountFull(pendingWithdraw.amount, decimals)} of ${symbol}`)
 
-      dispatch(setHighlightAndClaimingAction(tokenAddress))
+        dispatch(setHighlightAndClaimingAction(tokenAddress))
 
-      const receipt = await depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
+        const receipt = await depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
 
-      log(`The transaction has been mined: ${receipt.transactionHash}`)
-      toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
-    } catch (error) {
-      console.error('Error executing the withdraw request', error)
-      toast.error(`Error executing the withdraw request: ${error.message}`)
-    } finally {
-      dispatch(setHighlightAndClaimingAction(tokenAddress))
+        logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
+        toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
+      } catch (error) {
+        console.error('[DepositWidget:useRowActions] Error executing the withdraw request', error)
+        toast.error(`Error executing the withdraw request: ${error.message}`)
+      } finally {
+        dispatch(setHighlightAndClaimingAction(tokenAddress))
+      }
     }
-  }
 
-  return {
-    enableToken,
-    depositToken,
-    requestWithdrawToken,
-    claimToken,
-    enabling: state.enabling,
-    claiming: state.claiming,
-    highlighted: state.highlighted,
-  }
+    return {
+      enableToken,
+      depositToken,
+      requestWithdrawToken,
+      claimToken,
+    }
+  }, [balances, dispatch, networkId, userAddress])
+
+  return useMemo(
+    () => ({
+      ...methods,
+      enabling: state.enabling,
+      claiming: state.claiming,
+      highlighted: state.highlighted,
+    }),
+    [methods, state.claiming, state.enabling, state.highlighted],
+  )
 }

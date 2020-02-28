@@ -4,7 +4,7 @@ import { assert } from '@gnosis.pm/dex-js'
 
 import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
-import { log } from 'utils'
+import { logDebug } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
 
@@ -62,6 +62,10 @@ export interface CancelOrdersParams extends BaseParams, WithTxOptionalParams {
   orderIds: number[]
 }
 
+export interface PendingTxObj extends AuctionElement {
+  txHash: string
+}
+
 export interface ExchangeApi extends DepositApi {
   getNumTokens(networkId: number): Promise<number>
   getFeeDenominator(networkId: number): Promise<number>
@@ -94,12 +98,6 @@ export interface Order {
   remainingAmount: BN
 }
 
-export interface PendingTxObj extends AuctionElement {
-  txHash: string
-}
-
-export type PendingTxArray = PendingTxObj[]
-
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
   nextIndex?: number
@@ -117,7 +115,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async getOrders({ userAddress, networkId }: GetOrdersParams): Promise<AuctionElement[]> {
     const contract = await this._getContract(networkId)
-    log(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
+    logDebug(`[ExchangeApiImpl] Getting Orders for account ${userAddress}`)
 
     const encodedOrders = await contract.methods.getEncodedUserOrders(userAddress).call()
 
@@ -135,7 +133,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult> {
     const contract = await this._getContract(networkId)
 
-    log(
+    logDebug(
       `[ExchangeApiImpl] Getting Orders Paginated for account ${userAddress} on network ${networkId} with offset ${offset} and pageSize ${pageSize}`,
     )
 
@@ -195,7 +193,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[ExchangeApiImpl] Added Token ${tokenAddress}`)
+    logDebug(`[ExchangeApiImpl] Added Token ${tokenAddress}`)
 
     return tx
   }
@@ -223,7 +221,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(
+    logDebug(
       `[ExchangeApiImpl] Placed Order to 
       SELL ${sellAmount.toString()} tokenId ${sellTokenId} for ${buyAmount.toString()} tokenId ${buyTokenId}
       order valid until ${validUntil}
@@ -264,7 +262,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(
+    logDebug(
       `[ExchangeApiImpl] Placed multiple orders for user ${userAddress} with the following params:\n
       buyTokens: ${buyTokens}\n
       sellTokens: ${sellTokens}\n
@@ -290,7 +288,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
-    log(`[ExchangeApiImpl] Cancelled Orders ${orderIds}`)
+    logDebug(`[ExchangeApiImpl] Cancelled Orders ${orderIds}`)
 
     return tx
   }

@@ -3,6 +3,8 @@ import { toast } from 'toastify'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
+import styled from 'styled-components'
+
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
 import {
@@ -13,11 +15,11 @@ import {
   ProgressStepText,
   StepDescriptionWrapper,
   StepButtonsWrapper,
-  GreySubText,
 } from './PoolingWidget.styled'
 
-import { faCheckCircle, faSpinner, faPaperPlane, faFlagCheckered } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import checkIcon from 'assets/img/li-check.svg'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -30,7 +32,7 @@ import { tokenListApi } from 'api'
 import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { Network, Receipt } from 'types'
 
-import { maxAmountsForSpread, log } from 'utils'
+import { maxAmountsForSpread } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Link } from 'react-router-dom'
 
@@ -50,23 +52,13 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
         {stepArray.map((stepName, index) => (
           <React.Fragment key={stepName}>
             <ProgressStep
-              $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
+              data-title={stepName}
+              className={stepChecker(step, index) ? 'active' : ''}
+              $bgColor={stepChecker(step, index) ? '#218DFF;' : '#9FB4C9'}
             >
-              <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{index + 1}</ProgressStepText>
+              <ProgressStepText>{index + 1}</ProgressStepText>
             </ProgressStep>
-            {index + 1 < 3 && (
-              <StepSeparator
-                $bgColor={stepChecker(step, index) ? 'var(--color-background-progressBar)' : 'var(--color-background)'}
-              />
-            )}
-          </React.Fragment>
-        ))}
-      </BarWrapper>
-      <BarWrapper $minHeight="auto">
-        {stepArray.map((stepName, index) => (
-          <React.Fragment key={stepName}>
-            <ProgressStepText $bold={stepChecker(step, index) ? 'bolder' : 'normal'}>{stepName}</ProgressStepText>
-            {index + 1 < 3 && <p />}
+            {index + 1 < 3 && <StepSeparator />}
           </React.Fragment>
         ))}
       </BarWrapper>
@@ -74,27 +66,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
   )
 }
 
-const StepDescription: React.FC = () => (
+const StepDescription: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => (
   <StepDescriptionWrapper>
-    <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
-    <ul>
-      <li>
-        <FontAwesomeIcon icon={faCheckCircle} />
-        No maintenance needed
-      </li>
-      <li>
-        <FontAwesomeIcon icon={faCheckCircle} />
-        No gas costs for trades
-      </li>
-      <li>
-        <FontAwesomeIcon icon={faCheckCircle} />
-        Cancellation possible at any time
-      </li>
-    </ul>
-    {/*
-    TODO: add URL 
-    <a href="#">Learn more about liquidity provision</a>
-    */}
+    <StepTitle step={step} />
   </StepDescriptionWrapper>
 )
 
@@ -102,19 +76,42 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
   const { title, subtext }: { title: string; subtext?: string } = useMemo(() => {
     switch (step) {
       case 1:
+        // TODO: Add Link
+        // https://github.com/gnosis/dex-react/issues/615
         return {
-          title: '1. Select your trusted stablecoins',
-          subtext:
-            'Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1',
+          title: '1. Select at least two of your trusted stablecoins',
+          subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
+          <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
+          <ul>
+            <li><img src=${checkIcon} />No maintenance needed</li>
+            <li><img src=${checkIcon} />No gas costs for trades</li>
+            <li><img src=${checkIcon} />Cancellation possible at any time</li>
+          </ul>
+          <p class="not-implemented">            
+            <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
+          </p>`,
         }
       case 2:
+        // TODO: Add Link
+        // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '2. Define your spread',
-          subtext:
-            'The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens',
+          subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
+          <p class="not-implemented">            
+            <a href="#" target="_blank" rel="noopener">Learn more about the spread.</a>
+          </p>
+          `,
         }
       case 3:
-        return { title: '3. Create liquidity', subtext: '' }
+        return {
+          title: '3. New liquidity summary:',
+          subtext: `
+            <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
+            <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
+            <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
+            <p><b>The exchange only uses your fully available exchange balance to execute trades.</b></p>
+          `,
+        }
       default:
         return { title: 'An error occurred, please try again' }
     }
@@ -122,10 +119,8 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
 
   return (
     <div>
-      <ProgressStepText as="h2" $bold="bolder">
-        {title}
-      </ProgressStepText>
-      {subtext && <GreySubText $justify="flex-start">{subtext}</GreySubText>}
+      <ProgressStepText as="h2">{title}</ProgressStepText>
+      {subtext && <div className="liqContent" dangerouslySetInnerHTML={{ __html: subtext }} />}
     </div>
   )
 }
@@ -175,6 +170,14 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
   return orders
 }
 
+const ContentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  flex-flow: row wrap;
+  font-size: inherit;
+  line-height: inherit;
+`
+
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
   const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
@@ -221,6 +224,8 @@ const PoolingInterface: React.FC = () => {
       setTxReceipt(undefined)
 
       const { receipt } = await placeMultipleOrders({
+        networkId,
+        userAddress,
         orders,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
@@ -230,7 +235,7 @@ const PoolingInterface: React.FC = () => {
 
             unstable_batchedUpdates(() => {
               orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-                const newTxState = {
+                const pendingOrder = {
                   txHash,
                   id: 'PENDING ORDER',
                   buyTokenId,
@@ -245,7 +250,7 @@ const PoolingInterface: React.FC = () => {
                 }
 
                 setIsSubmitting(false)
-                dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+                dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
               })
             })
           },
@@ -254,7 +259,7 @@ const PoolingInterface: React.FC = () => {
 
       setTxReceipt(receipt)
     } catch (e) {
-      log('Failed to place orders for strategy', e)
+      console.error('[PoolingWidget] Failed to place orders for strategy', e)
       toast.error('Not able to create your orders, please try again')
 
       // Error handle
@@ -299,39 +304,41 @@ const PoolingInterface: React.FC = () => {
 
   return (
     <Widget>
-      <PoolingInterfaceWrapper $width="75vw">
-        <h2>New Liquidity</h2>
+      <PoolingInterfaceWrapper $width="100%">
+        <h2>New Liquidity Order</h2>
         <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
-        <StepDescription />
-        <StepTitle step={step} />
 
-        {/* Main Components here */}
-        <SubComponents step={step} {...restProps} />
-
+        <ContentWrapper>
+          <StepDescription step={step} />
+          {/* Main Components here */}
+          <SubComponents step={step} {...restProps} />
+        </ContentWrapper>
         <StepButtonsWrapper>
           {/* REMOVE BACK BUTTON ON TXRECEIPT */}
           {!txReceipt && (
-            <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
+            <button
+              type="button"
+              disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting}
+              onClick={(): void => prevStep()}
+            >
               Back
             </button>
           )}
           {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
           {step !== 3 ? (
-            <button disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+            <button type="button" disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
               Continue
             </button>
           ) : // STEP 3 - TXRECEIPT OR NOT?
           txReceipt ? (
             // TX RCEIPT SUCCESS
-            <Link to="/wallet">
-              <button className="success">
-                <FontAwesomeIcon icon={faFlagCheckered} /> Finish and go to Wallet
-              </button>
+            <Link to="/wallet" className="finish">
+              Finish and go to Balances
             </Link>
           ) : (
             // NOT YET SUBMITTED TX
-            <button className="success" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
-              <FontAwesomeIcon icon={isSubmitting ? faSpinner : faPaperPlane} spin={isSubmitting} /> Send transaction
+            <button type="button" className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
+              {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
             </button>
           )}
         </StepButtonsWrapper>

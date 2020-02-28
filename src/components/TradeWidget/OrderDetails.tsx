@@ -2,9 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
 
-import { FEE_PERCENTAGE } from 'const'
+// import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
-import { formatPrice, formatValidity } from 'utils'
+import { formatPrice, formatTimeInHours } from 'utils'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
@@ -19,7 +19,6 @@ const Wrapper = styled.dl`
     margin: 0 0 0.25em 4em;
   }
 `
-
 interface Props {
   sellAmount: string
   sellTokenName: string
@@ -66,14 +65,9 @@ const OrderDetails: React.FC<Props> = ({
         Your order may be partially filled
       </dt>
 
-      <dd>Fee:</dd>
-      <dt>
-        <Highlight>{FEE_PERCENTAGE}%</Highlight>, included already in your limit price.
-      </dt>
-
       <dd>Expiration date:</dd>
       <dt>
-        <Highlight>{formatValidity(validUntil)}</Highlight>
+        <Highlight>{formatTimeInHours(validUntil, 'Never')}</Highlight>
       </dt>
     </Wrapper>
   )

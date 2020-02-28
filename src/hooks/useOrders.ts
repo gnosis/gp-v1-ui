@@ -47,8 +47,9 @@ export function useOrders(): Result {
     },
     dispatch,
   ] = useGlobalState()
-  //  consider first state to be loading
-  const [isLoading, setIsLoading] = useSafeState<boolean>(true)
+
+  // can only start loading when connection is ready. Keep it `false` until then
+  const [isLoading, setIsLoading] = useSafeState<boolean>(false)
 
   useEffect(() => {
     // continue loading new orders
@@ -63,7 +64,8 @@ export function useOrders(): Result {
     const fetchOrders = async (offset: number): Promise<void> => {
       // isLoading is the important one
       // controls ongoing fetching chain
-      if (!userAddress || !networkId || !isLoading) {
+      if (!userAddress || !networkId /*|| !isLoading*/) {
+        // TODO: Do not merge with this, just for doing a quick test!!
         // next isLoading = true will be when userAddress and networkId are valid
         setIsLoading(false)
         return
@@ -100,7 +102,7 @@ export function useOrders(): Result {
           dispatch(updateOffset(offset + orders.length))
         })
       } catch (error) {
-        console.error('Failed to fetch orders', error)
+        console.error('[useOrders] Failed to fetch orders', error)
         // TODO: inform user
         setIsLoading(false)
       }
