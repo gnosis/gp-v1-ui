@@ -142,7 +142,7 @@ export const OrdersForm = styled.div`
     .total {
     }
 
-    .expired {
+    .closed {
     }
   }
 
