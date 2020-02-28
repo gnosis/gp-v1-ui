@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import arrow from 'assets/img/arrow.svg'
 import { MEDIA } from 'const'
 
-export const UserWalletWrapper = styled.div<{ $walletOpen: boolean }>`
+export const UserWalletWrapper = styled.div`
   position: relative;
   display: flex;
   flex-flow: column nowrap;

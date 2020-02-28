@@ -9,6 +9,7 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   font-size: inherit;
   margin: 0 0 0 0.3rem;
   color: #476481;
+  width: 100%;
 
   > a {
     color: #218dff;
@@ -22,10 +23,6 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
 
   &.error,
   &.warning {
-    margin: 1rem 0;
-    line-height: 1.2;
-    font-size: 1.2rem;
-    display: block;
     > strong {
       color: inherit;
     }

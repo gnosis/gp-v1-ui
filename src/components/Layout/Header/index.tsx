@@ -34,7 +34,7 @@ const TopWrapper = styled.div`
   }
 `
 
-const BatchCountDown = styled.div`
+const CountDownStyled = styled.div`
   display: flex;
   order: 2;
   font-family: var(--font-mono);
@@ -54,11 +54,18 @@ const BatchCountDown = styled.div`
   }
 `
 
+const BatchCountDown: React.FC = () => {
+  const timeRemainingInBatch = useTimeRemainingInBatch()
+  return (
+    <CountDownStyled>
+      Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
+    </CountDownStyled>
+  )
+}
+
 const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps) => {
   const { isResponsive, openNav, setOpenNav } = useOpenCloseNav()
   const navigationArray = useNavigation(initialState, isResponsive)
-
-  const timeRemainingInBatch = useTimeRemainingInBatch()
 
   const handleOpenNav = (): void | false => isResponsive && setOpenNav(!openNav)
 
@@ -73,9 +80,7 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
           {/* USER WALLET */}
           <UserWallet />
           {/* Global Batch Countdown */}
-          <BatchCountDown>
-            Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
-          </BatchCountDown>
+          <BatchCountDown />
         </TopWrapper>
         {/* HEADER LINKS */}
         <NavigationLinks

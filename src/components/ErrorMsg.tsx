@@ -5,7 +5,8 @@ import { faDizzy } from '@fortawesome/free-regular-svg-icons'
 
 const Wrapper = styled.div`
   text-align: center;
-  font-size: 1.3em;
+  font-size: 1.6rem;
+  margin: auto;
 
   p {
     color: var(--color-text-secondary);

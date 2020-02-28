@@ -12,6 +12,8 @@ export const CreateStrategyWrapper = styled.div`
   border-radius: 0.6rem;
   padding: 1.6rem 1.6rem 0;
   box-sizing: border-box;
+  font-size: inherit;
+  line-height: inherit;
 
   @media ${MEDIA.mobile} {
     width: 100%;
@@ -24,8 +26,8 @@ export const CreateStrategyWrapper = styled.div`
   }
   > p {
     margin: 0 0 2.4rem;
-    font-size: 1.5rem;
-    line-height: 1.4;
+    font-size: inherit;
+    line-height: inherit;
   }
 
   > p > i {

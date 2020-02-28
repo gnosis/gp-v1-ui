@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import PageWrapper from './PageWrapper'
+import { PageWrapper } from './PageWrapper'
 
 const Wrapper = styled(PageWrapper)`
   display: flex;

@@ -5,15 +5,17 @@ import switchTokenPair from 'assets/img/switch.svg'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useHistory } from 'react-router'
 import { toast } from 'toastify'
+import BN from 'bn.js'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
+import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
+import FormMessage from './FormMessage'
 
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -33,6 +35,7 @@ import { Network, TokenDetails } from 'types'
 import { getToken, parseAmount, parseBigNumber } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPrice } from './Price'
+import { useConnectWallet } from 'hooks/useConnectWallet'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -94,6 +97,11 @@ const WrappedForm = styled.form`
     text-align: center;
     margin: 1.6rem 0 0;
   }
+
+  ${FormMessage} {
+    font-size: 1.3rem;
+    margin: 0.5rem 0 0;
+  }
 `
 // Switcharoo arrows
 const IconWrapper = styled.a`
@@ -135,6 +143,10 @@ const SubmitButton = styled.button`
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
+  @media ${MEDIA.mobile} {
+    font-size: 1.3rem;
+    margin: 1rem auto 1.6rem;
+  }
 `
 
 const OrdersPanel = styled.div`
@@ -159,6 +171,16 @@ const OrdersPanel = styled.div`
   ${Wrapper} {
     background: transparent;
     box-shadow: none;
+  }
+
+  // Orders widget when inside the OrdersPanel
+  ${OrdersWrapper} {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    min-height: initial;
+    min-width: initial;
+    max-width: initial;
   }
 
   > div {
@@ -249,6 +271,7 @@ const OrdersPanel = styled.div`
 export const enum TradeFormTokenId {
   sellToken = 'sellToken',
   receiveToken = 'receiveToken',
+  validFrom = 'validFrom',
   validUntil = 'validUntil',
   price = 'price',
   priceInverse = 'priceInverse',
@@ -262,7 +285,8 @@ export const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
-
+  // ASAP
+  validFrom: '0',
   // 2 days
   validUntil: '2880',
 }
@@ -284,6 +308,7 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
 
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
+  const { connectWallet } = useConnectWallet()
   const [, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -294,11 +319,17 @@ const TradeWidget: React.FC = () => {
   const receiveInputId = TradeFormTokenId.receiveToken
   const priceInputId = TradeFormTokenId.price
   const priceInverseInputId = TradeFormTokenId.priceInverse
+  const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const { sellAmount: sellParam, price: priceParam, validUntil: validUntilParam } = useQuery()
+  const {
+    sellAmount: sellParam,
+    price: priceParam,
+    validFrom: validFromParam,
+    validUntil: validUntilParam,
+  } = useQuery()
 
   const [ordersVisible, setOrdersVisible] = useState(true)
   const [sellToken, setSellToken] = useState(
@@ -309,12 +340,14 @@ const TradeWidget: React.FC = () => {
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
+  const [asap, setAsap] = useState(!validFromParam || !Number(validFromParam))
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellParam,
       [receiveInputId]: '',
+      [validFromId]: validFromParam,
       [validUntilId]: validUntilParam,
       [priceInputId]: priceParam,
       [priceInverseInputId]: invertPrice(priceParam),
@@ -325,8 +358,8 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
-
   const receiveValue = watch(receiveInputId)
+  const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
   // Update receive amount
@@ -346,6 +379,7 @@ const TradeWidget: React.FC = () => {
   const searchQuery = buildSearchQuery({
     sell: sellValue,
     price: priceValue,
+    from: validFromValue,
     expires: validUntilValue,
   })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
@@ -377,8 +411,7 @@ const TradeWidget: React.FC = () => {
     [NULL_BALANCE_TOKEN, balances, receiveToken],
   )
 
-  const { placeOrder, isSubmitting, setIsSubmitting } = usePlaceOrder()
-  const history = useHistory()
+  const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
 
   const swapTokens = useCallback((): void => {
     setSellToken(receiveToken)
@@ -403,12 +436,124 @@ const TradeWidget: React.FC = () => {
 
   const sameToken = sellToken === receiveToken
 
+  const savePendingTransactions = useCallback(
+    (txHash: string, { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress }): void => {
+      // reset form on successful order placing
+      reset(DEFAULT_FORM_STATE)
+      setUnlimited(false)
+      // unblock form
+      setIsSubmitting(false)
+
+      // pendingTxHash = txHash
+      toast.info(<TxNotification txHash={txHash} />)
+
+      const newTxState = {
+        txHash,
+        id: 'PENDING ORDER',
+        buyTokenId,
+        sellTokenId,
+        priceNumerator,
+        priceDenominator,
+        user: userAddress,
+        remainingAmount: ZERO,
+        sellTokenBalance: ZERO,
+        validFrom: 0,
+        validUntil: 0,
+      }
+
+      return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+    },
+    [dispatch, reset, setIsSubmitting],
+  )
+
+  const _placeOrder = useCallback(
+    async (params: {
+      validFrom: number
+      validUntil: number
+      buyAmount: BN
+      buyToken: TokenDetails
+      sellAmount: BN
+      sellToken: TokenDetails
+      networkId: number
+      userAddress: string
+    }) => {
+      const { validFrom, validUntil, buyAmount, buyToken, sellAmount, sellToken, networkId, userAddress } = params
+
+      let pendingTxHash: string | undefined = undefined
+      // block form
+      setIsSubmitting(true)
+
+      let success: boolean
+      // ASAP ORDER
+      if (validFrom === 0) {
+        // ; for destructure reassign format
+        ;({ success } = await placeOrder({
+          networkId,
+          userAddress,
+          buyAmount,
+          buyToken,
+          sellAmount,
+          sellToken,
+          validUntil,
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
+              return savePendingTransactions(txHash, {
+                buyTokenId: buyToken.id,
+                sellTokenId: sellToken.id,
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
+            },
+          },
+        }))
+      } else {
+        // ; for destructure reassign format
+        ;({ success } = await placeMultipleOrders({
+          networkId,
+          userAddress,
+          orders: [
+            {
+              buyAmount,
+              buyToken: buyToken.id,
+              sellAmount,
+              sellToken: sellToken.id,
+              validFrom,
+              validUntil,
+            },
+          ],
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
+              return savePendingTransactions(txHash, {
+                buyTokenId: buyToken.id,
+                sellTokenId: sellToken.id,
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
+            },
+          },
+        }))
+      }
+      if (success && pendingTxHash) {
+        // remove pending tx
+        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+      }
+    },
+    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactions, setIsSubmitting],
+  )
+
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
+    const validFrom = +data[validFromId] / 5
     const validUntil = +data[validUntilId] / 5
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
@@ -417,52 +562,33 @@ const TradeWidget: React.FC = () => {
     if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
 
     if (isConnected && userAddress) {
-      let pendingTxHash: string | undefined = undefined
-      // block form
-      setIsSubmitting(true)
-
-      const { success } = await placeOrder({
-        buyAmount,
-        buyToken: cachedBuyToken,
-        sellAmount,
-        sellToken: cachedSellToken,
+      await _placeOrder({
+        validFrom,
         validUntil,
-        txOptionalParams: {
-          onSentTransaction: (txHash: string): void => {
-            // reset form on successful order placing
-            reset(DEFAULT_FORM_STATE)
-            setUnlimited(false)
-            // unblock form
-            setIsSubmitting(false)
-
-            pendingTxHash = txHash
-            toast.info(<TxNotification txHash={txHash} />)
-
-            const newTxState = {
-              txHash,
-              id: 'PENDING ORDER',
-              buyTokenId: cachedBuyToken.id,
-              sellTokenId: cachedSellToken.id,
-              priceNumerator: buyAmount,
-              priceDenominator: sellAmount,
-              user: userAddress,
-              remainingAmount: ZERO,
-              sellTokenBalance: ZERO,
-              validFrom: 0,
-              validUntil: 0,
-            }
-
-            return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
-          },
-        },
+        sellAmount,
+        buyAmount,
+        sellToken: cachedSellToken,
+        buyToken: cachedBuyToken,
+        networkId,
+        userAddress,
       })
-      if (success && pendingTxHash) {
-        // remove pending tx
-        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
-      }
     } else {
-      const from = history.location.pathname + history.location.search
-      history.push('/connect-wallet', { from })
+      // Not connected. Prompt user to connect his wallet
+      const walletInfo = await connectWallet()
+
+      // Then place the order if connection was successful
+      if (walletInfo && walletInfo.networkId && walletInfo.userAddress) {
+        await _placeOrder({
+          validFrom,
+          validUntil,
+          sellAmount,
+          buyAmount,
+          sellToken: cachedSellToken,
+          buyToken: cachedBuyToken,
+          networkId: walletInfo.networkId,
+          userAddress: walletInfo.userAddress,
+        })
+      }
     }
   }
 
@@ -475,9 +601,10 @@ const TradeWidget: React.FC = () => {
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
-        <WrappedForm onSubmit={handleSubmit(onSubmit)}>
+        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
+            autoFocus
             selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
@@ -502,7 +629,7 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
-            readOnly={true}
+            readOnly
             tooltipText={receiveTokenTooltipText}
           />
           <Price
@@ -512,9 +639,12 @@ const TradeWidget: React.FC = () => {
             receiveToken={receiveToken}
           />
           <OrderValidity
-            inputId={validUntilId}
+            validFromInputId={validFromId}
+            validUntilInputId={validUntilId}
             isDisabled={isSubmitting}
+            isAsap={asap}
             isUnlimited={unlimited}
+            setAsap={setAsap}
             setUnlimited={setUnlimited}
             tabIndex={3}
           />
@@ -522,7 +652,7 @@ const TradeWidget: React.FC = () => {
           <SubmitButton
             data-text="This order might be partially filled."
             type="submit"
-            disabled={!methods.formState.isValid || isSubmitting}
+            disabled={isSubmitting}
             tabIndex={5}
           >
             {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}

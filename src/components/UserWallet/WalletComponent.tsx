@@ -1,6 +1,5 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { RouteComponentProps, useRouteMatch } from 'react-router'
-import { toast } from 'toastify'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -21,9 +20,9 @@ import {
   LogInOutButton,
 } from './UserWallet.styled'
 
-import { walletApi } from 'api'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
+import { useConnectWallet } from 'hooks/useConnectWallet'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
@@ -39,53 +38,44 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const [loadingLabel, setLoadingLabel] = useSafeState<string | null>(null)
   const [copiedToClipboard, setCopiedToClipboard] = useSafeState(false)
   const [showWallet, setShowWallet] = useSafeState(false)
+  const { connectWallet: _connectWallet, disconnectWallet: _disconnectWallet } = useConnectWallet()
 
   const orderPageMatch = useRouteMatch('/order/')
 
   /***************************** */
   // EVENT HANDLERS
 
-  const connectWallet = async (): Promise<void> => {
-    try {
-      setLoadingLabel('Connecting...')
-      const success = await walletApi.connect()
+  const connectWallet = useCallback(async (): Promise<void> => {
+    setLoadingLabel('Connecting...')
 
-      // user closed Provider selection modal
-      if (!success) return
+    await _connectWallet()
 
-      toast.success('Wallet connected')
-    } catch (error) {
-      console.error('[WalletComponent] Connect wallet error', error)
-      toast.error('Error connecting wallet')
-    } finally {
-      setLoadingLabel(null)
+    setLoadingLabel(null)
+    setShowWallet(false)
+  }, [_connectWallet, setLoadingLabel, setShowWallet])
+
+  const disconnectWallet = useCallback(async (): Promise<void> => {
+    setLoadingLabel('Disconnecting...')
+
+    await _disconnectWallet()
+
+    setLoadingLabel(null)
+    setShowWallet(false)
+
+    if (!orderPageMatch) {
+      props.history.push('/')
     }
-  }
+  }, [_disconnectWallet, orderPageMatch, props.history, setLoadingLabel, setShowWallet])
 
-  const disconnectWallet = async (): Promise<void> => {
-    try {
-      setLoadingLabel('Disconnecting...')
-      await walletApi.disconnect()
-      toast.info('Wallet disconnected')
-    } catch (error) {
-      toast.error('Error disconnecting wallet')
-    } finally {
-      setLoadingLabel(null)
-      if (!orderPageMatch) {
-        props.history.push('/')
-      }
-    }
-  }
-
-  const handleCopyToClipBoard = (): NodeJS.Timeout => {
+  const handleCopyToClipBoard = useCallback((): NodeJS.Timeout => {
     setCopiedToClipboard(true)
     return setTimeout((): void => setCopiedToClipboard(false), 5000)
-  }
+  }, [setCopiedToClipboard])
 
   /***************************** */
   // RENDER FUNCTIONS
 
-  const renderLogInOutButton = (): JSX.Element => {
+  const renderLogInOutButton = useCallback((): JSX.Element => {
     let onClick, content
     if (loadingLabel) {
       content = (
@@ -119,17 +109,17 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
         </a>
       </LogInOutButton>
     )
-  }
+  }, [connectWallet, disconnectWallet, isConnected, loadingLabel, props.className])
 
   return (
-    <UserWalletWrapper $walletOpen={!!(showWallet && userAddress)}>
+    <UserWalletWrapper>
       {userAddress ? (
         <>
           {/* Wallet logo + address + chevron */}
           <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)} className={showWallet ? 'visible' : ''}>
             <EtherImage src={WalletImg} />
             <UserAddress>
-              {userAddress && abbreviateString(userAddress, 6, 4)}
+              {abbreviateString(userAddress, 6, 4)}
               {/* Network */}
               <NetworkTitle>
                 {/* Don't output MAINNET, only other networks. */}
@@ -148,7 +138,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       {/* Main elements of Wallet: QR, Address copy, Etherscan URL, Log Out */}
       {userAddress && showWallet && (
         <UserWalletSlideWrapper>
-          <button type="button" onClick={(): void => setShowWallet(!showWallet)}>
+          <button type="button" onClick={(): void => setShowWallet(false)}>
             <b>Wallet</b>
             <i>×</i>
           </button>

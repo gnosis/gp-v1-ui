@@ -13,6 +13,7 @@ import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from './InputWithTooltip'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,9 +31,13 @@ const Wrapper = styled.div`
   }
 
   > div > strong {
-    margin: 0 auto 0 0;
+    margin: 0 auto 0 0.5rem;
     text-transform: capitalize;
     color: #2f3e4e;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
   }
 
   > div > span {
@@ -159,6 +164,7 @@ interface Props {
   tabIndex: number
   readOnly: boolean
   tooltipText: string
+  autoFocus?: boolean
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -173,6 +179,7 @@ const TokenRow: React.FC<Props> = ({
   tabIndex,
   readOnly = false,
   tooltipText,
+  autoFocus,
 }) => {
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
@@ -190,19 +197,20 @@ const TokenRow: React.FC<Props> = ({
     const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
     overMax = value.gt(max) ? value.sub(max) : ZERO
   }
-
-  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
+  const sellAmountOverMax = overMax.gt(ZERO)
+  const balanceClassName = !error && sellAmountOverMax ? 'warning' : 'success'
+  const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
   const errorOrWarning = error ? (
     <FormMessage className="error">{error.message}</FormMessage>
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
-        <b>INFO</b>: Sell amount exceeding your balance by{' '}
+        <b>INFO</b>: Sell amount exceeding your balance by
         <strong>
-          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}
+          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
         </strong>
-        . This creates a standing order. <a href="#">Read more</a>.
+        {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
   )
@@ -246,10 +254,13 @@ const TokenRow: React.FC<Props> = ({
           <span>
             Balance:
             {readOnly ? (
-              <FormMessage> {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}</FormMessage>
+              <FormMessage className={balanceClassName}>
+                {' '}
+                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+              </FormMessage>
             ) : (
               <>
-                <FormMessage>
+                <FormMessage className={balanceClassName}>
                   {' '}
                   {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
                   {validateMaxAmount && (
@@ -268,7 +279,8 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
-          className={className}
+          autoFocus={!readOnly && autoFocus}
+          className={inputClassName}
           tooltip={tooltipText}
           placeholder="0"
           name={inputId}

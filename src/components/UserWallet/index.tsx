@@ -24,7 +24,7 @@ const LazyUserWallet = React.lazy(async () => {
 })
 
 const SuspendedWallet: React.FC<RouteComponentProps> = props => (
-  <Suspense fallback={<UserWalletWrapper $walletOpen={false} style={{ visibility: 'hidden' }} />}>
+  <Suspense fallback={<UserWalletWrapper style={{ visibility: 'hidden' }} />}>
     <LazyUserWallet {...props} />
   </Suspense>
 )

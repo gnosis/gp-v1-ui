@@ -20,7 +20,7 @@ import OrderRow from './OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 
-type OrderTabs = 'active' | 'liquidity' | 'expired'
+type OrderTabs = 'active' | 'liquidity' | 'closed'
 
 interface ShowOrdersButtonProps {
   type: OrderTabs
@@ -32,7 +32,6 @@ interface ShowOrdersButtonProps {
 const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
   <button type="button" className={isActive ? 'selected' : ''} onClick={onClick}>
     {type} <i>{count}</i>
-    {/* {!isActive ? <Highlight>{count}</Highlight> : <>{count}</>} {type} */}
   </button>
 )
 
@@ -47,9 +46,9 @@ type FilteredOrdersState = {
 
 function emptyState(): FilteredOrdersState {
   return {
-    active: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
-    expired: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
-    liquidity: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
+    active: { orders: [], pendingOrders: new Set(), markedForDeletion: new Set() },
+    closed: { orders: [], pendingOrders: new Set(), markedForDeletion: new Set() },
+    liquidity: { orders: [], pendingOrders: new Set(), markedForDeletion: new Set() },
   }
 }
 
@@ -94,7 +93,7 @@ const OrdersWidget: React.FC = () => {
 
     allOrders.forEach(order => {
       if (!isOrderActive(order, now)) {
-        filteredOrders.expired.orders.push(order)
+        filteredOrders.closed.orders.push(order)
       } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
         filteredOrders.liquidity.orders.push(order)
       } else {
@@ -104,7 +103,7 @@ const OrdersWidget: React.FC = () => {
 
     allPendingOrders.forEach(order => {
       if (!isOrderActive(order, now)) {
-        filteredOrders.expired.pendingOrders.push(order)
+        filteredOrders.closed.pendingOrders.push(order)
       } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
         filteredOrders.liquidity.pendingOrders.push(order)
       } else {
@@ -234,10 +233,10 @@ const OrdersWidget: React.FC = () => {
                   onClick={setSelectedTabFactory('liquidity')}
                 />
                 <ShowOrdersButton
-                  type="expired"
-                  isActive={selectedTab === 'expired'}
-                  count={filteredOrders.expired.orders.length + filteredOrders.expired.pendingOrders.length}
-                  onClick={setSelectedTabFactory('expired')}
+                  type="closed"
+                  isActive={selectedTab === 'closed'}
+                  count={filteredOrders.closed.orders.length + filteredOrders.closed.pendingOrders.length}
+                  onClick={setSelectedTabFactory('closed')}
                 />
               </div>
             </div>
@@ -275,7 +274,7 @@ const OrdersWidget: React.FC = () => {
                   <tbody>
                     {displayedPendingOrders.map((order: PendingTxObj) => (
                       <OrderRow
-                        key={Math.random()}
+                        key={order.id}
                         order={order}
                         networkId={networkId}
                         isOverBalance={false}

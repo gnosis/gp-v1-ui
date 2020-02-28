@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import Modali from 'modali'
 import BN from 'bn.js'
 
@@ -169,12 +169,6 @@ const BalancesWidget = styled(Widget)`
         color: #2f3e4e;
       }
     }
-
-    > div {
-      @media ${MEDIA.mobile} {
-        text-align: right;
-      }
-    }
   }
 `
 
@@ -183,7 +177,7 @@ const BalanceTools = styled.div`
   width: 100%;
   justify-content: space-between;
   margin: 0;
-  padding: 1.6rem;
+  padding: 0;
   box-sizing: border-box;
   align-items: center;
   order: 1;
@@ -198,6 +192,8 @@ const BalanceTools = styled.div`
     outline: 0;
     background: transparent;
     transition: text-decoration 0.2s ease-in-out;
+    padding: 0;
+    margin: 0 1.6rem;
 
     @media ${MEDIA.mobile} {
       padding: 0;
@@ -234,6 +230,7 @@ const BalanceTools = styled.div`
     max-width: 100%;
     position: relative;
     height: 5.6rem;
+    margin: 1.6rem;
 
     @media ${MEDIA.mobile} {
       width: 100%;
@@ -288,20 +285,81 @@ const BalanceTools = styled.div`
   }
 `
 
+type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
+  ReturnType<typeof useTokenBalances> & {
+    requestWithdrawConfirmation(amount: BN, tokenAddress: string, claimable: boolean): Promise<void>
+  }
+const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
+  balances,
+  error,
+  enableToken,
+  depositToken,
+  claimToken,
+  claiming,
+  highlighted,
+  enabling,
+  requestWithdrawConfirmation,
+}) => {
+  const windowSpecs = useWindowSizes()
+
+  return (
+    <BalancesWidget>
+      <BalanceTools>
+        <label className="balances-searchTokens not-implemented">
+          <input placeholder="Search token by Name, Symbol" type="text" required />
+        </label>
+        <label className="balances-hideZero not-implemented">
+          <input type="checkbox" />
+          <b>Hide zero balances</b>
+        </label>
+        <button type="button" className="balances-manageTokens not-implemented">
+          Manage Tokens
+        </button>
+      </BalanceTools>
+      {error ? (
+        <ErrorMsg title="oops..." message="Something happened while loading the balances" />
+      ) : (
+        <CardTable className="balancesOverview">
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Exchange Balance</th>
+              <th>Pending Withdrawals</th>
+              <th>Wallet Balance</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {balances &&
+              balances.map(tokenBalances => (
+                <Row
+                  key={tokenBalances.addressMainnet}
+                  tokenBalances={tokenBalances}
+                  onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                  onSubmitDeposit={(balance): Promise<void> => depositToken(balance, tokenBalances.address)}
+                  onSubmitWithdraw={(balance): Promise<void> => {
+                    return requestWithdrawConfirmation(balance, tokenBalances.address, tokenBalances.claimable)
+                  }}
+                  onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                  claiming={claiming}
+                  highlighted={highlighted}
+                  enabling={enabling}
+                  {...windowSpecs}
+                />
+              ))}
+          </tbody>
+        </CardTable>
+      )}
+    </BalancesWidget>
+  )
+}
+
+const BalancesDisplayMemoed = React.memo(BalancesDisplay)
+
 const DepositWidget: React.FC = () => {
   const { balances, error } = useTokenBalances()
-  const {
-    // Dispatchers
-    enableToken,
-    depositToken,
-    requestWithdrawToken,
-    claimToken,
-    // State Map
-    enabling,
-    claiming,
-    highlighted,
-  } = useRowActions({ balances })
-  const windowSpecs = useWindowSizes()
+
+  const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
 
   const [withdrawRequest, setWithdrawRequest] = useSafeState<WithdrawState>({
     amount: ZERO,
@@ -315,27 +373,30 @@ const DepositWidget: React.FC = () => {
     toggleWithdrawAndClaimModal,
   } = useDepositModals({ ...withdrawRequest, requestWithdrawToken })
 
-  const requestWithdrawConfirmation = async (amount: BN, tokenAddress: string, claimable: boolean): Promise<void> => {
-    const {
-      pendingWithdraw: { amount: withdrawingBalance },
-      symbol,
-    } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
+  const requestWithdrawConfirmation = useCallback(
+    async (amount: BN, tokenAddress: string, claimable: boolean): Promise<void> => {
+      const {
+        pendingWithdraw: { amount: withdrawingBalance },
+        symbol,
+      } = getToken('address', tokenAddress, balances) as Required<TokenBalanceDetails>
 
-    logDebug(`[DepositWidget] Confirm withdraw for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
+      logDebug(`[DepositWidget] Confirm withdraw for ${symbol} with withdrawingBalance ${withdrawingBalance}`)
 
-    if (!withdrawingBalance.isZero()) {
-      // Storing current values before displaying modal
-      setWithdrawRequest({
-        amount,
-        tokenAddress,
-      })
+      if (!withdrawingBalance.isZero()) {
+        // Storing current values before displaying modal
+        setWithdrawRequest({
+          amount,
+          tokenAddress,
+        })
 
-      claimable ? toggleWithdrawAndClaimModal() : toggleWithdrawOverwriteModal()
-    } else {
-      // No need to confirm the withdrawal: No amount is pending to be claimed
-      await requestWithdrawToken(amount, tokenAddress)
-    }
-  }
+        claimable ? toggleWithdrawAndClaimModal() : toggleWithdrawOverwriteModal()
+      } else {
+        // No need to confirm the withdrawal: No amount is pending to be claimed
+        await requestWithdrawToken(amount, tokenAddress)
+      }
+    },
+    [balances, requestWithdrawToken, setWithdrawRequest, toggleWithdrawAndClaimModal, toggleWithdrawOverwriteModal],
+  )
 
   if (balances === undefined) {
     // Loading: Do not show the widget
@@ -344,54 +405,12 @@ const DepositWidget: React.FC = () => {
 
   return (
     <section>
-      <BalancesWidget>
-        <BalanceTools>
-          <label className="balances-searchTokens not-implemented">
-            <input placeholder="Search token by Name, Symbol" type="text" required />
-          </label>
-          <label className="balances-hideZero not-implemented">
-            <input type="checkbox" />
-            <b>Hide zero balances</b>
-          </label>
-          <button type="button" className="balances-manageTokens not-implemented">
-            Manage Tokens
-          </button>
-        </BalanceTools>
-        {error ? (
-          <ErrorMsg title="oops..." message="Something happened while loading the balances" />
-        ) : (
-          <CardTable className="balancesOverview">
-            <thead>
-              <tr>
-                <th>Token</th>
-                <th>Exchange Balance</th>
-                <th>Pending Withdrawals</th>
-                <th>Wallet Balance</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {balances &&
-                balances.map(tokenBalances => (
-                  <Row
-                    key={tokenBalances.addressMainnet}
-                    tokenBalances={tokenBalances}
-                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                    onSubmitDeposit={(balance): Promise<void> => depositToken(balance, tokenBalances.address)}
-                    onSubmitWithdraw={(balance): Promise<void> => {
-                      return requestWithdrawConfirmation(balance, tokenBalances.address, tokenBalances.claimable)
-                    }}
-                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
-                    claiming={claiming}
-                    highlighted={highlighted}
-                    enabling={enabling}
-                    {...windowSpecs}
-                  />
-                ))}
-            </tbody>
-          </CardTable>
-        )}
-      </BalancesWidget>
+      <BalancesDisplayMemoed
+        balances={balances}
+        error={error}
+        {...restActions}
+        requestWithdrawConfirmation={requestWithdrawConfirmation}
+      />
       <Modali.Modal {...withdrawOverwriteModal} />
       <Modali.Modal {...withdrawAndClaimModal} />
     </section>
