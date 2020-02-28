@@ -85,7 +85,7 @@ const Wrapper = styled.div`
 `
 
 const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
-  visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
+  display: ${(props): string => (props.$visible ? 'flex' : 'none')};
   position: fixed;
 
   left: 0;
@@ -104,12 +104,10 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   padding: 2.7rem;
   border-radius: 0.8rem;
 
-  display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
   align-items: space-between;
 
-  transition: all 0.5s ease-in-out;
   > strong {
     text-transform: capitalize;
     color: #2f3e4e;
