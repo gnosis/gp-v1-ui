@@ -11,7 +11,7 @@ import { useDeleteOrders } from './useDeleteOrders'
 import usePendingOrders from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive } from 'utils'
 
@@ -282,6 +282,7 @@ const OrdersWidget: React.FC = () => {
                         pending
                         disabled={deleting}
                         isPendingOrder
+                        transactionHash={order.txHash}
                       />
                     ))}
                     {displayedOrders.map(order => (

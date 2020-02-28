@@ -29,12 +29,14 @@ import { AuctionElement } from 'api/exchange/ExchangeApi'
 import TokenImg from 'components/TokenImg'
 import { OrderRowWrapper } from './OrderRow.styled'
 
-const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
+const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
+  const { transactionHash } = props
   return (
-    <td className="pendingCell" data-label="Actions">
-      <FontAwesomeIcon icon={faSpinner} size="lg" spin />
-      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
-    </td>
+    <>
+      <FontAwesomeIcon icon={faSpinner} size="sm" spin /> Pending...
+      <br />
+      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
+    </>
   )
 }
 
@@ -49,9 +51,6 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
-    {/* <button className="danger" type="button" onClick={toggleMarkedForDeletion}>
-      Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
-    </button> */}
   </td>
 )
 
@@ -191,17 +190,10 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   // Display isLowBalance warning only for active and partial fill orders
   const isLowBalance = isOverBalance && !isUnlimited && !isFilled && !isScheduled && !isPendingOrder && !isExpiredOrder
 
-  const pending = useMemo(
-    () =>
-      isPendingOrder && (
-        <>
-          Pending...
-          <br />
-          <PendingLink transactionHash={transactionHash} />
-        </>
-      ),
-    [isPendingOrder, transactionHash],
-  )
+  const pending = useMemo(() => isPendingOrder && <PendingLink transactionHash={transactionHash} />, [
+    isPendingOrder,
+    transactionHash,
+  ])
 
   return (
     <td className="status">
@@ -312,21 +304,16 @@ const OrderRow: React.FC<Props> = props => {
     sellToken &&
     buyToken && (
       <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
-        {!isPendingOrder &&
-          (pending ? (
-            <PendingLink transactionHash={transactionHash} />
-          ) : (
-            <DeleteOrder
-              isMarkedForDeletion={isMarkedForDeletion}
-              toggleMarkedForDeletion={toggleMarkedForDeletion}
-              pending={pending}
-              disabled={disabled}
-            />
-          ))}
+        <DeleteOrder
+          isMarkedForDeletion={isMarkedForDeletion}
+          toggleMarkedForDeletion={toggleMarkedForDeletion}
+          pending={pending}
+          disabled={disabled || isPendingOrder || pending}
+        />
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
-        {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
+        <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        <Expires order={order} pending={pending} />
         <Status
           order={order}
           isOverBalance={isOverBalance}
