@@ -19,20 +19,18 @@ interface SubComponentProps extends TokenSelectorProps {
   nextStep: () => void
 }
 
-const SubComponents: React.FC<SubComponentProps> = props => {
-  const {
-    step,
-    handleTokenSelect,
-    selectedTokensMap,
-    tokens,
-    spread,
-    setSpread,
-    txHash,
-    txReceipt,
-    txError,
-    nextStep,
-  } = props
-
+const SubComponents: React.FC<SubComponentProps> = ({
+  step,
+  handleTokenSelect,
+  selectedTokensMap,
+  tokens,
+  spread,
+  setSpread,
+  txHash,
+  txReceipt,
+  txError,
+  nextStep,
+}) => {
   switch (step) {
     case 1:
       return (
