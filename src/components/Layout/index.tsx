@@ -41,36 +41,36 @@ const Wrapper = styled.div`
   }
 `
 
+const navigation = [
+  {
+    label: 'Trade',
+    to: '/trade',
+    order: 1,
+  },
+  {
+    label: 'Liquidity',
+    to: '/liquidity',
+    order: 2,
+    withPastLocation: true,
+  },
+  {
+    label: 'Orders',
+    to: '/orders',
+    order: 3,
+    withPastLocation: true,
+  },
+  {
+    label: 'Balances',
+    to: '/wallet',
+    order: 4,
+    withPastLocation: true,
+  },
+]
+
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner useFull={false} title="💀 This project is in beta. Use at your own risk." />
-    <Header
-      navigation={[
-        {
-          label: 'Trade',
-          to: '/trade',
-          order: 1,
-        },
-        {
-          label: 'Liquidity',
-          to: '/liquidity',
-          order: 2,
-          withPastLocation: true,
-        },
-        {
-          label: 'Orders',
-          to: '/orders',
-          order: 3,
-          withPastLocation: true,
-        },
-        {
-          label: 'Balances',
-          to: '/wallet',
-          order: 4,
-          withPastLocation: true,
-        },
-      ]}
-    />
+    <Header navigation={navigation} />
     <main>{children}</main>
     <Footer />
   </Wrapper>
