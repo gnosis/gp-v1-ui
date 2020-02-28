@@ -407,6 +407,36 @@ const TradeWidget: React.FC = () => {
 
   const sameToken = sellToken === receiveToken
 
+  const savePendingTransactions = useCallback(
+    (txHash: string, { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress }): void => {
+      // reset form on successful order placing
+      reset(DEFAULT_FORM_STATE)
+      setUnlimited(false)
+      // unblock form
+      setIsSubmitting(false)
+
+      // pendingTxHash = txHash
+      toast.info(<TxNotification txHash={txHash} />)
+
+      const newTxState = {
+        txHash,
+        id: 'PENDING ORDER',
+        buyTokenId,
+        sellTokenId,
+        priceNumerator,
+        priceDenominator,
+        user: userAddress,
+        remainingAmount: ZERO,
+        sellTokenBalance: ZERO,
+        validFrom: 0,
+        validUntil: 0,
+      }
+
+      return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+    },
+    [dispatch, reset, setIsSubmitting],
+  )
+
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
@@ -438,30 +468,15 @@ const TradeWidget: React.FC = () => {
           validUntil,
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
-              // reset form on successful order placing
-              reset(DEFAULT_FORM_STATE)
-              setUnlimited(false)
-              // unblock form
-              setIsSubmitting(false)
-
               pendingTxHash = txHash
-              toast.info(<TxNotification txHash={txHash} />)
-
-              const newTxState = {
-                txHash,
-                id: 'PENDING ORDER',
+              return savePendingTransactions(txHash, {
                 buyTokenId: cachedBuyToken.id,
                 sellTokenId: cachedSellToken.id,
-                priceNumerator: buyAmount,
-                priceDenominator: sellAmount,
-                user: userAddress,
-                remainingAmount: ZERO,
-                sellTokenBalance: ZERO,
-                validFrom: 0,
-                validUntil: 0,
-              }
-
-              return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
             },
           },
         }))
@@ -480,30 +495,15 @@ const TradeWidget: React.FC = () => {
           ],
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
-              // reset form on successful order placing
-              reset(DEFAULT_FORM_STATE)
-              setUnlimited(false)
-              // unblock form
-              setIsSubmitting(false)
-
               pendingTxHash = txHash
-              toast.info(<TxNotification txHash={txHash} />)
-
-              const newTxState = {
-                txHash,
-                id: 'PENDING ORDER',
+              return savePendingTransactions(txHash, {
                 buyTokenId: cachedBuyToken.id,
                 sellTokenId: cachedSellToken.id,
-                priceNumerator: buyAmount,
-                priceDenominator: sellAmount,
-                user: userAddress,
-                remainingAmount: ZERO,
-                sellTokenBalance: ZERO,
-                validFrom: 0,
-                validUntil: 0,
-              }
-
-              return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
             },
           },
         }))
