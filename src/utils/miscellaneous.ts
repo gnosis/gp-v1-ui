@@ -73,6 +73,8 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
 }
 
 export const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now
+export const isPendingOrderActive = (order: AuctionElement, now: Date): boolean =>
+  batchIdToDate(order.validUntil) >= now || order.validUntil === 0
 
 export function isOrderFilled(order: AuctionElement): boolean {
   // consider an oder filled when less than `negligibleAmount` is left

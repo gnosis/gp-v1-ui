@@ -32,10 +32,11 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount, parseBigNumber } from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPrice } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
+import { PendingTxObj } from 'api/exchange/ExchangeApi'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -437,7 +438,10 @@ const TradeWidget: React.FC = () => {
   const sameToken = sellToken === receiveToken
 
   const savePendingTransactions = useCallback(
-    (txHash: string, { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress }): void => {
+    (
+      txHash: string,
+      { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress, validFrom, validUntil },
+    ): void => {
       // reset form on successful order placing
       reset(DEFAULT_FORM_STATE)
       setUnlimited(false)
@@ -447,9 +451,8 @@ const TradeWidget: React.FC = () => {
       // pendingTxHash = txHash
       toast.info(<TxNotification txHash={txHash} />)
 
-      const newTxState = {
-        txHash,
-        id: 'PENDING ORDER',
+      const pendingOrder: PendingTxObj = {
+        id: Date.now() + '', // Uses a temporal unique id
         buyTokenId,
         sellTokenId,
         priceNumerator,
@@ -457,11 +460,12 @@ const TradeWidget: React.FC = () => {
         user: userAddress,
         remainingAmount: ZERO,
         sellTokenBalance: ZERO,
-        validFrom: 0,
-        validUntil: 0,
+        validFrom,
+        validUntil,
+        txHash,
       }
 
-      return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+      return dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
     },
     [dispatch, reset, setIsSubmitting],
   )
@@ -483,6 +487,10 @@ const TradeWidget: React.FC = () => {
       // block form
       setIsSubmitting(true)
 
+      // TODO: Review this logic. This should be calculated in the same place where we send the tx
+      const currentBatch = dateToBatchId(new Date())
+      const validFromBatchId = currentBatch + validFrom
+      const validUntilBatchId = currentBatch + validUntil
       let success: boolean
       // ASAP ORDER
       if (validFrom === 0) {
@@ -505,6 +513,9 @@ const TradeWidget: React.FC = () => {
                 priceDenominator: buyAmount,
                 networkId,
                 userAddress,
+                sellToken,
+                validFrom: validFromBatchId,
+                validUntil: validUntilBatchId,
               })
             },
           },
@@ -534,6 +545,8 @@ const TradeWidget: React.FC = () => {
                 priceDenominator: buyAmount,
                 networkId,
                 userAddress,
+                validFrom: validFromBatchId,
+                validUntil: validUntilBatchId,
               })
             },
           },

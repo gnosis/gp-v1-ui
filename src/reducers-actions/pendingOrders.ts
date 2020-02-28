@@ -1,4 +1,4 @@
-import { PendingTxObj, PendingTxArray } from 'api/exchange/ExchangeApi'
+import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
 
 export const enum ActionTypes {
@@ -52,7 +52,7 @@ export const removePendingOrdersAction = (payload: {
 
 export interface PendingOrdersState {
   [networkId: number]: {
-    [userAddress: string]: PendingTxArray
+    [userAddress: string]: PendingTxObj[]
   }
 }
 
