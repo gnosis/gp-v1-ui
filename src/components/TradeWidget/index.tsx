@@ -28,7 +28,7 @@ import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { MEDIA } from 'const'
 
-import { tokenListApi } from 'api'
+import { tokenListApi, walletApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
@@ -574,7 +574,23 @@ const TradeWidget: React.FC = () => {
       })
     } else {
       // Not connected. Prompt user to connect his wallet
-      await connectWallet()
+      const success = await connectWallet()
+      if (success) {
+        const { userAddress: address, networkId: netId } = await walletApi.getWalletInfo()
+
+        address &&
+          netId &&
+          (await _placeOrder({
+            validFrom,
+            validUntil,
+            sellAmount,
+            buyAmount,
+            sellToken: cachedSellToken,
+            buyToken: cachedBuyToken,
+            networkId: netId,
+            userAddress: address,
+          }))
+      }
     }
   }
 
