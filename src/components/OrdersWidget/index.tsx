@@ -259,7 +259,7 @@ const OrdersWidget: React.FC = () => {
                     <tbody>
                       {pendingOrders.map((order: PendingTxObj) => (
                         <OrderRow
-                          key={Math.random()}
+                          key={order.id}
                           order={order}
                           networkId={networkId}
                           isOverBalance={false}
