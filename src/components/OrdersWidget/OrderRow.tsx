@@ -31,10 +31,10 @@ import { OrderRowWrapper } from './OrderRow.styled'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
   return (
-    <td className="pendingCell" data-label="Actions">
+    <>
       <FontAwesomeIcon icon={faSpinner} size="lg" spin />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
-    </td>
+    </>
   )
 }
 
@@ -195,9 +195,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
     () =>
       isPendingOrder && (
         <>
-          Pending...
-          <br />
-          <PendingLink transactionHash={transactionHash} />
+          <PendingLink transactionHash={transactionHash} /> Pending...
         </>
       ),
     [isPendingOrder, transactionHash],
@@ -312,17 +310,17 @@ const OrderRow: React.FC<Props> = props => {
     sellToken &&
     buyToken && (
       <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
-        {!isPendingOrder &&
+        {/* {!isPendingOrder &&
           (pending ? (
             <PendingLink transactionHash={transactionHash} />
-          ) : (
-            <DeleteOrder
-              isMarkedForDeletion={isMarkedForDeletion}
-              toggleMarkedForDeletion={toggleMarkedForDeletion}
-              pending={pending}
-              disabled={disabled}
-            />
-          ))}
+          ) : ( */}
+        <DeleteOrder
+          isMarkedForDeletion={isMarkedForDeletion}
+          toggleMarkedForDeletion={toggleMarkedForDeletion}
+          pending={pending}
+          disabled={disabled || isPendingOrder || pending}
+        />
+        {/* ))} */}
         <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
