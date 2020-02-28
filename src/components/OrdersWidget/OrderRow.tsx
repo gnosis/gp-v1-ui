@@ -139,13 +139,13 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
   )
 }
 
-const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
+const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = ({ order, isPendingOrder }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
-    const isNeverExpires = isNeverExpiresOrder(order.validUntil)
+    const isNeverExpires = isNeverExpiresOrder(order.validUntil) || (isPendingOrder && order.validUntil === 0)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
 
     return { isNeverExpires, expiresOn }
-  }, [order.validUntil])
+  }, [isPendingOrder, order.validUntil])
 
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
@@ -294,7 +294,7 @@ const OrderRow: React.FC<Props> = props => {
         />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
-        <Expires order={order} pending={pending} />
+        <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
         <Status
           order={order}
           isOverBalance={isOverBalance}

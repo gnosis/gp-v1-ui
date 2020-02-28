@@ -13,7 +13,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
-import { isOrderActive } from 'utils'
+import { isOrderActive, isPendingOrderActive } from 'utils'
 
 import { CardTable } from 'components/Layout/Card'
 import OrderRow from './OrderRow'
@@ -102,7 +102,7 @@ const OrdersWidget: React.FC = () => {
     })
 
     allPendingOrders.forEach(order => {
-      if (!isOrderActive(order, now)) {
+      if (!isPendingOrderActive(order, now)) {
         filteredOrders.closed.pendingOrders.push(order)
       } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
         filteredOrders.liquidity.pendingOrders.push(order)
