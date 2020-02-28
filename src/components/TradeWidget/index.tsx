@@ -112,6 +112,7 @@ const WrappedForm = styled.form`
     }
     > strong {
       margin: 0.3rem 0 0.3rem 0.3rem;
+      font-size: 1.3rem;
     }
   }
 `
