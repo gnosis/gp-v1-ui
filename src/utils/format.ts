@@ -72,7 +72,7 @@ export const formatValidity = (
     ? matchedConstraintText
     : +validTime < 0
     ? errorText
-    : `~
+    : `in ~
 ${(+validTime / 60)
   .toFixed(2)
   .replace(leadingAndTrailingZeros, '')

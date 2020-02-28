@@ -233,7 +233,7 @@ const OrderValidity: React.FC<Props> = ({
   return (
     <Wrapper>
       <button type="button" onClick={handleShowConfig}>
-        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires: <b>{formatValidity(validUntil, 'never')}</b>
+        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires: <b>{formatValidity(validUntil, 'Never')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
@@ -280,7 +280,7 @@ const OrderValidity: React.FC<Props> = ({
               })}
               onChange={handleValidUntilChange}
               onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex + 2}
+              tabIndex={tabIndex + 3}
             />
             <div className="radio-container">
               <input
