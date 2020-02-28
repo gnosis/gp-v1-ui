@@ -9,11 +9,15 @@ import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
 import { logDebug, formatTimeInHours } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
-import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
 import useSafeState from './useSafeState'
 
-interface PlaceOrderParams<T> {
+interface ConnectionParams {
+  userAddress: string
+  networkId: number
+}
+
+interface PlaceOrderParams<T> extends ConnectionParams {
   buyAmount: BN
   buyToken: T
   sellAmount: BN
@@ -22,11 +26,12 @@ interface PlaceOrderParams<T> {
   txOptionalParams?: TxOptionalParams
 }
 
-export interface MultipleOrdersOrder extends Omit<PlaceOrderParams<number>, 'txOptionalParams'> {
+export interface MultipleOrdersOrder
+  extends Omit<PlaceOrderParams<number>, 'txOptionalParams' | 'userAddress' | 'networkId'> {
   validFrom?: number
 }
 
-interface PlaceMultipleOrdersParams {
+interface PlaceMultipleOrdersParams extends ConnectionParams {
   orders: MultipleOrdersOrder[]
   txOptionalParams?: TxOptionalParams
 }
@@ -45,7 +50,6 @@ export interface PlaceOrderResult {
 
 export const usePlaceOrder = (): Result => {
   const [isSubmitting, setIsSubmitting] = useSafeState(false)
-  const { userAddress, networkId } = useWalletConnection()
 
   const placeOrder = useCallback(
     async ({
@@ -55,6 +59,8 @@ export const usePlaceOrder = (): Result => {
       sellToken,
       validUntil,
       txOptionalParams,
+      userAddress,
+      networkId,
     }: PlaceOrderParams<TokenDetails>): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
@@ -108,13 +114,13 @@ export const usePlaceOrder = (): Result => {
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
           toast.success(
-            `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
+            `Transaction mined! Successfully placed order valid ASAP and expiring ${formatTimeInHours(
               validityInMinutes,
               'never',
             )}`,
           )
         } else {
-          toast.success(`Transaction mined! Succesfully placed order valid ASAP and never expiring`)
+          toast.success(`Transaction mined! Successfully placed order valid ASAP and never expiring`)
         }
 
         return { success: true, receipt }
@@ -134,11 +140,16 @@ export const usePlaceOrder = (): Result => {
         setIsSubmitting(false)
       }
     },
-    [networkId, setIsSubmitting, userAddress],
+    [setIsSubmitting],
   )
 
   const placeMultipleOrders = useCallback(
-    async ({ orders, txOptionalParams }: PlaceMultipleOrdersParams): Promise<PlaceOrderResult> => {
+    async ({
+      orders,
+      txOptionalParams,
+      userAddress,
+      networkId,
+    }: PlaceMultipleOrdersParams): Promise<PlaceOrderResult> => {
       if (!userAddress || !networkId) {
         toast.error('Wallet is not connected!')
         return { success: false }
@@ -234,7 +245,7 @@ export const usePlaceOrder = (): Result => {
         setIsSubmitting(false)
       }
     },
-    [networkId, setIsSubmitting, userAddress],
+    [setIsSubmitting],
   )
 
   return { placeOrder, isSubmitting, setIsSubmitting, placeMultipleOrders }

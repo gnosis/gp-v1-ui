@@ -5,8 +5,8 @@ import switchTokenPair from 'assets/img/switch.svg'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useHistory } from 'react-router'
 import { toast } from 'toastify'
+import BN from 'bn.js'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -35,6 +35,7 @@ import { Network, TokenDetails } from 'types'
 import { getToken, parseAmount, parseBigNumber } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPrice } from './Price'
+import { useConnectWallet } from 'hooks/useConnectWallet'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -307,6 +308,7 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
 
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
+  const { connectWallet } = useConnectWallet()
   const [, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -410,7 +412,6 @@ const TradeWidget: React.FC = () => {
   )
 
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
-  const history = useHistory()
 
   const swapTokens = useCallback((): void => {
     setSellToken(receiveToken)
@@ -465,6 +466,87 @@ const TradeWidget: React.FC = () => {
     [dispatch, reset, setIsSubmitting],
   )
 
+  const _placeOrder = useCallback(
+    async (params: {
+      validFrom: number
+      validUntil: number
+      buyAmount: BN
+      buyToken: TokenDetails
+      sellAmount: BN
+      sellToken: TokenDetails
+      networkId: number
+      userAddress: string
+    }) => {
+      const { validFrom, validUntil, buyAmount, buyToken, sellAmount, sellToken, networkId, userAddress } = params
+
+      let pendingTxHash: string | undefined = undefined
+      // block form
+      setIsSubmitting(true)
+
+      let success: boolean
+      // ASAP ORDER
+      if (validFrom === 0) {
+        // ; for destructure reassign format
+        ;({ success } = await placeOrder({
+          networkId,
+          userAddress,
+          buyAmount,
+          buyToken,
+          sellAmount,
+          sellToken,
+          validUntil,
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
+              return savePendingTransactions(txHash, {
+                buyTokenId: buyToken.id,
+                sellTokenId: sellToken.id,
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
+            },
+          },
+        }))
+      } else {
+        // ; for destructure reassign format
+        ;({ success } = await placeMultipleOrders({
+          networkId,
+          userAddress,
+          orders: [
+            {
+              buyAmount,
+              buyToken: buyToken.id,
+              sellAmount,
+              sellToken: sellToken.id,
+              validFrom,
+              validUntil,
+            },
+          ],
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
+              return savePendingTransactions(txHash, {
+                buyTokenId: buyToken.id,
+                sellTokenId: sellToken.id,
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
+            },
+          },
+        }))
+      }
+      if (success && pendingTxHash) {
+        // remove pending tx
+        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+      }
+    },
+    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactions, setIsSubmitting],
+  )
+
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
@@ -480,69 +562,33 @@ const TradeWidget: React.FC = () => {
     if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
 
     if (isConnected && userAddress) {
-      let pendingTxHash: string | undefined = undefined
-      // block form
-      setIsSubmitting(true)
-
-      let success: boolean
-      // ASAP ORDER
-      if (validFrom === 0) {
-        // ; for destructure reassign format
-        ;({ success } = await placeOrder({
-          buyAmount,
-          buyToken: cachedBuyToken,
-          sellAmount,
-          sellToken: cachedSellToken,
-          validUntil,
-          txOptionalParams: {
-            onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
-              return savePendingTransactions(txHash, {
-                buyTokenId: cachedBuyToken.id,
-                sellTokenId: cachedSellToken.id,
-                priceNumerator: sellAmount,
-                priceDenominator: buyAmount,
-                networkId,
-                userAddress,
-              })
-            },
-          },
-        }))
-      } else {
-        // ; for destructure reassign format
-        ;({ success } = await placeMultipleOrders({
-          orders: [
-            {
-              buyAmount,
-              buyToken: cachedBuyToken.id,
-              sellAmount,
-              sellToken: cachedSellToken.id,
-              validFrom,
-              validUntil,
-            },
-          ],
-          txOptionalParams: {
-            onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
-              return savePendingTransactions(txHash, {
-                buyTokenId: cachedBuyToken.id,
-                sellTokenId: cachedSellToken.id,
-                priceNumerator: sellAmount,
-                priceDenominator: buyAmount,
-                networkId,
-                userAddress,
-              })
-            },
-          },
-        }))
-      }
-      if (success && pendingTxHash) {
-        // remove pending tx
-        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
-      }
+      await _placeOrder({
+        validFrom,
+        validUntil,
+        sellAmount,
+        buyAmount,
+        sellToken: cachedSellToken,
+        buyToken: cachedBuyToken,
+        networkId,
+        userAddress,
+      })
     } else {
-      const from = history.location.pathname + history.location.search
-      history.push('/connect-wallet', { from })
+      // Not connected. Prompt user to connect his wallet
+      const walletInfo = await connectWallet()
+
+      // Then place the order if connection was successful
+      if (walletInfo && walletInfo.networkId && walletInfo.userAddress) {
+        await _placeOrder({
+          validFrom,
+          validUntil,
+          sellAmount,
+          buyAmount,
+          sellToken: cachedSellToken,
+          buyToken: cachedBuyToken,
+          networkId: walletInfo.networkId,
+          userAddress: walletInfo.userAddress,
+        })
+      }
     }
   }
 
