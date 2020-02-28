@@ -21,8 +21,9 @@ const Wrapper = styled.div`
     color: #2f3e4e;
     width: 100%;
     margin: 0 0 1rem;
-    padding: 0 1rem;
+    padding: 0;
     box-sizing: border-box;
+    font-size: 1.5rem;
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
     }
@@ -36,7 +37,6 @@ export const PriceInputBox = styled.div`
   width: 50%;
   width: calc(50% - 0.8rem);
   height: 5.6rem;
-
   position: relative;
   outline: 0;
 
