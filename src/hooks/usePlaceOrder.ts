@@ -7,7 +7,7 @@ import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { logDebug, formatValidity } from 'utils'
+import { logDebug, formatTimeInHours } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
@@ -108,7 +108,7 @@ export const usePlaceOrder = (): Result => {
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
           toast.success(
-            `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatValidity(
+            `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
               validityInMinutes,
               'never',
             )}`,
@@ -194,16 +194,16 @@ export const usePlaceOrder = (): Result => {
             const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid ${formatValidity(
+              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
                 validityFromInMinutes,
                 'ASAP',
-              )} and expiring ${formatValidity(validityUntilInMinutes, 'never')}`,
+              )} and expiring ${formatTimeInHours(validityUntilInMinutes, 'never')}`,
             )
           } else if (orders[0].validUntil) {
             const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatValidity(
+              `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
                 validityUntilInMinutes,
                 'never',
               )}`,
@@ -212,7 +212,7 @@ export const usePlaceOrder = (): Result => {
             const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid ${formatValidity(
+              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
                 validityFromInMinutes,
                 'ASAP',
               )} and never expiring`,

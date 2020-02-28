@@ -63,7 +63,7 @@ export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and
 export const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
 export const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
 
-export const formatValidity = (
+export const formatTimeInHours = (
   validTime: string | number,
   matchedConstraintText: string,
   errorText = 'Invalid time - time cannot be negative',

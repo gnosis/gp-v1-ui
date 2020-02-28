@@ -8,7 +8,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { PriceInputBox } from './Price'
 
 import useSafeState from 'hooks/useSafeState'
-import { validInputPattern, formatValidity, makeMultipleOf } from 'utils'
+import { validInputPattern, formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
 
@@ -233,7 +233,8 @@ const OrderValidity: React.FC<Props> = ({
   return (
     <Wrapper>
       <button type="button" onClick={handleShowConfig}>
-        Order starts: <b>{formatValidity(validFrom, 'ASAP')}</b> - expires: <b>{formatValidity(validUntil, 'Never')}</b>
+        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
+        <b>{formatTimeInHours(validUntil, 'Never')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
