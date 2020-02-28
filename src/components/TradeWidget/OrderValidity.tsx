@@ -8,7 +8,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { PriceInputBox } from './Price'
 
 import useSafeState from 'hooks/useSafeState'
-import { validInputPattern, validatePositive, formatValidity, makeMultipleOf } from 'utils'
+import { validInputPattern, formatValidity, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
 
@@ -276,7 +276,7 @@ const OrderValidity: React.FC<Props> = ({
               required
               ref={register({
                 pattern: { value: validInputPattern, message: 'Expiration time cannot be negative' },
-                validate: { positive: validatePositive },
+                validate: value => Number(value) === 0 || Number(value) >= 5,
               })}
               onChange={handleValidUntilChange}
               onFocus={(e): void => e.target.select()}

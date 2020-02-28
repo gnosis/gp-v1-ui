@@ -108,13 +108,13 @@ export const usePlaceOrder = (): Result => {
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
           toast.success(
-            `Transaction mined! Succesfully placed order valid for ${formatValidity(
+            `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatValidity(
               validityInMinutes,
-              'an unlimited amount of time',
+              'never',
             )}`,
           )
         } else {
-          toast.success(`Transaction mined! Succesfully placed standing order`)
+          toast.success(`Transaction mined! Succesfully placed order valid ASAP and never expiring`)
         }
 
         return { success: true, receipt }
@@ -185,16 +185,39 @@ export const usePlaceOrder = (): Result => {
         const receipt = await exchangeApi.placeValidFromOrders(params)
 
         logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
-        if (orders.length === 1 && orders[0].validUntil && orders[0].validFrom) {
-          const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
-          const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
-          // TODO: link to orders page?
-          toast.success(
-            `Transaction mined! Succesfully placed order valid in ${formatValidity(
-              validityFromInMinutes,
-              'ASAP',
-            )} and valid for ${formatValidity(validityUntilInMinutes, 'an unlimited amount of time')}`,
-          )
+        // placeMultipleOrders is the only way to use validFrom
+        // right now app doesn't support multiple orders with different validFrom times
+        // Liquidity creates multiple orders but with same order times
+        if (orders.length === 1) {
+          if (orders[0].validUntil && orders[0].validFrom) {
+            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ${formatValidity(
+                validityFromInMinutes,
+                'ASAP',
+              )} and expiring ${formatValidity(validityUntilInMinutes, 'never')}`,
+            )
+          } else if (orders[0].validUntil) {
+            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatValidity(
+                validityUntilInMinutes,
+                'never',
+              )}`,
+            )
+          } else if (orders[0].validFrom) {
+            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ${formatValidity(
+                validityFromInMinutes,
+                'ASAP',
+              )} and never expiring`,
+            )
+          }
         } else {
           toast.success(
             `Transaction mined! Succesfully placed ${orders.length} orders. Please check the orders page for their respective validity times.`,
