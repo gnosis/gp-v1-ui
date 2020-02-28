@@ -1,8 +1,8 @@
 import React from 'react'
-import PageWrapper from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/Layout/PageWrapper'
 
 const About: React.FC = () => (
-  <PageWrapper>
+  <ContentPage>
     <h1>About dFusion</h1>
     <p>
       The dFusion PoC protocol (working title) introduces a new, fully decentralized exchange mechanism for ERC20
@@ -41,7 +41,7 @@ const About: React.FC = () => (
         </a>
       </li>
     </ul>
-  </PageWrapper>
+  </ContentPage>
 )
 
 export default About

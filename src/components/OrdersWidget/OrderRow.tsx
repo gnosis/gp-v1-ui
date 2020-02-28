@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
-import { faSpinner, faExchangeAlt, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
@@ -26,7 +26,7 @@ import {
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
-import TokenImg from 'components/TokenImg'
+
 import { OrderRowWrapper } from './OrderRow.styled'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
@@ -49,7 +49,7 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
-    {/* <button className="danger" onClick={toggleMarkedForDeletion}>
+    {/* <button className="danger" type="button" onClick={toggleMarkedForDeletion}>
       Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
     </button> */}
   </td>
@@ -80,32 +80,14 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
 }
 
-const OrderImage: React.FC<Pick<OrderDetailsProps, 'sellToken' | 'buyToken'>> = ({ buyToken, sellToken }) => {
-  return (
-    <td className="order-image-row">
-      <div>
-        {/* e.g SELL DAI <-> BUY TUSD */}
-        <div>
-          <TokenImg src={sellToken.image} alt={sellToken.addressMainnet} />{' '}
-          <strong>{displayTokenSymbolOrLink(sellToken)}</strong>
-        </div>
-        {/* Switcher icon */}
-        <FontAwesomeIcon icon={faExchangeAlt} size="lg" />
-        <div>
-          <strong>{displayTokenSymbolOrLink(buyToken)}</strong>{' '}
-          <TokenImg src={buyToken.image} alt={buyToken.addressMainnet} />
-        </div>
-      </div>
-    </td>
-  )
-}
-
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
-  const price = useMemo(() => {
+  const [price, priceInverse] = useMemo((): string[] => {
     const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
     const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
+    const priceFmt = calculatePrice(numeratorString, denominatorString)
+    const priceInverseFmt = calculatePrice(denominatorString, numeratorString)
 
-    return calculatePrice(numeratorString, denominatorString)
+    return [priceFmt, priceInverseFmt]
   }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
 
   return (
@@ -116,7 +98,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
         {'/'}
         {displayTokenSymbolOrLink(buyToken)}
         <br />
-        {price} {displayTokenSymbolOrLink(buyToken)}
+        {priceInverse} {displayTokenSymbolOrLink(buyToken)}
         {'/'}
         {displayTokenSymbolOrLink(sellToken)}
       </div>
@@ -323,7 +305,6 @@ const OrderRow: React.FC<Props> = props => {
               disabled={disabled}
             />
           ))}
-        <OrderImage sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
         {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}

@@ -13,6 +13,7 @@ import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from './InputWithTooltip'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,9 +31,13 @@ const Wrapper = styled.div`
   }
 
   > div > strong {
-    margin: 0 auto 0 0;
+    margin: 0 auto 0 0.5rem;
     text-transform: capitalize;
     color: #2f3e4e;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
   }
 
   > div > span {
@@ -159,6 +164,7 @@ interface Props {
   tabIndex: number
   readOnly: boolean
   tooltipText: string
+  autoFocus?: boolean
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -173,6 +179,7 @@ const TokenRow: React.FC<Props> = ({
   tabIndex,
   readOnly = false,
   tooltipText,
+  autoFocus,
 }) => {
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
@@ -190,19 +197,20 @@ const TokenRow: React.FC<Props> = ({
     const value = new BN(parseAmount(inputValue, selectedToken.decimals) || '0')
     overMax = value.gt(max) ? value.sub(max) : ZERO
   }
-
-  const className = error ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
+  const sellAmountOverMax = overMax.gt(ZERO)
+  const balanceClassName = !error && sellAmountOverMax ? 'warning' : 'success'
+  const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
   const errorOrWarning = error ? (
     <FormMessage className="error">{error.message}</FormMessage>
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
-        <b>INFO</b>: Sell amount exceeding your balance by{' '}
+        <b>INFO</b>: Sell amount exceeding your balance by
         <strong>
-          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}
+          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
         </strong>
-        . This creates a standing order. <a href="#">Read more</a>.
+        {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
   )
@@ -230,25 +238,49 @@ const TokenRow: React.FC<Props> = ({
       <div>
         <strong>{selectLabel}</strong>
         <span>
-          {/* can pass props to as={Component} */}
-          <TooltipWrapper as="button" tooltip="Deposit" onClick={console.log}>
-            + Deposit
-          </TooltipWrapper>
-          {/* <button>+ Deposit</button> */}
+          {!readOnly && (
+            // TODO: Implement deposit in Trade widget
+            //  https://github.com/gnosis/dex-react/issues/610
+            <TooltipWrapper
+              className="not-implemented"
+              as="button"
+              type="button"
+              tooltip="Deposit"
+              onClick={(): void => alert('Not implemented yet!')}
+            >
+              + Deposit
+            </TooltipWrapper>
+          )}
           <span>
             Balance:
-            <TooltipWrapper as={FormMessage} tooltip="Fill maximum">
-              {' '}
-              {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-              {validateMaxAmount && <a onClick={useMax}>max</a>}
-            </TooltipWrapper>
-            <i aria-label="Tooltip"></i>
+            {readOnly ? (
+              <FormMessage className={balanceClassName}>
+                {' '}
+                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+              </FormMessage>
+            ) : (
+              <>
+                <FormMessage className={balanceClassName}>
+                  {' '}
+                  {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                  {validateMaxAmount && (
+                    <>
+                      <TooltipWrapper tooltip="Fill maximum">
+                        <a onClick={useMax}>max</a>
+                      </TooltipWrapper>
+                      <i aria-label="Tooltip"></i>
+                    </>
+                  )}
+                </FormMessage>
+              </>
+            )}
           </span>
         </span>
       </div>
       <InputBox>
         <InputWithTooltip
-          className={className}
+          autoFocus={!readOnly && autoFocus}
+          className={inputClassName}
           tooltip={tooltipText}
           placeholder="0"
           name={inputId}
@@ -264,17 +296,11 @@ const TokenRow: React.FC<Props> = ({
           onFocus={(e): void => e.target.select()}
         />
 
-        {/*
-        <FormMessage>
-          <div>
-            <strong>Wallet:</strong> {displayBalance(balance, 'walletBalance')}
-          </div>
-        </FormMessage>
-        */}
-        {/* <TokenImgWrapper alt={selectedToken.name} src={selectedToken.image} /> */}
         {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
         <TokenBoxWrapper>
-          <TokenEnable>Enable</TokenEnable>
+          {/* TODO: Implement enable token in Trade widget */}
+          {/*   https://github.com/gnosis/dex-react/issues/611 */}
+          {!readOnly && <TokenEnable className="not-implemented">Enable</TokenEnable>}
           <TokenSelector
             label={selectLabel}
             isDisabled={isDisabled}

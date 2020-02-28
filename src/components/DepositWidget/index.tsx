@@ -169,12 +169,6 @@ const BalancesWidget = styled(Widget)`
         color: #2f3e4e;
       }
     }
-
-    > div {
-      @media ${MEDIA.mobile} {
-        text-align: right;
-      }
-    }
   }
 `
 
@@ -183,7 +177,7 @@ const BalanceTools = styled.div`
   width: 100%;
   justify-content: space-between;
   margin: 0;
-  padding: 1.6rem;
+  padding: 0;
   box-sizing: border-box;
   align-items: center;
   order: 1;
@@ -198,6 +192,8 @@ const BalanceTools = styled.div`
     outline: 0;
     background: transparent;
     transition: text-decoration 0.2s ease-in-out;
+    padding: 0;
+    margin: 0 1.6rem;
 
     @media ${MEDIA.mobile} {
       padding: 0;
@@ -234,6 +230,7 @@ const BalanceTools = styled.div`
     max-width: 100%;
     position: relative;
     height: 5.6rem;
+    margin: 1.6rem;
 
     @media ${MEDIA.mobile} {
       width: 100%;
@@ -243,7 +240,7 @@ const BalanceTools = styled.div`
 
     > input {
       margin: 0;
-      width: 26.6rem;
+      width: 28rem;
       max-width: 100%;
       background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
@@ -253,7 +250,7 @@ const BalanceTools = styled.div`
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;
       font-weight: var(--font-weight-normal);
-      padding: 0 1rem 0 4.8rem;
+      padding: 0 1.6rem 0 4.8rem;
       outline: 0;
 
       @media ${MEDIA.mobile} {
@@ -346,14 +343,16 @@ const DepositWidget: React.FC = () => {
     <section>
       <BalancesWidget>
         <BalanceTools>
-          <label className="balances-searchTokens">
+          <label className="balances-searchTokens not-implemented">
             <input placeholder="Search token by Name, Symbol" type="text" required />
           </label>
-          <label className="balances-hideZero">
+          <label className="balances-hideZero not-implemented">
             <input type="checkbox" />
             <b>Hide zero balances</b>
           </label>
-          <button className="balances-manageTokens">Manage Tokens</button>
+          <button type="button" className="balances-manageTokens not-implemented">
+            Manage Tokens
+          </button>
         </BalanceTools>
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />

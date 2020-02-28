@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { LEGALDOCUMENT } from 'const'
+import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
-  flex-flow: column;
+  flex-flow: row nowrap;
   align-items: center;
   justify-content: center;
   background-color: var(--color-background-banner);
@@ -16,6 +17,9 @@ const Wrapper = styled.div`
     line-height: 1;
     padding: 0;
     margin: 0;
+    @media ${MEDIA.mobile} {
+      font-size: 1.2rem;
+    }
   }
 `
 
@@ -34,14 +38,17 @@ const Text = styled.p`
 `
 
 const BannerCloser = styled.span`
-  &:before {
-    content: 'X';
-  }
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-
   cursor: pointer;
+  font-family: var(--font-arial);
+  font-weight: bold;
+  font-size: 1.4rem;
+  margin: 0 0 0 1.2rem;
+  opacity: .7;
+  transition: opacity .2s ease-in-out;
+    &:hover {
+      opacity: 1;
+    }
+}
 `
 
 interface LegalBannerProps {
@@ -95,9 +102,9 @@ const LegalBanner: React.FC<LegalBannerProps> = ({ useFull, title }) => {
 
   return open === 'OPEN' ? (
     <Wrapper>
-      <BannerCloser onClick={openCloseDisclaimer} />
       <p>{title}</p>
       {useFull && <LegalText />}
+      <BannerCloser onClick={openCloseDisclaimer}>✕</BannerCloser>
     </Wrapper>
   ) : null
 }

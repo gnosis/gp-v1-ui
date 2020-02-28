@@ -76,6 +76,8 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
   const { title, subtext }: { title: string; subtext?: string } = useMemo(() => {
     switch (step) {
       case 1:
+        // TODO: Add Link
+        // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '1. Select at least two of your trusted stablecoins',
           subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
@@ -85,15 +87,19 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
             <li><img src=${checkIcon} />No gas costs for trades</li>
             <li><img src=${checkIcon} />Cancellation possible at any time</li>
           </ul>
-          <p>
+          <p class="not-implemented">            
             <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
           </p>`,
         }
       case 2:
+        // TODO: Add Link
+        // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '2. Define your spread',
           subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
-          <p><a href="#" target="_blank" rel="noopener">Learn more about the spread.</a></p>
+          <p class="not-implemented">            
+            <a href="#" target="_blank" rel="noopener">Learn more about the spread.</a>
+          </p>
           `,
         }
       case 3:
@@ -168,6 +174,8 @@ const ContentWrapper = styled.div`
   display: flex;
   width: 100%;
   flex-flow: row wrap;
+  font-size: inherit;
+  line-height: inherit;
 `
 
 const PoolingInterface: React.FC = () => {
@@ -306,13 +314,17 @@ const PoolingInterface: React.FC = () => {
         <StepButtonsWrapper>
           {/* REMOVE BACK BUTTON ON TXRECEIPT */}
           {!txReceipt && (
-            <button disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting} onClick={(): void => prevStep()}>
+            <button
+              type="button"
+              disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting}
+              onClick={(): void => prevStep()}
+            >
               Back
             </button>
           )}
           {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
           {step !== 3 ? (
-            <button disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+            <button type="button" disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
               Continue
             </button>
           ) : // STEP 3 - TXRECEIPT OR NOT?
@@ -323,7 +335,7 @@ const PoolingInterface: React.FC = () => {
             </Link>
           ) : (
             // NOT YET SUBMITTED TX
-            <button className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
+            <button type="button" className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
               {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
             </button>
           )}

@@ -90,19 +90,17 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
                 {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
                 {formatAmount(pendingWithdraw.amount, decimals)}
+                <div>
+                  <RowClaimLink
+                    className={claiming.has(address) ? 'disabled' : 'success'}
+                    onClick={(): void => {
+                      if (!claiming) {
+                        onClaim()
+                      }
+                    }}
+                  ></RowClaimLink>
+                </div>
               </RowClaimButton>
-              <div>
-                <RowClaimLink
-                  className={claiming.has(address) ? 'disabled' : 'success'}
-                  onClick={(): void => {
-                    if (!claiming) {
-                      onClaim()
-                    }
-                  }}
-                >
-                  <small>Claim</small>
-                </RowClaimLink>
-              </div>
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
@@ -118,12 +116,17 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled ? (
-            <button className="withdrawToken" onClick={(): void => showForm('deposit')} disabled={isDepositFormVisible}>
+            <button
+              type="button"
+              className="withdrawToken"
+              onClick={(): void => showForm('deposit')}
+              disabled={isDepositFormVisible}
+            >
               <img src={plus} />
             </button>
           ) : (
             <>
-              <button className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
+              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
                 {enabling.has(address) ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
@@ -137,6 +140,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           )}
           {!totalExchangeBalance.isZero() && (
             <button
+              type="button"
               onClick={(): void => showForm('withdraw')}
               disabled={isWithdrawFormVisible}
               className="depositToken"

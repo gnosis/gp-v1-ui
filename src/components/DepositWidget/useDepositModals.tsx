@@ -8,11 +8,13 @@ const OverwriteModalBody: React.FC = () => {
   return (
     <ModalBodyWrapper>
       <div>
-        <p>You have a pending withdraw request. </p>
-        <p>Sending this one will overwrite the pending amount.</p>
+        <p>
+          You currently have a pending withdraw request. By sending this new withdraw request, you will overwrite the
+          pending request amount. No funds will be lost.
+        </p>
         <p>No funds will be lost.</p>
       </div>
-      <p>Do you wish to replace the previous withdraw request?</p>
+      <strong>Do you wish to replace the previous withdraw request?</strong>
     </ModalBodyWrapper>
   )
 }

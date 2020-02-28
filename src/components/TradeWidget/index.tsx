@@ -12,7 +12,10 @@ import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
+import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
+import { Wrapper } from 'components/ConnectWalletBanner'
+import FormMessage from './FormMessage'
 
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -93,6 +96,11 @@ const WrappedForm = styled.form`
     text-align: center;
     margin: 1.6rem 0 0;
   }
+
+  ${FormMessage} {
+    font-size: 1.3rem;
+    margin: 0.5rem 0 0;
+  }
 `
 // Switcharoo arrows
 const IconWrapper = styled.a`
@@ -134,6 +142,10 @@ const SubmitButton = styled.button`
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
+  @media ${MEDIA.mobile} {
+    font-size: 1.3rem;
+    margin: 1rem auto 1.6rem;
+  }
 `
 
 const OrdersPanel = styled.div`
@@ -152,6 +164,22 @@ const OrdersPanel = styled.div`
   .expanded & {
     flex: 1 1 100%;
     min-width: 85rem;
+  }
+
+  // Connect Wallet banner in the orders panel
+  ${Wrapper} {
+    background: transparent;
+    box-shadow: none;
+  }
+
+  // Orders widget when inside the OrdersPanel
+  ${OrdersWrapper} {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    min-height: initial;
+    min-width: initial;
+    max-width: initial;
   }
 
   > div {
@@ -527,9 +555,10 @@ const TradeWidget: React.FC = () => {
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
-        <WrappedForm onSubmit={handleSubmit(onSubmit)}>
+        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
+            autoFocus
             selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
@@ -554,7 +583,7 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
-            readOnly={true}
+            readOnly
             tooltipText={receiveTokenTooltipText}
           />
           <Price

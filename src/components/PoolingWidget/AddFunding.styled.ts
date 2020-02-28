@@ -7,8 +7,8 @@ export const AddFundingWrapper = styled.div`
 
   > p {
     margin: 0 0 2.4rem;
-    font-size: 1.5rem;
-    line-height: 1.4;
+    font-size: inherit;
+    line-height: inherit;
   }
 
   > ul {
@@ -24,14 +24,14 @@ export const AddFundingWrapper = styled.div`
     > span {
       padding: 0 1rem;
       box-sizing: border-box;
-      font-size: 1.5rem;
-      line-height: 1.4;
+      font-size: inherit;
+      line-height: inherit;
 
       // Etherscan link
       a {
         word-break: break-all;
         display: block;
-        font-size: 1.3rem;
+        font-size: inherit;
       }
     }
   }
