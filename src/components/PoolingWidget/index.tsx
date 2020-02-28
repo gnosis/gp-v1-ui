@@ -202,16 +202,8 @@ const PoolingInterface: React.FC = () => {
     )
   }, [fallBackNetworkId])
 
-  const prevStep = useCallback((): void => {
-    if (step == 1) return
-
-    return setStep(step - 1)
-  }, [setStep, step])
-  const nextStep = useCallback((): void => {
-    if (step == 3) return
-
-    return setStep(step + 1)
-  }, [setStep, step])
+  const prevStep = useCallback((): void => setStep(step => (step === 1 ? step : step - 1)), [setStep])
+  const nextStep = useCallback((): void => setStep(step => (step === 3 ? step : step + 1)), [setStep])
 
   const { isSubmitting, setIsSubmitting, placeMultipleOrders } = usePlaceOrder()
 
