@@ -81,11 +81,13 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
-  const price = useMemo(() => {
+  const [price, priceInverse] = useMemo((): string[] => {
     const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
     const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
+    const priceFmt = calculatePrice(numeratorString, denominatorString)
+    const priceInverseFmt = calculatePrice(denominatorString, numeratorString)
 
-    return calculatePrice(numeratorString, denominatorString)
+    return [priceFmt, priceInverseFmt]
   }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
 
   return (
@@ -96,7 +98,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
         {'/'}
         {displayTokenSymbolOrLink(buyToken)}
         <br />
-        {price} {displayTokenSymbolOrLink(buyToken)}
+        {priceInverse} {displayTokenSymbolOrLink(buyToken)}
         {'/'}
         {displayTokenSymbolOrLink(sellToken)}
       </div>
