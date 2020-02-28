@@ -43,7 +43,7 @@ export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTo
 const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, setSpread, nextStep }) => {
   const onChange = useCallback(
     ({ currentTarget: { value } }: React.SyntheticEvent<HTMLInputElement>): void => {
-      if (+value === NaN || +value <= 0 || +value >= 100) {
+      if (isNaN(+value) || +value <= 0 || +value >= 100) {
         return
       }
 
