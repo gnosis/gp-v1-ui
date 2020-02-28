@@ -11,8 +11,15 @@ export const WalletDrawerInnerWrapper = styled.div`
 
   p.error {
     color: red;
-    padding: 0 0.5rem 0.5rem;
-    margin: auto;
+    text-align: left;
+    margin: 1rem 0 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 0 0 7.6rem;
+
+    @media ${MEDIA.mobile} {
+      padding: 0;
+    }
   }
 
   div.wallet {
@@ -44,10 +51,9 @@ export const WalletDrawerInnerWrapper = styled.div`
       }
       > p {
         font-size: 1.3rem;
-        color: #2f3e4e;
-        letter-spacing: -0.3px;
+        color: #218dff;
+        padding: 0.5rem 0 0;
         text-align: right;
-        padding: 0;
         margin: 0;
         width: 100%;
         cursor: pointer;

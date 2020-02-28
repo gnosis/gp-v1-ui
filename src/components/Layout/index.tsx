@@ -15,13 +15,13 @@ const Wrapper = styled.div`
   main {
     flex: 1;
     margin: 2.4rem auto 5rem;
-    // max-width: 85rem;
-    // width: 100%;
     width: auto;
     display: flex;
     flex-flow: row wrap;
     align-items: flex-start;
     justify-content: flex-start;
+    font-size: 1.3rem;
+    line-height: 1.2;
 
     @media ${MEDIA.mobile} {
       width: 100%;

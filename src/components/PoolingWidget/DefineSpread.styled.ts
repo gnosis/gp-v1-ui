@@ -67,8 +67,8 @@ export const SpreadInformationWrapper = styled.div`
   }
   > p {
     margin: 0 0 2.4rem;
-    font-size: 1.5rem;
-    line-height: 1.4;
+    font-size: inherit;
+    line-height: inherit;
   }
 
   > p > i {

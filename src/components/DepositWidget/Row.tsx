@@ -90,19 +90,17 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
                 {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
                 {formatAmount(pendingWithdraw.amount, decimals)}
+                <div>
+                  <RowClaimLink
+                    className={claiming.has(address) ? 'disabled' : 'success'}
+                    onClick={(): void => {
+                      if (!claiming) {
+                        onClaim()
+                      }
+                    }}
+                  ></RowClaimLink>
+                </div>
               </RowClaimButton>
-              <div>
-                <RowClaimLink
-                  className={claiming.has(address) ? 'disabled' : 'success'}
-                  onClick={(): void => {
-                    if (!claiming) {
-                      onClaim()
-                    }
-                  }}
-                >
-                  <small>Claim</small>
-                </RowClaimLink>
-              </div>
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>

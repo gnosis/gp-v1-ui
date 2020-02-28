@@ -7,13 +7,23 @@ export const OrdersWrapper = styled.div`
   flex-flow: column wrap;
   position: relative;
 
+  /* In use when accessed as a dedicated page and not part of OrdersPanel */
+  background: #ffffff;
+  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  border-radius: 0.6rem;
+  min-height: 54rem;
+  min-width: 85rem;
+  max-width: 140rem;
+  /* ====================================================================== */
+
   @media ${MEDIA.mobile} {
-    background: #ffffff;
-    box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-      rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-      rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-      rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
-    border-radius: 0.6rem;
+    max-width: 100%;
+    min-width: initial;
+    min-height: 25rem;
+    width: 100%;
   }
 
   > div {
@@ -95,6 +105,10 @@ export const OrdersForm = styled.div`
         transition: border 0.2s ease-in-out;
         align-items: center;
         border-bottom: 0.3rem solid transparent;
+
+        @media ${MEDIA.mobile} {
+          font-size: 1.3rem;
+        }
       }
 
       > button > i {
