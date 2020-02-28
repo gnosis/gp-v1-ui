@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js'
 
 // import { FEE_PERCENTAGE } from 'const'
 import Highlight from 'components/Highlight'
-import { formatPrice, formatValidity } from 'utils'
+import { formatPrice, formatTimeInHours } from 'utils'
 
 const Wrapper = styled.dl`
   margin: 2em 0 0 0;
@@ -67,7 +67,7 @@ const OrderDetails: React.FC<Props> = ({
 
       <dd>Expiration date:</dd>
       <dt>
-        <Highlight>{formatValidity(validUntil)}</Highlight>
+        <Highlight>{formatTimeInHours(validUntil, 'Never')}</Highlight>
       </dt>
     </Wrapper>
   )

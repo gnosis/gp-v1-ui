@@ -270,6 +270,7 @@ const OrdersPanel = styled.div`
 export const enum TradeFormTokenId {
   sellToken = 'sellToken',
   receiveToken = 'receiveToken',
+  validFrom = 'validFrom',
   validUntil = 'validUntil',
   price = 'price',
   priceInverse = 'priceInverse',
@@ -283,7 +284,8 @@ export const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
-
+  // ASAP
+  validFrom: '0',
   // 2 days
   validUntil: '2880',
 }
@@ -315,11 +317,17 @@ const TradeWidget: React.FC = () => {
   const receiveInputId = TradeFormTokenId.receiveToken
   const priceInputId = TradeFormTokenId.price
   const priceInverseInputId = TradeFormTokenId.priceInverse
+  const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
-  const { sellAmount: sellParam, price: priceParam, validUntil: validUntilParam } = useQuery()
+  const {
+    sellAmount: sellParam,
+    price: priceParam,
+    validFrom: validFromParam,
+    validUntil: validUntilParam,
+  } = useQuery()
 
   const [ordersVisible, setOrdersVisible] = useState(true)
   const [sellToken, setSellToken] = useState(
@@ -330,12 +338,14 @@ const TradeWidget: React.FC = () => {
       getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
+  const [asap, setAsap] = useState(!validFromParam || !Number(validFromParam))
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
       [sellInputId]: sellParam,
       [receiveInputId]: '',
+      [validFromId]: validFromParam,
       [validUntilId]: validUntilParam,
       [priceInputId]: priceParam,
       [priceInverseInputId]: invertPrice(priceParam),
@@ -346,8 +356,8 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
-
   const receiveValue = watch(receiveInputId)
+  const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
   // Update receive amount
@@ -367,6 +377,7 @@ const TradeWidget: React.FC = () => {
   const searchQuery = buildSearchQuery({
     sell: sellValue,
     price: priceValue,
+    from: validFromValue,
     expires: validUntilValue,
   })
   const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
@@ -398,7 +409,7 @@ const TradeWidget: React.FC = () => {
     [NULL_BALANCE_TOKEN, balances, receiveToken],
   )
 
-  const { placeOrder, isSubmitting, setIsSubmitting } = usePlaceOrder()
+  const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
   const history = useHistory()
 
   const swapTokens = useCallback((): void => {
@@ -424,12 +435,43 @@ const TradeWidget: React.FC = () => {
 
   const sameToken = sellToken === receiveToken
 
+  const savePendingTransactions = useCallback(
+    (txHash: string, { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress }): void => {
+      // reset form on successful order placing
+      reset(DEFAULT_FORM_STATE)
+      setUnlimited(false)
+      // unblock form
+      setIsSubmitting(false)
+
+      // pendingTxHash = txHash
+      toast.info(<TxNotification txHash={txHash} />)
+
+      const newTxState = {
+        txHash,
+        id: 'PENDING ORDER',
+        buyTokenId,
+        sellTokenId,
+        priceNumerator,
+        priceDenominator,
+        user: userAddress,
+        remainingAmount: ZERO,
+        sellTokenBalance: ZERO,
+        validFrom: 0,
+        validUntil: 0,
+      }
+
+      return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+    },
+    [dispatch, reset, setIsSubmitting],
+  )
+
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
+    const validFrom = +data[validFromId] / 5
     const validUntil = +data[validUntilId] / 5
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
@@ -442,41 +484,58 @@ const TradeWidget: React.FC = () => {
       // block form
       setIsSubmitting(true)
 
-      const { success } = await placeOrder({
-        buyAmount,
-        buyToken: cachedBuyToken,
-        sellAmount,
-        sellToken: cachedSellToken,
-        validUntil,
-        txOptionalParams: {
-          onSentTransaction: (txHash: string): void => {
-            // reset form on successful order placing
-            reset(DEFAULT_FORM_STATE)
-            setUnlimited(false)
-            // unblock form
-            setIsSubmitting(false)
-
-            pendingTxHash = txHash
-            toast.info(<TxNotification txHash={txHash} />)
-
-            const newTxState = {
-              txHash,
-              id: 'PENDING ORDER',
-              buyTokenId: cachedBuyToken.id,
-              sellTokenId: cachedSellToken.id,
-              priceNumerator: buyAmount,
-              priceDenominator: sellAmount,
-              user: userAddress,
-              remainingAmount: ZERO,
-              sellTokenBalance: ZERO,
-              validFrom: 0,
-              validUntil: 0,
-            }
-
-            return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+      let success: boolean
+      // ASAP ORDER
+      if (validFrom === 0) {
+        // ; for destructure reassign format
+        ;({ success } = await placeOrder({
+          buyAmount,
+          buyToken: cachedBuyToken,
+          sellAmount,
+          sellToken: cachedSellToken,
+          validUntil,
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
+              return savePendingTransactions(txHash, {
+                buyTokenId: cachedBuyToken.id,
+                sellTokenId: cachedSellToken.id,
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
+            },
           },
-        },
-      })
+        }))
+      } else {
+        // ; for destructure reassign format
+        ;({ success } = await placeMultipleOrders({
+          orders: [
+            {
+              buyAmount,
+              buyToken: cachedBuyToken.id,
+              sellAmount,
+              sellToken: cachedSellToken.id,
+              validFrom,
+              validUntil,
+            },
+          ],
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
+              return savePendingTransactions(txHash, {
+                buyTokenId: cachedBuyToken.id,
+                sellTokenId: cachedSellToken.id,
+                priceNumerator: sellAmount,
+                priceDenominator: buyAmount,
+                networkId,
+                userAddress,
+              })
+            },
+          },
+        }))
+      }
       if (success && pendingTxHash) {
         // remove pending tx
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
@@ -534,9 +593,12 @@ const TradeWidget: React.FC = () => {
             receiveToken={receiveToken}
           />
           <OrderValidity
-            inputId={validUntilId}
+            validFromInputId={validFromId}
+            validUntilInputId={validUntilId}
             isDisabled={isSubmitting}
+            isAsap={asap}
             isUnlimited={unlimited}
+            setAsap={setAsap}
             setUnlimited={setUnlimited}
             tabIndex={3}
           />

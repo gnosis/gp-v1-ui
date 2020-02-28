@@ -7,7 +7,7 @@ import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { logDebug, formatValidity } from 'utils'
+import { logDebug, formatTimeInHours } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { useWalletConnection } from './useWalletConnection'
 import { BATCHES_TO_WAIT } from 'const'
@@ -107,9 +107,14 @@ export const usePlaceOrder = (): Result => {
           //  In reality, no need to ceil cause we know batch time is 300, but it was done to avoid relying on knowing
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
-          toast.success(`Transaction mined! Succesfully placed order valid for ${formatValidity(validityInMinutes)}`)
+          toast.success(
+            `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
+              validityInMinutes,
+              'never',
+            )}`,
+          )
         } else {
-          toast.success(`Transaction mined! Succesfully placed standing order`)
+          toast.success(`Transaction mined! Succesfully placed order valid ASAP and never expiring`)
         }
 
         return { success: true, receipt }
@@ -138,7 +143,6 @@ export const usePlaceOrder = (): Result => {
         toast.error('Wallet is not connected!')
         return { success: false }
       }
-
       logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
       try {
@@ -158,9 +162,9 @@ export const usePlaceOrder = (): Result => {
           sellTokens.push(order.sellToken)
 
           // if not set, order is valid from placement + wait period
-          validFroms.push(order.validFrom ?? currentBatchId + BATCHES_TO_WAIT)
+          validFroms.push(currentBatchId + (order.validFrom ? order.validFrom : BATCHES_TO_WAIT))
           // if not set, order is valid forever
-          validUntils.push(order.validUntil || MAX_BATCH_ID)
+          validUntils.push(order.validUntil ? currentBatchId + order.validUntil : MAX_BATCH_ID)
 
           buyAmounts.push(order.buyAmount)
           sellAmounts.push(order.sellAmount)
@@ -181,9 +185,44 @@ export const usePlaceOrder = (): Result => {
         const receipt = await exchangeApi.placeValidFromOrders(params)
 
         logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
-
-        // TODO: link to orders page?
-        toast.success(`Transactions mined! Succesfully placed ${orders.length} orders`)
+        // placeMultipleOrders is the only way to use validFrom
+        // right now app doesn't support multiple orders with different validFrom times
+        // Liquidity creates multiple orders but with same order times
+        if (orders.length === 1) {
+          if (orders[0].validUntil && orders[0].validFrom) {
+            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
+                validityFromInMinutes,
+                'ASAP',
+              )} and expiring ${formatTimeInHours(validityUntilInMinutes, 'never')}`,
+            )
+          } else if (orders[0].validUntil) {
+            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
+                validityUntilInMinutes,
+                'never',
+              )}`,
+            )
+          } else if (orders[0].validFrom) {
+            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+            // TODO: link to orders page?
+            toast.success(
+              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
+                validityFromInMinutes,
+                'ASAP',
+              )} and never expiring`,
+            )
+          }
+        } else {
+          toast.success(
+            `Transaction mined! Succesfully placed ${orders.length} orders. Please check the orders page for their respective validity times.`,
+          )
+        }
 
         return { success: true, receipt }
       } catch (e) {
