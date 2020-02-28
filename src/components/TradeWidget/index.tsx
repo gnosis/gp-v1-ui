@@ -499,6 +499,7 @@ const TradeWidget: React.FC = () => {
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
+            autoFocus
             selectedToken={sellToken}
             tokens={tokens}
             balance={sellTokenBalance}
@@ -523,7 +524,7 @@ const TradeWidget: React.FC = () => {
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}
-            readOnly={true}
+            readOnly
             tooltipText={receiveTokenTooltipText}
           />
           <Price
