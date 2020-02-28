@@ -89,7 +89,7 @@ export const PriceInputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 7rem 0 1rem;
+    padding: 0 8.5rem 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {

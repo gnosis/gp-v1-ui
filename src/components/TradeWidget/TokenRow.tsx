@@ -206,7 +206,8 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
-        <b>INFO</b>: Sell amount exceeding your balance by
+        <b>INFO:</b>
+        <i>Sell amount exceeding your balance by</i>
         <strong>
           {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
         </strong>
