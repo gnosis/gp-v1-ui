@@ -60,7 +60,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "@fortawesome/react-fontawesome": "^0.1.8",
     "@gnosis.pm/dapp-ui": "^0.5.3",
-    "@gnosis.pm/dex-js": "0.1.12-RC.0",
+    "@gnosis.pm/dex-js": "0.1.12",
     "@hot-loader/react-dom": "^16.11.0",
     "@popperjs/core": "^2.0.6",
     "@types/react": "^16.9.19",
