@@ -85,8 +85,7 @@ const Wrapper = styled.div`
 `
 
 const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
-  display: ${(props): string => (props.$visible ? 'flex' : 'none')};
-  // visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
+  visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
   position: fixed;
 
   left: 0;

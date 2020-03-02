@@ -177,43 +177,6 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
     transactionHash,
   ])
 
-  return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
-}
-
-const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
-  order,
-  isOverBalance,
-  isPendingOrder,
-  transactionHash,
-}) => {
-  const now = new Date()
-
-  const isExpiredOrder = batchIdToDate(order.validUntil) <= now
-  const isScheduled = batchIdToDate(order.validFrom) > now
-  const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
-    order.priceDenominator,
-    order.priceNumerator,
-  ])
-  const isActive = useMemo(() => order.remainingAmount.eq(order.priceDenominator), [
-    order.priceDenominator,
-    order.remainingAmount,
-  ])
-  const isFilled = useMemo(() => isOrderFilled(order), [order])
-  // Display isLowBalance warning only for active and partial fill orders
-  const isLowBalance = isOverBalance && !isUnlimited && !isFilled && !isScheduled && !isPendingOrder && !isExpiredOrder
-
-  const pending = useMemo(
-    () =>
-      isPendingOrder && (
-        <>
-          Pending...
-          <br />
-          <PendingLink transactionHash={transactionHash} />
-        </>
-      ),
-    [isPendingOrder, transactionHash],
-  )
-
   return (
     <td className="status">
       {pending ? (
