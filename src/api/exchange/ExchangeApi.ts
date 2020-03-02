@@ -62,6 +62,10 @@ export interface CancelOrdersParams extends BaseParams, WithTxOptionalParams {
   orderIds: number[]
 }
 
+export interface PendingTxObj extends AuctionElement {
+  txHash: string
+}
+
 export interface ExchangeApi extends DepositApi {
   getNumTokens(networkId: number): Promise<number>
   getFeeDenominator(networkId: number): Promise<number>
@@ -93,12 +97,6 @@ export interface Order {
   priceDenominator: BN
   remainingAmount: BN
 }
-
-export interface PendingTxObj extends AuctionElement {
-  txHash: string
-}
-
-export type PendingTxArray = PendingTxObj[]
 
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]

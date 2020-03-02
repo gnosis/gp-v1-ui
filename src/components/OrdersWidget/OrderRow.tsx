@@ -29,12 +29,14 @@ import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from './OrderRow.styled'
 
-const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = ({ transactionHash }) => {
+const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
+  const { transactionHash } = props
   return (
-    <td className="pendingCell" data-label="Actions">
-      <FontAwesomeIcon icon={faSpinner} size="lg" spin />
-      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>view</small>} />}
-    </td>
+    <>
+      <FontAwesomeIcon icon={faSpinner} size="sm" spin /> Pending...
+      <br />
+      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
+    </>
   )
 }
 
@@ -49,9 +51,6 @@ const DeleteOrder: React.FC<Pick<
       checked={isMarkedForDeletion && !pending}
       disabled={disabled}
     />
-    {/* <button className="danger" type="button" onClick={toggleMarkedForDeletion}>
-      Cancel Order <FontAwesomeIcon icon={faTrashAlt} />
-    </button> */}
   </td>
 )
 
@@ -140,13 +139,43 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
   )
 }
 
-const Expires: React.FC<Pick<Props, 'order' | 'pending'>> = ({ order }) => {
+const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = ({ order, isPendingOrder }) => {
   const { isNeverExpires, expiresOn } = useMemo(() => {
-    const isNeverExpires = isNeverExpiresOrder(order.validUntil)
+    const isNeverExpires = isNeverExpiresOrder(order.validUntil) || (isPendingOrder && order.validUntil === 0)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
 
     return { isNeverExpires, expiresOn }
-  }, [order.validUntil])
+  }, [isPendingOrder, order.validUntil])
+
+  return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
+}
+
+const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
+  order,
+  isOverBalance,
+  isPendingOrder,
+  transactionHash,
+}) => {
+  const now = new Date()
+
+  const isExpiredOrder = batchIdToDate(order.validUntil) <= now
+  const isScheduled = batchIdToDate(order.validFrom) > now
+  const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
+    order.priceDenominator,
+    order.priceNumerator,
+  ])
+  const isActive = useMemo(() => order.remainingAmount.eq(order.priceDenominator), [
+    order.priceDenominator,
+    order.remainingAmount,
+  ])
+  const isFilled = useMemo(() => isOrderFilled(order), [order])
+  // Display isLowBalance warning only for active and partial fill orders
+  const isLowBalance = isOverBalance && !isUnlimited && !isFilled && !isScheduled && !isPendingOrder && !isExpiredOrder
+
+  const pending = useMemo(() => isPendingOrder && <PendingLink transactionHash={transactionHash} />, [
+    isPendingOrder,
+    transactionHash,
+  ])
 
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
@@ -294,20 +323,15 @@ const OrderRow: React.FC<Props> = props => {
     sellToken &&
     buyToken && (
       <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
-        {!isPendingOrder &&
-          (pending ? (
-            <PendingLink transactionHash={transactionHash} />
-          ) : (
-            <DeleteOrder
-              isMarkedForDeletion={isMarkedForDeletion}
-              toggleMarkedForDeletion={toggleMarkedForDeletion}
-              pending={pending}
-              disabled={disabled}
-            />
-          ))}
+        <DeleteOrder
+          isMarkedForDeletion={isMarkedForDeletion}
+          toggleMarkedForDeletion={toggleMarkedForDeletion}
+          pending={pending}
+          disabled={disabled || isPendingOrder || pending}
+        />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        {!isPendingOrder ? <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} /> : <PendingLink />}
-        {!isPendingOrder ? <Expires order={order} pending={pending} /> : <PendingLink />}
+        <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
         <Status
           order={order}
           isOverBalance={isOverBalance}
