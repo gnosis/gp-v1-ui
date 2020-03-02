@@ -18,8 +18,8 @@ import { TokenLocalState } from 'reducers-actions'
 
 export interface RowProps extends TokenLocalState {
   tokenBalances: TokenBalanceDetails
-  onSubmitDeposit: (amount: BN) => Promise<void>
-  onSubmitWithdraw: (amount: BN) => Promise<void>
+  onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
+  onSubmitWithdraw: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onClaim: Command
   onEnableToken: Command
   innerWidth?: number
@@ -37,6 +37,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     highlighted,
     enabling,
     claiming,
+    withdrawing,
+    depositing,
   } = props
 
   const {
@@ -82,36 +84,38 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           </div>
         </td>
         <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
+          {depositing.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
           {formatAmount(totalExchangeBalance, decimals)}
         </td>
         <td data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
-                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+                {(claiming.has(address) || withdrawing.has(address)) && (
+                  <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+                )}
                 {formatAmount(pendingWithdraw.amount, decimals)}
                 <div>
                   <RowClaimLink
-                    className={claiming.has(address) ? 'disabled' : 'success'}
-                    onClick={(): void => {
-                      if (!claiming) {
-                        onClaim()
-                      }
-                    }}
+                    className={claiming.has(address) || withdrawing.has(address) ? 'disabled' : 'success'}
                   ></RowClaimLink>
                 </div>
               </RowClaimButton>
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
+              {withdrawing.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
               {formatAmount(pendingWithdraw.amount, decimals)}
             </>
           ) : (
-            0
+            <>{withdrawing.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}0</>
           )}
         </td>
         <td data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
+          {(claiming.has(address) || depositing.has(address)) && (
+            <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+          )}
           {formatAmount(walletBalance, decimals)}
         </td>
         <td data-label="Actions">
