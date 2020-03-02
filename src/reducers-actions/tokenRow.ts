@@ -1,8 +1,12 @@
 export const enum ActionTypes {
   SET_ENABLING = 'enabling',
   SET_CLAIMING = 'claiming',
+  SET_DEPOSITING = 'depositing',
+  SET_WITHDRAWING = 'withdrawing',
   SET_HIGHLIGHTED = 'highlighted',
   SET_HIGHLIGHTED_AND_CLAIMING = 'highlighted_and_claiming',
+  SET_HIGHLIGHTED_AND_DEPOSITING = 'highlighted_and_depositing',
+  SET_HIGHLIGHTED_AND_WITHDRAWING = 'highlighted_and_withdrawing',
 }
 
 interface Actions {
@@ -12,6 +16,14 @@ interface Actions {
 
 export const setClaimingAction = (payload: string): Actions => ({
   type: ActionTypes.SET_CLAIMING,
+  payload,
+})
+export const setDepositingAction = (payload: string): Actions => ({
+  type: ActionTypes.SET_DEPOSITING,
+  payload,
+})
+export const setWithdrawingAction = (payload: string): Actions => ({
+  type: ActionTypes.SET_WITHDRAWING,
   payload,
 })
 
@@ -27,6 +39,16 @@ export const setHighlightAction = (payload: string): Actions => ({
 
 export const setHighlightAndClaimingAction = (payload: string): Actions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
+  payload,
+})
+
+export const setHighlightAndDepositing = (payload: string): Actions => ({
+  type: ActionTypes.SET_HIGHLIGHTED_AND_DEPOSITING,
+  payload,
+})
+
+export const setHighlightAndWithdrawing = (payload: string): Actions => ({
+  type: ActionTypes.SET_HIGHLIGHTED_AND_WITHDRAWING,
   payload,
 })
 
