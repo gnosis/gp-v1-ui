@@ -98,6 +98,12 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                 <div>
                   <RowClaimLink
                     className={claiming.has(address) || withdrawing.has(address) ? 'disabled' : 'success'}
+                    // onClick={(): void => {
+                    //   if (!claiming.has(address) && !withdrawing.has(address)) {
+                    //     console.debug('Claiming')
+                    //     onClaim()
+                    //   }
+                    // }}
                   ></RowClaimLink>
                 </div>
               </RowClaimButton>
