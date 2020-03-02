@@ -80,9 +80,9 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, 
         nextStep()
       } else if (
         // allow to remove chars and add numbers and a dot
-        !event.key.match(/(Backspace|Delete|\.|[0-9])/) ||
+        !/(Backspace|Delete|\.|[0-9])/.test(event.key) ||
         // do not allow a second dot
-        (event.key === '.' && event.currentTarget.value.match(/\./))
+        (event.key === '.' && event.currentTarget.value.includes('.')
       ) {
         event.preventDefault()
       }
