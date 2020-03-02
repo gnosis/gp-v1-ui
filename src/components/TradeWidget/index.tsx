@@ -509,8 +509,8 @@ const TradeWidget: React.FC = () => {
               return savePendingTransactions(txHash, {
                 buyTokenId: buyToken.id,
                 sellTokenId: sellToken.id,
-                priceNumerator: sellAmount,
-                priceDenominator: buyAmount,
+                priceNumerator: buyAmount,
+                priceDenominator: sellAmount,
                 networkId,
                 userAddress,
                 sellToken,
