@@ -287,7 +287,12 @@ const BalanceTools = styled.div`
 
 type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
   ReturnType<typeof useTokenBalances> & {
-    requestWithdrawConfirmation(amount: BN, tokenAddress: string, claimable: boolean): Promise<void>
+    requestWithdrawConfirmation(
+      amount: BN,
+      tokenAddress: string,
+      claimable: boolean,
+      onTxHash: (hash: string) => void,
+    ): Promise<void>
   }
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   balances,
@@ -296,6 +301,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   depositToken,
   claimToken,
   claiming,
+  withdrawing,
+  depositing,
   highlighted,
   enabling,
   requestWithdrawConfirmation,
@@ -336,12 +343,24 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                   key={tokenBalances.addressMainnet}
                   tokenBalances={tokenBalances}
                   onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                  onSubmitDeposit={(balance): Promise<void> => depositToken(balance, tokenBalances.address)}
-                  onSubmitWithdraw={(balance): Promise<void> => {
-                    return requestWithdrawConfirmation(balance, tokenBalances.address, tokenBalances.claimable)
+                  onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                    depositToken(balance, tokenBalances.address, onTxHash)
+                  }
+                  onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                    return requestWithdrawConfirmation(
+                      balance,
+                      tokenBalances.address,
+                      tokenBalances.claimable,
+                      onTxHash,
+                    )
                   }}
-                  onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                  onClaim={(): Promise<void> => {
+                    console.debug('Claim token')
+                    return claimToken(tokenBalances.address)
+                  }}
                   claiming={claiming}
+                  withdrawing={withdrawing}
+                  depositing={depositing}
                   highlighted={highlighted}
                   enabling={enabling}
                   {...windowSpecs}
@@ -374,7 +393,7 @@ const DepositWidget: React.FC = () => {
   } = useDepositModals({ ...withdrawRequest, requestWithdrawToken })
 
   const requestWithdrawConfirmation = useCallback(
-    async (amount: BN, tokenAddress: string, claimable: boolean): Promise<void> => {
+    async (amount: BN, tokenAddress: string, claimable: boolean, onTxHash: (hash: string) => void): Promise<void> => {
       const {
         pendingWithdraw: { amount: withdrawingBalance },
         symbol,
@@ -392,7 +411,7 @@ const DepositWidget: React.FC = () => {
         claimable ? toggleWithdrawAndClaimModal() : toggleWithdrawOverwriteModal()
       } else {
         // No need to confirm the withdrawal: No amount is pending to be claimed
-        await requestWithdrawToken(amount, tokenAddress)
+        await requestWithdrawToken(amount, tokenAddress, onTxHash)
       }
     },
     [balances, requestWithdrawToken, setWithdrawRequest, toggleWithdrawAndClaimModal, toggleWithdrawOverwriteModal],
