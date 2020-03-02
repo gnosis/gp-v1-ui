@@ -25,6 +25,7 @@ const Wrapper = styled.div`
 
   .optionItem {
     display: flex;
+    width: 100%;
     align-items: center;
 
     img {
@@ -37,6 +38,7 @@ const Wrapper = styled.div`
     .tokenDetails {
       display: flex;
       justify-content: space-between;
+      width: inherit;
 
       .tokenName {
         display: flex;
@@ -46,6 +48,7 @@ const Wrapper = styled.div`
 
       .tokenBalance {
         font-weight: bold;
+        align-self: center;
       }
     }
 
