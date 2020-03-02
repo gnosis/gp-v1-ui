@@ -53,15 +53,19 @@ export const setHighlightAndWithdrawing = (payload: string): Actions => ({
 })
 
 export interface TokenLocalState {
-  enabling: Set<string>
-  highlighted: Set<string>
-  claiming: Set<string>
+  [ActionTypes.SET_ENABLING]: Set<string>
+  [ActionTypes.SET_HIGHLIGHTED]: Set<string>
+  [ActionTypes.SET_CLAIMING]: Set<string>
+  [ActionTypes.SET_DEPOSITING]: Set<string>
+  [ActionTypes.SET_WITHDRAWING]: Set<string>
 }
 
 export const TokenRowInitialState: TokenLocalState = {
   enabling: new Set(),
   highlighted: new Set(),
   claiming: new Set(),
+  depositing: new Set(),
+  withdrawing: new Set(),
 }
 
 export const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
