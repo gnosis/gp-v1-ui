@@ -12,6 +12,8 @@ import { createFlux } from '../data'
 const fakeRowState: TokenLocalState = {
   enabling: new Set(),
   claiming: new Set(),
+  depositing: new Set(),
+  withdrawing: new Set(),
   highlighted: new Set(),
 }
 
