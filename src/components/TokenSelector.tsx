@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo } from 'react'
+import React, { CSSProperties, useMemo, useState, useCallback } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
@@ -8,7 +8,7 @@ import { formatAmount } from '@gnosis.pm/dex-js'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
-import { menuListFactory } from './TokenSelectorComponents'
+import { MenuList } from './TokenSelectorComponents'
 
 const Wrapper = styled.div`
   display: flex;
@@ -252,6 +252,32 @@ interface Props {
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
+  // isFocused is used to force the menu to remain open and give focus to the search input
+  const [isFocused, setIsFocused] = useState(false)
+
+  const onSelectChange = useCallback(
+    (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
+      // When an option is chosen, give control back to react-select
+      setIsFocused(false)
+
+      if (selected && action === 'select-option' && 'token' in selected) {
+        onChange(selected.token)
+      }
+    },
+    [onChange],
+  )
+
+  // When the search input is focused, force menu to remain open
+  const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
+
+  const onInputChange = useCallback((inputValue): void => {
+    // `inputValue` is an empty string on `Escape`.
+    // Setting isFocused to false hides the menu as desired
+    if (!inputValue) {
+      setIsFocused(false)
+    }
+  }, [])
+
   return (
     <Wrapper>
       <StyledSelect
@@ -262,16 +288,15 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         classNamePrefix="react-select"
         noOptionsMessage={(): string => 'No results'}
         formatOptionLabel={formatOptionLabel}
-        // menuIsOpen={true}  // uncomment to be able to interact with menu styles
         options={options}
         value={{ token: selected }}
-        onChange={(selected: { token: TokenDetails }, { action }: ActionMeta): void => {
-          if (selected && action === 'select-option' && 'token' in selected) {
-            onChange(selected.token)
-          }
-        }}
+        onChange={onSelectChange}
         tabIndex={tabIndex.toString()}
-        components={{ MenuList: menuListFactory() }}
+        components={{ MenuList }}
+        isFocused={isFocused || undefined}
+        menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
+        onMenuInputFocus={onMenuInputFocus}
+        onInputChange={onInputChange}
       />
     </Wrapper>
   )
