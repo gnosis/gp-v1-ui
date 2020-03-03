@@ -2,9 +2,11 @@ import React, { ReactNode, useMemo } from 'react'
 import { usePopperDefault } from 'hooks/usePopper'
 import { Placement } from '@popperjs/core'
 import { Tooltip } from 'components/Tooltip'
+import styled from 'styled-components'
 
 interface InputProps extends Partial<React.ComponentPropsWithRef<'input'>> {
   tooltip: ReactNode
+  showErrorStyle?: boolean
   placement?: Placement
 }
 
@@ -13,8 +15,15 @@ type TargetProps = Pick<
   'onBlur' | 'onFocus' | 'onMouseEnter' | 'onMouseLeave' | 'ref'
 >
 
+const Input = styled.input<{ $error?: boolean }>`
+  box-shadow: ${({ $error }): string => ($error ? '0px 0px 1.7px 0.4px #f24949' : '')};
+  &:focus {
+    border-color: ${({ $error }): string => ($error ? '#f24949 !important' : 'initial')};
+  }
+`
+
 const InputWithTooltip: React.RefForwardingComponent<HTMLInputElement, InputProps> = (
-  { tooltip, placement, onFocus, onBlur, onMouseEnter, onMouseLeave, ...props },
+  { tooltip, placement, onFocus, onBlur, onMouseEnter, onMouseLeave, showErrorStyle, ...props },
   ref,
 ) => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLInputElement>(placement)
@@ -65,7 +74,7 @@ const InputWithTooltip: React.RefForwardingComponent<HTMLInputElement, InputProp
 
   return (
     <>
-      <input {...props} {...finalTargetProps} />
+      <Input $error={showErrorStyle} {...props} {...finalTargetProps} />
       <Tooltip {...tooltipProps}>{tooltip}</Tooltip>
     </>
   )

@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo } from 'react'
+/* eslint-disable @typescript-eslint/ban-ts-ignore */
+import React, { useCallback, useMemo, useEffect } from 'react'
 import { toast } from 'toastify'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
@@ -35,6 +36,43 @@ import { Network, Receipt } from 'types'
 import { maxAmountsForSpread } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Link } from 'react-router-dom'
+
+import { useForm, FormContext } from 'react-hook-form'
+
+import joi, { ValidationError, ValidationResult } from '@hapi/joi'
+
+const validationSchema = joi.object({
+  spread: joi
+    .number()
+    .positive()
+    .precision(1)
+    .greater(0.0)
+    .less(100.0)
+    // dont autocast numbers
+    // to their required precision, throw instead
+    .strict()
+    .required(),
+})
+
+const numberResolver = (
+  data: FormData,
+): { values: ValidationResult /* { [key: string]: string } */; errors: ValidationError | {} } => {
+  console.debug('data', JSON.stringify(data))
+  const castedData = { ...data, spread: Number(data?.spread) }
+  console.debug('castedData', castedData)
+  const { error, value: values } = validationSchema.validate(castedData)
+  return {
+    values: error ? {} : values,
+    errors: error
+      ? error.details.reduce((previous, currentError) => {
+          return {
+            ...previous,
+            [currentError.path[0]]: currentError,
+          }
+        }, {})
+      : {},
+  }
+}
 
 const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI', 'sUSD'])
 
@@ -207,70 +245,93 @@ const PoolingInterface: React.FC = () => {
 
   const { isSubmitting, setIsSubmitting, placeMultipleOrders } = usePlaceOrder()
 
-  const sendTransaction = useCallback(async () => {
-    if (!networkId || !userAddress) return
-    const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-    let pendingTxHash: string | undefined
-    try {
-      setIsSubmitting(true)
-      setTxReceipt(undefined)
+  const methods = useForm({
+    defaultValues: {
+      spread,
+    },
+    mode: 'onChange',
+    validationResolver: numberResolver,
+  })
+  const { setValue, watch } = methods
+  const spreadValue = watch('spread')
 
-      const { receipt } = await placeMultipleOrders({
-        networkId,
-        userAddress,
-        orders,
-        txOptionalParams: {
-          onSentTransaction: (txHash: string): void => {
-            pendingTxHash = txHash
+  useEffect(() => {
+    setSpread(spreadValue)
+  }, [setSpread, setValue, spreadValue])
 
-            setTxHash(txHash)
+  console.debug('spreadVal', spreadValue, 'Spread', spread)
+  useEffect(() => {
+    console.debug('mount')
+    return (): void => console.debug('unmount')
+  }, [])
+  const sendTransaction = useCallback(
+    async (data: FormData) => {
+      console.debug('PoolingInterface:React.FC -> data', data)
+      if (!networkId || !userAddress) return
+      const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
+      let pendingTxHash: string | undefined
+      try {
+        setIsSubmitting(true)
+        setTxReceipt(undefined)
 
-            unstable_batchedUpdates(() => {
-              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-                const newTxState = {
-                  txHash,
-                  id: 'PENDING ORDER',
-                  buyTokenId,
-                  sellTokenId,
-                  priceNumerator: buyAmount,
-                  priceDenominator: sellAmount,
-                  user: userAddress,
-                  remainingAmount: ZERO,
-                  sellTokenBalance: ZERO,
-                  validFrom: 0,
-                  validUntil: 0,
-                }
+        const { receipt } = await placeMultipleOrders({
+          networkId,
+          userAddress,
+          orders,
+          txOptionalParams: {
+            onSentTransaction: (txHash: string): void => {
+              pendingTxHash = txHash
 
-                setIsSubmitting(false)
-                dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+              setTxHash(txHash)
+
+              unstable_batchedUpdates(() => {
+                orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
+                  const newTxState = {
+                    txHash,
+                    id: 'PENDING ORDER',
+                    buyTokenId,
+                    sellTokenId,
+                    priceNumerator: buyAmount,
+                    priceDenominator: sellAmount,
+                    user: userAddress,
+                    remainingAmount: ZERO,
+                    sellTokenBalance: ZERO,
+                    validFrom: 0,
+                    validUntil: 0,
+                  }
+
+                  setIsSubmitting(false)
+                  dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+                })
               })
-            })
+            },
           },
-        },
-      })
+        })
 
-      setTxReceipt(receipt)
-    } catch (e) {
-      console.error('[PoolingWidget] Failed to place orders for strategy', e)
-      toast.error('Not able to create your orders, please try again')
+        setTxReceipt(receipt)
+      } catch (e) {
+        console.error('[PoolingWidget] Failed to place orders for strategy', e)
+        toast.error('Not able to create your orders, please try again')
 
-      // Error handle
-      setTxError(e)
-    } finally {
-      pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
-    }
-  }, [
-    dispatch,
-    networkId,
-    placeMultipleOrders,
-    selectedTokensMap,
-    setIsSubmitting,
-    setTxError,
-    setTxHash,
-    setTxReceipt,
-    spread,
-    userAddress,
-  ])
+        // Error handle
+        setTxError(e)
+      } finally {
+        pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+      }
+    },
+    [
+      dispatch,
+      networkId,
+      placeMultipleOrders,
+      selectedTokensMap,
+      setIsSubmitting,
+      setTxError,
+      setTxHash,
+      setTxReceipt,
+      spread,
+      userAddress,
+    ],
+  )
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
@@ -298,43 +359,56 @@ const PoolingInterface: React.FC = () => {
   return (
     <Widget>
       <PoolingInterfaceWrapper $width="100%">
-        <h2>New Liquidity Order</h2>
-        <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
+        <FormContext {...methods}>
+          <form>
+            <h2>New Liquidity Order</h2>
+            <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
 
-        <ContentWrapper>
-          <StepDescription step={step} />
-          {/* Main Components here */}
-          <SubComponents step={step} {...restProps} />
-        </ContentWrapper>
-        <StepButtonsWrapper>
-          {/* REMOVE BACK BUTTON ON TXRECEIPT */}
-          {!txReceipt && (
-            <button
-              type="button"
-              disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting}
-              onClick={(): void => prevStep()}
-            >
-              Back
-            </button>
-          )}
-          {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
-          {step !== 3 ? (
-            <button type="button" disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
-              Continue
-            </button>
-          ) : // STEP 3 - TXRECEIPT OR NOT?
-          txReceipt ? (
-            // TX RCEIPT SUCCESS
-            <Link to="/wallet" className="finish">
-              Finish and go to Balances
-            </Link>
-          ) : (
-            // NOT YET SUBMITTED TX
-            <button type="button" className="finish" onClick={sendTransaction} disabled={!!txReceipt || isSubmitting}>
-              {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
-            </button>
-          )}
-        </StepButtonsWrapper>
+            <ContentWrapper>
+              <StepDescription step={step} />
+              {/* Main Components here */}
+              <SubComponents step={step} {...restProps} />
+            </ContentWrapper>
+            <StepButtonsWrapper>
+              {/* REMOVE BACK BUTTON ON TXRECEIPT */}
+              {!txReceipt && (
+                <button
+                  type="button"
+                  disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting}
+                  onClick={(): void => prevStep()}
+                >
+                  Back
+                </button>
+              )}
+              {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
+              {step !== 3 ? (
+                <button
+                  type="button"
+                  disabled={(step > 1 && !methods.formState.isValid) || selectedTokensMap.size < 2}
+                  onClick={(): void => nextStep()}
+                >
+                  Continue
+                </button>
+              ) : // STEP 3 - TXRECEIPT OR NOT?
+              txReceipt ? (
+                // TX RCEIPT SUCCESS
+                <Link to="/wallet" className="finish">
+                  Finish and go to Balances
+                </Link>
+              ) : (
+                // NOT YET SUBMITTED TX
+                <button
+                  type="button"
+                  className="finish"
+                  onClick={methods.handleSubmit(sendTransaction)}
+                  disabled={!!txReceipt || isSubmitting}
+                >
+                  {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
+                </button>
+              )}
+            </StepButtonsWrapper>
+          </form>
+        </FormContext>
       </PoolingInterfaceWrapper>
     </Widget>
   )
