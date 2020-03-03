@@ -16,7 +16,7 @@ import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 import { TokenLocalState } from 'reducers-actions'
 
-export interface RowProps extends TokenLocalState {
+export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onSubmitWithdraw: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
@@ -62,9 +62,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
-  if (highlighted.has(address)) {
+  if (highlighted) {
     className = 'highlight'
-  } else if (enabling.has(address)) {
+  } else if (enabling) {
     className = 'enabling'
   } else if (visibleForm) {
     className = 'selected'
@@ -84,20 +84,18 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           </div>
         </td>
         <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
-          {depositing.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+          {depositing && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
           {formatAmount(totalExchangeBalance, decimals)}
         </td>
         <td data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
           {claimable ? (
             <>
-              <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
-                {(claiming.has(address) || withdrawing.has(address)) && (
-                  <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
-                )}
+              <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
+                {(claiming || withdrawing) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
                 {formatAmount(pendingWithdraw.amount, decimals)}
                 <div>
                   <RowClaimLink
-                    className={claiming.has(address) || withdrawing.has(address) ? 'disabled' : 'success'}
+                    className={claiming || withdrawing ? 'disabled' : 'success'}
                     // onClick={(): void => {
                     //   if (!claiming.has(address) && !withdrawing.has(address)) {
                     //     console.debug('Claiming')
@@ -110,18 +108,16 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
-              {withdrawing.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+              {withdrawing && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
               {formatAmount(pendingWithdraw.amount, decimals)}
             </>
           ) : (
-            <>{withdrawing.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}0</>
+            <>{withdrawing && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}0</>
           )}
         </td>
         <td data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
-          {(claiming.has(address) || depositing.has(address)) && (
-            <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
-          )}
+          {(claiming || depositing) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
           {formatAmount(walletBalance, decimals)}
         </td>
         <td data-label="Actions">
@@ -136,8 +132,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </button>
           ) : (
             <>
-              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
-                {enabling.has(address) ? (
+              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
+                {enabling ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
                     Enabling {symbol}

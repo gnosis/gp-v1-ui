@@ -358,11 +358,11 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                     console.debug('Claim token')
                     return claimToken(tokenBalances.address)
                   }}
-                  claiming={claiming}
-                  withdrawing={withdrawing}
-                  depositing={depositing}
-                  highlighted={highlighted}
-                  enabling={enabling}
+                  claiming={claiming.has(tokenBalances.address)}
+                  withdrawing={withdrawing.has(tokenBalances.address)}
+                  depositing={depositing.has(tokenBalances.address)}
+                  highlighted={highlighted.has(tokenBalances.address)}
+                  enabling={enabling.has(tokenBalances.address)}
                   {...windowSpecs}
                 />
               ))}
