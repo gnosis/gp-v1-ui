@@ -11,8 +11,9 @@ import useSafeState from 'hooks/useSafeState'
 import useScrollIntoView from 'hooks/useScrollIntoView'
 
 import { TokenBalanceDetails } from 'types'
-import { formatAmountFull, parseAmount } from 'utils'
+import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 import useKeyPress from 'hooks/useKeyDown'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 export interface FormProps {
   tokenBalances: TokenBalanceDetails
@@ -58,6 +59,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
   const [errors, setErrors] = useSafeState<Errors>({
     amountInput: '',
   })
+  const { userAddress } = useWalletConnection()
 
   const cancelForm = (): void => {
     setAmountInput('')
@@ -112,7 +114,8 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
           <div className="wallet">
             {/* Output this <span> and parse the abbreviated wallet address here ONLY for DEPOSITS */}
             <span>
-              <b>0x4423...egs1</b> {totalAmountLabel}:
+              {userAddress && <b>{abbreviateString(userAddress, 6, 4)}</b>}
+              {totalAmountLabel}:
               <p onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}>
                 {formatAmountFull(totalAmount, decimals) || ''} {symbol}
               </p>
