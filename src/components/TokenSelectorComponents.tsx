@@ -1,76 +1,82 @@
-import React, { ComponentType } from 'react'
+import React, { ComponentType, useRef, useEffect, useCallback } from 'react'
 import { components, MenuListComponentProps } from 'react-select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
-// Trying to use the same example from https://github.com/JedWatson/react-select/issues/3111#issuecomment-470911304
-// Without much luck so far.
+// Inspired by https://github.com/JedWatson/react-select/issues/3111#issuecomment-470911304
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function menuListFactory(toggleMenuIsOpen?: () => void): ComponentType<MenuListComponentProps<any>> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
-    const ariaAttributes = {
-      // 'aria-autocomplete': 'list',
-      'aria-label': props.selectProps['aria-label'],
-      'aria-labelledby': props.selectProps['aria-labelledby'],
-    }
+export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
+  const {
+    selectProps: { onInputChange, onMenuInputFocus, inputValue, value },
+    setValue,
+  } = props
 
-    return (
-      <components.MenuList {...props}>
-        <div className="header" style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <h2>Select token</h2>
-          <button
-            type="button"
-            onClick={(): void => {
-              // TODO: no idea how to make this menu close
-              // I tried to use the state from the select, but besides breaking the menu on the parent
-              // it doesn't work here :/
-              toggleMenuIsOpen && toggleMenuIsOpen()
-              console.log('close pop up')
-            }}
-          >
-            X
-          </button>
-        </div>
-        <div className="searchContainer" style={{ display: 'flex' }}>
-          <FontAwesomeIcon icon={faSearch} />
-          <input
-            style={{
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-            autoCorrect="off"
-            autoComplete="off"
-            spellCheck="false"
-            type="text"
-            placeholder="Search by token Name, Symbol or Address"
-            value={props.selectProps.inputValue}
-            onChange={(e): void => {
-              const { selectProps } = props
-              const { onInputChange } = selectProps
-              onInputChange &&
-                onInputChange(e.currentTarget.value, {
-                  action: 'input-change',
-                })
-            }}
-            onMouseDown={(e): void => {
-              e.stopPropagation()
-              // TODO: don't know how to make focus
-              // e.target.focus()
-            }}
-            onTouchEnd={(e): void => {
-              e.stopPropagation()
-              //   e.target.focus()
-            }}
-            onFocus={props.selectProps.onMenuInputFocus}
-            {...ariaAttributes}
-          />
-        </div>
-        {props.children}
-      </components.MenuList>
-    )
+  const ariaAttributes = {
+    // 'aria-autocomplete': 'list',
+    'aria-label': props.selectProps['aria-label'],
+    'aria-labelledby': props.selectProps['aria-labelledby'],
   }
 
-  return MenuList
+  // Since I couldn't for the life of me figure out a way to call some sort of close on the menu,
+  // David offered the idea to instead set a value on the select.
+  // When a value is selected, the menu is closed. The value is whatever was selected already.
+  const onCloseButtonClick = useCallback((): void => setValue(value, 'set-value'), [setValue, value])
+
+  // On input's change event, we call the select's `onInputChange` handler with the appropriated action
+  const onChange = useCallback(
+    (e): void => {
+      onInputChange &&
+        onInputChange(e.currentTarget.value, {
+          action: 'input-change',
+        })
+    },
+    [onInputChange],
+  )
+
+  // To avoid triggering side effects on upper layers that causes the menu to be closed,
+  // we stopPropagation and trigger a focus
+  const onInputClick = useCallback((e): void => {
+    e.stopPropagation()
+    e.currentTarget.focus()
+  }, [])
+
+  // for autofocus
+  const inputRef = useRef(null)
+  //TODO: how to properly type this?
+  useEffect(() => inputRef.current && inputRef.current.focus(), [])
+
+  return (
+    // <components.MenuList {...props}>
+    <>
+      <div className="header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <h2>Select token</h2>
+        <button type="button" onClick={onCloseButtonClick}>
+          X
+        </button>
+      </div>
+      <div className="searchContainer" style={{ display: 'flex' }}>
+        <FontAwesomeIcon icon={faSearch} />
+        <input
+          ref={inputRef}
+          style={{
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+          autoCorrect="off"
+          autoComplete="off"
+          spellCheck="false"
+          type="text"
+          placeholder="Search by token Name, Symbol or Address"
+          value={inputValue}
+          onChange={onChange}
+          onMouseDown={onInputClick}
+          onTouchEnd={onInputClick}
+          onFocus={onMenuInputFocus}
+          {...ariaAttributes}
+        />
+      </div>
+      <components.MenuList {...props} />
+    </>
+  )
 }
