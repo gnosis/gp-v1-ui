@@ -96,15 +96,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                 {(claiming || withdrawing) && spinner}
                 {formatAmount(pendingWithdraw.amount, decimals)}
                 <div>
-                  <RowClaimLink
-                    className={claiming || withdrawing ? 'disabled' : 'success'}
-                    // onClick={(): void => {
-                    //   if (!claiming.has(address) && !withdrawing.has(address)) {
-                    //     console.debug('Claiming')
-                    //     onClaim()
-                    //   }
-                    // }}
-                  ></RowClaimLink>
+                  <RowClaimLink className={claiming || withdrawing ? 'disabled' : 'success'}></RowClaimLink>
                 </div>
               </RowClaimButton>
             </>

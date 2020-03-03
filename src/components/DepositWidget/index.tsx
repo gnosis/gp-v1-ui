@@ -354,10 +354,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                       onTxHash,
                     )
                   }}
-                  onClaim={(): Promise<void> => {
-                    console.debug('Claim token')
-                    return claimToken(tokenBalances.address)
-                  }}
+                  onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
                   claiming={claiming.has(tokenBalances.address)}
                   withdrawing={withdrawing.has(tokenBalances.address)}
                   depositing={depositing.has(tokenBalances.address)}

@@ -37,7 +37,6 @@ export const useRowActions = (params: Params): Result => {
   const { balances } = params
 
   const [{ tokens: state }, dispatch] = useGlobalState()
-  console.log('state', state)
 
   const { userAddress, networkId } = useWalletConnection()
 
