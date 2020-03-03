@@ -7,7 +7,7 @@ import plus from 'assets/img/plus.svg'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
-import { TokenRow, RowClaimButton, RowClaimLink } from './Styled'
+import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
@@ -95,9 +95,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
                 {(claiming || withdrawing) && spinner}
                 {formatAmount(pendingWithdraw.amount, decimals)}
-                <div>
-                  <RowClaimLink className={claiming || withdrawing ? 'disabled' : 'success'}></RowClaimLink>
-                </div>
+                <RowClaimSpan className={claiming || withdrawing ? 'disabled' : 'success'}>Claim</RowClaimSpan>
               </RowClaimButton>
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
