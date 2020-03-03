@@ -85,7 +85,7 @@ const Wrapper = styled.div`
 `
 
 const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
-  display: ${(props): string => (props.$visible ? 'flex' : 'none')};
+  visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
   position: fixed;
 
   left: 0;
@@ -104,10 +104,12 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   padding: 2.7rem;
   border-radius: 0.8rem;
 
+  display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
   align-items: space-between;
 
+  transition: all 0.5s ease-in-out;
   > strong {
     text-transform: capitalize;
     color: #2f3e4e;
@@ -182,6 +184,8 @@ const OrderValidity: React.FC<Props> = ({
       const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue).toString()
 
       batchedUpdates(() => {
+        if (sanitizedFromValue === '0') setAsap(true)
+        if (sanitizedUntilValue === '0') setUnlimited(true)
         setValue(validFromInputId, sanitizedFromValue, true)
         setValue(validUntilInputId, sanitizedUntilValue, true)
       })
@@ -189,7 +193,9 @@ const OrderValidity: React.FC<Props> = ({
 
     setShowOrderConfig(showOrderConfig => !showOrderConfig)
   }, [
+    setAsap,
     setShowOrderConfig,
+    setUnlimited,
     setValue,
     showOrderConfig,
     validFromInputId,
@@ -259,7 +265,7 @@ const OrderValidity: React.FC<Props> = ({
               tabIndex={tabIndex + 2}
             />
             <div className="radio-container">
-              <input type="checkbox" disabled={isDisabled} defaultChecked={isAsap} onClick={handleASAPClick} />
+              <input type="checkbox" checked={isAsap} disabled={isDisabled} onChange={handleASAPClick} />
               <small>ASAP</small>
             </div>
           </label>
@@ -283,12 +289,7 @@ const OrderValidity: React.FC<Props> = ({
               tabIndex={tabIndex + 3}
             />
             <div className="radio-container">
-              <input
-                type="checkbox"
-                disabled={isDisabled}
-                defaultChecked={isUnlimited}
-                onClick={handleUnlimitedClick}
-              />
+              <input type="checkbox" disabled={isDisabled} checked={isUnlimited} onChange={handleUnlimitedClick} />
               <small>Never</small>
             </div>
           </label>
