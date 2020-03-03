@@ -26,6 +26,8 @@ export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   innerHeight?: number
 }
 
+const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
     tokenBalances,
@@ -84,14 +86,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           </div>
         </td>
         <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
-          {depositing && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+          {depositing && spinner}
           {formatAmount(totalExchangeBalance, decimals)}
         </td>
         <td data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
-                {(claiming || withdrawing) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+                {(claiming || withdrawing) && spinner}
                 {formatAmount(pendingWithdraw.amount, decimals)}
                 <div>
                   <RowClaimLink
@@ -108,16 +110,16 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
-              {withdrawing && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+              {withdrawing && spinner}
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
               {formatAmount(pendingWithdraw.amount, decimals)}
             </>
           ) : (
-            <>{withdrawing && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}0</>
+            <>{withdrawing && spinner}0</>
           )}
         </td>
         <td data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
-          {(claiming || depositing) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+          {(claiming || depositing) && spinner}
           {formatAmount(walletBalance, decimals)}
         </td>
         <td data-label="Actions">
