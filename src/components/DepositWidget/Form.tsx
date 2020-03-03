@@ -50,7 +50,7 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
 }
 
 export const Form: React.FC<FormProps> = (props: FormProps) => {
-  const { symbol, decimals } = props.tokenBalances
+  const { symbol, decimals, totalExchangeBalance } = props.tokenBalances
   const { title, totalAmount, totalAmountLabel, inputLabel, submitBtnLabel } = props
   const [amountInput, setAmountInput] = useSafeState('')
   const [validatorActive, setValidatorActive] = useSafeState(false)
@@ -105,7 +105,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <b>Exchange Balance</b>
             <div>
               <i>{symbol}</i>
-              <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
+              <input type="text" value={formatAmountFull(totalExchangeBalance, decimals) || ''} disabled />
             </div>
           </div>
           {/* Deposit Row */}
