@@ -110,8 +110,7 @@ export const WalletDrawerInnerWrapper = styled.div`
       background: #e7ecf3;
       border-radius: 0.6rem 0.6rem 0 0;
       border: 0;
-      font-size: 1.6rem;
-      line-height: 1;
+      line-height: 2.8; /* half of height */
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;
       font-weight: var(--font-weight-normal);
