@@ -1,45 +1,31 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import React, { useCallback, useMemo, useEffect } from 'react'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { toast } from 'toastify'
-// eslint-disable-next-line @typescript-eslint/camelcase
-import { unstable_batchedUpdates } from 'react-dom'
-
 import styled from 'styled-components'
+import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
+import joi from '@hapi/joi'
 
+import ProgressBar from './ProgressBar'
+import { StepDescription } from './StepDecriptors'
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
-import {
-  BarWrapper,
-  StepSeparator,
-  PoolingInterfaceWrapper,
-  ProgressStep,
-  ProgressStepText,
-  StepDescriptionWrapper,
-  StepButtonsWrapper,
-} from './PoolingWidget.styled'
-
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import checkIcon from 'assets/img/li-check.svg'
+import LiquidityButtons from './LiquidityButtons'
+import { PoolingInterfaceWrapper } from './PoolingWidget.styled'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
 import useGlobalState from 'hooks/useGlobalState'
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-
-import { tokenListApi } from 'api'
-
-import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
-import { Network, Receipt } from 'types'
-
-import { maxAmountsForSpread } from 'utils'
-import { DEFAULT_PRECISION } from 'const'
-import { Link } from 'react-router-dom'
-
 import { useForm, FormContext } from 'react-hook-form'
 
-import joi, { ValidationError, ValidationResult } from '@hapi/joi'
+import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { tokenListApi } from 'api'
+
+import { Network, Receipt } from 'types'
+
+import { maxAmountsForSpread, resolverFactory } from 'utils'
+import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST } from 'const'
 
 const validationSchema = joi.object({
   spread: joi
@@ -54,114 +40,10 @@ const validationSchema = joi.object({
     .required(),
 })
 
-const numberResolver = (
-  data: FormData,
-): { values: ValidationResult /* { [key: string]: string } */; errors: ValidationError | {} } => {
-  console.debug('data', JSON.stringify(data))
-  const castedData = { ...data, spread: Number(data?.spread) }
-  console.debug('castedData', castedData)
-  const { error, value: values } = validationSchema.validate(castedData)
-  return {
-    values: error ? {} : values,
-    errors: error
-      ? error.details.reduce((previous, currentError) => {
-          return {
-            ...previous,
-            [currentError.path[0]]: currentError,
-          }
-        }, {})
-      : {},
-  }
-}
+const numberResolver = resolverFactory('number', validationSchema)
 
-const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI', 'sUSD'])
-
-interface ProgressBarProps {
-  step: number
-  stepArray: string[]
-}
-
-const stepChecker = (step: number, index: number): boolean => step >= index + 1 && step <= 3
-
-const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
-  return (
-    <>
-      <BarWrapper>
-        {stepArray.map((stepName, index) => (
-          <React.Fragment key={stepName}>
-            <ProgressStep
-              data-title={stepName}
-              className={stepChecker(step, index) ? 'active' : ''}
-              $bgColor={stepChecker(step, index) ? '#218DFF;' : '#9FB4C9'}
-            >
-              <ProgressStepText>{index + 1}</ProgressStepText>
-            </ProgressStep>
-            {index + 1 < 3 && <StepSeparator />}
-          </React.Fragment>
-        ))}
-      </BarWrapper>
-    </>
-  )
-}
-
-const StepDescription: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => (
-  <StepDescriptionWrapper>
-    <StepTitle step={step} />
-  </StepDescriptionWrapper>
-)
-
-const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
-  const { title, subtext }: { title: string; subtext?: string } = useMemo(() => {
-    switch (step) {
-      case 1:
-        // TODO: Add Link
-        // https://github.com/gnosis/dex-react/issues/615
-        return {
-          title: '1. Select at least two of your trusted stablecoins',
-          subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
-          <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
-          <ul>
-            <li><img src=${checkIcon} />No maintenance needed</li>
-            <li><img src=${checkIcon} />No gas costs for trades</li>
-            <li><img src=${checkIcon} />Cancellation possible at any time</li>
-          </ul>
-          <p class="not-implemented">            
-            <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
-          </p>`,
-        }
-      case 2:
-        // TODO: Add Link
-        // https://github.com/gnosis/dex-react/issues/615
-        return {
-          title: '2. Define your spread',
-          subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
-          <p class="not-implemented">            
-            <a href="#" target="_blank" rel="noopener">Learn more about the spread.</a>
-          </p>
-          `,
-        }
-      case 3:
-        return {
-          title: '3. New liquidity summary:',
-          subtext: `
-            <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
-            <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
-            <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
-            <p><b>The exchange only uses your fully available exchange balance to execute trades.</b></p>
-          `,
-        }
-      default:
-        return { title: 'An error occurred, please try again' }
-    }
-  }, [step])
-
-  return (
-    <div>
-      <ProgressStepText as="h2">{title}</ProgressStepText>
-      {subtext && <div className="liqContent" dangerouslySetInnerHTML={{ __html: subtext }} />}
-    </div>
-  )
-}
+export const FIRST_STEP = 1
+export const LAST_STEP = 2
 
 function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails): Map<number, TokenDetails> {
   // Cache map (no mutate)
@@ -230,6 +112,23 @@ const PoolingInterface: React.FC = () => {
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
+  const methods = useForm({
+    defaultValues: {
+      // @ts-ignore
+      spread,
+    },
+    mode: 'onChange',
+    validationResolver: numberResolver,
+  })
+  const { handleSubmit, watch } = methods
+  // Watch input and set defaultValue to state spread
+  const spreadValue = watch('spread')
+
+  useEffect(() => {
+    // only update spread on step 2
+    if (step === 2) setSpread(Number(spreadValue))
+  }, [setSpread, spreadValue, step])
+
   const tokens = useMemo(() => {
     return (
       // Get all the tokens for the current network
@@ -240,98 +139,75 @@ const PoolingInterface: React.FC = () => {
     )
   }, [fallBackNetworkId])
 
-  const prevStep = useCallback((): void => setStep(step => (step === 1 ? step : step - 1)), [setStep])
-  const nextStep = useCallback((): void => setStep(step => (step === 3 ? step : step + 1)), [setStep])
+  const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
+  const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])
 
   const { isSubmitting, setIsSubmitting, placeMultipleOrders } = usePlaceOrder()
 
-  const methods = useForm({
-    defaultValues: {
-      spread,
-    },
-    mode: 'onChange',
-    validationResolver: numberResolver,
-  })
-  const { watch } = methods
-  const spreadValue = watch('spread')
+  const sendTransaction = useCallback(async () => {
+    if (!networkId || !userAddress) return
+    const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
+    let pendingTxHash: string | undefined
+    try {
+      setIsSubmitting(true)
+      setTxReceipt(undefined)
 
-  useEffect(() => {
-    if (step === 2) setSpread(spreadValue)
-  }, [setSpread, spreadValue, step])
+      const { receipt } = await placeMultipleOrders({
+        networkId,
+        userAddress,
+        orders,
+        txOptionalParams: {
+          onSentTransaction: (txHash: string): void => {
+            pendingTxHash = txHash
 
-  console.debug('spreadVal', spreadValue, 'Spread', spread)
-  useEffect(() => {
-    console.debug('mount')
-    return (): void => console.debug('unmount')
-  }, [])
-  const sendTransaction = useCallback(
-    async (data: FormData) => {
-      console.debug('PoolingInterface:React.FC -> data', data)
-      if (!networkId || !userAddress) return
-      const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-      let pendingTxHash: string | undefined
-      try {
-        setIsSubmitting(true)
-        setTxReceipt(undefined)
+            setTxHash(txHash)
 
-        const { receipt } = await placeMultipleOrders({
-          networkId,
-          userAddress,
-          orders,
-          txOptionalParams: {
-            onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
+            batchedUpdates(() => {
+              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
+                const newTxState = {
+                  txHash,
+                  id: 'PENDING ORDER',
+                  buyTokenId,
+                  sellTokenId,
+                  priceNumerator: buyAmount,
+                  priceDenominator: sellAmount,
+                  user: userAddress,
+                  remainingAmount: ZERO,
+                  sellTokenBalance: ZERO,
+                  validFrom: 0,
+                  validUntil: 0,
+                }
 
-              setTxHash(txHash)
-
-              unstable_batchedUpdates(() => {
-                orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-                  const newTxState = {
-                    txHash,
-                    id: 'PENDING ORDER',
-                    buyTokenId,
-                    sellTokenId,
-                    priceNumerator: buyAmount,
-                    priceDenominator: sellAmount,
-                    user: userAddress,
-                    remainingAmount: ZERO,
-                    sellTokenBalance: ZERO,
-                    validFrom: 0,
-                    validUntil: 0,
-                  }
-
-                  setIsSubmitting(false)
-                  dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
-                })
+                setIsSubmitting(false)
+                dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
               })
-            },
+            })
           },
-        })
+        },
+      })
 
-        setTxReceipt(receipt)
-      } catch (e) {
-        console.error('[PoolingWidget] Failed to place orders for strategy', e)
-        toast.error('Not able to create your orders, please try again')
+      setTxReceipt(receipt)
+    } catch (e) {
+      console.error('[PoolingWidget] Failed to place orders for strategy', e)
+      toast.error('Not able to create your orders, please try again')
 
-        // Error handle
-        setTxError(e)
-      } finally {
-        pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
-      }
-    },
-    [
-      dispatch,
-      networkId,
-      placeMultipleOrders,
-      selectedTokensMap,
-      setIsSubmitting,
-      setTxError,
-      setTxHash,
-      setTxReceipt,
-      spread,
-      userAddress,
-    ],
-  )
+      // Error handle
+      setTxError(e)
+    } finally {
+      pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+    }
+  }, [
+    dispatch,
+    networkId,
+    placeMultipleOrders,
+    selectedTokensMap,
+    setIsSubmitting,
+    setTxError,
+    setTxHash,
+    setTxReceipt,
+    spread,
+    userAddress,
+  ])
 
   const handleTokenSelect = useCallback(
     (token: TokenDetails): void => {
@@ -351,62 +227,51 @@ const PoolingInterface: React.FC = () => {
       txHash,
       txReceipt,
       txError,
+      step,
+      prevStep,
       nextStep,
+      isSubmitting,
     }),
-    [handleTokenSelect, nextStep, selectedTokensMap, setSpread, spread, tokens, txError, txHash, txReceipt],
+    [
+      handleTokenSelect,
+      isSubmitting,
+      nextStep,
+      prevStep,
+      selectedTokensMap,
+      setSpread,
+      spread,
+      step,
+      tokens,
+      txError,
+      txHash,
+      txReceipt,
+    ],
   )
-
   return (
     <Widget>
       <PoolingInterfaceWrapper $width="100%">
         <FormContext {...methods}>
-          <form>
+          <form onSubmit={handleSubmit(sendTransaction)}>
             <h2>New Liquidity Order</h2>
-            <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread', 'Create Liquidity']} />
+            <ProgressBar
+              step={step}
+              stepArray={['Select Tokens', 'Define Spread & Finish' /* , 'Create Liquidity' */]}
+            />
 
             <ContentWrapper>
               <StepDescription step={step} />
               {/* Main Components here */}
               <SubComponents step={step} {...restProps} />
             </ContentWrapper>
-            <StepButtonsWrapper>
-              {/* REMOVE BACK BUTTON ON TXRECEIPT */}
-              {!txReceipt && (
-                <button
-                  type="button"
-                  disabled={step < 2 || selectedTokensMap.size < 2 || isSubmitting}
-                  onClick={(): void => prevStep()}
-                >
-                  Back
-                </button>
-              )}
-              {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
-              {step !== 3 ? (
-                <button
-                  type="button"
-                  disabled={(step > 1 && !methods.formState.isValid) || selectedTokensMap.size < 2}
-                  onClick={(): void => nextStep()}
-                >
-                  Continue
-                </button>
-              ) : // STEP 3 - TXRECEIPT OR NOT?
-              txReceipt ? (
-                // TX RCEIPT SUCCESS
-                <Link to="/wallet" className="finish">
-                  Finish and go to Balances
-                </Link>
-              ) : (
-                // NOT YET SUBMITTED TX
-                <button
-                  type="button"
-                  className="finish"
-                  onClick={methods.handleSubmit(sendTransaction)}
-                  disabled={!!txReceipt || isSubmitting}
-                >
-                  {isSubmitting && <FontAwesomeIcon icon={faSpinner} spin={isSubmitting} />}Submit transaction
-                </button>
-              )}
-            </StepButtonsWrapper>
+
+            {/* BUTTONS */}
+            <LiquidityButtons
+              handleSubmit={sendTransaction}
+              disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting}
+              disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
+              disableSubmit={!!txHash || isSubmitting}
+              {...restProps}
+            />
           </form>
         </FormContext>
       </PoolingInterfaceWrapper>
