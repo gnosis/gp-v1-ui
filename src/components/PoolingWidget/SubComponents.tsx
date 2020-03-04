@@ -2,13 +2,13 @@ import React from 'react'
 
 import TokenSelector from './TokenSelector'
 import { TokenSelectorProps } from './TokenSelector'
-import DefineSpread from './DefineSpread'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
 import { Receipt } from 'types'
 
-interface SubComponentProps extends TokenSelectorProps {
+export interface SubComponentProps extends TokenSelectorProps {
+  isSubmitting: boolean
   step: number
   selectedTokensMap: Map<number, TokenDetails>
   spread: number
@@ -29,34 +29,24 @@ const SubComponents: React.FC<SubComponentProps> = ({
   txHash,
   txReceipt,
   txError,
-  nextStep,
+  isSubmitting,
 }) => {
   switch (step) {
     case 1:
       return (
-        <>
-          <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
-          {/* <GreySubText>
-            Please select at least two tokens to continue{' '}
-            {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
-          </GreySubText> */}
-        </>
+        <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
       )
     case 2:
       return (
-        <DefineSpread selectedTokensMap={selectedTokensMap} spread={spread} setSpread={setSpread} nextStep={nextStep} />
-      )
-    case 3:
-      return (
-        <>
-          <CreateStrategy
-            spread={spread}
-            selectedTokensMap={selectedTokensMap}
-            txIdentifier={txHash}
-            txReceipt={txReceipt}
-            txError={txError}
-          />
-        </>
+        <CreateStrategy
+          spread={spread}
+          setSpread={setSpread}
+          selectedTokensMap={selectedTokensMap}
+          txIdentifier={txHash}
+          txReceipt={txReceipt}
+          txError={txError}
+          isSubmitting={isSubmitting}
+        />
       )
     default:
       return (
