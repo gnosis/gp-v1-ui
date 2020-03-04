@@ -12,3 +12,13 @@ export const txOptionalParams: TxOptionalParams = {
     }
   },
 }
+
+export const composeOptionalParams = (callback?: TxOptionalParams['onSentTransaction']): TxOptionalParams => {
+  if (!callback) return txOptionalParams
+  return {
+    onSentTransaction: (hash): void => {
+      txOptionalParams.onSentTransaction?.(hash)
+      callback(hash)
+    },
+  }
+}

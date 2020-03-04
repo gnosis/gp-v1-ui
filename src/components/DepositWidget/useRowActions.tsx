@@ -8,10 +8,16 @@ import { ALLOWANCE_MAX_VALUE } from 'const'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { formatAmount, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
-import { txOptionalParams } from 'utils/transaction'
+import { composeOptionalParams } from 'utils/transaction'
 
 import useGlobalState from 'hooks/useGlobalState'
-import { TokenLocalState, setHighlightAction, setEnablingAction, setHighlightAndClaimingAction } from 'reducers-actions'
+import {
+  TokenLocalState,
+  setEnablingAction,
+  setHighlightAndClaimingAction,
+  setHighlightAndDepositing,
+  setHighlightAndWithdrawing,
+} from 'reducers-actions'
 import { useMemo } from 'react'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
@@ -21,10 +27,10 @@ interface Params {
 }
 
 interface Result extends TokenLocalState {
-  enableToken: (tokenAddress: string) => Promise<void>
-  depositToken: (amount: BN, tokenAddress: string) => Promise<void>
-  requestWithdrawToken: (amount: BN, tokenAddress: string) => Promise<void>
-  claimToken: (tokenAddress: string) => Promise<void>
+  enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  requestWithdrawToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
 }
 
 export const useRowActions = (params: Params): Result => {
@@ -37,7 +43,7 @@ export const useRowActions = (params: Params): Result => {
   const methods = useMemo(() => {
     const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
 
-    async function enableToken(tokenAddress: string): Promise<void> {
+    async function enableToken(tokenAddress: string, onTxHash?: (hash: string) => void): Promise<void> {
       try {
         assert(userAddress, 'User address missing. Aborting.')
         assert(networkId, 'NetworkId missing. Aborting.')
@@ -56,7 +62,7 @@ export const useRowActions = (params: Params): Result => {
           spenderAddress: contractAddress,
           networkId,
           amount: ALLOWANCE_MAX_VALUE,
-          txOptionalParams,
+          txOptionalParams: composeOptionalParams(onTxHash),
         })
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
@@ -69,7 +75,7 @@ export const useRowActions = (params: Params): Result => {
       }
     }
 
-    async function depositToken(amount: BN, tokenAddress: string): Promise<void> {
+    async function depositToken(amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void): Promise<void> {
       try {
         assert(userAddress, ON_ERROR_MESSAGE)
         assert(networkId, ON_ERROR_MESSAGE)
@@ -77,12 +83,18 @@ export const useRowActions = (params: Params): Result => {
         const token = getToken('address', tokenAddress, balances)
         assert(token, 'No token')
 
-        dispatch(setHighlightAction(tokenAddress))
+        dispatch(setHighlightAndDepositing(tokenAddress))
 
         const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
         logDebug(`[DepositWidget:useRowActions] Processing deposit of ${amount} ${symbol} from ${userAddress}`)
-        const receipt = await depositApi.deposit({ userAddress, tokenAddress, networkId, amount, txOptionalParams })
+        const receipt = await depositApi.deposit({
+          userAddress,
+          tokenAddress,
+          networkId,
+          amount,
+          txOptionalParams: composeOptionalParams(onTxHash),
+        })
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
         toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
@@ -90,11 +102,15 @@ export const useRowActions = (params: Params): Result => {
         console.error('DepositWidget:useRowActions] Error depositing', error)
         toast.error(`Error depositing: ${error.message}`)
       } finally {
-        dispatch(setHighlightAction(tokenAddress))
+        dispatch(setHighlightAndDepositing(tokenAddress))
       }
     }
 
-    async function requestWithdrawToken(amount: BN, tokenAddress: string): Promise<void> {
+    async function requestWithdrawToken(
+      amount: BN,
+      tokenAddress: string,
+      onTxHash?: (hash: string) => void,
+    ): Promise<void> {
       try {
         assert(userAddress, ON_ERROR_MESSAGE)
         assert(networkId, ON_ERROR_MESSAGE)
@@ -102,7 +118,7 @@ export const useRowActions = (params: Params): Result => {
         const token = getToken('address', tokenAddress, balances)
         assert(token, 'No token')
 
-        dispatch(setHighlightAction(tokenAddress))
+        dispatch(setHighlightAndWithdrawing(tokenAddress))
 
         const { symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
@@ -114,7 +130,7 @@ export const useRowActions = (params: Params): Result => {
           tokenAddress,
           networkId,
           amount,
-          txOptionalParams,
+          txOptionalParams: composeOptionalParams(onTxHash),
         })
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
@@ -123,11 +139,11 @@ export const useRowActions = (params: Params): Result => {
         console.error('DepositWidget:useRowActions] Error requesting withdraw', error)
         toast.error(`Error requesting withdraw: ${error.message}`)
       } finally {
-        dispatch(setHighlightAction(tokenAddress))
+        dispatch(setHighlightAndWithdrawing(tokenAddress))
       }
     }
 
-    async function claimToken(tokenAddress: string): Promise<void> {
+    async function claimToken(tokenAddress: string, onTxHash?: (hash: string) => void): Promise<void> {
       try {
         assert(userAddress, ON_ERROR_MESSAGE)
         assert(networkId, ON_ERROR_MESSAGE)
@@ -141,7 +157,12 @@ export const useRowActions = (params: Params): Result => {
 
         dispatch(setHighlightAndClaimingAction(tokenAddress))
 
-        const receipt = await depositApi.withdraw({ userAddress, tokenAddress, networkId, txOptionalParams })
+        const receipt = await depositApi.withdraw({
+          userAddress,
+          tokenAddress,
+          networkId,
+          txOptionalParams: composeOptionalParams(onTxHash),
+        })
 
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
         toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
@@ -164,10 +185,8 @@ export const useRowActions = (params: Params): Result => {
   return useMemo(
     () => ({
       ...methods,
-      enabling: state.enabling,
-      claiming: state.claiming,
-      highlighted: state.highlighted,
+      ...state,
     }),
-    [methods, state.claiming, state.enabling, state.highlighted],
+    [methods, state],
   )
 }

@@ -23,7 +23,7 @@ export interface FormProps {
   responsive?: boolean
   submitBtnLabel: string
   submitBtnIcon: IconDefinition
-  onSubmit: (amount: BN) => Promise<void>
+  onSubmit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onClose: () => void
 }
 
@@ -84,12 +84,15 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     if (!error) {
       setLoading(true)
       const parsedAmt = parseAmount(amountInput, decimals)
-      parsedAmt &&
-        props.onSubmit(parsedAmt).then(() => {
-          setLoading(false)
-          setValidatorActive(false)
-          cancelForm()
-        })
+      let called = false
+      const onFinish = (): void => {
+        if (called) return
+        called = true
+        setLoading(false)
+        setValidatorActive(false)
+        cancelForm()
+      }
+      parsedAmt && props.onSubmit(parsedAmt, onFinish).then(onFinish)
     }
   }
 
