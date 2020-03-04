@@ -274,11 +274,15 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // When the search input is focused, force menu to remain open
   const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
 
-  const onInputChange = useCallback((inputValue): void => {
-    // `inputValue` is an empty string on `Escape`.
-    // Setting isFocused to false hides the menu as desired
-    if (!inputValue) {
+  const onKeyDown = useCallback((e): void => {
+    if (e.key === 'Escape') {
+      // Close menu on `Escape`
+      e.stopPropagation()
       setIsFocused(false)
+    } else if (!e.target.value && e.key === ' ') {
+      // Prevent a space when input in empty.
+      // That closes the menu. (/shrug)
+      e.preventDefault()
     }
   }, [])
 
@@ -301,7 +305,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         isFocused={isFocused || undefined}
         menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
         onMenuInputFocus={onMenuInputFocus}
-        onInputChange={onInputChange}
+        onKeyDown={onKeyDown}
       />
     </Wrapper>
   )

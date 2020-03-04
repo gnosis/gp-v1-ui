@@ -8,7 +8,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   const {
-    selectProps: { onInputChange, onMenuInputFocus, inputValue, value },
+    selectProps: { onKeyDown, onInputChange, onMenuInputFocus, inputValue, value },
     setValue,
   } = props
 
@@ -67,6 +67,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
           placeholder="Search by token Name, Symbol or Address"
           value={inputValue}
           onChange={onChange}
+          onKeyDown={onKeyDown}
           onMouseDown={onInputClick}
           onTouchEnd={onInputClick}
           onFocus={onMenuInputFocus}
