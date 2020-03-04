@@ -13,7 +13,6 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   } = props
 
   const ariaAttributes = {
-    // 'aria-autocomplete': 'list',
     'aria-label': props.selectProps['aria-label'],
     'aria-labelledby': props.selectProps['aria-labelledby'],
   }
@@ -46,7 +45,6 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   useEffect(() => inputRef.current?.focus(), [])
 
   return (
-    // <components.MenuList {...props}>
     <>
       <div className="header" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <h2>Select token</h2>
