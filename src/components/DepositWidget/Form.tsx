@@ -11,8 +11,9 @@ import useSafeState from 'hooks/useSafeState'
 import useScrollIntoView from 'hooks/useScrollIntoView'
 
 import { TokenBalanceDetails } from 'types'
-import { formatAmountFull, parseAmount } from 'utils'
+import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 import useKeyPress from 'hooks/useKeyDown'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 export interface FormProps {
   tokenBalances: TokenBalanceDetails
@@ -50,7 +51,7 @@ function _validateForm(totalAmount: BN, amountInput: string, decimals: number): 
 }
 
 export const Form: React.FC<FormProps> = (props: FormProps) => {
-  const { symbol, decimals } = props.tokenBalances
+  const { symbol, decimals, totalExchangeBalance } = props.tokenBalances
   const { title, totalAmount, totalAmountLabel, inputLabel, submitBtnLabel } = props
   const [amountInput, setAmountInput] = useSafeState('')
   const [validatorActive, setValidatorActive] = useSafeState(false)
@@ -58,6 +59,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
   const [errors, setErrors] = useSafeState<Errors>({
     amountInput: '',
   })
+  const { userAddress } = useWalletConnection()
 
   const cancelForm = (): void => {
     setAmountInput('')
@@ -105,14 +107,15 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <b>Exchange Balance</b>
             <div>
               <i>{symbol}</i>
-              <input type="text" value={formatAmountFull(totalAmount, decimals) || ''} disabled />
+              <input type="text" value={formatAmountFull(totalExchangeBalance, decimals) || ''} disabled />
             </div>
           </div>
           {/* Deposit Row */}
           <div className="wallet">
             {/* Output this <span> and parse the abbreviated wallet address here ONLY for DEPOSITS */}
             <span>
-              <b>0x4423...egs1</b> {totalAmountLabel}:
+              {userAddress && <b>{abbreviateString(userAddress, 6, 4)}</b>}
+              {totalAmountLabel}:
               <p onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}>
                 {formatAmountFull(totalAmount, decimals) || ''} {symbol}
               </p>
