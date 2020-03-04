@@ -240,6 +240,10 @@ const customSelectStyles = {
   }),
 }
 
+const components = { MenuList }
+
+const noOptionsMessage = (): string => 'No results'
+
 interface Props {
   label?: string
   isDisabled?: boolean
@@ -287,13 +291,13 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         styles={customSelectStyles}
         className="tokenSelectBox"
         classNamePrefix="react-select"
-        noOptionsMessage={(): string => 'No results'}
+        noOptionsMessage={noOptionsMessage}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
         onChange={onSelectChange}
         tabIndex={tabIndex.toString()}
-        components={{ MenuList }}
+        components={components}
         isFocused={isFocused || undefined}
         menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
         onMenuInputFocus={onMenuInputFocus}
