@@ -42,9 +42,8 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   }, [])
 
   // for autofocus
-  const inputRef = useRef(null)
-  //TODO: how to properly type this?
-  useEffect(() => inputRef.current && inputRef.current.focus(), [])
+  const inputRef = useRef<HTMLInputElement>(null)
+  useEffect(() => inputRef.current?.focus(), [])
 
   return (
     // <components.MenuList {...props}>
