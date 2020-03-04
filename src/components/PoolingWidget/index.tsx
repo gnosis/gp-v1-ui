@@ -252,12 +252,12 @@ const PoolingInterface: React.FC = () => {
     mode: 'onChange',
     validationResolver: numberResolver,
   })
-  const { setValue, watch } = methods
+  const { watch } = methods
   const spreadValue = watch('spread')
 
   useEffect(() => {
-    setSpread(spreadValue)
-  }, [setSpread, setValue, spreadValue])
+    if (step === 2) setSpread(spreadValue)
+  }, [setSpread, spreadValue, step])
 
   console.debug('spreadVal', spreadValue, 'Spread', spread)
   useEffect(() => {
