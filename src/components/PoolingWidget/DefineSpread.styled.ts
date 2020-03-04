@@ -5,8 +5,7 @@ import { MEDIA } from 'const'
 export const DefineSpreadWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
-  width: 50%;
-  width: calc(50% - 1.5rem);
+  width: calc(100% - 1.5rem);
   padding: 0;
   box-sizing: border-box;
 
