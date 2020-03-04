@@ -281,6 +281,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   return (
     <Wrapper>
       <StyledSelect
+        blurInputOnSelect
         isSearchable
         isDisabled={isDisabled}
         styles={customSelectStyles}
