@@ -253,10 +253,7 @@ const PoolingInterface: React.FC = () => {
         <FormContext {...methods}>
           <form onSubmit={handleSubmit(sendTransaction)}>
             <h2>New Liquidity Order</h2>
-            <ProgressBar
-              step={step}
-              stepArray={['Select Tokens', 'Define Spread & Finish' /* , 'Create Liquidity' */]}
-            />
+            <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
 
             <ContentWrapper>
               <StepDescription step={step} />

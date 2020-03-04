@@ -33,7 +33,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
         // TODO: Add Link
         // https://github.com/gnosis/dex-react/issues/615
         return {
-          title: '2. Define your log & review new liquidity summary:',
+          title: '2. Define your spread and review:',
           subtext: `
             <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
             <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
