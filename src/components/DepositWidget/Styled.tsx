@@ -98,7 +98,6 @@ export const RowClaimButton = styled.button`
 export const RowClaimSpan = styled.span`
   font-size: 1.2rem;
   line-height: 1;
-  display: block;
   border: 0.1rem solid #63ab52;
   border-radius: 2rem;
   background: transparent;
