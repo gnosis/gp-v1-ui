@@ -67,20 +67,16 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
 
   return (
     <>
-      <div className="header" style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div className="header">
         <h2>Select token</h2>
         <button type="button" onClick={onCloseButtonClick}>
           X
         </button>
       </div>
-      <div className="searchContainer" style={{ display: 'flex' }}>
+      <div className="searchContainer">
         <FontAwesomeIcon icon={faSearch} />
         <input
           ref={inputRef}
-          style={{
-            width: '100%',
-            boxSizing: 'border-box',
-          }}
           autoCorrect="off"
           autoComplete="off"
           spellCheck="false"

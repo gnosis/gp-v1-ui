@@ -70,6 +70,16 @@ const Wrapper = styled.div`
   .tokenSelectBox {
     position: relative;
     .react-select__menu {
+      // TODO: style custom menu header and search input
+      .header {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .searchContainer {
+        display: flex;
+      }
+
       &::before {
         @media ${MEDIA.mediumUp} {
           content: '';
