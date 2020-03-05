@@ -284,12 +284,12 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // When the search input is focused, force menu to remain open
   const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
 
-  const onKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const onKeyDown = useCallback((e): void => {
     if (e.key === 'Escape') {
       // Close menu on `Escape`
       e.stopPropagation()
       setIsFocused(false)
-    } else if (!e.currentTarget.value && e.key === ' ') {
+    } else if (!e.target.value && e.key === ' ') {
       // Prevent a space when input in empty.
       // That closes the menu. (/shrug)
       e.preventDefault()
@@ -300,6 +300,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
     <Wrapper>
       <StyledSelect
         blurInputOnSelect
+        // menuShouldBlockScroll
         isSearchable
         isDisabled={isDisabled}
         styles={customSelectStyles}
