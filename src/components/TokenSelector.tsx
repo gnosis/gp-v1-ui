@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo, useState, useCallback } from 'react'
+import React, { CSSProperties, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
@@ -296,11 +296,29 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
     }
   }, [])
 
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const onDocumentClick = useCallback(e => {
+    const menu = wrapperRef.current?.querySelector('.react-select__menu')
+    // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
+    // If neither, hand focus back to react-select but turning isFocused off
+    if (!wrapperRef.current?.contains(e.target) || !menu) {
+      setIsFocused(false)
+    }
+  }, [])
+
+  // mount and umount hooks for watching click events
+  useEffect(() => {
+    window.addEventListener('mousedown', onDocumentClick)
+
+    return (): void => window.removeEventListener('mousedown', onDocumentClick)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
-    <Wrapper>
+    <Wrapper ref={wrapperRef}>
       <StyledSelect
         blurInputOnSelect
-        // menuShouldBlockScroll
         isSearchable
         isDisabled={isDisabled}
         styles={customSelectStyles}
