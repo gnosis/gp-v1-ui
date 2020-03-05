@@ -129,6 +129,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
                 value={amountInput}
                 onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
                 placeholder="0"
+                autoFocus
               />
             </div>
             {/* Error Message */}
