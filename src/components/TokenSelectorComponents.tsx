@@ -12,6 +12,20 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
     setValue,
   } = props
 
+  const childrenRef = useRef(props.children)
+  childrenRef.current = props.children
+
+  const wrappedOnKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (React.Children.count(childrenRef.current) === 1 && e.key === 'Enter') {
+        // the only child is noOptionsMessage
+        e.preventDefault()
+      }
+      onKeyDown?.(e)
+    },
+    [onKeyDown],
+  )
+
   const ariaAttributes = {
     'aria-label': props.selectProps['aria-label'],
     'aria-labelledby': props.selectProps['aria-labelledby'],
@@ -67,7 +81,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
           placeholder="Search by token Name, Symbol or Address"
           value={inputValue}
           onChange={onChange}
-          onKeyDown={onKeyDown}
+          onKeyDown={wrappedOnKeyDown}
           onMouseDown={onInputClick}
           onTouchEnd={onInputClick}
           onFocus={onMenuInputFocus}
