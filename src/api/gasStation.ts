@@ -1,4 +1,5 @@
 import { WalletApi } from './wallet/WalletApi'
+import { logDebug } from 'utils'
 
 const GAS_STATIONS = {
   1: 'https://safe-relay.gnosis.pm/api/v1/gas-station/',
@@ -8,7 +9,7 @@ const GAS_STATIONS = {
 const GAS_PRICE_LEVEL: Exclude<keyof GasStationResponse, 'lastUpdate'> = 'standard'
 
 let cacheKey = ''
-let cachedGasPrice: undefined | string
+let cachedGasPrice: string
 
 const constructKey = ({ blockNumber, chainId }: GasPriceCacheDeps): string => chainId + '@' + blockNumber
 
@@ -26,6 +27,19 @@ interface GasStationResponse {
   fastest: string
 }
 
+export const earmarkAllButLastDigit = (input: string, userPrint: string): string => {
+  if (!userPrint) return input
+
+  // don't replace 8000 -> 1201, only if most significant digit is untouched
+  // 80000 -> 81201
+  if (input.length <= userPrint.length) return input
+
+  const markedGasPrice = input.slice(0, -userPrint.length) + userPrint
+
+  logDebug('Gap price', input, '->', markedGasPrice)
+  return markedGasPrice
+}
+
 const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string | undefined> => {
   const { blockchainState } = walletApi
 
@@ -36,7 +50,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
   // only fetch new gasPrice when chainId or blockNumber changed
   const key = constructKey({ chainId, blockNumber: blockHeader && blockHeader.number })
   if (key === cacheKey) {
-    return cachedGasPrice
+    return earmarkAllButLastDigit(cachedGasPrice, await walletApi.userPrintAsync)
   }
 
   const gasStationURL = GAS_STATIONS[chainId]
@@ -52,7 +66,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
       cacheKey = key
       cachedGasPrice = gasPrice
 
-      return gasPrice
+      return earmarkAllButLastDigit(gasPrice, await walletApi.userPrintAsync)
     }
   } catch (error) {
     console.error('[api:gasStation] Error fetching gasPrice from', gasStationURL, error)
