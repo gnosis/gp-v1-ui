@@ -187,3 +187,9 @@ export const decoderFactory = <T extends string>({
     return result
   }
 }
+
+// OUR encoder and decoder
+
+export const encoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
+
+export const decoder = decoderFactory({ sentinel: SENTINEL, flags: FLAGS, prefix: '\\d+', postfix: '$' })
