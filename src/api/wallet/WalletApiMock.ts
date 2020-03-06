@@ -23,6 +23,7 @@ export class WalletApiMock implements WalletApi {
     chainId: 1,
     blockHeader: null,
   }
+  public userPrintAsync = Promise.resolve('')
 
   public constructor() {
     this._connected = process.env.AUTOCONNECT === 'true'
