@@ -139,3 +139,51 @@ export const encoderFactory = <T extends string>({ sentinel = '', flags }: Encod
   }
 }
 
+// Decoder
+
+interface DecoderFactoryInput<T extends string> extends EncoderFactoryInput<T> {
+  prefix?: string
+  postfix?: string
+}
+
+type DecodedFlags<T extends string> = {
+  [K in T]: FlagValueType
+}
+
+export type Decoder<T extends string> = (code: string) => DecodedFlags<T> | null
+
+export const decoderFactory = <T extends string>({
+  sentinel = '',
+  flags,
+  prefix = '',
+  postfix = '',
+}: DecoderFactoryInput<T>): Decoder<T> => {
+  if (flags.length === 0) throw new Error('Flags array must not be empty')
+
+  const pattern = prefix + sentinel + flags.map(flag => `(\\d{${flag.meaningfulDigits}})`).join('') + postfix
+  const regexp = new RegExp(pattern)
+
+  return (code): DecodedFlags<T> | null => {
+    const match = code.match(regexp)
+
+    if (!match) return null
+
+    const result = {} as DecodedFlags<T>
+
+    for (let i = 0; i < flags.length; ++i) {
+      const group = match[i + 1]
+
+      if (!group) return null
+
+      const flag = flags[i]
+      const number = Number(group)
+      // if number isn't a valid flag
+      // short-circuit return
+      if (number >= flag.values.length) return null
+
+      result[flag.name] = flag.values[number]
+    }
+
+    return result
+  }
+}
