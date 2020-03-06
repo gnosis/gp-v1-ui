@@ -1,5 +1,5 @@
 import { encoderFactory, decoderFactory, Flag } from 'utils'
-import { earmarkGasPrice } from 'api/gasStation'
+import { earmarkAllButLastDigit } from 'api/gasStation'
 
 describe('flagCodes', () => {
   const flagA: Flag<'flagA'> = {
@@ -221,6 +221,41 @@ describe('flagCodes', () => {
       const decoded = decoder('prefix123SEN102postfix') // 02 >= flagB.values.length
 
       expect(decoded).toBeNull()
+    })
+  })
+
+  describe('earmark function', () => {
+    const input = '10000000001'
+
+    it('marks input', () => {
+      const print = 'SEN108'
+      const marked = earmarkAllButLastDigit(input, print)
+
+      expect(print.length).toBeLessThan(input.length)
+
+      expect(marked).toEqual('10000SEN108')
+    })
+    it('marks input when print.length < input.length', () => {
+      const print = 'SEN1081234'
+      const marked = earmarkAllButLastDigit(input, print)
+
+      expect(print.length).toEqual(input.length - 1)
+
+      expect(marked).toEqual('1SEN1081234')
+    })
+    it('does not mark when print.length >= input.length', () => {
+      const print = 'SEN10812345'
+      const marked = earmarkAllButLastDigit(input, print)
+
+      expect(print).toHaveLength(input.length)
+
+      expect(marked).toEqual(input)
+    })
+    it('does not mark when print is empty', () => {
+      const print = ''
+      const marked = earmarkAllButLastDigit(input, print)
+
+      expect(marked).toEqual(input)
     })
   })
 })
