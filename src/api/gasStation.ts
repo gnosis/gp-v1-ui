@@ -36,7 +36,7 @@ export const earmarkAllButLastDigit = (input: string, userPrint: string): string
 
   const markedGasPrice = input.slice(0, -userPrint.length) + userPrint
 
-  logDebug('Gap price', input, '->', markedGasPrice)
+  logDebug('Gas price', input, '->', markedGasPrice)
   return markedGasPrice
 }
 
@@ -60,6 +60,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
   try {
     const response = await fetch(gasStationURL)
     const json: GasStationResponse = await response.json()
+    console.log('json', json)
 
     const gasPrice = json[GAS_PRICE_LEVEL]
     if (gasPrice) {
