@@ -89,3 +89,53 @@ const browser: Flag<DxFlagName> = {
 
 const FLAGS: Flag<DxFlagName>[] = [provider, mobile, browser]
 
+// GENERIC flag functions
+
+type FlagValueType = Flag<never>['values'][number]
+
+type FlagValuesObject<T extends string> = Record<T, FlagValueType>
+
+// Encoder
+
+interface EncoderFactoryInput<T extends string> {
+  sentinel?: string
+  flags: Flag<T>[]
+}
+
+export type Encoder<T extends string> = (flagValues: FlagValuesObject<T>) => string
+
+type FlagMap = {
+  [K in FlagValueType]: number
+}
+
+const mapValsToIndex = (array: FlagValueType[]): FlagMap => {
+  return array.reduce<FlagMap>((accum, val, ind) => {
+    accum[val] = ind
+    return accum
+  }, {})
+}
+
+export const encoderFactory = <T extends string>({ sentinel = '', flags }: EncoderFactoryInput<T>): Encoder<T> => {
+  if (flags.length === 0) throw new Error('Flags array must not be empty')
+
+  const flagsWithMaps = flags.map(flag => ({
+    ...flag,
+    map: mapValsToIndex(flag.values),
+  }))
+
+  return (flagValues): string => {
+    return (
+      sentinel +
+      flagsWithMaps
+        .map(flag => {
+          const detectedValue = flagValues[flag.name]
+          // if detected as a value not already in flags.values, default to 0 index
+          const flagValueIndex = flag.map[detectedValue] ?? 0
+
+          return String(flagValueIndex).padStart(flag.meaningfulDigits, '0')
+        })
+        .join('')
+    )
+  }
+}
+
