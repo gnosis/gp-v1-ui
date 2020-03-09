@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 
 import { DefineSpreadWrapper } from './DefineSpread.styled'
 
@@ -19,12 +19,6 @@ interface DefineSpreadProps {
 const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
   const { errors, register } = useFormContext()
 
-  const onKeyPress = useCallback((event: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-    }
-  }, [])
-
   const errorMessage = (errors?.spread as FieldError)?.message
 
   return (
@@ -39,7 +33,6 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
         step={0.1}
         disabled={isSubmitting}
         ref={register}
-        onKeyPress={onKeyPress}
         tooltip={(errorMessage && formatErrorMessage(errorMessage)) || 'Value between 0 and 100, not inclusive'}
         showErrorStyle={!!errorMessage}
         tooltipBgColor={!!errorMessage ? '#f24949' : '#2f3e4e'}
