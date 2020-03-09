@@ -42,6 +42,7 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
         onKeyPress={onKeyPress}
         tooltip={(errorMessage && formatErrorMessage(errorMessage)) || 'Value between 0 and 100, not inclusive'}
         showErrorStyle={!!errorMessage}
+        tooltipBgColor={!!errorMessage ? '#f24949' : '#2f3e4e'}
       />
     </DefineSpreadWrapper>
   )
