@@ -32,10 +32,11 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount, parseBigNumber } from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPrice } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
+import { PendingTxObj } from 'api/exchange/ExchangeApi'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -314,13 +315,19 @@ const TradeWidget: React.FC = () => {
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
-  const tokens = useMemo(() => tokenListApi.getTokens(fallBackNetworkId), [fallBackNetworkId])
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
   const priceInputId = TradeFormTokenId.price
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
+  const { balances } = useTokenBalances()
+
+  // If user is connected, use balances, otherwise get the default list
+  const tokens = useMemo(
+    () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(fallBackNetworkId)),
+    [balances, fallBackNetworkId, isConnected],
+  )
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
@@ -399,8 +406,6 @@ const TradeWidget: React.FC = () => {
     claiming: false,
   }
 
-  const { balances } = useTokenBalances()
-
   const sellTokenBalance = useMemo(
     () => getToken('symbol', sellToken.symbol, balances) || { ...sellToken, ...NULL_BALANCE_TOKEN },
     [NULL_BALANCE_TOKEN, balances, sellToken],
@@ -414,9 +419,9 @@ const TradeWidget: React.FC = () => {
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
 
   const swapTokens = useCallback((): void => {
-    setSellToken(receiveToken)
-    setReceiveToken(sellToken)
-  }, [receiveToken, sellToken])
+    setSellToken(receiveTokenBalance)
+    setReceiveToken(sellTokenBalance)
+  }, [receiveTokenBalance, sellTokenBalance])
 
   const onSelectChangeFactory = useCallback(
     (
@@ -437,7 +442,10 @@ const TradeWidget: React.FC = () => {
   const sameToken = sellToken === receiveToken
 
   const savePendingTransactions = useCallback(
-    (txHash: string, { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress }): void => {
+    (
+      txHash: string,
+      { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress, validFrom, validUntil },
+    ): void => {
       // reset form on successful order placing
       reset(DEFAULT_FORM_STATE)
       setUnlimited(false)
@@ -447,9 +455,8 @@ const TradeWidget: React.FC = () => {
       // pendingTxHash = txHash
       toast.info(<TxNotification txHash={txHash} />)
 
-      const newTxState = {
-        txHash,
-        id: 'PENDING ORDER',
+      const pendingOrder: PendingTxObj = {
+        id: Date.now() + '', // Uses a temporal unique id
         buyTokenId,
         sellTokenId,
         priceNumerator,
@@ -457,11 +464,12 @@ const TradeWidget: React.FC = () => {
         user: userAddress,
         remainingAmount: ZERO,
         sellTokenBalance: ZERO,
-        validFrom: 0,
-        validUntil: 0,
+        validFrom,
+        validUntil,
+        txHash,
       }
 
-      return dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+      return dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
     },
     [dispatch, reset, setIsSubmitting],
   )
@@ -483,6 +491,10 @@ const TradeWidget: React.FC = () => {
       // block form
       setIsSubmitting(true)
 
+      // TODO: Review this logic. This should be calculated in the same place where we send the tx
+      const currentBatch = dateToBatchId(new Date())
+      const validFromBatchId = currentBatch + validFrom
+      const validUntilBatchId = currentBatch + validUntil
       let success: boolean
       // ASAP ORDER
       if (validFrom === 0) {
@@ -501,10 +513,13 @@ const TradeWidget: React.FC = () => {
               return savePendingTransactions(txHash, {
                 buyTokenId: buyToken.id,
                 sellTokenId: sellToken.id,
-                priceNumerator: sellAmount,
-                priceDenominator: buyAmount,
+                priceNumerator: buyAmount,
+                priceDenominator: sellAmount,
                 networkId,
                 userAddress,
+                sellToken,
+                validFrom: validFromBatchId,
+                validUntil: validUntilBatchId,
               })
             },
           },
@@ -534,6 +549,8 @@ const TradeWidget: React.FC = () => {
                 priceDenominator: buyAmount,
                 networkId,
                 userAddress,
+                validFrom: validFromBatchId,
+                validUntil: validUntilBatchId,
               })
             },
           },
@@ -609,7 +626,7 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="Sell"
-            onSelectChange={onSelectChangeFactory(setSellToken, receiveToken)}
+            onSelectChange={onSelectChangeFactory(setSellToken, receiveTokenBalance)}
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
@@ -621,11 +638,11 @@ const TradeWidget: React.FC = () => {
             <img src={switchTokenPair} />
           </IconWrapper>
           <TokenRow
-            selectedToken={receiveToken}
+            selectedToken={receiveTokenBalance}
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="Receive at least"
-            onSelectChange={onSelectChangeFactory(setReceiveToken, sellToken)}
+            onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={2}

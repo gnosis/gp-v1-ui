@@ -9,10 +9,12 @@ import { TokenBalanceDetails } from 'types'
 import { TokenLocalState } from 'reducers-actions'
 import { createFlux } from '../data'
 
-const fakeRowState: TokenLocalState = {
-  enabling: new Set(),
-  claiming: new Set(),
-  highlighted: new Set(),
+const fakeRowState: Record<keyof TokenLocalState, boolean> = {
+  enabling: false,
+  claiming: false,
+  depositing: false,
+  withdrawing: false,
+  highlighted: false,
 }
 
 const initialTokenBalanceDetails = {
@@ -37,10 +39,10 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}, rowProps = fakeRo
     ...params,
   }
 
-  const onSubmitDeposit = jest.fn<Promise<void>, BN[]>()
-  const onClaim = jest.fn<Promise<void>, void[]>()
-  const onEnableToken = jest.fn<Promise<void>, void[]>()
-  const onSubmitWithdraw = jest.fn<Promise<void>, BN[]>()
+  const onSubmitDeposit = jest.fn<Promise<void>, [BN, Function]>()
+  const onClaim = jest.fn<Promise<void>, []>()
+  const onEnableToken = jest.fn<Promise<void>, []>()
+  const onSubmitWithdraw = jest.fn<Promise<void>, [BN, Function]>()
   return (
     <Row
       tokenBalances={tokenBalanceDetails}
@@ -125,7 +127,7 @@ describe('<Row /> style', () => {
     const wrapper = render(
       _createRow(undefined, {
         ...fakeRowState,
-        highlighted: fakeRowState.highlighted.add(initialTokenBalanceDetails.address),
+        highlighted: true,
       }),
     )
     expect(wrapper.attr('class')).toMatch(/highlight/)
@@ -135,8 +137,8 @@ describe('<Row /> style', () => {
     const wrapper = render(
       _createRow(undefined, {
         ...fakeRowState,
-        highlighted: new Set(),
-        enabling: fakeRowState.enabling.add(initialTokenBalanceDetails.address),
+        highlighted: false,
+        enabling: true,
       }),
     )
     expect(wrapper.attr('class')).toMatch(/enabling/)

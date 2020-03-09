@@ -167,7 +167,7 @@ const PoolingInterface: React.FC = () => {
 
             batchedUpdates(() => {
               orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-                const newTxState = {
+                const pendingOrder = {
                   txHash,
                   id: 'PENDING ORDER',
                   buyTokenId,
@@ -182,7 +182,7 @@ const PoolingInterface: React.FC = () => {
                 }
 
                 setIsSubmitting(false)
-                dispatch(savePendingOrdersAction({ orders: newTxState, networkId, userAddress }))
+                dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
               })
             })
           },

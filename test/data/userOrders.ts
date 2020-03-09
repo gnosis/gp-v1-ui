@@ -5,7 +5,8 @@ import { UNLIMITED_ORDER_AMOUNT, MAX_BATCH_ID } from '@gnosis.pm/dex-js'
 
 import { dateToBatchId } from 'utils'
 
-import { USER_1, BATCH_ID } from './basic'
+import { USER_1, BATCH_ID, TX_HASH } from './basic'
+import { Order } from 'api/exchange/ExchangeApi'
 
 const NOW = Date.now()
 
@@ -59,7 +60,9 @@ export const exchangeOrders = {
   ],
 }
 
-export const pendingOrders = {
+export type OrderWithTx = Order & { txHash: string }
+export type OrdersWithTxByUser = { [user: string]: OrderWithTx[] }
+export const pendingOrders: OrdersWithTxByUser = {
   [USER_1]: [
     {
       buyTokenId: 7, // DAI
@@ -69,6 +72,7 @@ export const pendingOrders = {
       priceNumerator: new BN('1315273500000000000000'),
       priceDenominator: new BN('876849000'),
       remainingAmount: new BN('876849000'),
+      txHash: TX_HASH,
     },
   ],
 }
