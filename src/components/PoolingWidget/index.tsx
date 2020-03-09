@@ -27,21 +27,6 @@ import { Network, Receipt } from 'types'
 import { maxAmountsForSpread, resolverFactory } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST } from 'const'
 
-const validationSchema = joi.object({
-  spread: joi
-    .number()
-    .positive()
-    .precision(1)
-    .greater(0.0)
-    .less(100.0)
-    // dont autocast numbers
-    // to their required precision, throw instead
-    .strict()
-    .required(),
-})
-
-const numberResolver = resolverFactory('number', validationSchema)
-
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
 
@@ -98,6 +83,25 @@ const ContentWrapper = styled.div`
   line-height: inherit;
 `
 
+interface PoolingFormData {
+  spread: string
+}
+
+const validationSchema = joi.object({
+  spread: joi
+    .number()
+    .positive()
+    .precision(1)
+    .greater(0.0)
+    .less(100.0)
+    // dont autocast numbers
+    // to their required precision, throw instead
+    .strict()
+    .required(),
+})
+
+const numberResolver = resolverFactory<PoolingFormData, {}>('number', validationSchema)
+
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
   const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
@@ -112,10 +116,9 @@ const PoolingInterface: React.FC = () => {
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 
-  const methods = useForm({
+  const methods = useForm<PoolingFormData>({
     defaultValues: {
-      // @ts-ignore
-      spread,
+      spread: spread.toString(),
     },
     mode: 'onChange',
     validationResolver: numberResolver,
