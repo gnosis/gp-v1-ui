@@ -1,4 +1,5 @@
-import { ValidationResult, ValidationError, ObjectSchema } from '@hapi/joi'
+import { ValidationError, ObjectSchema } from '@hapi/joi'
+import { ValidationResolver } from 'react-hook-form'
 
 export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
 
@@ -16,31 +17,33 @@ export function validatePositive(value: string, constraint = 0): true | string {
   return Number(value) > constraint || 'Invalid amount'
 }
 
-export const resolverFactory = (type: string, validationSchema: ObjectSchema<unknown>) => (
-  data: FormData,
-): { values: ValidationResult; errors: ValidationError | {} } => {
-  const castedData =
+export const resolverFactory = <D, CustomContext = {}>(type: string, validationSchema: ObjectSchema<unknown>) => (
+  data: D,
+): ReturnType<ValidationResolver<D, CustomContext>> => {
+  const castedData: D =
     type === 'number'
       ? Object.keys(data).reduce((acc, key) => {
           const oldValue = data[key]
           const castedValue = Number(oldValue)
-          const castedObj = { ...acc, [key]: castedValue }
+          const castedObj: D = { ...acc, [key]: castedValue }
 
           return castedObj
-        }, {})
+        }, {} as D)
       : data
 
-  const { error, value: values } = validationSchema.validate(castedData)
+  const { error, value }: { value: typeof castedData | undefined; error?: ValidationError } = validationSchema.validate(
+    castedData,
+  )
 
   return {
-    values: error ? {} : values,
+    values: error || !value ? {} : data,
     errors: error
       ? error.details.reduce((previous, currentError) => {
           return {
             ...previous,
             [currentError.path[0]]: currentError,
           }
-        }, {})
+        }, {} as ValidationError)
       : {},
   }
 }
