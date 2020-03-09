@@ -13,15 +13,15 @@ beforeEach(() => {
 })
 
 describe('MOCK: Basic view functions', () => {
-  test('Mock API Token list has length 11', () => {
+  test('Mock API Token list has length 12', () => {
     const tokens = instanceMock.getTokens(1)
-    expect(tokens.length).toBe(11)
+    expect(tokens.length).toBe(12)
   })
 })
 
 describe('REAL: Basic view functions', () => {
-  test('API Token list has length 11', () => {
+  test('API Token list has length 12', () => {
     const tokens = instanceReal.getTokens(1)
-    expect(tokens.length).toBe(11)
+    expect(tokens.length).toBe(12)
   })
 })
