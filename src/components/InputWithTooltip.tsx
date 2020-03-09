@@ -6,6 +6,7 @@ import styled from 'styled-components'
 
 interface InputProps extends Partial<React.ComponentPropsWithRef<'input'>> {
   tooltip: ReactNode
+  tooltipBgColor?: string
   showErrorStyle?: boolean
   placement?: Placement
 }
@@ -16,14 +17,23 @@ type TargetProps = Pick<
 >
 
 const Input = styled.input<{ $error?: boolean }>`
-  box-shadow: ${({ $error }): string => ($error ? '0px 0px 1.7px 0.4px #f24949' : '')};
+  ${({ $error }): string | undefined | false =>
+    $error &&
+    `
+    box-shadow: 0px 0px 0px 2px #f24949;
+    color: #f24949 !important;
+  `}
+
+  transition: all 0.15s ease-in-out;
   &:focus {
-    border-color: ${({ $error }): string => ($error ? '#f24949 !important' : 'initial')};
+    ${({ $error }): string | undefined | false => $error && 'border-color: #f24949 !important;'}
+    box-shadow: none;
+    color: initial;
   }
 `
 
 const InputWithTooltip: React.RefForwardingComponent<HTMLInputElement, InputProps> = (
-  { tooltip, placement, onFocus, onBlur, onMouseEnter, onMouseLeave, showErrorStyle, ...props },
+  { tooltip, tooltipBgColor, placement, onFocus, onBlur, onMouseEnter, onMouseLeave, showErrorStyle, ...props },
   ref,
 ) => {
   const { targetProps, tooltipProps } = usePopperDefault<HTMLInputElement>(placement)
@@ -75,7 +85,9 @@ const InputWithTooltip: React.RefForwardingComponent<HTMLInputElement, InputProp
   return (
     <>
       <Input $error={showErrorStyle} {...props} {...finalTargetProps} />
-      <Tooltip {...tooltipProps}>{tooltip}</Tooltip>
+      <Tooltip bgColor={tooltipBgColor} {...tooltipProps}>
+        {tooltip}
+      </Tooltip>
     </>
   )
 }
