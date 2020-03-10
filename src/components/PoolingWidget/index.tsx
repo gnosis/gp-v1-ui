@@ -24,7 +24,7 @@ import { tokenListApi } from 'api'
 
 import { Network, Receipt } from 'types'
 
-import { maxAmountsForSpread, resolverFactory } from 'utils'
+import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST } from 'const'
 
 export const FIRST_STEP = 1
@@ -83,8 +83,8 @@ const ContentWrapper = styled.div`
   line-height: inherit;
 `
 
-interface PoolingFormData {
-  spread: string
+interface PoolingFormData<T = string> {
+  spread: T
 }
 
 const validationSchema = joi.object({
@@ -100,7 +100,7 @@ const validationSchema = joi.object({
     .required(),
 })
 
-const numberResolver = resolverFactory<PoolingFormData, {}>('number', validationSchema)
+const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validationSchema, 'number')
 
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
