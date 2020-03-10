@@ -25,7 +25,6 @@ const InputWithTooltip: React.RefForwardingComponent<HTMLInputElement, InputProp
     const composedProps: TargetProps = {}
     composedProps.onBlur = onBlur
       ? (event): void => {
-          console.log('event', event.currentTarget)
           onBlur(event)
           targetProps.onBlur()
         }
