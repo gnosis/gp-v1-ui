@@ -73,44 +73,78 @@ const StepDescription: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => 
 )
 
 const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
-  const { title, subtext }: { title: string; subtext?: string } = useMemo(() => {
+  const { title, subtext }: { title: string; subtext?: React.ReactNode } = useMemo(() => {
     switch (step) {
       case 1:
         // TODO: Add Link
         // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '1. Select at least two of your trusted stablecoins',
-          subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
-          <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
-          <ul>
-            <li><img src=${checkIcon} />No maintenance needed</li>
-            <li><img src=${checkIcon} />No gas costs for trades</li>
-            <li><img src=${checkIcon} />Cancellation possible at any time</li>
-          </ul>
-          <p class="not-implemented">            
-            <a href="#" target="_blank" rel="noopener">Learn more about liquidity provision.</a>
-          </p>`,
+          subtext: (
+            <>
+              <p>
+                Select two or more stablecoins you want to include in your liquidity provision and you believe are worth
+                $1
+              </p>
+              <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
+              <ul>
+                <li>
+                  <img src={checkIcon} />
+                  No maintenance needed
+                </li>
+                <li>
+                  <img src={checkIcon} />
+                  No gas costs for trades
+                </li>
+                <li>
+                  <img src={checkIcon} />
+                  Cancellation possible at any time
+                </li>
+              </ul>
+              <p className="not-implemented">
+                <a href="#" target="_blank" rel="noopener">
+                  Learn more about liquidity provision.
+                </a>
+              </p>
+            </>
+          ),
         }
       case 2:
         // TODO: Add Link
         // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '2. Define your spread',
-          subtext: `<p>The spread defines the percentage you want to sell above $1, and buy below $1 between all selected tokens</p>
-          <p class="not-implemented">            
-            <a href="#" target="_blank" rel="noopener">Learn more about the spread.</a>
-          </p>
-          `,
+          subtext: (
+            <>
+              <p>
+                The spread defines the percentage you want to sell above $1, and buy below $1 between all selected
+                tokens
+              </p>
+              <p className="not-implemented">
+                <a href="#" target="_blank" rel="noopener">
+                  Learn more about the spread.
+                </a>
+              </p>
+            </>
+          ),
         }
       case 3:
         return {
           title: '3. New liquidity summary:',
-          subtext: `
-            <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
-            <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
-            <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
-            <p><b>The exchange only uses your fully available exchange balance to execute trades.</b></p>
-          `,
+          subtext: (
+            <>
+              <p>
+                While you can create orders for tokens without having an exchange balance,{' '}
+                <u>these orders can only be executed</u> if any deposited balance is available in the{' '}
+                <b>exchange wallet</b>, to be found under menu option &apos;Balances&apos;.
+              </p>
+              <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
+              <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
+              <p>
+                <b>The exchange only uses your fully available exchange balance to execute trades.</b>
+              </p>
+            </>
+          ),
         }
       default:
         return { title: 'An error occurred, please try again' }
@@ -120,7 +154,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
   return (
     <div>
       <ProgressStepText as="h2">{title}</ProgressStepText>
-      {subtext && <div className="liqContent" dangerouslySetInnerHTML={{ __html: subtext }} />}
+      {subtext && <div className="liqContent">{subtext}</div>}
     </div>
   )
 }
