@@ -60,7 +60,6 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
   try {
     const response = await fetch(gasStationURL)
     const json: GasStationResponse = await response.json()
-    console.log('json', json)
 
     const gasPrice = json[GAS_PRICE_LEVEL]
     if (gasPrice) {
