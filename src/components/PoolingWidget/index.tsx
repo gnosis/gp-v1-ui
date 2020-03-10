@@ -136,7 +136,7 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
               <p>
                 While you can create orders for tokens without having an exchange balance,{' '}
                 <u>these orders can only be executed</u> if any deposited balance is available in the{' '}
-                <b>exchange wallet</b>, to be found under menu option 'Balances'.
+                <b>exchange wallet</b>, to be found under menu option &apos;Balances&apos;.
               </p>
               <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
               <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
