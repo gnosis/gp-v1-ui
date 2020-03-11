@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
+import { TooltipWrapper } from 'components/Tooltip'
 import {
   BarWrapper,
   StepSeparator,
@@ -360,9 +361,11 @@ const PoolingInterface: React.FC = () => {
           )}
           {/* // REGULAR CONTINUE BUTTONS (STEPS 1 & 2) */}
           {step !== 3 ? (
-            <button type="button" disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
-              Continue
-            </button>
+            <TooltipWrapper hover={selectedTokensMap.size < 2} tooltip={'Please select at least 2 tokens to continue'}>
+              <button type="button" disabled={selectedTokensMap.size < 2} onClick={(): void => nextStep()}>
+                Continue
+              </button>
+            </TooltipWrapper>
           ) : // STEP 3 - TXRECEIPT OR NOT?
           txReceipt ? (
             // TX RCEIPT SUCCESS
