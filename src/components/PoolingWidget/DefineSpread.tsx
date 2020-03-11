@@ -5,11 +5,7 @@ import { DefineSpreadWrapper } from './DefineSpread.styled'
 import InputWithTooltip from '../InputWithTooltip'
 
 import { useFormContext, FieldError } from 'react-hook-form'
-
-function formatErrorMessage(errorString: string): string {
-  const cleanedString = errorString.replace(/"/g, '')
-  return cleanedString[0].toUpperCase() + cleanedString.slice(1)
-}
+import { FormInputError } from 'components/TradeWidget/FormMessage'
 
 interface DefineSpreadProps {
   isSubmitting: boolean
@@ -28,15 +24,15 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
         <small>percentage you want to sell above $1, and buy below $1 between all selected tokens</small>
       </p>
       <InputWithTooltip
+        className={errorMessage ? 'error' : ''}
         name="spread"
         type="number"
         step={0.1}
         disabled={isSubmitting}
         ref={register}
-        tooltip={(errorMessage && formatErrorMessage(errorMessage)) || 'Value between 0 and 100, not inclusive'}
-        showErrorStyle={!!errorMessage}
-        tooltipBgColor={!!errorMessage ? '#f24949' : '#2f3e4e'}
+        tooltip="Value between 0 and 100, not inclusive"
       />
+      <FormInputError errorMessage={errorMessage} />
     </DefineSpreadWrapper>
   )
 }
