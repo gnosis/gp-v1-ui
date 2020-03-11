@@ -206,6 +206,14 @@ export class WalletApiImpl implements WalletApi {
   public constructor(web3: Web3) {
     this._listeners = []
     this._web3 = web3
+
+    // update userPrint on screenSize change
+    // normally wouldn't happen
+    // only when browser window is resized
+    // or device is switched between landscape <-> portrait orientation
+    subscribeToScreenSizeChange(() => {
+      this.userPrintAsync = this._generateAsyncUserPrint()
+    })
   }
 
   public isConnected(): boolean | Promise<boolean> {
