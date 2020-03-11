@@ -130,7 +130,7 @@ interface Props {
 
 export function invertPrice(priceValue: string): string {
   const price = parseBigNumber(priceValue)
-  return price ? new BigNumber(1).div(price).toString() : ''
+  return price ? new BigNumber(1).div(price).toString(10) : ''
 }
 
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
