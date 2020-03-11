@@ -12,7 +12,7 @@ const GlobalStyles = createGlobalStyle`
 
   html, body {  
     width: 100%;
-    height: auto;
+    height: 100%;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
@@ -49,7 +49,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   #root {
-    min-height: 100vh;
+    height: 100%;
     font-size: 1.3rem;
   }
 
