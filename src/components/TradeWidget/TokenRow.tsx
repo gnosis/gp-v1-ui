@@ -76,7 +76,7 @@ const Wrapper = styled.div`
   }
 `
 
-const InputBox = styled.div`
+export const InputBox = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;

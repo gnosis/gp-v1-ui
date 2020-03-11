@@ -58,3 +58,9 @@ export const stringOrNumberResolverFactory = <FormData, CustomContext = {}>(
       : {},
   }
 }
+
+export function formatSchemaErrorMessage(errorString?: string): string | undefined {
+  if (!errorString) return undefined
+  const cleanedString = errorString.replace(/"/g, '')
+  return cleanedString[0].toUpperCase() + cleanedString.slice(1)
+}
