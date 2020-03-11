@@ -25,6 +25,7 @@ import { logDebug, toBN, encoder } from 'utils'
 import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
+import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
@@ -416,12 +417,14 @@ export class WalletApiImpl implements WalletApi {
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
   }
 
-  // new userPrint is generated when provider changes
+  // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
   private async _generateAsyncUserPrint(): Promise<string> {
     const { name: providerName } = this.getProviderInfo()
 
     const mobile = Web3Connect.isMobile() ? 'mobile' : 'desktop'
+
+    const screenSize = getMatchingScreenSize()
 
     const { parseUserAgent } = await import(
       /* webpackChunkName: "detect-browser"*/
@@ -434,6 +437,7 @@ export class WalletApiImpl implements WalletApi {
       provider: providerName,
       mobile,
       browser: browserInfo?.name || '',
+      screenSize,
     }
 
     const encoded = encoder(flagObject)
