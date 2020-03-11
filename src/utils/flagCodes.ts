@@ -56,7 +56,7 @@ const mobile: Flag<DxFlagName> = {
 const browser: Flag<DxFlagName> = {
   name: 'browser',
   values: [
-    'unknown', // generic name for undetected provider
+    'unknown', // generic name for undetected browser
     'aol',
     'edge',
     'edge-ios',
