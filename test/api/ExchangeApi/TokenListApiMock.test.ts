@@ -1,21 +1,23 @@
-import { Network, TokenDetails } from 'types'
+import { Network } from 'types'
 
 import TokenListApiMock from 'api/tokenList/TokenListApiMock'
 import { TokenListApiImpl, TokenList } from 'api/tokenList/TokenListApi'
-import { tokenList } from '@gnosis.pm/dex-js'
+import { tokenList as testTokenList } from '../../data'
 
 let instanceMock: TokenList
 let instanceReal: TokenList
 
 beforeEach(() => {
-  instanceMock = new TokenListApiMock(tokenList as TokenDetails[])
+  instanceMock = new TokenListApiMock(testTokenList)
   instanceReal = new TokenListApiImpl([Network.Mainnet, Network.Rinkeby])
 })
 
+// TODO: These tests are dumb. Either do something meaningful or remove them entirely
+
 describe('MOCK: Basic view functions', () => {
-  test('Mock API Token list has length 12', () => {
+  test('Mock API Token list has length 7', () => {
     const tokens = instanceMock.getTokens(1)
-    expect(tokens.length).toBe(12)
+    expect(tokens.length).toBe(7)
   })
 })
 

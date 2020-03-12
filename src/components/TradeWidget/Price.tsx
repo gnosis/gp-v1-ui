@@ -1,13 +1,15 @@
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
-import { TokenDetails } from 'types'
 import { useFormContext } from 'react-hook-form'
-import { TradeFormData } from '.'
-import BigNumber from 'bignumber.js'
+import { invertPrice } from '@gnosis.pm/dex-js'
+
+import { TokenDetails } from 'types'
 import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
+import { DEFAULT_PRECISION, MEDIA } from 'const'
+
+import { TradeFormData } from '.'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import { DEFAULT_PRECISION, MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -128,9 +130,9 @@ interface Props {
   priceInverseInputId: string
 }
 
-export function invertPrice(priceValue: string): string {
+export function invertPriceFromString(priceValue: string): string {
   const price = parseBigNumber(priceValue)
-  return price ? new BigNumber(1).div(price).toString() : ''
+  return price ? invertPrice(price).toString(10) : ''
 }
 
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
@@ -143,7 +145,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   const updateInversePrice = useCallback(
     (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
-      const priceInverseValue = invertPrice(priceValue)
+      const priceInverseValue = invertPriceFromString(priceValue)
       setValue(inverseInputId, priceInverseValue, true)
     },
     [setValue],

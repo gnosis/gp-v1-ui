@@ -34,7 +34,7 @@ import { Network, TokenDetails } from 'types'
 
 import { getToken, parseAmount, parseBigNumber, dateToBatchId } from 'utils'
 import { ZERO } from 'const'
-import Price, { invertPrice } from './Price'
+import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 
@@ -371,7 +371,7 @@ const TradeWidget: React.FC = () => {
       [validFromId]: validFromParam,
       [validUntilId]: validUntilParam,
       [priceInputId]: priceParam,
-      [priceInverseInputId]: invertPrice(priceParam),
+      [priceInverseInputId]: invertPriceFromString(priceParam),
     },
   })
   const { handleSubmit, reset, watch, setValue } = methods
