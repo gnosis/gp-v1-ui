@@ -177,7 +177,7 @@ export const StepButtonsWrapper = styled.div`
     }
   }
 
-  > button:last-of-type,
+  > button:last-of-type:not(#backButton),
   > a.finish {
     background: #218dff;
     border-radius: 0.6rem;
