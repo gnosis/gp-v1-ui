@@ -1,5 +1,4 @@
 import React, { useMemo, useEffect } from 'react'
-import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
