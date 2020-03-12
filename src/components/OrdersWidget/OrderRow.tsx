@@ -7,7 +7,7 @@ import lowBalanceIcon from 'assets/img/lowBalance.svg'
 import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
-import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice } from '@gnosis.pm/dex-js'
+import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -63,10 +63,10 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
   const [price, priceInverse] = useMemo((): string[] => {
     const price = calculatePrice({
-      buyToken: { amount: order.priceNumerator, decimals: buyToken.decimals },
-      sellToken: { amount: order.priceDenominator, decimals: sellToken.decimals },
+      numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
+      denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
     })
-    const priceInverse = new BigNumber(1).div(price)
+    const priceInverse = invertPrice(price)
 
     return [formatPrice(price), formatPrice(priceInverse)]
   }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])

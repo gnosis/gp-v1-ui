@@ -1,5 +1,5 @@
 import BN from 'bn.js'
-import { assert } from '@gnosis.pm/dex-js'
+import { assert, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
 import { TEN, UNLIMITED_ORDER_AMOUNT_BIGNUMBER } from 'const'
 import BigNumber from 'bignumber.js'
 
@@ -63,7 +63,7 @@ export function maxAmountsForSpread({
   assert(spread > 0 && spread < 100, 'Invalid spread amount')
 
   const MAX = UNLIMITED_ORDER_AMOUNT_BIGNUMBER
-  const ONE = new BigNumber(1)
+  const ONE = ONE_BIG_NUMBER
 
   const spreadPercentage = new BigNumber(spread).dividedBy(new BigNumber(100))
 
