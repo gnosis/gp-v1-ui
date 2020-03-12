@@ -4,7 +4,7 @@ import { TokenDetails } from 'types'
 import { useFormContext } from 'react-hook-form'
 import { TradeFormData } from '.'
 import BigNumber from 'bignumber.js'
-import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
+import { parseBigNumber, validatePositiveConstructor, validInputPattern } from 'utils'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import { DEFAULT_PRECISION, MEDIA } from 'const'
@@ -194,7 +194,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onChange={onChangePrice}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
-              validate: { positive: validatePositive },
+              validate: { positive: validatePositiveConstructor('Invalid price') },
               required: 'The price is required',
               min: 0,
             })}
@@ -216,7 +216,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onChange={onChangePriceInverse}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
-              validate: { positive: validatePositive },
+              validate: { positive: validatePositiveConstructor('Invalid price') },
               required: true,
             })}
             onKeyPress={onKeyPressPriceInverse}
