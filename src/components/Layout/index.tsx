@@ -9,6 +9,7 @@ import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
   width: 100%;
+  min-height: 100%;
   display: flex;
   flex-flow: column wrap;
 
