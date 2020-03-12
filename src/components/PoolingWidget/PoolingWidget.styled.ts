@@ -146,7 +146,7 @@ export const StepButtonsWrapper = styled.div`
     text-decoration: none;
   }
 
-  > button:first-of-type {
+  > button#backButton {
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     background: transparent;
