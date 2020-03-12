@@ -123,7 +123,6 @@ const GlobalStyles = createGlobalStyle`
     &::placeholder {
       color: inherit;
       font-size: inherit;
-      line-height: inherit;
     }
     
     &:focus::placeholder {
