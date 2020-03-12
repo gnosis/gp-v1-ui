@@ -102,6 +102,20 @@ const WrappedForm = styled.form`
   ${FormMessage} {
     font-size: 1.3rem;
     margin: 0.5rem 0 0;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+
+    > b {
+      margin: 0.3rem;
+    }
+    > i {
+      margin: 0.3rem 0 0.3rem 0;
+      font-style: normal;
+    }
+    > strong {
+      margin: 0.3rem 0 0.3rem 0.3rem;
+      font-size: 1.3rem;
+    }
   }
 `
 // Switcharoo arrows
