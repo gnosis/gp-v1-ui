@@ -27,8 +27,8 @@ const LiquidityButtons: React.FC<LiquidityButtonsProps> = ({
   txReceipt,
 }) => (
   <StepButtonsWrapper>
-    {/* REMOVE BACK BUTTON ON TXRECEIPT */}
-    {!txReceipt && (
+    {/* REMOVE BACK BUTTON ON LAST STEP (TX CONFIRMATION) */}
+    {step !== LAST_STEP && (
       <button type="button" disabled={disableBack} onClick={(): void => prevStep()}>
         Back
       </button>
