@@ -1,4 +1,4 @@
-import React, { CSSProperties, useMemo } from 'react'
+import React, { CSSProperties, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
@@ -8,6 +8,7 @@ import { formatAmount } from '@gnosis.pm/dex-js'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
+import { MenuList } from './TokenSelectorComponents'
 
 const Wrapper = styled.div`
   display: flex;
@@ -69,6 +70,16 @@ const Wrapper = styled.div`
   .tokenSelectBox {
     position: relative;
     .react-select__menu {
+      // TODO: style custom menu header and search input
+      .header {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .searchContainer {
+        display: flex;
+      }
+
       &::before {
         @media ${MEDIA.mediumUp} {
           content: '';
@@ -239,6 +250,10 @@ const customSelectStyles = {
   }),
 }
 
+const components = { MenuList }
+
+const noOptionsMessage = (): string => 'No results'
+
 interface Props {
   label?: string
   isDisabled?: boolean
@@ -251,24 +266,75 @@ interface Props {
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
 
+  // isFocused is used to force the menu to remain open and give focus to the search input
+  const [isFocused, setIsFocused] = useState(false)
+
+  const onSelectChange = useCallback(
+    (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
+      // When an option is chosen, give control back to react-select
+      setIsFocused(false)
+
+      if (selected && action === 'select-option' && 'token' in selected) {
+        onChange(selected.token)
+      }
+    },
+    [onChange],
+  )
+
+  // When the search input is focused, force menu to remain open
+  const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
+
+  const onKeyDown = useCallback((e): void => {
+    if (e.key === 'Escape') {
+      // Close menu on `Escape`
+      e.stopPropagation()
+      setIsFocused(false)
+    } else if (!e.target.value && e.key === ' ') {
+      // Prevent a space when input in empty.
+      // That closes the menu. (/shrug)
+      e.preventDefault()
+    }
+  }, [])
+
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const onDocumentClick = useCallback(e => {
+    const menu = wrapperRef.current?.querySelector('.react-select__menu')
+    // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
+    // If neither, hand focus back to react-select but turning isFocused off
+    if (!wrapperRef.current?.contains(e.target) || !menu) {
+      setIsFocused(false)
+    }
+  }, [])
+
+  // mount and umount hooks for watching click events
+  useEffect(() => {
+    window.addEventListener('mousedown', onDocumentClick)
+
+    return (): void => window.removeEventListener('mousedown', onDocumentClick)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
-    <Wrapper>
+    <Wrapper ref={wrapperRef}>
       <StyledSelect
+        blurInputOnSelect
         isSearchable
         isDisabled={isDisabled}
         styles={customSelectStyles}
         className="tokenSelectBox"
         classNamePrefix="react-select"
-        noOptionsMessage={(): string => 'No results'}
+        noOptionsMessage={noOptionsMessage}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
-        onChange={(selected: { token: TokenDetails }, { action }: ActionMeta): void => {
-          if (selected && action === 'select-option' && 'token' in selected) {
-            onChange(selected.token)
-          }
-        }}
+        onChange={onSelectChange}
         tabIndex={tabIndex.toString()}
+        components={components}
+        isFocused={isFocused || undefined}
+        menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
+        onMenuInputFocus={onMenuInputFocus}
+        onKeyDown={onKeyDown}
       />
     </Wrapper>
   )
