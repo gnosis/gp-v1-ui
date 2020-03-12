@@ -254,7 +254,7 @@ const PoolingInterface: React.FC = () => {
     <Widget>
       <PoolingInterfaceWrapper $width="100%">
         <FormContext {...methods}>
-          <form onSubmit={handleSubmit(sendTransaction)}>
+          <form onSubmit={handleSubmit(sendTransaction)} noValidate>
             <h2>New Liquidity Order</h2>
             <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
 

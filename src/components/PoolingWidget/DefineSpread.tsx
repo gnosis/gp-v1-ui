@@ -27,7 +27,7 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
         className={errorMessage ? 'error' : ''}
         name="spread"
         type="number"
-        step={0.1}
+        step="0.1"
         disabled={isSubmitting}
         ref={register}
         tooltip="Value between 0 and 100, not inclusive"
