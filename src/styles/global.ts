@@ -12,7 +12,7 @@ const GlobalStyles = createGlobalStyle`
 
   html, body {  
     width: 100%;
-    height: auto;
+    height: 100%;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
@@ -49,7 +49,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   #root {
-    min-height: 100vh;
+    height: 100%;
     font-size: 1.3rem;
   }
 
@@ -61,13 +61,13 @@ const GlobalStyles = createGlobalStyle`
     font-weight: var(--font-weight-bold);
     outline: 0;
 
-    :hover {
+    :hover:not(:disabled):not([disabled]) {
       background-color: #0B66C6;
     }
 
     &:disabled,
     &[disabled]{
-      opacity: .8;
+      opacity: .35;
       pointer-events: none;
     }
     &.success {

@@ -25,7 +25,7 @@ import { tokenListApi } from 'api'
 import { Network, Receipt } from 'types'
 
 import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
-import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST } from 'const'
+import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -91,7 +91,7 @@ const validationSchema = joi.object({
   spread: joi
     .number()
     .positive()
-    .precision(1)
+    .precision(INPUT_PRECISION_SIZE)
     .greater(0.0)
     .less(100.0)
     // dont autocast numbers
@@ -273,6 +273,7 @@ const PoolingInterface: React.FC = () => {
               showContinue={step !== LAST_STEP}
               showFinish={!!txReceipt}
               showLoader={isSubmitting || !!(txHash && !txReceipt)}
+              showTooltipHover={selectedTokensMap.size < 2}
               {...restProps}
             />
           </form>

@@ -1,11 +1,13 @@
 import React from 'react'
-import { TokenDetails, DEFAULT_DECIMALS } from '@gnosis.pm/dex-js'
+import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { BlueBoldText, SpreadInformationWrapper } from './DefineSpread.styled'
 import DefineSpread from './DefineSpread'
 import { CreateStrategyWrapper } from './CreateStrategy.styled'
 import AddFunding from './AddFunding'
 import { Receipt } from 'types'
+import { formatPartialNumber } from 'utils'
+import { INPUT_PRECISION_SIZE } from 'const'
 
 export interface CreateStrategyProps {
   isSubmitting: boolean
@@ -32,12 +34,12 @@ const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap
       <strong>Sell Spread</strong>
       <p>
         {tokenSymbolsString.join(', ')} for <b>at least</b> <br />
-        <i>${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}</i>
+        <i>${formatPartialNumber((1 + spread / 100).toFixed(INPUT_PRECISION_SIZE + 2))}</i>
       </p>
       <strong>Buy Spread</strong>
       <p>
         {tokenSymbolsString.join(', ')} for <b>at most</b> <br />
-        <i>${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}</i>
+        <i>${formatPartialNumber((1 - spread / 100).toFixed(INPUT_PRECISION_SIZE + 2))}</i>
       </p>
     </SpreadInformationWrapper>
   )
