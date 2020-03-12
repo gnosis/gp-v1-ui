@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { formatSchemaErrorMessage } from 'utils'
 
@@ -64,7 +64,7 @@ export const FormInputError: React.FC<FormInputErrorProps> = ({
   visibilityHidden = true,
   wrapperMargin = '0.5rem 0',
 }) => {
-  const message = useCallback(() => {
+  const message = useMemo(() => {
     if (errorMessage) {
       if (schemaError) {
         return formatSchemaErrorMessage(errorMessage)
@@ -82,7 +82,7 @@ export const FormInputError: React.FC<FormInputErrorProps> = ({
 
   return (
     <FormMessageWrapper $margin={wrapperMargin}>
-      <FormMessage className={errorMessage ? 'error' : 'hidden'}>{message()}</FormMessage>
+      <FormMessage className={errorMessage ? 'error' : 'hidden'}>{message}</FormMessage>
     </FormMessageWrapper>
   )
 }
