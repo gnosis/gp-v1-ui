@@ -1,4 +1,11 @@
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
+import { formatSchemaErrorMessage } from 'utils'
+
+export const FormMessageWrapper = styled.div<{ $margin?: string; $padding?: string }>`
+  margin: ${({ $margin = '0' }): string => $margin};
+  padding: ${({ $padding = '0' }): string => $padding};
+`
 
 const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   className: props.className ? undefined : 'error',
@@ -39,6 +46,45 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
     box-sizing: border-box;
     margin: 0.3rem 0 1rem;
   }
+  &.hidden {
+    visibility: hidden;
+  }
 `
+
+interface FormInputErrorProps {
+  errorMessage?: string
+  schemaError?: boolean
+  visibilityHidden?: boolean
+  wrapperMargin?: string
+}
+
+export const FormInputError: React.FC<FormInputErrorProps> = ({
+  errorMessage,
+  schemaError = true,
+  visibilityHidden = true,
+  wrapperMargin = '0.5rem 0',
+}) => {
+  const message = useMemo(() => {
+    if (errorMessage) {
+      if (schemaError) {
+        return formatSchemaErrorMessage(errorMessage)
+      }
+
+      return errorMessage
+    } else {
+      if (visibilityHidden) {
+        return 'Stop using developer tools! :D'
+      }
+
+      return null
+    }
+  }, [errorMessage, schemaError, visibilityHidden])
+
+  return (
+    <FormMessageWrapper $margin={wrapperMargin}>
+      <FormMessage className={errorMessage ? 'error' : 'hidden'}>{message}</FormMessage>
+    </FormMessageWrapper>
+  )
+}
 
 export default FormMessage
