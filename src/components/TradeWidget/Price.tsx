@@ -32,11 +32,10 @@ const Wrapper = styled.div`
 
 export const PriceInputBox = styled.div`
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: column nowrap;
   margin: 0;
   width: 50%;
   width: calc(50% - 0.8rem);
-  height: 5.6rem;
   position: relative;
   outline: 0;
 
@@ -49,6 +48,7 @@ export const PriceInputBox = styled.div`
     display: flex;
     width: auto;
     max-width: 100%;
+    height: 5.6rem;
     position: relative;
 
     @media ${MEDIA.mobile} {
@@ -206,6 +206,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             {sellToken.symbol}/{receiveToken.symbol}
           </small>
         </label>
+        {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
       </PriceInputBox>
       <PriceInputBox>
         <label>
@@ -227,9 +228,8 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             {receiveToken.symbol}/{sellToken.symbol}
           </small>
         </label>
+        {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
       </PriceInputBox>
-      {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
-      {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
     </Wrapper>
   )
 }
