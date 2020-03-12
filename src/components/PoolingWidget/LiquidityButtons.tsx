@@ -5,12 +5,14 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 import { SubComponentProps } from './SubComponents'
 import { StepButtonsWrapper } from './PoolingWidget.styled'
+import { TooltipWrapper } from 'components/Tooltip'
 import { LAST_STEP } from '.'
 
 interface LiquidityButtonsProps extends Pick<SubComponentProps, 'step' | 'txReceipt' | 'nextStep' | 'isSubmitting'> {
   disableBack: boolean
   disableContinue: boolean
   disableSubmit: boolean
+  showTooltipHover: boolean
   prevStep: () => void
   handleSubmit: () => Promise<void>
 }
@@ -25,6 +27,7 @@ const LiquidityButtons: React.FC<LiquidityButtonsProps> = ({
   disableSubmit,
   handleSubmit,
   txReceipt,
+  showTooltipHover,
 }) => (
   <StepButtonsWrapper>
     {/* REMOVE BACK BUTTON ON LAST STEP (TX CONFIRMATION) */}
@@ -35,9 +38,11 @@ const LiquidityButtons: React.FC<LiquidityButtonsProps> = ({
     )}
     {/* REGULAR CONTINUE BUTTON (STEP 1) */}
     {step !== LAST_STEP ? (
-      <button type="button" disabled={disableContinue} onClick={(): void => nextStep()}>
-        Continue
-      </button>
+      <TooltipWrapper hover={showTooltipHover} tooltip={'Please select at least 2 tokens to continue'}>
+        <button type="button" disabled={disableContinue} onClick={(): void => nextStep()}>
+          Continue
+        </button>
+      </TooltipWrapper>
     ) : // LAST STEP - TXRECEIPT OR NOT?
     txReceipt ? (
       // TX RCEIPT SUCCESS

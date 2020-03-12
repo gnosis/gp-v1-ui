@@ -270,6 +270,7 @@ const PoolingInterface: React.FC = () => {
               disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting}
               disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
               disableSubmit={!!txHash || isSubmitting}
+              showTooltipHover={selectedTokensMap.size < 2}
               {...restProps}
             />
           </form>

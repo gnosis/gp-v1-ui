@@ -199,8 +199,14 @@ export const StepButtonsWrapper = styled.div`
       margin: 0 0.8rem 0 0;
     }
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: #0b66c6;
+    }
+
+    &:disabled,
+    &[disabled] {
+      cursor: not-allowed;
+      pointer-events: initial;
     }
 
     &::after {

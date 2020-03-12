@@ -21,8 +21,9 @@ const Wrapper = styled.div`
     color: #2f3e4e;
     width: 100%;
     margin: 0 0 1rem;
-    padding: 0 1rem;
+    padding: 0;
     box-sizing: border-box;
+    font-size: 1.5rem;
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
     }
@@ -36,7 +37,6 @@ export const PriceInputBox = styled.div`
   width: 50%;
   width: calc(50% - 0.8rem);
   height: 5.6rem;
-
   position: relative;
   outline: 0;
 
@@ -89,7 +89,7 @@ export const PriceInputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 7rem 0 1rem;
+    padding: 0 8.5rem 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {

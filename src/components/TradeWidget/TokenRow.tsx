@@ -26,14 +26,17 @@ const Wrapper = styled.div`
     display: flex;
     flex-flow: row nowrap;
     margin: 0 0 1rem;
-    padding: 0 1rem;
+    padding: 0;
     box-sizing: border-box;
   }
 
   > div > strong {
-    margin: 0 auto 0 0.5rem;
+    margin: 0 auto 0 0;
     text-transform: capitalize;
     color: #2f3e4e;
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
 
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
@@ -47,6 +50,10 @@ const Wrapper = styled.div`
     color: #218dff;
     letter-spacing: -0.03rem;
     text-align: right;
+  }
+
+  > div > span > span > ${FormMessage} {
+    margin: 0 0 0 0.25rem;
   }
 
   > div > span > button {
@@ -206,7 +213,8 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
-        <b>INFO</b>: Sell amount exceeding your balance by
+        <b>INFO:</b>
+        <i>Sell amount exceeding your balance by</i>
         <strong>
           {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
         </strong>
