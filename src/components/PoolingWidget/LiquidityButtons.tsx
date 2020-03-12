@@ -10,7 +10,6 @@ interface LiquidityButtonsProps extends Pick<SubComponentProps, 'step' | 'txRece
   disableBack: boolean
   disableContinue: boolean
   disableSubmit: boolean
-  showBack: boolean
   showContinue: boolean
   showFinish: boolean
   showLoader: boolean
@@ -25,18 +24,15 @@ const LiquidityButtons: React.FC<LiquidityButtonsProps> = ({
   disableBack,
   disableContinue,
   disableSubmit,
-  showBack,
   showContinue,
   showFinish,
   showLoader,
 }) => (
   <StepButtonsWrapper>
     {/* REMOVE BACK BUTTON ON LAST STEP (TX CONFIRMATION) */}
-    {showBack && (
-      <button type="button" id="backButton" disabled={disableBack} onClick={(): void => prevStep()}>
-        Back
-      </button>
-    )}
+    <button type="button" id="backButton" disabled={disableBack} onClick={(): void => prevStep()}>
+      Back
+    </button>
     {/* REGULAR CONTINUE BUTTON (STEP 1) */}
     {showContinue ? (
       <button type="button" disabled={disableContinue} onClick={(): void => nextStep()}>

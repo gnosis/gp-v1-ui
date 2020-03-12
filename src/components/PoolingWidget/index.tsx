@@ -267,10 +267,9 @@ const PoolingInterface: React.FC = () => {
             {/* BUTTONS */}
             <LiquidityButtons
               handleSubmit={handleSubmit(sendTransaction)}
-              disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting}
+              disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
               disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
               disableSubmit={!!txHash || isSubmitting}
-              showBack={step > FIRST_STEP && !txHash}
               showContinue={step !== LAST_STEP}
               showFinish={!!txReceipt}
               showLoader={isSubmitting || !!(txHash && !txReceipt)}
