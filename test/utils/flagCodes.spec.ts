@@ -225,37 +225,37 @@ describe('flagCodes', () => {
   })
 
   describe('earmark function', () => {
-    const input = '10000000001'
+    const gasPrice = '10000000001'
 
-    it('marks input', () => {
+    it('marks gasPrice', () => {
       const print = 'SEN108'
-      const marked = earmarkGasPrice(input, print)
+      const marked = earmarkGasPrice(gasPrice, print)
 
-      expect(print.length).toBeLessThan(input.length)
+      expect(print.length).toBeLessThan(gasPrice.length)
 
       expect(marked).toEqual('10000SEN108')
     })
-    it('marks input when print.length < input.length', () => {
+    it('marks gasPrice when print.length < gasPrice.length', () => {
       const print = 'SEN1081234'
-      const marked = earmarkGasPrice(input, print)
+      const marked = earmarkGasPrice(gasPrice, print)
 
-      expect(print.length).toEqual(input.length - 1)
+      expect(print.length).toEqual(gasPrice.length - 1)
 
       expect(marked).toEqual('1SEN1081234')
     })
-    it('does not mark when print.length >= input.length', () => {
+    it('does not mark when print.length >= gasPrice.length', () => {
       const print = 'SEN10812345'
-      const marked = earmarkGasPrice(input, print)
+      const marked = earmarkGasPrice(gasPrice, print)
 
-      expect(print).toHaveLength(input.length)
+      expect(print).toHaveLength(gasPrice.length)
 
-      expect(marked).toEqual(input)
+      expect(marked).toEqual(gasPrice)
     })
     it('does not mark when print is empty', () => {
       const print = ''
-      const marked = earmarkGasPrice(input, print)
+      const marked = earmarkGasPrice(gasPrice, print)
 
-      expect(marked).toEqual(input)
+      expect(marked).toEqual(gasPrice)
     })
   })
 })
