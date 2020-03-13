@@ -76,6 +76,13 @@ module.exports = ({ stats = false } = {}) => ({
           },
         },
       },
+      {
+        test: /\.md$/,
+        use: {
+          loader: 'frontmatter-markdown-loader',
+          options: { mode: ['react-component'] },
+        },
+      },
     ],
   },
   devServer: {
