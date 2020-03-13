@@ -27,16 +27,16 @@ interface GasStationResponse {
   fastest: string
 }
 
-export const earmarkAllButLastDigit = (input: string, userPrint: string): string => {
-  if (!userPrint) return input
+export const earmarkGasPrice = (gasPrice: string, userPrint: string): string => {
+  if (!userPrint) return gasPrice
 
   // don't replace 8000 -> 1201, only if most significant digit is untouched
   // 80000 -> 81201
-  if (input.length <= userPrint.length) return input
+  if (gasPrice.length <= userPrint.length) return gasPrice
 
-  const markedGasPrice = input.slice(0, -userPrint.length) + userPrint
+  const markedGasPrice = gasPrice.slice(0, -userPrint.length) + userPrint
 
-  logDebug('Gas price', input, '->', markedGasPrice)
+  logDebug('Gas price', gasPrice, '->', markedGasPrice)
   return markedGasPrice
 }
 
@@ -50,7 +50,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
   // only fetch new gasPrice when chainId or blockNumber changed
   const key = constructKey({ chainId, blockNumber: blockHeader && blockHeader.number })
   if (key === cacheKey) {
-    return earmarkAllButLastDigit(cachedGasPrice, await walletApi.userPrintAsync)
+    return earmarkGasPrice(cachedGasPrice, await walletApi.userPrintAsync)
   }
 
   const gasStationURL = GAS_STATIONS[chainId]
@@ -66,7 +66,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
       cacheKey = key
       cachedGasPrice = gasPrice
 
-      return earmarkAllButLastDigit(gasPrice, await walletApi.userPrintAsync)
+      return earmarkGasPrice(gasPrice, await walletApi.userPrintAsync)
     }
   } catch (error) {
     console.error('[api:gasStation] Error fetching gasPrice from', gasStationURL, error)

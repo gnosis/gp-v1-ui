@@ -1,5 +1,5 @@
 import { encoderFactory, decoderFactory, Flag } from 'utils'
-import { earmarkAllButLastDigit } from 'api/gasStation'
+import { earmarkGasPrice } from 'api/gasStation'
 
 describe('flagCodes', () => {
   const flagA: Flag<'flagA'> = {
@@ -229,7 +229,7 @@ describe('flagCodes', () => {
 
     it('marks input', () => {
       const print = 'SEN108'
-      const marked = earmarkAllButLastDigit(input, print)
+      const marked = earmarkGasPrice(input, print)
 
       expect(print.length).toBeLessThan(input.length)
 
@@ -237,7 +237,7 @@ describe('flagCodes', () => {
     })
     it('marks input when print.length < input.length', () => {
       const print = 'SEN1081234'
-      const marked = earmarkAllButLastDigit(input, print)
+      const marked = earmarkGasPrice(input, print)
 
       expect(print.length).toEqual(input.length - 1)
 
@@ -245,7 +245,7 @@ describe('flagCodes', () => {
     })
     it('does not mark when print.length >= input.length', () => {
       const print = 'SEN10812345'
-      const marked = earmarkAllButLastDigit(input, print)
+      const marked = earmarkGasPrice(input, print)
 
       expect(print).toHaveLength(input.length)
 
@@ -253,7 +253,7 @@ describe('flagCodes', () => {
     })
     it('does not mark when print is empty', () => {
       const print = ''
-      const marked = earmarkAllButLastDigit(input, print)
+      const marked = earmarkGasPrice(input, print)
 
       expect(marked).toEqual(input)
     })

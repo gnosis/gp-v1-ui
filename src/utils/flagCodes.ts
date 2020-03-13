@@ -108,9 +108,9 @@ type FlagMap = {
   [K in FlagValueType]: number
 }
 
-const mapValsToIndex = (array: FlagValueType[]): FlagMap => {
-  return array.reduce<FlagMap>((accum, val, ind) => {
-    accum[val] = ind
+const mapValuesToId = (array: FlagValueType[]): FlagMap => {
+  return array.reduce<FlagMap>((accum, val, index) => {
+    accum[val] = index
     return accum
   }, {})
 }
@@ -190,6 +190,6 @@ export const decoderFactory = <T extends string>({
 
 // OUR encoder and decoder
 
-export const encoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
+export const gasPriceEncoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
 
-export const decoder = decoderFactory({ sentinel: SENTINEL, flags: FLAGS, prefix: '\\d+', postfix: '$' })
+export const gasPriceDecoder = decoderFactory({ sentinel: SENTINEL, flags: FLAGS, prefix: '\\d+', postfix: '$' })
