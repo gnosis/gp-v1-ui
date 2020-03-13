@@ -4,6 +4,8 @@ import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
 import PreloadWebpackPlugin from 'preload-webpack-plugin'
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
+import markdownIt from 'markdown-it'
+import linkAttributes from 'markdown-it-link-attributes'
 
 import dotenv from 'dotenv'
 import path from 'path'
@@ -80,7 +82,19 @@ module.exports = ({ stats = false } = {}) => ({
         test: /\.md$/,
         use: {
           loader: 'frontmatter-markdown-loader',
-          options: { mode: ['react-component'] },
+          options: {
+            mode: ['react-component'],
+            markdownIt: markdownIt({
+              html: true,
+              linkify: true,
+              breaks: true,
+            }).use(linkAttributes, {
+              attrs: {
+                target: '_blank',
+                rel: 'noopener noreferrer',
+              },
+            }),
+          },
         },
       },
     ],
