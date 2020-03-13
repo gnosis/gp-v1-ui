@@ -108,6 +108,8 @@ type FlagMap = {
   [K in FlagValueType]: number
 }
 
+// maps flag.values to flag.map<{[K in flag.values]: flag.values.indexOf(K)}>
+// end up with {'desktop': 0, 'mobile': 1} like mapping for O(1) lookup
 const mapValuesToId = (array: FlagValueType[]): FlagMap => {
   return array.reduce<FlagMap>((accum, val, index) => {
     accum[val] = index
@@ -115,6 +117,8 @@ const mapValuesToId = (array: FlagValueType[]): FlagMap => {
   }, {})
 }
 
+// creates and encoder for given sentinel and flags
+// encoder accepts object of {flag => flag value} and produces encoded string
 export const encoderFactory = <T extends string>({ sentinel = '', flags }: EncoderFactoryInput<T>): Encoder<T> => {
   if (flags.length === 0) throw new Error('Flags array must not be empty')
 
@@ -152,6 +156,9 @@ type DecodedFlags<T extends string> = {
 
 export type Decoder<T extends string> = (code: string) => DecodedFlags<T> | null
 
+// creates and decoder for given sentinel, flags and optionally prefix and postfix
+// decoder accepts an encoded string (encoded by encoder from encoderFactory)
+// and produces an object of {flag => flag value} or null if unable to decode
 export const decoderFactory = <T extends string>({
   sentinel = '',
   flags,
