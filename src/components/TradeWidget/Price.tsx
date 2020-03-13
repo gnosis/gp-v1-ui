@@ -4,7 +4,7 @@ import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
 
 import { TokenDetails } from 'types'
-import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
+import { parseBigNumber, validatePositiveConstructor, validInputPattern } from 'utils'
 import { DEFAULT_PRECISION, MEDIA } from 'const'
 
 import { TradeFormData } from '.'
@@ -34,11 +34,10 @@ const Wrapper = styled.div`
 
 export const PriceInputBox = styled.div`
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: column nowrap;
   margin: 0;
   width: 50%;
   width: calc(50% - 0.8rem);
-  height: 5.6rem;
   position: relative;
   outline: 0;
 
@@ -51,6 +50,7 @@ export const PriceInputBox = styled.div`
     display: flex;
     width: auto;
     max-width: 100%;
+    height: 5.6rem;
     position: relative;
 
     @media ${MEDIA.mobile} {
@@ -196,7 +196,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onChange={onChangePrice}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
-              validate: { positive: validatePositive },
+              validate: { positive: validatePositiveConstructor('Invalid price') },
               required: 'The price is required',
               min: 0,
             })}
@@ -208,6 +208,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             {sellToken.symbol}/{receiveToken.symbol}
           </small>
         </label>
+        {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
       </PriceInputBox>
       <PriceInputBox>
         <label>
@@ -218,7 +219,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onChange={onChangePriceInverse}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
-              validate: { positive: validatePositive },
+              validate: { positive: validatePositiveConstructor('Invalid price') },
               required: true,
             })}
             onKeyPress={onKeyPressPriceInverse}
@@ -229,9 +230,8 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             {receiveToken.symbol}/{sellToken.symbol}
           </small>
         </label>
+        {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
       </PriceInputBox>
-      {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
-      {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
     </Wrapper>
   )
 }
