@@ -122,9 +122,9 @@ const mapValuesToId = (array: FlagValueType[]): FlagMap => {
 export const encoderFactory = <T extends string>({ sentinel = '', flags }: EncoderFactoryInput<T>): Encoder<T> => {
   if (flags.length === 0) throw new Error('Flags array must not be empty')
 
-  const flagsWithMaps = flags.map(flag => ({
-    ...flag,
-    map: mapValsToIndex(flag.values),
+  const flagsWithMaps = flags.map(({ values, ...rest }) => ({
+    ...rest,
+    map: mapValuesToId(values),
   }))
 
   return (flagValues): string => {
