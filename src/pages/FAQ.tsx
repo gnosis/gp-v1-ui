@@ -1,11 +1,11 @@
 import React from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
-import { react as FAQ } from 'assets/md/FAQ.md'
+import { react as FAQ_CONTENT } from 'assets/md/FAQ.md'
 
-const About: React.FC = () => (
+const FAQ: React.FC = () => (
   <ContentPage>
-    <FAQ />
+    <FAQ_CONTENT />
   </ContentPage>
 )
 
-export default About
+export default FAQ
