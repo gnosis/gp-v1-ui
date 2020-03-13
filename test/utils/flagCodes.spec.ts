@@ -1,5 +1,5 @@
 import { encoderFactory, decoderFactory, Flag } from 'utils'
-import { earmarkGasPrice } from 'api/gasStation'
+import { earmarkGasPrice, MIN_GAS_PRICE } from 'api/gasStation'
 
 describe('flagCodes', () => {
   const flagA: Flag<'flagA'> = {
@@ -248,6 +248,30 @@ describe('flagCodes', () => {
       const marked = earmarkGasPrice(gasPrice, print)
 
       expect(print).toHaveLength(gasPrice.length)
+
+      expect(marked).toEqual(gasPrice)
+    })
+    it('substitutes MIN_GAS_PRICE for gasPrice and marks that when print.length >= gasPrice.length but print.length < MIN_GAS_PRICE.length', () => {
+      const print = 'SEN10812'
+      const gasPrice = '10000001'
+
+      expect(print).toHaveLength(gasPrice.length)
+
+      expect(print.length).toBeLessThan(MIN_GAS_PRICE.length)
+
+      const marked = earmarkGasPrice(gasPrice, print)
+
+      expect(marked).toEqual(earmarkGasPrice(MIN_GAS_PRICE, print))
+    })
+    it('does not mark gasPrice when print.length >= gasPrice.length and print.length >= MIN_GAS_PRICE.length', () => {
+      const print = 'SEN108123'
+      const gasPrice = '100000001'
+
+      expect(print).toHaveLength(gasPrice.length)
+
+      expect(print.length).toBeGreaterThanOrEqual(MIN_GAS_PRICE.length)
+
+      const marked = earmarkGasPrice(gasPrice, print)
 
       expect(marked).toEqual(gasPrice)
     })
