@@ -269,7 +269,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
     height: 1.2rem;
     width: 1.6rem;
     margin: 0;
-    transform: ${({ $isOpen }): string => ($isOpen ? 'rotateY(180deg)' : 'rotateY(0)')};
+    transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
   }
 
   &:hover {
