@@ -8,7 +8,6 @@ export {
   abbreviateString,
   safeTokenName,
   safeFilledToken,
-  calculatePriceBigNumber,
   formatPrice,
 } from '@gnosis.pm/dex-js'
 

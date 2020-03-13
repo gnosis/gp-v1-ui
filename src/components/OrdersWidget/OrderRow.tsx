@@ -1,12 +1,12 @@
 import React, { useMemo, useEffect } from 'react'
-import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
 import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
-import { isOrderUnlimited, isNeverExpiresOrder } from '@gnosis.pm/dex-js'
+import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // import Highlight from 'components/Highlight'
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -15,15 +15,7 @@ import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import {
-  safeTokenName,
-  formatAmount,
-  formatAmountFull,
-  formatDateFromBatchId,
-  formatPrice,
-  batchIdToDate,
-  isOrderFilled,
-} from 'utils'
+import { safeTokenName, formatAmount, formatDateFromBatchId, batchIdToDate, isOrderFilled } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
@@ -62,18 +54,6 @@ function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string
   return displayName
 }
 
-function calculatePrice(numeratorString?: string | null, denominatorString?: string | null): string {
-  let price
-  if (numeratorString && denominatorString) {
-    const numerator = new BigNumber(numeratorString)
-    const denominator = new BigNumber(denominatorString)
-
-    price = formatPrice(numerator, denominator)
-  }
-
-  return price || 'N/A'
-}
-
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
   sellToken: TokenDetails
@@ -81,13 +61,14 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
   const [price, priceInverse] = useMemo((): string[] => {
-    const numeratorString = formatAmountFull(order.priceNumerator, buyToken.decimals, false)
-    const denominatorString = formatAmountFull(order.priceDenominator, sellToken.decimals, false)
-    const priceFmt = calculatePrice(numeratorString, denominatorString)
-    const priceInverseFmt = calculatePrice(denominatorString, numeratorString)
+    const price = calculatePrice({
+      numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
+      denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
+    })
+    const priceInverse = invertPrice(price)
 
-    return [priceFmt, priceInverseFmt]
-  }, [buyToken, order.priceDenominator, order.priceNumerator, sellToken])
+    return [formatPrice(price), formatPrice(priceInverse)]
+  }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])
 
   return (
     <td data-label="Price">

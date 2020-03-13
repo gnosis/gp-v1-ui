@@ -61,13 +61,13 @@ const GlobalStyles = createGlobalStyle`
     font-weight: var(--font-weight-bold);
     outline: 0;
 
-    :hover {
+    :hover:not(:disabled):not([disabled]) {
       background-color: #0B66C6;
     }
 
     &:disabled,
     &[disabled]{
-      opacity: .8;
+      opacity: .35;
       pointer-events: none;
     }
     &.success {
