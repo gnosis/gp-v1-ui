@@ -102,8 +102,12 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
                   Cancellation possible at any time
                 </li>
               </ul>
-              <p className="not-implemented">
-                <a href="#" target="_blank" rel="noopener">
+              <p>
+                <a
+                  href="https://dfusion-docs.dev.gnosisdev.com/docs/liquidity1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Learn more about liquidity provision.
                 </a>
               </p>
@@ -121,8 +125,12 @@ const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) => {
                 The spread defines the percentage you want to sell above $1, and buy below $1 between all selected
                 tokens
               </p>
-              <p className="not-implemented">
-                <a href="#" target="_blank" rel="noopener">
+              <p>
+                <a
+                  href="https://dfusion-docs.dev.gnosisdev.com/docs/liquidity1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Learn more about the spread.
                 </a>
               </p>
