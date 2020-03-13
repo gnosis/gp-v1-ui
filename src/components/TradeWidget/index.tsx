@@ -34,7 +34,7 @@ import { Network, TokenDetails } from 'types'
 
 import { getToken, parseAmount, parseBigNumber, dateToBatchId } from 'utils'
 import { ZERO } from 'const'
-import Price, { invertPrice } from './Price'
+import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 
@@ -247,39 +247,33 @@ const OrdersPanel = styled.div`
     color: #218dff;
     text-decoration: underline;
   }
+`
 
-  > button {
-    width: 1.6rem;
-    height: 100%;
-    border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-    background: #ecf2f7;
-    padding: 0;
-    margin: 0;
-    outline: 0;
+const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
+  width: 1.6rem;
+  height: 100%;
+  border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
+  background: #ecf2f7;
+  padding: 0;
+  margin: 0;
+  outline: 0;
 
-    @media ${MEDIA.mobile} {
-      display: none;
-    }
-
-    &::before {
-      display: block;
-      content: ' ';
-      background: url(${arrow}) no-repeat center/contain;
-      transform: rotate(180deg);
-      height: 1.2rem;
-      width: 1.6rem;
-      margin: 0;
-    }
-
-    &:hover {
-      background-color: #ecf2f7;
-    }
+  @media ${MEDIA.mobile} {
+    display: none;
   }
 
-  .expanded & {
-    > button::before {
-      transform: rotate(-180deg);
-    }
+  &::before {
+    display: block;
+    content: ' ';
+    background: url(${arrow}) no-repeat center/contain;
+    height: 1.2rem;
+    width: 1.6rem;
+    margin: 0;
+    transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
+  }
+
+  &:hover {
+    background-color: #ecf2f7;
   }
 `
 
@@ -371,7 +365,7 @@ const TradeWidget: React.FC = () => {
       [validFromId]: validFromParam,
       [validUntilId]: validUntilParam,
       [priceInputId]: priceParam,
-      [priceInverseInputId]: invertPrice(priceParam),
+      [priceInverseInputId]: invertPriceFromString(priceParam),
     },
   })
   const { handleSubmit, reset, watch, setValue } = methods
@@ -693,7 +687,11 @@ const TradeWidget: React.FC = () => {
       </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <button type="button" onClick={(): void => setOrdersVisible(!ordersVisible)} />
+        <OrdersToggler
+          type="button"
+          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          $isOpen={ordersVisible}
+        />
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>

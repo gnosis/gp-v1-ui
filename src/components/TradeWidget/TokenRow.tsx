@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositive } from 'utils'
+import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
@@ -234,7 +234,7 @@ const TokenRow: React.FC<Props> = ({
       !readOnly
         ? register({
             pattern: { value: validInputPattern, message: 'Invalid amount' },
-            validate: { positive: validatePositive },
+            validate: { positive: validatePositiveConstructor('Invalid amount') },
           })
         : register,
     // eslint-disable-next-line react-hooks/exhaustive-deps

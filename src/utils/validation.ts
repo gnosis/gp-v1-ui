@@ -1,7 +1,6 @@
 import { ValidationError, ObjectSchema } from '@hapi/joi'
 import { ValidationResolver } from 'react-hook-form'
-
-export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and trailing zeros
+import { validInputPattern } from 'utils'
 
 export function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (
