@@ -133,6 +133,7 @@ const Footer: React.FC = () => {
       <FooterLinks>
         <Link to="/about">About dFusion</Link>
         <Link to="/source-code">View Source Code</Link>
+        <Link to="/faq">FAQ</Link>
       </FooterLinks>
       {/* VERSION */}
       <div className="version">
