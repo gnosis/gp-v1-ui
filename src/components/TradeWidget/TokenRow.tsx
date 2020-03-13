@@ -124,8 +124,8 @@ const InputBox = styled.div`
     }
 
     &[datatype='readOnlyInput'] {
-      background: #334e69;
-      color: white;
+      background-color: var(--color-background-pageWrapper);
+      border: 1px solid #e7ecf3;
     }
   }
 `
