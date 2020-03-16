@@ -52,6 +52,10 @@ export const Wrapper = styled.div`
   > p {
     text-align: center;
     line-height: 1.3;
+
+    > a {
+      color: #218dff;
+    }
   }
 `
 export const ConnectWalletBanner: React.FC = () => {
@@ -61,7 +65,9 @@ export const ConnectWalletBanner: React.FC = () => {
     <Wrapper className="widget">
       <img src={iconWallet} alt="Wallet Disconnected" onClick={connectWallet} />
       <h1>Wallet Disconnected</h1>
-      <p>Please connect your wallet using the button at the top of the page 👆</p>
+      <p>
+        Please <a onClick={connectWallet}>connect your wallet</a>
+      </p>
     </Wrapper>
   )
 }
