@@ -63,6 +63,12 @@ const ConnectWallet = React.lazy(() =>
     'pages/ConnectWallet'
   ),
 )
+const FAQ = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Extra_routes_chunk"*/
+    'pages/FAQ'
+  ),
+)
 
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
@@ -86,6 +92,7 @@ const App: React.FC = () => (
             <PrivateRoute path="/wallet" exact component={Wallet} />
             <Route path="/about" exact component={About} />
             <Route path="/source-code" exact component={SourceCode} />
+            <Route path="/faq" exact component={FAQ} />
             <Route path="/connect-wallet" exact component={ConnectWallet} />
             <Redirect from="/" to="/trade/DAI-USDC?sell=0&price=0" />
             <Route component={NotFound} />
