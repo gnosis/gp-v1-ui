@@ -100,3 +100,6 @@ export const GP_ORDER_TX_HASHES = {
   1: 'GP_ORDER_TX_HASHES_1',
   4: 'GP_ORDER_TX_HASHES_4',
 }
+
+export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI', 'sUSD'])
+export const INPUT_PRECISION_SIZE = 6

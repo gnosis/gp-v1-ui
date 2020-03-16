@@ -10,7 +10,7 @@ const TooltipOuter = styled.div<Pick<TooltipBaseProps, 'isShown'>>`
   visibility: ${(props): 'hidden' | false => !props.isShown && 'hidden'};
 `
 // can style anything but TOOLTIP_OFFSET fields, position and transform: rotate
-const TooltipArrow = styled.div`
+const TooltipArrow = styled.div<{ $bgColor?: string }>`
   &,
   ::before {
     position: absolute;
@@ -22,12 +22,12 @@ const TooltipArrow = styled.div`
   ::before {
     content: '';
     transform: rotate(45deg);
-    background: #2f3e4e;
+    background: ${({ $bgColor = '#2f3e4e' }): string => $bgColor};
   }
 `
 
-const TooltipInner = styled.div`
-  background: #2f3e4e;
+const TooltipInner = styled.div<{ $bgColor?: string }>`
+  background: ${({ $bgColor = '#2f3e4e' }): string => $bgColor};
   color: white;
   font-weight: var(--font-weight-normal);
   padding: 0.8rem 1rem;
@@ -53,19 +53,29 @@ const TooltipInner = styled.div`
 `
 
 interface TooltipBaseProps {
+  bgColor?: string
   isShown: boolean
   state: Partial<Pick<State, 'placement' | 'styles'>>
 }
 
-const TooltipBase: React.FC<TooltipBaseProps> = ({ children, isShown, state }, ref) => {
+const TooltipBase: React.ForwardRefRenderFunction<HTMLDivElement, TooltipBaseProps> = (
+  { children, isShown, bgColor, state },
+  ref,
+) => {
   const { placement, styles = {} } = state
 
   return (
     // Portal isolates popup styles from the App styles
     <Portal>
       <TooltipOuter isShown={isShown}>
-        <TooltipInner role="tooltip" ref={ref} style={styles.popper as CSSProperties} data-popper-placement={placement}>
-          <TooltipArrow data-popper-arrow style={styles.arrow as CSSProperties} />
+        <TooltipInner
+          role="tooltip"
+          ref={ref}
+          style={styles.popper as CSSProperties}
+          data-popper-placement={placement}
+          $bgColor={bgColor}
+        >
+          <TooltipArrow data-popper-arrow style={styles.arrow as CSSProperties} $bgColor={bgColor} />
           {isShown && children}
         </TooltipInner>
       </TooltipOuter>

@@ -1,52 +1,38 @@
 import React from 'react'
-import { TokenDetails } from '@gnosis.pm/dex-js'
 
-import { SpreadInformationWrapper, DefineSpreadWrapper } from './DefineSpread.styled'
+import { DefineSpreadWrapper } from './DefineSpread.styled'
 
-import { DEFAULT_DECIMALS } from 'const'
+import InputWithTooltip from '../InputWithTooltip'
+
+import { useFormContext, FieldError } from 'react-hook-form'
+import { FormInputError } from 'components/TradeWidget/FormMessage'
 
 interface DefineSpreadProps {
-  selectedTokensMap: Map<number, TokenDetails>
-
+  isSubmitting: boolean
   spread: number
-  setSpread: React.Dispatch<React.SetStateAction<number>>
 }
 
-type SpreadInformationProps = Omit<DefineSpreadProps, 'setSpread'>
+const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
+  const { errors, register } = useFormContext()
 
-export const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
-  const tokenSymbolsString = React.useMemo(() => Array.from(selectedTokensMap.values()).map(token => token.symbol), [
-    selectedTokensMap,
-  ])
-
-  return (
-    <SpreadInformationWrapper>
-      <strong>Sell Spread</strong>
-      <p>
-        {tokenSymbolsString.join(', ')} for <b>at least</b> <br />
-        <i>${(1 + spread / 100).toFixed(DEFAULT_DECIMALS)}</i>
-      </p>
-      <strong>Buy Spread</strong>
-      <p>
-        {tokenSymbolsString.join(', ')} for <b>at most</b> <br />
-        <i>${(1 - spread / 100).toFixed(DEFAULT_DECIMALS)}</i>
-      </p>
-    </SpreadInformationWrapper>
-  )
-}
-
-const DefineSpread: React.FC<DefineSpreadProps> = ({ selectedTokensMap, spread, setSpread }) => {
-  const handleSpreadChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>): void => {
-    if (+value < 0 || +value >= 100) return
-
-    setSpread(+value)
-  }
+  const errorMessage = (errors?.spread as FieldError)?.message
 
   return (
     <DefineSpreadWrapper>
-      <strong>Spread %</strong>
-      <input type="number" step="0.1" value={spread} onChange={handleSpreadChange} />
-      <SpreadInformation selectedTokensMap={selectedTokensMap} spread={spread} />
+      <p>
+        <strong>Spread %</strong> -{' '}
+        <small>percentage you want to sell above $1, and buy below $1 between all selected tokens</small>
+      </p>
+      <InputWithTooltip
+        className={errorMessage ? 'error' : ''}
+        name="spread"
+        type="number"
+        step="0.1"
+        disabled={isSubmitting}
+        ref={register}
+        tooltip="Value between 0 and 100, not inclusive"
+      />
+      <FormInputError errorMessage={errorMessage} />
     </DefineSpreadWrapper>
   )
 }

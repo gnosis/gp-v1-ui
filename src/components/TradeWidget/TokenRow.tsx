@@ -12,7 +12,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import InputWithTooltip from './InputWithTooltip'
+import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
@@ -83,7 +83,7 @@ const Wrapper = styled.div`
   }
 `
 
-const InputBox = styled.div`
+export const InputBox = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;

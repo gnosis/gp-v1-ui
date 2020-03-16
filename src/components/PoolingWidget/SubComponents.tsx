@@ -2,13 +2,13 @@ import React from 'react'
 
 import TokenSelector from './TokenSelector'
 import { TokenSelectorProps } from './TokenSelector'
-import DefineSpread from './DefineSpread'
 
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { CreateStrategy } from './CreateStrategy'
 import { Receipt } from 'types'
 
-interface SubComponentProps extends TokenSelectorProps {
+export interface SubComponentProps extends TokenSelectorProps {
+  isSubmitting: boolean
   step: number
   selectedTokensMap: Map<number, TokenDetails>
   spread: number
@@ -16,35 +16,37 @@ interface SubComponentProps extends TokenSelectorProps {
   txHash: string
   txReceipt?: Receipt
   txError?: Error
+  nextStep: () => void
 }
 
-const SubComponents: React.FC<SubComponentProps> = props => {
-  const { step, handleTokenSelect, selectedTokensMap, tokens, spread, setSpread, txHash, txReceipt, txError } = props
-
+const SubComponents: React.FC<SubComponentProps> = ({
+  step,
+  handleTokenSelect,
+  selectedTokensMap,
+  tokens,
+  spread,
+  setSpread,
+  txHash,
+  txReceipt,
+  txError,
+  isSubmitting,
+}) => {
   switch (step) {
     case 1:
       return (
-        <>
-          <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
-          {/* <GreySubText>
-            Please select at least two tokens to continue{' '}
-            {selectedTokensMap.size >= 2 && <FontAwesomeIcon icon={faCheckCircle} color="green" />}
-          </GreySubText> */}
-        </>
+        <TokenSelector handleTokenSelect={handleTokenSelect} tokens={tokens} selectedTokensMap={selectedTokensMap} />
       )
     case 2:
-      return <DefineSpread selectedTokensMap={selectedTokensMap} spread={spread} setSpread={setSpread} />
-    case 3:
       return (
-        <>
-          <CreateStrategy
-            spread={spread}
-            selectedTokensMap={selectedTokensMap}
-            txIdentifier={txHash}
-            txReceipt={txReceipt}
-            txError={txError}
-          />
-        </>
+        <CreateStrategy
+          spread={spread}
+          setSpread={setSpread}
+          selectedTokensMap={selectedTokensMap}
+          txIdentifier={txHash}
+          txReceipt={txReceipt}
+          txError={txError}
+          isSubmitting={isSubmitting}
+        />
       )
     default:
       return (
