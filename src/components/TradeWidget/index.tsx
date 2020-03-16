@@ -656,6 +656,7 @@ const TradeWidget: React.FC = () => {
             tabIndex={2}
             readOnly
             tooltipText={receiveTokenTooltipText}
+            inputDataType="readOnlyInput"
           />
           <Price
             priceInputId={priceInputId}

@@ -122,6 +122,11 @@ export const InputBox = styled.div`
     &:disabled {
       box-shadow: none;
     }
+
+    &[datatype='readOnlyInput'] {
+      background-color: var(--color-background-pageWrapper);
+      border: 1px solid #e7ecf3;
+    }
   }
 `
 
@@ -172,6 +177,7 @@ interface Props {
   readOnly: boolean
   tooltipText: string
   autoFocus?: boolean
+  inputDataType?: string
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -187,6 +193,7 @@ const TokenRow: React.FC<Props> = ({
   readOnly = false,
   tooltipText,
   autoFocus,
+  inputDataType = '',
 }) => {
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
@@ -287,6 +294,7 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
+          datatype={inputDataType}
           autoFocus={!readOnly && autoFocus}
           className={inputClassName}
           tooltip={tooltipText}
