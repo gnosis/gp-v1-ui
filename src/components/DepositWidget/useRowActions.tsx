@@ -153,7 +153,12 @@ export const useRowActions = (params: Params): Result => {
 
         const { pendingWithdraw, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
-        console.debug(`Starting the withdraw for ${formatAmountFull(pendingWithdraw.amount, decimals)} of ${symbol}`)
+        console.debug(
+          `Starting the withdraw for ${formatAmountFull({
+            amount: pendingWithdraw.amount,
+            precision: decimals,
+          })} of ${symbol}`,
+        )
 
         dispatch(setHighlightAndClaimingAction(tokenAddress))
 
