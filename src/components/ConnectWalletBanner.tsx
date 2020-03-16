@@ -34,6 +34,12 @@ export const Wrapper = styled.div`
 
   > img {
     margin: 0 0 1.6rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 
   > h1 {
