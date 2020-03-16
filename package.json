@@ -61,7 +61,7 @@
     "@fortawesome/react-fontawesome": "^0.1.8",
     "@gnosis.pm/dapp-ui": "^0.5.3",
     "@hapi/joi": "^17.1.0",
-    "@gnosis.pm/dex-js": "0.1.14-RC.1",
+    "@gnosis.pm/dex-js": "0.1.15-RC.0",
     "@hot-loader/react-dom": "^16.11.0",
     "@popperjs/core": "^2.0.6",
     "@types/react": "^16.9.19",
