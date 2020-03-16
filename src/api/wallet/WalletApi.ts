@@ -21,10 +21,11 @@ import {
   Subscriptions,
 } from '@gnosis.pm/dapp-ui'
 
-import { logDebug, toBN } from 'utils'
+import { logDebug, toBN, gasPriceEncoder } from 'utils'
 import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
+import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
@@ -38,6 +39,7 @@ export interface WalletApi {
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo
   blockchainState: BlockchainUpdatePrompt
+  userPrintAsync: Promise<string>
 }
 
 export interface WalletInfo {
@@ -194,7 +196,7 @@ export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
   private _web3: Web3
-
+  public userPrintAsync: Promise<string> = Promise.resolve('')
   public blockchainState: BlockchainUpdatePrompt
 
   private _unsubscribe: Command = () => {
@@ -204,6 +206,14 @@ export class WalletApiImpl implements WalletApi {
   public constructor(web3: Web3) {
     this._listeners = []
     this._web3 = web3
+
+    // update userPrint on screenSize change
+    // normally wouldn't happen
+    // only when browser window is resized
+    // or device is switched between landscape <-> portrait orientation
+    subscribeToScreenSizeChange(() => {
+      this.userPrintAsync = this._generateAsyncUserPrint()
+    })
   }
 
   public isConnected(): boolean | Promise<boolean> {
@@ -278,6 +288,8 @@ export class WalletApiImpl implements WalletApi {
       unsubscribeUpdates()
       unsubscribeDisconnect()
     }
+
+    this.userPrintAsync = this._generateAsyncUserPrint()
 
     return true
   }
@@ -411,6 +423,36 @@ export class WalletApiImpl implements WalletApi {
     if (providerState) return providerState.chainId || 0
 
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
+  }
+
+  // new userPrint is generated when provider or screen size changes
+  // other flags -- mobile, browser -- are stable
+  private async _generateAsyncUserPrint(): Promise<string> {
+    const { name: providerName } = this.getProviderInfo()
+
+    const mobile = Web3Connect.isMobile() ? 'mobile' : 'desktop'
+
+    const screenSize = getMatchingScreenSize()
+
+    const { parseUserAgent } = await import(
+      /* webpackChunkName: "detect-browser"*/
+      'detect-browser'
+    )
+
+    const browserInfo = parseUserAgent(navigator.userAgent)
+
+    const flagObject = {
+      provider: providerName,
+      mobile,
+      browser: browserInfo?.name || '',
+      screenSize,
+    }
+
+    const encoded = gasPriceEncoder(flagObject)
+
+    logDebug('Encoded object', flagObject)
+    logDebug('User Wallet print', encoded)
+    return encoded
   }
 }
 
