@@ -1,3 +1,5 @@
+import { MEDIA_QUERY_NAMES } from './mediaQueries'
+
 // gasstation return example
 /*{
   lastUpdate: '2020-03-03T11:23:53.500017Z',
@@ -19,7 +21,7 @@ export interface Flag<T extends string> {
 // OUR specific flags
 const SENTINEL = '12'
 
-type DxFlagName = 'provider' | 'mobile' | 'browser'
+type DxFlagName = 'provider' | 'mobile' | 'browser' | 'screenSize'
 
 // Providers currently detected by web3connect
 // new provider names can be appended to values as long as values.length - 1 <= meaningfulDigits
@@ -54,7 +56,7 @@ const mobile: Flag<DxFlagName> = {
 const browser: Flag<DxFlagName> = {
   name: 'browser',
   values: [
-    'unknown',
+    'unknown', // generic name for undetected browser
     'aol',
     'edge',
     'edge-ios',
@@ -87,7 +89,14 @@ const browser: Flag<DxFlagName> = {
   meaningfulDigits: 2,
 }
 
-const FLAGS: Flag<DxFlagName>[] = [provider, mobile, browser]
+const screenSize: Flag<DxFlagName> = {
+  name: 'screenSize',
+  values: MEDIA_QUERY_NAMES,
+  // [xl, lg, md, sm, xs]
+  meaningfulDigits: 1,
+}
+
+const FLAGS: Flag<DxFlagName>[] = [provider, mobile, browser, screenSize]
 
 // GENERIC flag functions
 

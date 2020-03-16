@@ -25,6 +25,7 @@ import { logDebug, toBN, gasPriceEncoder } from 'utils'
 import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
+import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
@@ -205,6 +206,14 @@ export class WalletApiImpl implements WalletApi {
   public constructor(web3: Web3) {
     this._listeners = []
     this._web3 = web3
+
+    // update userPrint on screenSize change
+    // normally wouldn't happen
+    // only when browser window is resized
+    // or device is switched between landscape <-> portrait orientation
+    subscribeToScreenSizeChange(() => {
+      this.userPrintAsync = this._generateAsyncUserPrint()
+    })
   }
 
   public isConnected(): boolean | Promise<boolean> {
@@ -416,12 +425,14 @@ export class WalletApiImpl implements WalletApi {
     return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
   }
 
-  // new userPrint is generated when provider changes
+  // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
   private async _generateAsyncUserPrint(): Promise<string> {
     const { name: providerName } = this.getProviderInfo()
 
     const mobile = Web3Connect.isMobile() ? 'mobile' : 'desktop'
+
+    const screenSize = getMatchingScreenSize()
 
     const { parseUserAgent } = await import(
       /* webpackChunkName: "detect-browser"*/
@@ -434,6 +445,7 @@ export class WalletApiImpl implements WalletApi {
       provider: providerName,
       mobile,
       browser: browserInfo?.name || '',
+      screenSize,
     }
 
     const encoded = gasPriceEncoder(flagObject)
