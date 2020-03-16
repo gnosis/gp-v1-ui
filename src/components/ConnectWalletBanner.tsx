@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import iconWallet from 'assets/img/wallet.svg'
 import { MEDIA } from 'const'
+import { useConnectWallet } from 'hooks/useConnectWallet'
 
 export const Wrapper = styled.div`
   background: #ffffff;
@@ -47,10 +48,14 @@ export const Wrapper = styled.div`
     line-height: 1.3;
   }
 `
-export const ConnectWalletBanner: React.FC = () => (
-  <Wrapper className="widget">
-    <img src={iconWallet} alt="Wallet Disconnected" />
-    <h1>Wallet Disconnected</h1>
-    <p>Please connect your wallet using the button at the top of the page 👆</p>
-  </Wrapper>
-)
+export const ConnectWalletBanner: React.FC = () => {
+  const { connectWallet } = useConnectWallet()
+
+  return (
+    <Wrapper className="widget">
+      <img src={iconWallet} alt="Wallet Disconnected" onClick={connectWallet} />
+      <h1>Wallet Disconnected</h1>
+      <p>Please connect your wallet using the button at the top of the page 👆</p>
+    </Wrapper>
+  )
+}
