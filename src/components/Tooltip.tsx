@@ -58,7 +58,10 @@ interface TooltipBaseProps {
   state: Partial<Pick<State, 'placement' | 'styles'>>
 }
 
-const TooltipBase: React.FC<TooltipBaseProps> = ({ children, isShown, bgColor, state }, ref) => {
+const TooltipBase: React.ForwardRefRenderFunction<HTMLDivElement, TooltipBaseProps> = (
+  { children, isShown, bgColor, state },
+  ref,
+) => {
   const { placement, styles = {} } = state
 
   return (
