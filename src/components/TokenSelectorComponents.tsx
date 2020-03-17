@@ -15,6 +15,8 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   const childrenRef = useRef(props.children)
   childrenRef.current = props.children
 
+  const selectCurrent = useCallback((): void => setValue(value, 'set-value'), [setValue, value])
+
   // Wrap the event to capture `Enter` and avoid losing focus when there's no value set in the menu
   const wrappedOnKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -28,20 +30,22 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
         e.preventDefault()
       }
 
+      // When hitting the Esc key, the select will close.
+      // If nothing is selected, the select will contain an empty value. Which we don't like.
+      // To prevent that, we set again the currently selected value.
+      if (e.key === 'Escape') {
+        selectCurrent()
+      }
+
       onKeyDown?.(e)
     },
-    [onKeyDown],
+    [onKeyDown, selectCurrent],
   )
 
   const ariaAttributes = {
     'aria-label': props.selectProps['aria-label'],
     'aria-labelledby': props.selectProps['aria-labelledby'],
   }
-
-  // Since I couldn't for the life of me figure out a way to call some sort of close on the menu,
-  // David offered the idea to instead set a value on the select.
-  // When a value is selected, the menu is closed. The value is whatever was selected already.
-  const onCloseButtonClick = useCallback((): void => setValue(value, 'set-value'), [setValue, value])
 
   // On input's change event, we call the select's `onInputChange` handler with the appropriated action
   const onChange = useCallback(
@@ -69,7 +73,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
     <>
       <div className="header">
         <h2>Select token</h2>
-        <button type="button" onClick={onCloseButtonClick}>
+        <button type="button" onClick={selectCurrent}>
           X
         </button>
       </div>
