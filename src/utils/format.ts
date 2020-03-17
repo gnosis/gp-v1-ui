@@ -62,6 +62,16 @@ export const validInputPattern = new RegExp(/^\d+\.?\d*$/) // allows leading and
 export const leadingAndTrailingZeros = new RegExp(/(^0*(?=\d)|\.0*$)/, 'g') // removes leading zeros and trailing '.' followed by zeros
 export const trailingZerosAfterDot = new RegExp(/(.*\.\d+?)0*$/) // selects valid input without leading zeros after '.'
 
+/**
+ * Removes extra leading and trailing zeros, while allowing for partial numbers, so users can input decimals manually
+ * //    0 -> 0. -> 0.1 -> 0.10 -> 0.105
+ *
+ * @param value The input value to parse
+ */
+export function formatPartialNumber(value: string): string {
+  return value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
+}
+
 export const formatTimeInHours = (
   validTime: string | number,
   matchedConstraintText: string,

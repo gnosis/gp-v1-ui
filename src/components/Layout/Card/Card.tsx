@@ -128,7 +128,6 @@ export const CardTable = styled.table<{
     position: sticky;
     background: #ecf2f7;
     top: 0;
-    z-index: 5;
     font-size: 1.1rem;
     color: #2F3E4E;
     letter-spacing: 0;

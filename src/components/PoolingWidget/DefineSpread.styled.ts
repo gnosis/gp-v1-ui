@@ -1,58 +1,23 @@
 import styled from 'styled-components'
 import { ProgressStepText } from './PoolingWidget.styled'
-import { MEDIA } from 'const'
+import { InputBox } from 'components/TradeWidget/TokenRow'
 
-export const DefineSpreadWrapper = styled.div`
-  display: flex;
+export const DefineSpreadWrapper = styled(InputBox)`
   flex-flow: column nowrap;
-  width: 50%;
-  width: calc(50% - 1.5rem);
-  padding: 0;
-  box-sizing: border-box;
-
-  @media ${MEDIA.mobile} {
-    width: 100%;
-  }
+  height: auto;
 
   > strong {
     margin: 0 0 1rem 0;
     color: #2f3e4e;
   }
 
-  > input {
-    margin: 0 0 2.4rem 0;
-    width: auto;
-    max-width: 100%;
-    background: #e7ecf3;
-    border-radius: 0.6rem 0.6rem 0 0;
-    border: 0;
-    font-size: 1.6rem;
-    line-height: 1;
-    box-sizing: border-box;
-    border-bottom: 0.2rem solid transparent;
-    font-weight: var(--font-weight-normal);
-    padding: 0 1rem;
-    outline: none;
-    font-family: inherit;
-    height: 5.6rem;
+  input {
     width: 100%;
-
-    &:focus {
-      border-bottom: 0.2rem solid #218dff;
-      border-color: #218dff;
-      color: #218dff;
-    }
-
-    &.error {
-      border-color: #ff0000a3;
-    }
+    height: 5.6rem;
+    padding: 0 1rem;
 
     &.warning {
       border-color: orange;
-    }
-
-    &:disabled {
-      box-shadow: none;
     }
   }
 `

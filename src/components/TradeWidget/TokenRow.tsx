@@ -12,7 +12,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { TooltipWrapper } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import InputWithTooltip from './InputWithTooltip'
+import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA } from 'const'
 
 const Wrapper = styled.div`
@@ -83,7 +83,7 @@ const Wrapper = styled.div`
   }
 `
 
-const InputBox = styled.div`
+export const InputBox = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;
@@ -121,6 +121,11 @@ const InputBox = styled.div`
 
     &:disabled {
       box-shadow: none;
+    }
+
+    &[datatype='readOnlyInput'] {
+      background-color: var(--color-background-pageWrapper);
+      border: 1px solid #e7ecf3;
     }
   }
 `
@@ -172,6 +177,7 @@ interface Props {
   readOnly: boolean
   tooltipText: string
   autoFocus?: boolean
+  inputDataType?: string
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -187,6 +193,7 @@ const TokenRow: React.FC<Props> = ({
   readOnly = false,
   tooltipText,
   autoFocus,
+  inputDataType = '',
 }) => {
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
@@ -287,6 +294,7 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
+          datatype={inputDataType}
           autoFocus={!readOnly && autoFocus}
           className={inputClassName}
           tooltip={tooltipText}
