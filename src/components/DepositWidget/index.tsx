@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import Modali from 'modali'
 import BN from 'bn.js'
 
@@ -240,7 +240,7 @@ const BalanceTools = styled.div`
 
     > input {
       margin: 0;
-      width: 28rem;
+      width: 35rem;
       max-width: 100%;
       background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
@@ -309,11 +309,34 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 }) => {
   const windowSpecs = useWindowSizes()
 
+  const [search, setSearch] = useState('')
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
+
+  const filteredBalances = useMemo(() => {
+    if (!search || !balances || balances.length === 0) return balances
+
+    const searchTxt = search.toLowerCase()
+
+    return balances.filter(({ symbol, name, address }) => {
+      return (
+        symbol?.toLowerCase().includes(searchTxt) ||
+        name?.toLowerCase().includes(searchTxt) ||
+        address.toLowerCase().includes(searchTxt)
+      )
+    })
+  }, [search, balances])
+
   return (
     <BalancesWidget>
       <BalanceTools>
-        <label className="balances-searchTokens not-implemented">
-          <input placeholder="Search token by Name, Symbol" type="text" required />
+        <label className="balances-searchTokens">
+          <input
+            placeholder="Search token by Name, Symbol or Address"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+          />
         </label>
         <label className="balances-hideZero not-implemented">
           <input type="checkbox" />
@@ -337,8 +360,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </tr>
           </thead>
           <tbody>
-            {balances &&
-              balances.map(tokenBalances => (
+            {filteredBalances &&
+              filteredBalances.map(tokenBalances => (
                 <Row
                   key={tokenBalances.addressMainnet}
                   tokenBalances={tokenBalances}
