@@ -177,7 +177,6 @@ interface Props {
   readOnly: boolean
   tooltipText: string
   autoFocus?: boolean
-  inputDataType?: string
 }
 
 const TokenRow: React.FC<Props> = ({
@@ -193,7 +192,6 @@ const TokenRow: React.FC<Props> = ({
   readOnly = false,
   tooltipText,
   autoFocus,
-  inputDataType = '',
 }) => {
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
@@ -294,7 +292,6 @@ const TokenRow: React.FC<Props> = ({
       </div>
       <InputBox>
         <InputWithTooltip
-          datatype={inputDataType}
           autoFocus={!readOnly && autoFocus}
           className={inputClassName}
           tooltip={tooltipText}
