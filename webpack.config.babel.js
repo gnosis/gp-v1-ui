@@ -6,6 +6,7 @@ import PreloadWebpackPlugin from 'preload-webpack-plugin'
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
 import markdownIt from 'markdown-it'
 import linkAttributes from 'markdown-it-link-attributes'
+import TerserPlugin from 'terser-webpack-plugin'
 
 import dotenv from 'dotenv'
 import path from 'path'
@@ -183,5 +184,13 @@ module.exports = ({ stats = false } = {}) => ({
       maxSize: 1000000,
     },
     runtimeChunk: true,
+    minimize: isProduction,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          safari10: true,
+        },
+      }),
+    ],
   },
 })
