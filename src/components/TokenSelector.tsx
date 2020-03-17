@@ -264,7 +264,10 @@ interface Props {
 }
 
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
-  const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
+  const options = useMemo(
+    () => tokens.map(token => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
+    [tokens],
+  )
 
   // isFocused is used to force the menu to remain open and give focus to the search input
   const [isFocused, setIsFocused] = useState(false)
