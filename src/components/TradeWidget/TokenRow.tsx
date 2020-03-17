@@ -123,7 +123,7 @@ export const InputBox = styled.div`
       box-shadow: none;
     }
 
-    &[datatype='readOnlyInput'] {
+    &[readonly] {
       background-color: var(--color-background-pageWrapper);
       border: 1px solid #e7ecf3;
     }
