@@ -18,6 +18,7 @@ import useWindowSizes from 'hooks/useWindowSizes'
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
+import { useDebounce } from 'hooks/useDebounce'
 
 interface WithdrawState {
   amount: BN
@@ -313,10 +314,12 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
 
-  const filteredBalances = useMemo(() => {
-    if (!search || !balances || balances.length === 0) return balances
+  const debouncedSearch = useDebounce(search, 500)
 
-    const searchTxt = search.toLowerCase()
+  const filteredBalances = useMemo(() => {
+    if (!debouncedSearch || !balances || balances.length === 0) return balances
+
+    const searchTxt = debouncedSearch.toLowerCase()
 
     return balances.filter(({ symbol, name, address }) => {
       return (
@@ -325,7 +328,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
         address.toLowerCase().includes(searchTxt)
       )
     })
-  }, [search, balances])
+  }, [debouncedSearch, balances])
 
   return (
     <BalancesWidget>
