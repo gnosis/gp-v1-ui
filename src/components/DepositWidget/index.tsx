@@ -216,7 +216,7 @@ const BalanceTools = styled.div`
     cursor: pointer;
 
     @media ${MEDIA.mobile} {
-      margin: 0 1.6rem 0 0;
+      margin: 0 1.6rem 0 0.8rem;
     }
 
     > b {
@@ -311,8 +311,11 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const windowSpecs = useWindowSizes()
 
   const [search, setSearch] = useState('')
+  const [hideZeroBalances, setHideZeroBalances] = useState(false)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
+
+  const handleHideZeroBalances = (e: React.ChangeEvent<HTMLInputElement>): void => setHideZeroBalances(e.target.checked)
 
   const debouncedSearch = useDebounce(search, 500)
 
@@ -330,6 +333,14 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
     })
   }, [debouncedSearch, balances])
 
+  const displayedBalances = useMemo(() => {
+    if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
+
+    return filteredBalances.filter(({ exchangeBalance, pendingWithdraw, walletBalance }) => {
+      return !exchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
+    })
+  }, [hideZeroBalances, filteredBalances])
+
   return (
     <BalancesWidget>
       <BalanceTools>
@@ -341,8 +352,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             onChange={handleSearch}
           />
         </label>
-        <label className="balances-hideZero not-implemented">
-          <input type="checkbox" />
+        <label className="balances-hideZero">
+          <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
           <b>Hide zero balances</b>
         </label>
         <button type="button" className="balances-manageTokens not-implemented">
@@ -363,8 +374,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </tr>
           </thead>
           <tbody>
-            {filteredBalances &&
-              filteredBalances.map(tokenBalances => (
+            {displayedBalances &&
+              displayedBalances.map(tokenBalances => (
                 <Row
                   key={tokenBalances.addressMainnet}
                   tokenBalances={tokenBalances}
