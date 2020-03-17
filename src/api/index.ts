@@ -20,6 +20,7 @@ import {
   FEE_TOKEN,
   exchangeOrders,
   unregisteredTokens,
+  prices,
   TOKEN_8,
 } from '../../test/data'
 import Web3 from 'web3'
@@ -85,6 +86,7 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
       balanceStates: exchangeBalanceStates,
       erc20Api,
       registeredTokens: tokens,
+      prices,
       ordersByUser: exchangeOrders,
     })
   } else {
