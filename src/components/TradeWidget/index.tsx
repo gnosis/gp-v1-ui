@@ -24,7 +24,7 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
-import useGlobalState from 'hooks/useGlobalState'
+import useGlobalState, { useLastOrderIdRef } from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { MEDIA } from 'const'
 
@@ -318,7 +318,14 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
-  const [, dispatch] = useGlobalState()
+  const [
+    {
+      orders: { orders },
+    },
+    dispatch,
+  ] = useGlobalState()
+
+  const lastOrderIdRef = useLastOrderIdRef(orders)
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
@@ -464,7 +471,7 @@ const TradeWidget: React.FC = () => {
       toast.info(<TxNotification txHash={txHash} />)
 
       const pendingOrder: PendingTxObj = {
-        id: Date.now() + '', // Uses a temporal unique id
+        id: (lastOrderIdRef.current + 1).toString(10),
         buyTokenId,
         sellTokenId,
         priceNumerator,
@@ -479,6 +486,7 @@ const TradeWidget: React.FC = () => {
 
       return dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dispatch, reset, setIsSubmitting],
   )
 
