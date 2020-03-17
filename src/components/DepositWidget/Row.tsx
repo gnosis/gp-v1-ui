@@ -85,11 +85,17 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             {name}
           </div>
         </td>
-        <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
+        <td
+          data-label="Exchange Wallet"
+          title={formatAmountFull({ amount: totalExchangeBalance, precision: decimals }) || ''}
+        >
           {depositing && spinner}
           {formatAmount(totalExchangeBalance, decimals)}
         </td>
-        <td data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
+        <td
+          data-label="Pending Withdrawals"
+          title={formatAmountFull({ amount: pendingWithdraw.amount, precision: decimals }) || ''}
+        >
           {claimable ? (
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
@@ -108,7 +114,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>{withdrawing && spinner}0</>
           )}
         </td>
-        <td data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
+        <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
           {(claiming || depositing) && spinner}
           {formatAmount(walletBalance, decimals)}
         </td>

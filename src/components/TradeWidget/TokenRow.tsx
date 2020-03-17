@@ -223,7 +223,7 @@ const TokenRow: React.FC<Props> = ({
         <b>INFO:</b>
         <i>Sell amount exceeding your balance by</i>
         <strong>
-          {formatAmountFull(overMax, selectedToken.decimals)} {selectedToken.symbol}.
+          {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
         {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
@@ -232,7 +232,16 @@ const TokenRow: React.FC<Props> = ({
 
   function useMax(): void {
     // boolean true here forces form validation
-    setValue(inputId, formatAmountFull(balance.totalExchangeBalance, balance.decimals, false), true)
+    setValue(
+      inputId,
+      formatAmountFull({
+        amount: balance.totalExchangeBalance,
+        precision: balance.decimals,
+        thousandSeparator: false,
+        isLocaleAware: false,
+      }),
+      true,
+    )
   }
 
   // Form validation
