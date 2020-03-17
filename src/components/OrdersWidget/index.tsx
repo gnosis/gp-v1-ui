@@ -56,11 +56,18 @@ function classifyOrders(
   orders: AuctionElement[],
   state: FilteredOrdersState,
   ordersType: 'orders' | 'pendingOrders',
-): void {
+  alreadyCounted?: Set<string>,
+): Set<string> {
   const now = new Date()
   const isOrderActiveFn = ordersType === 'pendingOrders' ? isPendingOrderActive : isOrderActive
+  const counted = new Set<string>()
 
   orders.forEach(order => {
+    // don't process already processed orders
+    if (alreadyCounted && alreadyCounted.has(order.id)) return
+
+    counted.add(order.id)
+
     if (!isOrderActiveFn(order, now)) {
       state.closed[ordersType].push(order)
     } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
@@ -69,6 +76,8 @@ function classifyOrders(
       state.active[ordersType].push(order)
     }
   })
+
+  return counted
 }
 
 const OrdersWidget: React.FC = () => {
@@ -108,8 +117,12 @@ const OrdersWidget: React.FC = () => {
   useEffect(() => {
     const filteredOrders = emptyState()
 
-    classifyOrders(allOrders, filteredOrders, 'orders')
-    classifyOrders(allPendingOrders, filteredOrders, 'pendingOrders')
+    const countedOrderIds = classifyOrders(allOrders, filteredOrders, 'orders')
+
+    // don't include orders fetched from blockchain among pending orders
+    // consider them as finished pending
+    // even if pending tx hasn't been reported as mined yet
+    classifyOrders(allPendingOrders, filteredOrders, 'pendingOrders', countedOrderIds)
 
     setFilteredOrders(curr => {
       // copy markedForDeletion
