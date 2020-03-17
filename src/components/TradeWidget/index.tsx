@@ -470,7 +470,7 @@ const TradeWidget: React.FC = () => {
         priceNumerator,
         priceDenominator,
         user: userAddress,
-        remainingAmount: ZERO,
+        remainingAmount: priceDenominator,
         sellTokenBalance: ZERO,
         validFrom,
         validUntil,
