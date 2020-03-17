@@ -1,7 +1,7 @@
 import React, { useContext, useReducer, useRef, useEffect } from 'react'
 import { GlobalState } from 'reducers-actions'
 import { AnyAction } from 'combine-reducers'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
 const GlobalStateContext = React.createContext({})
 
@@ -25,16 +25,17 @@ const useGlobalState = (): [GlobalState, Function] => useContext(GlobalStateCont
 
 export default useGlobalState
 
-export const useLastOrderIdRef = (orders: AuctionElement[]): React.MutableRefObject<number> => {
+export const useLastOrderIdRef = (
+  orders: AuctionElement[],
+  pendingOrders: PendingTxObj[],
+): React.MutableRefObject<number> => {
   const lastOrderId = useRef(0)
 
   useEffect(() => {
-    if (orders.length) {
-      lastOrderId.current = +orders[orders.length - 1].id
-    } else {
-      lastOrderId.current = 0
-    }
-  }, [orders])
+    const ordersMaxId = orders.length && +orders[orders.length - 1].id
+    const pendingOrdersMaxId = pendingOrders.length && +pendingOrders[pendingOrders.length - 1].id
+    lastOrderId.current = Math.max(ordersMaxId, pendingOrdersMaxId)
+  }, [orders, pendingOrders])
 
   return lastOrderId
 }

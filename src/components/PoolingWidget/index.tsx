@@ -103,9 +103,11 @@ const validationSchema = joi.object({
 const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validationSchema, 'number')
 
 const PoolingInterface: React.FC = () => {
+  const { networkId, userAddress } = useWalletConnection()
   const [
     {
       orders: { orders },
+      pendingOrders,
     },
     dispatch,
   ] = useGlobalState()
@@ -117,9 +119,11 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
-  const lastOrderIdRef = useLastOrderIdRef(orders)
+  const lastOrderIdRef = useLastOrderIdRef(
+    orders,
+    networkId && userAddress ? pendingOrders[networkId][userAddress] : [],
+  )
 
-  const { networkId, userAddress } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
 

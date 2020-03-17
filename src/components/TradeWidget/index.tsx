@@ -321,11 +321,15 @@ const TradeWidget: React.FC = () => {
   const [
     {
       orders: { orders },
+      pendingOrders,
     },
     dispatch,
   ] = useGlobalState()
 
-  const lastOrderIdRef = useLastOrderIdRef(orders)
+  const lastOrderIdRef = useLastOrderIdRef(
+    orders,
+    networkId && userAddress ? pendingOrders[networkId][userAddress] : [],
+  )
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
