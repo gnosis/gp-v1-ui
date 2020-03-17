@@ -16,7 +16,7 @@ import { PoolingInterfaceWrapper } from './PoolingWidget.styled'
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
-import useGlobalState from 'hooks/useGlobalState'
+import useGlobalState, { useLastOrderIdRef } from 'hooks/useGlobalState'
 import { useForm, FormContext } from 'react-hook-form'
 
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
@@ -103,7 +103,12 @@ const validationSchema = joi.object({
 const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validationSchema, 'number')
 
 const PoolingInterface: React.FC = () => {
-  const [, dispatch] = useGlobalState()
+  const [
+    {
+      orders: { orders },
+    },
+    dispatch,
+  ] = useGlobalState()
   const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
   const [spread, setSpread] = useSafeState(0.2)
   const [step, setStep] = useSafeState(1)
@@ -111,6 +116,8 @@ const PoolingInterface: React.FC = () => {
   const [txHash, setTxHash] = useSafeState('')
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
+
+  const lastOrderIdRef = useLastOrderIdRef(orders)
 
   const { networkId, userAddress } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
@@ -166,10 +173,11 @@ const PoolingInterface: React.FC = () => {
             setTxHash(txHash)
 
             batchedUpdates(() => {
+              let orderId = lastOrderIdRef.current + 1
               orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
                 const pendingOrder = {
                   txHash,
-                  id: 'PENDING ORDER',
+                  id: (orderId++).toString(10),
                   buyTokenId,
                   sellTokenId,
                   priceNumerator: buyAmount,
@@ -199,6 +207,7 @@ const PoolingInterface: React.FC = () => {
     } finally {
       pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dispatch,
     networkId,
