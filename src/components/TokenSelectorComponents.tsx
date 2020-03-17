@@ -50,10 +50,9 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   // On input's change event, we call the select's `onInputChange` handler with the appropriated action
   const onChange = useCallback(
     (e): void => {
-      onInputChange &&
-        onInputChange(e.currentTarget.value, {
-          action: 'input-change',
-        })
+      onInputChange?.(e.currentTarget.value, {
+        action: 'input-change',
+      })
     },
     [onInputChange],
   )
