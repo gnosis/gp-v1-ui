@@ -37,6 +37,7 @@ beforeEach(() => {
     balanceStates: {},
     erc20Api: mockErc20Api,
     registeredTokens: tokens,
+    prices: [new BN('1000000000000000000')],
     ordersByUser: {
       [USER_1]: [baseOrder],
     },
@@ -60,6 +61,24 @@ describe('Basic view functions', () => {
 
     it('returns all placed orders', async () => {
       expect(await instance.getOrders({ userAddress: USER_1, networkId: NETWORK_ID })).toHaveLength(1)
+    })
+  })
+
+  describe('get prices', () => {
+    it('returns known token price', async () => {
+      const expected = '1000000000000000000'
+
+      const actual = await instance.getCurrentPrices({ networkId: NETWORK_ID, tokenId: 0 })
+
+      expect(actual.toString()).toEqual(expected)
+    })
+
+    it('returns zero for token without price', async () => {
+      const expected = '0'
+
+      const actual = await instance.getCurrentPrices({ networkId: NETWORK_ID, tokenId: 1 })
+
+      expect(actual.toString()).toEqual(expected)
     })
   })
 

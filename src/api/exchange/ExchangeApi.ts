@@ -12,6 +12,10 @@ interface BaseParams {
   networkId: number
 }
 
+export interface GetCurrentPricesParams extends BaseParams {
+  tokenId: number
+}
+
 export interface GetOrdersParams extends BaseParams {
   userAddress: string
 }
@@ -69,6 +73,8 @@ export interface PendingTxObj extends AuctionElement {
 export interface ExchangeApi extends DepositApi {
   getNumTokens(networkId: number): Promise<number>
   getFeeDenominator(networkId: number): Promise<number>
+
+  getCurrentPrices(params: GetCurrentPricesParams): Promise<BN>
 
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
   getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
@@ -172,6 +178,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract(networkId)
     const feeDenominator = await contract.methods.FEE_DENOMINATOR().call()
     return +feeDenominator
+  }
+
+  public async getCurrentPrices({ networkId, tokenId }: GetCurrentPricesParams): Promise<BN> {
+    const contract = await this._getContract(networkId)
+    const price = await contract.methods.currentPrices(tokenId).call()
+
+    return new BN(price)
   }
 
   public async getTokenAddressById({ tokenId, networkId }: GetTokenAddressByIdParams): Promise<string> {

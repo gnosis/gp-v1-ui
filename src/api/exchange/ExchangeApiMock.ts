@@ -1,4 +1,5 @@
 import BN from 'bn.js'
+import { ZERO } from '@gnosis.pm/dex-js'
 
 import assert from 'assert'
 
@@ -20,6 +21,7 @@ import {
   PlaceValidFromOrdersParams,
   GetOrdersPaginatedParams,
   GetOrdersPaginatedResult,
+  GetCurrentPricesParams,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { wait } from 'utils'
@@ -32,6 +34,7 @@ interface ConstructorParams {
   erc20Api: Erc20Api
   balanceStates?: BalancesByUserAndToken
   registeredTokens?: string[]
+  prices?: BN[]
   ordersByUser?: OrdersByUser
   maxTokens?: number
 }
@@ -42,11 +45,19 @@ interface ConstructorParams {
 export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   private registeredTokens: string[]
   private tokenAddressToId: { [address in string]: number } // reverse mapping of registeredTokens for faster access
+  private tokenPrices: BN[]
   private maxTokens: number
   private orders: OrdersByUser
 
   public constructor(params: ConstructorParams) {
-    const { erc20Api, balanceStates = {}, registeredTokens = [], ordersByUser = {}, maxTokens = 10000 } = params
+    const {
+      erc20Api,
+      balanceStates = {},
+      registeredTokens = [],
+      prices = [],
+      ordersByUser = {},
+      maxTokens = 10000,
+    } = params
 
     super(balanceStates, erc20Api)
 
@@ -55,6 +66,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       obj[address] = index
       return obj
     }, {})
+    this.tokenPrices = prices
     this.maxTokens = maxTokens
     this.orders = ordersByUser
   }
@@ -96,6 +108,10 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
    */
   public async getFeeDenominator(): Promise<number> {
     return FEE_DENOMINATOR
+  }
+
+  public async getCurrentPrices({ tokenId }: GetCurrentPricesParams): Promise<BN> {
+    return this.tokenPrices[tokenId] || ZERO
   }
 
   public async getTokenAddressById({ tokenId }: GetTokenAddressByIdParams): Promise<string> {
