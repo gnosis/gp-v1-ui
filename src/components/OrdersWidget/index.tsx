@@ -242,7 +242,7 @@ const OrdersWidget: React.FC = () => {
             </div>
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
               <b>↴</b>
-              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting}>
+              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
                 <FontAwesomeIcon icon={faTrashAlt} />{' '}
                 {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
               </ButtonWithIcon>
