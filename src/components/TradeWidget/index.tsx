@@ -653,7 +653,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
-            tabIndex={2}
+            tabIndex={1}
             readOnly
             tooltipText={receiveTokenTooltipText}
           />
@@ -662,6 +662,7 @@ const TradeWidget: React.FC = () => {
             priceInverseInputId={priceInverseInputId}
             sellToken={sellToken}
             receiveToken={receiveToken}
+            tabIndex={1}
           />
           <OrderValidity
             validFromInputId={validFromId}
@@ -671,14 +672,14 @@ const TradeWidget: React.FC = () => {
             isUnlimited={unlimited}
             setAsap={setAsap}
             setUnlimited={setUnlimited}
-            tabIndex={3}
+            tabIndex={1}
           />
           <p>This order might be partially filled.</p>
           <SubmitButton
             data-text="This order might be partially filled."
             type="submit"
             disabled={isSubmitting}
-            tabIndex={5}
+            tabIndex={1}
           >
             {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Please select different tokens' : 'Submit limit order'}
