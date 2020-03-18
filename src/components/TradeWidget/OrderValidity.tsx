@@ -12,6 +12,7 @@ import { validInputPattern, formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
 import { MEDIA } from 'const'
+import { TooltipWrapper, LongTooltipContainer } from 'components/Tooltip'
 
 const Wrapper = styled.div`
   display: flex;
@@ -220,6 +221,13 @@ const OrderValidityBox = styled(PriceInputBox)`
   }
 `
 
+const OrderStartsTooltip = (
+  <LongTooltipContainer>
+    Your order will be considered for the next upcoming batch. Orders are not considered for inclusion in the current
+    active batch. It’s up to you to control for how long your order is valid.
+  </LongTooltipContainer>
+)
+
 interface Props {
   validFromInputId: TradeFormTokenId
   validUntilInputId: TradeFormTokenId
@@ -313,10 +321,10 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <button type="button" onClick={handleShowConfig}>
+      <TooltipWrapper as="button" type="button" onClick={handleShowConfig} tooltip={OrderStartsTooltip}>
         Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
         <b>{formatTimeInHours(validUntil, 'Never')}</b>
-      </button>
+      </TooltipWrapper>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
         <h4>
