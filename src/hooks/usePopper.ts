@@ -116,10 +116,27 @@ interface PopperDefaultHookResult<T extends HTMLElement> {
 }
 
 // Popper hook using default triggers
-export const usePopperDefault = <T extends HTMLElement>(placement: Placement = 'top'): PopperDefaultHookResult<T> => {
-  const { target, show, hide, ...tooltipProps } = usePopper<T>({
-    placement,
-  })
+export const usePopperDefault = <T extends HTMLElement>(
+  placement: Placement = 'top',
+  offset?: number,
+): PopperDefaultHookResult<T> => {
+  const config = useMemo(() => {
+    const config: Partial<Options> = { placement }
+    if (offset !== undefined) {
+      config.modifiers = [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, offset],
+          },
+        },
+      ]
+      console.log('config.modifiers', config.modifiers)
+    }
+    return config
+  }, [placement, offset])
+
+  const { target, show, hide, ...tooltipProps } = usePopper<T>(config)
 
   const targetProps = useMemo(
     () => ({

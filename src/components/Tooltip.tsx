@@ -92,6 +92,7 @@ export const Tooltip = React.memo(React.forwardRef<HTMLDivElement, TooltipProps>
 interface WrapperProps<C> {
   tooltip: ReactNode
   placement?: Placement
+  offset?: number
   focus?: boolean
   hover?: boolean
   as?: C
@@ -114,9 +115,10 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
   as,
   focus = true,
   hover = true,
+  offset,
   ...props
 }: WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
-  const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
+  const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement, offset)
 
   const childrenNumber = React.Children.count(children)
 
