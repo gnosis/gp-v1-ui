@@ -116,6 +116,7 @@ export const CardTable = styled.table<{
   $webCSS?: string
 }>`
   display: grid;
+  flex: 1;
   // grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
 
@@ -207,6 +208,9 @@ export const CardTable = styled.table<{
 
   // Table Body
   tbody {
+    flex: 1;
+    display: flex;
+    flex-flow: nowrap column;
     font-size: 1.1rem;
     font-family: var(--font-mono);
     font-weight: var(--font-weight-regular);

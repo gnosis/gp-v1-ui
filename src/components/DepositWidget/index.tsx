@@ -286,6 +286,29 @@ const BalanceTools = styled.div`
   }
 `
 
+const NoTokensMessage = styled.tr`
+  /* increase speicifcity */
+  &&&&&& {
+    margin: auto;
+    border: none;
+
+    :hover {
+      background: initial;
+    }
+
+    a {
+      color: #218dff;
+    }
+
+    > td {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      min-height: 3.5em;
+    }
+  }
+`
+
 type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
   ReturnType<typeof useTokenBalances> & {
     requestWithdrawConfirmation(
@@ -316,6 +339,11 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
 
   const handleHideZeroBalances = (e: React.ChangeEvent<HTMLInputElement>): void => setHideZeroBalances(e.target.checked)
+
+  const clearFilters = (): void => {
+    setSearch('')
+    setHideZeroBalances(false)
+  }
 
   const debouncedSearch = useDebounce(search, 500)
 
@@ -374,32 +402,39 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </tr>
           </thead>
           <tbody>
-            {displayedBalances &&
-              displayedBalances.map(tokenBalances => (
-                <Row
-                  key={tokenBalances.addressMainnet}
-                  tokenBalances={tokenBalances}
-                  onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                  onSubmitDeposit={(balance, onTxHash): Promise<void> =>
-                    depositToken(balance, tokenBalances.address, onTxHash)
-                  }
-                  onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
-                    return requestWithdrawConfirmation(
-                      balance,
-                      tokenBalances.address,
-                      tokenBalances.claimable,
-                      onTxHash,
-                    )
-                  }}
-                  onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
-                  claiming={claiming.has(tokenBalances.address)}
-                  withdrawing={withdrawing.has(tokenBalances.address)}
-                  depositing={depositing.has(tokenBalances.address)}
-                  highlighted={highlighted.has(tokenBalances.address)}
-                  enabling={enabling.has(tokenBalances.address)}
-                  {...windowSpecs}
-                />
-              ))}
+            {displayedBalances && displayedBalances.length > 0
+              ? displayedBalances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.addressMainnet}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                      depositToken(balance, tokenBalances.address, onTxHash)
+                    }
+                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                      return requestWithdrawConfirmation(
+                        balance,
+                        tokenBalances.address,
+                        tokenBalances.claimable,
+                        onTxHash,
+                      )
+                    }}
+                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    claiming={claiming.has(tokenBalances.address)}
+                    withdrawing={withdrawing.has(tokenBalances.address)}
+                    depositing={depositing.has(tokenBalances.address)}
+                    highlighted={highlighted.has(tokenBalances.address)}
+                    enabling={enabling.has(tokenBalances.address)}
+                    {...windowSpecs}
+                  />
+                ))
+              : (search || hideZeroBalances) && (
+                  <NoTokensMessage>
+                    <td>
+                      No tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                    </td>
+                  </NoTokensMessage>
+                )}
           </tbody>
         </CardTable>
       )}
