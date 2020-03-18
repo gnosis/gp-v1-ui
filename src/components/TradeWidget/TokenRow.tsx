@@ -9,7 +9,7 @@ import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
 
-import { TooltipWrapper } from 'components/Tooltip'
+import { TooltipWrapper, LongTooltipContainer } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
@@ -179,6 +179,14 @@ interface Props {
   autoFocus?: boolean
 }
 
+const BalanceTooltip = (
+  <LongTooltipContainer>
+    This balance reflects the amount deposited in the Exchange Wallet on Mesa, not the overall amounts in your wallet.
+    Please note that orders can be placed without a balance, but that only orders that have a corresponding balance of
+    the sell token can be matched.
+  </LongTooltipContainer>
+)
+
 const TokenRow: React.FC<Props> = ({
   selectedToken,
   tokens,
@@ -273,7 +281,7 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
-          <span>
+          <TooltipWrapper as="span" tooltip={BalanceTooltip}>
             Balance:
             {readOnly ? (
               <FormMessage className={balanceClassName}>
@@ -296,7 +304,7 @@ const TokenRow: React.FC<Props> = ({
                 </FormMessage>
               </>
             )}
-          </span>
+          </TooltipWrapper>
         </span>
       </div>
       <InputBox>
