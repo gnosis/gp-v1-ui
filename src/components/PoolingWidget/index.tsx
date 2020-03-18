@@ -7,7 +7,7 @@ import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import joi from '@hapi/joi'
 
 import ProgressBar from './ProgressBar'
-import { StepDescription } from './StepDecriptors'
+import { StepDescription } from './StepDescriptors'
 import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
 import LiquidityButtons from './LiquidityButtons'
