@@ -340,12 +340,13 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 
   const handleHideZeroBalances = (e: React.ChangeEvent<HTMLInputElement>): void => setHideZeroBalances(e.target.checked)
 
+  const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
+
   const clearFilters = (): void => {
     setSearch('')
+    setDebouncedSearch('')
     setHideZeroBalances(false)
   }
-
-  const debouncedSearch = useDebounce(search, 500)
 
   const filteredBalances = useMemo(() => {
     if (!debouncedSearch || !balances || balances.length === 0) return balances
