@@ -14,6 +14,7 @@ export const Wrapper = styled.div`
   border-radius: 0.6rem;
   width: 100%;
   min-height: 35rem;
+  min-width: 55rem;
   display: flex;
   flex-flow: row nowrap;
   font-size: 1.6rem;
@@ -30,6 +31,7 @@ export const Wrapper = styled.div`
   @media ${MEDIA.mobile} {
     width: calc(100% - 2.4rem);
     margin: 0 auto;
+    min-width: initial;
   }
 
   > img {
