@@ -6,11 +6,20 @@ import InputWithTooltip from '../InputWithTooltip'
 
 import { useFormContext, FieldError } from 'react-hook-form'
 import { FormInputError } from 'components/TradeWidget/FormMessage'
+import { TooltipWrapper, LongTooltipContainer } from 'components/Tooltip'
 
 interface DefineSpreadProps {
   isSubmitting: boolean
   spread: number
 }
+
+const SpreadTooltip = (
+  <LongTooltipContainer>
+    If, for example, you select DAI and USDC with a spread of 1%, everytime the price of DAI is 1% above USDC (i.e. 1.01
+    as you are assuming both have a true value of 1USD), you might sell your DAI for USDC. If USDC is 1% above DAI (i.e.
+    1.01), you might sell your USDC for DAI.
+  </LongTooltipContainer>
+)
 
 const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
   const { errors, register } = useFormContext()
@@ -19,10 +28,10 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
 
   return (
     <DefineSpreadWrapper>
-      <p>
+      <TooltipWrapper as="p" tooltip={SpreadTooltip}>
         <strong>Spread %</strong> -{' '}
         <small>percentage you want to sell above $1, and buy below $1 between all selected tokens</small>
-      </p>
+      </TooltipWrapper>
       <InputWithTooltip
         className={errorMessage ? 'error' : ''}
         name="spread"
