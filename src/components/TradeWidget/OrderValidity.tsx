@@ -321,7 +321,7 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <TooltipWrapper as="button" type="button" onClick={handleShowConfig} tooltip={OrderStartsTooltip}>
+      <TooltipWrapper as="button" type="button" onClick={handleShowConfig} tooltip={OrderStartsTooltip} offset={-10}>
         Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
         <b>{formatTimeInHours(validUntil, 'Never')}</b>
       </TooltipWrapper>
