@@ -336,8 +336,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const displayedBalances = useMemo(() => {
     if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
 
-    return filteredBalances.filter(({ exchangeBalance, pendingWithdraw, walletBalance }) => {
-      return !exchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
+    return filteredBalances.filter(({ totalExchangeBalance, pendingWithdraw, walletBalance }) => {
+      return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
     })
   }, [hideZeroBalances, filteredBalances])
 
