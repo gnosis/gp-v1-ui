@@ -19,7 +19,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
         return {
           title: '1. Select at least two of your trusted stablecoins',
           subtext: `<p>Select two or more stablecoins you want to include in your liquidity provision and you believe are worth $1</p>
-            <p>Setup your liquidity provision once and allow your funds to be traded on your behalf.</p>
+            <p>Set your liquidity provision strategy once and allow your funds to market make.</p>
             <ul>
               <li><img src=${checkIcon} />No maintenance needed</li>
               <li><img src=${checkIcon} />No gas costs for trades</li>
@@ -35,10 +35,10 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
         return {
           title: '2. Define your spread and review:',
           subtext: `
-            <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>, to be found under menu option 'Balances'.</p>
+            <p>While you can create orders for tokens without having an exchange balance, <u>these orders can only be executed</u> if any deposited balance is available in the <b>exchange wallet</b>.</p>
             <p>Once the transaction is mined, please review the balances for your selected liquidity order tokens.</p>
             <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
-            <p><b>The exchange only uses your fully available exchange balance to execute trades.</b></p>
+            <p><b>Only orders that have a deposited balance in the Exchange Wallet will be matched.</b></p>
             `,
         }
       default:
