@@ -28,7 +28,7 @@ const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
 
   return (
     <DefineSpreadWrapper>
-      <TooltipWrapper as="p" tooltip={SpreadTooltip}>
+      <TooltipWrapper as="p" tooltip={SpreadTooltip} offset={0}>
         <strong>Spread %</strong> -{' '}
         <small>percentage you want to sell above $1, and buy below $1 between all selected tokens</small>
       </TooltipWrapper>
