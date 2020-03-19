@@ -32,6 +32,7 @@ export const OrdersWrapper = styled.div`
     display: flex;
     flex-flow: column wrap;
     flex: 1 1 auto;
+    min-width: initial;
   }
 
   > a {
