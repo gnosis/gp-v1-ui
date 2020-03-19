@@ -9,6 +9,7 @@ import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
+import searchIcon from 'assets/img/search.svg'
 
 const Wrapper = styled.div`
   display: flex;
@@ -70,14 +71,42 @@ const Wrapper = styled.div`
   .tokenSelectBox {
     position: relative;
     .react-select__menu {
-      // TODO: style custom menu header and search input
       .header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+
+        > button {
+          background-color: transparent;
+          font-size: 4rem;
+          line-height: 1;
+          color: #526877;
+          opacity: 0.5;
+          font-family: var(--font-arial);
+          transition: opacity 0.2s ease-in-out;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        > h2 {
+          margin-left: 1em;
+        }
       }
 
       .searchContainer {
         display: flex;
+
+        > input {
+          max-width: 100%;
+          font-size: 1.4rem;
+          font-weight: var(--font-weight-normal);
+          background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+          border-radius: 0;
+          padding: 0px 1.6rem 0px 4.8rem;
+          height: 3em;
+        }
       }
 
       &::before {
@@ -204,6 +233,7 @@ const customSelectStyles = {
     overflow: 'auto',
     borderRadius: '0.6rem',
     padding: '0 0 5rem 0',
+    background: 'var(--color-background-pageWrapper)',
   }),
   input: (provided: CSSProperties): CSSProperties => ({
     ...provided,

@@ -1,7 +1,5 @@
 import React, { ComponentType, useRef, useEffect, useCallback } from 'react'
 import { components, MenuListComponentProps } from 'react-select'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 // Inspired by https://github.com/JedWatson/react-select/issues/3111#issuecomment-470911304
 
@@ -73,7 +71,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
       <div className="header">
         <h2>Select token</h2>
         <button type="button" onClick={selectCurrent}>
-          X
+          ×
         </button>
       </div>
       <div className="searchContainer">
