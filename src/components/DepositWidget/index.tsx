@@ -305,6 +305,7 @@ const NoTokensMessage = styled.tr`
       flex-direction: column;
       justify-content: space-evenly;
       min-height: 3.5em;
+      line-height: 1.5;
     }
   }
 `
