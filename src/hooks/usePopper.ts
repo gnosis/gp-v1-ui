@@ -131,7 +131,6 @@ export const usePopperDefault = <T extends HTMLElement>(
           },
         },
       ]
-      console.log('config.modifiers', config.modifiers)
     }
     return config
   }, [placement, offset])
