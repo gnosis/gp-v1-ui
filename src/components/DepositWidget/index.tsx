@@ -216,7 +216,7 @@ const BalanceTools = styled.div`
     cursor: pointer;
 
     @media ${MEDIA.mobile} {
-      margin: 0 1.6rem 0 0.8rem;
+      margin: 0 1.6rem 1.6rem;
     }
 
     > b {
