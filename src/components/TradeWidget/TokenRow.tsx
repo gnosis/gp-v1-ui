@@ -182,8 +182,6 @@ interface Props {
 const BalanceTooltip = (
   <LongTooltipContainer>
     This balance reflects the amount deposited in the Exchange Wallet on Mesa, not the overall amounts in your wallet.
-    Please note that orders can be placed without a balance, but that only orders that have a corresponding balance of
-    the sell token can be matched.
   </LongTooltipContainer>
 )
 

@@ -222,10 +222,7 @@ const OrderValidityBox = styled(PriceInputBox)`
 `
 
 const OrderStartsTooltip = (
-  <LongTooltipContainer>
-    Your order will be considered for the next upcoming batch. Orders are not considered for inclusion in the current
-    active batch. It’s up to you to control for how long your order is valid.
-  </LongTooltipContainer>
+  <LongTooltipContainer>Your order will be considered for the next upcoming batch.</LongTooltipContainer>
 )
 
 interface Props {

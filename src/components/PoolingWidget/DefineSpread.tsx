@@ -15,9 +15,8 @@ interface DefineSpreadProps {
 
 const SpreadTooltip = (
   <LongTooltipContainer>
-    If, for example, you select DAI and USDC with a spread of 1%, everytime the price of DAI is 1% above USDC (i.e. 1.01
-    as you are assuming both have a true value of 1USD), you might sell your DAI for USDC. If USDC is 1% above DAI (i.e.
-    1.01), you might sell your USDC for DAI.
+    If, for example, you select DAI and USDC with a spread of 1%, everytime the price of DAI is 1% above USDC you might
+    sell your DAI for USDC. If USDC is 1% above DAI (i.e. 1.01), you might sell your USDC for DAI.
   </LongTooltipContainer>
 )
 
