@@ -1,10 +1,13 @@
-import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { assert, ZERO } from '@gnosis.pm/dex-js'
 
 export interface TheGraphApi {
-  getPrice(params: GetPriceParams): Promise<BigNumber>
-  getPriceInWei(params: GetPriceParams): Promise<BN>
+  getPrice(params: GetPriceParams): Promise<BN>
+  getPrices(params: GetPricesParams): Promise<GetPricesResult>
+}
+
+interface GetPricesResult {
+  [tokenId: number]: BN
 }
 
 export interface GetPriceParams {
@@ -12,7 +15,12 @@ export interface GetPriceParams {
   tokenId: number
 }
 
-export interface QueryParams {
+export interface GetPricesParams {
+  networkId: number
+  tokenIds: number[]
+}
+
+interface QueryParams {
   networkId: number
   queryString: string
 }
@@ -23,8 +31,7 @@ interface UrlByNetwork {
 
 interface PricesData {
   data: {
-    prices: {
-      batchId: string
+    [tokenKey: string]: {
       priceInOwl: string
     }[]
   }
@@ -51,31 +58,23 @@ export class TheGraphApiImpl {
     this.urlByNetwork = params.urls
   }
 
-  public async getPrice({ networkId, tokenId }: GetPriceParams): Promise<BigNumber> {
-    const queryString = `{ 
-        prices(
-          first: 1, 
-          orderBy: batchId
-          orderDirection: desc
-          where: { token: "${tokenId}" }
-        ) {
-            batchId
-            priceInOwl
-        }}`
-
-    const gqlResult = await this.query<GqlResult>({ networkId, queryString })
-
-    if (isGqlError(gqlResult)) {
-      throw new Error(gqlResult.errors[0].message)
-    }
-
-    const price = gqlResult.data.prices[0].priceInOwl
-    return new BigNumber(price)
+  public async getPrice({ networkId, tokenId }: GetPriceParams): Promise<BN> {
+    const prices = this.getPrices({ networkId, tokenIds: [tokenId] })
+    return prices[tokenId]
   }
 
-  public async getPriceInWei({}: GetPriceParams): Promise<BN> {
-    // TODO: implement this, maybe?
-    return ZERO
+  public async getPrices({ networkId, tokenIds }: GetPricesParams): Promise<GetPricesResult> {
+    const tokens = tokenIds.map(tokenId => this.buildPriceQuery(tokenId)).join('\n')
+    const queryString = `{${tokens}}`
+
+    try {
+      const response = await this.query<PricesData>({ networkId, queryString })
+
+      return this.parsePricesData(response)
+    } catch (e) {
+      console.error(e)
+      throw new Error(`Failed to query prices: ${e.message}`)
+    }
   }
 
   private async query<T>({ networkId, queryString }: QueryParams): Promise<T> {
@@ -84,7 +83,6 @@ export class TheGraphApiImpl {
 
     const data = {
       query: queryString,
-      variables: null,
     }
 
     const response = await fetch(url, {
@@ -101,6 +99,34 @@ export class TheGraphApiImpl {
       throw new Error(`Request failed: [${response.status}] ${response.body}`)
     }
 
-    return response.json()
+    const gqlResult = await response.json()
+
+    if (isGqlError(gqlResult)) {
+      throw new Error(`Query failed: ${gqlResult.errors[0].message}`)
+    }
+
+    return gqlResult
+  }
+
+  private buildPriceQuery(tokenId: number): string {
+    return `Token${tokenId}: prices(
+  first: 1, 
+  orderBy: batchId, 
+  orderDirection: desc, 
+  where: {token: "${tokenId}"}
+) {
+  priceInOwl
+}`
+  }
+
+  private parsePricesData({ data }: PricesData): GetPricesResult {
+    return Object.keys(data).reduce((acc, tokenKey) => {
+      // not possible to have a key with only integers, thus `Token` prefix was added
+      const tokenId = +tokenKey.replace(/Token/, '')
+
+      // When there's no data for a token, return 0
+      acc[tokenId] = new BN(data[tokenKey].length > 0 ? data[tokenKey][0].priceInOwl : ZERO)
+      return acc
+    }, {})
   }
 }
