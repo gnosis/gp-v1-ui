@@ -1,39 +1,43 @@
-import BN from 'bn.js'
-import { assert, ZERO } from '@gnosis.pm/dex-js'
+import { assert, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+import BigNumber from 'bignumber.js'
+
+import { ZERO_BIG_NUMBER, TEN_BIG_NUMBER } from 'const'
 
 export interface TheGraphApi {
-  getPrice(params: GetPriceParams): Promise<BN>
+  getPrice(params: GetPriceParams): Promise<BigNumber>
   getPrices(params: GetPricesParams): Promise<GetPricesResult>
-}
-
-interface GetPricesResult {
-  [tokenId: number]: BN
 }
 
 export interface GetPriceParams {
   networkId: number
   tokenId: number
+  inWei?: boolean
 }
 
 export interface GetPricesParams {
   networkId: number
   tokenIds: number[]
+  inWei?: boolean
 }
 
-interface QueryParams {
-  networkId: number
-  queryString: string
+interface GetPricesResult {
+  [tokenId: number]: BigNumber
 }
 
 interface UrlByNetwork {
   [network: number]: string
 }
 
-interface PricesData {
+interface PriceEntry {
+  priceInOwl: string
+  token: {
+    decimals?: number
+  }
+}
+
+interface PricesResponse {
   data: {
-    [tokenKey: string]: {
-      priceInOwl: string
-    }[]
+    [tokenKey: string]: PriceEntry[]
   }
 }
 
@@ -47,7 +51,7 @@ interface GqlError {
   }[]
 }
 
-type GqlResult = PricesData | GqlError
+type GqlResult = PricesResponse | GqlError
 
 const isGqlError = (gqlResult: GqlResult): gqlResult is GqlError => 'errors' in gqlResult
 
@@ -58,28 +62,33 @@ export class TheGraphApiImpl {
     this.urlByNetwork = params.urls
   }
 
-  public async getPrice({ networkId, tokenId }: GetPriceParams): Promise<BN> {
-    const prices = this.getPrices({ networkId, tokenIds: [tokenId] })
+  public async getPrice({ tokenId, ...params }: GetPriceParams): Promise<BigNumber> {
+    // syntactic sugar
+    const prices = this.getPrices({ ...params, tokenIds: [tokenId] })
     return prices[tokenId]
   }
 
-  public async getPrices({ networkId, tokenIds }: GetPricesParams): Promise<GetPricesResult> {
-    const tokens = tokenIds.map(tokenId => this.buildPriceQuery(tokenId)).join('\n')
+  /**
+   * Fetches prices for token based on TokenIds, in relation to OWL.
+   * Price is returned in units by default. To return in WEI, set `inWei` to true.
+   */
+  public async getPrices({ networkId, tokenIds, inWei = false }: GetPricesParams): Promise<GetPricesResult> {
+    const tokens = tokenIds.map(tokenId => this.buildPartialPriceQuery(tokenId)).join('\n')
     const queryString = `{${tokens}}`
 
     try {
-      const response = await this.query<PricesData>({ networkId, queryString })
+      const response = await this.query<PricesResponse>(networkId, queryString)
 
-      return this.parsePricesData(response)
+      return this.parsePricesResponse(response, inWei)
     } catch (e) {
       console.error(e)
       throw new Error(`Failed to query prices: ${e.message}`)
     }
   }
 
-  private async query<T>({ networkId, queryString }: QueryParams): Promise<T> {
+  private async query<T>(networkId: number, queryString: string): Promise<T> {
     const url = this.urlByNetwork[networkId]
-    assert(url, `No graph configured for network id ${networkId}`)
+    assert(url, `TheGraph instance is not available for network id ${networkId}`)
 
     const data = {
       query: queryString,
@@ -108,7 +117,7 @@ export class TheGraphApiImpl {
     return gqlResult
   }
 
-  private buildPriceQuery(tokenId: number): string {
+  private buildPartialPriceQuery(tokenId: number): string {
     return `Token${tokenId}: prices(
   first: 1, 
   orderBy: batchId, 
@@ -116,17 +125,29 @@ export class TheGraphApiImpl {
   where: {token: "${tokenId}"}
 ) {
   priceInOwl
+  token {
+    decimals
+  }
 }`
   }
 
-  private parsePricesData({ data }: PricesData): GetPricesResult {
+  private parsePricesResponse({ data }: PricesResponse, inWei: boolean): GetPricesResult {
     return Object.keys(data).reduce((acc, tokenKey) => {
       // not possible to have a key with only integers, thus `Token` prefix was added
       const tokenId = +tokenKey.replace(/Token/, '')
 
       // When there's no data for a token, return 0
-      acc[tokenId] = new BN(data[tokenKey].length > 0 ? data[tokenKey][0].priceInOwl : ZERO)
+      acc[tokenId] = data[tokenKey].length > 0 ? this.calculatePrice(data[tokenKey][0], inWei) : ZERO_BIG_NUMBER
       return acc
     }, {})
+  }
+
+  private calculatePrice(
+    { priceInOwl, token: { decimals = DEFAULT_PRECISION } }: PriceEntry,
+    inWei: boolean,
+  ): BigNumber {
+    const price = new BigNumber(priceInOwl)
+
+    return inWei ? price : price.dividedBy(TEN_BIG_NUMBER.exponentiatedBy(decimals))
   }
 }
