@@ -41,6 +41,9 @@ interface GqlError {
 }
 
 type GqlResult = PricesData | GqlError
+
+const isGqlError = (gqlResult: GqlResult): gqlResult is GqlError => 'errors' in gqlResult
+
 export class TheGraphApiImpl {
   private urlByNetwork: UrlByNetwork
 
@@ -61,6 +64,12 @@ export class TheGraphApiImpl {
         }}`
 
     const gqlResult = await this.query<GqlResult>({ networkId, queryString })
+
+    if (isGqlError(gqlResult)) {
+      throw new Error(gqlResult.errors[0].message)
+    }
+
+    const price = gqlResult.data.prices[0].priceInOwl
     return new BigNumber(price)
   }
 
