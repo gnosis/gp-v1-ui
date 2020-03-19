@@ -21,6 +21,26 @@ interface UrlByNetwork {
   [network: number]: string
 }
 
+interface PricesData {
+  data: {
+    prices: {
+      batchId: string
+      priceInOwl: string
+    }[]
+  }
+}
+
+interface GqlError {
+  errors: {
+    locations: {
+      line: number
+      column: number
+    }[]
+    message: string
+  }[]
+}
+
+type GqlResult = PricesData | GqlError
 export class TheGraphApiImpl {
   private urlByNetwork: UrlByNetwork
 
@@ -39,7 +59,8 @@ export class TheGraphApiImpl {
             batchId
             priceInOwl
         }}`
-    const price = await this.query<string>({ networkId, queryString })
+
+    const gqlResult = await this.query<GqlResult>({ networkId, queryString })
     return new BigNumber(price)
   }
 
