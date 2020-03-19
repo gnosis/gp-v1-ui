@@ -64,7 +64,13 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
 
   // for autofocus
   const inputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => inputRef.current?.focus(), [])
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    inputRef.current?.focus()
+
+    const menuList = searchContainerRef.current?.nextElementSibling
+    if (menuList) menuList.scrollTop = 0
+  }, [])
 
   return (
     <>
@@ -74,8 +80,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
           ×
         </button>
       </div>
-      <div className="searchContainer">
-        <FontAwesomeIcon icon={faSearch} />
+      <div className="searchContainer" ref={searchContainerRef}>
         <input
           ref={inputRef}
           autoCorrect="off"
