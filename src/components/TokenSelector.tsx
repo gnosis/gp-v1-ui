@@ -92,6 +92,7 @@ const Wrapper = styled.div`
 
         > h2 {
           margin-left: 1em;
+          font-size: 1.5rem;
         }
       }
 
