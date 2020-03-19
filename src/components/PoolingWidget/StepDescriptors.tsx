@@ -14,8 +14,6 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
   const { title, subtext }: { title: string; subtext?: React.ReactNode } = useMemo(() => {
     switch (step) {
       case 1:
-        // TODO: Add Link
-        // https://github.com/gnosis/dex-react/issues/615
         return {
           title: '1. Select at least two of your trusted stablecoins',
           subtext: (
@@ -39,9 +37,13 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
                   Cancellation possible at any time
                 </li>
               </ul>
-              <p className="not-implemented">
-                <a href="#" target="_blank" rel="noopener">
-                  Learn more about liquidity provision.
+              <p>
+                <a
+                  href="https://dfusion-docs.dev.gnosisdev.com/docs/liquidity1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Learn more about liquidity provision
                 </a>
               </p>
             </>
@@ -63,6 +65,15 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
               <p>Unlock and deposit any amount for these tokens so the liquidity order trades can be executed.</p>
               <p>
                 <b>Only orders that have a deposited balance in the Exchange Wallet will be matched.</b>
+              </p>
+              <p>
+                <a
+                  href="https://dfusion-docs.dev.gnosisdev.com/docs/liquidity1"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Learn more about the spread
+                </a>
               </p>
             </>
           ),
