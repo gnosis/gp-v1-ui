@@ -77,6 +77,12 @@ const WrappedForm = styled.form`
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 1;
 
+  .react-select__control:focus-within,
+  input[type='checkbox']:focus,
+  button:focus {
+    outline: 1px dotted gray;
+  }
+
   .expanded & {
     width: 0;
     overflow: hidden;
