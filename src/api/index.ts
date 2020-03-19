@@ -25,7 +25,8 @@ import {
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 import fetchGasPriceFactory from './gasStation'
-import { TheGraphApi, TheGraphApiImpl } from './thegraph/TheGraphApi'
+import { TheGraphApi } from './thegraph/TheGraphApi'
+import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
@@ -115,7 +116,7 @@ function createTheGraphApi(): TheGraphApi {
     [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion-rinkeby',
   }
 
-  const theGraphApi = new TheGraphApiImpl({ urls })
+  const theGraphApi = new TheGraphApiProxy({ urls })
 
   window['theGraphApi'] = theGraphApi
 

@@ -55,10 +55,14 @@ type GqlResult = PricesResponse | GqlError
 
 const isGqlError = (gqlResult: GqlResult): gqlResult is GqlError => 'errors' in gqlResult
 
+export interface Params {
+  urls: UrlByNetwork
+}
+
 export class TheGraphApiImpl {
   private urlByNetwork: UrlByNetwork
 
-  public constructor(params: { urls: UrlByNetwork }) {
+  public constructor(params: Params) {
     this.urlByNetwork = params.urls
   }
 
