@@ -45,12 +45,10 @@ export function getPriceEstimationFactory(factoryParams: {
 
     assert(baseTokenId !== quoteTokenId, 'Token ids cannot be the equal')
 
-    // As much as it'd be visually pleasing, cannot simplify it to a single expression
-    // We need to execute both functions.
-    let needsToSort = addTokenId(baseTokenId)
-    needsToSort = addTokenId(quoteTokenId) || needsToSort
+    const baseTokenAdded = addTokenId(baseTokenId)
+    const quoteTokenAdded = addTokenId(quoteTokenId)
 
-    if (needsToSort) {
+    if (baseTokenAdded || quoteTokenAdded) {
       tokenIds.sort()
     }
 
