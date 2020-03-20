@@ -18,27 +18,17 @@ const Wrapper = styled.div`
   margin: 1.6rem 0 0;
   justify-content: space-between;
 
-  div.label-wrapper {
-    width: 50%;
-    strong {
-      text-transform: capitalize;
-      display: inline-block;
-      color: #2f3e4e;
-      width: 100%;
-      margin: 0 0 1rem;
-      padding: 0;
-      box-sizing: border-box;
-      font-size: 1.5rem;
-      @media ${MEDIA.mobile} {
-        font-size: 1.3rem;
-      }
-
-      small {
-        padding-left: 1rem;
-        display: inline-block;
-        font-size: 1rem;
-        color: #476481;
-      }
+  > strong {
+    text-transform: capitalize;
+    display: inline-block;
+    color: #2f3e4e;
+    width: 100%;
+    margin: 0 0 1rem;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 1.5rem;
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
     }
   }
 `
@@ -203,21 +193,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
 
   return (
     <Wrapper>
-      <div className="label-wrapper">
-        <strong>
-          Limit price
-          <small>
-            {receiveToken.symbol}/{sellToken.symbol}
-          </small>
-        </strong>
-      </div>
-      <div className="label-wrapper">
-        <strong>
-          <small>
-            {sellToken.symbol}/{receiveToken.symbol}
-          </small>
-        </strong>
-      </div>
+      <strong>Limit price</strong>
       <PriceInputBox>
         <label>
           <input
@@ -236,7 +212,9 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <small>{sellToken.symbol}</small>
+          <small>
+            {receiveToken.symbol}/{sellToken.symbol}
+          </small>
         </label>
         {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
       </PriceInputBox>
@@ -258,7 +236,9 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <small>{receiveToken.symbol}</small>
+          <small>
+            {sellToken.symbol}/{receiveToken.symbol}
+          </small>
         </label>
         {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
       </PriceInputBox>
