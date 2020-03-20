@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { assert } from '@gnosis.pm/dex-js'
+import { assert, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
 
 import { ZERO_BIG_NUMBER } from 'const'
 
@@ -54,18 +54,17 @@ export function getPriceEstimationFactory(factoryParams: {
 
     const prices = await theGraphApi.getPrices({ networkId, tokenIds })
 
-    if (quoteTokenId === 0) {
-      // Optimization more for a matter of principle than performance:
-      // OWL token is always tokenId == 0 on the contract
-      // All prices are given in terms of OWL
-      // OWL price is always 1
-      // Anything divided by 1...
-      return prices[baseTokenId]
-    } else if (prices[baseTokenId].isZero() || prices[quoteTokenId].isZero()) {
+    // OWL token is always tokenId == 0 on the contract
+    // OWL price is always 1
+    // All prices are given in terms of OWL
+    const basePrice = baseTokenId === 0 ? ONE_BIG_NUMBER : prices[baseTokenId]
+    const quotePrice = quoteTokenId === 0 ? ONE_BIG_NUMBER : prices[quoteTokenId]
+
+    if (basePrice.isZero() || quotePrice.isZero()) {
       // there was never a trade for one of these tokens
       return ZERO_BIG_NUMBER
     }
 
-    return prices[baseTokenId].dividedBy(prices[quoteTokenId])
+    return basePrice.dividedBy(quotePrice)
   }
 }
