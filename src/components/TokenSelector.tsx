@@ -82,7 +82,8 @@ const Wrapper = styled.div`
           line-height: 1;
           color: #526877;
           opacity: 0.5;
-          font-family: var(--font-arial);
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-regular);
           transition: opacity 0.2s ease-in-out;
 
           &:hover {
