@@ -8,8 +8,8 @@ import { TokenList } from 'api/tokenList/TokenListApi'
 import { Network } from 'types'
 
 export interface GetPriceParams {
-  numeratorTokenId: number
-  denominatorTokenId: number
+  baseTokenId: number
+  quoteTokenId: number
 }
 
 export function getPriceEstimationFactory(factoryParams: {
@@ -41,14 +41,14 @@ export function getPriceEstimationFactory(factoryParams: {
   }
 
   return async (params: GetPriceParams): Promise<BigNumber> => {
-    const { numeratorTokenId, denominatorTokenId } = params
+    const { baseTokenId, quoteTokenId } = params
 
-    assert(numeratorTokenId !== denominatorTokenId, 'Token ids cannot be the equal')
+    assert(baseTokenId !== quoteTokenId, 'Token ids cannot be the equal')
 
     // As much as it'd be visually pleasing, cannot simplify it to a single expression
     // We need to execute both functions.
-    let needsToSort = addTokenId(numeratorTokenId)
-    needsToSort = addTokenId(denominatorTokenId) || needsToSort
+    let needsToSort = addTokenId(baseTokenId)
+    needsToSort = addTokenId(quoteTokenId) || needsToSort
 
     if (needsToSort) {
       tokenIds.sort()
@@ -56,18 +56,18 @@ export function getPriceEstimationFactory(factoryParams: {
 
     const prices = await theGraphApi.getPrices({ networkId, tokenIds })
 
-    if (denominatorTokenId === 0) {
+    if (quoteTokenId === 0) {
       // Optimization more for a matter of principle than performance:
       // OWL token is always tokenId == 0 on the contract
       // All prices are given in terms of OWL
       // OWL price is always 1
       // Anything divided by 1...
-      return prices[numeratorTokenId]
-    } else if (prices[numeratorTokenId].isZero() || prices[denominatorTokenId].isZero()) {
+      return prices[baseTokenId]
+    } else if (prices[baseTokenId].isZero() || prices[quoteTokenId].isZero()) {
       // there was never a trade for one of these tokens
       return ZERO_BIG_NUMBER
     }
 
-    return prices[numeratorTokenId].dividedBy(prices[denominatorTokenId])
+    return prices[baseTokenId].dividedBy(prices[quoteTokenId])
   }
 }
