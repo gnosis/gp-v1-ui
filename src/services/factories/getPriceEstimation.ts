@@ -5,9 +5,9 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import { TheGraphApi } from 'api/thegraph/TheGraphApi'
 import { TokenList } from 'api/tokenList/TokenListApi'
+import { Network } from 'types'
 
 export interface GetPriceParams {
-  networkId: number
   numeratorTokenId: number
   denominatorTokenId: number
 }
@@ -18,27 +18,41 @@ export function getPriceEstimationFactory(factoryParams: {
 }): (params: GetPriceParams) => Promise<BigNumber> {
   const { theGraphApi, tokenListApi } = factoryParams
 
+  // Only make sense to fetch prices for mainnet, thus we won't accept networkId parameter on this service
+  const networkId = Network.Mainnet
+
+  const tokenIdsSet = new Set(tokenListApi.getTokens(networkId).map(token => token.id))
+  const tokenIds = Array.from(tokenIdsSet).sort()
+
+  /**
+   * Given a tokenId, checked whether it's already in our list.
+   * Returns true if tokenId was added to the list and it requires sorting
+   */
+  function addTokenId(tokenId: number): boolean {
+    if (!tokenIdsSet.has(tokenId)) {
+      tokenIdsSet.add(tokenId)
+
+      tokenIds.push(tokenId)
+
+      return true
+    }
+
+    return false
+  }
+
   return async (params: GetPriceParams): Promise<BigNumber> => {
-    const { networkId, numeratorTokenId, denominatorTokenId } = params
+    const { numeratorTokenId, denominatorTokenId } = params
 
     assert(numeratorTokenId !== denominatorTokenId, 'Token ids cannot be the equal')
 
-    // ---
-    // For an 'optimization' of sorts, we always query all known tokens plus the requested token ids.
-    // Assuming the caching is on for the TheGraphApi layer (it was last time I checked) and we don't
-    // expect to have tokens ids not often outside of our list.
-    // Thus, we can actually make a request once, and reuse the response for all token pairs falling into the same list
+    // As much as it'd be visually pleasing, cannot simplify it to a single expression
+    // We need to execute both functions.
+    let needsToSort = addTokenId(numeratorTokenId)
+    needsToSort = addTokenId(denominatorTokenId) || needsToSort
 
-    // all known token ids
-    const tokenIdsSet = new Set(tokenListApi.getTokens(networkId).map(token => token.id))
-    // just in case the tokens are not in our initial list:
-    tokenIdsSet.add(numeratorTokenId)
-    tokenIdsSet.add(denominatorTokenId)
-    // make it nice and sorted to help with caching
-    const tokenIds = [...tokenIdsSet].sort()
-
-    // end of the 'optimization' part
-    // ---
+    if (needsToSort) {
+      tokenIds.sort()
+    }
 
     const prices = await theGraphApi.getPrices({ networkId, tokenIds })
 
