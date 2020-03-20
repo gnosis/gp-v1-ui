@@ -1,8 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { assert, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
 
-import { ZERO_BIG_NUMBER } from 'const'
-
 import { TheGraphApi } from 'api/thegraph/TheGraphApi'
 import { TokenList } from 'api/tokenList/TokenListApi'
 import { Network } from 'types'
@@ -15,7 +13,7 @@ export interface GetPriceParams {
 export function getPriceEstimationFactory(factoryParams: {
   theGraphApi: TheGraphApi
   tokenListApi: TokenList
-}): (params: GetPriceParams) => Promise<BigNumber> {
+}): (params: GetPriceParams) => Promise<BigNumber | null> {
   const { theGraphApi, tokenListApi } = factoryParams
 
   // Only make sense to fetch prices for mainnet, thus we won't accept networkId parameter on this service
@@ -40,7 +38,7 @@ export function getPriceEstimationFactory(factoryParams: {
     return false
   }
 
-  return async (params: GetPriceParams): Promise<BigNumber> => {
+  return async (params: GetPriceParams): Promise<BigNumber | null> => {
     const { baseTokenId, quoteTokenId } = params
 
     assert(baseTokenId !== quoteTokenId, 'Token ids cannot be the equal')
@@ -60,9 +58,9 @@ export function getPriceEstimationFactory(factoryParams: {
     const basePrice = baseTokenId === 0 ? ONE_BIG_NUMBER : prices[baseTokenId]
     const quotePrice = quoteTokenId === 0 ? ONE_BIG_NUMBER : prices[quoteTokenId]
 
-    if (basePrice.isZero() || quotePrice.isZero()) {
+    if (!basePrice || !quotePrice) {
       // there was never a trade for one of these tokens
-      return ZERO_BIG_NUMBER
+      return null
     }
 
     return basePrice.dividedBy(quotePrice)
