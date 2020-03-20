@@ -1,10 +1,10 @@
 import { assert, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 import BigNumber from 'bignumber.js'
 
-import { ZERO_BIG_NUMBER, TEN_BIG_NUMBER } from 'const'
+import { TEN_BIG_NUMBER } from 'const'
 
 export interface TheGraphApi {
-  getPrice(params: GetPriceParams): Promise<BigNumber>
+  getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getPrices(params: GetPricesParams): Promise<GetPricesResult>
 }
 
@@ -21,7 +21,7 @@ export interface GetPricesParams {
 }
 
 interface GetPricesResult {
-  [tokenId: number]: BigNumber
+  [tokenId: number]: BigNumber | null
 }
 
 interface UrlByNetwork {
@@ -66,7 +66,7 @@ export class TheGraphApiImpl {
     this.urlByNetwork = params.urls
   }
 
-  public async getPrice({ tokenId, ...params }: GetPriceParams): Promise<BigNumber> {
+  public async getPrice({ tokenId, ...params }: GetPriceParams): Promise<BigNumber | null> {
     // syntactic sugar
     const prices = this.getPrices({ ...params, tokenIds: [tokenId] })
     return prices[tokenId]
@@ -140,8 +140,8 @@ export class TheGraphApiImpl {
       // not possible to have a key with only integers, thus `Token` prefix was added
       const tokenId = +tokenKey.replace('Token', '')
 
-      // When there's no data for a token, return 0
-      acc[tokenId] = data[tokenKey].length > 0 ? this.calculatePrice(data[tokenKey][0], inWei) : ZERO_BIG_NUMBER
+      // When there's no data for a token, return is null
+      acc[tokenId] = data[tokenKey].length > 0 ? this.calculatePrice(data[tokenKey][0], inWei) : null
       return acc
     }, {})
   }
