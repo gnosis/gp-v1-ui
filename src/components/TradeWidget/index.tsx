@@ -404,14 +404,16 @@ const TradeWidget: React.FC = () => {
   const validUntilValue = watch(validUntilId)
 
   useEffect(() => {
-    logDebug('[TradeWidget] priceEstimation', priceEstimation.toString(10))
+    if (priceEstimation) {
+      logDebug('[TradeWidget] priceEstimation', priceEstimation.toString(10))
 
-    const newPrice = priceEstimation.toFixed(5)
+      const newPrice = priceEstimation.toFixed(5)
 
-    setValue(priceInputId, newPrice)
-    setValue(priceInverseInputId, invertPriceFromString(newPrice))
+      setValue(priceInputId, newPrice)
+      setValue(priceInverseInputId, invertPriceFromString(newPrice))
 
-    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+      setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceEstimation])
 

@@ -3,7 +3,6 @@ import BigNumber from 'bignumber.js'
 
 import useSafeState from './useSafeState'
 
-import { ZERO_BIG_NUMBER } from 'const'
 import { getPriceEstimation } from 'services'
 import { logDebug } from 'utils'
 
@@ -12,16 +11,16 @@ interface Params {
   denominatorTokenId: number
 }
 
-export function usePriceEstimation(params: Params): BigNumber {
-  const { numeratorTokenId, denominatorTokenId } = params
-  const [price, setPrice] = useSafeState(ZERO_BIG_NUMBER)
+export function usePriceEstimation(params: Params): BigNumber | null {
+  const { numeratorTokenId: baseTokenId, denominatorTokenId: quoteTokenId } = params
+  const [price, setPrice] = useSafeState<BigNumber | null>(null)
 
   useEffect(() => {
     async function updatePrice(): Promise<void> {
       try {
         const priceEstimate = await getPriceEstimation({
-          numeratorTokenId,
-          denominatorTokenId,
+          baseTokenId,
+          quoteTokenId,
         })
 
         setPrice(priceEstimate)
@@ -32,7 +31,7 @@ export function usePriceEstimation(params: Params): BigNumber {
     }
 
     updatePrice()
-  }, [denominatorTokenId, numeratorTokenId, setPrice])
+  }, [quoteTokenId, baseTokenId, setPrice])
 
   return price
 }
