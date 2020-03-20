@@ -138,7 +138,7 @@ export class TheGraphApiImpl {
   private parsePricesResponse({ data }: PricesResponse, inWei: boolean): GetPricesResult {
     return Object.keys(data).reduce((acc, tokenKey) => {
       // not possible to have a key with only integers, thus `Token` prefix was added
-      const tokenId = +tokenKey.replace(/Token/, '')
+      const tokenId = +tokenKey.replace('Token', '')
 
       // When there's no data for a token, return 0
       acc[tokenId] = data[tokenKey].length > 0 ? this.calculatePrice(data[tokenKey][0], inWei) : ZERO_BIG_NUMBER
