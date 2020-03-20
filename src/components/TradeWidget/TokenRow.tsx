@@ -314,7 +314,7 @@ const TokenRow: React.FC<Props> = ({
           onKeyPress={onKeyPress}
           onChange={enforcePrecision}
           onBlur={removeExcessZeros}
-          tabIndex={tabIndex + 2}
+          tabIndex={tabIndex}
           onFocus={(e): void => e.target.select()}
         />
 

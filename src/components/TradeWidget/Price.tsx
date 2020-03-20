@@ -128,6 +128,7 @@ interface Props {
   receiveToken: TokenDetails
   priceInputId: string
   priceInverseInputId: string
+  tabIndex?: number
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -135,7 +136,7 @@ export function invertPriceFromString(priceValue: string): string {
   return price ? invertPrice(price).toString(10) : ''
 }
 
-const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
+const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
   const errorPrice = errors[priceInputId]
@@ -203,7 +204,8 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onKeyPress={onKeyPressPrice}
             onBlur={removeExcessZerosPrice}
             onFocus={(e): void => e.target.select()}
-          ></input>
+            tabIndex={tabIndex}
+          />
           <small>
             {sellToken.symbol}/{receiveToken.symbol}
           </small>
@@ -225,7 +227,8 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onKeyPress={onKeyPressPriceInverse}
             onBlur={removeExcessZerosPriceInverse}
             onFocus={(e): void => e.target.select()}
-          ></input>
+            tabIndex={tabIndex}
+          />
           <small>
             {receiveToken.symbol}/{sellToken.symbol}
           </small>

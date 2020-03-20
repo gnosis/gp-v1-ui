@@ -77,6 +77,12 @@ const WrappedForm = styled.form`
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 1;
 
+  .react-select__control:focus-within,
+  input[type='checkbox']:focus,
+  button:focus {
+    outline: 1px dotted gray;
+  }
+
   .expanded & {
     width: 0;
     overflow: hidden;
@@ -653,7 +659,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
-            tabIndex={2}
+            tabIndex={1}
             readOnly
             tooltipText={receiveTokenTooltipText}
           />
@@ -662,6 +668,7 @@ const TradeWidget: React.FC = () => {
             priceInverseInputId={priceInverseInputId}
             sellToken={sellToken}
             receiveToken={receiveToken}
+            tabIndex={1}
           />
           <OrderValidity
             validFromInputId={validFromId}
@@ -671,14 +678,14 @@ const TradeWidget: React.FC = () => {
             isUnlimited={unlimited}
             setAsap={setAsap}
             setUnlimited={setUnlimited}
-            tabIndex={3}
+            tabIndex={1}
           />
           <p>This order might be partially filled.</p>
           <SubmitButton
             data-text="This order might be partially filled."
             type="submit"
             disabled={isSubmitting}
-            tabIndex={5}
+            tabIndex={1}
           >
             {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Please select different tokens' : 'Submit limit order'}
