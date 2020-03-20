@@ -391,7 +391,7 @@ const TradeWidget: React.FC = () => {
       const price = parseBigNumber(priceValue)
 
       if (sellAmount && price) {
-        receiveAmount = sellAmount.multipliedBy(price).toString(10)
+        receiveAmount = price.isZero() ? '0' : sellAmount.div(price).toString(10)
       }
     }
     setValue(receiveInputId, receiveAmount || '')

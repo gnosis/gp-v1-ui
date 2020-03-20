@@ -18,16 +18,27 @@ const Wrapper = styled.div`
   margin: 1.6rem 0 0;
   justify-content: space-between;
 
-  > strong {
-    text-transform: capitalize;
-    color: #2f3e4e;
-    width: 100%;
-    margin: 0 0 1rem;
-    padding: 0;
-    box-sizing: border-box;
-    font-size: 1.5rem;
-    @media ${MEDIA.mobile} {
-      font-size: 1.3rem;
+  div.label-wrapper {
+    width: 50%;
+    strong {
+      text-transform: capitalize;
+      display: inline-block;
+      color: #2f3e4e;
+      width: 100%;
+      margin: 0 0 1rem;
+      padding: 0;
+      box-sizing: border-box;
+      font-size: 1.5rem;
+      @media ${MEDIA.mobile} {
+        font-size: 1.3rem;
+      }
+
+      small {
+        padding-left: 1rem;
+        display: inline-block;
+        font-size: 1rem;
+        color: #476481;
+      }
     }
   }
 `
@@ -120,6 +131,11 @@ export const PriceInputBox = styled.div`
     &:disabled {
       box-shadow: none;
     }
+
+    &[readonly] {
+      background-color: var(--color-background-pageWrapper);
+      border: 1px solid #e7ecf3;
+    }
   }
 `
 
@@ -187,7 +203,21 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
 
   return (
     <Wrapper>
-      <strong>Min. sell price</strong>
+      <div className="label-wrapper">
+        <strong>
+          Limit price
+          <small>
+            {receiveToken.symbol}/{sellToken.symbol}
+          </small>
+        </strong>
+      </div>
+      <div className="label-wrapper">
+        <strong>
+          <small>
+            {sellToken.symbol}/{receiveToken.symbol}
+          </small>
+        </strong>
+      </div>
       <PriceInputBox>
         <label>
           <input
@@ -206,9 +236,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <small>
-            {sellToken.symbol}/{receiveToken.symbol}
-          </small>
+          <small>{sellToken.symbol}</small>
         </label>
         {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
       </PriceInputBox>
@@ -224,14 +252,13 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
               validate: { positive: validatePositiveConstructor('Invalid price') },
               required: true,
             })}
+            readOnly={true}
             onKeyPress={onKeyPressPriceInverse}
             onBlur={removeExcessZerosPriceInverse}
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <small>
-            {receiveToken.symbol}/{sellToken.symbol}
-          </small>
+          <small>{receiveToken.symbol}</small>
         </label>
         {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
       </PriceInputBox>
