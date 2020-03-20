@@ -32,11 +32,12 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount, parseBigNumber, dateToBatchId } from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
+import { usePriceEstimation } from 'hooks/usePriceEstimation'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -321,6 +322,20 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
   }
 }
 
+function calculateReceiveAmount(priceValue: string, sellValue: string): string {
+  let receiveAmount = ''
+  if (priceValue && sellValue) {
+    const sellAmount = parseBigNumber(sellValue)
+    const price = parseBigNumber(priceValue)
+
+    if (sellAmount && price) {
+      receiveAmount = sellAmount.multipliedBy(price).toString(10)
+    }
+  }
+
+  return receiveAmount
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -363,6 +378,11 @@ const TradeWidget: React.FC = () => {
   const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
   const [asap, setAsap] = useState(!validFromParam || !Number(validFromParam))
 
+  const priceEstimation = usePriceEstimation({
+    numeratorTokenId: sellToken.id,
+    denominatorTokenId: receiveToken.id,
+  })
+
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
@@ -383,18 +403,21 @@ const TradeWidget: React.FC = () => {
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
+  useEffect(() => {
+    logDebug('[TradeWidget] priceEstimation', priceEstimation.toString(10))
+
+    const newPrice = priceEstimation.toFixed(5)
+
+    setValue(priceInputId, newPrice)
+    setValue(priceInverseInputId, invertPriceFromString(newPrice))
+
+    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [priceEstimation])
+
   // Update receive amount
   useEffect(() => {
-    let receiveAmount: string | undefined
-    if (priceValue && sellValue) {
-      const sellAmount = parseBigNumber(sellValue)
-      const price = parseBigNumber(priceValue)
-
-      if (sellAmount && price) {
-        receiveAmount = sellAmount.multipliedBy(price).toString(10)
-      }
-    }
-    setValue(receiveInputId, receiveAmount || '')
+    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
   const searchQuery = buildSearchQuery({
