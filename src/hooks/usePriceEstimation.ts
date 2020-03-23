@@ -16,7 +16,7 @@ export function usePriceEstimation(params: Params): BigNumber | null {
   const [price, setPrice] = useSafeState<BigNumber | null>(null)
 
   useEffect(() => {
-    getriceEstimation({ baseTokenId, quoteTokenId }).then(setPrice, logDebug)
+    getPriceEstimation({ baseTokenId, quoteTokenId }).then(setPrice, logDebug)
   }, [quoteTokenId, baseTokenId, setPrice])
 
   return price
