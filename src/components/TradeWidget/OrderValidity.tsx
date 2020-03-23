@@ -139,7 +139,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     opacity: 0.5;
     margin: 0 0 0 auto;
     font-style: normal;
-    font-family: var(--font-arial);
+    font-family: var(--font-mono);
     transition: opacity 0.2s ease-in-out;
 
     &:hover {

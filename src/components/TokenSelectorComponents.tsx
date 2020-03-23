@@ -1,7 +1,5 @@
 import React, { ComponentType, useRef, useEffect, useCallback } from 'react'
 import { components, MenuListComponentProps } from 'react-select'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
 
 // Inspired by https://github.com/JedWatson/react-select/issues/3111#issuecomment-470911304
 
@@ -66,18 +64,23 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
 
   // for autofocus
   const inputRef = useRef<HTMLInputElement>(null)
-  useEffect(() => inputRef.current?.focus(), [])
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    inputRef.current?.focus()
+
+    const menuList = searchContainerRef.current?.nextElementSibling
+    if (menuList) menuList.scrollTop = 0
+  }, [])
 
   return (
     <>
       <div className="header">
         <h2>Select token</h2>
         <button type="button" onClick={selectCurrent}>
-          X
+          ×
         </button>
       </div>
-      <div className="searchContainer">
-        <FontAwesomeIcon icon={faSearch} />
+      <div className="searchContainer" ref={searchContainerRef}>
         <input
           ref={inputRef}
           autoCorrect="off"
