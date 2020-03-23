@@ -342,7 +342,7 @@ const TradeWidget: React.FC = () => {
   const [, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  const fallBackNetworkId = networkId ?? Network.Mainnet // fallback to mainnet
 
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
