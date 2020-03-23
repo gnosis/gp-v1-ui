@@ -379,8 +379,8 @@ const TradeWidget: React.FC = () => {
   const [asap, setAsap] = useState(!validFromParam || !Number(validFromParam))
 
   const priceEstimation = usePriceEstimation({
-    numeratorTokenId: sellToken.id,
-    denominatorTokenId: receiveToken.id,
+    baseTokenId: sellToken.id,
+    quoteTokenId: receiveToken.id,
   })
 
   const methods = useForm<TradeFormData>({

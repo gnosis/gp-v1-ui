@@ -7,12 +7,12 @@ import { getPriceEstimation } from 'services'
 import { logDebug } from 'utils'
 
 interface Params {
-  numeratorTokenId: number
-  denominatorTokenId: number
+  baseTokenId: number
+  quoteTokenId: number
 }
 
 export function usePriceEstimation(params: Params): BigNumber | null {
-  const { numeratorTokenId: baseTokenId, denominatorTokenId: quoteTokenId } = params
+  const { baseTokenId, quoteTokenId } = params
   const [price, setPrice] = useSafeState<BigNumber | null>(null)
 
   useEffect(() => {
