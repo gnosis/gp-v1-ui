@@ -223,7 +223,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = '
       <HelperSpan ref={ref} onClick={handleClick}>
         <FontAwesomeIcon icon={faQuestionCircle} />
       </HelperSpan>
-      <Tooltip {...tooltipProps} bgColor="wheat">
+      <Tooltip {...tooltipProps} bgColor="#bfd6ef">
         {tooltip}
       </Tooltip>
     </>
