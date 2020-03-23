@@ -1,9 +1,11 @@
-import React, { ReactNode, CSSProperties } from 'react'
+import React, { ReactNode, CSSProperties, useCallback } from 'react'
 import Portal from './Portal'
-import { usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
+import { usePopperOnClick, usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 import { State, Placement } from '@popperjs/core'
 import styled from 'styled-components'
 import { isElement, isFragment } from 'react-is'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 
 // visibility necessary for correct boundingRect calculation by popper
 const TooltipOuter = styled.div<Pick<TooltipBaseProps, 'isShown'>>`
@@ -179,3 +181,33 @@ export const LongTooltipContainer = styled.div`
   max-width: 20rem;
   line-height: 1.4;
 `
+
+interface HelpTooltipProps {
+  tooltip: ReactNode
+  placement?: Placement
+  offset?: number
+}
+
+export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = 'top', offset }) => {
+  const {
+    targetProps: { ref, onClick },
+    tooltipProps,
+  } = usePopperOnClick<HTMLSpanElement>(placement, offset)
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLSpanElement>) => {
+      e.stopPropagation()
+      onClick()
+    },
+    [onClick],
+  )
+
+  return (
+    <>
+      <span ref={ref} onClick={handleClick}>
+        <FontAwesomeIcon icon={faQuestionCircle} />
+      </span>
+      <Tooltip {...tooltipProps}>{tooltip}</Tooltip>
+    </>
+  )
+}
