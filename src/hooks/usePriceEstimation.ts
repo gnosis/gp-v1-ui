@@ -16,21 +16,7 @@ export function usePriceEstimation(params: Params): BigNumber | null {
   const [price, setPrice] = useSafeState<BigNumber | null>(null)
 
   useEffect(() => {
-    async function updatePrice(): Promise<void> {
-      try {
-        const priceEstimate = await getPriceEstimation({
-          baseTokenId,
-          quoteTokenId,
-        })
-
-        setPrice(priceEstimate)
-      } catch (e) {
-        // Fail silently. Not a critical part of the app, user doesn't need to know about it.
-        logDebug(e)
-      }
-    }
-
-    updatePrice()
+    getriceEstimation({ baseTokenId, quoteTokenId }).then(setPrice, logDebug)
   }, [quoteTokenId, baseTokenId, setPrice])
 
   return price
