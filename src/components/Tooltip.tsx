@@ -69,7 +69,7 @@ const TooltipBase: React.ForwardRefRenderFunction<HTMLDivElement, TooltipBasePro
   return (
     // Portal isolates popup styles from the App styles
     <Portal>
-      <TooltipOuter isShown={isShown}>
+      <TooltipOuter isShown={isShown} onClick={(e): void => e.stopPropagation()}>
         <TooltipInner
           role="tooltip"
           ref={ref}
