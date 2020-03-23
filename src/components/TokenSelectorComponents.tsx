@@ -18,13 +18,13 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   // Wrap the event to capture `Enter` and avoid losing focus when there's no value set in the menu
   const wrappedOnKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      const childrenNames = React.Children.map(
-        childrenRef.current,
-        (c: { type: { name: string } }): string => c.type.name,
-      )
-
-      if (childrenNames?.length === 1 && e.key === 'Enter' && childrenNames[0] === 'NoOptionsMessage') {
-        // the only child is noOptionsMessage
+      if (
+        e.key === 'Enter' &&
+        React.Children.count(childrenRef.current) === 1 &&
+        React.isValidElement(childrenRef.current) &&
+        childrenRef.current.props.children === 'No results'
+      ) {
+        // the only child is noOptionsMessage, which returns string 'No results'
         e.preventDefault()
       }
 
