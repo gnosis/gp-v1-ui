@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import switchTokenPair from 'assets/img/switch.svg'
@@ -403,16 +403,33 @@ const TradeWidget: React.FC = () => {
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
+  const initialPrice = useRef(priceParam)
+
   useEffect(() => {
+    // We DON'T want to use the price estimation when the page is being loaded with a price in the URL.
+    // For example when sharing the URL or when filling in from Telegram bot suggestions
+    // We DO want to use price estimation when there's no price coming from the URL
+    const shouldUsePriceEstimation = !initialPrice.current || +initialPrice.current === 0
+
+    // Only bother when there's an actual priceEstimation
+    // This is important because on first page load, default price is `null`
+    // Only after the promise is resolved there will be anything
     if (priceEstimation) {
+      // There's a valid price estimation, we can clear initial price.
+      // Keep in mind that next time is when token selection is changed.
+      // In that case, initial price doesn't matter anymore
+      initialPrice.current = ''
+
       logDebug('[TradeWidget] priceEstimation', priceEstimation.toString(10))
 
-      const newPrice = priceEstimation.toFixed(5)
+      if (shouldUsePriceEstimation) {
+        const newPrice = priceEstimation.toFixed(5)
 
-      setValue(priceInputId, newPrice)
-      setValue(priceInverseInputId, invertPriceFromString(newPrice))
+        setValue(priceInputId, newPrice)
+        setValue(priceInverseInputId, invertPriceFromString(newPrice))
 
-      setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+        setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceEstimation])
