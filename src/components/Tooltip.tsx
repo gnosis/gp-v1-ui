@@ -178,7 +178,7 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
 export const TooltipWrapper = (React.memo(Wrapper) as unknown) as typeof Wrapper
 
 export const LongTooltipContainer = styled.div`
-  max-width: 20rem;
+  max-width: 30rem;
   line-height: 1.4;
 `
 
@@ -187,6 +187,22 @@ interface HelpTooltipProps {
   placement?: Placement
   offset?: number
 }
+
+const HelperSpan = styled.span`
+  cursor: pointer;
+  transition: color 0.1s;
+
+  :hover {
+    color: #748a47;
+  }
+`
+
+export const HelpTooltipContainer = styled(LongTooltipContainer)`
+  font-size: 1.6rem;
+  font-family: monospace;
+  padding: 1em;
+  color: black;
+`
 
 export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = 'top', offset }) => {
   const {
