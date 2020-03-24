@@ -319,9 +319,9 @@ const OrderValidity: React.FC<Props> = ({
   return (
     <Wrapper>
       <button type="button" onClick={handleShowConfig}>
-        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
-        <b>{formatTimeInHours(validUntil, 'Never')}</b>
         <HelpTooltip tooltip={OrderStartsTooltip} />
+        &nbsp;Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
+        <b>{formatTimeInHours(validUntil, 'Never')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
