@@ -29,7 +29,8 @@ interface UrlByNetwork {
 }
 
 interface PriceEntry {
-  priceInOwl: string
+  priceInOwlNumerator: string
+  priceInOwlDenominator: string
   token: {
     decimals?: number
   }
@@ -128,7 +129,8 @@ export class TheGraphApiImpl {
   orderDirection: desc, 
   where: {token: "${tokenId}"}
 ) {
-  priceInOwl
+  priceInOwlNumerator
+  priceInOwlDenominator
   token {
     decimals
   }
@@ -146,12 +148,18 @@ export class TheGraphApiImpl {
     }, {})
   }
 
-  private calculatePrice(
-    { priceInOwl, token: { decimals = DEFAULT_PRECISION } }: PriceEntry,
-    inWei: boolean,
-  ): BigNumber {
-    const price = new BigNumber(priceInOwl)
+  private calculatePrice(priceEntry: PriceEntry, inWei: boolean): BigNumber {
+    const {
+      priceInOwlNumerator,
+      priceInOwlDenominator,
+      token: { decimals = DEFAULT_PRECISION },
+    } = priceEntry
 
-    return inWei ? price : price.dividedBy(TEN_BIG_NUMBER.exponentiatedBy(decimals))
+    const numerator = new BigNumber(priceInOwlNumerator)
+    const denominator = new BigNumber(priceInOwlDenominator)
+
+    const price = numerator.dividedBy(denominator)
+
+    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(decimals)) : price
   }
 }
