@@ -1,4 +1,5 @@
 import { TokenDetails } from '@gnosis.pm/dex-js'
+import { Actions } from 'reducers-actions'
 
 export interface TradeState {
   price: string | null
@@ -9,28 +10,44 @@ export interface TradeState {
   validUntil: string
 }
 
-export const updatePrice = (price: string): Pick<TradeState, 'price'> => ({
-  price,
+export type ActionTypes = 'UPDATE_PAYLOAD'
+
+type UpdatePriceActionType = Actions<ActionTypes, Pick<TradeState, 'price'>>
+type UpdateSellAmountActionType = Actions<ActionTypes, Pick<TradeState, 'sellAmount'>>
+type UpdateSellTokenActionType = Actions<ActionTypes, Pick<TradeState, 'sellToken'>>
+type UpdateBuyTokenActionType = Actions<ActionTypes, Pick<TradeState, 'buyToken'>>
+type UpdateValidFromActionType = Actions<ActionTypes, Pick<TradeState, 'validFrom'>>
+type UpdateValidUntilActionType = Actions<ActionTypes, Pick<TradeState, 'validUntil'>>
+type ReducerActionType = Actions<ActionTypes, TradeState>
+
+export const updatePrice = (price: string): UpdatePriceActionType => ({
+  type: 'UPDATE_PAYLOAD',
+  payload: { price },
 })
 
-export const updateSellAmount = (sellAmount: string): Pick<TradeState, 'sellAmount'> => ({
-  sellAmount,
+export const updateSellAmount = (sellAmount: string): UpdateSellAmountActionType => ({
+  type: 'UPDATE_PAYLOAD',
+  payload: { sellAmount },
 })
 
-export const updateSellToken = (sellToken: TokenDetails): Pick<TradeState, 'sellToken'> => ({
-  sellToken: sellToken as Required<TokenDetails>,
+export const updateSellToken = (sellToken: TokenDetails): UpdateSellTokenActionType => ({
+  type: 'UPDATE_PAYLOAD',
+  payload: { sellToken: sellToken as Required<TokenDetails> },
 })
 
-export const updateBuyToken = (buyToken: TokenDetails): Pick<TradeState, 'buyToken'> => ({
-  buyToken: buyToken as Required<TokenDetails>,
+export const updateBuyToken = (buyToken: TokenDetails): UpdateBuyTokenActionType => ({
+  type: 'UPDATE_PAYLOAD',
+  payload: { buyToken: buyToken as Required<TokenDetails> },
 })
 
-export const updateValidFrom = (validFrom: string): Pick<TradeState, 'validFrom'> => ({
-  validFrom,
+export const updateValidFrom = (validFrom: string): UpdateValidFromActionType => ({
+  type: 'UPDATE_PAYLOAD',
+  payload: { validFrom },
 })
 
-export const updateValidUntil = (validUntil: string): Pick<TradeState, 'validUntil'> => ({
-  validUntil,
+export const updateValidUntil = (validUntil: string): UpdateValidUntilActionType => ({
+  type: 'UPDATE_PAYLOAD',
+  payload: { validUntil },
 })
 
 export const INITIAL_TRADE_STATE: TradeState = {
@@ -42,6 +59,12 @@ export const INITIAL_TRADE_STATE: TradeState = {
   validUntil: '2880',
 }
 
-export function reducer(state: TradeState, subset: TradeState): TradeState {
-  return { ...state, ...subset }
+export function reducer(state: TradeState, action: ReducerActionType): TradeState {
+  const { type, payload } = action
+  switch (type) {
+    case 'UPDATE_PAYLOAD':
+      return { ...state, ...payload }
+    default:
+      return state
+  }
 }
