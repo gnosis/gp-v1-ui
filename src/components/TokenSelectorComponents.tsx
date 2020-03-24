@@ -67,9 +67,6 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   const searchContainerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     inputRef.current?.focus()
-
-    const menuList = searchContainerRef.current?.nextElementSibling
-    if (menuList) menuList.scrollTop = 0
   }, [])
 
   return (
