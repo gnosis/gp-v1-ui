@@ -222,7 +222,7 @@ const OrderValidityBox = styled(PriceInputBox)`
 `
 
 const OrderStartsTooltip = (
-  <HelpTooltipContainer>Your order will be considered for the next upcoming batch.</HelpTooltipContainer>
+  <HelpTooltipContainer>Orders that are valid ASAP will be considered for the next batch.</HelpTooltipContainer>
 )
 
 interface Props {
