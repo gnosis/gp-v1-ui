@@ -136,6 +136,10 @@ const Wrapper = styled.div`
       @media ${MEDIA.mobile} {
         height: 5.6rem;
       }
+
+      &--is-focused {
+        background: rgba(33, 141, 255, 0.1);
+      }
     }
   }
 `
