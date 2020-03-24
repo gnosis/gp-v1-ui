@@ -31,6 +31,10 @@ function publish_pull_request_urls_in_github {
   # Check GITHUB_PR_COMMENTS if `gnosis-info` exists
   # If present, do nothing as we want to reduce noise
   # Else, comment URL
+  echo "fetch comments"
+  curl -s $GITHUB_PR_COMMENTS
+  echo "grepping"
+  curl -s $GITHUB_PR_COMMENTS | grep -q "\"login\":\s*\"$PREDICATE\""
   IS_COMMENT_PRESENT=$(curl -s $GITHUB_PR_COMMENTS | tac | tac | grep -q "\"login\":\s*\"$PREDICATE\"" && echo "true" || echo "false")
   if [ "$IS_COMMENT_PRESENT" = "true" ]
   then
