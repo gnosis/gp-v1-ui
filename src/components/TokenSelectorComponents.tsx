@@ -31,7 +31,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
       // When hitting the Esc key, the select will close.
       // If nothing is selected, the select will contain an empty value. Which we don't like.
       // To prevent that, we set again the currently selected value.
-      if (e.key === 'Escape') {
+      else if (e.key === 'Escape') {
         selectCurrent()
       }
 
