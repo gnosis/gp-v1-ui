@@ -15,9 +15,9 @@ type ActionTypes = 'UPDATE_TRADE_STATE'
 type UpdateTradeStateActionType = Actions<ActionTypes, Partial<TradeState>>
 type ReducerActionType = Actions<ActionTypes, TradeState>
 
-export const updateTradeState = (state: Partial<TradeState>): UpdateTradeStateActionType => ({
+export const updateTradeState = (payload: Partial<TradeState>): UpdateTradeStateActionType => ({
   type: 'UPDATE_TRADE_STATE',
-  payload: state,
+  payload,
 })
 
 export const INITIAL_TRADE_STATE: TradeState = {
