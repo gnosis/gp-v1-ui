@@ -74,28 +74,30 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
 
   return (
     <>
-      <div className="header">
-        <h2>Select token</h2>
-        <button type="button" onClick={selectCurrent}>
-          ×
-        </button>
-      </div>
-      <div className="searchContainer" ref={searchContainerRef}>
-        <input
-          ref={inputRef}
-          autoCorrect="off"
-          autoComplete="off"
-          spellCheck="false"
-          type="text"
-          placeholder="Search by token Name, Symbol or Address"
-          value={inputValue}
-          onChange={onChange}
-          onKeyDown={wrappedOnKeyDown}
-          onMouseDown={onInputClick}
-          onTouchEnd={onInputClick}
-          onFocus={onMenuInputFocus}
-          {...ariaAttributes}
-        />
+      <div className="menulist-head">
+        <div className="header">
+          <h2>Select token</h2>
+          <button type="button" onClick={selectCurrent}>
+            ×
+          </button>
+        </div>
+        <div className="searchContainer" ref={searchContainerRef}>
+          <input
+            ref={inputRef}
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck="false"
+            type="text"
+            placeholder="Search by token Name, Symbol or Address"
+            value={inputValue}
+            onChange={onChange}
+            onKeyDown={wrappedOnKeyDown}
+            onMouseDown={onInputClick}
+            onTouchEnd={onInputClick}
+            onFocus={onMenuInputFocus}
+            {...ariaAttributes}
+          />
+        </div>
       </div>
       <components.MenuList {...props} />
     </>
