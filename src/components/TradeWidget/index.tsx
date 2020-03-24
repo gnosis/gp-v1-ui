@@ -26,7 +26,6 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { updateTradeState } from 'reducers-actions/trade'
 import { MEDIA } from 'const'
 
 import { tokenListApi } from 'api'
@@ -39,6 +38,14 @@ import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import {
+  updatePrice,
+  updateSellAmount,
+  updateSellToken,
+  updateBuyToken,
+  updateValidFrom,
+  updateValidUntil,
+} from 'reducers-actions/trade'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -418,22 +425,22 @@ const TradeWidget: React.FC = () => {
 
   // Updating global state, on change of each respective prop
   useEffect(() => {
-    dispatch(updateTradeState('price', priceValue))
+    dispatch(updatePrice(priceValue))
   }, [dispatch, priceValue])
   useEffect(() => {
-    dispatch(updateTradeState('sellAmount', sellValue))
+    dispatch(updateSellAmount(sellValue))
   }, [dispatch, sellValue])
   useEffect(() => {
-    dispatch(updateTradeState('sellToken', sellToken as Required<TokenDetails>))
+    dispatch(updateSellToken(sellToken))
   }, [dispatch, sellToken])
   useEffect(() => {
-    dispatch(updateTradeState('buyToken', receiveToken as Required<TokenDetails>))
+    dispatch(updateBuyToken(receiveToken))
   }, [dispatch, receiveToken])
   useEffect(() => {
-    dispatch(updateTradeState('validFrom', validFromValue))
+    dispatch(updateValidFrom(validFromValue))
   }, [dispatch, validFromValue])
   useEffect(() => {
-    dispatch(updateTradeState('validUntil', validUntilValue))
+    dispatch(updateValidUntil(validUntilValue))
   }, [dispatch, validUntilValue])
 
   const initialPrice = useRef(defaultPrice)
