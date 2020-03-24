@@ -10,44 +10,14 @@ export interface TradeState {
   validUntil: string
 }
 
-export type ActionTypes = 'UPDATE_PAYLOAD'
+type ActionTypes = 'UPDATE_TRADE_STATE'
 
-type UpdatePriceActionType = Actions<ActionTypes, Pick<TradeState, 'price'>>
-type UpdateSellAmountActionType = Actions<ActionTypes, Pick<TradeState, 'sellAmount'>>
-type UpdateSellTokenActionType = Actions<ActionTypes, Pick<TradeState, 'sellToken'>>
-type UpdateBuyTokenActionType = Actions<ActionTypes, Pick<TradeState, 'buyToken'>>
-type UpdateValidFromActionType = Actions<ActionTypes, Pick<TradeState, 'validFrom'>>
-type UpdateValidUntilActionType = Actions<ActionTypes, Pick<TradeState, 'validUntil'>>
+type UpdateTradeStateActionType = Actions<ActionTypes, Partial<TradeState>>
 type ReducerActionType = Actions<ActionTypes, TradeState>
 
-export const updatePrice = (price: string): UpdatePriceActionType => ({
-  type: 'UPDATE_PAYLOAD',
-  payload: { price },
-})
-
-export const updateSellAmount = (sellAmount: string): UpdateSellAmountActionType => ({
-  type: 'UPDATE_PAYLOAD',
-  payload: { sellAmount },
-})
-
-export const updateSellToken = (sellToken: TokenDetails): UpdateSellTokenActionType => ({
-  type: 'UPDATE_PAYLOAD',
-  payload: { sellToken: sellToken as Required<TokenDetails> },
-})
-
-export const updateBuyToken = (buyToken: TokenDetails): UpdateBuyTokenActionType => ({
-  type: 'UPDATE_PAYLOAD',
-  payload: { buyToken: buyToken as Required<TokenDetails> },
-})
-
-export const updateValidFrom = (validFrom: string): UpdateValidFromActionType => ({
-  type: 'UPDATE_PAYLOAD',
-  payload: { validFrom },
-})
-
-export const updateValidUntil = (validUntil: string): UpdateValidUntilActionType => ({
-  type: 'UPDATE_PAYLOAD',
-  payload: { validUntil },
+export const updateTradeState = (state: Partial<TradeState>): UpdateTradeStateActionType => ({
+  type: 'UPDATE_TRADE_STATE',
+  payload: state,
 })
 
 export const INITIAL_TRADE_STATE: TradeState = {
@@ -62,7 +32,7 @@ export const INITIAL_TRADE_STATE: TradeState = {
 export function reducer(state: TradeState, action: ReducerActionType): TradeState {
   const { type, payload } = action
   switch (type) {
-    case 'UPDATE_PAYLOAD':
+    case 'UPDATE_TRADE_STATE':
       return { ...state, ...payload }
     default:
       return state
