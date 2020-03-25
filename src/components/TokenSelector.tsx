@@ -9,6 +9,7 @@ import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
+import searchIcon from 'assets/img/search.svg'
 
 const Wrapper = styled.div`
   display: flex;
@@ -70,14 +71,52 @@ const Wrapper = styled.div`
   .tokenSelectBox {
     position: relative;
     .react-select__menu {
-      // TODO: style custom menu header and search input
+      .menulist-head {
+        position: absolute;
+        bottom: 100%;
+        background-color: inherit;
+        width: 100%;
+        border-radius: 0.6rem;
+      }
+
       .header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
+
+        > button {
+          background-color: transparent;
+          font-size: 4rem;
+          line-height: 1;
+          color: #526877;
+          opacity: 0.5;
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-regular);
+          transition: opacity 0.2s ease-in-out;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        > h2 {
+          margin-left: 1em;
+          font-size: 1.5rem;
+        }
       }
 
       .searchContainer {
         display: flex;
+
+        > input {
+          max-width: 100%;
+          font-size: 1.4rem;
+          font-weight: var(--font-weight-normal);
+          background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+          border-radius: 0;
+          padding: 0px 1.6rem 0px 4.8rem;
+          height: 3em;
+        }
       }
 
       &::before {
@@ -104,6 +143,10 @@ const Wrapper = styled.div`
     .react-select__option {
       @media ${MEDIA.mobile} {
         height: 5.6rem;
+      }
+
+      &--is-focused {
+        background: rgba(33, 141, 255, 0.1);
       }
     }
   }
@@ -202,8 +245,9 @@ const customSelectStyles = {
   menuList: (): CSSProperties => ({
     height: '100%',
     overflow: 'auto',
-    borderRadius: '0.6rem',
+    borderRadius: '0 0 0.6rem 0.6rem',
     padding: '0 0 5rem 0',
+    background: 'var(--color-background-pageWrapper)',
   }),
   input: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -264,7 +308,10 @@ interface Props {
 }
 
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
-  const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
+  const options = useMemo(
+    () => tokens.map(token => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
+    [tokens],
+  )
 
   // isFocused is used to force the menu to remain open and give focus to the search input
   const [isFocused, setIsFocused] = useState(false)

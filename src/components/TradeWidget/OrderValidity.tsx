@@ -140,7 +140,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     opacity: 0.5;
     margin: 0 0 0 auto;
     font-style: normal;
-    font-family: var(--font-arial);
+    font-family: var(--font-mono);
     transition: opacity 0.2s ease-in-out;
 
     &:hover {
@@ -318,7 +318,7 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <button type="button" onClick={handleShowConfig}>
+      <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
         Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
         <HelpTooltip tooltip={OrderStartsTooltip} />
         &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
@@ -347,10 +347,16 @@ const OrderValidity: React.FC<Props> = ({
               })}
               onChange={handleValidFromChange}
               onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex + 2}
+              tabIndex={tabIndex}
             />
             <div className="radio-container">
-              <input type="checkbox" checked={isAsap} disabled={isDisabled} onChange={handleASAPClick} />
+              <input
+                type="checkbox"
+                checked={isAsap}
+                disabled={isDisabled}
+                onChange={handleASAPClick}
+                tabIndex={tabIndex}
+              />
               <small>ASAP</small>
             </div>
           </label>
@@ -371,16 +377,22 @@ const OrderValidity: React.FC<Props> = ({
               })}
               onChange={handleValidUntilChange}
               onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex + 3}
+              tabIndex={tabIndex}
             />
             <div className="radio-container">
-              <input type="checkbox" disabled={isDisabled} checked={isUnlimited} onChange={handleUnlimitedClick} />
+              <input
+                type="checkbox"
+                disabled={isDisabled}
+                checked={isUnlimited}
+                onChange={handleUnlimitedClick}
+                tabIndex={tabIndex}
+              />
               <small>Never</small>
             </div>
           </label>
         </OrderValidityBox>
         <span>
-          <button type="button" onClick={handleShowConfig}>
+          <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
             Set order parameters
           </button>
         </span>

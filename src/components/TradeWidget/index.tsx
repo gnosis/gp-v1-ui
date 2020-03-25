@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react'
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import switchTokenPair from 'assets/img/switch.svg'
@@ -32,11 +32,12 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount, parseBigNumber, dateToBatchId } from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
+import { usePriceEstimation } from 'hooks/usePriceEstimation'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -76,6 +77,12 @@ const WrappedForm = styled.form`
   box-sizing: border-box;
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 1;
+
+  .react-select__control:focus-within,
+  input[type='checkbox']:focus,
+  button:focus {
+    outline: 1px dotted gray;
+  }
 
   .expanded & {
     width: 0;
@@ -315,13 +322,27 @@ function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): s
   }
 }
 
+function calculateReceiveAmount(priceValue: string, sellValue: string): string {
+  let receiveAmount = ''
+  if (priceValue && sellValue) {
+    const sellAmount = parseBigNumber(sellValue)
+    const price = parseBigNumber(priceValue)
+
+    if (sellAmount && price) {
+      receiveAmount = sellAmount.multipliedBy(price).toString(10)
+    }
+  }
+
+  return receiveAmount
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
   const [, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  const fallBackNetworkId = networkId || Network.Mainnet // fallback to mainnet
 
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
@@ -357,6 +378,11 @@ const TradeWidget: React.FC = () => {
   const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
   const [asap, setAsap] = useState(!validFromParam || !Number(validFromParam))
 
+  const priceEstimation = usePriceEstimation({
+    baseTokenId: sellToken.id,
+    quoteTokenId: receiveToken.id,
+  })
+
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
@@ -377,18 +403,40 @@ const TradeWidget: React.FC = () => {
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
-  // Update receive amount
-  useEffect(() => {
-    let receiveAmount: string | undefined
-    if (priceValue && sellValue) {
-      const sellAmount = parseBigNumber(sellValue)
-      const price = parseBigNumber(priceValue)
+  const initialPrice = useRef(priceParam)
 
-      if (sellAmount && price) {
-        receiveAmount = sellAmount.multipliedBy(price).toString(10)
+  useEffect(() => {
+    // We DON'T want to use the price estimation when the page is being loaded with a price in the URL.
+    // For example when sharing the URL or when filling in from Telegram bot suggestions
+    // We DO want to use price estimation when there's no price coming from the URL
+    const shouldUsePriceEstimation = !initialPrice.current || +initialPrice.current === 0
+
+    // Only bother when there's an actual priceEstimation
+    // This is important because on first page load, default price is `null`
+    // Only after the promise is resolved there will be anything
+    if (priceEstimation) {
+      // There's a valid price estimation, we can clear initial price.
+      // Keep in mind that next time is when token selection is changed.
+      // In that case, initial price doesn't matter anymore
+      initialPrice.current = ''
+
+      logDebug('[TradeWidget] priceEstimation', priceEstimation.toString(10))
+
+      if (shouldUsePriceEstimation) {
+        const newPrice = priceEstimation.toFixed(5)
+
+        setValue(priceInputId, newPrice)
+        setValue(priceInverseInputId, invertPriceFromString(newPrice))
+
+        setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
       }
     }
-    setValue(receiveInputId, receiveAmount || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [priceEstimation])
+
+  // Update receive amount
+  useEffect(() => {
+    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
   const searchQuery = buildSearchQuery({
@@ -653,7 +701,7 @@ const TradeWidget: React.FC = () => {
             onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
-            tabIndex={2}
+            tabIndex={1}
             readOnly
             tooltipText={receiveTokenTooltipText}
           />
@@ -662,6 +710,7 @@ const TradeWidget: React.FC = () => {
             priceInverseInputId={priceInverseInputId}
             sellToken={sellToken}
             receiveToken={receiveToken}
+            tabIndex={1}
           />
           <OrderValidity
             validFromInputId={validFromId}
@@ -671,14 +720,14 @@ const TradeWidget: React.FC = () => {
             isUnlimited={unlimited}
             setAsap={setAsap}
             setUnlimited={setUnlimited}
-            tabIndex={3}
+            tabIndex={1}
           />
           <p>This order might be partially filled.</p>
           <SubmitButton
             data-text="This order might be partially filled."
             type="submit"
             disabled={isSubmitting}
-            tabIndex={5}
+            tabIndex={1}
           >
             {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Please select different tokens' : 'Submit limit order'}

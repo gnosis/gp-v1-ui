@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import Modali from 'modali'
 import BN from 'bn.js'
 
@@ -18,6 +18,7 @@ import useWindowSizes from 'hooks/useWindowSizes'
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
+import { useDebounce } from 'hooks/useDebounce'
 
 interface WithdrawState {
   amount: BN
@@ -215,7 +216,7 @@ const BalanceTools = styled.div`
     cursor: pointer;
 
     @media ${MEDIA.mobile} {
-      margin: 0 1.6rem 0 0;
+      margin: 0 1.6rem 1.6rem;
     }
 
     > b {
@@ -240,7 +241,7 @@ const BalanceTools = styled.div`
 
     > input {
       margin: 0;
-      width: 28rem;
+      width: 35rem;
       max-width: 100%;
       background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
@@ -285,6 +286,30 @@ const BalanceTools = styled.div`
   }
 `
 
+const NoTokensMessage = styled.tr`
+  /* increase speicifcity */
+  &&&&&& {
+    margin: auto;
+    border: none;
+
+    :hover {
+      background: initial;
+    }
+
+    a {
+      color: #218dff;
+    }
+
+    > td {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      min-height: 3.5em;
+      line-height: 1.5;
+    }
+  }
+`
+
 type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
   ReturnType<typeof useTokenBalances> & {
     requestWithdrawConfirmation(
@@ -309,14 +334,56 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 }) => {
   const windowSpecs = useWindowSizes()
 
+  const [search, setSearch] = useState('')
+  const [hideZeroBalances, setHideZeroBalances] = useState(false)
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
+
+  const handleHideZeroBalances = (e: React.ChangeEvent<HTMLInputElement>): void => setHideZeroBalances(e.target.checked)
+
+  const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
+
+  const clearFilters = (): void => {
+    setSearch('')
+    setDebouncedSearch('')
+    setHideZeroBalances(false)
+  }
+
+  const filteredBalances = useMemo(() => {
+    if (!debouncedSearch || !balances || balances.length === 0) return balances
+
+    const searchTxt = debouncedSearch.toLowerCase()
+
+    return balances.filter(({ symbol, name, address }) => {
+      return (
+        symbol?.toLowerCase().includes(searchTxt) ||
+        name?.toLowerCase().includes(searchTxt) ||
+        address.toLowerCase().includes(searchTxt)
+      )
+    })
+  }, [debouncedSearch, balances])
+
+  const displayedBalances = useMemo(() => {
+    if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
+
+    return filteredBalances.filter(({ totalExchangeBalance, pendingWithdraw, walletBalance }) => {
+      return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
+    })
+  }, [hideZeroBalances, filteredBalances])
+
   return (
     <BalancesWidget>
       <BalanceTools>
-        <label className="balances-searchTokens not-implemented">
-          <input placeholder="Search token by Name, Symbol" type="text" required />
+        <label className="balances-searchTokens">
+          <input
+            placeholder="Search token by Name, Symbol or Address"
+            type="text"
+            value={search}
+            onChange={handleSearch}
+          />
         </label>
-        <label className="balances-hideZero not-implemented">
-          <input type="checkbox" />
+        <label className="balances-hideZero">
+          <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
           <b>Hide zero balances</b>
         </label>
         <button type="button" className="balances-manageTokens not-implemented">
@@ -337,32 +404,39 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </tr>
           </thead>
           <tbody>
-            {balances &&
-              balances.map(tokenBalances => (
-                <Row
-                  key={tokenBalances.addressMainnet}
-                  tokenBalances={tokenBalances}
-                  onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                  onSubmitDeposit={(balance, onTxHash): Promise<void> =>
-                    depositToken(balance, tokenBalances.address, onTxHash)
-                  }
-                  onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
-                    return requestWithdrawConfirmation(
-                      balance,
-                      tokenBalances.address,
-                      tokenBalances.claimable,
-                      onTxHash,
-                    )
-                  }}
-                  onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
-                  claiming={claiming.has(tokenBalances.address)}
-                  withdrawing={withdrawing.has(tokenBalances.address)}
-                  depositing={depositing.has(tokenBalances.address)}
-                  highlighted={highlighted.has(tokenBalances.address)}
-                  enabling={enabling.has(tokenBalances.address)}
-                  {...windowSpecs}
-                />
-              ))}
+            {displayedBalances && displayedBalances.length > 0
+              ? displayedBalances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.addressMainnet}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                      depositToken(balance, tokenBalances.address, onTxHash)
+                    }
+                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                      return requestWithdrawConfirmation(
+                        balance,
+                        tokenBalances.address,
+                        tokenBalances.claimable,
+                        onTxHash,
+                      )
+                    }}
+                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    claiming={claiming.has(tokenBalances.address)}
+                    withdrawing={withdrawing.has(tokenBalances.address)}
+                    depositing={depositing.has(tokenBalances.address)}
+                    highlighted={highlighted.has(tokenBalances.address)}
+                    enabling={enabling.has(tokenBalances.address)}
+                    {...windowSpecs}
+                  />
+                ))
+              : (search || hideZeroBalances) && (
+                  <NoTokensMessage>
+                    <td>
+                      No tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                    </td>
+                  </NoTokensMessage>
+                )}
           </tbody>
         </CardTable>
       )}

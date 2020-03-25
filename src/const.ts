@@ -12,6 +12,9 @@ export {
 } from '@gnosis.pm/dex-js'
 export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
 
+export const ZERO_BIG_NUMBER = new BigNumber(0)
+export const TEN_BIG_NUMBER = new BigNumber(10)
+
 // How much of the order needs to be matched to consider it filled
 // Will divide the total sell amount by this factor.
 // E.g.: Sell = 500; ORDER_FILLED_FACTOR = 100 (1%) => 500/100 => 5
