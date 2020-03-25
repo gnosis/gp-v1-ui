@@ -88,6 +88,7 @@ module.exports = ({ stats = false } = {}) => ({
               html: true,
               linkify: true,
               breaks: true,
+              xhtmlOut: true,
             }).use(linkAttributes, {
               attrs: {
                 target: '_blank',
