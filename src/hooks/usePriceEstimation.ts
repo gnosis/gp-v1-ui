@@ -22,12 +22,18 @@ export function usePriceEstimation(params: Params): Result {
   const [priceEstimation, setPriceEstimation] = useSafeState<BigNumber | null>(null)
 
   useEffect(() => {
-    setIsPriceLoading(true)
+    async function estimatePrice(): Promise<void> {
+      setIsPriceLoading(true)
+      try {
+        setPriceEstimation(await getPriceEstimation({ baseTokenId, quoteTokenId }))
+      } catch (e) {
+        logDebug(e)
+      } finally {
+        setIsPriceLoading(false)
+      }
+    }
 
-    getPriceEstimation({ baseTokenId, quoteTokenId }).then(price => {
-      setPriceEstimation(price)
-      setIsPriceLoading(false)
-    }, logDebug)
+    estimatePrice()
   }, [quoteTokenId, baseTokenId, setPriceEstimation, setIsPriceLoading])
 
   return { priceEstimation, isPriceLoading }
