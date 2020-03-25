@@ -26,7 +26,7 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { MEDIA } from 'const'
+import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
 import { tokenListApi } from 'api'
 
@@ -450,7 +450,7 @@ const TradeWidget: React.FC = () => {
 
       if (shouldUsePriceEstimation) {
         // Price estimation can be null. In that case, set the input to 0
-        const newPrice = priceEstimation ? priceEstimation.toFixed(5) : '0'
+        const newPrice = priceEstimation ? priceEstimation.toFixed(PRICE_ESTIMATION_PRECISION) : '0'
 
         setValue(priceInputId, newPrice)
         setValue(priceInverseInputId, invertPriceFromString(newPrice))
