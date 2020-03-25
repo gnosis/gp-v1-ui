@@ -331,7 +331,7 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
 
     if (sellAmount && price) {
       const receiveBigNumber = sellAmount.multipliedBy(price)
-      receiveAmount = receiveBigNumber.isNaN() ? '0' : receiveBigNumber.toString(10)
+      receiveAmount = receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : receiveBigNumber.toString(10)
     }
   }
 
