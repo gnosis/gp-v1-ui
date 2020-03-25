@@ -38,6 +38,7 @@ import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import { updateTradeState } from 'reducers-actions/trade'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -339,7 +340,7 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
 const TradeWidget: React.FC = () => {
   const { networkId, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
-  const [, dispatch] = useGlobalState()
+  const [{ trade }, dispatch] = useGlobalState()
 
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId || Network.Mainnet // fallback to mainnet
@@ -367,16 +368,28 @@ const TradeWidget: React.FC = () => {
     validUntil: validUntilParam,
   } = useQuery()
 
-  const [ordersVisible, setOrdersVisible] = useState(true)
+  // Combining global state with query params
+  const defaultPrice = trade.price || priceParam
+  const defaultSellAmount = trade.sellAmount || sellParam
+  const defaultValidFrom = trade.validFrom || validFromParam
+  const defaultValidUntil = trade.validUntil || validUntilParam
+
   const [sellToken, setSellToken] = useState(
-    () => getToken('symbol', sellTokenSymbol, tokens) || (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
+    () =>
+      trade.sellToken ||
+      getToken('symbol', sellTokenSymbol, tokens) ||
+      (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
   const [receiveToken, setReceiveToken] = useState(
     () =>
-      getToken('symbol', receiveTokenSymbol, tokens) || (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
+      trade.buyToken ||
+      getToken('symbol', receiveTokenSymbol, tokens) ||
+      (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
-  const [unlimited, setUnlimited] = useState(!validUntilParam || !Number(validUntilParam))
-  const [asap, setAsap] = useState(!validFromParam || !Number(validFromParam))
+  const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
+  const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
+
+  const [ordersVisible, setOrdersVisible] = useState(true)
 
   const priceEstimation = usePriceEstimation({
     baseTokenId: sellToken.id,
@@ -386,12 +399,12 @@ const TradeWidget: React.FC = () => {
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
-      [sellInputId]: sellParam,
+      [sellInputId]: defaultSellAmount,
       [receiveInputId]: '',
-      [validFromId]: validFromParam,
-      [validUntilId]: validUntilParam,
-      [priceInputId]: priceParam,
-      [priceInverseInputId]: invertPriceFromString(priceParam),
+      [validFromId]: defaultValidFrom,
+      [validUntilId]: defaultValidUntil,
+      [priceInputId]: defaultPrice,
+      [priceInverseInputId]: invertPriceFromString(defaultPrice),
     },
   })
   const { handleSubmit, reset, watch, setValue } = methods
@@ -403,7 +416,21 @@ const TradeWidget: React.FC = () => {
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
-  const initialPrice = useRef(priceParam)
+  // Updating global trade state on change
+  useEffect(() => {
+    dispatch(
+      updateTradeState({
+        price: priceValue,
+        sellAmount: sellValue,
+        sellToken: sellToken as Required<TokenDetails>,
+        buyToken: receiveToken as Required<TokenDetails>,
+        validFrom: validFromValue,
+        validUntil: validUntilValue,
+      }),
+    )
+  }, [dispatch, priceValue, sellValue, sellToken, receiveToken, validFromValue, validUntilValue])
+
+  const initialPrice = useRef(defaultPrice)
 
   useEffect(() => {
     // We DON'T want to use the price estimation when the page is being loaded with a price in the URL.

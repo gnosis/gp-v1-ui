@@ -6,6 +6,7 @@ import {
   PendingOrdersInitialState as pendingOrders,
 } from './pendingOrders'
 import { reducer as OrdersReducer, OrdersState, INITIAL_ORDERS_STATE as orders } from './orders'
+import { reducer as TradeReducer, TradeState, INITIAL_TRADE_STATE as trade } from './trade'
 
 export * from './tokenRow'
 
@@ -18,6 +19,7 @@ export interface GlobalState {
   tokens: TokenLocalState
   pendingOrders: PendingOrdersState
   orders: OrdersState
+  trade: TradeState
 }
 
 /**********************************
@@ -32,6 +34,7 @@ export const INITIAL_STATE = (): GlobalState => {
     tokens,
     pendingOrders,
     orders,
+    trade,
   }
 }
 
@@ -45,4 +48,5 @@ export const rootReducer = combineReducers({
   tokens: TokenRowReducer,
   pendingOrders: PendingOrderReducer,
   orders: OrdersReducer,
+  trade: TradeReducer,
 })
