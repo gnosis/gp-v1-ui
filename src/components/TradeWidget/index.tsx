@@ -391,7 +391,7 @@ const TradeWidget: React.FC = () => {
 
   const [ordersVisible, setOrdersVisible] = useState(true)
 
-  const priceEstimation = usePriceEstimation({
+  const { priceEstimation, isPriceLoading } = usePriceEstimation({
     baseTokenId: sellToken.id,
     quoteTokenId: receiveToken.id,
   })
@@ -438,28 +438,28 @@ const TradeWidget: React.FC = () => {
     // We DO want to use price estimation when there's no price coming from the URL
     const shouldUsePriceEstimation = !initialPrice.current || +initialPrice.current === 0
 
-    // Only bother when there's an actual priceEstimation
-    // This is important because on first page load, default price is `null`
-    // Only after the promise is resolved there will be anything
-    if (priceEstimation) {
-      // There's a valid price estimation, we can clear initial price.
-      // Keep in mind that next time is when token selection is changed.
-      // In that case, initial price doesn't matter anymore
-      initialPrice.current = ''
-    }
+    // Only try to update price estimation when not loading
+    if (!isPriceLoading) {
+      // If there was a price set coming from the URL, reset it
+      // It was supposed to be used only once. Initial price doesn't matter anymore
+      if (initialPrice.current) {
+        initialPrice.current = ''
+      }
 
-    logDebug(`[TradeWidget] priceEstimation ${priceEstimation}`)
+      logDebug(`[TradeWidget] priceEstimation ${priceEstimation}`)
 
-    if (shouldUsePriceEstimation) {
-      const newPrice = priceEstimation ? priceEstimation.toFixed(5) : '0'
+      if (shouldUsePriceEstimation) {
+        // Price estimation can be null. In that case, set the input to 0
+        const newPrice = priceEstimation ? priceEstimation.toFixed(5) : '0'
 
-      setValue(priceInputId, newPrice)
-      setValue(priceInverseInputId, invertPriceFromString(newPrice))
+        setValue(priceInputId, newPrice)
+        setValue(priceInverseInputId, invertPriceFromString(newPrice))
 
-      setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+        setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [priceEstimation])
+  }, [priceEstimation, isPriceLoading])
 
   // Update receive amount
   useEffect(() => {
