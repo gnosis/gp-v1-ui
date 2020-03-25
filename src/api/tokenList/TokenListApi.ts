@@ -1,8 +1,26 @@
 import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
+import { getTokenFromExchangeByAddress, addTokenToExchange } from 'services'
+import { logDebug } from 'utils'
 
 export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
+  addTokenToList: (params: AddTokenParams) => Promise<AddTokenResult>
+  addTokenToExchange: (params: AddTokenToExchangeParams) => Promise<AddTokenResult>
+}
+
+export interface AddTokenParams {
+  networkId: number
+  tokenAddress: string
+}
+
+export interface AddTokenResult {
+  success: boolean
+  tokenList: TokenDetails[]
+}
+
+export interface AddTokenToExchangeParams extends AddTokenParams {
+  userAddress: string
 }
 
 /**
