@@ -6,7 +6,8 @@ export function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>
   if (
     event.key !== 'Backspace' &&
     event.key !== 'Delete' &&
-    !validInputPattern.test(event.currentTarget.value + event.key)
+    !validInputPattern.test(event.currentTarget.value + event.key) &&
+    validInputPattern.test(event.currentTarget.value)
   ) {
     event.preventDefault()
   }
