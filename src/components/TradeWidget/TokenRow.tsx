@@ -9,7 +9,7 @@ import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
 
-import { TooltipWrapper, LongTooltipContainer } from 'components/Tooltip'
+import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
@@ -180,9 +180,9 @@ interface Props {
 }
 
 const BalanceTooltip = (
-  <LongTooltipContainer>
+  <HelpTooltipContainer>
     This balance reflects the amount deposited in the Exchange Wallet on Mesa, not the overall amounts in your wallet.
-  </LongTooltipContainer>
+  </HelpTooltipContainer>
 )
 
 const TokenRow: React.FC<Props> = ({
@@ -279,7 +279,7 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
-          <TooltipWrapper as="span" tooltip={BalanceTooltip}>
+          <span>
             Balance:
             {readOnly ? (
               <FormMessage className={balanceClassName}>
@@ -287,22 +287,22 @@ const TokenRow: React.FC<Props> = ({
                 {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
               </FormMessage>
             ) : (
-              <>
-                <FormMessage className={balanceClassName}>
-                  {' '}
-                  {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
-                  {validateMaxAmount && (
-                    <>
-                      <TooltipWrapper tooltip="Fill maximum">
-                        <a onClick={useMax}>max</a>
-                      </TooltipWrapper>
-                      <i aria-label="Tooltip"></i>
-                    </>
-                  )}
-                </FormMessage>
-              </>
+              <FormMessage className={balanceClassName}>
+                {' '}
+                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {validateMaxAmount && (
+                  <>
+                    <TooltipWrapper tooltip="Fill maximum">
+                      <a onClick={useMax}>max</a>
+                    </TooltipWrapper>
+                    <i aria-label="Tooltip"></i>
+                  </>
+                )}
+              </FormMessage>
             )}
-          </TooltipWrapper>
+            &nbsp;
+            <HelpTooltip tooltip={BalanceTooltip} />
+          </span>
         </span>
       </div>
       <InputBox>

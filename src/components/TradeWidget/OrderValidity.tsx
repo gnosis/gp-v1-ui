@@ -12,7 +12,7 @@ import { validInputPattern, formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
 import { MEDIA } from 'const'
-import { TooltipWrapper, LongTooltipContainer } from 'components/Tooltip'
+import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
 const Wrapper = styled.div`
   display: flex;
@@ -222,7 +222,7 @@ const OrderValidityBox = styled(PriceInputBox)`
 `
 
 const OrderStartsTooltip = (
-  <LongTooltipContainer>Your order will be considered for the next upcoming batch.</LongTooltipContainer>
+  <HelpTooltipContainer>Orders that are valid ASAP will be considered for the next batch.</HelpTooltipContainer>
 )
 
 interface Props {
@@ -318,10 +318,11 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <TooltipWrapper as="button" type="button" onClick={handleShowConfig} tooltip={OrderStartsTooltip} offset={-10}>
-        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
-        <b>{formatTimeInHours(validUntil, 'Never')}</b>
-      </TooltipWrapper>
+      <button type="button" onClick={handleShowConfig}>
+        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
+        <HelpTooltip tooltip={OrderStartsTooltip} />
+        &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
+      </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
         <h4>
