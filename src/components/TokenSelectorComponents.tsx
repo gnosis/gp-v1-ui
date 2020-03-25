@@ -31,7 +31,7 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
       // When hitting the Esc key, the select will close.
       // If nothing is selected, the select will contain an empty value. Which we don't like.
       // To prevent that, we set again the currently selected value.
-      if (e.key === 'Escape') {
+      else if (e.key === 'Escape') {
         selectCurrent()
       }
 
@@ -67,35 +67,34 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
   const searchContainerRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
     inputRef.current?.focus()
-
-    const menuList = searchContainerRef.current?.nextElementSibling
-    if (menuList) menuList.scrollTop = 0
   }, [])
 
   return (
     <>
-      <div className="header">
-        <h2>Select token</h2>
-        <button type="button" onClick={selectCurrent}>
-          ×
-        </button>
-      </div>
-      <div className="searchContainer" ref={searchContainerRef}>
-        <input
-          ref={inputRef}
-          autoCorrect="off"
-          autoComplete="off"
-          spellCheck="false"
-          type="text"
-          placeholder="Search by token Name, Symbol or Address"
-          value={inputValue}
-          onChange={onChange}
-          onKeyDown={wrappedOnKeyDown}
-          onMouseDown={onInputClick}
-          onTouchEnd={onInputClick}
-          onFocus={onMenuInputFocus}
-          {...ariaAttributes}
-        />
+      <div className="menulist-head">
+        <div className="header">
+          <h2>Select token</h2>
+          <button type="button" onClick={selectCurrent}>
+            ×
+          </button>
+        </div>
+        <div className="searchContainer" ref={searchContainerRef}>
+          <input
+            ref={inputRef}
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck="false"
+            type="text"
+            placeholder="Search by token Name, Symbol or Address"
+            value={inputValue}
+            onChange={onChange}
+            onKeyDown={wrappedOnKeyDown}
+            onMouseDown={onInputClick}
+            onTouchEnd={onInputClick}
+            onFocus={onMenuInputFocus}
+            {...ariaAttributes}
+          />
+        </div>
       </div>
       <components.MenuList {...props} />
     </>

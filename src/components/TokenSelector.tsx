@@ -71,6 +71,14 @@ const Wrapper = styled.div`
   .tokenSelectBox {
     position: relative;
     .react-select__menu {
+      .menulist-head {
+        position: absolute;
+        bottom: 100%;
+        background-color: inherit;
+        width: 100%;
+        border-radius: 0.6rem;
+      }
+
       .header {
         display: flex;
         justify-content: space-between;
@@ -135,6 +143,10 @@ const Wrapper = styled.div`
     .react-select__option {
       @media ${MEDIA.mobile} {
         height: 5.6rem;
+      }
+
+      &--is-focused {
+        background: rgba(33, 141, 255, 0.1);
       }
     }
   }
@@ -233,7 +245,7 @@ const customSelectStyles = {
   menuList: (): CSSProperties => ({
     height: '100%',
     overflow: 'auto',
-    borderRadius: '0.6rem',
+    borderRadius: '0 0 0.6rem 0.6rem',
     padding: '0 0 5rem 0',
     background: 'var(--color-background-pageWrapper)',
   }),
