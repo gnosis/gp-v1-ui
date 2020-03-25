@@ -45,6 +45,25 @@ export class TokenListApiImpl implements TokenList {
     }
   }
 
+  public async addTokenToExchange({
+    userAddress,
+    networkId,
+    tokenAddress,
+  }: AddTokenToExchangeParams): Promise<AddTokenResult> {
+    const newToken = await addTokenToExchange({ userAddress, networkId, tokenAddress })
+    if (newToken) {
+      logDebug('Added new Token to userlist', newToken)
+
+      this._tokensByNetwork[networkId].push(newToken)
+      this.persistUserTokenList(newToken, networkId)
+    } else {
+      logDebug('Token at address', tokenAddress, 'could not be added to Exchange contract')
+    }
+    return {
+      success: !!newToken,
+      tokenList: this.getTokens(networkId),
+    }
+  }
 }
 
 export default TokenListApiImpl
