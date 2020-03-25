@@ -446,17 +446,17 @@ const TradeWidget: React.FC = () => {
       // Keep in mind that next time is when token selection is changed.
       // In that case, initial price doesn't matter anymore
       initialPrice.current = ''
+    }
 
-      logDebug('[TradeWidget] priceEstimation', priceEstimation.toString(10))
+    logDebug(`[TradeWidget] priceEstimation ${priceEstimation}`)
 
-      if (shouldUsePriceEstimation) {
-        const newPrice = priceEstimation.toFixed(5)
+    if (shouldUsePriceEstimation) {
+      const newPrice = priceEstimation ? priceEstimation.toFixed(5) : '0'
 
-        setValue(priceInputId, newPrice)
-        setValue(priceInverseInputId, invertPriceFromString(newPrice))
+      setValue(priceInputId, newPrice)
+      setValue(priceInverseInputId, invertPriceFromString(newPrice))
 
-        setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
-      }
+      setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceEstimation])
