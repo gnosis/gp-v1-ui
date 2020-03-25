@@ -21,7 +21,7 @@ export class TokenListApiImpl implements TokenList {
     this._tokensByNetwork = {}
     networkIds.forEach(networkId => {
       // initial value
-      this._tokensByNetwork[networkId] = getTokensByNetwork(networkId)
+      this._tokensByNetwork[networkId] = getTokensByNetwork(networkId).concat(this.loadUserTokenList(networkId))
     })
   }
 
@@ -63,6 +63,19 @@ export class TokenListApiImpl implements TokenList {
       success: !!newToken,
       tokenList: this.getTokens(networkId),
     }
+  }
+
+  private loadUserTokenList(networkId: number): TokenDetails[] {
+    const listStringified = localStorage.getItem('USER_TOKEN_LIST_' + networkId)
+    return listStringified ? JSON.parse(listStringified) : []
+  }
+
+  private persistUserTokenList(token: TokenDetails, networkId: number): void {
+    const listStringified = localStorage.getItem('USER_TOKEN_LIST_' + networkId)
+    const currentUserList: TokenDetails[] = listStringified ? JSON.parse(listStringified) : []
+
+    currentUserList.push(token)
+    localStorage.setItem('USER_TOKEN_LIST', JSON.stringify(currentUserList))
   }
 }
 
