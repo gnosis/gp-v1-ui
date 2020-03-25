@@ -12,6 +12,7 @@ import { validInputPattern, formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
 import { MEDIA } from 'const'
+import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
 const Wrapper = styled.div`
   display: flex;
@@ -220,6 +221,10 @@ const OrderValidityBox = styled(PriceInputBox)`
   }
 `
 
+const OrderStartsTooltip = (
+  <HelpTooltipContainer>Orders that are valid ASAP will be considered for the next batch.</HelpTooltipContainer>
+)
+
 interface Props {
   validFromInputId: TradeFormTokenId
   validUntilInputId: TradeFormTokenId
@@ -314,8 +319,9 @@ const OrderValidity: React.FC<Props> = ({
   return (
     <Wrapper>
       <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
-        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
-        <b>{formatTimeInHours(validUntil, 'Never')}</b>
+        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
+        <HelpTooltip tooltip={OrderStartsTooltip} />
+        &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>

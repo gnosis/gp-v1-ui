@@ -38,7 +38,7 @@ const LiquidityButtons: React.FC<LiquidityButtonsProps> = ({
     </button>
     {/* REGULAR CONTINUE BUTTON (STEP 1) */}
     {showContinue ? (
-      <TooltipWrapper hover={showTooltipHover} tooltip={'Please select at least 2 tokens to continue'}>
+      <TooltipWrapper hover={showTooltipHover} tooltip="Please select at least 2 tokens to continue">
         <button type="button" disabled={disableContinue} onClick={(): void => nextStep()}>
           Continue
         </button>
