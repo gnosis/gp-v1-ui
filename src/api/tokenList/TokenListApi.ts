@@ -28,6 +28,23 @@ export class TokenListApiImpl implements TokenList {
   public getTokens(networkId: number): TokenDetails[] {
     return this._tokensByNetwork[networkId] || []
   }
+
+  public async addTokenToList({ networkId, tokenAddress }: AddTokenParams): Promise<AddTokenResult> {
+    const newToken = await getTokenFromExchangeByAddress({ networkId, tokenAddress })
+    if (newToken) {
+      logDebug('Added new Token to userlist', newToken)
+
+      this._tokensByNetwork[networkId].push(newToken)
+      this.persistUserTokenList(newToken, networkId)
+    } else {
+      logDebug('Token at address', tokenAddress, 'not available in Exchange contract')
+    }
+    return {
+      success: !!newToken,
+      tokenList: this.getTokens(networkId),
+    }
+  }
+
 }
 
 export default TokenListApiImpl
