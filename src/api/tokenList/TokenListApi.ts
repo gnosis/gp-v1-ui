@@ -1,17 +1,15 @@
 import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
-import { getTokenFromExchangeByAddress, addTokenToExchange } from 'services'
 import { logDebug } from 'utils'
 
 export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
-  addTokenToList: (params: AddTokenParams) => Promise<AddTokenResult>
-  addTokenToExchange: (params: AddTokenToExchangeParams) => Promise<AddTokenResult>
+  addToken: (params: AddTokenParams) => void
 }
 
 export interface AddTokenParams {
   networkId: number
-  tokenAddress: string
+  token: TokenDetails
 }
 
 export interface AddTokenResult {
@@ -52,35 +50,12 @@ export class TokenListApiImpl implements TokenList {
     if (newToken) {
       logDebug('Added new Token to userlist', newToken)
 
-      this._tokensByNetwork[networkId].push(newToken)
-      this.persistUserTokenList(newToken, networkId)
-    } else {
-      logDebug('Token at address', tokenAddress, 'not available in Exchange contract')
-    }
-    return {
-      success: !!newToken,
-      tokenList: this.getTokens(networkId),
-    }
-  }
+  public addToken({ networkId, token }: AddTokenParams): void {
+    logDebug('Added new Token to userlist', token)
 
-  public async addTokenToExchange({
-    userAddress,
-    networkId,
-    tokenAddress,
-  }: AddTokenToExchangeParams): Promise<AddTokenResult> {
-    const newToken = await addTokenToExchange({ userAddress, networkId, tokenAddress })
-    if (newToken) {
-      logDebug('Added new Token to userlist', newToken)
-
-      this._tokensByNetwork[networkId].push(newToken)
-      this.persistUserTokenList(newToken, networkId)
-    } else {
-      logDebug('Token at address', tokenAddress, 'could not be added to Exchange contract')
-    }
-    return {
-      success: !!newToken,
-      tokenList: this.getTokens(networkId),
-    }
+    this._tokensByNetwork[networkId].push(token)
+    this.persistUserTokenList(token, networkId)
+    // return this.getTokens(networkId)
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {

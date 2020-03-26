@@ -1,5 +1,5 @@
 import { TokenDetails } from 'types'
-import { TokenList, AddTokenParams, AddTokenResult, AddTokenToExchangeParams } from './TokenListApi'
+import { TokenList, AddTokenParams } from './TokenListApi'
 
 export class TokenListApiMock implements TokenList {
   private _tokenList: TokenDetails[]
@@ -13,24 +13,9 @@ export class TokenListApiMock implements TokenList {
     return this._tokenList
   }
 
-  public async addTokenToList({ tokenAddress, networkId }: AddTokenParams): Promise<AddTokenResult> {
-    this._tokenList.push({
-      id: this._tokenList.length + 1,
-      name: 'New Token',
-      symbol: 'NTK',
-      decimals: 18,
-      addressMainnet: '0x12345',
-      image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x12345/logo.png`,
-      address: tokenAddress,
-    })
-    return {
-      success: true,
-      tokenList: this.getTokens(networkId),
-    }
-  }
-
-  public addTokenToExchange(params: AddTokenToExchangeParams): Promise<AddTokenResult> {
-    return this.addTokenToList(params)
+  public async addToken({ token }: AddTokenParams): void {
+    this._tokenList.push(token)
+    // return this.getTokens(networkId)
   }
 }
 
