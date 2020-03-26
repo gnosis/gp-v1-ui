@@ -1,3 +1,5 @@
+import { Actions } from 'reducers-actions'
+
 export const enum ActionTypes {
   SET_ENABLING = 'enabling',
   SET_CLAIMING = 'claiming',
@@ -9,45 +11,42 @@ export const enum ActionTypes {
   SET_HIGHLIGHTED_AND_WITHDRAWING = 'highlighted_and_withdrawing',
 }
 
-interface Actions {
-  type: ActionTypes
-  payload: string
-}
+type TokenRowActions = Actions<ActionTypes, string>
 
-export const setClaimingAction = (payload: string): Actions => ({
+export const setClaimingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_CLAIMING,
   payload,
 })
-export const setDepositingAction = (payload: string): Actions => ({
+export const setDepositingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_DEPOSITING,
   payload,
 })
-export const setWithdrawingAction = (payload: string): Actions => ({
+export const setWithdrawingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_WITHDRAWING,
   payload,
 })
 
-export const setEnablingAction = (payload: string): Actions => ({
+export const setEnablingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_ENABLING,
   payload,
 })
 
-export const setHighlightAction = (payload: string): Actions => ({
+export const setHighlightAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED,
   payload,
 })
 
-export const setHighlightAndClaimingAction = (payload: string): Actions => ({
+export const setHighlightAndClaimingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
   payload,
 })
 
-export const setHighlightAndDepositing = (payload: string): Actions => ({
+export const setHighlightAndDepositing = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_DEPOSITING,
   payload,
 })
 
-export const setHighlightAndWithdrawing = (payload: string): Actions => ({
+export const setHighlightAndWithdrawing = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_WITHDRAWING,
   payload,
 })
@@ -93,7 +92,7 @@ function getRemainingType(type: ActionTypes): ActionTypes {
   throw new Error(`Unexpected ActionTypes -- ${type}`)
 }
 
-export const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
+export const reducer = (state: TokenLocalState, action: TokenRowActions): TokenLocalState => {
   const { type, payload } = action
   switch (type) {
     case ActionTypes.SET_ENABLING:
