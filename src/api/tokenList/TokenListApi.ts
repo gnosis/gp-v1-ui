@@ -12,6 +12,11 @@ export interface AddTokenParams {
   token: TokenDetails
 }
 
+export interface HasTokenParams {
+  networkId: number
+  tokenAddress: string
+}
+
 const getUserTokenListName = (networkId: number): string => 'USER_TOKEN_LIST_' + networkId
 
 /**
@@ -22,26 +27,40 @@ const getUserTokenListName = (networkId: number): string => 'USER_TOKEN_LIST_' +
 export class TokenListApiImpl implements TokenList {
   public networkIds: number[]
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
+  private _tokenAddressNetworkSet: Set<string>
 
   public constructor(networkIds: number[]) {
     this.networkIds = networkIds
 
     // Init the tokens by network
     this._tokensByNetwork = {}
+    this._tokenAddressNetworkSet = new Set<string>()
+
     networkIds.forEach(networkId => {
       // initial value
-      this._tokensByNetwork[networkId] = getTokensByNetwork(networkId).concat(this.loadUserTokenList(networkId))
+      const tokenList = getTokensByNetwork(networkId).concat(this.loadUserTokenList(networkId))
+      this._tokensByNetwork[networkId] = tokenList
+
+      tokenList.forEach(({ address }) => {
+        this._tokenAddressNetworkSet.add(
+          TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: address, networkId }),
+        )
+      })
     })
+  }
+
+  public hasToken(params: HasTokenParams): boolean {
+    return this._tokenAddressNetworkSet.has(TokenListApiImpl.constructAddressNetworkKey(params))
   }
 
   public getTokens(networkId: number): TokenDetails[] {
     return this._tokensByNetwork[networkId] || []
   }
 
-  public async addTokenToList({ networkId, tokenAddress }: AddTokenParams): Promise<AddTokenResult> {
-    const newToken = await getTokenFromExchangeByAddress({ networkId, tokenAddress })
-    if (newToken) {
-      logDebug('Added new Token to userlist', newToken)
+  private static constructAddressNetworkKey({ tokenAddress, networkId }: HasTokenParams): string {
+    return tokenAddress.toLowerCase() + '|' + networkId
+  }
+
 
   public addToken({ networkId, token }: AddTokenParams): void {
     logDebug('Added new Token to userlist', token)
