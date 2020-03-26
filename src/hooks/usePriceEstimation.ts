@@ -27,7 +27,7 @@ export function usePriceEstimation(params: Params): Result {
       try {
         setPriceEstimation(await getPriceEstimation({ baseTokenId, quoteTokenId }))
       } catch (e) {
-        logDebug(e)
+        console.error(`Error getting price estimation for tokens ${baseTokenId} and ${quoteTokenId}`, e)
       } finally {
         setIsPriceLoading(false)
       }
