@@ -2,6 +2,7 @@ import { Actions } from 'reducers-actions'
 
 export const enum ActionTypes {
   SET_ENABLING = 'enabling',
+  SET_ENABLED = 'enabled',
   SET_CLAIMING = 'claiming',
   SET_DEPOSITING = 'depositing',
   SET_WITHDRAWING = 'withdrawing',
@@ -17,10 +18,12 @@ export const setClaimingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_CLAIMING,
   payload,
 })
+
 export const setDepositingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_DEPOSITING,
   payload,
 })
+
 export const setWithdrawingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_WITHDRAWING,
   payload,
@@ -28,6 +31,11 @@ export const setWithdrawingAction = (payload: string): TokenRowActions => ({
 
 export const setEnablingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_ENABLING,
+  payload,
+})
+
+export const setEnabledAction = (payload: string): TokenRowActions => ({
+  type: ActionTypes.SET_ENABLED,
   payload,
 })
 
@@ -53,6 +61,7 @@ export const setHighlightAndWithdrawing = (payload: string): TokenRowActions => 
 
 export interface TokenLocalState {
   [ActionTypes.SET_ENABLING]: Set<string>
+  [ActionTypes.SET_ENABLED]: Set<string>
   [ActionTypes.SET_HIGHLIGHTED]: Set<string>
   [ActionTypes.SET_CLAIMING]: Set<string>
   [ActionTypes.SET_DEPOSITING]: Set<string>
@@ -61,6 +70,7 @@ export interface TokenLocalState {
 
 export const TokenRowInitialState: TokenLocalState = {
   enabling: new Set(),
+  enabled: new Set(),
   highlighted: new Set(),
   claiming: new Set(),
   depositing: new Set(),
@@ -96,6 +106,7 @@ export const reducer = (state: TokenLocalState, action: TokenRowActions): TokenL
   const { type, payload } = action
   switch (type) {
     case ActionTypes.SET_ENABLING:
+    case ActionTypes.SET_ENABLED:
     case ActionTypes.SET_CLAIMING:
     case ActionTypes.SET_DEPOSITING:
     case ActionTypes.SET_WITHDRAWING:
