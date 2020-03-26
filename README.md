@@ -10,17 +10,24 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
-# dFusion DEX: PoC Web App
+# Mesa - Gnosis Protocol UI
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Web app for [dFusion DEX](https://github.com/gnosis/dex-contracts) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
+Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/dfusion) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
 
-This app will allow to:
+Gnosis Protocol introduces a new, fully decentralized exchange mechanism for ERC20 tokens with the following
+properties:
 
+- Batch auctions
+- Multidimensional order books with ring trades
+- Uniform clearing prices in every batch
+
+This UI will allow to:
+
+- Create orders in [Gnosis Protocol](https://docs.gnosis.io/dfusion)
 - See the balances for any token: Both in your wallet and the exchange
 - Deposit/Withdraw tokens from the exchange
-- Submit sell orders to the Exchange
 
 ## Running locally
 
