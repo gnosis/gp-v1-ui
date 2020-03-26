@@ -12,7 +12,7 @@ const GlobalStyles = createGlobalStyle`
 
   html, body {  
     width: 100%;
-    height: auto;
+    height: 100%;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
@@ -49,7 +49,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   #root {
-    min-height: 100vh;
+    height: 100%;
     font-size: 1.3rem;
   }
 
@@ -67,7 +67,10 @@ const GlobalStyles = createGlobalStyle`
 
     &:disabled,
     &[disabled]{
-      opacity: .8;
+      &:hover {
+        background-color: initial;
+      }
+      opacity: .35;
       pointer-events: none;
     }
     &.success {
@@ -123,7 +126,6 @@ const GlobalStyles = createGlobalStyle`
     &::placeholder {
       color: inherit;
       font-size: inherit;
-      line-height: inherit;
     }
     
     &:focus::placeholder {

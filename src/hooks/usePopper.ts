@@ -41,13 +41,14 @@ const createConfig = (
 interface Result<T extends HTMLElement, U extends HTMLElement = HTMLDivElement> {
   show(): void
   hide(): void
+  toggle(): void
   target: RefObject<T>
   ref: RefObject<U>
   isShown: boolean
   state: State | {}
 }
 
-const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement>(
+export const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement>(
   config?: Partial<Options>,
 ): Result<T, U> => {
   const [isShown, setIsShown] = useState(false)
@@ -78,6 +79,7 @@ const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement
     () => ({
       show: (): void => setIsShown(true),
       hide: (): void => setIsShown(false),
+      toggle: (): void => setIsShown(isShown => !isShown),
       target: targetRef,
       ref: popupRef,
     }),
@@ -100,6 +102,23 @@ const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement
   )
 }
 
+const usePlacementAndOffset = ({ placement, offset }: { placement: Placement; offset?: number }): Partial<Options> => {
+  return useMemo(() => {
+    const config: Partial<Options> = { placement }
+    if (offset !== undefined) {
+      config.modifiers = [
+        {
+          name: 'offset',
+          options: {
+            offset: [0, offset],
+          },
+        },
+      ]
+    }
+    return config
+  }, [placement, offset])
+}
+
 interface PopperDefaultHookResult<T extends HTMLElement> {
   // default triggers for the tooltip
   // can spread over target element
@@ -116,10 +135,15 @@ interface PopperDefaultHookResult<T extends HTMLElement> {
 }
 
 // Popper hook using default triggers
-export const usePopperDefault = <T extends HTMLElement>(placement: Placement = 'top'): PopperDefaultHookResult<T> => {
-  const { target, show, hide, ...tooltipProps } = usePopper<T>({
-    placement,
-  })
+export const usePopperDefault = <T extends HTMLElement>(
+  placement: Placement = 'top',
+  offset?: number,
+): PopperDefaultHookResult<T> => {
+  const config = usePlacementAndOffset({ placement, offset })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { target, show, hide, toggle, ...tooltipProps } = usePopper<T>(config)
+  // ignore toggle var
 
   const targetProps = useMemo(
     () => ({
@@ -130,6 +154,53 @@ export const usePopperDefault = <T extends HTMLElement>(placement: Placement = '
       ref: target,
     }),
     [hide, show, target],
+  )
+
+  return {
+    targetProps,
+    tooltipProps,
+  }
+}
+
+interface PopperOnClickResult<T extends HTMLElement> {
+  // default triggers for the tooltip
+  // can spread over target element
+  targetProps: {
+    onClick: Result<T>['toggle']
+    ref: Result<T>['target']
+  }
+  // tooltip state
+  // can spread over Tooltip component
+  tooltipProps: Pick<Result<T>, 'ref' | 'isShown' | 'state'>
+}
+
+export const usePopperOnClick = <T extends HTMLElement>(
+  placement: Placement = 'top',
+  offset?: number,
+): PopperOnClickResult<T> => {
+  const config = usePlacementAndOffset({ placement, offset })
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { target, show, hide, toggle, ...tooltipProps } = usePopper<T>(config)
+  // ignore show and hide vars
+
+  useEffect(() => {
+    const handler = (e: MouseEvent): void => {
+      const clickTarget = e.target as Node
+      // close Tooltip on click outside
+      if (!target.current?.contains(clickTarget) && !tooltipProps.ref.current?.contains(clickTarget)) hide()
+    }
+    document.addEventListener('click', handler)
+
+    return (): void => document.removeEventListener('click', handler)
+  }, [hide, target, tooltipProps.ref])
+
+  const targetProps = useMemo(
+    () => ({
+      onClick: toggle,
+      ref: target,
+    }),
+    [toggle, target],
   )
 
   return {

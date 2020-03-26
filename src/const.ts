@@ -12,6 +12,9 @@ export {
 } from '@gnosis.pm/dex-js'
 export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
 
+export const ZERO_BIG_NUMBER = new BigNumber(0)
+export const TEN_BIG_NUMBER = new BigNumber(10)
+
 // How much of the order needs to be matched to consider it filled
 // Will divide the total sell amount by this factor.
 // E.g.: Sell = 500; ORDER_FILLED_FACTOR = 100 (1%) => 500/100 => 5
@@ -39,6 +42,8 @@ export const DEFAULT_ORDERS_PAGE_SIZE = 50
 export const HIGHLIGHT_TIME = 5000
 
 export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
+
+export const PRICE_ESTIMATION_PRECISION = 5
 
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
@@ -100,3 +105,6 @@ export const GP_ORDER_TX_HASHES = {
   1: 'GP_ORDER_TX_HASHES_1',
   4: 'GP_ORDER_TX_HASHES_4',
 }
+
+export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI', 'sUSD'])
+export const INPUT_PRECISION_SIZE = 6

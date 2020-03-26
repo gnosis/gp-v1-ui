@@ -1,16 +1,18 @@
-import React, { ReactNode, CSSProperties } from 'react'
+import React, { ReactNode, CSSProperties, useCallback } from 'react'
 import Portal from './Portal'
-import { usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
+import { usePopperOnClick, usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 import { State, Placement } from '@popperjs/core'
 import styled from 'styled-components'
 import { isElement, isFragment } from 'react-is'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 
 // visibility necessary for correct boundingRect calculation by popper
 const TooltipOuter = styled.div<Pick<TooltipBaseProps, 'isShown'>>`
   visibility: ${(props): 'hidden' | false => !props.isShown && 'hidden'};
 `
 // can style anything but TOOLTIP_OFFSET fields, position and transform: rotate
-const TooltipArrow = styled.div`
+const TooltipArrow = styled.div<{ $bgColor?: string }>`
   &,
   ::before {
     position: absolute;
@@ -22,12 +24,12 @@ const TooltipArrow = styled.div`
   ::before {
     content: '';
     transform: rotate(45deg);
-    background: #2f3e4e;
+    background: ${({ $bgColor = '#2f3e4e' }): string => $bgColor};
   }
 `
 
-const TooltipInner = styled.div`
-  background: #2f3e4e;
+const TooltipInner = styled.div<{ $bgColor?: string }>`
+  background: ${({ $bgColor = '#2f3e4e' }): string => $bgColor};
   color: white;
   font-weight: var(--font-weight-normal);
   padding: 0.8rem 1rem;
@@ -53,19 +55,29 @@ const TooltipInner = styled.div`
 `
 
 interface TooltipBaseProps {
+  bgColor?: string
   isShown: boolean
   state: Partial<Pick<State, 'placement' | 'styles'>>
 }
 
-const TooltipBase: React.FC<TooltipBaseProps> = ({ children, isShown, state }, ref) => {
+const TooltipBase: React.ForwardRefRenderFunction<HTMLDivElement, TooltipBaseProps> = (
+  { children, isShown, bgColor, state },
+  ref,
+) => {
   const { placement, styles = {} } = state
 
   return (
     // Portal isolates popup styles from the App styles
     <Portal>
-      <TooltipOuter isShown={isShown}>
-        <TooltipInner role="tooltip" ref={ref} style={styles.popper as CSSProperties} data-popper-placement={placement}>
-          <TooltipArrow data-popper-arrow style={styles.arrow as CSSProperties} />
+      <TooltipOuter isShown={isShown} onClick={(e): void => e.stopPropagation()}>
+        <TooltipInner
+          role="tooltip"
+          ref={ref}
+          style={styles.popper as CSSProperties}
+          data-popper-placement={placement}
+          $bgColor={bgColor}
+        >
+          <TooltipArrow data-popper-arrow style={styles.arrow as CSSProperties} $bgColor={bgColor} />
           {isShown && children}
         </TooltipInner>
       </TooltipOuter>
@@ -82,6 +94,7 @@ export const Tooltip = React.memo(React.forwardRef<HTMLDivElement, TooltipProps>
 interface WrapperProps<C> {
   tooltip: ReactNode
   placement?: Placement
+  offset?: number
   focus?: boolean
   hover?: boolean
   as?: C
@@ -104,9 +117,10 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
   as,
   focus = true,
   hover = true,
+  offset,
   ...props
 }: WrapperPropsAll<C> & { children?: ReactNode }): React.ReactElement => {
-  const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement)
+  const { targetProps, tooltipProps } = usePopperDefault<HTMLDivElement>(placement, offset)
 
   const childrenNumber = React.Children.count(children)
 
@@ -162,3 +176,56 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
 }
 
 export const TooltipWrapper = (React.memo(Wrapper) as unknown) as typeof Wrapper
+
+export const LongTooltipContainer = styled.div`
+  max-width: 30rem;
+  line-height: 1.4;
+`
+
+interface HelpTooltipProps {
+  tooltip: ReactNode
+  placement?: Placement
+  offset?: number
+}
+
+const HelperSpan = styled.span`
+  cursor: pointer;
+  transition: color 0.1s;
+
+  :hover {
+    color: #748a47;
+  }
+`
+
+export const HelpTooltipContainer = styled(LongTooltipContainer)`
+  font-size: 1.6rem;
+  font-family: monospace;
+  padding: 1em;
+  color: black;
+`
+
+export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = 'top', offset }) => {
+  const {
+    targetProps: { ref, onClick },
+    tooltipProps,
+  } = usePopperOnClick<HTMLSpanElement>(placement, offset)
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLSpanElement>) => {
+      e.stopPropagation()
+      onClick()
+    },
+    [onClick],
+  )
+
+  return (
+    <>
+      <HelperSpan ref={ref} onClick={handleClick}>
+        <FontAwesomeIcon icon={faQuestionCircle} />
+      </HelperSpan>
+      <Tooltip {...tooltipProps} bgColor="#bfd6ef">
+        {tooltip}
+      </Tooltip>
+    </>
+  )
+}

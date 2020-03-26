@@ -39,7 +39,7 @@ type FilteredOrdersStateKeys = OrderTabs
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
     orders: AuctionElement[]
-    pendingOrders: PendingTxObj[]
+    pendingOrders: AuctionElement[]
     markedForDeletion: Set<string>
   }
 }
@@ -50,6 +50,25 @@ function emptyState(): FilteredOrdersState {
     closed: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
     liquidity: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
   }
+}
+
+function classifyOrders(
+  orders: AuctionElement[],
+  state: FilteredOrdersState,
+  ordersType: 'orders' | 'pendingOrders',
+): void {
+  const now = new Date()
+  const isOrderActiveFn = ordersType === 'pendingOrders' ? isPendingOrderActive : isOrderActive
+
+  orders.forEach(order => {
+    if (!isOrderActiveFn(order, now)) {
+      state.closed[ordersType].push(order)
+    } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
+      state.liquidity[ordersType].push(order)
+    } else {
+      state.active[ordersType].push(order)
+    }
+  })
 }
 
 const OrdersWidget: React.FC = () => {
@@ -87,29 +106,10 @@ const OrdersWidget: React.FC = () => {
   // Update filteredOrders state whenever there's a change to allOrders
   // splitting orders into respective tabs
   useEffect(() => {
-    const now = new Date()
-
     const filteredOrders = emptyState()
 
-    allOrders.forEach(order => {
-      if (!isOrderActive(order, now)) {
-        filteredOrders.closed.orders.push(order)
-      } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
-        filteredOrders.liquidity.orders.push(order)
-      } else {
-        filteredOrders.active.orders.push(order)
-      }
-    })
-
-    allPendingOrders.forEach(order => {
-      if (!isPendingOrderActive(order, now)) {
-        filteredOrders.closed.pendingOrders.push(order)
-      } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
-        filteredOrders.liquidity.pendingOrders.push(order)
-      } else {
-        filteredOrders.active.pendingOrders.push(order)
-      }
-    })
+    classifyOrders(allOrders, filteredOrders, 'orders')
+    classifyOrders(allPendingOrders, filteredOrders, 'pendingOrders')
 
     setFilteredOrders(curr => {
       // copy markedForDeletion
@@ -242,7 +242,7 @@ const OrdersWidget: React.FC = () => {
             </div>
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
               <b>↴</b>
-              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting}>
+              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
                 <FontAwesomeIcon icon={faTrashAlt} />{' '}
                 {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
               </ButtonWithIcon>

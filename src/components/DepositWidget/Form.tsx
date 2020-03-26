@@ -24,7 +24,7 @@ export interface FormProps {
   responsive?: boolean
   submitBtnLabel: string
   submitBtnIcon: IconDefinition
-  onSubmit: (amount: BN) => Promise<void>
+  onSubmit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onClose: () => void
 }
 
@@ -86,12 +86,15 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     if (!error) {
       setLoading(true)
       const parsedAmt = parseAmount(amountInput, decimals)
-      parsedAmt &&
-        props.onSubmit(parsedAmt).then(() => {
-          setLoading(false)
-          setValidatorActive(false)
-          cancelForm()
-        })
+      let called = false
+      const onFinish = (): void => {
+        if (called) return
+        called = true
+        setLoading(false)
+        setValidatorActive(false)
+        cancelForm()
+      }
+      parsedAmt && props.onSubmit(parsedAmt, onFinish).then(onFinish)
     }
   }
 
@@ -107,7 +110,11 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <b>Exchange Balance</b>
             <div>
               <i>{symbol}</i>
-              <input type="text" value={formatAmountFull(totalExchangeBalance, decimals) || ''} disabled />
+              <input
+                type="text"
+                value={formatAmountFull({ amount: totalExchangeBalance, precision: decimals }) || ''}
+                disabled
+              />
             </div>
           </div>
           {/* Deposit Row */}
@@ -116,8 +123,19 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <span>
               {userAddress && <b>{abbreviateString(userAddress, 6, 4)}</b>}
               {totalAmountLabel}:
-              <p onClick={(): void => setAmountInput(formatAmountFull(totalAmount, decimals, false) || '')}>
-                {formatAmountFull(totalAmount, decimals) || ''} {symbol}
+              <p
+                onClick={(): void =>
+                  setAmountInput(
+                    formatAmountFull({
+                      amount: totalAmount,
+                      precision: decimals,
+                      thousandSeparator: false,
+                      isLocaleAware: false,
+                    }) || '',
+                  )
+                }
+              >
+                {formatAmountFull({ amount: totalAmount, precision: decimals }) || ''} {symbol}
               </p>
             </span>
 
@@ -129,6 +147,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
                 value={amountInput}
                 onChange={(e: ChangeEvent<HTMLInputElement>): void => setAmountInput(e.target.value)}
                 placeholder="0"
+                autoFocus
               />
             </div>
             {/* Error Message */}

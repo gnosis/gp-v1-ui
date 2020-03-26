@@ -1,13 +1,15 @@
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
-import { TokenDetails } from 'types'
 import { useFormContext } from 'react-hook-form'
+import { invertPrice } from '@gnosis.pm/dex-js'
+
+import { TokenDetails } from 'types'
+import { parseBigNumber, validatePositiveConstructor, validInputPattern } from 'utils'
+import { DEFAULT_PRECISION, MEDIA } from 'const'
+
 import { TradeFormData } from '.'
-import BigNumber from 'bignumber.js'
-import { parseBigNumber, validatePositive, validInputPattern } from 'utils'
 import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import { DEFAULT_PRECISION, MEDIA } from 'const'
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,8 +23,9 @@ const Wrapper = styled.div`
     color: #2f3e4e;
     width: 100%;
     margin: 0 0 1rem;
-    padding: 0 1rem;
+    padding: 0;
     box-sizing: border-box;
+    font-size: 1.5rem;
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
     }
@@ -31,12 +34,10 @@ const Wrapper = styled.div`
 
 export const PriceInputBox = styled.div`
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: column nowrap;
   margin: 0;
   width: 50%;
   width: calc(50% - 0.8rem);
-  height: 5.6rem;
-
   position: relative;
   outline: 0;
 
@@ -49,6 +50,7 @@ export const PriceInputBox = styled.div`
     display: flex;
     width: auto;
     max-width: 100%;
+    height: 5.6rem;
     position: relative;
 
     @media ${MEDIA.mobile} {
@@ -89,7 +91,7 @@ export const PriceInputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 7rem 0 1rem;
+    padding: 0 8.5rem 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {
@@ -126,14 +128,15 @@ interface Props {
   receiveToken: TokenDetails
   priceInputId: string
   priceInverseInputId: string
+  tabIndex?: number
 }
 
-export function invertPrice(priceValue: string): string {
+export function invertPriceFromString(priceValue: string): string {
   const price = parseBigNumber(priceValue)
-  return price ? new BigNumber(1).div(price).toString() : ''
+  return price ? invertPrice(price).toString(10) : ''
 }
 
-const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId }) => {
+const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
   const errorPrice = errors[priceInputId]
@@ -143,7 +146,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   const updateInversePrice = useCallback(
     (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
-      const priceInverseValue = invertPrice(priceValue)
+      const priceInverseValue = invertPriceFromString(priceValue)
       setValue(inverseInputId, priceInverseValue, true)
     },
     [setValue],
@@ -194,18 +197,20 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onChange={onChangePrice}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
-              validate: { positive: validatePositive },
+              validate: { positive: validatePositiveConstructor('Invalid price') },
               required: 'The price is required',
               min: 0,
             })}
             onKeyPress={onKeyPressPrice}
             onBlur={removeExcessZerosPrice}
             onFocus={(e): void => e.target.select()}
-          ></input>
+            tabIndex={tabIndex}
+          />
           <small>
             {sellToken.symbol}/{receiveToken.symbol}
           </small>
         </label>
+        {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
       </PriceInputBox>
       <PriceInputBox>
         <label>
@@ -216,20 +221,20 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onChange={onChangePriceInverse}
             ref={register({
               pattern: { value: validInputPattern, message: 'Invalid price' },
-              validate: { positive: validatePositive },
+              validate: { positive: validatePositiveConstructor('Invalid price') },
               required: true,
             })}
             onKeyPress={onKeyPressPriceInverse}
             onBlur={removeExcessZerosPriceInverse}
             onFocus={(e): void => e.target.select()}
-          ></input>
+            tabIndex={tabIndex}
+          />
           <small>
             {receiveToken.symbol}/{sellToken.symbol}
           </small>
         </label>
+        {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
       </PriceInputBox>
-      {errorPrice && <FormMessage className="error">{errorPrice.message}</FormMessage>}
-      {errorPriceInverse && <FormMessage className="error">{errorPriceInverse.message}</FormMessage>}
     </Wrapper>
   )
 }

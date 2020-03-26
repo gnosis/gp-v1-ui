@@ -1,11 +1,15 @@
-import React, { CSSProperties, useMemo } from 'react'
+import React, { CSSProperties, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
-import { TokenDetails } from 'types'
+import { formatAmount } from '@gnosis.pm/dex-js'
+
+import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
+import { MenuList } from './TokenSelectorComponents'
+import searchIcon from 'assets/img/search.svg'
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,6 +27,7 @@ const Wrapper = styled.div`
 
   .optionItem {
     display: flex;
+    width: 100%;
     align-items: center;
 
     img {
@@ -32,10 +37,21 @@ const Wrapper = styled.div`
       margin: 0;
     }
 
-    > div {
+    .tokenDetails {
       display: flex;
-      flex-direction: column;
-      margin-left: 1rem;
+      justify-content: space-between;
+      width: inherit;
+
+      .tokenName {
+        display: flex;
+        flex-direction: column;
+        margin-left: 1rem;
+      }
+
+      .tokenBalance {
+        font-weight: bold;
+        align-self: center;
+      }
     }
 
     > div > div {
@@ -55,6 +71,54 @@ const Wrapper = styled.div`
   .tokenSelectBox {
     position: relative;
     .react-select__menu {
+      .menulist-head {
+        position: absolute;
+        bottom: 100%;
+        background-color: inherit;
+        width: 100%;
+        border-radius: 0.6rem;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        > button {
+          background-color: transparent;
+          font-size: 4rem;
+          line-height: 1;
+          color: #526877;
+          opacity: 0.5;
+          font-family: var(--font-mono);
+          font-weight: var(--font-weight-regular);
+          transition: opacity 0.2s ease-in-out;
+
+          &:hover {
+            opacity: 1;
+          }
+        }
+
+        > h2 {
+          margin-left: 1em;
+          font-size: 1.5rem;
+        }
+      }
+
+      .searchContainer {
+        display: flex;
+
+        > input {
+          max-width: 100%;
+          font-size: 1.4rem;
+          font-weight: var(--font-weight-normal);
+          background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+          border-radius: 0;
+          padding: 0px 1.6rem 0px 4.8rem;
+          height: 3em;
+        }
+      }
+
       &::before {
         @media ${MEDIA.mediumUp} {
           content: '';
@@ -80,6 +144,10 @@ const Wrapper = styled.div`
       @media ${MEDIA.mobile} {
         height: 5.6rem;
       }
+
+      &--is-focused {
+        background: rgba(33, 141, 255, 0.1);
+      }
     }
   }
 `
@@ -104,15 +172,20 @@ const SelectedTokenWrapper = styled.span`
   text-align: right;
 `
 
-function renderOptionLabel(token: TokenDetails): React.ReactNode {
+function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.ReactNode {
   return (
     <div className="optionItem">
       <TokenImgWrapper src={token.image} alt={token.name} />
-      <div>
-        <div>
-          <strong>{token.symbol}</strong>
+      <div className="tokenDetails">
+        <div className="tokenName">
+          <div>
+            <strong>{token.symbol}</strong>
+          </div>
+          <div>{token.name}</div>
         </div>
-        <div>{token.name}</div>
+        {'totalExchangeBalance' in token && (
+          <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, token.decimals)}</div>
+        )}
       </div>
     </div>
   )
@@ -172,8 +245,9 @@ const customSelectStyles = {
   menuList: (): CSSProperties => ({
     height: '100%',
     overflow: 'auto',
-    borderRadius: '0.6rem',
+    borderRadius: '0 0 0.6rem 0.6rem',
     padding: '0 0 5rem 0',
+    background: 'var(--color-background-pageWrapper)',
   }),
   input: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -220,6 +294,10 @@ const customSelectStyles = {
   }),
 }
 
+const components = { MenuList }
+
+const noOptionsMessage = (): string => 'No results'
+
 interface Props {
   label?: string
   isDisabled?: boolean
@@ -230,26 +308,80 @@ interface Props {
 }
 
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
-  const options = useMemo(() => tokens.map(token => ({ token, value: token.symbol, label: token.name })), [tokens])
+  const options = useMemo(
+    () => tokens.map(token => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
+    [tokens],
+  )
+
+  // isFocused is used to force the menu to remain open and give focus to the search input
+  const [isFocused, setIsFocused] = useState(false)
+
+  const onSelectChange = useCallback(
+    (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
+      // When an option is chosen, give control back to react-select
+      setIsFocused(false)
+
+      if (selected && action === 'select-option' && 'token' in selected) {
+        onChange(selected.token)
+      }
+    },
+    [onChange],
+  )
+
+  // When the search input is focused, force menu to remain open
+  const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
+
+  const onKeyDown = useCallback((e): void => {
+    if (e.key === 'Escape') {
+      // Close menu on `Escape`
+      e.stopPropagation()
+      setIsFocused(false)
+    } else if (!e.target.value && e.key === ' ') {
+      // Prevent a space when input in empty.
+      // That closes the menu. (/shrug)
+      e.preventDefault()
+    }
+  }, [])
+
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  const onDocumentClick = useCallback(e => {
+    const menu = wrapperRef.current?.querySelector('.react-select__menu')
+    // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
+    // If neither, hand focus back to react-select but turning isFocused off
+    if (!wrapperRef.current?.contains(e.target) || !menu) {
+      setIsFocused(false)
+    }
+  }, [])
+
+  // mount and umount hooks for watching click events
+  useEffect(() => {
+    window.addEventListener('mousedown', onDocumentClick)
+
+    return (): void => window.removeEventListener('mousedown', onDocumentClick)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
-    <Wrapper>
+    <Wrapper ref={wrapperRef}>
       <StyledSelect
+        blurInputOnSelect
         isSearchable
         isDisabled={isDisabled}
         styles={customSelectStyles}
         className="tokenSelectBox"
         classNamePrefix="react-select"
-        noOptionsMessage={(): string => 'No results'}
+        noOptionsMessage={noOptionsMessage}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
-        onChange={(selected: { token: TokenDetails }, { action }: ActionMeta): void => {
-          if (selected && action === 'select-option' && 'token' in selected) {
-            onChange(selected.token)
-          }
-        }}
+        onChange={onSelectChange}
         tabIndex={tabIndex.toString()}
+        components={components}
+        isFocused={isFocused || undefined}
+        menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
+        onMenuInputFocus={onMenuInputFocus}
+        onKeyDown={onKeyDown}
       />
     </Wrapper>
   )

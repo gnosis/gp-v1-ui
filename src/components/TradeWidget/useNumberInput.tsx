@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { leadingAndTrailingZeros, adjustPrecision, trailingZerosAfterDot, validInputPattern } from 'utils'
+import { adjustPrecision, formatPartialNumber, preventInvalidChars } from 'utils'
 import { TradeFormData } from '.'
 
 interface Params {
@@ -12,12 +12,6 @@ interface Result {
   removeExcessZeros: (event: React.SyntheticEvent<HTMLInputElement, Event>) => void
   enforcePrecision: () => void
   onKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void
-}
-
-function _preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
-  if (!validInputPattern.test(event.currentTarget.value + event.key)) {
-    event.preventDefault()
-  }
 }
 
 export function useNumberInput(params: Params): Result {
@@ -45,7 +39,7 @@ export function useNumberInput(params: Params): Result {
       // A: Too many steps (convert to and from BN) and binds the function to selectedToken.decimals
 
       const { value } = event.currentTarget
-      const newValue = value.replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')
+      const newValue = formatPartialNumber(value)
 
       if (value != newValue) {
         setValue(inputId, newValue, true)
@@ -56,7 +50,7 @@ export function useNumberInput(params: Params): Result {
 
   const onKeyPress = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>): void =>
-      event.key === 'Enter' ? removeExcessZeros(event) : _preventInvalidChars(event),
+      event.key === 'Enter' ? removeExcessZeros(event) : preventInvalidChars(event),
     [removeExcessZeros],
   )
 

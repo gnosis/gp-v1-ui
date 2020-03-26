@@ -95,27 +95,18 @@ export const RowClaimButton = styled.button`
   }
 `
 
-export const RowClaimLink = styled.a`
-  text-decoration: none;
-  cursor: pointer;
+export const RowClaimSpan = styled.span`
   font-size: 1.2rem;
   line-height: 1;
+  border: 0.1rem solid #63ab52;
+  border-radius: 2rem;
+  background: transparent;
+  color: #63ab52;
+  padding: 0.4rem 1rem;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+  margin: 0 0 0 0.5rem;
 
-  &::after {
-    content: 'Claim';
-    display: block;
-    line-height: inherit;
-    border: 0.1rem solid #63ab52;
-    border-radius: 2rem;
-    background: transparent;
-    color: #63ab52;
-    padding: 0.4rem 1rem;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    box-sizing: border-box;
-    margin: 0 0 0 0.5rem;
-  }
-
-  &:hover::after {
+  &:hover {
     background: var(--color-button-success);
     color: white;
   }

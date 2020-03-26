@@ -11,6 +11,8 @@ import useSafeState from 'hooks/useSafeState'
 import { validInputPattern, formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
+import { MEDIA } from 'const'
+import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
 const Wrapper = styled.div`
   display: flex;
@@ -87,7 +89,6 @@ const Wrapper = styled.div`
 const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
   position: fixed;
-
   left: 0;
   right: 0;
   top: 0;
@@ -96,34 +97,110 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   background: var(--color-background-pageWrapper);
   color: var(--color-text-primary);
   z-index: 500;
-  box-shadow: 0 999vh 0 999vw rgba(47, 62, 78, 0.5);
-
+  box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 50rem;
   min-width: 30rem;
-  height: 18rem;
-  padding: 2.7rem;
+  height: 30rem;
+  padding: 0 0 2.4rem;
   border-radius: 0.8rem;
-
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
-  align-items: space-between;
+  justify-content: center;
+  align-items: flex-start;
+  align-content: flex-start;
+  transition: all 0.2s ease-in-out;
 
-  transition: all 0.5s ease-in-out;
-  > strong {
-    text-transform: capitalize;
+  @media ${MEDIA.mobile} {
+    height: 40rem;
+  }
+
+  > h4 {
+    height: 5.6rem;
+    padding: 0 1.6rem;
+    box-sizing: border-box;
+    letter-spacing: 0;
+    font-size: 1.6rem;
+    text-align: left;
     color: #2f3e4e;
+    margin: 0 0 2.4rem;
+    display: flex;
+    align-items: center;
+    font-family: var(--font-default);
+    font-weight: var(--font-weight-regular);
+    border-bottom: 0.1rem solid #dfe6ef;
     width: 100%;
-    margin: 0 0 1rem;
-    padding: 0 1rem;
+  }
+
+  > h4 > i {
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 4rem;
+    line-height: 1;
+    color: #526877;
+    opacity: 0.5;
+    margin: 0 0 0 auto;
+    font-style: normal;
+    font-family: var(--font-mono);
+    transition: opacity 0.2s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  label > input:not([type='checkbox']) {
+    padding: 0 6.5rem 0 1rem;
+  }
+
+  ${PriceInputBox} {
+    padding: 0 0.8rem;
+
+    @media ${MEDIA.mobile} {
+      padding: 0 1.6rem;
+    }
+
+    > strong {
+      text-transform: capitalize;
+      color: #2f3e4e;
+      font-size: 1.5rem;
+      width: 100%;
+      margin: 0 0 1rem;
+      padding: 0;
+      box-sizing: border-box;
+    }
+  }
+
+  > span {
+    margin: auto;
+    height: 5.6rem;
+    border-top: 0.1rem solid #dfe6ef;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 0 1.6rem;
     box-sizing: border-box;
   }
-  > button {
+
+  > span > button {
     background: #218dff;
-    border-radius: 3rem;
-    padding: 0.8rem 2rem;
-    color: white;
-    margin: auto;
+    border-radius: 0.6rem;
+    min-width: 14rem;
+    padding: 0 1.6rem;
+    font-weight: var(--font-weight-bold);
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 1.4rem;
+    margin: 0 auto;
+    outline: 0;
+    height: 3.6rem;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0.03rem;
   }
 `
 
@@ -143,6 +220,10 @@ const OrderValidityBox = styled(PriceInputBox)`
     margin: auto;
   }
 `
+
+const OrderStartsTooltip = (
+  <HelpTooltipContainer>Orders that are valid ASAP will be considered for the next batch.</HelpTooltipContainer>
+)
 
 interface Props {
   validFromInputId: TradeFormTokenId
@@ -237,12 +318,16 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <button type="button" onClick={handleShowConfig}>
-        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b> - expires:{' '}
-        <b>{formatTimeInHours(validUntil, 'Never')}</b>
+      <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
+        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
+        <HelpTooltip tooltip={OrderStartsTooltip} />
+        &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
       </button>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
+        <h4>
+          Order settings <i onClick={handleShowConfig}>×</i>
+        </h4>
         <OrderValidityBox>
           <strong>Order starts in (min)</strong>
           <label>
@@ -262,10 +347,16 @@ const OrderValidity: React.FC<Props> = ({
               })}
               onChange={handleValidFromChange}
               onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex + 2}
+              tabIndex={tabIndex}
             />
             <div className="radio-container">
-              <input type="checkbox" checked={isAsap} disabled={isDisabled} onChange={handleASAPClick} />
+              <input
+                type="checkbox"
+                checked={isAsap}
+                disabled={isDisabled}
+                onChange={handleASAPClick}
+                tabIndex={tabIndex}
+              />
               <small>ASAP</small>
             </div>
           </label>
@@ -286,17 +377,25 @@ const OrderValidity: React.FC<Props> = ({
               })}
               onChange={handleValidUntilChange}
               onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex + 3}
+              tabIndex={tabIndex}
             />
             <div className="radio-container">
-              <input type="checkbox" disabled={isDisabled} checked={isUnlimited} onChange={handleUnlimitedClick} />
+              <input
+                type="checkbox"
+                disabled={isDisabled}
+                checked={isUnlimited}
+                onChange={handleUnlimitedClick}
+                tabIndex={tabIndex}
+              />
               <small>Never</small>
             </div>
           </label>
         </OrderValidityBox>
-        <button type="button" onClick={handleShowConfig}>
-          Set order parameters
-        </button>
+        <span>
+          <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
+            Set order parameters
+          </button>
+        </span>
       </OrderValidityInputsWrapper>
     </Wrapper>
   )

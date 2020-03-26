@@ -37,7 +37,7 @@ async function fetchBalancesForToken(
     exchangeBalance,
     pendingDeposit,
     pendingWithdraw,
-    currentBachId,
+    currentBatchId,
     walletBalance,
     allowance,
   ] = await Promise.all([
@@ -53,13 +53,24 @@ async function fetchBalancesForToken(
     ...token,
     decimals: token.decimals,
     exchangeBalance,
-    totalExchangeBalance: calculateTotalBalance(exchangeBalance, currentBachId, pendingDeposit),
+    totalExchangeBalance: calculateTotalBalance(exchangeBalance, currentBatchId, pendingDeposit),
     pendingDeposit,
     pendingWithdraw,
-    claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBachId,
+    claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBatchId,
     walletBalance,
     enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
   }
+}
+
+const balanceCache: { [K: string]: TokenBalanceDetails } = {}
+interface CacheKeyParams {
+  token: TokenDetails
+  userAddress: string
+  contractAddress: string
+  networkId: number
+}
+const constructCacheKey = ({ token, userAddress, contractAddress, networkId }: CacheKeyParams): string => {
+  return token.address + '|' + userAddress + '|' + contractAddress + '|' + networkId
 }
 
 async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[]> {
@@ -74,11 +85,25 @@ async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails
   const tokens = tokenListApi.getTokens(networkId)
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
-    fetchBalancesForToken(token, userAddress, contractAddress, networkId).catch(e => {
-      console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
+    fetchBalancesForToken(token, userAddress, contractAddress, networkId)
+      .then(balance => {
+        const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
+        balanceCache[cacheKey] = balance
+        return balance
+      })
+      .catch(e => {
+        console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
 
-      return null
-    }),
+        const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
+
+        const cachedValue = balanceCache[cacheKey]
+        if (cachedValue) {
+          logDebug('Using cached value for', token, userAddress, contractAddress)
+          return cachedValue
+        }
+
+        return null
+      }),
   )
   const balances = await Promise.all(balancePromises)
   return balances.filter(Boolean) as TokenBalanceDetails[]

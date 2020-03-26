@@ -25,6 +25,8 @@ import {
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 import fetchGasPriceFactory from './gasStation'
+import { TheGraphApi } from './thegraph/TheGraphApi'
+import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
@@ -108,6 +110,19 @@ function createTokenListApi(): TokenList {
   return tokenListApi
 }
 
+function createTheGraphApi(): TheGraphApi {
+  const urls = {
+    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion',
+    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion-rinkeby',
+  }
+
+  const theGraphApi = new TheGraphApiProxy({ urls })
+
+  window['theGraphApi'] = theGraphApi
+
+  return theGraphApi
+}
+
 // Build APIs
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
@@ -121,3 +136,4 @@ export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
 export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDependencies)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()
+export const theGraphApi: TheGraphApi = createTheGraphApi()

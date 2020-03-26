@@ -7,7 +7,7 @@ import plus from 'assets/img/plus.svg'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
-import { TokenRow, RowClaimButton, RowClaimLink } from './Styled'
+import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
@@ -16,15 +16,17 @@ import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 import { TokenLocalState } from 'reducers-actions'
 
-export interface RowProps extends TokenLocalState {
+export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   tokenBalances: TokenBalanceDetails
-  onSubmitDeposit: (amount: BN) => Promise<void>
-  onSubmitWithdraw: (amount: BN) => Promise<void>
+  onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
+  onSubmitWithdraw: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onClaim: Command
   onEnableToken: Command
   innerWidth?: number
   innerHeight?: number
 }
+
+const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
@@ -37,6 +39,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     highlighted,
     enabling,
     claiming,
+    withdrawing,
+    depositing,
   } = props
 
   const {
@@ -60,9 +64,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   useNoScroll(!!visibleForm && showResponsive)
 
   let className
-  if (highlighted.has(address)) {
+  if (highlighted) {
     className = 'highlight'
-  } else if (enabling.has(address)) {
+  } else if (enabling) {
     className = 'enabling'
   } else if (visibleForm) {
     className = 'selected'
@@ -81,37 +85,37 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             {name}
           </div>
         </td>
-        <td data-label="Exchange Wallet" title={formatAmountFull(totalExchangeBalance, decimals) || ''}>
+        <td
+          data-label="Exchange Wallet"
+          title={formatAmountFull({ amount: totalExchangeBalance, precision: decimals }) || ''}
+        >
+          {depositing && spinner}
           {formatAmount(totalExchangeBalance, decimals)}
         </td>
-        <td data-label="Pending Withdrawals" title={formatAmountFull(pendingWithdraw.amount, decimals) || ''}>
+        <td
+          data-label="Pending Withdrawals"
+          title={formatAmountFull({ amount: pendingWithdraw.amount, precision: decimals }) || ''}
+        >
           {claimable ? (
             <>
-              <RowClaimButton className="success" onClick={onClaim} disabled={claiming.has(address)}>
-                {claiming.has(address) && <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />}
+              <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
+                {(claiming || withdrawing) && spinner}
                 {formatAmount(pendingWithdraw.amount, decimals)}
-                <div>
-                  <RowClaimLink
-                    className={claiming.has(address) ? 'disabled' : 'success'}
-                    onClick={(): void => {
-                      if (!claiming) {
-                        onClaim()
-                      }
-                    }}
-                  ></RowClaimLink>
-                </div>
+                <RowClaimSpan className={claiming || withdrawing ? 'disabled' : 'success'}>Claim</RowClaimSpan>
               </RowClaimButton>
             </>
           ) : pendingWithdraw.amount.gt(ZERO) ? (
             <>
+              {withdrawing && spinner}
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
               {formatAmount(pendingWithdraw.amount, decimals)}
             </>
           ) : (
-            0
+            <>{withdrawing && spinner}0</>
           )}
         </td>
-        <td data-label="Wallet" title={formatAmountFull(walletBalance, decimals) || ''}>
+        <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
+          {(claiming || depositing) && spinner}
           {formatAmount(walletBalance, decimals)}
         </td>
         <td data-label="Actions">
@@ -126,8 +130,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             </button>
           ) : (
             <>
-              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling.has(address)}>
-                {enabling.has(address) ? (
+              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
+                {enabling ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
                     Enabling {symbol}
