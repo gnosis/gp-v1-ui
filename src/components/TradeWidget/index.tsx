@@ -330,7 +330,8 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
     const price = parseBigNumber(priceValue)
 
     if (sellAmount && price) {
-      receiveAmount = sellAmount.multipliedBy(price).toString(10)
+      const receiveBigNumber = sellAmount.multipliedBy(price)
+      receiveAmount = receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : receiveBigNumber.toString(10)
     }
   }
 
