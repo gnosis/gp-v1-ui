@@ -132,7 +132,6 @@ const Footer: React.FC = () => {
       {/* LINKS */}
       <FooterLinks>
         <Link to="/about">About Mesa</Link>
-        <Link to="/source-code">View Source Code</Link>
         <Link to="/faq">FAQ</Link>
       </FooterLinks>
       {/* VERSION */}
