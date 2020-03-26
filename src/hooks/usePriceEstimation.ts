@@ -4,7 +4,6 @@ import BigNumber from 'bignumber.js'
 import useSafeState from './useSafeState'
 
 import { getPriceEstimation } from 'services'
-import { logDebug } from 'utils'
 
 interface Params {
   baseTokenId: number
@@ -27,7 +26,10 @@ export function usePriceEstimation(params: Params): Result {
       try {
         setPriceEstimation(await getPriceEstimation({ baseTokenId, quoteTokenId }))
       } catch (e) {
-        console.error(`Error getting price estimation for tokens ${baseTokenId} and ${quoteTokenId}`, e)
+        console.error(
+          `[usePriceEstimation] Error getting price estimation for tokens ${baseTokenId} and ${quoteTokenId}`,
+          e,
+        )
       } finally {
         setIsPriceLoading(false)
       }
