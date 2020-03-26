@@ -43,6 +43,8 @@ export const HIGHLIGHT_TIME = 5000
 
 export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
+export const PRICE_ESTIMATION_PRECISION = 5
+
 export const LEGALDOCUMENT = {
   CONTACT_ADDRESS: '[INSERT ADDRESS]',
   POC_URL: '/',
