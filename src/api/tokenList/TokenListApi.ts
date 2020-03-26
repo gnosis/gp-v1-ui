@@ -12,14 +12,7 @@ export interface AddTokenParams {
   token: TokenDetails
 }
 
-export interface AddTokenResult {
-  success: boolean
-  tokenList: TokenDetails[]
-}
-
-export interface AddTokenToExchangeParams extends AddTokenParams {
-  userAddress: string
-}
+const getUserTokenListName = (networkId: number): string => 'USER_TOKEN_LIST_' + networkId
 
 /**
  * Basic implementation of Token API
@@ -59,16 +52,18 @@ export class TokenListApiImpl implements TokenList {
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {
-    const listStringified = localStorage.getItem('USER_TOKEN_LIST_' + networkId)
+    const storageKey = getUserTokenListName(networkId)
+    const listStringified = localStorage.getItem(storageKey)
     return listStringified ? JSON.parse(listStringified) : []
   }
 
   private persistUserTokenList(token: TokenDetails, networkId: number): void {
-    const listStringified = localStorage.getItem('USER_TOKEN_LIST_' + networkId)
+    const storageKey = getUserTokenListName(networkId)
+    const listStringified = localStorage.getItem(storageKey)
     const currentUserList: TokenDetails[] = listStringified ? JSON.parse(listStringified) : []
 
     currentUserList.push(token)
-    localStorage.setItem('USER_TOKEN_LIST', JSON.stringify(currentUserList))
+    localStorage.setItem(storageKey, JSON.stringify(currentUserList))
   }
 }
 
