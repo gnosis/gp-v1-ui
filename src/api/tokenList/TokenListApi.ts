@@ -5,6 +5,7 @@ import { logDebug } from 'utils'
 export interface TokenList {
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
+  hasToken: (params: HasTokenParams) => boolean
 }
 
 export interface AddTokenParams {
