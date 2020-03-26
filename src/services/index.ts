@@ -38,7 +38,8 @@ interface AddTokenResult {
 }
 
 export const addTokenToList = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<AddTokenResult> => {
-  const token = await getTokenFromExchangeByAddress({ networkId, tokenAddress })
+  const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
+  const token = await getTokenFromExchangeByAddress({ networkId, tokenAddress: checkSumAddress })
   if (token) {
     logDebug('Added new Token to userlist', token)
 
@@ -58,7 +59,8 @@ export const addTokenToExchange = async ({
   networkId,
   tokenAddress,
 }: AddTokenToExchangeParams): Promise<AddTokenResult> => {
-  const token = await addTokenToExchangeContract({ userAddress, networkId, tokenAddress })
+  const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
+  const token = await addTokenToExchangeContract({ userAddress, networkId, tokenAddress: checkSumAddress })
   if (token) {
     logDebug('Added new Token to userlist', token)
 
