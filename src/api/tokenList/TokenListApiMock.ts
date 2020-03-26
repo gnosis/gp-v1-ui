@@ -1,5 +1,5 @@
 import { TokenDetails } from 'types'
-import { TokenList, AddTokenParams } from './TokenListApi'
+import { TokenList, AddTokenParams, HasTokenParams } from './TokenListApi'
 
 export class TokenListApiMock implements TokenList {
   private _tokenList: TokenDetails[]
@@ -15,6 +15,10 @@ export class TokenListApiMock implements TokenList {
 
   public addToken({ token }: AddTokenParams): void {
     this._tokenList.push(token)
+  }
+
+  public hasToken({ tokenAddress }: HasTokenParams): boolean {
+    return !!this._tokenList.find(({ address }) => address === tokenAddress)
   }
 }
 
