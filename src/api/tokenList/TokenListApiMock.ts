@@ -13,9 +13,8 @@ export class TokenListApiMock implements TokenList {
     return this._tokenList
   }
 
-  public async addToken({ token }: AddTokenParams): void {
+  public addToken({ token }: AddTokenParams): void {
     this._tokenList.push(token)
-    // return this.getTokens(networkId)
   }
 }
 

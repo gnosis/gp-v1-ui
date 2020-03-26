@@ -62,27 +62,11 @@ export class TokenListApiImpl implements TokenList {
   private static getUserTokenListName(networkId: number): string {
     return 'USER_TOKEN_LIST_' + networkId
   }
-
-  // {
-  //     "id": 6,
-  //     "name": "Gemini dollar",
-  //     "symbol": "GUSD",
-  //     "decimals": 2,
-  //     "addressByNetwork": {
-  //         "1": "0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd",
-  //         "4": "0x784B46A4331f5c7C495F296AE700652265ab2fC6"
-  //     },
-  //     "website": "https://gemini.com/dollar/",
-  //     "description": "Regulated by the New York State Department of Financial Services launched same day as PAX by Gemini Trust Company. backed by USD",
-  //     "rinkeby_faucet": "mint using Team's shared account 0xf85D1a0E1b71e72013Db51139f285C6d5356B712. Using ERC20Impl (0x8d54C3af182A5ef4f74e7eCC07aB6182153797bB) contract, call `requestPrint(address, amount). On same contract, use the `lockId` returned from previous call and execute `confirmPrint(lockId)`."
-  // },
-
   public addToken({ networkId, token }: AddTokenParams): void {
     logDebug('Added new Token to userlist', token)
 
     this._tokensByNetwork[networkId].push(token)
     this.persistUserTokenList(token, networkId)
-    // return this.getTokens(networkId)
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {
