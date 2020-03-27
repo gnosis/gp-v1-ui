@@ -114,7 +114,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
-      title: 'dFusion',
+      title: 'Mesa',
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
@@ -134,9 +134,9 @@ module.exports = ({ stats = false } = {}) => ({
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
-        appName: 'dFusion',
-        appDescription: 'dFusion',
-        developerName: 'dFusion',
+        appName: 'Mesa',
+        appDescription: 'Mesa',
+        developerName: 'Mesa',
         developerURL: null, // prevent retrieving from the nearest package.json
         background: '#dfe6ef',
         themeColor: '#476481',

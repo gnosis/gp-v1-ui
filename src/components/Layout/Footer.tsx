@@ -131,8 +131,7 @@ const Footer: React.FC = () => {
       <ThemeToggler />
       {/* LINKS */}
       <FooterLinks>
-        <Link to="/about">About dFusion</Link>
-        <Link to="/source-code">View Source Code</Link>
+        <Link to="/about">About Mesa</Link>
         <Link to="/faq">FAQ</Link>
       </FooterLinks>
       {/* VERSION */}
