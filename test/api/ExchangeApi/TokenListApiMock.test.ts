@@ -3,6 +3,7 @@ import { Network } from 'types'
 import TokenListApiMock from 'api/tokenList/TokenListApiMock'
 import { TokenListApiImpl, TokenList } from 'api/tokenList/TokenListApi'
 import { tokenList as testTokenList } from '../../data'
+import GenericSubscriptions from 'api/tokenList/Subscriptions'
 
 let instanceMock: TokenList
 let instanceReal: TokenList
@@ -72,5 +73,76 @@ describe('REAL: Basic functions', () => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const userList = JSON.parse(userListStringified!)
     expect(userList).toEqual([NEW_TOKEN])
+  })
+})
+
+describe('GenericSubscription functions', () => {
+  test('can add subscriptions', () => {
+    const Subscriptions = new GenericSubscriptions<number>()
+    const callback = jest.fn()
+
+    Subscriptions.subscribe(callback)
+  })
+  test('can trigger subscriptions', () => {
+    const Subscriptions = new GenericSubscriptions<number>()
+    const callback = jest.fn()
+
+    Subscriptions.subscribe(callback)
+
+    Subscriptions.triggerSubscriptions(0)
+    expect(callback).toHaveBeenCalledWith(0)
+  })
+  test('can remove subscriptions with ::unsubscribe', () => {
+    const Subscriptions = new GenericSubscriptions<number>()
+    const callback = jest.fn()
+
+    Subscriptions.subscribe(callback)
+
+    Subscriptions.triggerSubscriptions(0)
+    expect(callback).toHaveBeenCalledWith(0)
+    expect(callback).toHaveBeenCalledTimes(1)
+
+    Subscriptions.unsubscribe(callback)
+
+    Subscriptions.triggerSubscriptions(1)
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
+  test('can remove subscriptions with returned function', () => {
+    const Subscriptions = new GenericSubscriptions<number>()
+    const callback = jest.fn()
+
+    const unsubscribe = Subscriptions.subscribe(callback)
+
+    expect(unsubscribe).toBeInstanceOf(Function)
+
+    Subscriptions.triggerSubscriptions(0)
+    expect(callback).toHaveBeenCalledWith(0)
+    expect(callback).toHaveBeenCalledTimes(1)
+
+    unsubscribe()
+
+    Subscriptions.triggerSubscriptions(1)
+    expect(callback).toHaveBeenCalledTimes(1)
+  })
+  test('can remove all subscriptions with ::unsubscribeAll', () => {
+    const Subscriptions = new GenericSubscriptions<number>()
+    const callback1 = jest.fn()
+    const callback2 = jest.fn()
+
+    Subscriptions.subscribe(callback1)
+    Subscriptions.subscribe(callback2)
+
+    Subscriptions.triggerSubscriptions(0)
+    expect(callback1).toHaveBeenCalledWith(0)
+    expect(callback1).toHaveBeenCalledTimes(1)
+
+    expect(callback2).toHaveBeenCalledWith(0)
+    expect(callback2).toHaveBeenCalledTimes(1)
+
+    Subscriptions.unsubscribeAll()
+
+    Subscriptions.triggerSubscriptions(1)
+    expect(callback1).toHaveBeenCalledTimes(1)
+    expect(callback2).toHaveBeenCalledTimes(1)
   })
 })
