@@ -14,7 +14,7 @@ export class TokenListApiMock implements TokenList {
   }
 
   public addToken({ token }: AddTokenParams): void {
-    this._tokenList.push(token)
+    this._tokenList = this._tokenList.concat(token)
   }
 
   public hasToken({ tokenAddress }: HasTokenParams): boolean {

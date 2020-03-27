@@ -66,7 +66,7 @@ export class TokenListApiImpl implements TokenList {
   public addToken({ networkId, token }: AddTokenParams): void {
     logDebug('Added new Token to userlist', token)
 
-    this._tokensByNetwork[networkId].push(token)
+    this._tokensByNetwork[networkId] = this._tokensByNetwork[networkId].concat(token)
     this._tokenAddressNetworkSet.add(
       TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId }),
     )
