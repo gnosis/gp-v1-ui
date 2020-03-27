@@ -70,7 +70,7 @@ const About: React.FC = () => (
       </li>
     </ul>
 
-    <h2>Useful links</h2>
+    <h2>Learn more about Gnosis Protocol</h2>
     <ul>
       <li>
         dFusion Paper:{' '}
@@ -96,7 +96,7 @@ const About: React.FC = () => (
       </li>
     </ul>
 
-    <h2>Other useful links</h2>
+    <h2>Tools</h2>
     <ul>
       <li>
         CLI <small>(Command Line Interface)</small>:{' '}
