@@ -39,6 +39,8 @@ describe('MOCK: Basic functions', () => {
       token: NEW_TOKEN,
       networkId: 1,
     })
+
+    expect(instanceMock.hasToken({ tokenAddress: NEW_TOKEN.address, networkId: 1 })).toBe(true)
     expect(instanceMock.getTokens(1)).toHaveLength(length + 1)
   })
 })
@@ -58,6 +60,8 @@ describe('REAL: Basic functions', () => {
       token: NEW_TOKEN,
       networkId: 1,
     })
+
+    expect(instanceReal.hasToken({ tokenAddress: NEW_TOKEN.address, networkId: 1 })).toBe(true)
     expect(instanceReal.getTokens(1)).toHaveLength(length + 1)
 
     const userListStringified = localStorage.getItem('USER_TOKEN_LIST_1')
