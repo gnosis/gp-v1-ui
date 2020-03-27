@@ -52,7 +52,6 @@ export const addTokenToList = async ({ networkId, tokenAddress }: AddTokenToList
     tokenList: tokenListApi.getTokens(networkId),
   }
 }
-;(window as any).addTokenToList = addTokenToList
 
 export const addTokenToExchange = async ({
   userAddress,
