@@ -7,7 +7,7 @@ import {
   getPriceEstimationFactory,
 } from './factories'
 import { logDebug } from 'utils'
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDetails } from 'types'
 
 const apis = {
   tokenListApi,
