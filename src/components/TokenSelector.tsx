@@ -3,13 +3,19 @@ import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
-import { formatAmount } from '@gnosis.pm/dex-js'
+import { formatAmount, safeFilledToken } from '@gnosis.pm/dex-js'
+import { isAddress } from 'web3-utils'
 
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
+import { addTokenToList, AddTokenToListParams } from 'services'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import { logDebug, getToken } from 'utils'
+import { toast } from 'toastify'
+import { tokenListApi } from 'api'
 
 const Wrapper = styled.div`
   display: flex;
@@ -298,6 +304,33 @@ const components = { MenuList }
 
 const noOptionsMessage = (): string => 'No results'
 
+const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<boolean> => {
+  try {
+    const { success, tokenList } = await addTokenToList({ networkId, tokenAddress })
+
+    if (!success) {
+      toast.warn(`Couldn't add token at address ${tokenAddress} to token list`)
+      return false
+    }
+
+    const newToken = getToken('address', tokenAddress, tokenList)
+
+    if (newToken) {
+      const { symbol: tokenDisplayName } = safeFilledToken(newToken)
+
+      toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
+      return true
+    } else {
+      toast.warn(`Couldn't add token at address ${tokenAddress} to token list`)
+      return false
+    }
+  } catch (error) {
+    logDebug('Error adding token', tokenAddress, error)
+    toast.error(`Failed to add token at address ${tokenAddress} to token list`)
+    return false
+  }
+}
+
 interface Props {
   label?: string
   isDisabled?: boolean
@@ -316,6 +349,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // isFocused is used to force the menu to remain open and give focus to the search input
   const [isFocused, setIsFocused] = useState(false)
 
+  const { networkId } = useWalletConnection()
+
   const onSelectChange = useCallback(
     (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
       // When an option is chosen, give control back to react-select
@@ -331,17 +366,33 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // When the search input is focused, force menu to remain open
   const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
 
-  const onKeyDown = useCallback((e): void => {
-    if (e.key === 'Escape') {
-      // Close menu on `Escape`
-      e.stopPropagation()
-      setIsFocused(false)
-    } else if (!e.target.value && e.key === ' ') {
-      // Prevent a space when input in empty.
-      // That closes the menu. (/shrug)
-      e.preventDefault()
-    }
-  }, [])
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }): void => {
+      if (e.key === 'Escape') {
+        // Close menu on `Escape`
+        e.stopPropagation()
+        setIsFocused(false)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      } else if (!e.target.value! && e.key === ' ') {
+        // Prevent a space when input in empty.
+        // That closes the menu. (/shrug)
+        e.preventDefault()
+      } else if (e.key === 'Enter' && networkId && isAddress(e.target.value.toLowerCase())) {
+        const tokenAddress = e.target.value
+        if (tokenListApi.hasToken({ tokenAddress, networkId })) return
+
+        // prevents double-catch of this event
+        // double because it's captured from onKeyDown in MenuList
+        // and in general on Select, I guess
+        e.stopPropagation()
+        console.log('tokenAddress', tokenAddress)
+        if (window.confirm(`Do you want to add ${tokenAddress} to your local tokneList`)) {
+          addTokenFromInput({ networkId, tokenAddress })
+        }
+      }
+    },
+    [networkId],
+  )
 
   const wrapperRef = useRef<HTMLDivElement>(null)
 
