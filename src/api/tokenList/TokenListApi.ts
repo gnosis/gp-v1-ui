@@ -1,8 +1,9 @@
 import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
+import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
 
-export interface TokenList {
+export interface TokenList extends Omit<SubscriptionsInterface<TokenDetails[]>, 'triggerSubscriptions'> {
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   hasToken: (params: HasTokenParams) => boolean
@@ -23,12 +24,14 @@ export interface HasTokenParams {
  *
  * Has a pre-define list of tokens.
  */
-export class TokenListApiImpl implements TokenList {
+export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> implements TokenList {
   public networkIds: number[]
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
   public constructor(networkIds: number[]) {
+    super()
+
     this.networkIds = networkIds
 
     // Init the tokens by network
@@ -71,6 +74,8 @@ export class TokenListApiImpl implements TokenList {
       TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId }),
     )
     this.persistUserTokenList(token, networkId)
+
+    this.triggerSubscriptions(this.getTokens(networkId))
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {
