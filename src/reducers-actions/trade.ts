@@ -6,8 +6,8 @@ export interface TradeState {
   sellAmount: string | null
   sellToken: Required<TokenDetails> | null
   buyToken: Required<TokenDetails> | null
-  validFrom: string
-  validUntil: string
+  validFrom: string | null
+  validUntil: string | null
 }
 
 type ActionTypes = 'UPDATE_TRADE_STATE'
@@ -25,7 +25,7 @@ export const INITIAL_TRADE_STATE: TradeState = {
   sellAmount: null,
   sellToken: null,
   buyToken: null,
-  validFrom: '0',
+  validFrom: null,
   validUntil: '2880',
 }
 
