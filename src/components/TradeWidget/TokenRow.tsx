@@ -10,7 +10,7 @@ import { ZERO } from 'const'
 import { TradeFormTokenId, TradeFormData } from './'
 
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
-import FormMessage from './FormMessage'
+import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA } from 'const'
@@ -220,7 +220,7 @@ const TokenRow: React.FC<Props> = ({
   const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
   const errorOrWarning = error ? (
-    <FormMessage className="error">{error.message}</FormMessage>
+    <FormInputError errorMessage={error.message} />
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
