@@ -27,23 +27,23 @@ interface FormDataAsNumbers {
  * @param validationSchema joi.ObjectSchema<unknown> - Joi schema to check data
  * @param type [OPTIONAL] 'number' | undefined - sets casting use or straight FormData use
  */
-export const stringOrNumberResolverFactory = <FormData, CustomContext = {}>(
-  validationSchema: ObjectSchema<unknown>,
-  type?: 'number',
-) => (data: FormData): ReturnType<ValidationResolver<FormData, CustomContext>> => {
-  const castedData: FormDataAsNumbers | FormData =
-    type === 'number'
-      ? Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
-          const oldValue = data[key]
-          const castedValue = Number(oldValue)
-          const castedObj = { ...acc, [key]: castedValue }
 
-          return castedObj
-        }, {})
-      : data
+export const resolverFactory = <FormData, CustomContext = {}>(validationSchema: ObjectSchema<unknown>) => (
+  data: FormData,
+): ReturnType<ValidationResolver<FormData, CustomContext>> => {
+  const castedData: FormDataAsNumbers | FormData = Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
+    const oldValue = data[key]
+    const castedValue = oldValue ? oldValue : undefined
+    const castedObj = { ...acc, [key]: castedValue }
+
+    return castedObj
+  }, {})
 
   const { error, value }: { value: typeof castedData | undefined; error?: ValidationError } = validationSchema.validate(
     castedData,
+    {
+      abortEarly: false,
+    },
   )
 
   return {
@@ -61,6 +61,9 @@ export const stringOrNumberResolverFactory = <FormData, CustomContext = {}>(
 
 export function formatSchemaErrorMessage(errorString?: string): string | undefined {
   if (!errorString) return undefined
-  const cleanedString = errorString.replace(/"/g, '')
-  return cleanedString[0].toUpperCase() + cleanedString.slice(1)
+  const cleanedString = errorString
+    .split(' ')
+    .slice(1)
+    .join(' ')
+  return `Value ${cleanedString}`
 }
