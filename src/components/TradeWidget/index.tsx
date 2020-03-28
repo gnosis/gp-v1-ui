@@ -7,6 +7,7 @@ import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
+import Joi from '@hapi/joi'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -32,7 +33,7 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug } from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug, resolverFactory } from 'utils'
 import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
@@ -298,12 +299,51 @@ export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
 }
 
+const validationSchema = Joi.object({
+  sellToken: Joi.number()
+    // allow unsafe JS numbers
+    .unsafe()
+    .greater(0)
+    // key value cannot be undefined
+    .required(),
+  receiveToken: Joi.number()
+    // allow unsafe JS numbers
+    .unsafe()
+    .greater(0)
+    // key value cannot be undefined
+    .required(),
+  price: Joi.number()
+    // allow unsafe JS numbers
+    .unsafe()
+    .greater(0)
+    // key value cannot be undefined
+    .required(),
+  priceInverse: Joi.number()
+    // allow unsafe JS numbers
+    .unsafe()
+    .greater(0)
+    // key value cannot be undefined
+    .required(),
+  validFrom: Joi.number()
+    // no floating points
+    .integer()
+    .multiple(5)
+    .min(15),
+  validUntil: Joi.number()
+    // no floating points
+    .integer()
+    .multiple(5)
+    .min(5),
+})
+
+const validationResolver = resolverFactory<TradeFormData>(validationSchema)
+
 export const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
   // ASAP
-  validFrom: '0',
+  validFrom: undefined,
   // 2 days
   validUntil: '2880',
 }
@@ -406,6 +446,7 @@ const TradeWidget: React.FC = () => {
       [priceInputId]: defaultPrice,
       [priceInverseInputId]: invertPriceFromString(defaultPrice),
     },
+    validationResolver,
   })
   const { handleSubmit, reset, watch, setValue } = methods
 
@@ -701,7 +742,7 @@ const TradeWidget: React.FC = () => {
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
-        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             autoFocus
