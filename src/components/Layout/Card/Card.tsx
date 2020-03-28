@@ -155,7 +155,6 @@ export const CardTable = styled.table<{
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
       text-align: center;
       transition: all 0.2s ease-in-out;
-      z-index: 1;
 
       &:hover {
         background: #deeeff;
