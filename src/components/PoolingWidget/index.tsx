@@ -24,7 +24,7 @@ import { tokenListApi } from 'api'
 
 import { Network, Receipt } from 'types'
 
-import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
+import { maxAmountsForSpread, resolverFactory } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 
 export const FIRST_STEP = 1
@@ -90,17 +90,13 @@ interface PoolingFormData<T = string> {
 const validationSchema = joi.object({
   spread: joi
     .number()
-    .positive()
     .precision(INPUT_PRECISION_SIZE)
-    .greater(0.0)
-    .less(100.0)
-    // dont autocast numbers
-    // to their required precision, throw instead
-    .strict()
+    .greater(0)
+    .less(100)
     .required(),
 })
 
-const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validationSchema, 'number')
+const validationResolver = resolverFactory<PoolingFormData>(validationSchema)
 
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
@@ -121,7 +117,7 @@ const PoolingInterface: React.FC = () => {
       spread: spread.toString(),
     },
     mode: 'onChange',
-    validationResolver: numberResolver,
+    validationResolver,
   })
   const { handleSubmit, watch } = methods
   // Watch input and set defaultValue to state spread
