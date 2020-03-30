@@ -4,7 +4,7 @@ import { DefineSpreadWrapper } from './DefineSpread.styled'
 
 import InputWithTooltip from '../InputWithTooltip'
 
-import { useFormContext, FieldError } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
 import { FormInputError } from 'components/TradeWidget/FormMessage'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
@@ -24,7 +24,7 @@ const SpreadTooltip = (
 const DefineSpread: React.FC<DefineSpreadProps> = ({ isSubmitting }) => {
   const { errors, register } = useFormContext()
 
-  const errorMessage = (errors?.spread as FieldError)?.message
+  const errorMessage: string | undefined = errors?.spread?.message
 
   return (
     <DefineSpreadWrapper>
