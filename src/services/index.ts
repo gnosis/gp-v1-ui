@@ -7,7 +7,7 @@ import {
   getPriceEstimationFactory,
 } from './factories'
 import { logDebug } from 'utils'
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDetails } from 'types'
 
 const apis = {
   tokenListApi,
@@ -25,14 +25,14 @@ export const addTokenToExchangeContract = addTokenToExchangeFactory(apis)
 
 export const getPriceEstimation = getPriceEstimationFactory(apis)
 
-interface AddTokenToListParams {
+export interface AddTokenToListParams {
   networkId: number
   tokenAddress: string
 }
-interface AddTokenToExchangeParams extends AddTokenToListParams {
+export interface AddTokenToExchangeParams extends AddTokenToListParams {
   userAddress: string
 }
-interface AddTokenResult {
+export interface AddTokenResult {
   success: boolean
   tokenList: TokenDetails[]
 }

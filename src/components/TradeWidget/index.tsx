@@ -356,6 +356,8 @@ const TradeWidget: React.FC = () => {
 
   // If user is connected, use balances, otherwise get the default list
   const tokens = useMemo(
+    // it's okay to tokenListApi.getTokens() here without subscribing to updates
+    // because balances from useTokenBalances is already subscribed
     () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(fallBackNetworkId)),
     [balances, fallBackNetworkId, isConnected],
   )
