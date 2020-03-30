@@ -19,13 +19,15 @@ const LightColors = `
   --color-background-pageWrapper: #fff;
   --color-background-actionCards: #bbfdbb;
   --color-background-highlighted: #fcfde0;
-  --color-background-selected: ##d9d9d9;
+  --color-background-selected: #d9d9d9;
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #bfbfbf;
   --color-background-progressBar: lightskyblue;
   --color-background-input: #e7ecf3;
   --color-background-validation-warning: #fff0eb;
   --color-background-row-hover: #deeeff;
+  --color-background-CTA: #218DFF;
+  --color-background-selection: #218DFF;
 
   // Borders
   --color-border: transparent;
@@ -35,6 +37,8 @@ const LightColors = `
   --color-text-secondary: #9FB4C9;
   --color-text-active: #218DFF;
   --color-text-alternate: #456483;
+  --color-text-CTA: #fff;
+  --color-text-selection: #fff;
 
   // Buttons
   --color-button-primary: #000;
@@ -58,7 +62,7 @@ const DarkColors = `
   --color-background-lighter: #f7f7f7;
   --color-background: #2e2e2e;
   --color-background-pageWrapper: #181a1b;
-  --color-background-actionCards: #026902;
+  --color-background-actionCards: #0269025c;
   --color-background-highlighted: #3f4104;
   --color-background-selected: #d9d9d9;
   --color-background-selected-darker: #b6b6b6;
@@ -67,6 +71,8 @@ const DarkColors = `
   --color-background-input: #2a2d2f;
   --color-background-validation-warning: #4338b5;
   --color-background-row-hover: #09233e;
+  --color-background-CTA: #2e2e2e;
+  --color-background-selection: #181a1b;
 
   // Borders
   --color-border: #262626;
@@ -74,7 +80,9 @@ const DarkColors = `
   // Text
   --color-text-primary: #a1c3e4;
   --color-text-secondary: #545454;
-  --color-text-active: #218DFF; // #474092;
+  --color-text-active: #218DFF;
+  --color-text-CTA: #218DFF;
+  --color-text-selection: #218DFF;
 
   // Buttons
   --color-button-primary: #e8e6e3;

@@ -150,11 +150,11 @@ const WarningLabel = styled.code`
 `
 
 const SubmitButton = styled.button`
-  background-color: var(--color-text-active);
+  background-color: var(--color-background-CTA);
+  color: var(--color-text-CTA);
   border-radius: 3rem;
   font-family: var(--font-default);
   font-size: 1.6rem;
-  color: var(--color-background-pageWrapper);
   letter-spacing: 0.1rem;
   text-align: center;
   text-transform: uppercase;
@@ -166,6 +166,11 @@ const SubmitButton = styled.button`
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
+
+  &:hover {
+    color: var(--color-background-pageWrapper);
+  }
+
   @media ${MEDIA.mobile} {
     font-size: 1.3rem;
     margin: 1rem auto 1.6rem;

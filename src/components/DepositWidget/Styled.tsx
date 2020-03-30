@@ -23,7 +23,7 @@ export const TokenRow = styled.tr`
     align-items: center;
     padding: 0.4rem 1rem;
     box-sizing: border-box;
-    background: var(--color-background-row-hover);
+    background: var(--color-background);
     border: 0.1rem solid var(--color-text-active);
     border-radius: 2rem;
     cursor: pointer;

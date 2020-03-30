@@ -25,6 +25,18 @@ const GlobalStyles = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  *::selection {
+    background: var(--color-background-selection); /* WebKit/Blink Browsers */
+    color: var(--color-text-selection);
+  }
+  *::-moz-selection {
+    background: var(--color-background-selection); /* Gecko Browsers */
+  }
+  *::-webkit-selection {
+    background: var(--color-background-selection); /* Chrome Browsers */
+  }
+
   *, *:before, *:after {
     box-sizing: inherit;
   }
@@ -175,7 +187,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0.4rem;
     width: 40rem;
     box-sizing: border-box;
-    color: #fff;
+    color: var(--color-background-pageWrapper);
   }
 
   .Toastify__toast-container--top-left {
