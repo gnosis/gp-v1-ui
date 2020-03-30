@@ -60,7 +60,7 @@ export class TokenListApiImpl implements TokenList {
     return tokenAddress.toLowerCase() + '|' + networkId
   }
 
-  private static getUserTokenListName(networkId: number): string {
+  private static getLocalStorageKey(networkId: number): string {
     return 'USER_TOKEN_LIST_' + networkId
   }
   public addToken({ networkId, token }: AddTokenParams): void {
@@ -70,17 +70,17 @@ export class TokenListApiImpl implements TokenList {
     this._tokenAddressNetworkSet.add(
       TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId }),
     )
-    this.persistUserTokenList(token, networkId)
+    this.persistNewUserToken(token, networkId)
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {
-    const storageKey = TokenListApiImpl.getUserTokenListName(networkId)
+    const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
     const listStringified = localStorage.getItem(storageKey)
     return listStringified ? JSON.parse(listStringified) : []
   }
 
-  private persistUserTokenList(token: TokenDetails, networkId: number): void {
-    const storageKey = TokenListApiImpl.getUserTokenListName(networkId)
+  private persistNewUserToken(token: TokenDetails, networkId: number): void {
+    const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
     const listStringified = localStorage.getItem(storageKey)
     const currentUserList: TokenDetails[] = listStringified ? JSON.parse(listStringified) : []
 
