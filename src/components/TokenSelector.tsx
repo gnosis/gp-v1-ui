@@ -13,7 +13,7 @@ import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
 import { addTokenToList, AddTokenToListParams } from 'services'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { logDebug, getToken } from 'utils'
+import { logDebug } from 'utils'
 import { toast } from 'toastify'
 import { tokenListApi } from 'api'
 
@@ -306,17 +306,15 @@ const noOptionsMessage = (): string => 'No results'
 
 const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<boolean> => {
   try {
-    const { success, tokenList } = await addTokenToList({ networkId, tokenAddress })
+    const { success, token } = await addTokenToList({ networkId, tokenAddress })
 
     if (!success) {
       toast.warn(`Couldn't add token at address ${tokenAddress} to token list`)
       return false
     }
 
-    const newToken = getToken('address', tokenAddress, tokenList)
-
-    if (newToken) {
-      const { symbol: tokenDisplayName } = safeFilledToken(newToken)
+    if (token) {
+      const { symbol: tokenDisplayName } = safeFilledToken(token)
 
       toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
       return true
