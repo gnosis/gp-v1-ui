@@ -128,7 +128,7 @@ export const CardTable = styled.table<{
   > thead {
     position: sticky;
     z-index: 2;
-    background: var(--color-background-pageWrapper);
+    background: var(--color-background-row-hover);
     top: 0;
     font-size: 1.1rem;
     color: var(--color-text-primary);
