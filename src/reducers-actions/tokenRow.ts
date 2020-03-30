@@ -1,5 +1,8 @@
+import { Actions } from 'reducers-actions'
+
 export const enum ActionTypes {
   SET_ENABLING = 'enabling',
+  SET_ENABLED = 'enabled',
   SET_CLAIMING = 'claiming',
   SET_DEPOSITING = 'depositing',
   SET_WITHDRAWING = 'withdrawing',
@@ -9,51 +12,56 @@ export const enum ActionTypes {
   SET_HIGHLIGHTED_AND_WITHDRAWING = 'highlighted_and_withdrawing',
 }
 
-interface Actions {
-  type: ActionTypes
-  payload: string
-}
+type TokenRowActions = Actions<ActionTypes, string>
 
-export const setClaimingAction = (payload: string): Actions => ({
+export const setClaimingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_CLAIMING,
   payload,
 })
-export const setDepositingAction = (payload: string): Actions => ({
+
+export const setDepositingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_DEPOSITING,
   payload,
 })
-export const setWithdrawingAction = (payload: string): Actions => ({
+
+export const setWithdrawingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_WITHDRAWING,
   payload,
 })
 
-export const setEnablingAction = (payload: string): Actions => ({
+export const setEnablingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_ENABLING,
   payload,
 })
 
-export const setHighlightAction = (payload: string): Actions => ({
+export const setEnabledAction = (payload: string): TokenRowActions => ({
+  type: ActionTypes.SET_ENABLED,
+  payload,
+})
+
+export const setHighlightAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED,
   payload,
 })
 
-export const setHighlightAndClaimingAction = (payload: string): Actions => ({
+export const setHighlightAndClaimingAction = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING,
   payload,
 })
 
-export const setHighlightAndDepositing = (payload: string): Actions => ({
+export const setHighlightAndDepositing = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_DEPOSITING,
   payload,
 })
 
-export const setHighlightAndWithdrawing = (payload: string): Actions => ({
+export const setHighlightAndWithdrawing = (payload: string): TokenRowActions => ({
   type: ActionTypes.SET_HIGHLIGHTED_AND_WITHDRAWING,
   payload,
 })
 
 export interface TokenLocalState {
   [ActionTypes.SET_ENABLING]: Set<string>
+  [ActionTypes.SET_ENABLED]: Set<string>
   [ActionTypes.SET_HIGHLIGHTED]: Set<string>
   [ActionTypes.SET_CLAIMING]: Set<string>
   [ActionTypes.SET_DEPOSITING]: Set<string>
@@ -62,6 +70,7 @@ export interface TokenLocalState {
 
 export const TokenRowInitialState: TokenLocalState = {
   enabling: new Set(),
+  enabled: new Set(),
   highlighted: new Set(),
   claiming: new Set(),
   depositing: new Set(),
@@ -93,10 +102,11 @@ function getRemainingType(type: ActionTypes): ActionTypes {
   throw new Error(`Unexpected ActionTypes -- ${type}`)
 }
 
-export const reducer = (state: TokenLocalState, action: Actions): TokenLocalState => {
+export const reducer = (state: TokenLocalState, action: TokenRowActions): TokenLocalState => {
   const { type, payload } = action
   switch (type) {
     case ActionTypes.SET_ENABLING:
+    case ActionTypes.SET_ENABLED:
     case ActionTypes.SET_CLAIMING:
     case ActionTypes.SET_DEPOSITING:
     case ActionTypes.SET_WITHDRAWING:

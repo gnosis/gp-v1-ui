@@ -17,6 +17,7 @@ import {
   setHighlightAndClaimingAction,
   setHighlightAndDepositing,
   setHighlightAndWithdrawing,
+  setEnabledAction,
 } from 'reducers-actions'
 import { useMemo } from 'react'
 
@@ -67,6 +68,8 @@ export const useRowActions = (params: Params): Result => {
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
         toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
+
+        dispatch(setEnabledAction(tokenAddress))
       } catch (error) {
         console.error('DepositWidget:useRowActions] Error enabling the token', error)
         toast.error('Error enabling the token')
