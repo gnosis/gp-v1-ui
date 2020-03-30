@@ -564,14 +564,30 @@ const TradeWidget: React.FC = () => {
   )
 
   const sameToken = sellToken === receiveToken
-
   const savePendingTransactions = useCallback(
     (
       txHash: string,
-      { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress, validFrom, validUntil },
+      {
+        buyTokenId,
+        sellTokenId,
+        priceNumerator,
+        priceDenominator,
+        networkId,
+        userAddress,
+        validFrom,
+        validUntil,
+        validFromFormatted,
+        validUntilFormatted,
+      },
     ): void => {
+      const customFormResetState = {
+        ...DEFAULT_FORM_STATE,
+        // Convert validFrom bactch > minutes
+        validFrom: (validFrom * 5).toString(),
+        validUntil: (validUntil * 5).toString(),
+      }
       // reset form on successful order placing
-      reset(DEFAULT_FORM_STATE)
+      reset(customFormResetState)
       setUnlimited(false)
       // unblock form
       setIsSubmitting(false)
@@ -588,8 +604,8 @@ const TradeWidget: React.FC = () => {
         user: userAddress,
         remainingAmount: priceDenominator,
         sellTokenBalance: ZERO,
-        validFrom,
-        validUntil,
+        validFrom: validFromFormatted,
+        validUntil: validUntilFormatted,
         txHash,
       }
 
@@ -642,8 +658,10 @@ const TradeWidget: React.FC = () => {
                 networkId,
                 userAddress,
                 sellToken,
-                validFrom: validFromBatchId,
-                validUntil: validUntilBatchId,
+                validFrom,
+                validUntil,
+                validFromFormatted: validFromBatchId,
+                validUntilFormatted: validUntilBatchId,
               })
             },
           },
@@ -673,8 +691,10 @@ const TradeWidget: React.FC = () => {
                 priceDenominator: buyAmount,
                 networkId,
                 userAddress,
-                validFrom: validFromBatchId,
-                validUntil: validUntilBatchId,
+                validFrom,
+                validUntil,
+                validFromFormatted: validFromBatchId,
+                validUntilFormatted: validUntilBatchId,
               })
             },
           },
