@@ -11,7 +11,7 @@ export const TokenSelectorWrapper = styled.div`
   border: 0.1rem solid #dfe6ef;
   border-radius: 0.6rem;
   margin: 0 0 4rem auto;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
 
   @media ${MEDIA.mobile} {
     width: 100%;
@@ -40,7 +40,7 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   min-height: 5.6rem;
   font-weight: var(--font-weight-normal);
   font-size: 1.4rem;
-  color: #2f3e4e;
+  color: var(--color-text-primary);
   letter-spacing: 0;
   line-height: 1;
   border-bottom: 0.2rem solid white;

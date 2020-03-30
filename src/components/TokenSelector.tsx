@@ -57,7 +57,7 @@ const Wrapper = styled.div`
     > div > div {
       font-weight: var(--font-weight-normal);
       font-size: 1.3rem;
-      color: #476481;
+      color: var(--color-text-primary);
       line-height: 1.1;
     }
 
@@ -112,7 +112,7 @@ const Wrapper = styled.div`
           max-width: 100%;
           font-size: 1.4rem;
           font-weight: var(--font-weight-normal);
-          background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+          background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
           border-radius: 0;
           padding: 0px 1.6rem 0px 4.8rem;
           height: 3em;
@@ -167,7 +167,7 @@ const SelectedTokenWrapper = styled.span`
   display: flex;
   align-items: center;
   font-size: 1.4rem;
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: -0.05rem;
   text-align: right;
 `
@@ -216,13 +216,13 @@ const customSelectStyles = {
     borderWidth: '.1rem',
     margin: 'auto 0',
     borderRadius: '15rem',
-    background: '#e6ecf3',
+    background: 'var(--color-background)',
     cursor: 'pointer',
     display: 'flex',
     flexFlow: 'row nowrap',
     '&:hover': {
       opacity: '1',
-      borderColor: '#476481',
+      borderColor: 'var(--color-text-primary)',
     },
   }),
   menu: (provided: CSSProperties): CSSProperties => ({
@@ -279,7 +279,7 @@ const customSelectStyles = {
   }),
   dropdownIndicator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
-    color: '#476481',
+    color: 'var(--color-text-primary)',
     opacity: '1',
   }),
   singleValue: (provided: CSSProperties): CSSProperties => ({

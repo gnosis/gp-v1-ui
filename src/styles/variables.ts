@@ -14,22 +14,27 @@ const AllColors = `
 const LightColors = `
   // Background
   --color-background-lighter: #f7f7f7;
+  --color-background-darker: #EDF2F7;
   --color-background: #EDF2F7;
-  --color-background-pageWrapper: #ffffff;
+  --color-background-pageWrapper: #fff;
   --color-background-actionCards: #bbfdbb;
   --color-background-highlighted: #fcfde0;
   --color-background-selected: ##d9d9d9;
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #bfbfbf;
   --color-background-progressBar: lightskyblue;
+  --color-background-input: #e7ecf3;
+  --color-background-validation-warning: #fff0eb;
+  --color-background-row-hover: #deeeff;
 
   // Borders
   --color-border: transparent;
 
   // Text
-  --color-text-primary: #476481;
+  --color-text-primary: #456483;
   --color-text-secondary: #9FB4C9;
   --color-text-active: #218DFF;
+  --color-text-alternate: #456483;
 
   // Buttons
   --color-button-primary: #000;
@@ -55,17 +60,21 @@ const DarkColors = `
   --color-background-pageWrapper: #181a1b;
   --color-background-actionCards: #026902;
   --color-background-highlighted: #3f4104;
-  --color-background-selected: ##d9d9d9;
+  --color-background-selected: #d9d9d9;
   --color-background-selected-darker: #b6b6b6;
   --color-background-selected-dark: #2a2d2f;
   --color-background-progressBar: #4338b5;
+  --color-background-input: #2a2d2f;
+  --color-background-validation-warning: #4338b5;
+  --color-background-row-hover: #09233e;
 
   // Borders
   --color-border: #262626;
 
   // Text
-  --color-text-primary: #e8e6e3;
-  --color-text-secondar: #545454;
+  --color-text-primary: #a1c3e4;
+  --color-text-secondary: #545454;
+  --color-text-active: #218DFF; // #474092;
 
   // Buttons
   --color-button-primary: #e8e6e3;
@@ -76,6 +85,7 @@ const DarkColors = `
   // Components
   --color-background-banner: #252729;
   --color-text-banner: wheat;
+  --color-background-nav-active: #404040;
 
   // Shadow
   --shadow-color: #00000047;

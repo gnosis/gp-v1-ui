@@ -13,7 +13,7 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
   align-content: flex-start;
   position: relative;
   max-width: 85rem;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -37,7 +37,7 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
     text-align: center;
     font-weight: var(--font-weight-bold);
     font-size: 2rem;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0;
   }
 `
@@ -70,7 +70,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     content: attr(data-title);
     font-weight: var(--font-weight-normal);
     font-size: inherit;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0;
 
     @media ${MEDIA.mobile} {
@@ -90,12 +90,12 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
 export const ProgressStepText = styled.p`
   font-weight: var(--font-weight-bold);
   margin: 0;
-  color: #2f3e4e;
+  color: var(--color-text-primary);
   font-size: inherit;
   line-height: inherit;
 
   > i {
-    color: #476481;
+    color: var(--color-text-primary);
     font-style: normal;
     font-weight: var(--font-weight-normal);
     font-size: inherit;
@@ -151,7 +151,7 @@ export const StepButtonsWrapper = styled.div`
     text-transform: uppercase;
     background: transparent;
     font-size: 1.4rem;
-    color: #218dff;
+    color: var(--color-text-active);
     letter-spacing: 0;
     line-height: 1;
     transition: color 0.2s ease-in-out;
@@ -179,7 +179,7 @@ export const StepButtonsWrapper = styled.div`
 
   > button:last-of-type:not(#backButton),
   > a.finish {
-    background: #218dff;
+    background: var(--color-text-active);
     border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;
@@ -268,7 +268,7 @@ export const StepDescriptionWrapper = styled.div`
   }
 
   .liqContent {
-    color: #456483;
+    color: var(--color-text-primary);
     font-size: inherit;
     line-height: inherit;
     margin: 1.6rem 0 0;

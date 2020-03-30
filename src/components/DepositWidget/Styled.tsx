@@ -14,7 +14,7 @@ export const TokenRow = styled.tr`
     outline: 0;
     margin: 0;
     font-size: 1.2rem;
-    color: #218dff;
+    color: var(--color-text-active);
     letter-spacing: -0.03rem;
     text-align: center;
     font-family: var(--font-default);
@@ -23,8 +23,8 @@ export const TokenRow = styled.tr`
     align-items: center;
     padding: 0.4rem 1rem;
     box-sizing: border-box;
-    background: #deeeff;
-    border: 0.1rem solid #218dff;
+    background: var(--color-background-row-hover);
+    border: 0.1rem solid var(--color-text-active);
     border-radius: 2rem;
     cursor: pointer;
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
@@ -34,7 +34,7 @@ export const TokenRow = styled.tr`
     }
 
     &:hover {
-      background: #218dff;
+      background: var(--color-text-active);
       color: #ffffff;
     }
   }
@@ -42,7 +42,7 @@ export const TokenRow = styled.tr`
   .withdrawToken,
   .depositToken {
     outline: 0;
-    background: #218dff;
+    background: var(--color-text-active);
     border-radius: 2.4rem;
     height: 2.4rem;
     width: 2.4rem;
@@ -55,7 +55,7 @@ export const TokenRow = styled.tr`
   }
 
   .withdrawToken {
-    background: #218dff;
+    background: var(--color-text-active);
   }
 
   .depositToken {

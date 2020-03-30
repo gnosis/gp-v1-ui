@@ -47,7 +47,7 @@ const Wrapper = styled.div`
     justify-content: flex-start;
     font-weight: var(--font-weight-normal);
     font-size: 1.4rem;
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: -0.03rem;
     height: 5.6rem;
     position: relative;
@@ -81,7 +81,7 @@ const Wrapper = styled.div`
   }
 
   > button > b {
-    color: #218dff;
+    color: var(--color-text-active);
     margin: 0 0.4rem;
   }
 `
@@ -121,7 +121,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     letter-spacing: 0;
     font-size: 1.6rem;
     text-align: left;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     margin: 0 0 2.4rem;
     display: flex;
     align-items: center;
@@ -161,7 +161,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
     > strong {
       text-transform: capitalize;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       font-size: 1.5rem;
       width: 100%;
       margin: 0 0 1rem;
@@ -186,7 +186,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   }
 
   > span > button {
-    background: #218dff;
+    background: var(--color-text-active);
     border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;

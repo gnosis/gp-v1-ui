@@ -136,7 +136,7 @@ const GlobalStyles = createGlobalStyle`
       margin: 0 auto;
       background: transparent;
       appearance: none;
-      border: 0.2rem solid #9fb4c9;
+      border: 0.2rem solid var(--color-text-secondary);
       border-radius: 0.3rem;
       box-sizing: border-box;
       height: 1.4rem;
@@ -146,7 +146,7 @@ const GlobalStyles = createGlobalStyle`
       outline: 0;
       
         &:checked {
-          background: #218dff url(${checkWhite}) no-repeat center/.85rem;
+          background: var(--color-text-active) url(${checkWhite}) no-repeat center/.85rem;
           border: 0.2rem solid transparent;
         }
     }
@@ -252,8 +252,8 @@ const GlobalStyles = createGlobalStyle`
     font-family: var(--font-default);
     cursor: pointer;
     direction: ltr;
-    background: #ffffff;
-    color: #2f3e4e;
+    background: var(--color-background-pageWrapper);
+    color: var(--color-text-primary);
     box-shadow: 0 0 1rem 0 rgba(33, 48, 77, 0.1);
     border-radius: 0.6rem;
     font-size: 1.4rem;
@@ -850,7 +850,7 @@ const GlobalStyles = createGlobalStyle`
       display: flex;
       width: 100%;
       max-width: 60rem;
-      background: #ffffff;
+      background: var(--color-background-pageWrapper);
       flex-flow: column wrap;
       margin: 0;
       padding: 0 1.6rem 1.6rem;
@@ -863,13 +863,13 @@ const GlobalStyles = createGlobalStyle`
         line-height: 1;
         padding: 2.4rem 0;
         box-sizing: border-box;
-        color: #2f3e4e;
+        color: var(--color-text-primary);
         font-weight: var(--font-weight-bold);
       }
     
     // Individual outer container
     > div {
-      background: #ffffff;
+      background: var(--color-background-pageWrapper);
       border-radius: var(--border-radius);
       color: var(--color-text-primary);
       display: flex;
@@ -880,7 +880,7 @@ const GlobalStyles = createGlobalStyle`
     
     // Individual inner container
     > div > div {
-      background: #ffffff;
+      background: var(--color-background-pageWrapper);
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -896,7 +896,7 @@ const GlobalStyles = createGlobalStyle`
       min-height: 5.6rem;
       
         &:hover {
-          border: 0.1rem solid #218dff;
+          border: 0.1rem solid var(--color-text-active);
         }
     }
     
@@ -922,13 +922,13 @@ const GlobalStyles = createGlobalStyle`
       text-align: left;
       padding: 0 1.2rem;
       margin: 0;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
     }
     
     // Client description
     > div > div > div:nth-of-type(3) {
       font-size: 1.5rem;
-      color: #476481;
+      color: var(--color-text-primary);
       white-space: nowrap;
     }
   }
@@ -946,7 +946,7 @@ const GlobalStyles = createGlobalStyle`
     font-size: 1.8rem;
     line-height: 1.2;
     padding: 0 2rem;
-    color: #476481;
+    color: var(--color-text-primary);
   }
   // End WalletConnect Modal
 
@@ -985,7 +985,7 @@ const GlobalStyles = createGlobalStyle`
       letter-spacing: 0;
       font-size: 1.6rem;
       text-align: left;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       margin: 0;
       display: flex;
       align-items: center;
@@ -1018,7 +1018,7 @@ const GlobalStyles = createGlobalStyle`
     .modali-body {
       font-size: 1.4rem;
       line-height: 1.3;
-      color: #476481;
+      color: var(--color-text-primary);
     }
     
     .modali-footer {
@@ -1045,7 +1045,7 @@ const GlobalStyles = createGlobalStyle`
         justify-content: center;
         text-decoration: none;
         text-transform: uppercase;
-        background: #218dff;
+        background: var(--color-text-active);
         border-radius: 0.6rem;
         min-width: 14rem;
         padding: 0 1.6rem;
@@ -1070,7 +1070,7 @@ const GlobalStyles = createGlobalStyle`
         text-transform: uppercase;
         font-size: 1.4rem;
         font-weight: var(--font-weight-bold);
-        color: #476481;
+        color: var(--color-text-primary);
       }
     }
   }
