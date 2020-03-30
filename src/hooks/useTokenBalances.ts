@@ -12,7 +12,7 @@ import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
-import { useTokenList } from './useTokeList'
+import { useTokenList } from './useTokenList'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]

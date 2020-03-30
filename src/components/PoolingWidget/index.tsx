@@ -25,7 +25,7 @@ import { Network, Receipt } from 'types'
 
 import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
-import { useTokenList } from 'hooks/useTokeList'
+import { useTokenList } from 'hooks/useTokenList'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2

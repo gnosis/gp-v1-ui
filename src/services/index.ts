@@ -45,7 +45,7 @@ export const addTokenToList = async ({ networkId, tokenAddress }: AddTokenToList
 
     tokenListApi.addToken({ token, networkId })
   } else {
-    logDebug('Token at address', tokenAddress, 'not available in Exchange contract')
+    logDebug(`[services:addTokenToList] Token at address ${tokenAddress} not available in Exchange contract`)
   }
   return {
     success: !!token,

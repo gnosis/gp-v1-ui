@@ -6,7 +6,6 @@ export interface SubscriptionsInterface<State> {
   subscribe(callback: SubscriptionCallback<State>): Command
   unsubscribe(callback: SubscriptionCallback<State>): void
   unsubscribeAll(): void
-  triggerSubscriptions(newState: State): void
 }
 
 export default class GenericSubscriptions<State> implements SubscriptionsInterface<State> {
@@ -22,7 +21,7 @@ export default class GenericSubscriptions<State> implements SubscriptionsInterfa
     this._subscriptions = this._subscriptions.filter(sub => sub !== callback)
   }
 
-  public triggerSubscriptions(newState: State): void {
+  protected triggerSubscriptions(newState: State): void {
     this._subscriptions.forEach(sub => sub(newState))
   }
 

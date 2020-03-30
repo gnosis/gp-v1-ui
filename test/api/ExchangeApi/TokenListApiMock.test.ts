@@ -3,7 +3,14 @@ import { Network } from 'types'
 import TokenListApiMock from 'api/tokenList/TokenListApiMock'
 import { TokenListApiImpl, TokenList } from 'api/tokenList/TokenListApi'
 import { tokenList as testTokenList } from '../../data'
-import GenericSubscriptions from 'api/tokenList/Subscriptions'
+import SubscriptionBase from 'api/tokenList/Subscriptions'
+
+class GenericSubscriptions<T> extends SubscriptionBase<T> {
+  // expose triggerSubscriptions for testing
+  public triggerSubscriptions(newState: T): void {
+    super.triggerSubscriptions(newState)
+  }
+}
 
 let instanceMock: TokenList
 let instanceReal: TokenList
