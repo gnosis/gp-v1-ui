@@ -11,7 +11,7 @@ import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
-import { addTokenToList, AddTokenToListParams } from 'services'
+import { addTokenToList, AddTokenToListParams, isTokenAddedSuccess } from 'services'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { logDebug } from 'utils'
 import { toast } from 'toastify'
@@ -306,22 +306,17 @@ const noOptionsMessage = (): string => 'No results'
 
 const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<boolean> => {
   try {
-    const { success, token } = await addTokenToList({ networkId, tokenAddress })
+    const tokenAddedResult = await addTokenToList({ networkId, tokenAddress })
 
-    if (!success) {
-      toast.warn(`Couldn't add token at address ${tokenAddress} to token list`)
+    if (!isTokenAddedSuccess(tokenAddedResult)) {
+      toast.warn(tokenAddedResult.error)
       return false
     }
 
-    if (token) {
-      const { symbol: tokenDisplayName } = safeFilledToken(token)
+    const { symbol: tokenDisplayName } = safeFilledToken(tokenAddedResult.token)
 
-      toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-      return true
-    } else {
-      toast.warn(`Couldn't add token at address ${tokenAddress} to token list`)
-      return false
-    }
+    toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
+    return true
   } catch (error) {
     logDebug('Error adding token', tokenAddress, error)
     toast.error(`Failed to add token at address ${tokenAddress} to token list`)
