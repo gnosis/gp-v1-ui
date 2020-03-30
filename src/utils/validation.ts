@@ -32,11 +32,8 @@ export const resolverFactory = <FormData, CustomContext = {}>(validationSchema: 
   data: FormData,
 ): ReturnType<ValidationResolver<FormData, CustomContext>> => {
   const castedData: FormDataAsNumbers | FormData = Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
-    const oldValue = data[key]
-    const castedValue = oldValue ? oldValue : undefined
-    const castedObj = { ...acc, [key]: castedValue }
-
-    return castedObj
+    acc[key] = data[key] || undefined
+    return acc
   }, {})
 
   const { error, value }: { value: typeof castedData | undefined; error?: ValidationError } = validationSchema.validate(
