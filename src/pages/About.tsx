@@ -110,6 +110,16 @@ const About: React.FC = () => (
           https://thegraph.com/explorer/subgraph/gnosis/dfusion
         </a>
       </li>
+      <li>
+        Protocol info:{' '}
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://explore.duneanalytics.com/public/dashboards/I43OkDWnojXZYm8vmdBDcLz5UsS3Tn0cx1xU8Hcg"
+        >
+          Dune analytics: Gnosis Protocol
+        </a>
+      </li>
 
       <li>
         Open Solver:{' '}
