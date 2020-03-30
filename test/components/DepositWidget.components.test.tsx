@@ -11,6 +11,7 @@ import { createFlux } from '../data'
 
 const fakeRowState: Record<keyof TokenLocalState, boolean> = {
   enabling: false,
+  enabled: false,
   claiming: false,
   depositing: false,
   withdrawing: false,
