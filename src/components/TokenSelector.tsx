@@ -372,8 +372,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         // Close menu on `Escape`
         e.stopPropagation()
         setIsFocused(false)
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      } else if (!e.target.value! && e.key === ' ') {
+      } else if (!e.target.value && e.key === ' ') {
         // Prevent a space when input in empty.
         // That closes the menu. (/shrug)
         e.preventDefault()
