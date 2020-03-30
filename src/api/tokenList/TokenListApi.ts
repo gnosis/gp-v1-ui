@@ -3,7 +3,7 @@ import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
 
-export interface TokenList extends Omit<SubscriptionsInterface<TokenDetails[]>, 'triggerSubscriptions'> {
+export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   hasToken: (params: HasTokenParams) => boolean
