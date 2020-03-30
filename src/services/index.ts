@@ -35,21 +35,28 @@ export interface AddTokenToExchangeParams extends AddTokenToListParams {
 export interface AddTokenResult {
   success: boolean
   tokenList: TokenDetails[]
+  token: TokenDetails | null
+  error?: string | null
 }
 
 export const addTokenToList = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<AddTokenResult> => {
   const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
   const token = await getTokenFromExchangeByAddress({ networkId, tokenAddress: checkSumAddress })
+  let error = null
+
   if (token) {
     logDebug('Added new Token to userlist', token)
 
     tokenListApi.addToken({ token, networkId })
   } else {
-    logDebug(`[services:addTokenToList] Token at address ${tokenAddress} not available in Exchange contract`)
+    error = `Token at address ${tokenAddress} not available in Exchange contract`
+    logDebug('[services:addTokenToList]', error)
   }
   return {
     success: !!token,
     tokenList: tokenListApi.getTokens(networkId),
+    token,
+    error,
   }
 }
 
@@ -60,15 +67,20 @@ export const addTokenToExchange = async ({
 }: AddTokenToExchangeParams): Promise<AddTokenResult> => {
   const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
   const token = await addTokenToExchangeContract({ userAddress, networkId, tokenAddress: checkSumAddress })
+  let error = null
+
   if (token) {
     logDebug('Added new Token to userlist', token)
 
     tokenListApi.addToken({ token, networkId })
   } else {
-    logDebug('Token at address', tokenAddress, 'could not be added to Exchange contract')
+    error = `Token at address ${tokenAddress} could not be added to Exchange contract`
+    logDebug('[services:addTokenToExchange]', error)
   }
   return {
     success: !!token,
     tokenList: tokenListApi.getTokens(networkId),
+    token,
+    error,
   }
 }
