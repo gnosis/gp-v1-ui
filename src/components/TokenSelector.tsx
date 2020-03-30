@@ -259,7 +259,7 @@ const customSelectStyles = {
     ...provided,
     background: 'none',
     cursor: 'pointer',
-    borderBottom: '0.1rem solid #dfe6ef',
+    borderBottom: '0.1rem solid var(--color-background-banner)',
     display: 'flex',
     alignItems: 'center',
     minHeight: '5.6rem',

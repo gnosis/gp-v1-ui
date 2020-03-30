@@ -58,7 +58,7 @@ const CardRowDrawer = styled.tr`
       align-items: center;
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
-      border-bottom: 0.1rem solid #dfe6ef;
+      border-bottom: 0.1rem solid var(--color-background-banner);
     }
 
     .times {

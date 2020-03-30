@@ -35,7 +35,7 @@ export const TokenRow = styled.tr`
 
     &:hover {
       background: var(--color-text-active);
-      color: #ffffff;
+      color: var(--color-background-pageWrapper);
     }
   }
 
@@ -59,7 +59,7 @@ export const TokenRow = styled.tr`
   }
 
   .depositToken {
-    background: #dfe6ef;
+    background: var(--color-background-banner);
   }
 
   &.loading {

@@ -56,7 +56,7 @@ export const ButtonWithIcon = styled.button`
 
   &:hover {
     background: #a71409;
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
   }
 
   > svg {
@@ -116,7 +116,7 @@ export const OrdersForm = styled.div`
         height: 1.8rem;
         font-weight: inherit;
         font-size: 1.1rem;
-        color: #ffffff;
+        color: var(--color-background-pageWrapper);
         letter-spacing: -0.046rem;
         text-align: center;
         background: var(--color-text-secondary);

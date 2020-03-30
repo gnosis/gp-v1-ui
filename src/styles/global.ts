@@ -12,7 +12,7 @@ const GlobalStyles = createGlobalStyle`
 
   html, body {  
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
@@ -890,7 +890,7 @@ const GlobalStyles = createGlobalStyle`
       outline: none;
       border-radius: 1.2rem;
       padding: 1rem;
-      border: 0.1rem solid #dfe6ef;
+      border: 0.1rem solid var(--color-background-banner);
       flex-flow: row nowrap;
       transition: border .2s ease-in-out;
       min-height: 5.6rem;
@@ -991,7 +991,7 @@ const GlobalStyles = createGlobalStyle`
       align-items: center;
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
-      border-bottom: 0.1rem solid #dfe6ef;
+      border-bottom: 0.1rem solid var(--color-background-banner);
     }
     
     .modali-header .modali-title {
@@ -1024,7 +1024,7 @@ const GlobalStyles = createGlobalStyle`
     .modali-footer {
       margin: 1.6rem auto 0;
       height: 5.6rem;
-      border-top: 0.1rem solid #dfe6ef;
+      border-top: 0.1rem solid var(--color-background-banner);
       width: 100%;
       display: flex;
       justify-content: space-between;
@@ -1050,7 +1050,7 @@ const GlobalStyles = createGlobalStyle`
         min-width: 14rem;
         padding: 0 1.6rem;
         font-weight: var(--font-weight-bold);
-        color: #ffffff;
+        color: var(--color-background-pageWrapper);
         text-transform: uppercase;
         font-size: 1.4rem;
         margin: 0;

@@ -20,7 +20,7 @@ const Wrapper = styled.div`
   align-items: flex-start;
   width: 100%;
   flex-flow: row wrap;
-  border-bottom: 0.1rem solid #dfe6ef;
+  border-bottom: 0.1rem solid var(--color-background-banner);
 
   > input {
     width: 100%;
@@ -127,7 +127,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     align-items: center;
     font-family: var(--font-default);
     font-weight: var(--font-weight-regular);
-    border-bottom: 0.1rem solid #dfe6ef;
+    border-bottom: 0.1rem solid var(--color-background-banner);
     width: 100%;
   }
 
@@ -173,7 +173,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   > span {
     margin: auto;
     height: 5.6rem;
-    border-top: 0.1rem solid #dfe6ef;
+    border-top: 0.1rem solid var(--color-background-banner);
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -191,7 +191,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     min-width: 14rem;
     padding: 0 1.6rem;
     font-weight: var(--font-weight-bold);
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
     text-transform: uppercase;
     font-size: 1.4rem;
     margin: 0 auto;

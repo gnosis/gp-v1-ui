@@ -56,7 +56,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     height: 2.5rem;
     width: 2.5rem;
     border-radius: 2.5rem;
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
     font-weight: var(--font-weight-normal);
     font-size: inherit;
     letter-spacing: 0;
@@ -112,7 +112,7 @@ export const StepSeparator = styled.div<{ $bgColor?: string }>`
   height: 0.1rem;
   width: 13rem;
   margin: 0 1rem;
-  background: #dfe6ef;
+  background: var(--color-background-banner);
 `
 
 export const StepButtonsWrapper = styled.div`
@@ -123,7 +123,7 @@ export const StepButtonsWrapper = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
-  border-top: 0.1rem solid #dfe6ef;
+  border-top: 0.1rem solid var(--color-background-banner);
   justify-content: space-between;
   align-items: center;
 
@@ -184,7 +184,7 @@ export const StepButtonsWrapper = styled.div`
     min-width: 14rem;
     padding: 0 1.6rem;
     font-weight: var(--font-weight-bold);
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
     text-transform: uppercase;
     font-size: 1.4rem;
     margin: 0 1.6rem 0 auto;

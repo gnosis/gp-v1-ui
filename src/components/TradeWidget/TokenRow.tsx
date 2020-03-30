@@ -160,7 +160,7 @@ const TokenEnable = styled.div`
 
   &:hover {
     background: var(--color-text-active);
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
   }
 `
 

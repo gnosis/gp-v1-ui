@@ -6,9 +6,9 @@ export const TokenSelectorWrapper = styled.div`
   width: calc(50% - 1.5rem);
   padding: 0 0 5rem 0;
   box-sizing: border-box;
-  height: 34rem;
+  height: 33.6rem;
   overflow-y: auto;
-  border: 0.1rem solid #dfe6ef;
+  border: 0.1rem solid var(--color-background-banner);
   border-radius: 0.6rem;
   margin: 0 0 4rem auto;
   background: var(--color-background-pageWrapper);
@@ -16,7 +16,7 @@ export const TokenSelectorWrapper = styled.div`
   @media ${MEDIA.mobile} {
     width: 100%;
     margin: 1.6rem auto 2.4rem;
-    height: 29rem;
+    height: 28rem;
   }
 `
 
@@ -35,7 +35,8 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   flex-flow: row nowrap;
   align-items: center;
   justify-content: flex-start;
-  background: ${({ $selected }): string => `${$selected ? 'rgba(33,141,255,0.10);' : '#ffffff;'}`};
+  background: ${({ $selected }): string =>
+    `${$selected ? 'rgba(33,141,255,0.10);' : 'var(--color-background-pageWrapper);'}`};
   cursor: pointer;
   min-height: 5.6rem;
   font-weight: var(--font-weight-normal);
@@ -43,8 +44,12 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   color: var(--color-text-primary);
   letter-spacing: 0;
   line-height: 1;
-  border-bottom: 0.2rem solid white;
+  border-bottom: 0.2rem solid var(--color-background-pageWrapper);
   transition: all 0.2s ease-in-out;
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   &:hover {
     background: rgba(33, 141, 255, 0.1);

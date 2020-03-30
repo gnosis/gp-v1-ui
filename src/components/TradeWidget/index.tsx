@@ -154,7 +154,7 @@ const SubmitButton = styled.button`
   border-radius: 3rem;
   font-family: var(--font-default);
   font-size: 1.6rem;
-  color: #ffffff;
+  color: var(--color-background-pageWrapper);
   letter-spacing: 0.1rem;
   text-align: center;
   text-transform: uppercase;
@@ -178,7 +178,7 @@ const OrdersPanel = styled.div`
   flex: 1;
   min-width: 48rem;
   max-width: 100%;
-  background: var(--color-background-pageWrapper);
+  background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
   transition: flex 0.2s ease-in-out;
@@ -261,7 +261,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   width: 1.6rem;
   height: 100%;
   border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-  background: var(--color-background-pageWrapper);
+  background: var(--color-background);
   padding: 0;
   margin: 0;
   outline: 0;
@@ -281,7 +281,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   }
 
   &:hover {
-    background-color: var(--color-background-pageWrapper);
+    background-color: var(--color-background-banner);
   }
 `
 

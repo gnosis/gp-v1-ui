@@ -233,7 +233,7 @@ export const MonospaceAddress = styled.div`
   line-height: 1.4;
 
   @media ${MEDIA.mobile} {
-    border: solid 0.1rem #dfe6ef;
+    border: solid 0.1rem var(--color-background-banner);
     border-radius: 0.6rem 0.6rem 0 0;
     padding: 1rem;
     box-sizing: border-box;

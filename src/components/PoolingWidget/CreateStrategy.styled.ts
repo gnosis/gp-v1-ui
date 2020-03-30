@@ -8,9 +8,9 @@ export const CreateStrategyWrapper = styled.div`
   width: calc(50% - 1.5rem);
   padding: 0;
   box-sizing: border-box;
-  background: rgba(223, 230, 239, 0.51);
+  background: var(--color-background);
   border-radius: 0.6rem;
-  padding: 1.6rem 1.6rem 0;
+  padding: 0 1.6rem;
   box-sizing: border-box;
   font-size: inherit;
   line-height: inherit;
