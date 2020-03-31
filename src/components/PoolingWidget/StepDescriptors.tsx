@@ -38,11 +38,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
                 </li>
               </ul>
               <p>
-                <a
-                  href="https://dfusion-docs.dev.gnosisdev.com/docs/liquidity1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href="https://docs.gnosis.io/dfusion/docs/liquidity1" target="_blank" rel="noopener noreferrer">
                   Learn more about liquidity provision
                 </a>
               </p>
@@ -67,11 +63,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
                 <b>Only orders that have a deposited balance in the Exchange Wallet will be matched.</b>
               </p>
               <p>
-                <a
-                  href="https://dfusion-docs.dev.gnosisdev.com/docs/liquidity1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                <a href="https://docs.gnosis.io/dfusion/docs/liquidity1" target="_blank" rel="noopener noreferrer">
                   Learn more about the spread
                 </a>
               </p>

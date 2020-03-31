@@ -1,47 +1,189 @@
 import React from 'react'
+import styled from 'styled-components'
 import { ContentPage } from 'components/Layout/PageWrapper'
+import addressesByNetwork from 'api/deposit/batchExchangeAddresses'
+import { getNetworkFromId } from '@gnosis.pm/dex-js'
+import { EtherscanLink } from 'components/EtherscanLink'
 
-const About: React.FC = () => (
-  <ContentPage>
-    <h1>About dFusion</h1>
-    <p>
-      The dFusion PoC protocol (working title) introduces a new, fully decentralized exchange mechanism for ERC20
-      tokens: batch-auctions with multidimensional order books (in the form of ring trades) with uniform clearing prices
-      in every batch. <br />
-      <a
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://docs.google.com/document/d/1GjDX1_2RsCCxtwnjBgXaV6yXJ2AXYL4-EEYv7HjptaM/edit"
-      >
-        Read more here
-      </a>
-    </p>
-    <p>Versions used in this web:</p>
-    <ul>
-      <li>
-        Web:&nbsp;
-        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
-          v{VERSION}
-        </a>{' '}
-      </li>
-      <li>
-        Smart Contract:&nbsp;
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
-        >
-          v{CONTRACT_VERSION}
+export const AboutWrapper = styled(ContentPage)`
+  line-height: 2.2rem;
+
+  a {
+    display: inline-block;
+    margin-left: 0.3rem;
+  }
+
+  div#code-link {
+    color: gray;
+    margin-left: 2rem;
+    font-size: 1.2rem;
+  }
+
+  .contract-addresses {
+    font-size: 0.85em;
+    a {
+      margin-left: 0;
+    }
+  }
+`
+
+const About: React.FC = () => {
+  const ContractAddresses = Object.entries(addressesByNetwork).map(([networkIdString, address], index) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const networkId = +networkIdString!
+    return (
+      <React.Fragment key={address}>
+        {index > 0 && <span>, </span>}
+        <EtherscanLink type="contract" identifier={address} networkId={networkId} label={getNetworkFromId(networkId)} />
+      </React.Fragment>
+    )
+  })
+  return (
+    <AboutWrapper>
+      <h1>About Mesa</h1>
+      <p>
+        Mesa it&apos;s an Open Source interface for{' '}
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+          Gnosis Protocol
         </a>
-      </li>
-      <li>
-        dex-js library:&nbsp;
-        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-js/tree/v' + DEX_JS_VERSION}>
-          v{DEX_JS_VERSION}
+        .<br />
+        <div id="code-link">
+          Check out the{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react">
+            Source Code
+          </a>{' '}
+          and{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react/releases">
+            Releases
+          </a>
+          .
+        </div>
+      </p>
+      <p>
+        <strong>Gnosis Protocol</strong> introduces a new, fully decentralized exchange mechanism for ERC20 tokens with
+        the following properties:
+        <ul>
+          <li>Batch auctions</li>
+          <li>Multidimensional order books with ring trades</li>
+          <li>Uniform clearing prices in every batch</li>
+        </ul>
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+          Read more here
         </a>
-      </li>
-    </ul>
-  </ContentPage>
-)
+      </p>
+
+      <h2>Versions:</h2>
+      <ul>
+        <li>
+          Mesa:&nbsp;
+          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+            v{VERSION}
+          </a>{' '}
+        </li>
+        <li>
+          Smart Contract:&nbsp;
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
+          >
+            v{CONTRACT_VERSION}
+          </a>{' '}
+          <span className="contract-addresses">({ContractAddresses})</span>
+        </li>
+        <li>
+          dex-js library:&nbsp;
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={'https://github.com/gnosis/dex-js/tree/v' + DEX_JS_VERSION}
+          >
+            v{DEX_JS_VERSION}
+          </a>
+        </li>
+      </ul>
+
+      <h2>Learn more about Gnosis Protocol</h2>
+      <ul>
+        <li>
+          dFusion Paper:{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf"
+          >
+            dfusion.v1.pdf
+          </a>
+        </li>
+        <li>
+          Developer portal:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+            https://docs.gnosis.io/dfusion
+          </a>
+        </li>
+        <li>
+          Smart Contracts:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-contracts">
+            @gnosis/dex-contracts
+          </a>
+        </li>
+      </ul>
+
+      <h2>Tools</h2>
+      <ul>
+        <li>
+          CLI <small>(Command Line Interface)</small>:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-cli">
+            @gnosis/dex-cli
+          </a>
+        </li>
+        <li>
+          Subgraph API:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://thegraph.com/explorer/subgraph/gnosis/dfusion">
+            https://thegraph.com/explorer/subgraph/gnosis/dfusion
+          </a>
+        </li>
+        <li>
+          Protocol info:{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://explore.duneanalytics.com/public/dashboards/I43OkDWnojXZYm8vmdBDcLz5UsS3Tn0cx1xU8Hcg"
+          >
+            Dune analytics: Gnosis Protocol
+          </a>
+        </li>
+
+        <li>
+          Open Solver:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-open-solver">
+            @gnosis/dex-open-solver
+          </a>
+        </li>
+
+        <li>
+          Telegram bot:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-telegram">
+            @gnosis/dex-telegram
+          </a>
+        </li>
+
+        <li>
+          Visualization tools:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-visualization-tools">
+            @gnosis/dex-visualization-tools
+          </a>
+        </li>
+
+        <li>
+          Price Estimator:{' '}
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-price-estimator">
+            @gnosis/dex-price-estimator
+          </a>
+        </li>
+      </ul>
+    </AboutWrapper>
+  )
+}
 
 export default About
