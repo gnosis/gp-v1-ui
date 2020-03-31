@@ -28,12 +28,16 @@ export const AboutWrapper = styled(ContentPage)`
 `
 
 const About: React.FC = () => {
-  const ContractAddresses = Object.entries(addressesByNetwork).map(([networkId, address], index) => (
-    <React.Fragment key={address}>
-      {index > 0 && <span>, </span>}
-      <EtherscanLink type="contract" identifier={address} networkId={+networkId} label={getNetworkFromId(+networkId)} />
-    </React.Fragment>
-  ))
+  const ContractAddresses = Object.entries(addressesByNetwork).map(([networkIdString, address], index) => {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const networkId = +networkIdString!
+    return (
+      <React.Fragment key={address}>
+        {index > 0 && <span>, </span>}
+        <EtherscanLink type="contract" identifier={address} networkId={networkId} label={getNetworkFromId(networkId)} />
+      </React.Fragment>
+    )
+  })
   return (
     <AboutWrapper>
       <h1>About Mesa</h1>
