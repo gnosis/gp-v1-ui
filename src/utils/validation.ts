@@ -30,7 +30,7 @@ interface FormDataAsNumbers {
 
 export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => (
   data: FormData,
-): ReturnType<ValidationResolver<FormData>> => {
+): ReturnType<ValidationResolver<FormData, {}>> => {
   const castedData: FormDataAsNumbers | FormData = Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
     acc[key] = data[key] || undefined
     return acc
