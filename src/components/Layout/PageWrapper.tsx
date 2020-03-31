@@ -39,6 +39,13 @@ export const ContentPage = styled(PageWrapper)`
     color: #2f3e4e;
     letter-spacing: 0;
   }
+  h2 {
+    margin: 1.5rem auto 0.5rem;
+    text-align: left;
+    width: 100%;
+    font-size: 1.8rem;
+    letter-spacing: 0;
+  }
 
   ul {
     display: block;
