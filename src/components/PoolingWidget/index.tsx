@@ -20,12 +20,12 @@ import useGlobalState from 'hooks/useGlobalState'
 import { useForm, FormContext } from 'react-hook-form'
 
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { tokenListApi } from 'api'
 
 import { Network, Receipt } from 'types'
 
 import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
+import { useTokenList } from 'hooks/useTokenList'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -132,15 +132,16 @@ const PoolingInterface: React.FC = () => {
     if (step === 2) setSpread(Number(spreadValue))
   }, [setSpread, spreadValue, step])
 
+  // Get all the tokens for the current network
+  const tokenList = useTokenList(fallBackNetworkId)
+
   const tokens = useMemo(() => {
     return (
-      // Get all the tokens for the current network
-      tokenListApi
-        .getTokens(fallBackNetworkId)
+      tokenList
         // Filter out the tokens not in the list
         .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
     )
-  }, [fallBackNetworkId])
+  }, [tokenList])
 
   const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
   const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])
