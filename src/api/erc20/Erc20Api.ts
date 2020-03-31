@@ -8,6 +8,7 @@ import { ZERO } from 'const'
 import { toBN } from 'utils'
 
 import Web3 from 'web3'
+import { RateLimiterApi } from 'api/rateLimiter/RateLimiterApi'
 
 interface BaseParams {
   tokenAddress: string
@@ -69,6 +70,7 @@ export interface Erc20Api {
 export interface Params {
   web3: Web3
   fetchGasPrice(): Promise<string | undefined>
+  rateLimiterApi: RateLimiterApi<any>
 }
 
 /**
@@ -77,6 +79,7 @@ export interface Params {
 export class Erc20ApiImpl implements Erc20Api {
   private _contractPrototype: Erc20Contract
   private web3: Web3
+  private rateLimiterApi: RateLimiterApi<any>
 
   private static _contractsCache: { [network: number]: { [address: string]: Erc20Contract } } = {}
 
@@ -97,7 +100,8 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    const result = await erc20.methods.balanceOf(userAddress).call()
+    const promise = erc20.methods.balanceOf(userAddress).call()
+    const result = await this.rateLimiterApi.call(promise)
 
     return toBN(result)
   }
@@ -105,19 +109,22 @@ export class Erc20ApiImpl implements Erc20Api {
   public async name({ tokenAddress, networkId }: NameParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    return await erc20.methods.name().call()
+    const promise = erc20.methods.name().call()
+    return await this.rateLimiterApi.call(promise)
   }
 
   public async symbol({ tokenAddress, networkId }: SymbolParams): Promise<string> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    return await erc20.methods.symbol().call()
+    const promise = erc20.methods.symbol().call()
+    return await this.rateLimiterApi.call(promise)
   }
 
   public async decimals({ tokenAddress, networkId }: DecimalsParams): Promise<number> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    const decimals = await erc20.methods.decimals().call()
+    const promise = erc20.methods.decimals().call()
+    const decimals = await this.rateLimiterApi.call(promise)
 
     return Number(decimals)
   }
@@ -125,7 +132,8 @@ export class Erc20ApiImpl implements Erc20Api {
   public async totalSupply({ tokenAddress, networkId }: TotalSupplyParams): Promise<BN> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    const totalSupply = await erc20.methods.totalSupply().call()
+    const promise = erc20.methods.totalSupply().call()
+    const totalSupply = await this.rateLimiterApi.call(promise)
 
     return toBN(totalSupply)
   }

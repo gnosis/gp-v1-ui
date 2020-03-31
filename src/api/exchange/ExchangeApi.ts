@@ -138,7 +138,8 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     )
 
     // query 1 more than required to check whether there's a next page
-    const encodedOrders = await contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, pageSize + 1).call()
+    const promise = contract.methods.getEncodedUserOrdersPaginated(userAddress, offset, pageSize + 1).call()
+    const encodedOrders = await this.rateLimiterApi.call(promise)
 
     // is null if Contract returns empty bytes
     if (!encodedOrders) return { orders: [] }
@@ -176,12 +177,16 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async getTokenAddressById({ tokenId, networkId }: GetTokenAddressByIdParams): Promise<string> {
     const contract = await this._getContract(networkId)
-    return contract.methods.tokenIdToAddressMap(tokenId).call()
+
+    const promise = contract.methods.tokenIdToAddressMap(tokenId).call()
+    return this.rateLimiterApi.call(promise)
   }
 
   public async getTokenIdByAddress({ tokenAddress, networkId }: GetTokenIdByAddressParams): Promise<number> {
     const contract = await this._getContract(networkId)
-    const tokenId = await contract.methods.tokenAddressToIdMap(tokenAddress).call()
+
+    const promise = contract.methods.tokenAddressToIdMap(tokenAddress).call()
+    const tokenId = await this.rateLimiterApi.call(promise)
     return +tokenId
   }
 

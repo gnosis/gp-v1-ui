@@ -27,6 +27,7 @@ import { INITIAL_INFURA_ENDPOINT } from 'const'
 import fetchGasPriceFactory from './gasStation'
 import { TheGraphApi } from './thegraph/TheGraphApi'
 import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
+import { RateLimiterApiImpl, RateLimiterApi } from './rateLimiter/RateLimiterApi'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
@@ -127,9 +128,16 @@ function createTheGraphApi(): TheGraphApi {
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
 
+export const rateLimiterApi: RateLimiterApi<any> = new RateLimiterApiImpl({
+  requestsPerSecond: 5,
+  waitTime: 1000,
+  maxTries: 5,
+})
+
 const injectedDependencies = {
   web3,
   fetchGasPrice: fetchGasPriceFactory(walletApi),
+  rateLimiterApi,
 }
 
 export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)

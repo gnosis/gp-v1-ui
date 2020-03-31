@@ -9,6 +9,7 @@ import { getAddressForNetwork } from './batchExchangeAddresses'
 import { Receipt, TxOptionalParams } from 'types'
 
 import Web3 from 'web3'
+import { RateLimiterApi } from 'api/rateLimiter/RateLimiterApi'
 
 interface ReadOnlyParams {
   userAddress: string
@@ -55,11 +56,13 @@ export interface PendingFlux {
 export interface Params {
   web3: Web3
   fetchGasPrice(): Promise<string | undefined>
+  rateLimiterApi: RateLimiterApi<any>
 }
 
 export class DepositApiImpl implements DepositApi {
   protected _contractPrototype: BatchExchangeContract
   protected web3: Web3
+  protected rateLimiterApi: RateLimiterApi<any>
   protected static _contractsCache: { [network: number]: { [address: string]: BatchExchangeContract } } = {}
 
   protected fetchGasPrice: Params['fetchGasPrice']
