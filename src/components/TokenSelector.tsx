@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
-import { formatAmount, safeFilledToken } from '@gnosis.pm/dex-js'
+import { formatAmount } from '@gnosis.pm/dex-js'
 import { isAddress } from 'web3-utils'
 
 import { TokenDetails, TokenBalanceDetails } from 'types'
@@ -11,11 +11,10 @@ import TokenImg from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
-import { addTokenToList, AddTokenToListParams, isTokenAddedSuccess } from 'services'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { logDebug } from 'utils'
-import { toast } from 'toastify'
 import { tokenListApi } from 'api'
+import Modali from 'modali'
+import { useAddTokenModal } from './AddTokenModal'
 
 const Wrapper = styled.div`
   display: flex;
@@ -244,7 +243,7 @@ const customSelectStyles = {
     minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',
-    zIndex: 9999,
+    zIndex: 999,
     boxShadow: '0 999vh 0 999vw rgba(47, 62, 78, 0.50)',
     borderRadius: '0.6rem',
   }),
@@ -304,26 +303,6 @@ const components = { MenuList }
 
 const noOptionsMessage = (): string => 'No results'
 
-const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<boolean> => {
-  try {
-    const tokenAddedResult = await addTokenToList({ networkId, tokenAddress })
-
-    if (!isTokenAddedSuccess(tokenAddedResult)) {
-      toast.warn(tokenAddedResult.error)
-      return false
-    }
-
-    const { symbol: tokenDisplayName } = safeFilledToken(tokenAddedResult.token)
-
-    toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-    return true
-  } catch (error) {
-    logDebug('Error adding token', tokenAddress, error)
-    toast.error(`Failed to add token at address ${tokenAddress} to token list`)
-    return false
-  }
-}
-
 interface Props {
   label?: string
   isDisabled?: boolean
@@ -359,6 +338,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // When the search input is focused, force menu to remain open
   const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
 
+  const { addTokenToList, modalProps } = useAddTokenModal()
+
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }): void => {
       if (e.key === 'Escape') {
@@ -378,12 +359,13 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         // and in general on Select, I guess
         e.stopPropagation()
         console.log('tokenAddress', tokenAddress)
-        if (window.confirm(`Do you want to add ${tokenAddress} to your local tokneList`)) {
-          addTokenFromInput({ networkId, tokenAddress })
-        }
+        // if (window.confirm(`Do you want to add ${tokenAddress} to your local tokneList`)) {
+        //   addTokenFromInput({ networkId, tokenAddress })
+        // }
+        addTokenToList({ tokenAddress, networkId })
       }
     },
-    [networkId],
+    [addTokenToList, networkId],
   )
 
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -405,8 +387,29 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // const [modalProps, toggleModal] = useModali({
+  //   animated: true,
+  //   centered: true,
+  //   title: 'Are you sure?',
+  //   message: <TokenAddConfirmation tokenAddress="" />,
+  //   buttons: [
+  //     <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleModal()} />,
+  //     <Modali.Button
+  //       label="Confirm"
+  //       key="yes"
+  //       isStyleDefault
+  //       onClick={async (): Promise<void> => {
+  //         // On confirm, do the request
+  //       }}
+  //     />,
+  //   ],
+  // })
+  // ;(window as any).modal = toggleModal
+
   return (
     <Wrapper ref={wrapperRef}>
+      <Modali.Modal {...modalProps} />
+      {/* <Modali.Modal {...modalProps}></Modali.Modal> */}
       <StyledSelect
         blurInputOnSelect
         isSearchable
