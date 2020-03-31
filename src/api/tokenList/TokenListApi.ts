@@ -2,11 +2,17 @@ import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
+import { ExchangeApi } from 'api/exchange/ExchangeApi'
 
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   hasToken: (params: HasTokenParams) => boolean
+}
+
+export interface TokenListApiParams {
+  exchangeApi: ExchangeApi
+  networkIds: number[]
 }
 
 export interface AddTokenParams {
@@ -25,18 +31,20 @@ export interface HasTokenParams {
  * Has a pre-define list of tokens.
  */
 export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> implements TokenList {
-  public networkIds: number[]
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
+  private updatedIdsForNetwork: Set<number>
+  private exchangeApi: ExchangeApi
 
-  public constructor(networkIds: number[]) {
+  public constructor({ networkIds, exchangeApi }: TokenListApiParams) {
     super()
 
-    this.networkIds = networkIds
+    this.exchangeApi = exchangeApi
 
     // Init the tokens by network
     this._tokensByNetwork = {}
     this._tokenAddressNetworkSet = new Set<string>()
+    this.updatedIdsForNetwork = new Set<number>()
 
     networkIds.forEach(networkId => {
       // initial value
@@ -59,6 +67,11 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   }
 
   public getTokens(networkId: number): TokenDetails[] {
+    if (!this.updatedIdsForNetwork.has(networkId)) {
+      // update token ids from contract if this it has not updated successfully before, async
+      this.updateTokenIds(networkId)
+    }
+
     return this._tokensByNetwork[networkId] || []
   }
 
@@ -82,6 +95,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private static getLocalStorageKey(networkId: number): string {
     return 'USER_TOKEN_LIST_' + networkId
   }
+
   public addToken({ networkId, token }: AddTokenParams): void {
     logDebug('[TokenListApi]: Added new Token to userlist', token)
 
@@ -91,7 +105,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     )
     this.persistNewUserToken(token, networkId)
 
-    this.triggerSubscriptions(this.getTokens(networkId))
+    this.triggerSubscriptions(this._tokensByNetwork[networkId])
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {
@@ -107,6 +121,55 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
 
     currentUserList.push(token)
     localStorage.setItem(storageKey, JSON.stringify(currentUserList))
+  }
+
+  private persistTokensForNetwork(networkId: number): void {
+    const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
+    localStorage.setItem(storageKey, JSON.stringify(this._tokensByNetwork[networkId]))
+  }
+
+  private async updateTokenIds(networkId: number): Promise<void> {
+    // Set as updated on start to prevent concurrent queries
+    this.updatedIdsForNetwork.add(networkId)
+
+    // Sequentially fetch updated ids
+    const updatedTokenList = []
+    let failedToUpdate = false
+    for (let i = 0; i < this._tokensByNetwork[networkId].length; i++) {
+      const token = this._tokensByNetwork[networkId][i]
+      const tokenAddress = token.address
+
+      try {
+        token.id = await this.exchangeApi.getTokenIdByAddress({ networkId, tokenAddress })
+        updatedTokenList.push(token)
+
+        logDebug(`[network:${networkId}][address:${tokenAddress}] Token id updated: ${token.id}`)
+      } catch (e) {
+        if (e.message.match(/Must have Address to get ID/)) {
+          logDebug(
+            `[network:${networkId}][address:${tokenAddress}] Address not registered on network, removing from the list`,
+          )
+        } else {
+          logDebug(`[network:${networkId}][address:${tokenAddress}] Failed to fetch id from contract`, e.message)
+
+          updatedTokenList.push(token)
+          failedToUpdate = true
+        }
+      }
+    }
+    this._tokensByNetwork[networkId] = updatedTokenList
+
+    // If any token failed, clear flag to try again next time
+    if (failedToUpdate) {
+      this.updatedIdsForNetwork.delete(networkId)
+      // TODO: update only the ones that failed
+    }
+
+    // persist
+    this.persistTokensForNetwork(networkId)
+
+    // update subscribers
+    this.triggerSubscriptions(this._tokensByNetwork[networkId])
   }
 }
 
