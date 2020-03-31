@@ -40,7 +40,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
 
     networkIds.forEach(networkId => {
       // initial value
-      const tokenList = this.mergeTokenLists(getTokensByNetwork(networkId), this.loadUserTokenList(networkId))
+      const tokenList = TokenListApiImpl.mergeTokenLists(
+        getTokensByNetwork(networkId),
+        this.loadUserTokenList(networkId),
+      )
       this._tokensByNetwork[networkId] = tokenList
 
       tokenList.forEach(({ address }) => {
@@ -59,14 +62,13 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     return this._tokensByNetwork[networkId] || []
   }
 
-
-  private mergeTokenLists(baseList: TokenDetails[], newList: TokenDetails[]): TokenDetails[] {
+  private static mergeTokenLists(baseList: TokenDetails[], newList: TokenDetails[]): TokenDetails[] {
     const seenAddresses = new Set<string>()
     const result: TokenDetails[] = []
 
     baseList.concat(newList).forEach(token => {
-      if (!seenAddresses.has(token.address.toLocaleLowerCase())) {
-        seenAddresses.add(token.address.toLocaleLowerCase())
+      if (!seenAddresses.has(token.address.toLowerCase())) {
+        seenAddresses.add(token.address.toLowerCase())
         result.push(token)
       }
     })
