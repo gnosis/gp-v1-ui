@@ -63,7 +63,7 @@ declare module 'modali' {
     /**
      * The text displayed in the body of the modal
      */
-    message?: string | React.Element
+    message?: React.ReactNode
 
     /**
      * Displays whatever is passed in in the footer
