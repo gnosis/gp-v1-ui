@@ -9,6 +9,7 @@ export interface EtherscanLinkProps {
   type: EtherscanLinkType
   identifier: string
   networkId?: number
+  networkIdDefault?: number
   label?: string | ReactElement | void
   className?: string // to allow subclassing styles with styled-components
 }
@@ -35,9 +36,12 @@ export const EtherscanLink: React.FC<EtherscanLinkProps> = ({
   identifier,
   label,
   className,
-  networkId: netId,
+  networkId: networkIdFixed,
+  networkIdDefault,
 }) => {
-  const { networkId = netId } = useWalletConnection()
+  const { networkId: networkIdWallet = networkIdDefault } = useWalletConnection()
+
+  const networkId = networkIdFixed || networkIdWallet
 
   if (!networkId || !identifier) {
     return null

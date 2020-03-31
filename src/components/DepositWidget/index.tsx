@@ -330,6 +330,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   depositing,
   highlighted,
   enabling,
+  enabled,
   requestWithdrawConfirmation,
 }) => {
   const windowSpecs = useWindowSizes()
@@ -427,6 +428,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                     depositing={depositing.has(tokenBalances.address)}
                     highlighted={highlighted.has(tokenBalances.address)}
                     enabling={enabling.has(tokenBalances.address)}
+                    enabled={enabled.has(tokenBalances.address)}
                     {...windowSpecs}
                   />
                 ))
