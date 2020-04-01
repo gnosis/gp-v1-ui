@@ -332,7 +332,7 @@ const OrderValidity: React.FC<Props> = ({
               <small>ASAP</small>
             </div>
           </label>
-          <FormInputError errorMessage={validFromError?.message} />
+          <FormInputError errorMessage={validFromError?.message as string} />
         </OrderValidityBox>
         <OrderValidityBox>
           <strong>Order expires in (min)</strong>
@@ -359,7 +359,7 @@ const OrderValidity: React.FC<Props> = ({
               <small>Never</small>
             </div>
           </label>
-          <FormInputError errorMessage={validUntilError?.message} />
+          <FormInputError errorMessage={validUntilError?.message as string} />
         </OrderValidityBox>
         <span>
           <button

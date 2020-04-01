@@ -219,8 +219,8 @@ const TokenRow: React.FC<Props> = ({
   const balanceClassName = !error && sellAmountOverMax ? 'warning' : 'success'
   const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
-  const errorOrWarning = error ? (
-    <FormInputError errorMessage={error.message} />
+  const errorOrWarning = error?.message ? (
+    <FormInputError errorMessage={error.message as string} />
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">

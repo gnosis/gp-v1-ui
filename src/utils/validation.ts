@@ -28,9 +28,9 @@ interface FormDataAsNumbers {
  * @param type [OPTIONAL] 'number' | undefined - sets casting use or straight FormData use
  */
 
-export const resolverFactory = <FormData, CustomContext = {}>(validationSchema: ObjectSchema<unknown>) => (
+export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => (
   data: FormData,
-): ReturnType<ValidationResolver<FormData, CustomContext>> => {
+): ReturnType<ValidationResolver<FormData, {}>> => {
   const castedData: FormDataAsNumbers | FormData = Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
     acc[key] = data[key] || undefined
     return acc
@@ -58,9 +58,7 @@ export const resolverFactory = <FormData, CustomContext = {}>(validationSchema: 
 
 export function formatSchemaErrorMessage(errorString?: string): string | undefined {
   if (!errorString) return undefined
-  const cleanedString = errorString
-    .split(' ')
-    .slice(1)
-    .join(' ')
-  return `Value ${cleanedString}`
+  const cleanedString = errorString.replace(/^"\w+"\s+/, 'Value ')
+
+  return cleanedString
 }
