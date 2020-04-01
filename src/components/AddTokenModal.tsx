@@ -1,29 +1,57 @@
-import React, { useState, useCallback, useRef } from 'react'
-import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
+import React, { useState, useCallback, useRef, useEffect } from 'react'
+import { toChecksumAddress } from 'web3-utils'
 import Modali, { useModali, ModalHook } from 'modali'
-import { AddTokenToListParams, addTokenToList, isTokenAddedSuccess } from 'services'
+import { AddTokenToListParams, addTokenToList, isTokenAddedSuccess, getTokenFromExchangeByAddress } from 'services'
 import { toast } from 'toastify'
 import { safeFilledToken, logDebug } from 'utils'
 import { TokenDetails } from 'types'
 import TokenImg from './TokenImg'
 import styled from 'styled-components'
+import { tokenListApi } from 'api'
 
-const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<TokenDetails | null> => {
+// const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<TokenDetails | null> => {
+//   try {
+//     const tokenAddedResult = await addTokenToList({ networkId, tokenAddress })
+
+//     if (!isTokenAddedSuccess(tokenAddedResult)) {
+//       toast.warn(tokenAddedResult.error)
+//       throw new Error(tokenAddedResult.error)
+//     }
+
+//     const { symbol: tokenDisplayName } = safeFilledToken(tokenAddedResult.token)
+
+//     toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
+//     return tokenAddedResult.token
+//   } catch (error) {
+//     logDebug('Error adding token', tokenAddress, error)
+//     toast.error(`Failed to add token at address ${tokenAddress} to token list`)
+//     throw error
+//   }
+// }
+const addTokenFromInput = async (
+  { networkId, tokenAddress }: AddTokenToListParams,
+  tokenPromised: Promise<TokenDetails | null>,
+): Promise<TokenDetails | null> => {
   try {
-    const tokenAddedResult = await addTokenToList({ networkId, tokenAddress })
+    const token = await tokenPromised
 
-    if (!isTokenAddedSuccess(tokenAddedResult)) {
-      toast.warn(tokenAddedResult.error)
-      throw new Error(tokenAddedResult.error)
+    if (token) {
+      logDebug('Added new Token to userlist', token)
+
+      tokenListApi.addToken({ token, networkId })
+    } else {
+      const error = `Token at address ${tokenAddress} not available in Exchange contract`
+      toast.warn(error)
+      throw new Error(error)
     }
 
-    const { symbol: tokenDisplayName } = safeFilledToken(tokenAddedResult.token)
+    const { symbol: tokenDisplayName } = safeFilledToken(token)
 
     toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-    return tokenAddedResult.token
+    return token
   } catch (error) {
     logDebug('Error adding token', tokenAddress, error)
-    toast.error(`Failed to add token at address ${tokenAddress} to token list`)
+    // toast.error(`Failed to add token at address ${tokenAddress} to token list`)
     throw error
   }
 }
@@ -168,6 +196,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const [tokenAddress, setTokenAddress] = useState('')
 
   const result = useRef<Deferred<boolean>>()
+  const prefetchToken = useRef<Promise<TokenDetails | null>>(Promise.resolve(null))
   const [token, setToken] = useState<TokenDetails | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
@@ -199,7 +228,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
           } else if (error) {
             result.current?.resolve(false)
           } else {
-            addTokenFromInput({ networkId, tokenAddress }).then(setToken, setError)
+            addTokenFromInput({ networkId, tokenAddress }, prefetchToken.current).then(setToken, setError)
           }
         }}
       />,
@@ -216,6 +245,9 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
 
     const deferred = createDeferredPromise<boolean>()
     result.current = deferred
+
+    prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: toChecksumAddress(tokenAddress), networkId })
+    prefetchToken.current.then(console.log)
 
     toggleRef.current()
     console.log('Toggle MODAL ON')
