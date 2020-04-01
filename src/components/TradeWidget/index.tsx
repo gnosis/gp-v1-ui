@@ -815,6 +815,9 @@ const TradeWidget: React.FC = () => {
           <OrdersWidget />
         </div>
       </OrdersPanel>
+      {/* React Forms DevTool debugger */}
+      {process.env.NODE_ENV === 'development' &&
+        React.createElement(require('react-hook-form-devtools').DevTool, { control: methods.control })}
     </WrappedWidget>
   )
 }
