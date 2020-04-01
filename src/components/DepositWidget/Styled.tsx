@@ -1,13 +1,5 @@
 import styled from 'styled-components'
 
-export const ModalBodyWrapper = styled.div`
-  div > p {
-    font-size: inherit;
-    color: inherit;
-    padding: 0;
-  }
-`
-
 export const TokenRow = styled.tr`
   .enableToken {
     height: auto;
