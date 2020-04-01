@@ -1,33 +1,14 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { toChecksumAddress } from 'web3-utils'
 import Modali, { useModali, ModalHook } from 'modali'
-import { AddTokenToListParams, addTokenToList, isTokenAddedSuccess, getTokenFromExchangeByAddress } from 'services'
+import { AddTokenToListParams, getTokenFromExchangeByAddress } from 'services'
 import { toast } from 'toastify'
-import { safeFilledToken, logDebug } from 'utils'
+import { safeFilledToken, logDebug, Deferred, createDeferredPromise } from 'utils'
 import { TokenDetails } from 'types'
-import TokenImg from './TokenImg'
+import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
 import { tokenListApi } from 'api'
 
-// const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<TokenDetails | null> => {
-//   try {
-//     const tokenAddedResult = await addTokenToList({ networkId, tokenAddress })
-
-//     if (!isTokenAddedSuccess(tokenAddedResult)) {
-//       toast.warn(tokenAddedResult.error)
-//       throw new Error(tokenAddedResult.error)
-//     }
-
-//     const { symbol: tokenDisplayName } = safeFilledToken(tokenAddedResult.token)
-
-//     toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-//     return tokenAddedResult.token
-//   } catch (error) {
-//     logDebug('Error adding token', tokenAddress, error)
-//     toast.error(`Failed to add token at address ${tokenAddress} to token list`)
-//     throw error
-//   }
-// }
 const addTokenFromInput = async (
   { networkId, tokenAddress }: AddTokenToListParams,
   tokenPromised: Promise<TokenDetails | null>,
@@ -51,7 +32,6 @@ const addTokenFromInput = async (
     return token
   } catch (error) {
     logDebug('Error adding token', tokenAddress, error)
-    // toast.error(`Failed to add token at address ${tokenAddress} to token list`)
     throw error
   }
 }
@@ -162,30 +142,6 @@ const generateMessage = ({ token, tokenAddress, networkId, error }: GenerateMess
   return null
 }
 
-type PromiseResolve<T> = (value: T | PromiseLike<T>) => void
-type PromiseReject = (reason?: unknown) => void
-
-interface Deferred<T> {
-  promise: Promise<T>
-  resolve: PromiseResolve<T>
-  reject: PromiseReject
-}
-const createDeferredPromise = <T,>(): Deferred<T> => {
-  let resolve: PromiseResolve<T> = () => void 0
-  let reject: PromiseReject = () => void 0
-
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res
-    reject = rej
-  })
-
-  return {
-    promise,
-    resolve,
-    reject,
-  }
-}
-
 interface UseAddTokenModalResult {
   addTokenToList: (params: TokenAddConfirmationProps) => Promise<boolean>
   modalProps: ModalHook
@@ -234,7 +190,6 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
       />,
     ],
   })
-  ;(window as any).toggleModal = toggleModal
 
   const toggleRef = useRef(toggleModal)
   toggleRef.current = toggleModal
@@ -250,12 +205,9 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     prefetchToken.current.then(console.log)
 
     toggleRef.current()
-    console.log('Toggle MODAL ON')
 
     return deferred.promise.then(value => {
-      console.log('value', value)
       // close modal
-      console.log('Toggle MODAL OFF')
       toggleRef.current()
 
       // reset hook state
@@ -275,7 +227,6 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     }
   }, [modalProps.isModalVisible])
 
-  console.log('modalProps', modalProps)
   return {
     addTokenToList,
     modalProps,

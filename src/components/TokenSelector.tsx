@@ -14,7 +14,7 @@ import searchIcon from 'assets/img/search.svg'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { tokenListApi } from 'api'
 import Modali from 'modali'
-import { useAddTokenModal } from './AddTokenModal'
+import { useAddTokenModal } from 'hooks/useAddTokenModal'
 
 const Wrapper = styled.div`
   display: flex;
@@ -361,10 +361,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         // double because it's captured from onKeyDown in MenuList
         // and in general on Select, I guess
         e.stopPropagation()
-        console.log('tokenAddress', tokenAddress)
-        // if (window.confirm(`Do you want to add ${tokenAddress} to your local tokneList`)) {
-        //   addTokenFromInput({ networkId, tokenAddress })
-        // }
+
         addTokenToList({ tokenAddress, networkId })
       }
     },
@@ -392,29 +389,9 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // const [modalProps, toggleModal] = useModali({
-  //   animated: true,
-  //   centered: true,
-  //   title: 'Are you sure?',
-  //   message: <TokenAddConfirmation tokenAddress="" />,
-  //   buttons: [
-  //     <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleModal()} />,
-  //     <Modali.Button
-  //       label="Confirm"
-  //       key="yes"
-  //       isStyleDefault
-  //       onClick={async (): Promise<void> => {
-  //         // On confirm, do the request
-  //       }}
-  //     />,
-  //   ],
-  // })
-  // ;(window as any).modal = toggleModal
-
   return (
     <Wrapper ref={wrapperRef}>
       <Modali.Modal {...modalProps} />
-      {/* <Modali.Modal {...modalProps}></Modali.Modal> */}
       <StyledSelect
         blurInputOnSelect
         isSearchable
