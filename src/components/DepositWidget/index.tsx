@@ -311,7 +311,7 @@ const NoTokensMessage = styled.tr`
 `
 
 type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
-  ReturnType<typeof useTokenBalances> & {
+  Pick<ReturnType<typeof useTokenBalances>, 'balances' | 'error'> & {
     requestWithdrawConfirmation(
       amount: BN,
       tokenAddress: string,
