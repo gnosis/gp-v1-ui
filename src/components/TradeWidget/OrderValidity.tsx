@@ -285,7 +285,7 @@ const OrderValidity: React.FC<Props> = ({
 
   function handleUnlimitedClick(): void {
     setUnlimited(isUnlimited => !isUnlimited)
-    !isUnlimited ? setValue(validUntilInputId, undefined, true) : setValue(validUntilInputId, '30', true)
+    !isUnlimited ? setValue(validUntilInputId, undefined, true) : setValue(validUntilInputId, '2880', true)
   }
   function handleASAPClick(): void {
     setAsap(isAsap => !isAsap)
