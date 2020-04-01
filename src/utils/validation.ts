@@ -47,18 +47,12 @@ export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown
     values: error || !value ? {} : data,
     errors: error
       ? error.details.reduce((previous, currentError) => {
+          const finalError = { ...currentError, message: currentError?.message?.replace(/(['"])/g, '') }
           return {
             ...previous,
-            [currentError.path[0]]: currentError,
+            [currentError.path[0]]: finalError,
           }
         }, {})
       : {},
   }
-}
-
-export function formatSchemaErrorMessage(errorString?: string): string | undefined {
-  if (!errorString) return undefined
-  const cleanedString = errorString.replace(/^"\w+"\s+/, 'Value ')
-
-  return cleanedString
 }
