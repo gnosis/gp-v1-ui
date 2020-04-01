@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useRef } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import Modali, { useModali, ModalHook } from 'modali'
-import { ModalBodyWrapper } from 'components/DepositWidget/Styled'
 import { AddTokenToListParams, addTokenToList, isTokenAddedSuccess } from 'services'
 import { toast } from 'toastify'
 import { safeFilledToken, logDebug } from 'utils'
 import { TokenDetails } from 'types'
+import TokenImg from './TokenImg'
+import styled from 'styled-components'
 
 const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<TokenDetails | null> => {
   try {
@@ -27,6 +28,17 @@ const addTokenFromInput = async ({ networkId, tokenAddress }: AddTokenToListPara
   }
 }
 
+export const ModalBodyWrapper = styled.div`
+  p {
+    line-height: 1.8;
+  }
+
+  min-height: 15rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`
+
 interface TokenAddConfirmationProps {
   tokenAddress: string
   networkId: number
@@ -46,12 +58,54 @@ interface TokenAddResultProps {
   token: TokenDetails
 }
 
+const TokenDisplay = styled.div`
+  display: grid;
+  align-items: center;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    'image symbol'
+    'image name';
+
+  .tokenImage {
+    grid-area: image;
+    height: 5em;
+    width: 5em;
+  }
+
+  .tokenSymbol {
+    grid-area: symbol;
+  }
+
+  .tokenName {
+    grid-area: name;
+  }
+`
+
+const CenteredContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+
+  ${TokenDisplay} {
+    margin: auto;
+  }
+`
+
 const TokeAddResult: React.FC<TokenAddResultProps> = ({ token }) => {
   return (
     <ModalBodyWrapper>
-      <div>
-        <p>Added token {token.symbol}</p>
-      </div>
+      <CenteredContent>
+        <h2>Added token</h2>
+        <TokenDisplay>
+          <TokenImg src={token.image} alt={token.name} className="tokenImage" />
+          <div className="tokenSymbol">
+            <strong>{token.symbol}</strong>
+          </div>
+          <div className="tokenName">{token.name}</div>
+        </TokenDisplay>
+      </CenteredContent>
     </ModalBodyWrapper>
   )
 }
@@ -123,15 +177,18 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     title: 'Are you sure?',
     message: generateMessage({ token, tokenAddress, networkId, error }),
     buttons: [
-      <Modali.Button
-        label="Cancel"
-        key="no"
-        isStyleCancel
-        onClick={(): void => {
-          // toggleModal()
-          result.current?.resolve(false)
-        }}
-      />,
+      token ? (
+        <>&nbsp;</>
+      ) : (
+        <Modali.Button
+          label="Cancel"
+          key="no"
+          isStyleCancel
+          onClick={(): void => {
+            result.current?.resolve(false)
+          }}
+        />
+      ),
       <Modali.Button
         label={token || error ? 'Done' : 'Confirm'}
         key="yes"
