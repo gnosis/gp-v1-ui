@@ -13,8 +13,8 @@ export class ExchangeApiProxy extends ExchangeApiImpl {
 
     this.cache.injectCache<ExchangeApi>(this, [
       { method: 'getFeeDenominator' },
-      { method: 'getTokenAddressById' },
-      { method: 'getTokenIdByAddress' },
+      // { method: 'getTokenAddressById' },
+      // { method: 'getTokenIdByAddress' },
     ])
   }
 }

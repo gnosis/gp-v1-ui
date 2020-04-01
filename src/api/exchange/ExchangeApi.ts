@@ -176,12 +176,17 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async getTokenAddressById({ tokenId, networkId }: GetTokenAddressByIdParams): Promise<string> {
     const contract = await this._getContract(networkId)
-    return contract.methods.tokenIdToAddressMap(tokenId).call()
+    console.log(`[${networkId}][${tokenId}] Trying to get address for id`)
+    const address = await contract.methods.tokenIdToAddressMap(tokenId).call()
+    console.log(`[${networkId}][${tokenId}] response :${address}`)
+    return address
   }
 
   public async getTokenIdByAddress({ tokenAddress, networkId }: GetTokenIdByAddressParams): Promise<number> {
     const contract = await this._getContract(networkId)
+    console.log(`[${networkId}][${tokenAddress}] Trying to get id for address `)
     const tokenId = await contract.methods.tokenAddressToIdMap(tokenAddress).call()
+    console.log(`[${networkId}][${tokenAddress}] response: ${tokenId}`)
     return +tokenId
   }
 

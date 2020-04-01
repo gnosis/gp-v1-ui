@@ -4,6 +4,7 @@ import { ContentPage } from 'components/Layout/PageWrapper'
 import addressesByNetwork from 'api/deposit/batchExchangeAddresses'
 import { getNetworkFromId } from '@gnosis.pm/dex-js'
 import { EtherscanLink } from 'components/EtherscanLink'
+import { exchangeApi } from 'api'
 
 export const AboutWrapper = styled(ContentPage)`
   line-height: 2.2rem;
@@ -38,9 +39,27 @@ const About: React.FC = () => {
       </React.Fragment>
     )
   })
+  const fetchId = async (): Promise<void> => {
+    console.log('clicked id button')
+    const id = await exchangeApi.getTokenIdByAddress({
+      tokenAddress: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      networkId: 1,
+    })
+    console.log(`id: ${id}`)
+  }
+  const fetchAddress = async (): Promise<void> => {
+    console.log('clicked address button')
+    const id = await exchangeApi.getTokenAddressById({
+      tokenId: 1,
+      networkId: 1,
+    })
+    console.log(`id: ${id}`)
+  }
   return (
     <AboutWrapper>
       <h1>About Mesa</h1>
+      <button onClick={fetchId}>Get id</button>
+      <button onClick={fetchAddress}>Get address</button>
       <p>
         Mesa it&apos;s an Open Source interface for{' '}
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
