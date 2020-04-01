@@ -16,6 +16,9 @@ import FormMessage from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA } from 'const'
+import { DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+
+export const INPUT_ID_WRAP_ETH_AMOUNT = 'etherAmount'
 
 const Wrapper = styled.div`
   display: flex;
@@ -132,6 +135,49 @@ export const InputBox = styled.div`
   }
 `
 
+const WrapEtherModalWrapper = styled(ModalBodyWrapper)`
+  > div {
+    margin: 3rem 1.5rem;
+
+    ${InputBox} {
+      position: relative;
+      display: flex;
+      flex-flow: row wrap;
+
+      i {
+        position: absolute;
+        right: 1rem;
+        top: 0;
+        bottom: 0;
+        margin: 0;
+        color: #476481;
+        letter-spacing: -0.05rem;
+        text-align: right;
+        font-family: var(--font-default);
+        font-weight: var(--font-weight-bold);
+        font-size: 1.2rem;
+        font-style: normal;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+
+  .error {
+    color: red;
+  }
+
+  b {
+    font-size: 1.3rem;
+    color: #2f3e4e;
+    margin: 0 1.6rem 0 0;
+    margin-bottom: 0.5rem;
+    padding-left: -0.5;
+    display: block;
+  }
+`
+
 const TokenBoxWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
@@ -204,27 +250,63 @@ const TokenRow: React.FC<Props> = ({
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
+  const wrapEtherError = errors[INPUT_ID_WRAP_ETH_AMOUNT]
   const inputValue = watch(inputId)
 
   const { onKeyPress, enforcePrecision, removeExcessZeros } = useNumberInput({
     inputId,
     precision: selectedToken.decimals,
   })
+  // const [wethAmountToWrap, setWethAmountToWrap] = useSafeState('0')
+  const {
+    onKeyPress: onKeyPressEtherAmount,
+    enforcePrecision: enforcePrecisionEtherAmount,
+    removeExcessZeros: removeExcessZerosEtherAmount,
+  } = useNumberInput({
+    inputId: INPUT_ID_WRAP_ETH_AMOUNT,
+    precision: DEFAULT_PRECISION,
+  })
 
   const [wrapEtherModal, toggleWrapEtherModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
     title: 'Wrap Ether',
     message: (
-      <ModalBodyWrapper>
+      <WrapEtherModalWrapper>
         <div>
-          <p>
-            You currently have a pending withdraw request. By sending this new withdraw request, you will overwrite the
-            pending request amount. No funds will be lost.
-          </p>
-          <p>No funds will be lost.</p>
+          <b>Available Ether</b>
+          <div>
+            <a href="">{formatAmountFull({ amount: new BN(0), precision: DEFAULT_PRECISION }) || ''} ETH</a>
+          </div>
         </div>
-        <strong>Do you wish to replace the previous withdraw request?</strong>
-      </ModalBodyWrapper>
+        <div>
+          <b>Amount to Wrap</b>
+          <div>
+            <InputBox>
+              <i>ETH</i>
+              <input
+                type="text"
+                name={INPUT_ID_WRAP_ETH_AMOUNT}
+                // value={wethAmountToWrap}
+                onChange={enforcePrecisionEtherAmount}
+                // onChange={(e: ChangeEvent<HTMLInputElement>): void => setWethAmountToWrap(e.target.value)}
+                placeholder="0"
+                autoFocus
+                required
+                ref={register({
+                  pattern: { value: validInputPattern, message: 'Invalid price' },
+                  validate: { positive: validatePositiveConstructor('Invalid price') },
+                  required: 'The amount is required',
+                  min: 0,
+                })}
+                onFocus={(e): void => e.target.select()}
+                onKeyPress={onKeyPressEtherAmount}
+                onBlur={removeExcessZerosEtherAmount}
+              />
+            </InputBox>
+          </div>
+          {wrapEtherError && <p className="error">{wrapEtherError.message || ''}</p>}
+        </div>
+      </WrapEtherModalWrapper>
     ),
     buttons: [
       <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWrapEtherModal()} />,
@@ -232,6 +314,7 @@ const TokenRow: React.FC<Props> = ({
         label="Continue"
         key="yes"
         isStyleDefault
+        disabled={wrapEtherError}
         onClick={async (): Promise<void> => {
           alert('Continue!')
         }}
