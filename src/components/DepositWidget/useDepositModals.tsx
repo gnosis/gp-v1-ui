@@ -1,8 +1,7 @@
 import React, { useCallback } from 'react'
 import BN from 'bn.js'
 
-import { ModalBodyWrapper } from './Styled'
-import { DEFAULT_MODAL_OPTIONS } from '../Modal'
+import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from '../Modal'
 import Modali, { useModali, ModalHook, toggleModaliComponent } from 'modali'
 
 const OverwriteModalBody: React.FC = () => {

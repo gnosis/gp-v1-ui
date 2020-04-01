@@ -6,7 +6,7 @@ import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
-import { DEFAULT_MODAL_OPTIONS } from '../Modal'
+import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from '../Modal'
 import Modali, { useModali } from 'modali'
 
 import { TradeFormTokenId, TradeFormData } from './'
@@ -215,7 +215,7 @@ const TokenRow: React.FC<Props> = ({
     ...DEFAULT_MODAL_OPTIONS,
     title: 'Wrap Ether',
     message: (
-      <div>
+      <ModalBodyWrapper>
         <div>
           <p>
             You currently have a pending withdraw request. By sending this new withdraw request, you will overwrite the
@@ -224,7 +224,7 @@ const TokenRow: React.FC<Props> = ({
           <p>No funds will be lost.</p>
         </div>
         <strong>Do you wish to replace the previous withdraw request?</strong>
-      </div>
+      </ModalBodyWrapper>
     ),
     buttons: [
       <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWrapEtherModal()} />,
