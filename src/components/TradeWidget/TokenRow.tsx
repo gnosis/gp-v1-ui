@@ -6,6 +6,7 @@ import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
+import Modali, { useModali } from 'modali'
 
 import { TradeFormTokenId, TradeFormData } from './'
 
@@ -209,6 +210,35 @@ const TokenRow: React.FC<Props> = ({
     precision: selectedToken.decimals,
   })
 
+  const [wrapEtherModal, toggleWrapEtherModal] = useModali({
+    centered: true,
+    animated: true,
+    title: 'Wrap Ether',
+    message: (
+      <div>
+        <div>
+          <p>
+            You currently have a pending withdraw request. By sending this new withdraw request, you will overwrite the
+            pending request amount. No funds will be lost.
+          </p>
+          <p>No funds will be lost.</p>
+        </div>
+        <strong>Do you wish to replace the previous withdraw request?</strong>
+      </div>
+    ),
+    buttons: [
+      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWrapEtherModal()} />,
+      <Modali.Button
+        label="Continue"
+        key="yes"
+        isStyleDefault
+        onClick={async (): Promise<void> => {
+          alert('Continue!')
+        }}
+      />,
+    ],
+  })
+
   let overMax = ZERO
   if (balance && validateMaxAmount) {
     const max = balance.totalExchangeBalance
@@ -279,6 +309,16 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
+          {selectedToken.symbol && selectedToken.symbol === 'WETH' && (
+            <TooltipWrapper
+              as="button"
+              type="button"
+              tooltip="Ether needs to be Wrapped and then deposited into the Exchange balance in order to be traded"
+              onClick={toggleWrapEtherModal}
+            >
+              + Wrap Ether
+            </TooltipWrapper>
+          )}
           <span>
             Balance:
             {readOnly ? (
@@ -340,6 +380,7 @@ const TokenRow: React.FC<Props> = ({
         </TokenBoxWrapper>
       </InputBox>
       {errorOrWarning}
+      <Modali.Modal {...wrapEtherModal} />
     </Wrapper>
   )
 }
