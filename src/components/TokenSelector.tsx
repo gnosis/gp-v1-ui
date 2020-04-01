@@ -340,6 +340,9 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
 
   const { addTokenToList, modalProps } = useAddTokenModal()
 
+  const addTokenModalOpen = useRef(modalProps.isShown)
+  addTokenModalOpen.current = modalProps.isShown
+
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }): void => {
       if (e.key === 'Escape') {
@@ -371,6 +374,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   const wrapperRef = useRef<HTMLDivElement>(null)
 
   const onDocumentClick = useCallback(e => {
+    if (addTokenModalOpen.current) return
+
     const menu = wrapperRef.current?.querySelector('.react-select__menu')
     // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
     // If neither, hand focus back to react-select but turning isFocused off
