@@ -176,6 +176,10 @@ const WrapEtherModalWrapper = styled(ModalBodyWrapper)`
     padding-left: -0.5;
     display: block;
   }
+
+  a {
+    color: rgb(33, 141, 255);
+  }
 `
 
 const TokenBoxWrapper = styled.div`
@@ -267,6 +271,9 @@ const TokenRow: React.FC<Props> = ({
     precision: DEFAULT_PRECISION,
   })
 
+  // TODO: Get balance in another PR
+  const availableBalanceInEther = new BN('1234567800000000000')
+
   const [wrapEtherModal, toggleWrapEtherModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
     title: 'Wrap Ether',
@@ -275,7 +282,11 @@ const TokenRow: React.FC<Props> = ({
         <div>
           <b>Available Ether</b>
           <div>
-            <a href="">{formatAmountFull({ amount: new BN(0), precision: DEFAULT_PRECISION }) || ''} ETH</a>
+            <a
+              onClick={(): void => setValue(INPUT_ID_WRAP_ETH_AMOUNT, formatAmountFull(availableBalanceInEther), true)}
+            >
+              {formatAmountFull({ amount: availableBalanceInEther, precision: DEFAULT_PRECISION }) || ''} ETH
+            </a>
           </div>
         </div>
         <div>
@@ -293,8 +304,8 @@ const TokenRow: React.FC<Props> = ({
                 autoFocus
                 required
                 ref={register({
-                  pattern: { value: validInputPattern, message: 'Invalid price' },
-                  validate: { positive: validatePositiveConstructor('Invalid price') },
+                  pattern: { value: validInputPattern, message: 'Invalid amount' },
+                  validate: { positive: validatePositiveConstructor('Invalid amount') },
                   required: 'The amount is required',
                   min: 0,
                 })}
@@ -314,9 +325,13 @@ const TokenRow: React.FC<Props> = ({
         label="Continue"
         key="yes"
         isStyleDefault
-        disabled={wrapEtherError}
         onClick={async (): Promise<void> => {
-          alert('Continue!')
+          if (!wrapEtherError) {
+            // TODO: Wrap ether in another PR
+            setTimeout(() => {
+              toggleWrapEtherModal()
+            }, 2000)
+          }
         }}
       />,
     ],
