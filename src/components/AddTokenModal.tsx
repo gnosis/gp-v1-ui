@@ -222,22 +222,26 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
 
     return deferred.promise.then(value => {
       console.log('value', value)
-      batchedUpdates(() => {
-        // close modal
-        console.log('Toggle MODAL OFF')
-        toggleRef.current()
+      // close modal
+      console.log('Toggle MODAL OFF')
+      toggleRef.current()
 
-        // reset hook state
-        setNetworkId(0)
-        setTokenAddress('')
-        setToken(null)
-        setError(null)
-        result.current = undefined
-      })
+      // reset hook state
+      result.current = undefined
 
       return value
     })
   }, [])
+
+  useEffect(() => {
+    if (!modalProps.isModalVisible) {
+      // reset hook state
+      setNetworkId(0)
+      setTokenAddress('')
+      setToken(null)
+      setError(null)
+    }
+  }, [modalProps.isModalVisible])
 
   console.log('modalProps', modalProps)
   return {
