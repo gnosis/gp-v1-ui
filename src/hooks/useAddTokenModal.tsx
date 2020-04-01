@@ -151,7 +151,9 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const [networkId, setNetworkId] = useState(0)
   const [tokenAddress, setTokenAddress] = useState('')
 
+  // using deferred promise that will be resolved separately
   const result = useRef<Deferred<boolean>>()
+  // to faster show the Token on Confirm, prefetch sooner
   const prefetchToken = useRef<Promise<TokenDetails | null>>(Promise.resolve(null))
   const [token, setToken] = useState<TokenDetails | null>(null)
   const [error, setError] = useState<Error | null>(null)
@@ -163,7 +165,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     message: generateMessage({ token, tokenAddress, networkId, error }),
     buttons: [
       token || error ? (
-        <>&nbsp;</>
+        <>&nbsp;</> // must be an element for spacing
       ) : (
         <Modali.Button
           label="Cancel"
@@ -180,10 +182,13 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
         isStyleDefault
         onClick={(): void => {
           if (token) {
+            // have fetched token -> added already -> resolve deferred -> close modal
             result.current?.resolve(true)
           } else if (error) {
+            // have failed adding token -> nothing more to do -> resolve deferred -> close modal
             result.current?.resolve(false)
           } else {
+            // nothing done yet -> step 1 -- add token to list
             addTokenFromInput({ networkId, tokenAddress }, prefetchToken.current).then(setToken, setError)
           }
         }}
@@ -191,6 +196,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     ],
   })
 
+  // toggleModal recreated every time, keep ref to use in Promise.then
   const toggleRef = useRef(toggleModal)
   toggleRef.current = toggleModal
 
@@ -198,9 +204,11 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     setNetworkId(networkId)
     setTokenAddress(tokenAddress)
 
+    // start deferred promise to be resolved later
     const deferred = createDeferredPromise<boolean>()
     result.current = deferred
 
+    // fetch token as soon as we have tokenAddress
     prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: toChecksumAddress(tokenAddress), networkId })
     prefetchToken.current.then(console.log)
 
@@ -220,6 +228,8 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   useEffect(() => {
     if (!modalProps.isModalVisible) {
       // reset hook state
+      // only after modal closed to avoid rerendering not-yet closed modal
+      // also visible layout thrashing
       setNetworkId(0)
       setTokenAddress('')
       setToken(null)
@@ -231,4 +241,6 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     addTokenToList,
     modalProps,
   }
+  //  can be used like
+  // const added: boolean = await addTokenToList({tokenAddress, networkId})
 }
