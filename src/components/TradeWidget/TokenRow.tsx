@@ -6,6 +6,7 @@ import TokenSelector from 'components/TokenSelector'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
+import { DEFAULT_MODAL_OPTIONS } from '../Modal'
 import Modali, { useModali } from 'modali'
 
 import { TradeFormTokenId, TradeFormData } from './'
@@ -207,8 +208,7 @@ const TokenRow: React.FC<Props> = ({
   })
 
   const [wrapEtherModal, toggleWrapEtherModal] = useModali({
-    centered: true,
-    animated: true,
+    ...DEFAULT_MODAL_OPTIONS,
     title: 'Wrap Ether',
     message: (
       <div>
