@@ -28,9 +28,7 @@ import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
-import { tokenListApi } from 'api'
-
-import { Network, TokenDetails } from 'types'
+import { TokenDetails } from 'types'
 
 import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug } from 'utils'
 import { ZERO } from 'const'
@@ -343,24 +341,16 @@ const TradeWidget: React.FC = () => {
   const { connectWallet } = useConnectWallet()
   const [{ trade }, dispatch] = useGlobalState()
 
-  // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId || Network.Mainnet // fallback to mainnet
-
   const sellInputId = TradeFormTokenId.sellToken
   const receiveInputId = TradeFormTokenId.receiveToken
   const priceInputId = TradeFormTokenId.price
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances } = useTokenBalances()
+  const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
-  const tokens = useMemo(
-    // it's okay to tokenListApi.getTokens() here without subscribing to updates
-    // because balances from useTokenBalances is already subscribed
-    () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(fallBackNetworkId)),
-    [balances, fallBackNetworkId, isConnected],
-  )
+  const tokens = isConnected && balances.length > 0 ? balances : tokenList
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
