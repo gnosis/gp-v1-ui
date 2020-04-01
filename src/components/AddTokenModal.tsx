@@ -177,7 +177,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
     title: 'Are you sure?',
     message: generateMessage({ token, tokenAddress, networkId, error }),
     buttons: [
-      token ? (
+      token || error ? (
         <>&nbsp;</>
       ) : (
         <Modali.Button
