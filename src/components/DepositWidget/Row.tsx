@@ -38,6 +38,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     innerWidth,
     highlighted,
     enabling,
+    enabled,
     claiming,
     withdrawing,
     depositing,
@@ -54,7 +55,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     pendingWithdraw,
     claimable,
     walletBalance,
-    enabled,
+    enabled: tokenEnabled,
   } = tokenBalances
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
@@ -119,7 +120,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           {formatAmount(walletBalance, decimals)}
         </td>
         <td data-label="Actions">
-          {enabled ? (
+          {enabled || tokenEnabled ? (
             <button
               type="button"
               className="withdrawToken"
