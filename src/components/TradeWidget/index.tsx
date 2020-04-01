@@ -301,17 +301,13 @@ export type TradeFormData = {
 
 const validationSchema = Joi.object({
   sellToken: Joi.number()
+    // .label('Sell amount')
     // allow unsafe JS numbers
     .unsafe()
     .greater(0)
     // key value cannot be undefined
     .required(),
-  receiveToken: Joi.number()
-    // allow unsafe JS numbers
-    .unsafe()
-    .greater(0)
-    // key value cannot be undefined
-    .required(),
+  receiveToken: Joi.number().optional(),
   price: Joi.number()
     // allow unsafe JS numbers
     .unsafe()
