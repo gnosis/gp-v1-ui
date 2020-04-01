@@ -3,11 +3,10 @@ import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import TokenSelector from 'components/TokenSelector'
+import { InputBox } from 'components/InputBox'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
-import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from '../Modal'
-import Modali, { useModali } from 'modali'
 
 import { TradeFormTokenId, TradeFormData } from './'
 
@@ -16,9 +15,7 @@ import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA } from 'const'
-import { DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
-
-export const INPUT_ID_WRAP_ETH_AMOUNT = 'etherAmount'
+import { WrapEtherBtn } from 'components/WrapEtherBtn'
 
 const Wrapper = styled.div`
   display: flex;
@@ -85,100 +82,6 @@ const Wrapper = styled.div`
     align-items: center;
     justify-items: center;
     color: var(--color-text-secondary);
-  }
-`
-
-export const InputBox = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  margin: 0;
-  width: 100%;
-  height: 5.6rem;
-  position: relative;
-
-  input {
-    margin: 0;
-    width: 100%;
-    background: var(--color-background-input);
-    border-radius: 0.6rem 0.6rem 0 0;
-    border: 0;
-    font-size: 1.6rem;
-    line-height: 1;
-    box-sizing: border-box;
-    border-bottom: 0.2rem solid transparent;
-    font-weight: var(--font-weight-normal);
-    padding: 0 15rem 0 1rem;
-    outline: 0;
-
-    &:focus {
-      border-bottom: 0.2rem solid var(--color-text-active);
-      border-color: var(--color-text-active);
-      color: var(--color-text-active);
-    }
-
-    &.error {
-      border-color: var(--color-error);
-    }
-
-    &.warning {
-      color: #ff5722;
-    }
-
-    &:disabled {
-      box-shadow: none;
-    }
-
-    &[readonly] {
-      background-color: var(--color-background-pageWrapper);
-      border: 1px solid var(--color-background-input);
-    }
-  }
-`
-
-const WrapEtherModalWrapper = styled(ModalBodyWrapper)`
-  > div {
-    margin: 3rem 1.5rem;
-
-    ${InputBox} {
-      position: relative;
-      display: flex;
-      flex-flow: row wrap;
-
-      i {
-        position: absolute;
-        right: 1rem;
-        top: 0;
-        bottom: 0;
-        margin: 0;
-        color: #476481;
-        letter-spacing: -0.05rem;
-        text-align: right;
-        font-family: var(--font-default);
-        font-weight: var(--font-weight-bold);
-        font-size: 1.2rem;
-        font-style: normal;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-    }
-  }
-
-  .error {
-    color: red;
-  }
-
-  b {
-    font-size: 1.3rem;
-    color: #2f3e4e;
-    margin: 0 1.6rem 0 0;
-    margin-bottom: 0.5rem;
-    padding-left: -0.5;
-    display: block;
-  }
-
-  a {
-    color: rgb(33, 141, 255);
   }
 `
 
@@ -250,87 +153,12 @@ const TokenRow: React.FC<Props> = ({
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
-  const wrapEtherError = errors[INPUT_ID_WRAP_ETH_AMOUNT]
+
   const inputValue = watch(inputId)
 
   const { onKeyPress, enforcePrecision, removeExcessZeros } = useNumberInput({
     inputId,
     precision: selectedToken.decimals,
-  })
-  // const [wethAmountToWrap, setWethAmountToWrap] = useSafeState('0')
-  const {
-    onKeyPress: onKeyPressEtherAmount,
-    enforcePrecision: enforcePrecisionEtherAmount,
-    removeExcessZeros: removeExcessZerosEtherAmount,
-  } = useNumberInput({
-    inputId: INPUT_ID_WRAP_ETH_AMOUNT,
-    precision: DEFAULT_PRECISION,
-  })
-
-  // TODO: Get balance in another PR
-  const availableBalanceInEther = new BN('1234567800000000000')
-
-  const [wrapEtherModal, toggleWrapEtherModal] = useModali({
-    ...DEFAULT_MODAL_OPTIONS,
-    title: 'Wrap Ether',
-    message: (
-      <WrapEtherModalWrapper>
-        <div>
-          <b>Available Ether</b>
-          <div>
-            <a
-              onClick={(): void => setValue(INPUT_ID_WRAP_ETH_AMOUNT, formatAmountFull(availableBalanceInEther), true)}
-            >
-              {formatAmountFull({ amount: availableBalanceInEther, precision: DEFAULT_PRECISION }) || ''} ETH
-            </a>
-          </div>
-        </div>
-        <div>
-          <b>Amount to Wrap</b>
-          <div>
-            <InputBox>
-              <i>ETH</i>
-              <input
-                type="text"
-                name={INPUT_ID_WRAP_ETH_AMOUNT}
-                // value={wethAmountToWrap}
-                onChange={enforcePrecisionEtherAmount}
-                // onChange={(e: ChangeEvent<HTMLInputElement>): void => setWethAmountToWrap(e.target.value)}
-                placeholder="0"
-                autoFocus
-                required
-                ref={register({
-                  pattern: { value: validInputPattern, message: 'Invalid amount' },
-                  validate: { positive: validatePositiveConstructor('Invalid amount') },
-                  required: 'The amount is required',
-                  min: 0,
-                })}
-                onFocus={(e): void => e.target.select()}
-                onKeyPress={onKeyPressEtherAmount}
-                onBlur={removeExcessZerosEtherAmount}
-              />
-            </InputBox>
-          </div>
-          {wrapEtherError && <p className="error">{wrapEtherError.message || ''}</p>}
-        </div>
-      </WrapEtherModalWrapper>
-    ),
-    buttons: [
-      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleWrapEtherModal()} />,
-      <Modali.Button
-        label="Continue"
-        key="yes"
-        isStyleDefault
-        onClick={async (): Promise<void> => {
-          if (!wrapEtherError) {
-            // TODO: Wrap ether in another PR
-            setTimeout(() => {
-              toggleWrapEtherModal()
-            }, 2000)
-          }
-        }}
-      />,
-    ],
   })
 
   let overMax = ZERO
@@ -403,16 +231,7 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
-          {selectedToken.symbol && selectedToken.symbol === 'WETH' && (
-            <TooltipWrapper
-              as="button"
-              type="button"
-              tooltip="Ether needs to be Wrapped and then deposited into the Exchange balance in order to be traded"
-              onClick={toggleWrapEtherModal}
-            >
-              + Wrap Ether
-            </TooltipWrapper>
-          )}
+          {selectedToken.symbol && selectedToken.symbol === 'WETH' && <WrapEtherBtn />}
           <span>
             Balance:
             {readOnly ? (
@@ -474,7 +293,6 @@ const TokenRow: React.FC<Props> = ({
         </TokenBoxWrapper>
       </InputBox>
       {errorOrWarning}
-      <Modali.Modal {...wrapEtherModal} />
     </Wrapper>
   )
 }
