@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { TokenDetails } from 'types'
-import { useWalletConnection } from 'hooks/useWalletConnection'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
@@ -9,6 +8,7 @@ import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 interface OrderBookProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
+  networkId: number
 }
 
 const Wrapper = styled.div`
@@ -97,9 +97,14 @@ const processData = (
   )
 }
 
-const draw = (baseToken: TokenDetails, quoteToken: TokenDetails, dataSource: string): am4charts.XYChart => {
+const draw = (
+  chartElement: HTMLElement,
+  baseToken: TokenDetails,
+  quoteToken: TokenDetails,
+  dataSource: string,
+): am4charts.XYChart => {
   am4core.useTheme(am4themesSpiritedaway)
-  const chart = am4core.create('chartdiv', am4charts.XYChart)
+  const chart = am4core.create(chartElement, am4charts.XYChart)
 
   // Add data
   chart.dataSource.url = dataSource
@@ -157,18 +162,19 @@ const draw = (baseToken: TokenDetails, quoteToken: TokenDetails, dataSource: str
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken } = props
-  const { networkId } = useWalletConnection()
-  const [chart, setChart] = useState<am4charts.XYChart | null>(null)
+  const { baseToken, quoteToken, networkId } = props
+  const mountPoint = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
-    if (chart) {
-      chart.dispose()
-    }
-    setChart(draw(baseToken, quoteToken, orderbookUrl(baseToken, quoteToken, networkId)))
+    if (!mountPoint.current) return
+
+    const chart = draw(mountPoint.current, baseToken, quoteToken, orderbookUrl(baseToken, quoteToken, networkId))
+
+    return (): void => chart.dispose()
   }, [baseToken, quoteToken, networkId])
 
   return (
-    <Wrapper id="chartdiv">
+    <Wrapper ref={mountPoint}>
       Show order book for token {baseToken.symbol} ({baseToken.id}) and {quoteToken.symbol} ({quoteToken.id})
     </Wrapper>
   )
