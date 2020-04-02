@@ -26,6 +26,7 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+
 import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
 import { tokenListApi } from 'api'
