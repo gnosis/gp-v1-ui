@@ -710,7 +710,6 @@ const TradeWidget: React.FC = () => {
   )
 
   async function onSubmit(data: FieldValues): Promise<void> {
-    console.debug('data', data)
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     const price = data[priceInputId]
