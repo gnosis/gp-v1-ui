@@ -8,6 +8,7 @@ import { TokenDetails } from 'types'
 import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
 import { tokenListApi } from 'api'
+import { TokenFromExchangeResult, TokenFromExchange } from 'services/factories'
 
 const addTokenFromInput = async (
   { networkId, tokenAddress }: AddTokenToListParams,
@@ -154,7 +155,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   // using deferred promise that will be resolved separately
   const result = useRef<Deferred<boolean>>()
   // to faster show the Token on Confirm, prefetch sooner
-  const prefetchToken = useRef<Promise<TokenDetails | null>>(Promise.resolve(null))
+  const prefetchToken = useRef<Promise<TokenFromExchangeResult | null>>(Promise.resolve(null))
   const [token, setToken] = useState<TokenDetails | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
@@ -189,7 +190,18 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
             result.current?.resolve(false)
           } else {
             // nothing done yet -> step 1 -- add token to list
-            addTokenFromInput({ networkId, tokenAddress }, prefetchToken.current).then(setToken, setError)
+            const prefetchedTokenWithRetry = prefetchToken.current
+              .then(result => {
+                // retry logic because we may have been between providers
+                // when adding token right away from URL on page load
+                // and lastProvider not yet connected
+                if (result?.token || result?.reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT) return result
+
+                return getTokenFromExchangeByAddress({ tokenAddress, networkId })
+              })
+              .then(result => result && result.token)
+
+            addTokenFromInput({ networkId, tokenAddress }, prefetchedTokenWithRetry).then(setToken, setError)
           }
         }}
       />,
@@ -202,15 +214,15 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
 
   const addTokenToList = useCallback(({ networkId, tokenAddress }: TokenAddConfirmationProps): Promise<boolean> => {
     setNetworkId(networkId)
-    setTokenAddress(tokenAddress)
+    const checkSumAddress = toChecksumAddress(tokenAddress)
+    setTokenAddress(checkSumAddress)
 
     // start deferred promise to be resolved later
     const deferred = createDeferredPromise<boolean>()
     result.current = deferred
 
     // fetch token as soon as we have tokenAddress
-    prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: toChecksumAddress(tokenAddress), networkId })
-    prefetchToken.current.then(console.log)
+    prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: checkSumAddress, networkId })
 
     toggleRef.current()
 
