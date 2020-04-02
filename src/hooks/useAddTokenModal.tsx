@@ -144,7 +144,7 @@ const generateMessage = ({ token, tokenAddress, networkId, error }: GenerateMess
 }
 
 interface UseAddTokenModalResult {
-  addTokenToList: (params: TokenAddConfirmationProps) => Promise<boolean>
+  addTokenToList: (params: TokenAddConfirmationProps) => Promise<TokenDetails | null>
   modalProps: ModalHook
 }
 
@@ -153,7 +153,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const [tokenAddress, setTokenAddress] = useState('')
 
   // using deferred promise that will be resolved separately
-  const result = useRef<Deferred<boolean>>()
+  const result = useRef<Deferred<TokenDetails | null>>()
   // to faster show the Token on Confirm, prefetch sooner
   const prefetchToken = useRef<Promise<TokenFromExchangeResult | null>>(Promise.resolve(null))
   const [token, setToken] = useState<TokenDetails | null>(null)
@@ -173,7 +173,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
           key="no"
           isStyleCancel
           onClick={(): void => {
-            result.current?.resolve(false)
+            result.current?.resolve(null)
           }}
         />
       ),
@@ -184,10 +184,10 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
         onClick={(): void => {
           if (token) {
             // have fetched token -> added already -> resolve deferred -> close modal
-            result.current?.resolve(true)
+            result.current?.resolve(token)
           } else if (error) {
             // have failed adding token -> nothing more to do -> resolve deferred -> close modal
-            result.current?.resolve(false)
+            result.current?.resolve(null)
           } else {
             // nothing done yet -> step 1 -- add token to list
             const prefetchedTokenWithRetry = prefetchToken.current
@@ -212,30 +212,33 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const toggleRef = useRef(toggleModal)
   toggleRef.current = toggleModal
 
-  const addTokenToList = useCallback(({ networkId, tokenAddress }: TokenAddConfirmationProps): Promise<boolean> => {
-    setNetworkId(networkId)
-    const checkSumAddress = toChecksumAddress(tokenAddress)
-    setTokenAddress(checkSumAddress)
+  const addTokenToList = useCallback(
+    ({ networkId, tokenAddress }: TokenAddConfirmationProps): Promise<TokenDetails | null> => {
+      setNetworkId(networkId)
+      const checkSumAddress = toChecksumAddress(tokenAddress)
+      setTokenAddress(checkSumAddress)
 
-    // start deferred promise to be resolved later
-    const deferred = createDeferredPromise<boolean>()
-    result.current = deferred
+      // start deferred promise to be resolved later
+      const deferred = createDeferredPromise<TokenDetails | null>()
+      result.current = deferred
 
-    // fetch token as soon as we have tokenAddress
-    prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: checkSumAddress, networkId })
+      // fetch token as soon as we have tokenAddress
+      prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: checkSumAddress, networkId })
 
-    toggleRef.current()
-
-    return deferred.promise.then(value => {
-      // close modal
       toggleRef.current()
 
-      // reset hook state
-      result.current = undefined
+      return deferred.promise.then(value => {
+        // close modal
+        toggleRef.current()
 
-      return value
-    })
-  }, [])
+        // reset hook state
+        result.current = undefined
+
+        return value
+      })
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!modalProps.isModalVisible) {
