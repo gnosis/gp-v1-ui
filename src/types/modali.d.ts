@@ -58,7 +58,7 @@ declare module 'modali' {
     /**
      * The text displayed in the upper left corner
      */
-    title?: string
+    title?: React.ReactNode
 
     /**
      * The text displayed in the body of the modal
