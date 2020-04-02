@@ -9,6 +9,9 @@ import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
 import { tokenListApi } from 'api'
 import { TokenFromExchangeResult, TokenFromExchange } from 'services/factories'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 
 const addTokenFromInput = async (
   { networkId, tokenAddress }: AddTokenToListParams,
@@ -143,6 +146,8 @@ const generateMessage = ({ token, tokenAddress, networkId, error }: GenerateMess
   return null
 }
 
+const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+
 interface UseAddTokenModalResult {
   addTokenToList: (params: TokenAddConfirmationProps) => Promise<TokenDetails | null>
   modalProps: ModalHook
@@ -159,10 +164,12 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const [token, setToken] = useState<TokenDetails | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
+  const [isProcessing, setIsProcessing] = useState(false)
+
   const [modalProps, toggleModal] = useModali({
     animated: true,
     centered: true,
-    title: 'Are you sure?',
+    title: isProcessing ? spinner : 'Are you sure?',
     message: generateMessage({ token, tokenAddress, networkId, error }),
     buttons: [
       token || error ? (
@@ -182,6 +189,8 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
         key="yes"
         isStyleDefault
         onClick={(): void => {
+          if (isProcessing) return
+
           if (token) {
             // have fetched token -> added already -> resolve deferred -> close modal
             result.current?.resolve(token)
@@ -189,6 +198,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
             // have failed adding token -> nothing more to do -> resolve deferred -> close modal
             result.current?.resolve(null)
           } else {
+            setIsProcessing(true)
             // nothing done yet -> step 1 -- add token to list
             const prefetchedTokenWithRetry = prefetchToken.current
               .then(result => {
@@ -201,7 +211,18 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
               })
               .then(result => result && result.token)
 
-            addTokenFromInput({ networkId, tokenAddress }, prefetchedTokenWithRetry).then(setToken, setError)
+            addTokenFromInput({ networkId, tokenAddress }, prefetchedTokenWithRetry).then(
+              token => {
+                batchUpdates(() => {
+                  setToken(token)
+                  setIsProcessing(false)
+                })
+              },
+              error => {
+                setError(error)
+                setIsProcessing(false)
+              },
+            )
           }
         }}
       />,
@@ -249,6 +270,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
       setTokenAddress('')
       setToken(null)
       setError(null)
+      setIsProcessing(false)
     }
   }, [modalProps.isModalVisible])
 
