@@ -393,13 +393,17 @@ const TradeWidget: React.FC = () => {
   const [sellToken, setSellToken] = useState(
     () =>
       trade.sellToken ||
-      getToken('symbol', sellTokenSymbol, tokens) ||
+      (sellTokenSymbol && isAddress(sellTokenSymbol?.toLowerCase())
+        ? getToken('address', sellTokenSymbol, tokens)
+        : getToken('symbol', sellTokenSymbol, tokens)) ||
       (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
   const [receiveToken, setReceiveToken] = useState(
     () =>
       trade.buyToken ||
-      getToken('symbol', receiveTokenSymbol, tokens) ||
+      (receiveTokenSymbol && isAddress(receiveTokenSymbol?.toLowerCase())
+        ? getToken('address', receiveTokenSymbol, tokens)
+        : getToken('symbol', receiveTokenSymbol, tokens)) ||
       (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
