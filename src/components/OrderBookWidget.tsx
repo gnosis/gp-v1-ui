@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import { TokenDetails } from 'types'
-import { useWalletConnection } from 'hooks/useWalletConnection'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
@@ -9,6 +8,7 @@ import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 interface OrderBookProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
+  networkId: number
 }
 
 const Wrapper = styled.div`
@@ -157,9 +157,7 @@ const draw = (baseToken: TokenDetails, quoteToken: TokenDetails, dataSource: str
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken } = props
-  const { networkId } = useWalletConnection()
-  const [chart, setChart] = useState<am4charts.XYChart | null>(null)
+  const { baseToken, quoteToken, networkId } = props
   useEffect(() => {
     if (chart) {
       chart.dispose()
