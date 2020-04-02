@@ -17,10 +17,6 @@ export function validatePositive(value: string, constraint = 0): true | string {
   return Number(value) > constraint || 'Invalid amount'
 }
 
-interface FormDataAsNumbers {
-  [key: string]: number
-}
-
 /**
  * @name stringOrNumberResolverFactory
  * @description Factory function for form resolver using JOI validation
@@ -31,10 +27,10 @@ interface FormDataAsNumbers {
 export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => (
   data: FormData,
 ): ReturnType<ValidationResolver<FormData, {}>> => {
-  const castedData: FormDataAsNumbers | FormData = Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
+  const castedData: Partial<FormData> = Object.keys(data).reduce((acc, key) => {
     acc[key] = data[key] || undefined
     return acc
-  }, {})
+  }, {} as FormData)
 
   const { error, value }: { value: typeof castedData | undefined; error?: ValidationError } = validationSchema.validate(
     castedData,
@@ -55,4 +51,16 @@ export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown
         }, {})
       : {},
   }
+}
+
+export const NUMBER_VALIDATION_KEYS = {
+  BASE: 'number.base',
+  UNSAFE: 'number.unsafe',
+  REQUIRED: 'any.required',
+  GREATER: 'number.greater',
+  LESS: 'number.less',
+  MIN: 'number.min',
+  MAX: 'number.max',
+  MULTIPLE: 'number.multiple',
+  INTEGER: 'number.integer',
 }
