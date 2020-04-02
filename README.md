@@ -14,7 +14,7 @@ Develop:
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/dfusion) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
+Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/protocol) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
 
 Gnosis Protocol introduces a new, fully decentralized exchange mechanism for ERC20 tokens with the following
 properties:
@@ -25,7 +25,7 @@ properties:
 
 This UI will allow to:
 
-- Create orders in [Gnosis Protocol](https://docs.gnosis.io/dfusion)
+- Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
 - See the balances for any token: Both in your wallet and the exchange
 - Deposit/Withdraw tokens from the exchange
 
