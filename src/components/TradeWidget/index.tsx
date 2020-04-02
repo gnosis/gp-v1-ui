@@ -7,6 +7,8 @@ import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
+import Modali from 'modali'
+import { isAddress } from 'web3-utils'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -28,7 +30,7 @@ import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 
 import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug } from 'utils'
 import { ZERO } from 'const'
@@ -37,6 +39,8 @@ import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimation } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
+import { useAddTokenModal } from 'hooks/useAddTokenModal'
+import { tokenListApi } from 'api'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -334,6 +338,22 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   }
 
   return receiveAmount
+}
+
+interface TokenAdderProps {
+  tokenAddress: string
+  networkId: number
+}
+
+const TokenAdder: React.FC<TokenAdderProps> = ({ tokenAddress, networkId }: TokenAdderProps) => {
+  const { addTokenToList, modalProps } = useAddTokenModal()
+
+  useEffect(() => {
+    addTokenToList({ tokenAddress, networkId })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // no deps, so that we only open modal once on mount
+
+  return <Modali.Modal {...modalProps} />
 }
 
 const TradeWidget: React.FC = () => {
@@ -690,8 +710,35 @@ const TradeWidget: React.FC = () => {
     receiveValue,
   ])
 
+  const fallBackNetworkId = networkId || Network.Mainnet // fallback to mainnet
+
+  const { needToAddSellToken, needToAddReceiveToken } = useMemo(() => {
+    const needToAddSellToken =
+      sellTokenSymbol &&
+      !tokenListApi.hasToken({ tokenAddress: sellTokenSymbol, networkId: fallBackNetworkId }) &&
+      isAddress(sellTokenSymbol.toLowerCase())
+
+    const needToAddReceiveToken =
+      receiveTokenSymbol &&
+      receiveTokenSymbol.toLowerCase() !== sellTokenSymbol?.toLowerCase() &&
+      !tokenListApi.hasToken({ tokenAddress: receiveTokenSymbol, networkId: fallBackNetworkId }) &&
+      isAddress(receiveTokenSymbol.toLowerCase())
+
+    return {
+      needToAddSellToken,
+      needToAddReceiveToken,
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // no deps, so that we only calc once on mount
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
+      {needToAddSellToken && sellTokenSymbol && (
+        <TokenAdder tokenAddress={sellTokenSymbol} networkId={fallBackNetworkId} />
+      )}
+      {needToAddReceiveToken && receiveTokenSymbol && (
+        <TokenAdder tokenAddress={receiveTokenSymbol} networkId={fallBackNetworkId} />
+      )}
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off">
