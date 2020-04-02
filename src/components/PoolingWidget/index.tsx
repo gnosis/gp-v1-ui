@@ -23,7 +23,7 @@ import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-act
 
 import { Network, Receipt } from 'types'
 
-import { maxAmountsForSpread, resolverFactory } from 'utils'
+import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { useTokenList } from 'hooks/useTokenList'
 
@@ -90,10 +90,17 @@ interface PoolingFormData<T = string> {
 const validationSchema = joi.object({
   spread: joi
     .number()
-    .precision(INPUT_PRECISION_SIZE)
+    .unsafe()
     .greater(0)
     .less(100)
-    .required(),
+    .precision(INPUT_PRECISION_SIZE)
+    .required()
+    .messages({
+      [NUMBER_VALIDATION_KEYS.REQUIRED]: 'Invalid spread amount',
+      [NUMBER_VALIDATION_KEYS.UNSAFE]: 'Invalid spread amount',
+      [NUMBER_VALIDATION_KEYS.LESS]: 'Spread must be between 0 and 100',
+      [NUMBER_VALIDATION_KEYS.GREATER]: 'Spread must be between 0 and 100',
+    }),
 })
 
 const validationResolver = resolverFactory<PoolingFormData>(validationSchema)
