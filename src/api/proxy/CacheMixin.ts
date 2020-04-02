@@ -31,7 +31,7 @@ export class CacheMixin {
       const methodName = method.toString()
 
       const fnToCache = instance[methodName].bind(instance)
-      \
+
       const params: CacheMethodParams<T, ReturnType<typeof fnToCache>> = {
         ...cacheConfig,
         fnToCache,
@@ -59,11 +59,10 @@ export class CacheMixin {
       value = fnToCache(...params)
 
       // save it for next round
-      Promise.resolve(value)
-        .then(val => {
-          this.store(hash, val, ttl)
-        })
-        // don't cache errors
+      Promise.resolve(value).then(val => {
+        this.store(hash, val, ttl)
+      })
+      // don't cache errors
 
       return value as R
     }
