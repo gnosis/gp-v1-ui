@@ -37,7 +37,7 @@ const OrderBook: React.FC = () => {
       <h1>Order book</h1>
       <TokenSelector tokens={tokenList} selected={baseToken} onChange={setBaseToken} />
       <TokenSelector tokens={tokenList} selected={quoteToken} onChange={setQuoteToken} />
-      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken}></OrderBookWidget>
+      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={fallBackNetworkId} />
     </ContentPage>
   )
 }
