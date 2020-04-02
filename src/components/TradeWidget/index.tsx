@@ -343,13 +343,16 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
 interface TokenAdderProps {
   tokenAddress: string
   networkId: number
+  onSelectChange: (selected: TokenDetails) => void
 }
 
-const TokenAdder: React.FC<TokenAdderProps> = ({ tokenAddress, networkId }: TokenAdderProps) => {
+const TokenAdder: React.FC<TokenAdderProps> = ({ tokenAddress, networkId, onSelectChange }: TokenAdderProps) => {
   const { addTokenToList, modalProps } = useAddTokenModal()
 
   useEffect(() => {
-    addTokenToList({ tokenAddress, networkId })
+    addTokenToList({ tokenAddress, networkId }).then(newToken => {
+      if (newToken) onSelectChange(newToken)
+    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // no deps, so that we only open modal once on mount
 
@@ -731,13 +734,24 @@ const TradeWidget: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // no deps, so that we only calc once on mount
 
+  const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
+  const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {needToAddSellToken && sellTokenSymbol && (
-        <TokenAdder tokenAddress={sellTokenSymbol} networkId={fallBackNetworkId} />
+        <TokenAdder
+          tokenAddress={sellTokenSymbol}
+          networkId={fallBackNetworkId}
+          onSelectChange={onSelectChangeSellToken}
+        />
       )}
       {needToAddReceiveToken && receiveTokenSymbol && (
-        <TokenAdder tokenAddress={receiveTokenSymbol} networkId={fallBackNetworkId} />
+        <TokenAdder
+          tokenAddress={receiveTokenSymbol}
+          networkId={fallBackNetworkId}
+          onSelectChange={onSelectChangeReceiveToken}
+        />
       )}
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
@@ -749,7 +763,7 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="Sell"
-            onSelectChange={onSelectChangeFactory(setSellToken, receiveTokenBalance)}
+            onSelectChange={onSelectChangeSellToken}
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
@@ -765,7 +779,7 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="Receive at least"
-            onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
+            onSelectChange={onSelectChangeReceiveToken}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={1}
