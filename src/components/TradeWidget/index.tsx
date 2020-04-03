@@ -9,7 +9,6 @@ import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
-import Joi from '@hapi/joi'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -44,12 +43,16 @@ import {
   resolverFactory,
   formatTimeToFromBatch,
 } from 'utils'
+
 import { ZERO } from 'const'
+
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimation } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
+
+import validationSchema from './validationSchema'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -309,39 +312,6 @@ export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
 }
 
-const validationSchema = Joi.object({
-  sellToken: Joi.number()
-    // .label('Sell amount')
-    // allow unsafe JS numbers
-    .unsafe()
-    .greater(0)
-    // key value cannot be undefined
-    .required(),
-  receiveToken: Joi.number().optional(),
-  price: Joi.number()
-    // allow unsafe JS numbers
-    .unsafe()
-    .greater(0)
-    // key value cannot be undefined
-    .required(),
-  priceInverse: Joi.number()
-    // allow unsafe JS numbers
-    .unsafe()
-    .greater(0)
-    // key value cannot be undefined
-    .required(),
-  validFrom: Joi.number()
-    // no floating points
-    .integer()
-    .multiple(5)
-    .min(15),
-  validUntil: Joi.number()
-    // no floating points
-    .integer()
-    .multiple(5)
-    .min(5),
-})
-
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
 export const DEFAULT_FORM_STATE = {
@@ -586,7 +556,7 @@ const TradeWidget: React.FC = () => {
         validFromWithBatchID,
         validUntilWithBatchID,
       },
-      resetStateOptions: Partial<Omit<TradeFormData, 'priceInverse'>> = DEFAULT_FORM_STATE,
+      resetStateOptions: Partial<TradeFormData> = DEFAULT_FORM_STATE,
     ): void => {
       batchUpdateState(() => {
         // reset form on successful order placing
@@ -681,6 +651,7 @@ const TradeWidget: React.FC = () => {
                 {
                   ...DEFAULT_FORM_STATE,
                   price,
+                  priceInverse: invertPriceFromString(price),
                   validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
                   validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
@@ -721,6 +692,7 @@ const TradeWidget: React.FC = () => {
                 {
                   ...DEFAULT_FORM_STATE,
                   price,
+                  priceInverse: invertPriceFromString(price),
                   validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
                   validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },

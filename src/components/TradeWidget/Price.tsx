@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
@@ -137,11 +137,34 @@ export function invertPriceFromString(priceValue: string): string {
 }
 
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
-  const { register, errors } = useFormContext<TradeFormData>()
+  const { register, errors, setValue } = useFormContext<TradeFormData>()
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
   const isError = errorPrice || errorPriceInverse
+
+  const updateInversePrice = useCallback(
+    (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
+      const priceValue = event.target.value
+      const priceInverseValue = invertPriceFromString(priceValue)
+      setValue(inverseInputId, priceInverseValue, true)
+    },
+    [setValue],
+  )
+
+  const onChangePrice = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      updateInversePrice(priceInverseInputId, e)
+    },
+    [updateInversePrice, priceInverseInputId],
+  )
+
+  const onChangePriceInverse = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      updateInversePrice(priceInputId, e)
+    },
+    [updateInversePrice, priceInputId],
+  )
 
   const { onKeyPress: onKeyPressPrice, removeExcessZeros: removeExcessZerosPrice } = useNumberInput({
     inputId: priceInputId,
@@ -161,6 +184,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             className={isError ? 'error' : ''}
             name={priceInputId}
             type="text"
+            onChange={onChangePrice}
             ref={register}
             onKeyPress={onKeyPressPrice}
             onBlur={removeExcessZerosPrice}
@@ -180,6 +204,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             className={isError ? 'error' : ''}
             type="text"
             ref={register}
+            onChange={onChangePriceInverse}
             onKeyPress={onKeyPressPriceInverse}
             onBlur={removeExcessZerosPriceInverse}
             onFocus={(e): void => e.target.select()}
