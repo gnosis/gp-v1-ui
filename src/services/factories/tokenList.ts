@@ -19,18 +19,14 @@ export function getTokensFactory(factoryParams: {
 
   async function getTokenId(networkId: number, tokenAddress: string): Promise<GetTokenIdResult> {
     try {
+      const hasToken = await exchangeApi.hasToken({ networkId, tokenAddress })
+      if (!hasToken) {
+        return { value: null, remove: true }
+      }
       return { value: await exchangeApi.getTokenIdByAddress({ networkId, tokenAddress }) }
     } catch (e) {
-      const value = null
-      if (e.message.match(/Must have Address to get ID/)) {
-        logDebug(
-          `[network:${networkId}][address:${tokenAddress}] Address not registered on network, removing from the list`,
-        )
-        return { value, remove: true }
-      } else {
-        logDebug(`[network:${networkId}][address:${tokenAddress}] Failed to fetch id from contract`, e.message)
-        return { value }
-      }
+      logDebug(`[network:${networkId}][address:${tokenAddress}] Failed to fetch id from contract`, e.message)
+      return { value: null }
     }
   }
 
