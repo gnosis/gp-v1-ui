@@ -5,7 +5,10 @@ import {
   getTokenFromExchangeByIdFactory,
   addTokenToExchangeFactory,
   getPriceEstimationFactory,
+  subscribeToTokenListFactory,
+  getTokensFactory,
 } from './factories'
+
 import { logDebug } from 'utils'
 import { TokenDetails } from 'types'
 
@@ -24,6 +27,10 @@ export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis)
 export const addTokenToExchangeContract = addTokenToExchangeFactory(apis)
 
 export const getPriceEstimation = getPriceEstimationFactory(apis)
+
+export const subscribeToTokenList = subscribeToTokenListFactory(apis)
+
+export const getTokens = getTokensFactory(apis)
 
 export interface AddTokenToListParams {
   networkId: number

@@ -96,14 +96,14 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
   return exchangeApi
 }
 
-function createTokenListApi(exchangeApi: ExchangeApi): TokenList {
+function createTokenListApi(): TokenList {
   const networkIds = [Network.Mainnet, Network.Rinkeby]
 
   let tokenListApi: TokenList
   if (process.env.MOCK_TOKEN_LIST === 'true') {
     tokenListApi = new TokenListApiMock(tokenList)
   } else {
-    tokenListApi = new TokenListApiImpl({ networkIds, exchangeApi })
+    tokenListApi = new TokenListApiImpl({ networkIds })
   }
 
   window['tokenListApi'] = tokenListApi // register for convenience
@@ -135,5 +135,5 @@ const injectedDependencies = {
 export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
 export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDependencies)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
-export const tokenListApi: TokenList = createTokenListApi(exchangeApi)
+export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
