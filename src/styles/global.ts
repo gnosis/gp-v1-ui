@@ -107,8 +107,8 @@ const GlobalStyles = createGlobalStyle`
       }
     }
     &.secondary {
-      border-color: #696969;
-      color: #696969;
+      border-color: var(--color-button-secondary);
+      color: var(--color-button-secondary);
       :hover {
         border-color: black;
         color: black;
@@ -977,17 +977,18 @@ const GlobalStyles = createGlobalStyle`
     left: 0;
     right: 0;
     content: "";
-    background-color: rgba(47,62,78,0.5);
+    background-color: var(--color-background-modali);
     z-index: 1040;
   }
   /* End hack */
   
   .modali-open .modali-overlay {
-    background-color: rgba(47,62,78,0.5);
+    background-color: var(--color-background-modali);
     opacity: 1;
   }
   
   .modali-open .modali-wrapper-centered .modali {
+    background: var(--color-background-pageWrapper);
     box-shadow: 0 .2rem .4rem 0 rgba(0,0,0,0.14);
     border-radius: .6rem;
     border: 0;
@@ -1016,16 +1017,16 @@ const GlobalStyles = createGlobalStyle`
     }
     
     .modali-header .modali-close-button {
+      background: transparent;
       font-size: 4rem;
       line-height: 1;
-      color: #526877;
+      color: var(--color-text-CTA);
       font-weight: normal;
       opacity: .5;
       padding: 0;
       margin: auto 0 auto auto;
       
         &:hover {
-          background: transparent;
           opacity: 1;
         }
     }
@@ -1033,6 +1034,7 @@ const GlobalStyles = createGlobalStyle`
     .modali-body {
       font-size: 1.4rem;
       line-height: 1.3;
+      background: inherit;
       color: var(--color-text-primary);
     }
     
@@ -1046,9 +1048,8 @@ const GlobalStyles = createGlobalStyle`
       align-items: center;
       padding: 0 1.6rem;
       box-sizing: border-box;
-      font-family: var(--font-mono);
 
-      .modali-button.modali-button-default {
+      .modali-button.modali-button-default, .modali-button.modali-button-cancel {
         margin: 0;
         border-radius: 0.6rem;
         outline: 0;
@@ -1060,32 +1061,26 @@ const GlobalStyles = createGlobalStyle`
         justify-content: center;
         text-decoration: none;
         text-transform: uppercase;
-        background: var(--color-text-active);
+        background: var(--color-background-CTA);
+        color: var(--color-text-CTA);
+        font-weight: var(--font-weight-bold);
+        font-size: 1.4rem;
+        
+        &:hover {
+          background-color: var(--color-background-button-hover);
+          color: var(--color-text-button-hover);
+        }
+      }
+      
+      .modali-button.modali-button-default {
         border-radius: 0.6rem;
         min-width: 14rem;
         padding: 0 1.6rem;
-        font-weight: var(--font-weight-bold);
-        color: var(--color-background-pageWrapper);
-        text-transform: uppercase;
-        font-size: 1.4rem;
-        margin: 0;
       }
-      
+
       .modali-button.modali-button-cancel {
-        margin: 0;
-        border-radius: 0.6rem;
-        outline: 0;
-        height: 3.6rem;
-        box-sizing: border-box;
-        letter-spacing: 0.03rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        text-transform: uppercase;
-        font-size: 1.4rem;
-        font-weight: var(--font-weight-bold);
-        color: var(--color-text-primary);
+        background: transparent;
+        color: var(--color-text-active);
       }
     }
   }

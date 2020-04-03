@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import switchTokenPair from 'assets/img/switch.svg'
+import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -130,7 +130,8 @@ const WrappedForm = styled.form`
 const IconWrapper = styled.a`
   margin: 1rem auto;
 
-  > img {
+  > svg {
+    fill: var(--color-svg-switcher);
     transition: opacity 0.2s ease-in-out;
     opacity: 0.5;
     &:hover {
@@ -722,7 +723,7 @@ const TradeWidget: React.FC = () => {
             tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
-            <img src={switchTokenPair} />
+            <SwitcherSVG />
           </IconWrapper>
           <TokenRow
             selectedToken={receiveTokenBalance}

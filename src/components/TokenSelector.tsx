@@ -211,7 +211,7 @@ function formatOptionLabel(
 
 const customSelectStyles = {
   control: (): CSSProperties & { '&:hover': CSSProperties } => ({
-    borderColor: '#B8C7D7',
+    borderColor: 'var(--color-background-selected)',
     borderStyle: 'solid',
     borderWidth: '.1rem',
     margin: 'auto 0',

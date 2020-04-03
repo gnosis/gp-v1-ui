@@ -48,16 +48,20 @@ const LightColors = `
   --color-button-success: #5ca95c;
   --color-button-disabled: #666;
   --color-button-danger: #e55353;
+  --color-button-secondary: #696969;
 
   // Components
   --color-background-banner: #DFE6EF;
   --color-text-wallet: #000;
   --color-text-deposit-header: #000000;
   --color-background-nav-active: #DFE6EF;
+  --color-background-modali: #2f3e4e80;
+  --color-text-modali: #526877;
 
   // SVGs
   --color-svg-deposit: #000;
   --color-svg-withdraw: #fff;
+  --color-svg-switcher: #476481;
 
   // Shadow
   --shadow-color: #00000047;
@@ -99,6 +103,7 @@ const DarkColors = `
   --color-button-success: #91c591;
   --color-button-disabled: #3d4043;
   --color-button-danger: #9c1818;
+  --color-button-secondary: #696969;
 
   // Components
   --color-background-banner: #252729;
@@ -108,6 +113,7 @@ const DarkColors = `
   // SVGs
   --color-svg-deposit: #218DFF;
   --color-svg-withdraw: #000;
+  --color-svg-switcher: #218DFF;
 
   // Shadow
   --shadow-color: #00000047;
