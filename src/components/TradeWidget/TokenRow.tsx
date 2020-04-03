@@ -157,11 +157,6 @@ const TokenEnable = styled.div`
   border-radius: 2rem;
   cursor: pointer;
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
-
-  &:hover {
-    background: var(--color-text-active);
-    color: var(--color-background-pageWrapper);
-  }
 `
 
 interface Props {

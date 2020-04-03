@@ -167,10 +167,6 @@ const SubmitButton = styled.button`
   margin: 1rem auto 0;
   max-width: 32rem;
 
-  &:hover {
-    color: var(--color-background-pageWrapper);
-  }
-
   @media ${MEDIA.mobile} {
     font-size: 1.3rem;
     margin: 1rem auto 1.6rem;

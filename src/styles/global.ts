@@ -66,6 +66,8 @@ const GlobalStyles = createGlobalStyle`
   }
 
   button {
+    background-color: var(--color-background-CTA);
+    color: var(--color-text-CTA);
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
@@ -73,8 +75,9 @@ const GlobalStyles = createGlobalStyle`
     font-weight: var(--font-weight-bold);
     outline: 0;
 
-    :hover {
-      background-color: #0B66C6;
+    &:hover {
+      background-color: var(--color-background-button-hover);
+      color: var(--color-text-button-hover);
     }
 
     &:disabled,

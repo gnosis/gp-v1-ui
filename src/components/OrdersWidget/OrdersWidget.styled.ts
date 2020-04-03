@@ -56,7 +56,6 @@ export const ButtonWithIcon = styled.button`
 
   &:hover {
     background: #a71409;
-    color: var(--color-background-pageWrapper);
   }
 
   > svg {
@@ -151,10 +150,6 @@ export const OrdersForm = styled.div`
     display: flex;
     justify-content: left;
     align-items: center;
-
-    > input {
-      // width: auto;
-    }
   }
 
   .deleteContainer {

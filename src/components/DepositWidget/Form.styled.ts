@@ -145,7 +145,7 @@ export const WalletDrawerInnerWrapper = styled.div`
 
       &:disabled {
         opacity: 1;
-        background: rgba(230, 236, 243, 0.7);
+        background: var(--color-background-pageWrapper);
       }
     }
   }
@@ -185,12 +185,10 @@ export const WalletDrawerInnerWrapper = styled.div`
     }
 
     > button {
-      background: var(--color-text-active);
       border-radius: 0.6rem;
       min-width: 14rem;
       padding: 0 1.6rem;
       font-weight: var(--font-weight-bold);
-      color: var(--color-background-pageWrapper);
       text-transform: uppercase;
       font-size: 1.4rem;
       margin: 0;
@@ -204,10 +202,6 @@ export const WalletDrawerInnerWrapper = styled.div`
       > img,
       > svg {
         margin: 0 0 0 0.8rem;
-      }
-
-      &:hover {
-        background: #0b66c6;
       }
     }
   }

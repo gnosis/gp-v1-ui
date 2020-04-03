@@ -28,6 +28,8 @@ const LightColors = `
   --color-background-row-hover: #deeeff;
   --color-background-CTA: #218DFF;
   --color-background-selection: #218DFF;
+  --color-background-button-hover: #0B66C6;
+  --color-background-balance-button-hover: #218DFF;
 
   // Borders
   --color-border: transparent;
@@ -39,6 +41,7 @@ const LightColors = `
   --color-text-alternate: #456483;
   --color-text-CTA: #fff;
   --color-text-selection: #fff;
+  --color-text-button-hover: #fff;
 
   // Buttons
   --color-button-primary: #000;
@@ -51,6 +54,10 @@ const LightColors = `
   --color-text-wallet: #000;
   --color-text-deposit-header: #000000;
   --color-background-nav-active: #DFE6EF;
+
+  // SVGs
+  --color-svg-deposit: #000;
+  --color-svg-withdraw: #fff;
 
   // Shadow
   --shadow-color: #00000047;
@@ -73,6 +80,8 @@ const DarkColors = `
   --color-background-row-hover: #09233e;
   --color-background-CTA: #2e2e2e;
   --color-background-selection: #181a1b;
+  --color-background-button-hover: #0B66C6;
+  --color-background-balance-button-hover: #0B66C6;
 
   // Borders
   --color-border: #262626;
@@ -83,6 +92,7 @@ const DarkColors = `
   --color-text-active: #218DFF;
   --color-text-CTA: #218DFF;
   --color-text-selection: #218DFF;
+  --color-text-button-hover: #e9e9f0;
 
   // Buttons
   --color-button-primary: #e8e6e3;
@@ -94,6 +104,10 @@ const DarkColors = `
   --color-background-banner: #252729;
   --color-text-banner: wheat;
   --color-background-nav-active: #404040;
+
+  // SVGs
+  --color-svg-deposit: #218DFF;
+  --color-svg-withdraw: #000;
 
   // Shadow
   --shadow-color: #00000047;

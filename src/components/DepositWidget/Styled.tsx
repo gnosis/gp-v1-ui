@@ -29,13 +29,14 @@ export const TokenRow = styled.tr`
     cursor: pointer;
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
-    > svg {
-      margin: 0 0.5rem 0 0;
+    &:hover {
+      background-color: var(--color-background-balance-button-hover);
+      border-color: var(--color-background-balance-button-hover);
+      color: var(--color-text-button-hover);
     }
 
-    &:hover {
-      background: var(--color-text-active);
-      color: var(--color-background-pageWrapper);
+    > svg {
+      margin: 0 0.5rem 0 0;
     }
   }
 
@@ -56,10 +57,28 @@ export const TokenRow = styled.tr`
 
   .withdrawToken {
     background: var(--color-text-active);
+    > svg {
+      fill: var(--color-svg-withdraw);
+    }
   }
 
   .depositToken {
     background: var(--color-background-banner);
+    > svg {
+      fill: var(--color-svg-deposit);
+    }
+  }
+
+  .depositToken,
+  .withdrawToken {
+    border: 0.1rem solid var(--color-text-CTA);
+    &:hover {
+      background-color: var(--color-background-button-hover);
+      border-color: var(--color-background-button-hover);
+      > svg {
+        fill: ghostwhite;
+      }
+    }
   }
 
   &.loading {

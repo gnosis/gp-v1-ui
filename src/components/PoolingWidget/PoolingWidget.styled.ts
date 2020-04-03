@@ -164,7 +164,7 @@ export const StepButtonsWrapper = styled.div`
 
     &:hover {
       background: 0;
-      color: #0b66c6;
+      color: var(--color-background-button-hover);
     }
 
     &::before {
@@ -179,12 +179,10 @@ export const StepButtonsWrapper = styled.div`
 
   > button:last-of-type:not(#backButton),
   > a.finish {
-    background: var(--color-background-CTA);
     border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-CTA);
     text-transform: uppercase;
     font-size: 1.4rem;
     margin: 0 1.6rem 0 auto;
@@ -197,11 +195,6 @@ export const StepButtonsWrapper = styled.div`
 
     > svg {
       margin: 0 0.8rem 0 0;
-    }
-
-    &:hover:not(:disabled) {
-      background: #0b66c6;
-      color: var(--color-background-pageWrapper);
     }
 
     &:disabled,
