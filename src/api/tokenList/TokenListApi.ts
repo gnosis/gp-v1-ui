@@ -128,35 +128,52 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     localStorage.setItem(storageKey, JSON.stringify(this._tokensByNetwork[networkId]))
   }
 
+  private async getTokenId(networkId: number, tokenAddress: string): Promise<{ value: number | null; remove?: true }> {
+    try {
+      return { value: await this.exchangeApi.getTokenIdByAddress({ networkId, tokenAddress }) }
+    } catch (e) {
+      const value = null
+      if (e.message.match(/Must have Address to get ID/)) {
+        logDebug(
+          `[network:${networkId}][address:${tokenAddress}] Address not registered on network, removing from the list`,
+        )
+        return { value, remove: true }
+      } else {
+        logDebug(`[network:${networkId}][address:${tokenAddress}] Failed to fetch id from contract`, e.message)
+        return { value }
+      }
+    }
+  }
+
   private async updateTokenIds(networkId: number): Promise<void> {
     // Set as updated on start to prevent concurrent queries
     this.updatedIdsForNetwork.add(networkId)
 
-    // Sequentially fetch updated ids
-    const updatedTokenList = []
+    const promises = this._tokensByNetwork[networkId].map(token => this.getTokenId(networkId, token.address))
+
+    const results = await Promise.all(promises)
+
     let failedToUpdate = false
-    for (let i = 0; i < this._tokensByNetwork[networkId].length; i++) {
-      const token = this._tokensByNetwork[networkId][i]
-      const tokenAddress = token.address
 
-      try {
-        token.id = await this.exchangeApi.getTokenIdByAddress({ networkId, tokenAddress })
-        updatedTokenList.push(token)
-
-        logDebug(`[network:${networkId}][address:${tokenAddress}] Token id updated: ${token.id}`)
-      } catch (e) {
-        if (e.message.match(/Must have Address to get ID/)) {
-          logDebug(
-            `[network:${networkId}][address:${tokenAddress}] Address not registered on network, removing from the list`,
-          )
-        } else {
-          logDebug(`[network:${networkId}][address:${tokenAddress}] Failed to fetch id from contract`, e.message)
-
-          updatedTokenList.push(token)
+    const updatedTokenList = results.reduce(
+      (tokens: TokenDetails[], result: { value: number | null; remove?: true }, index: number) => {
+        if (result.value !== null) {
+          // We got a result, yay
+          const token = this._tokensByNetwork[networkId][index]
+          token.id = result.value
+          tokens.push(token)
+        } else if (!result.remove) {
+          // Failed to query, but don't remove from the list
+          tokens.push(this._tokensByNetwork[networkId][index])
+          // Try again next time
+          // TODO: try again only for the ones that failed
           failedToUpdate = true
         }
-      }
-    }
+        return tokens
+      },
+      [],
+    )
+
     this._tokensByNetwork[networkId] = updatedTokenList
 
     // If any token failed, clear flag to try again next time
