@@ -4,6 +4,7 @@ import { TokenDetails } from 'types'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
+import { getNetworkFromId } from '@gnosis.pm/dex-js'
 
 interface OrderBookProps {
   baseToken: TokenDetails
@@ -41,11 +42,8 @@ interface ProcessedItem {
 }
 
 const orderbookUrl = (baseToken: TokenDetails, quoteToken: TokenDetails, networkId?: number): string => {
-  let network = 'mainnet'
-  if (networkId === 4) {
-    network = 'rinkeby'
-  }
-  return `https://price-estimate-${network}.dev.gnosisdev.com/orderbook?base=${baseToken.id}&quote=${quoteToken.id}`
+  const network = getNetworkFromId(networkId || 1)
+  return `https://price-estimate-${network}.dev.gnosisdev.com/api/v1/markets/${baseToken.id}-${quoteToken.id}?atoms=true`
 }
 
 /**
@@ -59,6 +57,7 @@ const processData = (
   type: Offer,
 ): ProcessedItem[] => {
   let totalVolume = 0
+  const isBid = type == Offer.Bid
   return (
     list
       // Account fo decimals
@@ -90,8 +89,8 @@ const processData = (
           // For asks, we can offset the "startLocation" by 0.5. However, Amcharts does not support a "startLocation" of -0.5.
           // For bids, we therefore offset the curve by -1 (expose the previous total volume) and use an offset of 0.5.
           // Otherwise our steps would be off by one.
-          askValueY: type == Offer.Bid ? previousTotalVolume : null,
-          bidValueY: type == Offer.Ask ? totalVolume : null,
+          askValueY: isBid ? null : totalVolume,
+          bidValueY: isBid ? previousTotalVolume : null,
         }
       })
   )
@@ -108,8 +107,7 @@ const draw = (
 
   // Add data
   chart.dataSource.url = dataSource
-  chart.dataSource.adapter.add('parsedData', function(data) {
-    data = JSON.parse(data)
+  chart.dataSource.adapter.add('parsedData', data => {
     const processed = processData(data.bids, baseToken, quoteToken, Offer.Bid).concat(
       processData(data.asks, baseToken, quoteToken, Offer.Ask),
     )
@@ -131,7 +129,7 @@ const draw = (
   // Create series
   const bidCurve = chart.series.push(new am4charts.StepLineSeries())
   bidCurve.dataFields.categoryX = 'price'
-  bidCurve.dataFields.valueY = 'askValueY'
+  bidCurve.dataFields.valueY = 'bidValueY'
   bidCurve.strokeWidth = 2
   bidCurve.stroke = am4core.color('#0f0')
   bidCurve.fill = bidCurve.stroke
@@ -141,7 +139,7 @@ const draw = (
 
   const askCurve = chart.series.push(new am4charts.StepLineSeries())
   askCurve.dataFields.categoryX = 'price'
-  askCurve.dataFields.valueY = 'bidValueY'
+  askCurve.dataFields.valueY = 'askValueY'
   askCurve.strokeWidth = 2
   askCurve.stroke = am4core.color('#f00')
   askCurve.fill = askCurve.stroke
