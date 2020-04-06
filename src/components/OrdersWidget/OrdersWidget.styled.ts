@@ -65,6 +65,12 @@ export const ButtonWithIcon = styled.button`
 `
 
 export const OrdersForm = styled.div`
+  > form {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 54rem;
+  }
+
   .infoContainer {
     margin: 1rem auto 0;
     display: flex;
@@ -77,9 +83,6 @@ export const OrdersForm = styled.div`
 
     @media ${MEDIA.mobile} {
       margin: 0 auto;
-    }
-
-    .warning {
     }
 
     .countContainer {
@@ -145,6 +148,7 @@ export const OrdersForm = styled.div`
     display: grid;
     padding: 0 0 5rem;
     box-sizing: border-box;
+    overflow-y: scroll;
   }
 
   .checked {
