@@ -213,7 +213,6 @@ const OrdersPanel = styled.div`
     display: flex;
     flex-flow: row wrap;
     border-radius: 0 0.6rem 0.6rem 0;
-    overflow-y: auto;
 
     @media ${MEDIA.mobile} {
       display: none;
