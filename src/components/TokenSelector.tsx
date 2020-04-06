@@ -15,6 +15,7 @@ import { tokenListApi } from 'api'
 import Modali from 'modali'
 import { useAddTokenModal } from 'hooks/useAddTokenModal'
 import useSafeState from 'hooks/useSafeState'
+import { SearchItem, OptionItem } from './TokenOptionItem'
 
 const Wrapper = styled.div`
   display: flex;
@@ -30,47 +31,9 @@ const Wrapper = styled.div`
     margin-left: 0; // to fix extra space on Select search box
   }
 
-  .optionItem {
-    display: flex;
-    width: 100%;
-    align-items: center;
-
-    img {
-      width: 3.6rem;
-      height: 3.6rem;
-      object-fit: contain;
-      margin: 0;
-    }
-
-    .tokenDetails {
-      display: flex;
-      justify-content: space-between;
-      width: inherit;
-
-      .tokenName {
-        display: flex;
-        flex-direction: column;
-        margin-left: 1rem;
-      }
-
-      .tokenBalance {
-        font-weight: bold;
-        align-self: center;
-      }
-    }
-
-    > div > div {
-      font-weight: var(--font-weight-normal);
-      font-size: 1.3rem;
-      color: #476481;
-      line-height: 1.1;
-    }
-
-    > div > div > strong {
-      font-weight: var(--font-weight-bold);
-      margin: 0;
-      font-size: 1.6rem;
-    }
+  .tokenBalance {
+    font-weight: bold;
+    align-self: center;
   }
 
   .tokenSelectBox {
@@ -172,21 +135,13 @@ const SelectedTokenWrapper = styled.span`
 `
 
 function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.ReactNode {
+  const { name, symbol, image, decimals } = token
   return (
-    <div className="optionItem">
-      <TokenImgWrapper src={token.image} alt={token.name} />
-      <div className="tokenDetails">
-        <div className="tokenName">
-          <div>
-            <strong>{token.symbol}</strong>
-          </div>
-          <div>{token.name}</div>
-        </div>
-        {'totalExchangeBalance' in token && (
-          <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, token.decimals)}</div>
-        )}
-      </div>
-    </div>
+    <OptionItem name={name} symbol={symbol} image={image}>
+      {'totalExchangeBalance' in token && (
+        <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, decimals)}</div>
+      )}
+    </OptionItem>
   )
 }
 
