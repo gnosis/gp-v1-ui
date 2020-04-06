@@ -44,7 +44,6 @@ export default Joi.object({
     .integer()
     .multiple(5)
     .min(15)
-    .precision(DEFAULT_PRECISION)
     .messages({
       [INTEGER]: 'Invalid time',
       [MIN]: 'Time must be greater than or equal to 15',
@@ -55,7 +54,6 @@ export default Joi.object({
     .integer()
     .multiple(5)
     .min(5)
-    .precision(DEFAULT_PRECISION)
     .messages({
       [INTEGER]: 'Invalid time',
       [MIN]: 'Time must be greater than or equal to 5',
