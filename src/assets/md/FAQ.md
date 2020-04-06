@@ -8,7 +8,9 @@ Orders are collected in batches every 5 minutes, and external participants calle
 
 **What advantages does this bring?**
 
-Through this method of order matching, liquidity is shared amongst all assets tradable on the protocol. Users can easily provide liquidity, and the protocol guarantees that trades will only be filled at a user’s preferred price or a better one. Additionally, with order batches, the risk of front running is greatly reduced.
+- Liquidity shared amongst all token pairs - thanks to ring trades 
+- Don't get front-run - thanks to batch actions
+- Get a fairer price - thanks to uniform clearing prices
 
 **Is Gnosis Protocol secure?**
 
