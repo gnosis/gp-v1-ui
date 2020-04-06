@@ -9,13 +9,14 @@ import { useWalletConnection } from './useWalletConnection'
 
 import { formatAmount, logDebug } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
-import { TokenBalanceDetails, TokenDetails } from 'types'
+import { TokenBalanceDetails, TokenDetails, Network } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
 import { useTokenList } from './useTokenList'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]
+  tokens: TokenDetails[]
   error: boolean
 }
 
@@ -113,7 +114,9 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
-  const tokens = useTokenList(walletInfo.networkId)
+  const fallBackNetworkId = walletInfo.networkId || Network.Mainnet
+
+  const tokens = useTokenList(fallBackNetworkId)
 
   useEffect(() => {
     // can return NULL (if no address or network)
@@ -133,5 +136,5 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
         })
   }, [setBalances, setError, walletInfo, tokens])
 
-  return { balances, error }
+  return { balances, error, tokens }
 }
