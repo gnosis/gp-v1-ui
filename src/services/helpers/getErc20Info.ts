@@ -1,21 +1,9 @@
 import Web3 from 'web3'
 
 import { MinimalTokenDetails } from 'types'
-import { logDebug } from 'utils'
+import { logDebug, silentPromise } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Erc20Api } from 'api/erc20/Erc20Api'
-
-/**
- * Wraps erc20 function and returns undefined in case of failure
- */
-async function wrapPromise<T>(promise: Promise<T>): Promise<T | undefined> {
-  try {
-    return await promise
-  } catch (e) {
-    console.error('[services:helpers:getErc20Info] Failed to get ERC20 detail', e)
-    return
-  }
-}
 
 interface Params {
   tokenAddress: string
@@ -50,11 +38,12 @@ export async function getErc20Info({
     return null
   }
 
+  const errorMsg = '[services:helpers:getErc20Info] Failed to get ERC20 detail'
   // Query for optional details. Do not fail in case any is missing.
   const [symbol, name, decimals] = await Promise.all([
-    wrapPromise(erc20Api.symbol({ tokenAddress, networkId })),
-    wrapPromise(erc20Api.name({ tokenAddress, networkId })),
-    wrapPromise(erc20Api.decimals({ tokenAddress, networkId })),
+    silentPromise(erc20Api.symbol({ tokenAddress, networkId }), errorMsg),
+    silentPromise(erc20Api.name({ tokenAddress, networkId }), errorMsg),
+    silentPromise(erc20Api.decimals({ tokenAddress, networkId }), errorMsg),
   ])
   return { address: tokenAddress, symbol, name, decimals: decimals || DEFAULT_PRECISION }
 }

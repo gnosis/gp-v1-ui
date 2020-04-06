@@ -7,6 +7,12 @@ export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   hasToken: (params: HasTokenParams) => boolean
+
+  persistTokens: (params: PersistTokensParams) => void
+}
+
+export interface TokenListApiParams {
+  networkIds: number[]
 }
 
 export interface AddTokenParams {
@@ -19,20 +25,22 @@ export interface HasTokenParams {
   tokenAddress: string
 }
 
+export interface PersistTokensParams {
+  networkId: number
+  tokenList: TokenDetails[]
+}
+
 /**
  * Basic implementation of Token API
  *
  * Has a pre-define list of tokens.
  */
 export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> implements TokenList {
-  public networkIds: number[]
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
-  public constructor(networkIds: number[]) {
+  public constructor({ networkIds }: TokenListApiParams) {
     super()
-
-    this.networkIds = networkIds
 
     // Init the tokens by network
     this._tokensByNetwork = {}
@@ -82,6 +90,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private static getLocalStorageKey(networkId: number): string {
     return 'USER_TOKEN_LIST_' + networkId
   }
+
   public addToken({ networkId, token }: AddTokenParams): void {
     logDebug('[TokenListApi]: Added new Token to userlist', token)
 
@@ -91,7 +100,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     )
     this.persistNewUserToken(token, networkId)
 
-    this.triggerSubscriptions(this.getTokens(networkId))
+    this.triggerSubscriptions(this._tokensByNetwork[networkId])
   }
 
   private loadUserTokenList(networkId: number): TokenDetails[] {
@@ -107,6 +116,16 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
 
     currentUserList.push(token)
     localStorage.setItem(storageKey, JSON.stringify(currentUserList))
+  }
+
+  public persistTokens({ networkId, tokenList }: PersistTokensParams): void {
+    // update copy in memory
+    this._tokensByNetwork[networkId] = tokenList
+    // update copy in local storage
+    const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
+    localStorage.setItem(storageKey, JSON.stringify(tokenList))
+    // notify subscribers
+    this.triggerSubscriptions(tokenList)
   }
 }
 

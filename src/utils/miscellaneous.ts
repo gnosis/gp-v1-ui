@@ -81,3 +81,12 @@ export function isOrderFilled(order: AuctionElement): boolean {
   const negligibleAmount = order.priceDenominator.divRound(ORDER_FILLED_FACTOR)
   return !order.remainingAmount.gte(negligibleAmount)
 }
+
+export async function silentPromise<T>(promise: Promise<T>, customMessage?: string): Promise<T | undefined> {
+  try {
+    return await promise
+  } catch (e) {
+    console.error(customMessage || 'Failed to fetch promise', e)
+    return
+  }
+}

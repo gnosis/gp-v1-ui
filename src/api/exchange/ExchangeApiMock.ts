@@ -20,6 +20,7 @@ import {
   PlaceValidFromOrdersParams,
   GetOrdersPaginatedParams,
   GetOrdersPaginatedResult,
+  HasTokenParams,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { wait } from 'utils'
@@ -106,6 +107,10 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   public async getTokenIdByAddress({ tokenAddress }: GetTokenIdByAddressParams): Promise<number> {
     assert(typeof this.tokenAddressToId[tokenAddress] === 'number', 'Must have Address to get ID')
     return this.tokenAddressToId[tokenAddress]
+  }
+
+  public async hasToken({ tokenAddress }: HasTokenParams): Promise<boolean> {
+    return !!this.tokenAddressToId[tokenAddress]
   }
 
   public async addToken({ tokenAddress, txOptionalParams }: AddTokenParams): Promise<Receipt> {
