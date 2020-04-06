@@ -6,8 +6,7 @@ import { MEDIA } from 'const'
 import { formatAmount } from '@gnosis.pm/dex-js'
 import { isAddress } from 'web3-utils'
 
-import { TokenDetails, TokenBalanceDetails } from 'types'
-import TokenImg from './TokenImg'
+import { TokenImgWrapper } from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
@@ -156,12 +155,6 @@ const Wrapper = styled.div`
       }
     }
   }
-`
-
-const TokenImgWrapper = styled(TokenImg)`
-  width: 2.4rem;
-  height: 2.4rem;
-  margin: 0 0.5rem 0 0;
 `
 
 const StyledSelect = styled(Select)`
