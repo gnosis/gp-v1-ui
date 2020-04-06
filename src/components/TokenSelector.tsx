@@ -6,6 +6,7 @@ import { MEDIA } from 'const'
 import { formatAmount } from '@gnosis.pm/dex-js'
 import { isAddress } from 'web3-utils'
 
+import { TokenDetails, TokenBalanceDetails, Network } from 'types'
 import { TokenImgWrapper } from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
@@ -250,10 +251,7 @@ const customSelectStyles = {
 
 const components = { MenuList }
 
-const enum NO_OPTIONS_MESSAGE {
-  NO_RESULTS = 'No results',
-  ADD_TOKEN = 'Press Enter to add Token',
-}
+const NO_OPTIONS_MESSAGE = 'No results'
 
 interface Props {
   label?: string
@@ -295,14 +293,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   const addTokenModalOpen = useRef(modalProps.isShown)
   addTokenModalOpen.current = modalProps.isShown
 
-  const [noOptionsMessage, setNoOptionsMessage] = useSafeState(NO_OPTIONS_MESSAGE.NO_RESULTS)
-
-  const onInputChange = useCallback(
-    (value: string) => {
-      setNoOptionsMessage(isAddress(value.toLowerCase()) ? NO_OPTIONS_MESSAGE.ADD_TOKEN : NO_OPTIONS_MESSAGE.NO_RESULTS)
-    },
-    [setNoOptionsMessage],
-  )
+  const [inputText, setInputText] = useSafeState('')
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }): void => {
@@ -350,6 +341,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const fallBackNetworkId = networkId || Network.Mainnet
+
   return (
     <Wrapper ref={wrapperRef}>
       <Modali.Modal {...modalProps} />
@@ -360,7 +353,9 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         styles={customSelectStyles}
         className="tokenSelectBox"
         classNamePrefix="react-select"
-        noOptionsMessage={(): string => noOptionsMessage}
+        noOptionsMessage={(): React.ReactNode => (
+          <SearchItem value={inputText} defaultText={NO_OPTIONS_MESSAGE} networkId={fallBackNetworkId} />
+        )}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
@@ -371,7 +366,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
         onMenuInputFocus={onMenuInputFocus}
         onKeyDown={onKeyDown}
-        onInputChange={onInputChange}
+        onInputChange={setInputText}
       />
     </Wrapper>
   )
