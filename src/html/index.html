@@ -6,7 +6,14 @@
   <base href="/">
   <script>
     (function () {
-      const { pathname, hostname } = window.location
+      const { pathname, hostname, protocol } = window.location
+
+      // redirect to https on non-localhost
+      if (protocol === 'http:' && hostname !== 'localhost') {
+        window.location.protocol = 'https'
+        return
+      }
+
       const ipfsMatch = /.*\/Qm\w{44}/.exec(pathname)
       let arweaveMatch = false
 
