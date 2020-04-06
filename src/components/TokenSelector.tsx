@@ -15,6 +15,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { tokenListApi } from 'api'
 import Modali from 'modali'
 import { useAddTokenModal } from 'hooks/useAddTokenModal'
+import useSafeState from 'hooks/useSafeState'
 
 const Wrapper = styled.div`
   display: flex;
@@ -301,7 +302,10 @@ const customSelectStyles = {
 
 const components = { MenuList }
 
-const noOptionsMessage = (): string => 'No results'
+const enum NO_OPTIONS_MESSAGE {
+  NO_RESULTS = 'No results',
+  ADD_TOKEN = 'Press Enter to add Token',
+}
 
 interface Props {
   label?: string
@@ -342,6 +346,15 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
 
   const addTokenModalOpen = useRef(modalProps.isShown)
   addTokenModalOpen.current = modalProps.isShown
+
+  const [noOptionsMessage, setNoOptionsMessage] = useSafeState(NO_OPTIONS_MESSAGE.NO_RESULTS)
+
+  const onInputChange = useCallback(
+    (value: string) => {
+      setNoOptionsMessage(isAddress(value.toLowerCase()) ? NO_OPTIONS_MESSAGE.ADD_TOKEN : NO_OPTIONS_MESSAGE.NO_RESULTS)
+    },
+    [setNoOptionsMessage],
+  )
 
   const onKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }): void => {
@@ -399,7 +412,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         styles={customSelectStyles}
         className="tokenSelectBox"
         classNamePrefix="react-select"
-        noOptionsMessage={noOptionsMessage}
+        noOptionsMessage={(): string => noOptionsMessage}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
@@ -410,6 +423,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
         onMenuInputFocus={onMenuInputFocus}
         onKeyDown={onKeyDown}
+        onInputChange={onInputChange}
       />
     </Wrapper>
   )
