@@ -52,7 +52,7 @@ export const isTokenAddedSuccess = (result: AddTokenResult): result is AddTokenR
 
 export const addTokenToList = async ({ networkId, tokenAddress }: AddTokenToListParams): Promise<AddTokenResult> => {
   const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
-  const token = await getTokenFromExchangeByAddress({ networkId, tokenAddress: checkSumAddress })
+  const { token } = await getTokenFromExchangeByAddress({ networkId, tokenAddress: checkSumAddress })
   if (token) {
     logDebug('Added new Token to userlist', token)
 

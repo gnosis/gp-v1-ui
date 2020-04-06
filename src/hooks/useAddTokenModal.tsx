@@ -8,6 +8,10 @@ import { TokenDetails } from 'types'
 import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
 import { tokenListApi } from 'api'
+import { TokenFromExchangeResult, TokenFromExchange } from 'services/factories'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 
 const addTokenFromInput = async (
   { networkId, tokenAddress }: AddTokenToListParams,
@@ -142,8 +146,10 @@ const generateMessage = ({ token, tokenAddress, networkId, error }: GenerateMess
   return null
 }
 
+const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+
 interface UseAddTokenModalResult {
-  addTokenToList: (params: TokenAddConfirmationProps) => Promise<boolean>
+  addTokenToList: (params: TokenAddConfirmationProps) => Promise<TokenDetails | null>
   modalProps: ModalHook
 }
 
@@ -152,16 +158,18 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const [tokenAddress, setTokenAddress] = useState('')
 
   // using deferred promise that will be resolved separately
-  const result = useRef<Deferred<boolean>>()
+  const result = useRef<Deferred<TokenDetails | null>>()
   // to faster show the Token on Confirm, prefetch sooner
-  const prefetchToken = useRef<Promise<TokenDetails | null>>(Promise.resolve(null))
+  const prefetchToken = useRef<Promise<TokenFromExchangeResult | null>>(Promise.resolve(null))
   const [token, setToken] = useState<TokenDetails | null>(null)
   const [error, setError] = useState<Error | null>(null)
+
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const [modalProps, toggleModal] = useModali({
     animated: true,
     centered: true,
-    title: 'Are you sure?',
+    title: isProcessing ? spinner : 'Are you sure?',
     message: generateMessage({ token, tokenAddress, networkId, error }),
     buttons: [
       token || error ? (
@@ -172,7 +180,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
           key="no"
           isStyleCancel
           onClick={(): void => {
-            result.current?.resolve(false)
+            result.current?.resolve(null)
           }}
         />
       ),
@@ -181,15 +189,40 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
         key="yes"
         isStyleDefault
         onClick={(): void => {
+          if (isProcessing) return
+
           if (token) {
             // have fetched token -> added already -> resolve deferred -> close modal
-            result.current?.resolve(true)
+            result.current?.resolve(token)
           } else if (error) {
             // have failed adding token -> nothing more to do -> resolve deferred -> close modal
-            result.current?.resolve(false)
+            result.current?.resolve(null)
           } else {
+            setIsProcessing(true)
             // nothing done yet -> step 1 -- add token to list
-            addTokenFromInput({ networkId, tokenAddress }, prefetchToken.current).then(setToken, setError)
+            const prefetchedTokenWithRetry = prefetchToken.current
+              .then(result => {
+                // retry logic because we may have been between providers
+                // when adding token right away from URL on page load
+                // and lastProvider not yet connected
+                if (result?.token || result?.reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT) return result
+
+                return getTokenFromExchangeByAddress({ tokenAddress, networkId })
+              })
+              .then(result => result && result.token)
+
+            addTokenFromInput({ networkId, tokenAddress }, prefetchedTokenWithRetry).then(
+              token => {
+                batchUpdates(() => {
+                  setToken(token)
+                  setIsProcessing(false)
+                })
+              },
+              error => {
+                setError(error)
+                setIsProcessing(false)
+              },
+            )
           }
         }}
       />,
@@ -200,30 +233,33 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
   const toggleRef = useRef(toggleModal)
   toggleRef.current = toggleModal
 
-  const addTokenToList = useCallback(({ networkId, tokenAddress }: TokenAddConfirmationProps): Promise<boolean> => {
-    setNetworkId(networkId)
-    setTokenAddress(tokenAddress)
+  const addTokenToList = useCallback(
+    ({ networkId, tokenAddress }: TokenAddConfirmationProps): Promise<TokenDetails | null> => {
+      setNetworkId(networkId)
+      const checkSumAddress = toChecksumAddress(tokenAddress)
+      setTokenAddress(checkSumAddress)
 
-    // start deferred promise to be resolved later
-    const deferred = createDeferredPromise<boolean>()
-    result.current = deferred
+      // start deferred promise to be resolved later
+      const deferred = createDeferredPromise<TokenDetails | null>()
+      result.current = deferred
 
-    // fetch token as soon as we have tokenAddress
-    prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: toChecksumAddress(tokenAddress), networkId })
-    prefetchToken.current.then(console.log)
+      // fetch token as soon as we have tokenAddress
+      prefetchToken.current = getTokenFromExchangeByAddress({ tokenAddress: checkSumAddress, networkId })
 
-    toggleRef.current()
-
-    return deferred.promise.then(value => {
-      // close modal
       toggleRef.current()
 
-      // reset hook state
-      result.current = undefined
+      return deferred.promise.then(value => {
+        // close modal
+        toggleRef.current()
 
-      return value
-    })
-  }, [])
+        // reset hook state
+        result.current = undefined
+
+        return value
+      })
+    },
+    [],
+  )
 
   useEffect(() => {
     if (!modalProps.isModalVisible) {
@@ -234,6 +270,7 @@ export const useAddTokenModal = (): UseAddTokenModalResult => {
       setTokenAddress('')
       setToken(null)
       setError(null)
+      setIsProcessing(false)
     }
   }, [modalProps.isModalVisible])
 
