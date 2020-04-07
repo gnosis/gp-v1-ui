@@ -1,8 +1,12 @@
-import React from 'react'
-import { isAddress } from 'web3-utils'
+import React, { useEffect } from 'react'
+import { isAddress, toChecksumAddress } from 'web3-utils'
 import { TokenImgWrapper } from './TokenImg'
-import { tokenListApi } from 'api'
+import { tokenListApi, exchangeApi } from 'api'
 import styled from 'styled-components'
+import useSafeState from 'hooks/useSafeState'
+import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenFromExchange } from 'services/factories'
+import { getTokenFromErc20 } from 'services'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -85,10 +89,87 @@ const testPAXG = {
     'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x45804880De22913dAFE09f4980848ECE6EcbAf78/logo.png',
 }
 
+interface TokenAndNetwork {
+  tokenAddress: string
+  networkId: number
+}
+
+type ValidResons =
+  | TokenFromExchange.NOT_ERC20
+  | TokenFromExchange.NOT_REGISTERED_ON_CONTRACT
+  | TokenFromExchange.UNREGISTERED_ERC20
+
+interface FetchTokenResult {
+  token: TokenDetails | null
+  reason: ValidResons
+}
+
+const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
+  console.log('fetching Token')
+  const tokenInExchange = await exchangeApi.hasToken(params)
+
+  if (!tokenInExchange)
+    return {
+      token: null,
+      reason: TokenFromExchange.NOT_REGISTERED_ON_CONTRACT,
+    }
+
+  const tokenId = await exchangeApi.getTokenIdByAddress(params)
+
+  const erc20Token = await getTokenFromErc20(params)
+
+  if (!erc20Token)
+    return {
+      token: null,
+      reason: TokenFromExchange.NOT_ERC20,
+    }
+
+  return {
+    token: {
+      ...erc20Token,
+      id: tokenId,
+    },
+    reason: TokenFromExchange.UNREGISTERED_ERC20,
+  }
+}
+
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId }) => {
-  if (!value || tokenListApi.hasToken({ tokenAddress: value, networkId }) || !isAddress(value.toLowerCase())) {
+  const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(null)
+
+  useEffect(() => {
+    // if truthy value, not already in the list and a valid address
+    if (!value || tokenListApi.hasToken({ tokenAddress: value, networkId }) || !isAddress(value.toLowerCase())) return
+
+    setFetchResult(null)
+
+    fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
+      console.log('fetchResult', result)
+      setFetchResult(result)
+    })
+  }, [value, networkId, setFetchResult])
+
+  if (
+    !fetchResult ||
+    !value ||
+    tokenListApi.hasToken({ tokenAddress: value, networkId }) ||
+    !isAddress(value.toLowerCase())
+  ) {
     return <>{defaultText}</>
   }
 
-  return <OptionItem {...testPAXG} />
+  const { token, reason } = fetchResult
+
+  switch (reason) {
+    case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
+      return <>Register token on Exchange first</>
+    case TokenFromExchange.NOT_ERC20:
+      return <>Not a valid ERC20 token</>
+    case TokenFromExchange.UNREGISTERED_ERC20:
+      if (!token) return <>{defaultText}</>
+      return (
+        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+          <button onClick={console.log}>Add Token</button>
+        </OptionItem>
+      )
+  }
 }
