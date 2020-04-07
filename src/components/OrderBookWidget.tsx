@@ -20,25 +20,25 @@ const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   min-width: 100%;
-    
-    .amcharts-Sprite-group {
-      font-size: 1rem;
-    }
 
-    .amcharts-Container .amcharts-Label {
-      text-transform: uppercase;
-      font-size: 1.2rem;
-    }
+  .amcharts-Sprite-group {
+    font-size: 1rem;
+  }
 
-    .amcharts-ZoomOutButton-group>.amcharts-RoundedRectangle-group {
-      fill: var(--color-text-active);
-      opacity: .6;
-      transition: .3s ease-in-out;
+  .amcharts-Container .amcharts-Label {
+    text-transform: uppercase;
+    font-size: 1.2rem;
+  }
 
-      &:hover {
-        opacity: 1;
-      }
+  .amcharts-ZoomOutButton-group > .amcharts-RoundedRectangle-group {
+    fill: var(--color-text-active);
+    opacity: 0.6;
+    transition: 0.3s ease-in-out;
+
+    &:hover {
+      opacity: 1;
     }
+  }
 `
 
 enum Offer {
@@ -121,7 +121,7 @@ const draw = (
   dataSource: string,
 ): am4charts.XYChart => {
   am4core.useTheme(am4themesSpiritedaway)
-  am4core.options.autoSetClassName = true;
+  am4core.options.autoSetClassName = true
   const chart = am4core.create(chartElement, am4charts.XYChart)
 
   // Add data
@@ -139,8 +139,8 @@ const draw = (
 
   // Colors
   const colors = {
-    green: "#3d7542",
-    red: "#dc1235"
+    green: '#3d7542',
+    red: '#dc1235',
   }
 
   // Create axes
@@ -179,12 +179,12 @@ const draw = (
   series3.fill = am4core.color(colors.green)
   series3.fillOpacity = 0.2
 
-  const series4 = chart.series.push(new am4charts.ColumnSeries());
-  series4.dataFields.categoryX = "price";
-  series4.dataFields.valueY = "askValueY";
-  series4.strokeWidth = 0;
-  series4.fill = am4core.color(colors.red);
-  series4.fillOpacity = .2;
+  const series4 = chart.series.push(new am4charts.ColumnSeries())
+  series4.dataFields.categoryX = 'price'
+  series4.dataFields.valueY = 'askValueY'
+  series4.strokeWidth = 0
+  series4.fill = am4core.color(colors.red)
+  series4.fillOpacity = 0.2
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
