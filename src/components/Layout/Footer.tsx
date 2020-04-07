@@ -19,7 +19,7 @@ const Wrapper = styled.footer`
   background: transparent;
   font-weight: var(--font-weight-normal);
   font-size: 1.3rem;
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: -0.03rem;
   max-width: 85rem;
   margin: 0 auto;
@@ -42,7 +42,7 @@ const Wrapper = styled.footer`
     }
 
     > a:hover {
-      color: #218dff;
+      color: var(--color-text-active);
     }
   }
 `

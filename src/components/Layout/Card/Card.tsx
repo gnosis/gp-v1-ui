@@ -17,7 +17,7 @@ const CardRowDrawer = styled.tr`
   width: 50rem;
   height: 42rem;
   border-radius: 0.6rem;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
 
   @media ${MEDIA.mobile} {
     width: 100%;
@@ -52,13 +52,13 @@ const CardRowDrawer = styled.tr`
       letter-spacing: 0;
       font-size: 1.6rem;
       text-align: left;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       margin: 0;
       display: flex;
       align-items: center;
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
-      border-bottom: 0.1rem solid #dfe6ef;
+      border-bottom: 0.1rem solid var(--color-background-banner);
     }
 
     .times {
@@ -127,10 +127,11 @@ export const CardTable = styled.table<{
   
   > thead {
     position: sticky;
-    background: #ecf2f7;
+    z-index: 2;
+    background: var(--color-background-row-hover);
     top: 0;
     font-size: 1.1rem;
-    color: #2F3E4E;
+    color: var(--color-text-primary);
     letter-spacing: 0;
     font-weight: var(--font-weight-bold);
   }
@@ -158,7 +159,7 @@ export const CardTable = styled.table<{
       z-index: 1;
 
       &:hover {
-        background: #deeeff;
+        background: var(--color-background-row-hover);
       }
       
       &.highlight {
@@ -214,7 +215,7 @@ export const CardTable = styled.table<{
     font-size: 1.1rem;
     font-family: var(--font-mono);
     font-weight: var(--font-weight-regular);
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: -0.085rem;
     line-height: 1.2;
   }

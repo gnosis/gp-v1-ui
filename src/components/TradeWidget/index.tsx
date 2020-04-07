@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import switchTokenPair from 'assets/img/switch.svg'
+import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -49,7 +49,7 @@ const WrappedWidget = styled(Widget)`
   width: auto;
   flex-flow: row nowrap;
   display: flex;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -101,7 +101,7 @@ const WrappedForm = styled.form`
 
   > p {
     font-size: 1.3rem;
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: 0;
     text-align: center;
     margin: 1.6rem 0 0;
@@ -130,7 +130,8 @@ const WrappedForm = styled.form`
 const IconWrapper = styled.a`
   margin: 1rem auto;
 
-  > img {
+  > svg {
+    fill: var(--color-svg-switcher);
     transition: opacity 0.2s ease-in-out;
     opacity: 0.5;
     &:hover {
@@ -140,7 +141,7 @@ const IconWrapper = styled.a`
 `
 
 const WarningLabel = styled.code`
-  background: #ffa8a8;
+  background: var(--color-error);
   border-radius: var(--border-radius);
   font-weight: bolder;
   margin: 0 auto 0.9375rem;
@@ -150,11 +151,11 @@ const WarningLabel = styled.code`
 `
 
 const SubmitButton = styled.button`
-  background-color: #218dff;
+  background-color: var(--color-background-CTA);
+  color: var(--color-text-CTA);
   border-radius: 3rem;
   font-family: var(--font-default);
   font-size: 1.6rem;
-  color: #ffffff;
   letter-spacing: 0.1rem;
   text-align: center;
   text-transform: uppercase;
@@ -166,6 +167,7 @@ const SubmitButton = styled.button`
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
+
   @media ${MEDIA.mobile} {
     font-size: 1.3rem;
     margin: 1rem auto 1.6rem;
@@ -178,7 +180,7 @@ const OrdersPanel = styled.div`
   flex: 1;
   min-width: 48rem;
   max-width: 100%;
-  background: #edf2f7;
+  background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
   transition: flex 0.2s ease-in-out;
@@ -234,7 +236,7 @@ const OrdersPanel = styled.div`
     padding: 1.6rem 0 1rem;
     font-weight: var(--font-weight-bold);
     font-size: 1.6rem;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0.03rem;
     text-align: center;
     box-sizing: border-box;
@@ -244,14 +246,14 @@ const OrdersPanel = styled.div`
   > div > h5 > a {
     font-size: 1.3rem;
     font-weight: var(--font-weight-normal);
-    color: #218dff;
+    color: var(--color-text-active);
     text-decoration: underline;
   }
 
   > div > h5 > a {
     font-size: 1.3rem;
     font-weight: var(--font-weight-normal);
-    color: #218dff;
+    color: var(--color-text-active);
     text-decoration: underline;
   }
 `
@@ -260,7 +262,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   width: 1.6rem;
   height: 100%;
   border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-  background: #ecf2f7;
+  background: var(--color-background);
   padding: 0;
   margin: 0;
   outline: 0;
@@ -280,7 +282,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   }
 
   &:hover {
-    background-color: #ecf2f7;
+    background-color: var(--color-background-banner);
   }
 `
 
@@ -720,7 +722,7 @@ const TradeWidget: React.FC = () => {
             tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
-            <img src={switchTokenPair} />
+            <SwitcherSVG />
           </IconWrapper>
           <TokenRow
             selectedToken={receiveTokenBalance}

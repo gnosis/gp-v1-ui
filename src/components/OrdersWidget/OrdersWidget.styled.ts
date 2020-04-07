@@ -8,7 +8,7 @@ export const OrdersWrapper = styled.div`
   position: relative;
 
   /* In use when accessed as a dedicated page and not part of OrdersPanel */
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -56,7 +56,6 @@ export const ButtonWithIcon = styled.button`
 
   &:hover {
     background: #a71409;
-    color: #ffffff;
   }
 
   > svg {
@@ -78,7 +77,7 @@ export const OrdersForm = styled.div`
     width: 100%;
     justify-content: center;
     height: 6.4rem;
-    border-bottom: 0.1rem solid #9fb4c9;
+    border-bottom: 0.1rem solid var(--color-text-secondary);
     align-items: center;
 
     @media ${MEDIA.mobile} {
@@ -95,7 +94,7 @@ export const OrdersForm = styled.div`
       > button {
         font-weight: var(--font-weight-bold);
         font-size: 1.5rem;
-        color: #9fb4c9;
+        color: var(--color-text-secondary);
         letter-spacing: 0;
         text-align: center;
         background: transparent;
@@ -119,10 +118,10 @@ export const OrdersForm = styled.div`
         height: 1.8rem;
         font-weight: inherit;
         font-size: 1.1rem;
-        color: #ffffff;
+        color: var(--color-background-pageWrapper);
         letter-spacing: -0.046rem;
         text-align: center;
-        background: #9fb4c9;
+        background: var(--color-text-secondary);
         border-radius: 6rem;
         padding: 0 0.75rem;
         box-sizing: border-box;
@@ -134,12 +133,12 @@ export const OrdersForm = styled.div`
       }
 
       > button.selected {
-        border-bottom: 0.3rem solid #218dff;
-        color: #218dff;
+        border-bottom: 0.3rem solid var(--color-text-active);
+        color: var(--color-text-active);
       }
 
       > button.selected > i {
-        background: #218dff;
+        background: var(--color-text-active);
       }
     }
   }
@@ -155,10 +154,6 @@ export const OrdersForm = styled.div`
     display: flex;
     justify-content: left;
     align-items: center;
-
-    > input {
-      // width: auto;
-    }
   }
 
   .deleteContainer {
@@ -169,7 +164,7 @@ export const OrdersForm = styled.div`
     z-index: 10;
     justify-content: flex-start;
     align-items: center;
-    background: #ffd4d1;
+    background: var(--color-error);
     color: #a71409;
     height: 4rem;
     text-align: left;

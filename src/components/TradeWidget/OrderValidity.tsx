@@ -20,7 +20,7 @@ const Wrapper = styled.div`
   align-items: flex-start;
   width: 100%;
   flex-flow: row wrap;
-  border-bottom: 0.1rem solid #dfe6ef;
+  border-bottom: 0.1rem solid var(--color-background-banner);
 
   > input {
     width: 100%;
@@ -47,7 +47,7 @@ const Wrapper = styled.div`
     justify-content: flex-start;
     font-weight: var(--font-weight-normal);
     font-size: 1.4rem;
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: -0.03rem;
     height: 5.6rem;
     position: relative;
@@ -81,7 +81,7 @@ const Wrapper = styled.div`
   }
 
   > button > b {
-    color: #218dff;
+    color: var(--color-text-active);
     margin: 0 0.4rem;
   }
 `
@@ -121,13 +121,13 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     letter-spacing: 0;
     font-size: 1.6rem;
     text-align: left;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     margin: 0 0 2.4rem;
     display: flex;
     align-items: center;
     font-family: var(--font-default);
     font-weight: var(--font-weight-regular);
-    border-bottom: 0.1rem solid #dfe6ef;
+    border-bottom: 0.1rem solid var(--color-background-banner);
     width: 100%;
   }
 
@@ -161,7 +161,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
     > strong {
       text-transform: capitalize;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       font-size: 1.5rem;
       width: 100%;
       margin: 0 0 1rem;
@@ -173,7 +173,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   > span {
     margin: auto;
     height: 5.6rem;
-    border-top: 0.1rem solid #dfe6ef;
+    border-top: 0.1rem solid var(--color-background-banner);
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -186,12 +186,10 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   }
 
   > span > button {
-    background: #218dff;
     border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;
     font-weight: var(--font-weight-bold);
-    color: #ffffff;
     text-transform: uppercase;
     font-size: 1.4rem;
     margin: 0 auto;
