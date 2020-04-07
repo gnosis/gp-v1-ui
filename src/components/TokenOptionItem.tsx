@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress, toChecksumAddress } from 'web3-utils'
 import { TokenImgWrapper } from './TokenImg'
 import { tokenListApi, exchangeApi } from 'api'
@@ -157,6 +158,7 @@ const constructCacheKey = ({ tokenAddress, networkId }: TokenAndNetwork): string
 }
 
 const fetchedCache = new SimpleCache<FetchTokenResult, TokenAndNetwork>(constructCacheKey)
+const promisedCache = new SimpleCache<Promise<FetchTokenResult>, TokenAndNetwork>(constructCacheKey)
 
 // checks if token address is a valid address and not already in the list
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
@@ -191,13 +193,28 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     // fetching indicator on
     setIsFetching(true)
 
-    fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
-      // cache result
-      fetchedCache.set(result, cacheKey)
-      if (!cancelled) setFetchResult(result)
-      // fetching indicator off
-      setIsFetching(false)
-    })
+    let promise = promisedCache.get(cacheKey)
+
+    if (!promise) {
+      promise = fetchToken({ tokenAddress: toChecksumAddress(value), networkId })
+      promisedCache.set(promise, cacheKey)
+    }
+
+    promise
+      .then(result => {
+        // cache result
+        fetchedCache.set(result, cacheKey)
+        //bust promised cache
+        promisedCache.delete(cacheKey)
+
+        batchedUpdates(() => {
+          if (!cancelled) setFetchResult(result)
+          // fetching indicator off
+          setIsFetching(false)
+        })
+      })
+      .catch(() => promisedCache.delete(cacheKey))
+
     return (): void => {
       cancelled = true
       setIsFetching(false)
