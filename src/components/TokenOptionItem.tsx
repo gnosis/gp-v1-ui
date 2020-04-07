@@ -162,12 +162,22 @@ const constructCacheKey = ({ tokenAddress, networkId }: TokenAndNetwork): string
   return tokenAddress.toLowerCase() + '|' + networkId
 }
 
+const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
+  !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
+
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId }) => {
-  const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(null)
+  const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(() => {
+    if (!checkIfAddableAddress(value, networkId)) return null
+
+    // check cache on mount
+    // to avoid `No results` flash on remount
+    const cacheKey = constructCacheKey({ tokenAddress: value, networkId })
+    return fetchedCache[cacheKey] || null
+  })
 
   useEffect(() => {
     // if truthy value, not already in the list and a valid address
-    if (!value || tokenListApi.hasToken({ tokenAddress: value, networkId }) || !isAddress(value.toLowerCase())) return
+    if (checkIfAddableAddress(value, networkId)) return
 
     // when cache is hit, token display is immediate
     const cacheKey = constructCacheKey({ tokenAddress: value, networkId })
