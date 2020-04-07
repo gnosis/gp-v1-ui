@@ -12,7 +12,7 @@ import useSafeState from 'hooks/useSafeState'
 import { formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
-import { MEDIA } from 'const'
+import { MEDIA, VALID_UNTIL_DEFAULT, VALID_FROM_DEFAULT } from 'const'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { FormInputError } from './FormMessage'
 
@@ -314,7 +314,7 @@ const OrderValidity: React.FC<Props> = ({
     }
 
     reffedInput.focus()
-    setValue(validUntilInputId, '2880', true)
+    setValue(validUntilInputId, VALID_UNTIL_DEFAULT, true)
     reffedInput.select()
   }
   function handleASAPClick(): void {
@@ -324,7 +324,7 @@ const OrderValidity: React.FC<Props> = ({
       return setValue(validFromInputId, undefined, true)
     }
     reffedInput.focus()
-    setValue(validFromInputId, '30', true)
+    setValue(validFromInputId, VALID_FROM_DEFAULT, true)
     reffedInput.select()
   }
 
