@@ -102,7 +102,7 @@ const addTokenToList = ({ token, networkId }: TokenDetailsAndNetwork): void => {
 type ValidResons =
   | TokenFromExchange.NOT_ERC20
   | TokenFromExchange.NOT_REGISTERED_ON_CONTRACT
-  | TokenFromExchange.UNREGISTERED_ERC20
+  | TokenFromExchange.NOT_IN_TOKEN_LIST
 
 interface FetchTokenResult {
   token: TokenDetails | null
@@ -137,7 +137,7 @@ const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> =>
         ...erc20Token,
         id: tokenId,
       },
-      reason: TokenFromExchange.UNREGISTERED_ERC20,
+      reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
     }
   } catch (error) {
     logDebug('Error fetching token', params, error)
@@ -231,7 +231,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     case TokenFromExchange.NOT_ERC20:
       return <>Not a valid ERC20 token</>
     // registered but not in list --> option to add
-    case TokenFromExchange.UNREGISTERED_ERC20:
+    case TokenFromExchange.NOT_IN_TOKEN_LIST:
       if (!token) return <>{defaultText}</>
 
       const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = e => {

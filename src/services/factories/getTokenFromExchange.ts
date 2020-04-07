@@ -23,7 +23,7 @@ interface GetByAddressParams {
 export const enum TokenFromExchange {
   FROM_TOKEN_LIST = 'FROM TOKEN LIST',
   NOT_REGISTERED_ON_CONTRACT = 'NOT REGISTERED ON CONTRACT',
-  UNREGISTERED_ERC20 = 'UNREGISTERED ERC20',
+  NOT_IN_TOKEN_LIST = 'NOT IN TOKEN LIST',
   NOT_ERC20 = 'NOT ERC20',
 }
 
@@ -95,7 +95,7 @@ function getTokenFromExchangeByAddressFactory(
     if (token) {
       return {
         token,
-        reason: TokenFromExchange.UNREGISTERED_ERC20,
+        reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
       }
     }
 
