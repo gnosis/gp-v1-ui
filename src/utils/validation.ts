@@ -17,50 +17,50 @@ export function validatePositive(value: string, constraint = 0): true | string {
   return Number(value) > constraint || 'Invalid amount'
 }
 
-interface FormDataAsNumbers {
-  [key: string]: number
-}
-
 /**
  * @name stringOrNumberResolverFactory
  * @description Factory function for form resolver using JOI validation
  * @param validationSchema joi.ObjectSchema<unknown> - Joi schema to check data
  * @param type [OPTIONAL] 'number' | undefined - sets casting use or straight FormData use
  */
-export const stringOrNumberResolverFactory = <FormData, CustomContext = {}>(
-  validationSchema: ObjectSchema<unknown>,
-  type?: 'number',
-) => (data: FormData): ReturnType<ValidationResolver<FormData, CustomContext>> => {
-  const castedData: FormDataAsNumbers | FormData =
-    type === 'number'
-      ? Object.keys(data).reduce<FormDataAsNumbers>((acc, key) => {
-          const oldValue = data[key]
-          const castedValue = Number(oldValue)
-          const castedObj = { ...acc, [key]: castedValue }
 
-          return castedObj
-        }, {})
-      : data
+export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => (
+  data: FormData,
+): ReturnType<ValidationResolver<FormData, {}>> => {
+  const castedData: Partial<FormData> = Object.keys(data).reduce((acc, key) => {
+    acc[key] = data[key] || undefined
+    return acc
+  }, {} as FormData)
 
   const { error, value }: { value: typeof castedData | undefined; error?: ValidationError } = validationSchema.validate(
     castedData,
+    {
+      abortEarly: false,
+    },
   )
 
   return {
     values: error || !value ? {} : data,
     errors: error
       ? error.details.reduce((previous, currentError) => {
+          const finalError = { ...currentError, message: currentError?.message?.replace(/(['"])/g, '') }
           return {
             ...previous,
-            [currentError.path[0]]: currentError,
+            [currentError.path[0]]: finalError,
           }
         }, {})
       : {},
   }
 }
 
-export function formatSchemaErrorMessage(errorString?: string): string | undefined {
-  if (!errorString) return undefined
-  const cleanedString = errorString.replace(/"/g, '')
-  return cleanedString[0].toUpperCase() + cleanedString.slice(1)
+export const NUMBER_VALIDATION_KEYS = {
+  BASE: 'number.base',
+  UNSAFE: 'number.unsafe',
+  REQUIRED: 'any.required',
+  GREATER: 'number.greater',
+  LESS: 'number.less',
+  MIN: 'number.min',
+  MAX: 'number.max',
+  MULTIPLE: 'number.multiple',
+  INTEGER: 'number.integer',
 }

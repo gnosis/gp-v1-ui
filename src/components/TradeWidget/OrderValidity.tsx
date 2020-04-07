@@ -1,18 +1,20 @@
-import React, { useEffect, useCallback, Dispatch, SetStateAction } from 'react'
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import React, { useCallback, Dispatch, SetStateAction, useRef, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-import { adjustPrecision, ZERO } from '@gnosis.pm/dex-js'
+import { ZERO } from '@gnosis.pm/dex-js'
 
 import { TradeFormTokenId, TradeFormData } from './'
 import { PriceInputBox } from './Price'
 
 import useSafeState from 'hooks/useSafeState'
-import { validInputPattern, formatTimeInHours, makeMultipleOf } from 'utils'
+import { formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
-import { MEDIA } from 'const'
+import { MEDIA, VALID_UNTIL_DEFAULT, VALID_FROM_DEFAULT } from 'const'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
+import { FormInputError } from './FormMessage'
 
 const Wrapper = styled.div`
   display: flex;
@@ -41,48 +43,46 @@ const Wrapper = styled.div`
     }
   }
 
-  > button {
+  > div:first-child {
     width: 100%;
     display: flex;
-    justify-content: flex-start;
-    font-weight: var(--font-weight-normal);
-    font-size: 1.4rem;
-    color: var(--color-text-primary);
-    letter-spacing: -0.03rem;
-    height: 5.6rem;
-    position: relative;
-    outline: 0;
-    background: transparent;
     align-items: center;
-    flex-flow: row wrap;
 
-    &:hover {
+    > div {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      font-weight: var(--font-weight-normal);
+      font-size: 1.4rem;
+      color: #476481;
+      letter-spacing: -0.03rem;
+      height: 5.6rem;
+      position: relative;
+      outline: 0;
       background: transparent;
-    }
+      align-items: center;
+      flex-flow: row wrap;
+      padding: 0 0.8rem;
 
-    &::after {
+      > b {
+        color: #218dff;
+        margin: 0 0.4rem;
+      }
+    }
+    > button {
       content: '';
       background: url(${cog}) no-repeat center/contain;
-      width: 1.3rem;
-      height: 1.3rem;
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      margin: auto;
+      width: 1.8rem;
+      height: 1.8rem;
+      margin-left: auto;
       opacity: 0.5;
       transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-    }
 
-    &:hover::after {
-      opacity: 1;
-      transform: rotate(90deg);
+      &:hover {
+        opacity: 1;
+        transform: rotate(90deg);
+      }
     }
-  }
-
-  > button > b {
-    color: var(--color-text-active);
-    margin: 0 0.4rem;
   }
 `
 
@@ -96,7 +96,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   margin: auto;
   background: var(--color-background-pageWrapper);
   color: var(--color-text-primary);
-  z-index: 500;
+  z-index: 2;
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 50rem;
   min-width: 30rem;
@@ -204,14 +204,13 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
 const OrderValidityBox = styled(PriceInputBox)`
   flex-flow: column nowrap;
-  height: 7rem;
 
   strong {
     margin-bottom: 1rem;
   }
 
   label {
-    height: 100%;
+    height: 7rem;
   }
 
   input[type='checkbox'] {
@@ -259,12 +258,12 @@ const OrderValidity: React.FC<Props> = ({
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
       // sanitize inputs as multiples of 5
-      const sanitizedFromValue = makeMultipleOf(5, validFromInputValue).toString()
-      const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue).toString()
+      const sanitizedFromValue = validFromInputValue ? makeMultipleOf(5, validFromInputValue).toString() : undefined
+      const sanitizedUntilValue = validUntilInputValue ? makeMultipleOf(5, validUntilInputValue).toString() : undefined
 
       batchedUpdates(() => {
-        if (sanitizedFromValue === '0') setAsap(true)
-        if (sanitizedUntilValue === '0') setUnlimited(true)
+        if (!sanitizedFromValue) setAsap(true)
+        if (!sanitizedUntilValue) setUnlimited(true)
         setValue(validFromInputId, sanitizedFromValue, true)
         setValue(validUntilInputId, sanitizedUntilValue, true)
       })
@@ -282,45 +281,61 @@ const OrderValidity: React.FC<Props> = ({
     validUntilInputId,
     validUntilInputValue,
   ])
+  const validFromRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
+  const validUntilRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
 
-  const handleValidFromChange = useCallback(() => {
-    const newValue = adjustPrecision(validFromInputValue, 0)
-    if (validFromInputValue !== newValue) {
-      setValue(validFromInputId, newValue, true)
-    }
-  }, [validFromInputValue, setValue, validFromInputId])
-
-  const handleValidUntilChange = useCallback(() => {
-    const newValue = adjustPrecision(validUntilInputValue, 0)
-    if (validUntilInputValue !== newValue) {
-      setValue(validUntilInputId, newValue, true)
-    }
-  }, [validUntilInputValue, setValue, validUntilInputId])
-
+  // This side effect is for not requiring disable on validFrom/Until inputs
+  // and auto-magically updating the checkbox/values on change
+  // also allows auto focus and select when manually unchecking ASAP or Never checkboxes
   useEffect(() => {
-    handleValidFromChange()
-  }, [handleValidFromChange])
-
-  useEffect(() => {
-    handleValidUntilChange()
-  }, [handleValidUntilChange])
+    // undefined validFrom input - set ASAP
+    !validFromInputValue
+      ? batchedUpdates(() => {
+          setAsap(true)
+          setValue(validFromInputId, undefined, true)
+        })
+      : setAsap(false)
+    // undefined validUntil input - set unlimited
+    !validUntilInputValue
+      ? batchedUpdates(() => {
+          setUnlimited(true)
+          setValue(validUntilInputId, undefined, true)
+        })
+      : setUnlimited(false)
+  }, [setAsap, setUnlimited, setValue, validFromInputValue, validFromInputId, validUntilInputValue, validUntilInputId])
 
   function handleUnlimitedClick(): void {
+    const reffedInput = validUntilRef.current!
     setUnlimited(isUnlimited => !isUnlimited)
-    !isUnlimited ? setValue(validUntilInputId, '', true) : setValue(validUntilInputId, '30', true)
+    if (!isUnlimited) {
+      return setValue(validUntilInputId, undefined, true)
+    }
+
+    reffedInput.focus()
+    setValue(validUntilInputId, VALID_UNTIL_DEFAULT, true)
+    reffedInput.select()
   }
   function handleASAPClick(): void {
+    const reffedInput = validFromRef.current!
     setAsap(isAsap => !isAsap)
-    !isAsap ? setValue(validFromInputId, '', true) : setValue(validFromInputId, '30', true)
+    if (!isAsap) {
+      return setValue(validFromInputId, undefined, true)
+    }
+    reffedInput.focus()
+    setValue(validFromInputId, VALID_FROM_DEFAULT, true)
+    reffedInput.select()
   }
 
   return (
     <Wrapper>
-      <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
-        Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
-        <HelpTooltip tooltip={OrderStartsTooltip} />
-        &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
-      </button>
+      <div>
+        <div>
+          Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
+          <HelpTooltip tooltip={OrderStartsTooltip} />
+          &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
+        </div>
+        <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
+      </div>
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
         <h4>
@@ -332,18 +347,13 @@ const OrderValidity: React.FC<Props> = ({
             <input
               className={validFromClassName}
               name={validFromInputId}
-              type="number"
-              step="5"
-              disabled={isDisabled || isAsap}
+              type="text"
+              disabled={isDisabled}
               required
-              ref={register({
-                pattern: {
-                  value: validInputPattern,
-                  message: 'Order from time cannot be negative or less than 15 minutes',
-                },
-                validate: value => Number(value) === 0 || Number(value) >= 15,
-              })}
-              onChange={handleValidFromChange}
+              ref={(e): void => {
+                register(e)
+                validFromRef.current = e
+              }}
               onFocus={(e): void => e.target.select()}
               tabIndex={tabIndex}
             />
@@ -358,6 +368,7 @@ const OrderValidity: React.FC<Props> = ({
               <small>ASAP</small>
             </div>
           </label>
+          <FormInputError errorMessage={validFromError?.message as string} />
         </OrderValidityBox>
         <OrderValidityBox>
           <strong>Order expires in (min)</strong>
@@ -365,15 +376,13 @@ const OrderValidity: React.FC<Props> = ({
             <input
               className={validUntilClassName}
               name={validUntilInputId}
-              type="number"
-              step="5"
-              disabled={isDisabled || isUnlimited}
+              type="text"
+              disabled={isDisabled}
               required
-              ref={register({
-                pattern: { value: validInputPattern, message: 'Expiration time cannot be negative' },
-                validate: value => Number(value) === 0 || Number(value) >= 5,
-              })}
-              onChange={handleValidUntilChange}
+              ref={(e): void => {
+                register(e)
+                validUntilRef.current = e
+              }}
               onFocus={(e): void => e.target.select()}
               tabIndex={tabIndex}
             />
@@ -388,9 +397,15 @@ const OrderValidity: React.FC<Props> = ({
               <small>Never</small>
             </div>
           </label>
+          <FormInputError errorMessage={validUntilError?.message as string} />
         </OrderValidityBox>
         <span>
-          <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
+          <button
+            type="button"
+            onClick={handleShowConfig}
+            disabled={!!validUntilError || !!validFromError}
+            tabIndex={tabIndex}
+          >
             Set order parameters
           </button>
         </span>
