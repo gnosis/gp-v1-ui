@@ -45,6 +45,7 @@ export default Joi.object({
     .multiple(5)
     .min(15)
     .messages({
+      [BASE]: 'Invalid time',
       [INTEGER]: 'Invalid time',
       [MIN]: 'Time must be greater than or equal to 15',
       [MULTIPLE]: 'Time must be a multiple of 5',
@@ -55,6 +56,7 @@ export default Joi.object({
     .multiple(5)
     .min(5)
     .messages({
+      [BASE]: 'Invalid time',
       [INTEGER]: 'Invalid time',
       [MIN]: 'Time must be greater than or equal to 5',
       [MULTIPLE]: 'Time must be a multiple of 5',

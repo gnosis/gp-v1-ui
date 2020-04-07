@@ -1,4 +1,5 @@
-import React, { useCallback, Dispatch, SetStateAction } from 'react'
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import React, { useCallback, Dispatch, SetStateAction, useRef, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -11,7 +12,7 @@ import useSafeState from 'hooks/useSafeState'
 import { formatTimeInHours, makeMultipleOf } from 'utils'
 
 import cog from 'assets/img/cog.svg'
-import { MEDIA } from 'const'
+import { MEDIA, VALID_UNTIL_DEFAULT, VALID_FROM_DEFAULT } from 'const'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { FormInputError } from './FormMessage'
 
@@ -282,14 +283,49 @@ const OrderValidity: React.FC<Props> = ({
     validUntilInputId,
     validUntilInputValue,
   ])
+  const validFromRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
+  const validUntilRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
+
+  // This side effect is for not requiring disable on validFrom/Until inputs
+  // and auto-magically updating the checkbox/values on change
+  // also allows auto focus and select when manually unchecking ASAP or Never checkboxes
+  useEffect(() => {
+    // undefined validFrom input - set ASAP
+    !validFromInputValue
+      ? batchedUpdates(() => {
+          setAsap(true)
+          setValue(validFromInputId, undefined, true)
+        })
+      : setAsap(false)
+    // undefined validUntil input - set unlimited
+    !validUntilInputValue
+      ? batchedUpdates(() => {
+          setUnlimited(true)
+          setValue(validUntilInputId, undefined, true)
+        })
+      : setUnlimited(false)
+  }, [setAsap, setUnlimited, setValue, validFromInputValue, validFromInputId, validUntilInputValue, validUntilInputId])
 
   function handleUnlimitedClick(): void {
+    const reffedInput = validUntilRef.current!
     setUnlimited(isUnlimited => !isUnlimited)
-    !isUnlimited ? setValue(validUntilInputId, undefined, true) : setValue(validUntilInputId, '2880', true)
+    if (!isUnlimited) {
+      return setValue(validUntilInputId, undefined, true)
+    }
+
+    reffedInput.focus()
+    setValue(validUntilInputId, VALID_UNTIL_DEFAULT, true)
+    reffedInput.select()
   }
   function handleASAPClick(): void {
+    const reffedInput = validFromRef.current!
     setAsap(isAsap => !isAsap)
-    !isAsap ? setValue(validFromInputId, undefined, true) : setValue(validFromInputId, '30', true)
+    if (!isAsap) {
+      return setValue(validFromInputId, undefined, true)
+    }
+    reffedInput.focus()
+    setValue(validFromInputId, VALID_FROM_DEFAULT, true)
+    reffedInput.select()
   }
 
   return (
@@ -313,11 +349,13 @@ const OrderValidity: React.FC<Props> = ({
             <input
               className={validFromClassName}
               name={validFromInputId}
-              type="number"
-              step="5"
-              disabled={isDisabled || isAsap}
+              type="text"
+              disabled={isDisabled}
               required
-              ref={register}
+              ref={(e): void => {
+                register(e)
+                validFromRef.current = e
+              }}
               onFocus={(e): void => e.target.select()}
               tabIndex={tabIndex}
             />
@@ -340,11 +378,13 @@ const OrderValidity: React.FC<Props> = ({
             <input
               className={validUntilClassName}
               name={validUntilInputId}
-              type="number"
-              step="5"
-              disabled={isDisabled || isUnlimited}
+              type="text"
+              disabled={isDisabled}
               required
-              ref={register}
+              ref={(e): void => {
+                register(e)
+                validUntilRef.current = e
+              }}
               onFocus={(e): void => e.target.select()}
               tabIndex={tabIndex}
             />
