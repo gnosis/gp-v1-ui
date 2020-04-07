@@ -110,7 +110,9 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     <>
       <p>
         Wrap ETH into WETH, so it can later be deposited into the exchange.{' '}
-        {!wethHelpVisible && <a onClick={(): void => showWethHelp(true)}>Learn more...</a>}
+        <a onClick={(): void => showWethHelp(!wethHelpVisible)}>
+          {wethHelpVisible ? '[-] Show less...' : '[+] Show more...'}
+        </a>
       </p>
       {wethHelpVisible && WethHelp}
     </>

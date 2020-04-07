@@ -231,7 +231,7 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
-          {!readOnly && selectedToken.addressMainnet === WETH_ADDRESS_MAINNET && <WrapEtherBtn />}
+          {!readOnly && selectedToken.addressMainnet === WETH_ADDRESS_MAINNET && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
             {readOnly ? (
