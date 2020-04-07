@@ -146,7 +146,8 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
       console.log('fetchResult', result)
       setFetchResult(result)
     })
-  }, [value, networkId, setFetchResult])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value.toLowerCase(), networkId, setFetchResult])
 
   if (
     !fetchResult ||
