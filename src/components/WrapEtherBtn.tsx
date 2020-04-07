@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-// import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
 import { InputBox } from 'components/InputBox'
@@ -78,20 +77,25 @@ interface WrapUnwrapEtherBtnProps {
 
 export type WrapEtherBtnProps = Omit<WrapUnwrapEtherBtnProps, 'wrap'>
 
-const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
-  const { wrap, label, className } = props
-  const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { register, errors, setValue } = useForm()
-  const wrapEtherError = errors[INPUT_ID_WRAP_ETH_AMOUNT]
-  // const [isWrapEtherModalVisible, showWrapEtherModal] = useSafeState(false)
+interface WrapUnwrapInfo {
+  title: string
+  symbolSource: string
+  balance: BN
+  tooltipText: JSX.Element | string
+  description: JSX.Element
+  amountLabel: string
+}
 
-  // TODO: Get balance in another PR
-  const availableBalanceInEther = new BN('1234567800000000000')
-
-  const title = wrap ? 'Wrap Ether' : 'Unwrap Ether'
+function getModalParams(
+  wrap: boolean,
+  wethHelpVisible: boolean,
+  showWethHelp: React.Dispatch<React.SetStateAction<boolean>>,
+): WrapUnwrapInfo {
   const WethHelp = (
     <div className="more-info">
-      <p>Gnosis Protocol allows to exchange any ERC20 token, but since ETH is not one, it needs to be wrapped first.</p>
+      <p>
+        Gnosis Protocol allows to exchange any ERC20 token, but since ETH is not an ERC20, it needs to be wrapped first.
+      </p>
       <p>
         Wrapping is sending your ether into the WETH contract. That would mint the same amount of WETH as ETH you send
         to it.
@@ -106,24 +110,71 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     </div>
   )
 
-  const description = wrap ? (
-    <>
-      <p>
-        Wrap ETH into WETH, so it can later be deposited into the exchange.{' '}
-        <a onClick={(): void => showWethHelp(!wethHelpVisible)}>
-          {wethHelpVisible ? '[-] Show less...' : '[+] Show more...'}
-        </a>
-      </p>
-      {wethHelpVisible && WethHelp}
-    </>
-  ) : (
-    <>
-      <p>
-        Unwrap converts back WETH into ETH.{' '}
-        {!wethHelpVisible && <a onClick={(): void => showWethHelp(true)}>Learn more...</a>}
-      </p>
-      {wethHelpVisible && WethHelp}
-    </>
+  if (wrap) {
+    // TODO: Get ETH balance
+    const description = (
+      <>
+        <p>
+          Wrap ETH into WETH, so it can later be deposited into the exchange.{' '}
+          <a onClick={(): void => showWethHelp(!wethHelpVisible)}>
+            {wethHelpVisible ? '[-] Show less...' : '[+] Show more...'}
+          </a>
+        </p>
+        {wethHelpVisible && WethHelp}
+      </>
+    )
+    const tooltipText = (
+      <div>
+        Wrap converts ETH into WETH,
+        <br />
+        so it can be deposited into the exchange)
+      </div>
+    )
+
+    // TODO: Get ETH balance
+    const balance = new BN('1234567800000000000')
+
+    return {
+      title: 'Wrap Ether',
+      amountLabel: 'Amount to Wrap',
+      symbolSource: 'ETH',
+      balance,
+      description,
+      tooltipText,
+    }
+  } else {
+    const description = (
+      <>
+        <p>
+          Unwrap converts back WETH into ETH.{' '}
+          {!wethHelpVisible && <a onClick={(): void => showWethHelp(true)}>Learn more...</a>}
+        </p>
+        {wethHelpVisible && WethHelp}
+      </>
+    )
+    // TODO: Get WETH balance
+    const balance = new BN('1234567800000000000')
+
+    return {
+      title: 'Unwrap Ether',
+      amountLabel: 'Amount to Wrap',
+      symbolSource: 'WETH',
+      balance,
+      description,
+      tooltipText: 'Unwrap converts back WETH into ETH',
+    }
+  }
+}
+
+const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
+  const { wrap, label, className } = props
+  const [wethHelpVisible, showWethHelp] = useSafeState(false)
+  const { register, errors, setValue } = useForm()
+  const wrapEtherError = errors[INPUT_ID_WRAP_ETH_AMOUNT]
+  const { title, balance, symbolSource, tooltipText, description, amountLabel } = getModalParams(
+    wrap,
+    wethHelpVisible,
+    showWethHelp,
   )
 
   const [modalHook, toggleModal] = useModali({
@@ -133,26 +184,21 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       <ModalWrapper>
         <div>
           {description}
-          <b>Available Ether</b>
+          <b>Available {symbolSource}</b>
           <div>
-            <a
-              onClick={(): void => setValue(INPUT_ID_WRAP_ETH_AMOUNT, formatAmountFull(availableBalanceInEther), true)}
-            >
-              {formatAmountFull({ amount: availableBalanceInEther, precision: DEFAULT_PRECISION }) || ''} ETH
+            <a onClick={(): void => setValue(INPUT_ID_WRAP_ETH_AMOUNT, formatAmountFull(balance), true)}>
+              {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
             </a>
           </div>
         </div>
         <div>
-          <b>Amount to Wrap</b>
+          <b>{amountLabel}</b>
           <div>
             <InputBox>
-              <i>ETH</i>
+              <i>{symbolSource}</i>
               <input
                 type="text"
                 name={INPUT_ID_WRAP_ETH_AMOUNT}
-                // value={wethAmountToWrap}
-                // onChange={enforcePrecisionEtherAmount}
-                // onChange={(e: ChangeEvent<HTMLInputElement>): void => setWethAmountToWrap(e.target.value)}
                 placeholder="0"
                 autoFocus
                 required
@@ -162,9 +208,6 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
                   required: 'The amount is required',
                   min: 0,
                 })}
-                // onFocus={(e): void => e.target.select()}
-                // onKeyPress={onKeyPressEtherAmount}
-                // onBlur={removeExcessZerosEtherAmount}
               />
             </InputBox>
           </div>
@@ -177,16 +220,6 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       <Modali.Button label="Continue" key="yes" isStyleDefault onClick={(): void => toggleModal()} />,
     ],
   })
-
-  const tooltipText = wrap ? (
-    <div>
-      Wrap converts ETH into WETH,
-      <br />
-      so it can be deposited into the exchange)
-    </div>
-  ) : (
-    'Unwrap converts back WETH into ETH'
-  )
 
   return (
     <>
