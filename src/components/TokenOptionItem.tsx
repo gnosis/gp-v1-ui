@@ -4,10 +4,11 @@ import { TokenImgWrapper } from './TokenImg'
 import { tokenListApi, exchangeApi } from 'api'
 import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDetails } from 'types'
 import { TokenFromExchange } from 'services/factories'
 import { getTokenFromErc20 } from 'services'
-import { logDebug } from 'utils'
+import { logDebug, safeFilledToken } from 'utils'
+import { toast } from 'toastify'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -93,6 +94,17 @@ const testPAXG = {
 interface TokenAndNetwork {
   tokenAddress: string
   networkId: number
+}
+
+interface TokenDetailsAndNetwork {
+  token: TokenDetails
+  networkId: number
+}
+
+const addTokenToList = ({ token, networkId }: TokenDetailsAndNetwork): void => {
+  tokenListApi.addToken({ token, networkId })
+  const { symbol: tokenDisplayName } = safeFilledToken(token)
+  toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
 }
 
 type ValidResons =
@@ -194,9 +206,17 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
       return <>Not a valid ERC20 token</>
     case TokenFromExchange.UNREGISTERED_ERC20:
       if (!token) return <>{defaultText}</>
+
+      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = e => {
+        e.preventDefault()
+        addTokenToList({ token, networkId })
+
+        delete fetchedCache[constructCacheKey({ tokenAddress: token.address, networkId })]
+      }
+
       return (
         <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
-          <button onClick={console.log}>Add Token</button>
+          <button onClick={handleAddToken}>Add Token</button>
         </OptionItem>
       )
     default:
