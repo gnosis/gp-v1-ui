@@ -7,6 +7,7 @@ import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 import { TokenFromExchange } from 'services/factories'
 import { getTokenFromErc20 } from 'services'
+import { logDebug } from 'utils'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -101,35 +102,43 @@ type ValidResons =
 
 interface FetchTokenResult {
   token: TokenDetails | null
-  reason: ValidResons
+  reason: ValidResons | null
 }
 
 const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
-  console.log('fetching Token')
-  const tokenInExchange = await exchangeApi.hasToken(params)
+  try {
+    console.log('fetching Token')
+    const tokenInExchange = await exchangeApi.hasToken(params)
 
-  if (!tokenInExchange)
+    if (!tokenInExchange)
+      return {
+        token: null,
+        reason: TokenFromExchange.NOT_REGISTERED_ON_CONTRACT,
+      }
+
+    const tokenId = await exchangeApi.getTokenIdByAddress(params)
+
+    const erc20Token = await getTokenFromErc20(params)
+
+    if (!erc20Token)
+      return {
+        token: null,
+        reason: TokenFromExchange.NOT_ERC20,
+      }
+
+    return {
+      token: {
+        ...erc20Token,
+        id: tokenId,
+      },
+      reason: TokenFromExchange.UNREGISTERED_ERC20,
+    }
+  } catch (error) {
+    logDebug('Error fetching token', params, error)
     return {
       token: null,
-      reason: TokenFromExchange.NOT_REGISTERED_ON_CONTRACT,
+      reason: null,
     }
-
-  const tokenId = await exchangeApi.getTokenIdByAddress(params)
-
-  const erc20Token = await getTokenFromErc20(params)
-
-  if (!erc20Token)
-    return {
-      token: null,
-      reason: TokenFromExchange.NOT_ERC20,
-    }
-
-  return {
-    token: {
-      ...erc20Token,
-      id: tokenId,
-    },
-    reason: TokenFromExchange.UNREGISTERED_ERC20,
   }
 }
 
@@ -190,5 +199,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
           <button onClick={console.log}>Add Token</button>
         </OptionItem>
       )
+    default:
+      return <>{defaultText}</>
   }
 }
