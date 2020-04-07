@@ -14,7 +14,7 @@ import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/To
 import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
-import { MEDIA } from 'const'
+import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { WrapEtherBtn } from 'components/WrapEtherBtn'
 
 const Wrapper = styled.div`
@@ -231,7 +231,7 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
-          {selectedToken.symbol && selectedToken.symbol === 'WETH' && <WrapEtherBtn />}
+          {selectedToken.addressMainnet === WETH_ADDRESS_MAINNET && <WrapEtherBtn />}
           <span>
             Balance:
             {readOnly ? (
