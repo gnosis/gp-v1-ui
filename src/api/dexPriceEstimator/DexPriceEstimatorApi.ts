@@ -2,7 +2,7 @@ import BigNumber from 'bignumber.js'
 import { getNetworkFromId, assert, TEN_BIG_NUMBER } from '@gnosis.pm/dex-js'
 
 export interface DexPriceEstimatorApi {
-  getPrice(params: GetPriceParams): Promise<BigNumber>
+  getPrice(params: GetPriceParams): Promise<BigNumber | null>
 }
 
 interface GetPriceParams {
@@ -52,7 +52,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     })
   }
 
-  public async getPrice(params: GetPriceParams): Promise<BigNumber> {
+  public async getPrice(params: GetPriceParams): Promise<BigNumber | null> {
     const {
       networkId,
       baseToken: { id: baseTokenId, decimals: baseTokenDecimals = 18 },
@@ -70,6 +70,10 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       const response = await this.query<GetPriceResponse>(networkId, queryString)
       console.log('response:', response)
 
+      if (!response) {
+        return response
+      }
+
       return this.parsePricesResponse(response.buyAmountInBase, baseTokenDecimals, inWei)
     } catch (e) {
       console.error(e)
@@ -84,7 +88,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     return inWei ? price : price.dividedBy(TEN_BIG_NUMBER.exponentiatedBy(decimals))
   }
 
-  private async query<T>(networkId: number, queryString: string): Promise<T> {
+  private async query<T>(networkId: number, queryString: string): Promise<T | null> {
     const baseUrl = this.urlsByNetwork[networkId]
     assert(baseUrl, `Dex-price-estimator not available for network id ${networkId}`)
 
@@ -96,8 +100,12 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       throw new Error(`Request failed: [${response.status}] ${response.body}`)
     }
 
-    console.log(response)
+    const body = await response.text()
 
-    return response.json()
+    if (!body) {
+      return null
+    }
+
+    return JSON.parse(body)
   }
 }
