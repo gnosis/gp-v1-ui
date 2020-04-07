@@ -49,11 +49,10 @@ import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimation, usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
 
 import validationSchema from './validationSchema'
-import { useDebounce } from 'hooks/useDebounce'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -437,7 +436,6 @@ const TradeWidget: React.FC = () => {
   //   baseTokenId: sellToken.id,
   //   quoteTokenId: receiveToken.id,
   // })
-  // const { value: debouncedAmount } = useDebounce(sellValue, 2000)
 
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId: fallBackNetworkId,
