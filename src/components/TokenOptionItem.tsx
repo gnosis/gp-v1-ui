@@ -188,13 +188,16 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
       return
     }
 
-    setFetchResult(null)
+    let cancelled = false
 
     fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
       console.log('fetchResult', result)
       fetchedCache[cacheKey] = result
-      setFetchResult(result)
+      if (!cancelled) setFetchResult(result)
     })
+    return (): void => {
+      cancelled = true
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.toLowerCase(), networkId, setFetchResult])
 
