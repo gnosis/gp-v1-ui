@@ -37,6 +37,10 @@ const GlobalStyles = createGlobalStyle`
     background: var(--color-background-selection); /* Chrome Browsers */
   }
 
+  *::-moz-placeholder {
+    line-height: revert;
+  }
+
   *, *:before, *:after {
     box-sizing: inherit;
   }

@@ -262,7 +262,6 @@ const BalanceTools = styled.div`
       &::placeholder {
         font-size: inherit;
         color: inherit;
-        line-height: inherit;
       }
 
       &:focus {
