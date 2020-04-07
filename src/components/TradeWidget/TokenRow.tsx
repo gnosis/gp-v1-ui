@@ -112,7 +112,7 @@ export const InputBox = styled.div`
     }
 
     &.error {
-      border-color: #ff0000a3;
+      border-color: var(--color-error);
     }
 
     &.warning {

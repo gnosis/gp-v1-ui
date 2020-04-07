@@ -10,7 +10,7 @@ export const WalletDrawerInnerWrapper = styled.div`
   box-sizing: border-box;
 
   p.error {
-    color: red;
+    color: var(--color-error);
     text-align: left;
     margin: 1rem 0 0;
     width: 100%;
@@ -136,7 +136,7 @@ export const WalletDrawerInnerWrapper = styled.div`
       }
 
       &.error {
-        border-color: #ff0000a3;
+        border-color: var(--color-error);
       }
 
       &.warning {

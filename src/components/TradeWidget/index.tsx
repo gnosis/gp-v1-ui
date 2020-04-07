@@ -141,7 +141,7 @@ const IconWrapper = styled.a`
 `
 
 const WarningLabel = styled.code`
-  background: #ffa8a8;
+  background: var(--color-error);
   border-radius: var(--border-radius);
   font-weight: bolder;
   margin: 0 auto 0.9375rem;

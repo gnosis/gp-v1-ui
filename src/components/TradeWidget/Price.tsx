@@ -110,7 +110,7 @@ export const PriceInputBox = styled.div`
     }
 
     &.error {
-      border-color: #ff0000a3;
+      border-color: var(--color-error);
     }
 
     &.warning {

@@ -36,7 +36,7 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   }
 
   &.error {
-    color: red;
+    color: var(--color-error);
   }
   &.warning {
     color: var(--color-text-primary);

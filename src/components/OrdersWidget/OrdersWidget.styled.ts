@@ -160,7 +160,7 @@ export const OrdersForm = styled.div`
     z-index: 10;
     justify-content: flex-start;
     align-items: center;
-    background: #ffd4d1;
+    background: var(--color-error);
     color: #a71409;
     height: 4rem;
     text-align: left;

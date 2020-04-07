@@ -66,6 +66,9 @@ const LightColors = `
   // Shadow
   --shadow-color: #00000047;
 
+  // States
+  --color-error: red;
+
 `
 
 const DarkColors = `
@@ -117,6 +120,9 @@ const DarkColors = `
 
   // Shadow
   --shadow-color: #00000047;
+
+  // States
+  --color-error: #cd3636;
 
 `
 
