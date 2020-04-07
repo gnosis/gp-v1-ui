@@ -55,12 +55,11 @@ interface OptionItemProps {
   image?: string
   name?: string
   symbol?: string
-  children?: React.ReactNode
 }
 
 // generic component to display token
 // with custom children option
-const OptionItemBase: React.FC<OptionItemProps> = ({ image, name, symbol, children }) => {
+export const OptionItem: React.FC<OptionItemProps> = ({ image, name, symbol, children }) => {
   return (
     <OptionItemWrapper>
       <TokenImgWrapper src={image} alt={name} />
@@ -76,8 +75,6 @@ const OptionItemBase: React.FC<OptionItemProps> = ({ image, name, symbol, childr
     </OptionItemWrapper>
   )
 }
-
-export const OptionItem = React.memo(OptionItemBase)
 
 interface SearchItemProps {
   value: string
