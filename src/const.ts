@@ -108,3 +108,5 @@ export const GP_ORDER_TX_HASHES = {
 
 export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI'])
 export const INPUT_PRECISION_SIZE = 6
+export const VALID_UNTIL_DEFAULT = '2880'
+export const VALID_FROM_DEFAULT = '30'

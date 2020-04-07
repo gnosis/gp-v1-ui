@@ -36,7 +36,7 @@ const TooltipInner = styled.div<{ $bgColor?: string }>`
   font-size: 1.2rem;
   border-radius: 0.6rem;
   letter-spacing: 0.03rem;
-  z-index: 99;
+  z-index: 2;
 
   &[data-popper-placement^='top'] > ${TooltipArrow} {
     bottom: -${TOOLTIP_OFFSET / 2}px;
