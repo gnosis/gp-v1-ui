@@ -9,6 +9,7 @@ import { TokenFromExchange } from 'services/factories'
 import { getTokenFromErc20 } from 'services'
 import { logDebug, safeFilledToken } from 'utils'
 import { toast } from 'toastify'
+import { SimpleCache } from 'api/proxy/SimpleCache'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -151,10 +152,11 @@ const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> =>
 // cache fetched tokens
 // even between remounts
 // as SearchItem will be remounted often
-const fetchedCache: Record<string, FetchTokenResult | undefined> = {}
 const constructCacheKey = ({ tokenAddress, networkId }: TokenAndNetwork): string => {
   return tokenAddress.toLowerCase() + '|' + networkId
 }
+
+const fetchedCache = new SimpleCache<FetchTokenResult, TokenAndNetwork>(constructCacheKey)
 
 // checks if token address is a valid address and not already in the list
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
@@ -168,8 +170,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
 
     // check cache on mount
     // to avoid `No results` flash on remount
-    const cacheKey = constructCacheKey({ tokenAddress: value, networkId })
-    return fetchedCache[cacheKey] || null
+    return fetchedCache.get({ tokenAddress: value, networkId }) || null
   })
 
   useEffect(() => {
@@ -177,8 +178,8 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     if (checkIfAddableAddress(value, networkId)) return
 
     // when cache is hit, token display is immediate
-    const cacheKey = constructCacheKey({ tokenAddress: value, networkId })
-    const cachedResult = fetchedCache[cacheKey]
+    const cacheKey = { tokenAddress: value, networkId }
+    const cachedResult = fetchedCache.get(cacheKey)
     if (cachedResult) {
       setFetchResult(cachedResult)
       return
@@ -192,7 +193,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
 
     fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
       // cache result
-      fetchedCache[cacheKey] = result
+      fetchedCache.set(result, cacheKey)
       if (!cancelled) setFetchResult(result)
       // fetching indicator off
       setIsFetching(false)
@@ -240,7 +241,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
         addTokenToList({ token, networkId })
 
         // clear cache as token is in list now
-        delete fetchedCache[constructCacheKey({ tokenAddress: token.address, networkId })]
+        fetchedCache.delete({ tokenAddress: token.address, networkId })
       }
 
       return (
