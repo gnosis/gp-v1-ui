@@ -133,6 +133,14 @@ const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> =>
   }
 }
 
+// cache fetched tokens
+// even between remounts
+// as SearchItem will be remounted often
+const fetchedCache: Record<string, FetchTokenResult | undefined> = {}
+const constructCacheKey = ({ tokenAddress, networkId }: TokenAndNetwork): string => {
+  return tokenAddress.toLowerCase() + '|' + networkId
+}
+
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId }) => {
   const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(null)
 
@@ -140,10 +148,20 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     // if truthy value, not already in the list and a valid address
     if (!value || tokenListApi.hasToken({ tokenAddress: value, networkId }) || !isAddress(value.toLowerCase())) return
 
+    // when cache is hit, token display is immediate
+    const cacheKey = constructCacheKey({ tokenAddress: value, networkId })
+    const cachedResult = fetchedCache[cacheKey]
+    if (cachedResult) {
+      console.log('cachedResult', cachedResult, fetchedCache)
+      setFetchResult(cachedResult)
+      return
+    }
+
     setFetchResult(null)
 
     fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
       console.log('fetchResult', result)
+      fetchedCache[cacheKey] = result
       setFetchResult(result)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
