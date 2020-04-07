@@ -15,7 +15,7 @@ interface GetPriceParams {
 
 interface Token {
   id: number
-  decimals: number
+  decimals?: number
 }
 
 // Sample response:
