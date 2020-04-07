@@ -15,11 +15,11 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   align-items: center;
   font-size: inherit;
   margin: 0 0 0 0.3rem;
-  color: #476481;
+  color: var(--color-text-primary);
   width: 100%;
 
   > a {
-    color: #218dff;
+    color: var(--color-text-active);
     margin: 0 0 0 0.3rem;
   }
 
@@ -36,11 +36,11 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   }
 
   &.error {
-    color: red;
+    color: var(--color-error);
   }
   &.warning {
-    color: #476481;
-    background: #fff0eb;
+    color: var(--color-text-primary);
+    background: var(--color-background-validation-warning);
     border-radius: 0 0 0.3rem 0.3rem;
     padding: 0.5rem;
     box-sizing: border-box;

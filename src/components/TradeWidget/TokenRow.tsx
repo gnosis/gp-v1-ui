@@ -33,7 +33,7 @@ const Wrapper = styled.div`
   > div > strong {
     margin: 0 auto 0 0;
     text-transform: capitalize;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     display: flex;
     align-items: center;
     font-size: 1.5rem;
@@ -47,7 +47,7 @@ const Wrapper = styled.div`
     display: flex;
     flex-flow: row nowrap;
     font-size: 1.3rem;
-    color: #218dff;
+    color: var(--color-text-active);
     letter-spacing: -0.03rem;
     text-align: right;
   }
@@ -69,7 +69,7 @@ const Wrapper = styled.div`
       content: '-';
       margin: 0 0.5rem;
       display: inline-block;
-      color: #9fb4c9;
+      color: var(--color-text-secondary);
       text-decoration: none;
     }
   }
@@ -79,7 +79,7 @@ const Wrapper = styled.div`
     flex-flow: row nowrap;
     align-items: center;
     justify-items: center;
-    color: #9fb4c9;
+    color: var(--color-text-secondary);
   }
 `
 
@@ -94,7 +94,7 @@ export const InputBox = styled.div`
   input {
     margin: 0;
     width: 100%;
-    background: #e7ecf3;
+    background: var(--color-background-input);
     border-radius: 0.6rem 0.6rem 0 0;
     border: 0;
     font-size: 1.6rem;
@@ -106,13 +106,13 @@ export const InputBox = styled.div`
     outline: 0;
 
     &:focus {
-      border-bottom: 0.2rem solid #218dff;
-      border-color: #218dff;
-      color: #218dff;
+      border-bottom: 0.2rem solid var(--color-text-active);
+      border-color: var(--color-text-active);
+      color: var(--color-text-active);
     }
 
     &.error {
-      border-color: #ff0000a3;
+      border-color: var(--color-error);
     }
 
     &.warning {
@@ -125,7 +125,7 @@ export const InputBox = styled.div`
 
     &[readonly] {
       background-color: var(--color-background-pageWrapper);
-      border: 1px solid #e7ecf3;
+      border: 1px solid var(--color-background-input);
     }
   }
 `
@@ -144,7 +144,7 @@ const TokenEnable = styled.div`
   height: 3.8rem;
   margin: auto -3.2rem auto 0;
   font-size: 1.4rem;
-  color: #218dff;
+  color: var(--color-text-active);
   letter-spacing: -0.05rem;
   text-align: center;
   font-weight: var(--font-weight-bold);
@@ -152,16 +152,11 @@ const TokenEnable = styled.div`
   align-items: center;
   padding: 0 4.2rem 0 1.6rem;
   box-sizing: border-box;
-  background: #deeeff;
-  border: 0.1rem solid #218dff;
+  background: var(--color-background-row-hover);
+  border: 0.1rem solid var(--color-text-active);
   border-radius: 2rem;
   cursor: pointer;
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
-
-  &:hover {
-    background: #218dff;
-    color: #ffffff;
-  }
 `
 
 interface Props {

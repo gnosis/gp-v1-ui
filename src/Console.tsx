@@ -32,7 +32,7 @@ const ButtonGroup = styled.div`
 
   > button:hover {
     background: #208dff;
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
   }
 `
 

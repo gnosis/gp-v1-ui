@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 
   > strong {
     text-transform: capitalize;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     width: 100%;
     margin: 0 0 1rem;
     padding: 0;
@@ -68,7 +68,7 @@ export const PriceInputBox = styled.div`
     align-items: center;
     opacity: 0.75;
     font-size: 1.2rem;
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: -0.05rem;
     text-align: right;
     font-weight: var(--font-weight-bold);
@@ -83,7 +83,7 @@ export const PriceInputBox = styled.div`
     margin: 0;
     width: auto;
     max-width: 100%;
-    background: #e7ecf3;
+    background: var(--color-background-input);
     border-radius: 0.6rem 0.6rem 0 0;
     border: 0;
     font-size: 1.6rem;
@@ -100,9 +100,9 @@ export const PriceInputBox = styled.div`
     }
 
     &:focus {
-      border-bottom: 0.2rem solid #218dff;
-      border-color: #218dff;
-      color: #218dff;
+      border-bottom: 0.2rem solid var(--color-text-active);
+      border-color: var(--color-text-active);
+      color: var(--color-text-active);
     }
 
     &:focus::placeholder {
@@ -110,7 +110,7 @@ export const PriceInputBox = styled.div`
     }
 
     &.error {
-      border-color: #ff0000a3;
+      border-color: var(--color-error);
     }
 
     &.warning {
