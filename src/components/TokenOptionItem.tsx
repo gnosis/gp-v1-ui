@@ -191,7 +191,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   if (
     !fetchResult ||
     !value ||
-    tokenListApi.hasToken({ tokenAddress: value, networkId }) ||
+    (!fetchResult && tokenListApi.hasToken({ tokenAddress: value, networkId })) ||
     !isAddress(value.toLowerCase())
   ) {
     return <>{defaultText}</>
