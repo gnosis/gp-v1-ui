@@ -13,8 +13,6 @@ import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { tokenListApi } from 'api'
-import Modali from 'modali'
-import { useAddTokenModal } from 'hooks/useAddTokenModal'
 import useSafeState from 'hooks/useSafeState'
 import { SearchItem, OptionItem } from './TokenOptionItem'
 
@@ -288,11 +286,6 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // When the search input is focused, force menu to remain open
   const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
 
-  const { addTokenToList, modalProps } = useAddTokenModal()
-
-  const addTokenModalOpen = useRef(modalProps.isShown)
-  addTokenModalOpen.current = modalProps.isShown
-
   const [inputText, setInputText] = useSafeState('')
 
   const onKeyDown = useCallback(
@@ -313,11 +306,9 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         // double because it's captured from onKeyDown in MenuList
         // and in general on Select, I guess
         e.stopPropagation()
-
-        addTokenToList({ tokenAddress, networkId })
       }
     },
-    [addTokenToList, networkId],
+    [networkId],
   )
 
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -325,8 +316,6 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // mount and umount hooks for watching click events
   useEffect(() => {
     const onDocumentClick = (e: MouseEvent): void => {
-      if (addTokenModalOpen.current) return
-
       const menu = wrapperRef.current?.querySelector('.react-select__menu')
       // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
       // If neither, hand focus back to react-select but turning isFocused off
@@ -345,7 +334,6 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
 
   return (
     <Wrapper ref={wrapperRef}>
-      <Modali.Modal {...modalProps} />
       <StyledSelect
         blurInputOnSelect
         isSearchable
