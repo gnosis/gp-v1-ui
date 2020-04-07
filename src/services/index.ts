@@ -23,7 +23,9 @@ const apis = {
 
 export const getTokenFromErc20 = getTokenFromErc20Factory(apis)
 
-export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis)
+export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory(apis, { getTokenFromErc20 })
+
+export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis, { getTokenFromErc20 })
 
 export const addTokenToExchangeContract = addTokenToExchangeFactory(apis)
 
