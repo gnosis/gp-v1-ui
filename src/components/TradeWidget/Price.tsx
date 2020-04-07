@@ -19,6 +19,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
 
   > strong {
+    display: flex;
     text-transform: capitalize;
     color: #2f3e4e;
     width: 100%;
@@ -28,6 +29,17 @@ const Wrapper = styled.div`
     font-size: 1.5rem;
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
+    }
+
+    > button {
+      background: none;
+      border: 0;
+      outline: 0;
+      color: var(--color-text-active);
+    }
+
+    > button:hover {
+      text-decoration: underline;
     }
   }
 `
@@ -187,7 +199,9 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
 
   return (
     <Wrapper>
-      <strong>Min. sell price</strong>
+      <strong>
+        Limit Price <button>View orderbook</button>
+      </strong>
       <PriceInputBox>
         <label>
           <input
