@@ -40,6 +40,12 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
   return copyMap
 }
 
+function setFullTokenMap(tokens: TokenDetails[]): Map<number, TokenDetails> {
+  const tokenMap = new Map()
+  tokens.forEach(token => tokenMap.set(token.id, token))
+  return tokenMap
+}
+
 // TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
 export function createOrderParams(tokens: TokenDetails[], spread: number): MultipleOrdersOrder[] {
   // We'll create 2 orders for each pair: SELL_A -> BUY_B and SELL_B -> BUY_A
@@ -104,7 +110,6 @@ const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validation
 
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
-  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
   const [spread, setSpread] = useSafeState(0.2)
   const [step, setStep] = useSafeState(1)
 
@@ -115,6 +120,18 @@ const PoolingInterface: React.FC = () => {
   const { networkId, userAddress } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  // Get all the tokens for the current network
+  const tokenList = useTokenList(fallBackNetworkId)
+
+  const tokens = useMemo(() => {
+    return (
+      tokenList
+        // Filter out the tokens not in the list
+        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
+    )
+  }, [tokenList])
+
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(setFullTokenMap(tokens))
 
   const methods = useForm<PoolingFormData>({
     defaultValues: {
@@ -131,17 +148,6 @@ const PoolingInterface: React.FC = () => {
     // only update spread on step 2
     if (step === 2) setSpread(Number(spreadValue))
   }, [setSpread, spreadValue, step])
-
-  // Get all the tokens for the current network
-  const tokenList = useTokenList(fallBackNetworkId)
-
-  const tokens = useMemo(() => {
-    return (
-      tokenList
-        // Filter out the tokens not in the list
-        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
-    )
-  }, [tokenList])
 
   const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
   const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])

@@ -19,8 +19,8 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
           subtext: (
             <>
               <p>
-                Select two or more stablecoins you want to include in your liquidity provision and you believe are worth
-                $1
+                By (de)-selecting, define <b>at least two</b> stablecoins you want to include in your liquidity
+                provision and believe are worth $1.
               </p>
               <p>Set your liquidity provision strategy once and allow your funds to market make.</p>
               <ul>
