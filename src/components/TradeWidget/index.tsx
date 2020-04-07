@@ -49,10 +49,11 @@ import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import { usePriceEstimation, usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
 
 import validationSchema from './validationSchema'
+import { useDebounce } from 'hooks/useDebounce'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -411,11 +412,6 @@ const TradeWidget: React.FC = () => {
 
   const [ordersVisible, setOrdersVisible] = useState(true)
 
-  const { priceEstimation, isPriceLoading } = usePriceEstimation({
-    baseTokenId: sellToken.id,
-    quoteTokenId: receiveToken.id,
-  })
-
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
@@ -436,6 +432,19 @@ const TradeWidget: React.FC = () => {
   const receiveValue = watch(receiveInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
+
+  // const { priceEstimation, isPriceLoading } = usePriceEstimation({
+  //   baseTokenId: sellToken.id,
+  //   quoteTokenId: receiveToken.id,
+  // })
+  // const { value: debouncedAmount } = useDebounce(sellValue, 2000)
+
+  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
+    networkId: fallBackNetworkId,
+    baseToken: { id: sellToken.id, decimals: sellToken.decimals },
+    quoteToken: { id: receiveToken.id, decimals: receiveToken.decimals },
+    amount: '0',
+  })
 
   // Updating global trade state on change
   useEffect(() => {
@@ -465,6 +474,7 @@ const TradeWidget: React.FC = () => {
       // It was supposed to be used only once. Initial price doesn't matter anymore
       if (initialPrice.current) {
         initialPrice.current = ''
+        console.log('initialPrice cleared')
       }
 
       logDebug(`[TradeWidget] priceEstimation ${priceEstimation}`)
@@ -478,6 +488,8 @@ const TradeWidget: React.FC = () => {
 
         setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
       }
+    } else {
+      console.log(`isPriceLoading: true`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceEstimation, isPriceLoading])
