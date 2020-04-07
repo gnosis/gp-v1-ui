@@ -56,6 +56,8 @@ interface OptionItemProps {
   children?: React.ReactNode
 }
 
+// generic component to display token
+// with custom children option
 const OptionItemBase: React.FC<OptionItemProps> = ({ image, name, symbol, children }) => {
   return (
     <OptionItemWrapper>
@@ -109,6 +111,7 @@ interface FetchTokenResult {
 
 const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
   try {
+    // check if registered token
     const tokenInExchange = await exchangeApi.hasToken(params)
 
     if (!tokenInExchange)
@@ -117,8 +120,10 @@ const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> =>
         reason: TokenFromExchange.NOT_REGISTERED_ON_CONTRACT,
       }
 
+    // get registered id
     const tokenId = await exchangeApi.getTokenIdByAddress(params)
 
+    // get ERC20 data
     const erc20Token = await getTokenFromErc20(params)
 
     if (!erc20Token)
@@ -151,11 +156,13 @@ const constructCacheKey = ({ tokenAddress, networkId }: TokenAndNetwork): string
   return tokenAddress.toLowerCase() + '|' + networkId
 }
 
+// checks if token address is a valid address and not already in the list
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
   !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
 
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId }) => {
   const [isFetching, setIsFetching] = useSafeState(false)
+  // cached values can be retieved on first render already
   const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(() => {
     if (!checkIfAddableAddress(value, networkId)) return null
 
@@ -177,12 +184,17 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
       return
     }
 
+    // value can change during fetch
+    // then fetch result becomes stale
     let cancelled = false
+    // fetching indicator on
     setIsFetching(true)
 
     fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
+      // cache result
       fetchedCache[cacheKey] = result
       if (!cancelled) setFetchResult(result)
+      // fetching indicator off
       setIsFetching(false)
     })
     return (): void => {
@@ -191,13 +203,19 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.toLowerCase(), networkId, setFetchResult])
+  // don't differentiate based on case
 
   if (isFetching) return <>Checking token address...</>
 
   if (
+    // if nothing fetched
     !fetchResult ||
+    // or no input at all
     !value ||
+    // or token in list
+    // !fetchResult && guards agains race condition when updated list propagates through hooks
     (!fetchResult && tokenListApi.hasToken({ tokenAddress: value, networkId })) ||
+    // or not a valid address
     !isAddress(value.toLowerCase())
   ) {
     return <>{defaultText}</>
@@ -206,17 +224,22 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   const { token, reason } = fetchResult
 
   switch (reason) {
+    // not registered --> advise to register
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
       return <>Register token on Exchange first</>
+    // not a ERC20 --> can't do much
     case TokenFromExchange.NOT_ERC20:
       return <>Not a valid ERC20 token</>
+    // registered but not in list --> option to add
     case TokenFromExchange.UNREGISTERED_ERC20:
       if (!token) return <>{defaultText}</>
 
       const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = e => {
+        // prevent react-select reaction
         e.preventDefault()
         addTokenToList({ token, networkId })
 
+        // clear cache as token is in list now
         delete fetchedCache[constructCacheKey({ tokenAddress: token.address, networkId })]
       }
 
