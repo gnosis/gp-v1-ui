@@ -57,7 +57,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
       background: var(--color-background-nav-active);
       @media ${MEDIA.mobile} {
         background: #208dff;
-        color: #ffffff;
+        color: var(--color-background-pageWrapper);
       }
     }
   }

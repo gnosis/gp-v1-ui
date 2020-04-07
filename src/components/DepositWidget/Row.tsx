@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
-import minus from 'assets/img/minus.svg'
-import plus from 'assets/img/plus.svg'
+import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
@@ -127,7 +126,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               onClick={(): void => showForm('deposit')}
               disabled={isDepositFormVisible}
             >
-              <img src={plus} />
+              <PlusSVG />
             </button>
           ) : (
             <>
@@ -150,7 +149,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               disabled={isWithdrawFormVisible}
               className="depositToken"
             >
-              <img src={minus} />
+              <MinusSVG />
             </button>
           )}
         </td>

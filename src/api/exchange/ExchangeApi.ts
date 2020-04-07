@@ -29,6 +29,8 @@ export interface GetTokenIdByAddressParams extends BaseParams {
   tokenAddress: string
 }
 
+export type HasTokenParams = GetTokenIdByAddressParams
+
 interface WithTxOptionalParams {
   txOptionalParams?: TxOptionalParams
 }
@@ -75,6 +77,7 @@ export interface ExchangeApi extends DepositApi {
 
   getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
+  hasToken(params: HasTokenParams): Promise<boolean>
 
   addToken(params: AddTokenParams): Promise<Receipt>
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
@@ -183,6 +186,11 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract(networkId)
     const tokenId = await contract.methods.tokenAddressToIdMap(tokenAddress).call()
     return +tokenId
+  }
+
+  public async hasToken({ tokenAddress, networkId }: HasTokenParams): Promise<boolean> {
+    const contract = await this._getContract(networkId)
+    return contract.methods.hasToken(tokenAddress).call()
   }
 
   public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {

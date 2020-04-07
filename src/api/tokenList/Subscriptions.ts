@@ -1,6 +1,6 @@
 import { Command } from 'types'
 
-type SubscriptionCallback<T> = (newState: T) => void
+export type SubscriptionCallback<T> = (newState: T) => void
 
 export interface SubscriptionsInterface<State> {
   subscribe(callback: SubscriptionCallback<State>): Command
