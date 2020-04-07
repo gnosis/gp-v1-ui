@@ -8,7 +8,7 @@ export const DefineSpreadWrapper = styled(InputBox)`
 
   > strong {
     margin: 0 0 1rem 0;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
   }
 
   input {
@@ -28,7 +28,7 @@ export const SpreadInformationWrapper = styled.div`
   width: 100%;
   > strong {
     margin: 0 0 1rem 0;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
   }
   > p {
     margin: 0 0 2.4rem;
@@ -38,12 +38,12 @@ export const SpreadInformationWrapper = styled.div`
 
   > p > i {
     font-style: normal;
-    color: #218dff;
+    color: var(--color-text-active);
     font-weight: var(--font-weight-bold);
   }
 `
 
 export const BlueBoldText = styled(ProgressStepText)`
-  color: #218dff;
+  color: var(--color-text-active);
   font-weight: var(--font-weight-bold);
 `
