@@ -7,6 +7,7 @@ import {
   getPriceEstimationFactory,
   subscribeToTokenListFactory,
   getTokensFactory,
+  getTokenFromErc20Factory,
 } from './factories'
 
 import { logDebug } from 'utils'
@@ -20,7 +21,7 @@ const apis = {
   theGraphApi,
 }
 
-export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory(apis)
+export const getTokenFromErc20 = getTokenFromErc20Factory(apis)
 
 export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis)
 
