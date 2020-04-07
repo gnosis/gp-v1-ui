@@ -166,6 +166,7 @@ const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean
   !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
 
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId }) => {
+  const [isFetching, setIsFetching] = useSafeState(false)
   const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(() => {
     if (!checkIfAddableAddress(value, networkId)) return null
 
@@ -189,17 +190,22 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     }
 
     let cancelled = false
+    setIsFetching(true)
 
     fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
       console.log('fetchResult', result)
       fetchedCache[cacheKey] = result
       if (!cancelled) setFetchResult(result)
+      setIsFetching(false)
     })
     return (): void => {
       cancelled = true
+      setIsFetching(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value.toLowerCase(), networkId, setFetchResult])
+
+  if (isFetching) return <>Checking token address...</>
 
   if (
     !fetchResult ||
