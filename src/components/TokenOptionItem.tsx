@@ -81,16 +81,6 @@ interface SearchItemProps {
   networkId: number
 }
 
-const testPAXG = {
-  address: '0x45804880De22913dAFE09f4980848ECE6EcbAf78',
-  symbol: 'PAXG',
-  name: 'Paxos Gold',
-  decimals: 18,
-  id: 17,
-  image:
-    'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x45804880De22913dAFE09f4980848ECE6EcbAf78/logo.png',
-}
-
 interface TokenAndNetwork {
   tokenAddress: string
   networkId: number
@@ -119,7 +109,6 @@ interface FetchTokenResult {
 
 const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
   try {
-    console.log('fetching Token')
     const tokenInExchange = await exchangeApi.hasToken(params)
 
     if (!tokenInExchange)
@@ -184,7 +173,6 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     const cacheKey = constructCacheKey({ tokenAddress: value, networkId })
     const cachedResult = fetchedCache[cacheKey]
     if (cachedResult) {
-      console.log('cachedResult', cachedResult, fetchedCache)
       setFetchResult(cachedResult)
       return
     }
@@ -193,7 +181,6 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     setIsFetching(true)
 
     fetchToken({ tokenAddress: toChecksumAddress(value), networkId }).then(result => {
-      console.log('fetchResult', result)
       fetchedCache[cacheKey] = result
       if (!cancelled) setFetchResult(result)
       setIsFetching(false)
