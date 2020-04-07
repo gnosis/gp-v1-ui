@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
@@ -10,7 +10,7 @@ import { validatePositiveConstructor, validInputPattern } from 'utils'
 import { TooltipWrapper } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
 
-export const INPUT_ID_WRAP_ETH_AMOUNT = 'etherAmount'
+export const INPUT_ID_AMOUNT = 'wrapAmount'
 
 const ModalWrapper = styled(ModalBodyWrapper)`
   > div {
@@ -169,13 +169,35 @@ function getModalParams(
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { register, errors, setValue } = useForm()
-  const wrapEtherError = errors[INPUT_ID_WRAP_ETH_AMOUNT]
-  const { title, balance, symbolSource, tooltipText, description, amountLabel } = getModalParams(
-    wrap,
-    wethHelpVisible,
-    showWethHelp,
+  const { register, errors, setValue, watch, triggerValidation } = useForm()
+  // const formRef = useRef<HTMLFormElement | null>(null)
+  const amountValue = watch(INPUT_ID_AMOUNT)
+  const amountError = errors[INPUT_ID_AMOUNT]
+
+  // console.log('amountValue', amountValue)
+
+  const { title, balance, symbolSource, tooltipText, description, amountLabel } = useMemo(
+    () => getModalParams(wrap, wethHelpVisible, showWethHelp),
+    [wrap, wethHelpVisible, showWethHelp],
   )
+
+  // const onSubmit = (data: any, event?: BaseSyntheticEvent): void => {
+  //   // OnSubmit<FieldValues>
+  //   alert('on submit 1')
+  //   if (event) {
+  //     alert('on submit 2')
+  //     console.log('Stop propagation')
+  //     event.preventDefault()
+  //     event.stopPropagation()
+  //   }
+  //   alert('on submit 4')
+  //   console.log('HANDLE SUBMITTT!!!', data)
+  // }
+
+  // const handleSubmit = (event: BaseSyntheticEvent): void => {
+  //   alert('A name was submitted')
+  //   event.preventDefault()
+  // }
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -186,7 +208,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           {description}
           <b>Available {symbolSource}</b>
           <div>
-            <a onClick={(): void => setValue(INPUT_ID_WRAP_ETH_AMOUNT, formatAmountFull(balance), true)}>
+            <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
               {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
             </a>
           </div>
@@ -198,9 +220,8 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
               <i>{symbolSource}</i>
               <input
                 type="text"
-                name={INPUT_ID_WRAP_ETH_AMOUNT}
+                name={INPUT_ID_AMOUNT}
                 placeholder="0"
-                autoFocus
                 required
                 ref={register({
                   pattern: { value: validInputPattern, message: 'Invalid amount' },
@@ -211,13 +232,32 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
               />
             </InputBox>
           </div>
-          {wrapEtherError && <p className="error">Invalid amount</p>}
+          {amountError && <p className="error">Invalid amount</p>}
         </div>
+        {/* <form ref={formRef} onSubmit={handleSubmit}></form> */}
       </ModalWrapper>
     ),
     buttons: [
       <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleModal()} />,
-      <Modali.Button label="Continue" key="yes" isStyleDefault onClick={(): void => toggleModal()} />,
+      <Modali.Button
+        label="Continue"
+        key="yes"
+        isStyleDefault
+        onClick={(): void => {
+          // if (formRef.current) {
+          //   formRef.current.submit()
+          // }
+          // handleSubmit()
+          triggerValidation(undefined, true)
+            .then(success => {
+              if (success) {
+                alert((wrap ? "Let's wrap it!" : "Let's unwrap it!") + ' --> ' + amountValue + ' ' + symbolSource)
+              }
+            })
+            .catch(console.error)
+          // toggleModal()
+        }}
+      />,
     ],
   })
 
