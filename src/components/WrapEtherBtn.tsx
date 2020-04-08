@@ -169,9 +169,11 @@ function getModalParams(
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { register, errors, setValue, watch, triggerValidation } = useForm()
+  const { register, errors, handleSubmit, setValue /* watch, triggerValidation */ } = useForm({
+    mode: 'onChange',
+  })
   // const formRef = useRef<HTMLFormElement | null>(null)
-  const amountValue = watch(INPUT_ID_AMOUNT)
+  // const amountValue = watch(INPUT_ID_AMOUNT)
   const amountError = errors[INPUT_ID_AMOUNT]
 
   // console.log('amountValue', amountValue)
@@ -181,18 +183,19 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     [wrap, wethHelpVisible, showWethHelp],
   )
 
-  // const onSubmit = (data: any, event?: BaseSyntheticEvent): void => {
-  //   // OnSubmit<FieldValues>
-  //   alert('on submit 1')
-  //   if (event) {
-  //     alert('on submit 2')
-  //     console.log('Stop propagation')
-  //     event.preventDefault()
-  //     event.stopPropagation()
-  //   }
-  //   alert('on submit 4')
-  //   console.log('HANDLE SUBMITTT!!!', data)
-  // }
+  const onSubmit = (data: FormData): void => {
+    console.debug('data', data)
+    // OnSubmit<FieldValues>
+    alert('on submit 1')
+    // if (event) {
+    //   alert('on submit 2')
+    //   console.log('Stop propagation')
+    //   event.preventDefault()
+    //   event.stopPropagation()
+    // }
+    alert('on submit 4')
+    console.log('HANDLE SUBMITTT!!!', data)
+  }
 
   // const handleSubmit = (event: BaseSyntheticEvent): void => {
   //   alert('A name was submitted')
@@ -204,60 +207,44 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     title,
     message: (
       <ModalWrapper>
-        <div>
-          {description}
-          <b>Available {symbolSource}</b>
+        <form /* onSubmit={handleSubmit(onSubmit)} */>
           <div>
-            <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
-              {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
-            </a>
+            {description}
+            <b>Available {symbolSource}</b>
+            <div>
+              <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
+                {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
+              </a>
+            </div>
           </div>
-        </div>
-        <div>
-          <b>{amountLabel}</b>
           <div>
-            <InputBox>
-              <i>{symbolSource}</i>
-              <input
-                type="text"
-                name={INPUT_ID_AMOUNT}
-                placeholder="0"
-                required
-                ref={register({
-                  pattern: { value: validInputPattern, message: 'Invalid amount' },
-                  validate: { positive: validatePositiveConstructor('Invalid amount') },
-                  required: 'The amount is required',
-                  min: 0,
-                })}
-              />
-            </InputBox>
+            <b>{amountLabel}</b>
+            <div>
+              <InputBox>
+                {/* <i>{symbolSource}</i> */}
+                <input
+                  type="text"
+                  name={INPUT_ID_AMOUNT}
+                  placeholder="0"
+                  required
+                  ref={register({
+                    pattern: { value: validInputPattern, message: 'Invalid amount' },
+                    validate: { positive: validatePositiveConstructor('Invalid amount') },
+                    required: 'The amount is required',
+                    min: 0,
+                  })}
+                />
+              </InputBox>
+            </div>
+            {amountError && <p className="error">Invalid amount</p>}
           </div>
-          {amountError && <p className="error">Invalid amount</p>}
-        </div>
+        </form>
         {/* <form ref={formRef} onSubmit={handleSubmit}></form> */}
       </ModalWrapper>
     ),
     buttons: [
       <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleModal()} />,
-      <Modali.Button
-        label="Continue"
-        key="yes"
-        isStyleDefault
-        onClick={(): void => {
-          // if (formRef.current) {
-          //   formRef.current.submit()
-          // }
-          // handleSubmit()
-          triggerValidation(undefined, true)
-            .then(success => {
-              if (success) {
-                alert((wrap ? "Let's wrap it!" : "Let's unwrap it!") + ' --> ' + amountValue + ' ' + symbolSource)
-              }
-            })
-            .catch(console.error)
-          // toggleModal()
-        }}
-      />,
+      <Modali.Button label="Continue" key="yes" isStyleDefault onClick={handleSubmit(onSubmit)} />,
     ],
   })
 
