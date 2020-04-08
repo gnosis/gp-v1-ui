@@ -229,7 +229,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       </ModalWrapper>
     ),
     buttons: [
-      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleModal()} />,
+      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => modalHook.hide()} />,
       <Modali.Button
         label="Continue"
         key="yes"
@@ -243,7 +243,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
             logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`)
             alert(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`) // TODO: Do real thing
           }
-          toggleModal()
+          modalHook.hide()
         })}
       />,
     ],
