@@ -438,10 +438,10 @@ const TradeWidget: React.FC = () => {
 
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId: fallBackNetworkId,
-    baseTokenId: sellToken.id,
-    baseTokenDecimals: sellToken.decimals,
-    quoteTokenId: receiveToken.id,
-    quoteTokenDecimals: receiveToken.decimals,
+    baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
+    quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
     amount: debouncedSellValue,
   })
 
