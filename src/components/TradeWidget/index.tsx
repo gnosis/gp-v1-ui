@@ -26,6 +26,7 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
@@ -432,16 +433,16 @@ const TradeWidget: React.FC = () => {
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
-  // const { priceEstimation, isPriceLoading } = usePriceEstimation({
-  //   baseTokenId: sellToken.id,
-  //   quoteTokenId: receiveToken.id,
-  // })
+  // Avoid querying for a new price at every input change
+  const { value: debouncedSellValue } = useDebounce(sellValue, 200)
 
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId: fallBackNetworkId,
-    baseToken: { id: sellToken.id, decimals: sellToken.decimals },
-    quoteToken: { id: receiveToken.id, decimals: receiveToken.decimals },
-    amount: '0',
+    baseTokenId: sellToken.id,
+    baseTokenDecimals: sellToken.decimals,
+    quoteTokenId: receiveToken.id,
+    quoteTokenDecimals: receiveToken.decimals,
+    amount: debouncedSellValue,
   })
 
   // Updating global trade state on change
@@ -472,7 +473,6 @@ const TradeWidget: React.FC = () => {
       // It was supposed to be used only once. Initial price doesn't matter anymore
       if (initialPrice.current) {
         initialPrice.current = ''
-        console.log('initialPrice cleared')
       }
 
       logDebug(`[TradeWidget] priceEstimation ${priceEstimation}`)
@@ -486,8 +486,6 @@ const TradeWidget: React.FC = () => {
 
         setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
       }
-    } else {
-      console.log(`isPriceLoading: true`)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [priceEstimation, isPriceLoading])
