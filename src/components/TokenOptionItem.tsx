@@ -29,6 +29,9 @@ const OptionItemWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     width: inherit;
+    align-items: center;
+    align-content: center;
+    flex-flow: row wrap;
 
     .tokenName {
       display: flex;
@@ -53,6 +56,10 @@ const OptionItemWrapper = styled.div`
 
 const ExtraOptionsMessage = styled.a`
   align-self: flex-end;
+  margin: auto 0;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  text-align: right;
 `
 
 interface OptionItemProps {
