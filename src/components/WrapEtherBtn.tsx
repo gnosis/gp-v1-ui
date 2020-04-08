@@ -6,7 +6,7 @@ import { InputBox } from 'components/InputBox'
 import { useForm } from 'react-hook-form'
 import { DEFAULT_PRECISION, formatAmountFull } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
-import { validatePositiveConstructor, validInputPattern } from 'utils'
+import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
 import { TooltipWrapper } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
 
@@ -168,10 +168,14 @@ function getModalParams(
   }
 }
 
+interface WrapEtherFormData {
+  [INPUT_ID_AMOUNT]: string
+}
+
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { register, errors, handleSubmit, setValue /* watch, triggerValidation */ } = useForm({
+  const { register, errors, handleSubmit, setValue } = useForm<WrapEtherFormData>({
     mode: 'onChange',
   })
   // const formRef = useRef<HTMLFormElement | null>(null)
@@ -184,25 +188,6 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     () => getModalParams(wrap, wethHelpVisible, showWethHelp),
     [wrap, wethHelpVisible, showWethHelp],
   )
-
-  const onSubmit = (data: FormData): void => {
-    console.debug('data', data)
-    // OnSubmit<FieldValues>
-    alert('on submit 1')
-    // if (event) {
-    //   alert('on submit 2')
-    //   console.log('Stop propagation')
-    //   event.preventDefault()
-    //   event.stopPropagation()
-    // }
-    alert('on submit 4')
-    console.log('HANDLE SUBMITTT!!!', data)
-  }
-
-  // const handleSubmit = (event: BaseSyntheticEvent): void => {
-  //   alert('A name was submitted')
-  //   event.preventDefault()
-  // }
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -241,12 +226,26 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
             {amountError && <p className="error">Invalid amount</p>}
           </div>
         </form>
-        {/* <form ref={formRef} onSubmit={handleSubmit}></form> */}
       </ModalWrapper>
     ),
     buttons: [
       <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => toggleModal()} />,
-      <Modali.Button label="Continue" key="yes" isStyleDefault onClick={handleSubmit(onSubmit)} />,
+      <Modali.Button
+        label="Continue"
+        key="yes"
+        isStyleDefault
+        onClick={handleSubmit((data: WrapEtherFormData): void => {
+          const { wrapAmount } = data
+          if (wrap) {
+            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`)
+            alert(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`) // TODO: Do real thing
+          } else {
+            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`)
+            alert(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`) // TODO: Do real thing
+          }
+          toggleModal()
+        })}
+      />,
     ],
   })
 
