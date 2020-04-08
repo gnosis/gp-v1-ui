@@ -62,7 +62,9 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       inWei = false,
     } = params
 
-    const amountInAtoms = new BigNumber(amountInUnits).multipliedBy(10 ** quoteTokenDecimals).toFixed(0)
+    const amount = new BigNumber(amountInUnits)
+
+    const amountInAtoms = amount.multipliedBy(10 ** quoteTokenDecimals).toFixed(0)
 
     // Query format: markets/1-2/estimated-buy-amount/1000000000000000000?atoms=true
     // See https://github.com/gnosis/dex-price-estimator#api
@@ -76,7 +78,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
         return response
       }
 
-      return this.parsePricesResponse(response.buyAmountInBase, baseTokenDecimals, inWei)
+      return this.parsePricesResponse(response.buyAmountInBase, baseTokenDecimals, amount, inWei)
     } catch (e) {
       console.error(e)
       throw new Error(
@@ -85,9 +87,17 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
   }
 
-  private parsePricesResponse(priceString: string, decimals: number, inWei: boolean): BigNumber {
-    const price = new BigNumber(priceString)
-    return inWei ? price : price.dividedBy(TEN_BIG_NUMBER.exponentiatedBy(decimals))
+  private parsePricesResponse(
+    baseAmountInAtoms: string,
+    baseDecimals: number,
+    quoteAmountInUnits: BigNumber,
+    inWei: boolean,
+  ): BigNumber {
+    const baseAmountInUnits = new BigNumber(baseAmountInAtoms).dividedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals))
+
+    const price = baseAmountInUnits.dividedBy(quoteAmountInUnits)
+
+    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals)) : price
   }
 
   private async query<T>(networkId: number, queryString: string): Promise<T | null> {
