@@ -114,10 +114,12 @@ interface FetchTokenResult {
 
 const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
   try {
-    // check if registered token
-    const tokenInExchange = await exchangeApi.hasToken(params)
-    // get ERC20 data
-    const erc20Token = await getTokenFromErc20(params)
+    const [tokenInExchange, erc20Token] = await Promise.all([
+      // check if registered token
+      exchangeApi.hasToken(params),
+      // get ERC20 data
+      getTokenFromErc20(params),
+    ])
 
     if (!tokenInExchange)
       return {
