@@ -6,7 +6,7 @@ import { tokenListApi, exchangeApi } from 'api'
 import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
-import { TokenFromExchange } from 'services/factories'
+import { TokenFromExchange, TokenFromErc20 } from 'services/factories'
 import { getTokenFromErc20 } from 'services'
 import { logDebug, safeFilledToken } from 'utils'
 import { toast } from 'toastify'
@@ -104,7 +104,7 @@ type ValidResons =
   | TokenFromExchange.NOT_IN_TOKEN_LIST
 
 interface FetchTokenResult {
-  token: TokenDetails | null
+  token: TokenDetails | TokenFromErc20 | null
   reason: ValidResons | null
 }
 
@@ -112,24 +112,23 @@ const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> =>
   try {
     // check if registered token
     const tokenInExchange = await exchangeApi.hasToken(params)
+    // get ERC20 data
+    const erc20Token = await getTokenFromErc20(params)
 
     if (!tokenInExchange)
       return {
-        token: null,
-        reason: TokenFromExchange.NOT_REGISTERED_ON_CONTRACT,
+        token: erc20Token,
+        reason: erc20Token ? TokenFromExchange.NOT_REGISTERED_ON_CONTRACT : TokenFromExchange.NOT_ERC20,
       }
-
-    // get registered id
-    const tokenId = await exchangeApi.getTokenIdByAddress(params)
-
-    // get ERC20 data
-    const erc20Token = await getTokenFromErc20(params)
 
     if (!erc20Token)
       return {
         token: null,
         reason: TokenFromExchange.NOT_ERC20,
       }
+
+    // get registered id
+    const tokenId = await exchangeApi.getTokenIdByAddress(params)
 
     return {
       token: {
@@ -247,7 +246,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
       return <>Not a valid ERC20 token</>
     // registered but not in list --> option to add
     case TokenFromExchange.NOT_IN_TOKEN_LIST:
-      if (!token) return <>{defaultText}</>
+      if (!token || !('id' in token)) return <>{defaultText}</>
 
       const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = e => {
         // prevent react-select reaction
