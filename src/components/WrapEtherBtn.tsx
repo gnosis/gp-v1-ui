@@ -148,7 +148,7 @@ function getModalParams(
     const description = (
       <>
         <p>
-          Unwrap converts back WETH into ETH.{' '}
+          Unwrapping converts WETH back into ETH.{' '}
           {!wethHelpVisible && <a onClick={(): void => showWethHelp(true)}>Learn more...</a>}
         </p>
         {wethHelpVisible && WethHelp}
