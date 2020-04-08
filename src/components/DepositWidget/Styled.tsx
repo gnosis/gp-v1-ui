@@ -1,15 +1,8 @@
 import styled from 'styled-components'
 
-export const ModalBodyWrapper = styled.div`
-  div > p {
-    font-size: inherit;
-    color: inherit;
-    padding: 0;
-  }
-`
-
 export const TokenRow = styled.tr`
-  .enableToken {
+  .enableToken,
+  .wrapUnwrapEther {
     height: auto;
     outline: 0;
     margin: 0;
@@ -84,6 +77,20 @@ export const TokenRow = styled.tr`
   &.loading {
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    button.wrapUnwrapEther {
+      font-size: 1rem;
+      padding 0.2rem 0.5rem;
+      margin: 0.2rem 0;
+      display: inline;
+      min-width: 5rem;
+    }
   }
 `
 

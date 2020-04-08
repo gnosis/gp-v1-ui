@@ -3,6 +3,7 @@ import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import TokenSelector from 'components/TokenSelector'
+import { InputBox } from 'components/InputBox'
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
@@ -13,7 +14,8 @@ import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/To
 import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
-import { MEDIA } from 'const'
+import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
+import { WrapEtherBtn } from 'components/WrapEtherBtn'
 
 const Wrapper = styled.div`
   display: flex;
@@ -80,53 +82,6 @@ const Wrapper = styled.div`
     align-items: center;
     justify-items: center;
     color: var(--color-text-secondary);
-  }
-`
-
-export const InputBox = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  margin: 0;
-  width: 100%;
-  height: 5.6rem;
-  position: relative;
-
-  input {
-    margin: 0;
-    width: 100%;
-    background: var(--color-background-input);
-    border-radius: 0.6rem 0.6rem 0 0;
-    border: 0;
-    font-size: 1.6rem;
-    line-height: 1;
-    box-sizing: border-box;
-    border-bottom: 0.2rem solid transparent;
-    font-weight: var(--font-weight-normal);
-    padding: 0 15rem 0 1rem;
-    outline: 0;
-
-    &:focus {
-      border-bottom: 0.2rem solid var(--color-text-active);
-      border-color: var(--color-text-active);
-      color: var(--color-text-active);
-    }
-
-    &.error {
-      border-color: var(--color-error);
-    }
-
-    &.warning {
-      color: #ff5722;
-    }
-
-    &:disabled {
-      box-shadow: none;
-    }
-
-    &[readonly] {
-      background-color: var(--color-background-pageWrapper);
-      border: 1px solid var(--color-background-input);
-    }
   }
 `
 
@@ -198,6 +153,7 @@ const TokenRow: React.FC<Props> = ({
   const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
+
   const inputValue = watch(inputId)
 
   const { onKeyPress, enforcePrecision, removeExcessZeros } = useNumberInput({
@@ -257,6 +213,8 @@ const TokenRow: React.FC<Props> = ({
     [register],
   )
 
+  const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
+
   return (
     <Wrapper>
       <div>
@@ -275,6 +233,7 @@ const TokenRow: React.FC<Props> = ({
               + Deposit
             </TooltipWrapper>
           )}
+          {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
             {readOnly ? (
