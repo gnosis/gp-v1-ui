@@ -51,6 +51,10 @@ const OptionItemWrapper = styled.div`
   }
 `
 
+const ExtraOptionsMessage = styled.span`
+  align-self: flex-end;
+`
+
 interface OptionItemProps {
   image?: string
   name?: string
@@ -240,7 +244,12 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   switch (reason) {
     // not registered --> advise to register
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
-      return <>Register token on Exchange first</>
+      if (!token) return <>Register token on Exchange first</>
+      return (
+        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+          <ExtraOptionsMessage>Register token on Exchange first</ExtraOptionsMessage>
+        </OptionItem>
+      )
     // not a ERC20 --> can't do much
     case TokenFromExchange.NOT_ERC20:
       return <>Not a valid ERC20 token</>
