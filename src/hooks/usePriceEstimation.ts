@@ -1,11 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import BigNumber from 'bignumber.js'
 
 import useSafeState from './useSafeState'
 
 import { getPriceEstimation } from 'services'
 import { dexPriceEstimatorApi } from 'api'
-import { useDebounce } from './useDebounce'
 
 interface Params {
   baseTokenId: number
@@ -43,71 +42,74 @@ export function usePriceEstimation(params: Params): Result {
   return { priceEstimation, isPriceLoading }
 }
 
-interface Token {
-  id: number
-  decimals?: number
-}
-
 interface SlippageParams {
   networkId: number
-  baseToken: Token
-  quoteToken: Token
+  baseTokenId: number
+  baseTokenDecimals?: number
+  quoteTokenId: number
+  quoteTokenDecimals?: number
   amount: string
 }
 
 export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
   const [isPriceLoading, setIsPriceLoading] = useSafeState(true)
   const [priceEstimation, setPriceEstimation] = useSafeState<BigNumber | null>(null)
-  const querying = useRef(false)
-  const { value: debouncedParams } = useDebounce(params, 5000)
+  const { networkId, baseTokenId, baseTokenDecimals, quoteTokenId, quoteTokenDecimals, amount } = params
+
+  console.log(`outside useEffect`, amount, baseTokenDecimals, baseTokenId, networkId, quoteTokenDecimals, quoteTokenId)
 
   useEffect(() => {
     let cancelled = false
-    const { networkId, baseToken, quoteToken, amount } = debouncedParams
+    console.log(`inside useEffect`, amount, baseTokenDecimals, baseTokenId, networkId, quoteTokenDecimals, quoteTokenId)
 
     async function estimatePrice(): Promise<void> {
       setIsPriceLoading(true)
-      console.log(`started loading`)
+
       try {
-        const getPriceParams = { networkId, baseToken, quoteToken }
+        const getPriceParams = {
+          networkId,
+          baseToken: { id: baseTokenId, decimals: baseTokenDecimals },
+          quoteToken: { id: quoteTokenId, decimals: quoteTokenDecimals },
+        }
         if (+amount > 0) {
           // Default (when no amount is provided) is to query 1 unit
           getPriceParams['amountInUnits'] = amount
         }
 
         const price = await dexPriceEstimatorApi.getPrice(getPriceParams)
-        console.log(`got price ${price}`)
+
         if (!cancelled) {
-          console.log(`not cancelled, updating price`)
+          console.log(`not cancelled`)
           setPriceEstimation(price)
+        } else {
+          console.log(`cancelled`)
         }
       } catch (e) {
         console.error(
-          `[usePriceEstimationWithSlippage] Error getting price estimation for tokens ${baseToken.id} and ${quoteToken.id} amount ${amount}`,
+          `[usePriceEstimationWithSlippage] Error getting price estimation for tokens ${baseTokenId} and ${quoteTokenId} amount ${amount}`,
           e,
         )
       } finally {
-        console.log(`finished loading`)
         setIsPriceLoading(false)
       }
     }
-    console.log('something changed', amount, baseToken, networkId, quoteToken)
 
-    if (!querying.current) {
-      console.log(`not querying, starting`)
-      querying.current = true
-      estimatePrice().then(() => {
-        console.log(`done querying`)
-        querying.current = false
-      })
-    }
+    estimatePrice()
 
     return (): void => {
-      console.log(`umounting, cancelling and resting querying`)
       cancelled = true
-      querying.current = false
+      console.log(`cancelled`)
     }
-  }, [debouncedParams, setIsPriceLoading, setPriceEstimation])
+  }, [
+    amount,
+    baseTokenDecimals,
+    baseTokenId,
+    networkId,
+    quoteTokenDecimals,
+    quoteTokenId,
+    setIsPriceLoading,
+    setPriceEstimation,
+  ])
 
   return { priceEstimation, isPriceLoading }
 }
