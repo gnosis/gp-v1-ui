@@ -15,12 +15,30 @@ interface OrderBookProps {
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
-
   min-height: 40rem;
-  color: white;
   text-align: center;
-  font-size: 1.6rem;
   width: 100%;
+  height: 100%;
+  min-width: 100%;
+
+  .amcharts-Sprite-group {
+    font-size: 1rem;
+  }
+
+  .amcharts-Container .amcharts-Label {
+    text-transform: uppercase;
+    font-size: 1.2rem;
+  }
+
+  .amcharts-ZoomOutButton-group > .amcharts-RoundedRectangle-group {
+    fill: var(--color-text-active);
+    opacity: 0.6;
+    transition: 0.3s ease-in-out;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
 `
 
 enum Offer {
@@ -103,6 +121,7 @@ const draw = (
   dataSource: string,
 ): am4charts.XYChart => {
   am4core.useTheme(am4themesSpiritedaway)
+  am4core.options.autoSetClassName = true
   const chart = am4core.create(chartElement, am4charts.XYChart)
 
   // Add data
@@ -118,6 +137,12 @@ const draw = (
   // Set up precision for numbers
   chart.numberFormatter.numberFormat = '#,###.##'
 
+  // Colors
+  const colors = {
+    green: '#3d7542',
+    red: '#dc1235',
+  }
+
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
   xAxis.dataFields.category = 'price'
@@ -130,8 +155,8 @@ const draw = (
   const bidCurve = chart.series.push(new am4charts.StepLineSeries())
   bidCurve.dataFields.categoryX = 'price'
   bidCurve.dataFields.valueY = 'bidValueY'
-  bidCurve.strokeWidth = 2
-  bidCurve.stroke = am4core.color('#0f0')
+  bidCurve.strokeWidth = 1
+  bidCurve.stroke = am4core.color(colors.green)
   bidCurve.fill = bidCurve.stroke
   bidCurve.startLocation = 0.5
   bidCurve.fillOpacity = 0.1
@@ -140,8 +165,8 @@ const draw = (
   const askCurve = chart.series.push(new am4charts.StepLineSeries())
   askCurve.dataFields.categoryX = 'price'
   askCurve.dataFields.valueY = 'askValueY'
-  askCurve.strokeWidth = 2
-  askCurve.stroke = am4core.color('#f00')
+  askCurve.strokeWidth = 1
+  askCurve.stroke = am4core.color(colors.red)
   askCurve.fill = askCurve.stroke
   askCurve.fillOpacity = 0.1
   askCurve.startLocation = 0.5
@@ -149,10 +174,17 @@ const draw = (
 
   const series3 = chart.series.push(new am4charts.ColumnSeries())
   series3.dataFields.categoryX = 'price'
-  series3.dataFields.valueY = 'volume'
+  series3.dataFields.valueY = 'bidValueY'
   series3.strokeWidth = 0
-  series3.fill = am4core.color('#000')
+  series3.fill = am4core.color(colors.green)
   series3.fillOpacity = 0.2
+
+  const series4 = chart.series.push(new am4charts.ColumnSeries())
+  series4.dataFields.categoryX = 'price'
+  series4.dataFields.valueY = 'askValueY'
+  series4.strokeWidth = 0
+  series4.fill = am4core.color(colors.red)
+  series4.fillOpacity = 0.2
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
