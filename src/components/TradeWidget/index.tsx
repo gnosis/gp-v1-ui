@@ -32,7 +32,7 @@ import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
 import { tokenListApi } from 'api'
 
-import { Network, TokenDetails } from 'types'
+import { TokenDetails } from 'types'
 
 import {
   getToken,

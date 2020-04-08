@@ -21,7 +21,7 @@ import { useForm, FormContext } from 'react-hook-form'
 
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
-import { Network, Receipt } from 'types'
+import { Receipt } from 'types'
 
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
