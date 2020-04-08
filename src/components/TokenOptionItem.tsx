@@ -51,7 +51,7 @@ const OptionItemWrapper = styled.div`
   }
 `
 
-const ExtraOptionsMessage = styled.span`
+const ExtraOptionsMessage = styled.a`
   align-self: flex-end;
 `
 
@@ -244,10 +244,21 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   switch (reason) {
     // not registered --> advise to register
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
-      if (!token) return <>Register token on Exchange first</>
+      if (!token)
+        return (
+          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+            Register token on Exchange first
+          </a>
+        )
       return (
         <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
-          <ExtraOptionsMessage>Register token on Exchange first</ExtraOptionsMessage>
+          <ExtraOptionsMessage
+            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Register token on Exchange first
+          </ExtraOptionsMessage>
         </OptionItem>
       )
     // not a ERC20 --> can't do much
