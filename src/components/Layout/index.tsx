@@ -14,7 +14,7 @@ const Wrapper = styled.div`
   flex-flow: column wrap;
 
   main {
-    flex: 1;
+    flex: 0 1 auto;
     margin: 2.4rem auto 5rem;
     width: auto;
     display: flex;
