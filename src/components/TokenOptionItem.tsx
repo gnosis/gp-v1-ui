@@ -2,13 +2,13 @@ import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress, toChecksumAddress } from 'web3-utils'
 import { TokenImgWrapper } from './TokenImg'
-import { tokenListApi, exchangeApi } from 'api'
+import { tokenListApi } from 'api'
 import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
-import { TokenFromExchange, TokenFromErc20 } from 'services/factories'
-import { getTokenFromErc20 } from 'services'
-import { logDebug, safeFilledToken } from 'utils'
+import { TokenFromExchange } from 'services/factories'
+import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
+import { safeFilledToken } from 'utils'
 import { toast } from 'toastify'
 import { SimpleCache } from 'api/proxy/SimpleCache'
 
@@ -86,11 +86,6 @@ interface SearchItemProps {
   networkId: number
 }
 
-interface TokenAndNetwork {
-  tokenAddress: string
-  networkId: number
-}
-
 interface TokenDetailsAndNetwork {
   token: TokenDetails
   networkId: number
@@ -100,56 +95,6 @@ const addTokenToList = ({ token, networkId }: TokenDetailsAndNetwork): void => {
   tokenListApi.addToken({ token, networkId })
   const { symbol: tokenDisplayName } = safeFilledToken(token)
   toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-}
-
-type ValidResons =
-  | TokenFromExchange.NOT_ERC20
-  | TokenFromExchange.NOT_REGISTERED_ON_CONTRACT
-  | TokenFromExchange.NOT_IN_TOKEN_LIST
-
-interface FetchTokenResult {
-  token: TokenDetails | TokenFromErc20 | null
-  reason: ValidResons | null
-}
-
-const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
-  try {
-    const [tokenInExchange, erc20Token] = await Promise.all([
-      // check if registered token
-      exchangeApi.hasToken(params),
-      // get ERC20 data
-      getTokenFromErc20(params),
-    ])
-
-    if (!tokenInExchange)
-      return {
-        token: erc20Token,
-        reason: erc20Token ? TokenFromExchange.NOT_REGISTERED_ON_CONTRACT : TokenFromExchange.NOT_ERC20,
-      }
-
-    if (!erc20Token)
-      return {
-        token: null,
-        reason: TokenFromExchange.NOT_ERC20,
-      }
-
-    // get registered id
-    const tokenId = await exchangeApi.getTokenIdByAddress(params)
-
-    return {
-      token: {
-        ...erc20Token,
-        id: tokenId,
-      },
-      reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
-    }
-  } catch (error) {
-    logDebug('Error fetching token', params, error)
-    return {
-      token: null,
-      reason: null,
-    }
-  }
 }
 
 // cache fetched tokens
@@ -198,7 +143,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     let promise = promisedCache.get(cacheKey)
 
     if (!promise) {
-      promise = fetchToken({ tokenAddress: toChecksumAddress(value), networkId })
+      promise = fetchTokenData({ tokenAddress: toChecksumAddress(value), networkId })
       promisedCache.set(promise, cacheKey)
     }
 
