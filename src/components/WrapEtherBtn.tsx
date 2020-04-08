@@ -162,7 +162,7 @@ function getModalParams(
       symbolSource: 'WETH',
       balance,
       description,
-      tooltipText: 'Unwrap converts back WETH into ETH',
+      tooltipText: 'Unwrapping converts WETH back into ETH',
     }
   }
 }
