@@ -190,7 +190,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   return (
     <Wrapper>
       <strong>
-        Limit Price <button>View orderbook</button>
+        Limit Price <button className="not-implemented">View orderbook</button>
       </strong>
       <PriceInputBox>
         <label>
