@@ -127,7 +127,7 @@ function getModalParams(
     )
     const tooltipText = (
       <div>
-        Wrap converts ETH into WETH,
+        Wrapping converts ETH into WETH,
         <br />
         so it can be deposited into the exchange)
       </div>
