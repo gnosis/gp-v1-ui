@@ -83,8 +83,8 @@ interface WrapUnwrapInfo {
   title: string
   symbolSource: string
   balance: BN
-  tooltipText: JSX.Element | string
-  description: JSX.Element
+  tooltipText: React.ReactNode | string
+  description: React.ReactNode
   amountLabel: string
 }
 
