@@ -6,13 +6,11 @@ import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
 import { wethAbi } from '@gnosis.pm/dex-js'
 import { logDebug } from 'utils'
 
-export interface BaseParams extends WithTxOptionalParams {
+export interface WrapUnwrapParams extends WithTxOptionalParams {
   networkId: number
-  amount: string
   userAddress: string
+  amount: string
 }
-export type DepositParams = BaseParams
-export type WithdrawParams = BaseParams
 
 /**
  * Interfaces the access to ERC20 token
@@ -20,8 +18,8 @@ export type WithdrawParams = BaseParams
  * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
  */
 export interface WethApi {
-  deposit(params: DepositParams): Promise<Receipt>
-  withdraw(params: WithdrawParams): Promise<Receipt>
+  deposit(params: WrapUnwrapParams): Promise<Receipt>
+  withdraw(params: WrapUnwrapParams): Promise<Receipt>
 }
 
 export interface WethApiDependencies {
@@ -55,7 +53,7 @@ export class WethApiImpl implements WethApi {
     this._contractPrototype = new this.web3.eth.Contract(wethAbi) as WethContract
   }
 
-  public async deposit(params: DepositParams): Promise<Receipt> {
+  public async deposit(params: WrapUnwrapParams): Promise<Receipt> {
     const { networkId, amount, userAddress, txOptionalParams } = params
     const contract = await this._getContract(networkId)
 
@@ -72,7 +70,7 @@ export class WethApiImpl implements WethApi {
     return tx
   }
 
-  public async withdraw(params: WithdrawParams): Promise<Receipt> {
+  public async withdraw(params: WrapUnwrapParams): Promise<Receipt> {
     const { networkId, amount, userAddress, txOptionalParams } = params
     const contract = await this._getContract(networkId)
 

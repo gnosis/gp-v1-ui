@@ -2,7 +2,7 @@ import { logDebug } from 'utils'
 import { Receipt } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
 import { Erc20ApiMock } from 'api/erc20/Erc20ApiMock'
-import { WethApi, DepositParams, WithdrawParams } from './WethApi'
+import { WethApi, WrapUnwrapParams } from './WethApi'
 
 import { RECEIPT } from '../../../test/data'
 
@@ -22,7 +22,7 @@ export class WethApiMock implements WethApi {
     // this._erc20ApiMock = erc20ApiMock
   }
 
-  async deposit(params: DepositParams): Promise<Receipt> {
+  async deposit(params: WrapUnwrapParams): Promise<Receipt> {
     const { networkId, amount, userAddress, txOptionalParams } = params
 
     await waitAndSendReceipt({ txOptionalParams })
@@ -49,7 +49,7 @@ export class WethApiMock implements WethApi {
     return RECEIPT
   }
 
-  async withdraw(params: WithdrawParams): Promise<Receipt> {
+  async withdraw(params: WrapUnwrapParams): Promise<Receipt> {
     const { networkId, amount, userAddress, txOptionalParams } = params
 
     await waitAndSendReceipt({ txOptionalParams })

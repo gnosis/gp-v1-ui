@@ -181,6 +181,7 @@ interface WrapEtherFormData {
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
+  use
   const { register, errors, handleSubmit, setValue } = useForm<WrapEtherFormData>({
     mode: 'onChange',
   })
@@ -244,6 +245,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           const { wrapAmount } = data
           if (wrap) {
             logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`)
+
             alert(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`) // TODO: Do real thing
           } else {
             logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`)
@@ -260,8 +262,8 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       <TooltipWrapper
         as="button"
         type="button"
-        // className={className}
-        className={className ? 'not-implemented ' + className : 'not-implemented'}
+        className={className}
+        // className={className ? 'not-implemented ' + className : 'not-implemented'}
         onClick={toggleModal}
         tooltip={tooltipText}
       >
