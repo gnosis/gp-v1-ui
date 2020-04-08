@@ -43,7 +43,7 @@ const ModalWrapper = styled(ModalBodyWrapper)`
     }
 
     .error {
-      color: red;
+      color: var(--color-error);
     }
 
     b {
