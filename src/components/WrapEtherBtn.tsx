@@ -13,59 +13,61 @@ import useSafeState from 'hooks/useSafeState'
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
 const ModalWrapper = styled(ModalBodyWrapper)`
-  > div {
-    margin: 3rem 1.5rem;
+  > form {
+    > div {
+      margin: 3rem 1.5rem;
 
-    ${InputBox} {
-      position: relative;
-      display: flex;
-      flex-flow: row wrap;
-
-      i {
-        position: absolute;
-        right: 1rem;
-        top: 0;
-        bottom: 0;
-        margin: 0;
-        color: #476481;
-        letter-spacing: -0.05rem;
-        text-align: right;
-        font-family: var(--font-default);
-        font-weight: var(--font-weight-bold);
-        font-size: 1.2rem;
-        font-style: normal;
+      ${InputBox} {
+        position: relative;
         display: flex;
-        justify-content: center;
-        align-items: center;
+        flex-flow: row wrap;
+
+        i {
+          position: absolute;
+          right: 1rem;
+          top: 0;
+          bottom: 0;
+          margin: 0;
+          color: #476481;
+          letter-spacing: -0.05rem;
+          text-align: right;
+          font-family: var(--font-default);
+          font-weight: var(--font-weight-bold);
+          font-size: 1.2rem;
+          font-style: normal;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
       }
     }
-  }
 
-  .error {
-    color: red;
-  }
+    .error {
+      color: red;
+    }
 
-  b {
-    font-size: 1.3rem;
-    color: #2f3e4e;
-    margin: 0 1.6rem 0 0;
-    margin-bottom: 0.5rem;
-    padding-left: -0.5;
-    display: block;
-  }
+    b {
+      font-size: 1.3rem;
+      color: #2f3e4e;
+      margin: 0 1.6rem 0 0;
+      margin-bottom: 0.5rem;
+      padding-left: -0.5;
+      display: block;
+    }
 
-  a {
-    color: rgb(33, 141, 255);
-  }
+    a {
+      color: rgb(33, 141, 255);
+    }
 
-  p a {
-    font-size: 1.2rem;
-    margin-left: 0.2rem;
-  }
+    p a {
+      font-size: 1.2rem;
+      margin-left: 0.2rem;
+    }
 
-  .more-info {
-    font-size: 1.3rem;
-    padding-left: 1rem;
+    .more-info {
+      font-size: 1.3rem;
+      padding-left: 1rem;
+    }
   }
 `
 
@@ -207,7 +209,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     title,
     message: (
       <ModalWrapper>
-        <form /* onSubmit={handleSubmit(onSubmit)} */>
+        <form>
           <div>
             {description}
             <b>Available {symbolSource}</b>
@@ -221,7 +223,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
             <b>{amountLabel}</b>
             <div>
               <InputBox>
-                {/* <i>{symbolSource}</i> */}
+                <i>{symbolSource}</i>
                 <input
                   type="text"
                   name={INPUT_ID_AMOUNT}
