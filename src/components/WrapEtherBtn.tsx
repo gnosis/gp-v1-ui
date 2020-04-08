@@ -98,7 +98,7 @@ function getModalParams(
       <p>
         Gnosis Protocol allows the exchange of any ERC20 token. As ETH is not an ERC20 token, it must first be wrapped.
       </p>
-      <p>By wrapping ETH you will be minting your submitted amount as WETH. to it.</p>
+      <p>By wrapping ETH you will be minting your submitted amount as WETH.</p>
       <p>
         ETH can be <b>wrapped</b> as WETH anytime. Equally, WETH can be <b>unwrapped</b> back into ETH
       </p>
@@ -253,6 +253,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       <TooltipWrapper
         as="button"
         type="button"
+        // className={className}
         className={className ? 'not-implemented ' + className : 'not-implemented'}
         onClick={toggleModal}
         tooltip={tooltipText}
