@@ -1142,10 +1142,8 @@
   dependencies:
     bn.js "^5.1.1"
 
-"@gnosis.pm/dex-js@0.1.16":
-  version "0.1.16"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.1.16.tgz#1308228f8ed90c90453920bb3cdb6a25f8ceb657"
-  integrity sha512-nlc1cjFD1nPiUz/u/x1++W1EzbAoo7IRiu1YMf+WU5f7I6X5jaqTp0pDBbQrw7u8k3qes8m2RsQLQk3oSfGnew==
+"@gnosis.pm/dex-js@file:.yalc/@gnosis.pm/dex-js":
+  version "0.1.16-9f4d6d68"
   dependencies:
     "@gnosis.pm/dex-contracts" "^0.2.0"
     bignumber.js "^9.0.0"
@@ -11787,11 +11785,6 @@ react-error-overlay@^6.0.6:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-6.0.6.tgz#ac4d9dc4c1b5c536c2c312bf66aa2b09bfa384e2"
   integrity sha512-Yzpno3enVzSrSCnnljmr4b/2KUQSMZaPuqmS26t9k4nW7uwJk6STWmH9heNjPuvqUTO3jOSPkHoKgO4+Dw7uIw==
 
-react-hook-form@^5.2.0:
-  version "5.2.0"
-  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-5.2.0.tgz#b5b654516ee03d55d78b7b9e194c7f4632885426"
-  integrity sha512-EqGCSl3DxSUBtL/9lFvrFQLJ7ICdVKrfjcMHay2SvmU4trR8aqrd7YuiLSojBKmZBRdBnCcxG+LzLWF9z474NA==
-
 react-hook-form-devtools@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/react-hook-form-devtools/-/react-hook-form-devtools-1.1.3.tgz#30168f6eedc3c854b875af1ddd32e6ebde9fea21"
@@ -11803,6 +11796,11 @@ react-hook-form-devtools@^1.1.3:
     little-state-machine "^2.11.3"
     lodash "^4.17.15"
     react-simple-animate "^3.3.6"
+
+react-hook-form@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-5.2.0.tgz#b5b654516ee03d55d78b7b9e194c7f4632885426"
+  integrity sha512-EqGCSl3DxSUBtL/9lFvrFQLJ7ICdVKrfjcMHay2SvmU4trR8aqrd7YuiLSojBKmZBRdBnCcxG+LzLWF9z474NA==
 
 react-hot-loader@^4.12.19:
   version "4.12.19"
