@@ -102,7 +102,7 @@ function getModalParams(
         By wrapping ETH you will be minting your submitted amount as WETH.
         to it.
       </p>
-      <p>You can exchange back ETH for WETH any time, this is called Unwrapping WETH.</p>
+      <p>ETH can be <b>wrapped</b> as WETH anytime. Equally, WETH can be <b>unwrapped</b> back into ETH</p>
       <p>
         Learn more about WETH{' '}
         <a target="_blank" rel="noopener noreferrer" href="https://weth.io/">
