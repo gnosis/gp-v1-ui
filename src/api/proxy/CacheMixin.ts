@@ -59,7 +59,18 @@ export class CacheMixin {
       value = fnToCache(...params)
 
       // save it for next round
+      // store possibly a promise
       this.store(hash, value, ttl)
+      Promise.resolve(value)
+        .then(val => {
+          // store a value of resolved promise
+          this.store(hash, val, ttl)
+        })
+        // don't cache errors
+        .catch(() => {
+          // remove failed promise from store
+          this.remove(hash)
+        })
 
       return value as R
     }
@@ -73,6 +84,10 @@ export class CacheMixin {
     }
 
     return obj
+  }
+
+  private remove(hash: string): void {
+    this.cache.del(hash)
   }
 
   private store<R>(hash: string, obj: R, ttl?: number): void {

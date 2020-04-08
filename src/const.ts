@@ -97,7 +97,7 @@ export const MEDIA = {
 export const ELLIPSIS = '...'
 // TODO change infuraID for production
 export const INFURA_ID = '8b4d9b4306294d2e92e0775ff1075066'
-export const INITIAL_INFURA_ENDPOINT = `wss://rinkeby.infura.io/ws/v3/${INFURA_ID}`
+export const INITIAL_INFURA_ENDPOINT = `wss://mainnet.infura.io/ws/v3/${INFURA_ID}`
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
 
@@ -106,5 +106,7 @@ export const GP_ORDER_TX_HASHES = {
   4: 'GP_ORDER_TX_HASHES_4',
 }
 
-export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI', 'sUSD'])
+export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI'])
 export const INPUT_PRECISION_SIZE = 6
+export const VALID_UNTIL_DEFAULT = '2880'
+export const VALID_FROM_DEFAULT = '30'

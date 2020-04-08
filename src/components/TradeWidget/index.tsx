@@ -1,7 +1,9 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
+
 import styled from 'styled-components'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import switchTokenPair from 'assets/img/switch.svg'
+import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -32,13 +34,25 @@ import { tokenListApi } from 'api'
 
 import { Network, TokenDetails } from 'types'
 
-import { getToken, parseAmount, parseBigNumber, dateToBatchId, logDebug } from 'utils'
+import {
+  getToken,
+  parseAmount,
+  parseBigNumber,
+  dateToBatchId,
+  logDebug,
+  resolverFactory,
+  formatTimeToFromBatch,
+} from 'utils'
+
 import { ZERO } from 'const'
+
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimation } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
+
+import validationSchema from './validationSchema'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -49,7 +63,7 @@ const WrappedWidget = styled(Widget)`
   width: auto;
   flex-flow: row nowrap;
   display: flex;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -101,7 +115,7 @@ const WrappedForm = styled.form`
 
   > p {
     font-size: 1.3rem;
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: 0;
     text-align: center;
     margin: 1.6rem 0 0;
@@ -130,7 +144,8 @@ const WrappedForm = styled.form`
 const IconWrapper = styled.a`
   margin: 1rem auto;
 
-  > img {
+  > svg {
+    fill: var(--color-svg-switcher);
     transition: opacity 0.2s ease-in-out;
     opacity: 0.5;
     &:hover {
@@ -140,7 +155,7 @@ const IconWrapper = styled.a`
 `
 
 const WarningLabel = styled.code`
-  background: #ffa8a8;
+  background: var(--color-error);
   border-radius: var(--border-radius);
   font-weight: bolder;
   margin: 0 auto 0.9375rem;
@@ -150,11 +165,11 @@ const WarningLabel = styled.code`
 `
 
 const SubmitButton = styled.button`
-  background-color: #218dff;
+  background-color: var(--color-background-CTA);
+  color: var(--color-text-CTA);
   border-radius: 3rem;
   font-family: var(--font-default);
   font-size: 1.6rem;
-  color: #ffffff;
   letter-spacing: 0.1rem;
   text-align: center;
   text-transform: uppercase;
@@ -166,6 +181,7 @@ const SubmitButton = styled.button`
   height: 4.6rem;
   margin: 1rem auto 0;
   max-width: 32rem;
+
   @media ${MEDIA.mobile} {
     font-size: 1.3rem;
     margin: 1rem auto 1.6rem;
@@ -178,7 +194,7 @@ const OrdersPanel = styled.div`
   flex: 1;
   min-width: 48rem;
   max-width: 100%;
-  background: #edf2f7;
+  background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
   transition: flex 0.2s ease-in-out;
@@ -213,7 +229,6 @@ const OrdersPanel = styled.div`
     display: flex;
     flex-flow: row wrap;
     border-radius: 0 0.6rem 0.6rem 0;
-    overflow-y: auto;
 
     @media ${MEDIA.mobile} {
       display: none;
@@ -235,7 +250,7 @@ const OrdersPanel = styled.div`
     padding: 1.6rem 0 1rem;
     font-weight: var(--font-weight-bold);
     font-size: 1.6rem;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0.03rem;
     text-align: center;
     box-sizing: border-box;
@@ -245,14 +260,14 @@ const OrdersPanel = styled.div`
   > div > h5 > a {
     font-size: 1.3rem;
     font-weight: var(--font-weight-normal);
-    color: #218dff;
+    color: var(--color-text-active);
     text-decoration: underline;
   }
 
   > div > h5 > a {
     font-size: 1.3rem;
     font-weight: var(--font-weight-normal);
-    color: #218dff;
+    color: var(--color-text-active);
     text-decoration: underline;
   }
 `
@@ -261,7 +276,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   width: 1.6rem;
   height: 100%;
   border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-  background: #ecf2f7;
+  background: var(--color-background);
   padding: 0;
   margin: 0;
   outline: 0;
@@ -281,7 +296,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   }
 
   &:hover {
-    background-color: #ecf2f7;
+    background-color: var(--color-background-banner);
   }
 `
 
@@ -298,12 +313,14 @@ export type TradeFormData = {
   [K in keyof typeof TradeFormTokenId]: string
 }
 
+const validationResolver = resolverFactory<TradeFormData>(validationSchema)
+
 export const DEFAULT_FORM_STATE = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
   // ASAP
-  validFrom: '0',
+  validFrom: undefined,
   // 2 days
   validUntil: '2880',
 }
@@ -409,6 +426,7 @@ const TradeWidget: React.FC = () => {
       [priceInputId]: defaultPrice,
       [priceInverseInputId]: invertPriceFromString(defaultPrice),
     },
+    validationResolver,
   })
   const { handleSubmit, reset, watch, setValue } = methods
 
@@ -526,19 +544,29 @@ const TradeWidget: React.FC = () => {
   )
 
   const sameToken = sellToken === receiveToken
-
-  const savePendingTransactions = useCallback(
+  const savePendingTransactionsAndResetForm = useCallback(
     (
       txHash: string,
-      { buyTokenId, sellTokenId, priceNumerator, priceDenominator, networkId, userAddress, validFrom, validUntil },
+      {
+        buyTokenId,
+        sellTokenId,
+        priceNumerator,
+        priceDenominator,
+        networkId,
+        userAddress,
+        validFromWithBatchID,
+        validUntilWithBatchID,
+      },
+      resetStateOptions: Partial<TradeFormData> = DEFAULT_FORM_STATE,
     ): void => {
-      // reset form on successful order placing
-      reset(DEFAULT_FORM_STATE)
-      setUnlimited(false)
-      // unblock form
-      setIsSubmitting(false)
+      batchUpdateState(() => {
+        // reset form on successful order placing
+        reset(resetStateOptions)
+        setUnlimited(false)
+        // unblock form
+        setIsSubmitting(false)
+      })
 
-      // pendingTxHash = txHash
       toast.info(<TxNotification txHash={txHash} />)
 
       const pendingOrder: PendingTxObj = {
@@ -550,8 +578,8 @@ const TradeWidget: React.FC = () => {
         user: userAddress,
         remainingAmount: priceDenominator,
         sellTokenBalance: ZERO,
-        validFrom,
-        validUntil,
+        validFrom: validFromWithBatchID,
+        validUntil: validUntilWithBatchID,
         txHash,
       }
 
@@ -570,8 +598,19 @@ const TradeWidget: React.FC = () => {
       sellToken: TokenDetails
       networkId: number
       userAddress: string
+      price: string
     }) => {
-      const { validFrom, validUntil, buyAmount, buyToken, sellAmount, sellToken, networkId, userAddress } = params
+      const {
+        price,
+        validFrom,
+        validUntil,
+        buyAmount,
+        buyToken,
+        sellAmount,
+        sellToken,
+        networkId,
+        userAddress,
+      } = params
 
       let pendingTxHash: string | undefined = undefined
       // block form
@@ -579,8 +618,9 @@ const TradeWidget: React.FC = () => {
 
       // TODO: Review this logic. This should be calculated in the same place where we send the tx
       const currentBatch = dateToBatchId(new Date())
-      const validFromBatchId = currentBatch + validFrom
-      const validUntilBatchId = currentBatch + validUntil
+      const validFromWithBatchID = currentBatch + validFrom
+      const validUntilWithBatchID = currentBatch + validUntil
+
       let success: boolean
       // ASAP ORDER
       if (validFrom === 0) {
@@ -596,17 +636,27 @@ const TradeWidget: React.FC = () => {
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
               pendingTxHash = txHash
-              return savePendingTransactions(txHash, {
-                buyTokenId: buyToken.id,
-                sellTokenId: sellToken.id,
-                priceNumerator: buyAmount,
-                priceDenominator: sellAmount,
-                networkId,
-                userAddress,
-                sellToken,
-                validFrom: validFromBatchId,
-                validUntil: validUntilBatchId,
-              })
+              return savePendingTransactionsAndResetForm(
+                txHash,
+                {
+                  buyTokenId: buyToken.id,
+                  sellTokenId: sellToken.id,
+                  priceNumerator: buyAmount,
+                  priceDenominator: sellAmount,
+                  networkId,
+                  userAddress,
+                  sellToken,
+                  validFromWithBatchID,
+                  validUntilWithBatchID,
+                },
+                {
+                  ...DEFAULT_FORM_STATE,
+                  price,
+                  priceInverse: invertPriceFromString(price),
+                  validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
+                  validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                },
+              )
             },
           },
         }))
@@ -628,16 +678,26 @@ const TradeWidget: React.FC = () => {
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
               pendingTxHash = txHash
-              return savePendingTransactions(txHash, {
-                buyTokenId: buyToken.id,
-                sellTokenId: sellToken.id,
-                priceNumerator: sellAmount,
-                priceDenominator: buyAmount,
-                networkId,
-                userAddress,
-                validFrom: validFromBatchId,
-                validUntil: validUntilBatchId,
-              })
+              return savePendingTransactionsAndResetForm(
+                txHash,
+                {
+                  buyTokenId: buyToken.id,
+                  sellTokenId: sellToken.id,
+                  priceNumerator: buyAmount,
+                  priceDenominator: sellAmount,
+                  networkId,
+                  userAddress,
+                  validFromWithBatchID,
+                  validUntilWithBatchID,
+                },
+                {
+                  ...DEFAULT_FORM_STATE,
+                  price,
+                  priceInverse: invertPriceFromString(price),
+                  validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
+                  validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                },
+              )
             },
           },
         }))
@@ -647,31 +707,35 @@ const TradeWidget: React.FC = () => {
         dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     },
-    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactions, setIsSubmitting],
+    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
   )
 
   async function onSubmit(data: FieldValues): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
+    const price = data[priceInputId]
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
-    const validFrom = +data[validFromId] / 5
-    const validUntil = +data[validUntilId] / 5
+    const validFromAsBatch = formatTimeToFromBatch(data[validFromId], 'BATCH')
+    const validUntilAsBatch = formatTimeToFromBatch(data[validUntilId], 'BATCH')
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
     if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
-
+    const orderParams = {
+      price,
+      validFrom: validFromAsBatch,
+      validUntil: validUntilAsBatch,
+      sellAmount,
+      buyAmount,
+      sellToken: cachedSellToken,
+      buyToken: cachedBuyToken,
+    }
     if (isConnected && userAddress) {
       await _placeOrder({
-        validFrom,
-        validUntil,
-        sellAmount,
-        buyAmount,
-        sellToken: cachedSellToken,
-        buyToken: cachedBuyToken,
+        ...orderParams,
         networkId,
         userAddress,
       })
@@ -682,12 +746,7 @@ const TradeWidget: React.FC = () => {
       // Then place the order if connection was successful
       if (walletInfo && walletInfo.networkId && walletInfo.userAddress) {
         await _placeOrder({
-          validFrom,
-          validUntil,
-          sellAmount,
-          buyAmount,
-          sellToken: cachedSellToken,
-          buyToken: cachedBuyToken,
+          ...orderParams,
           networkId: walletInfo.networkId,
           userAddress: walletInfo.userAddress,
         })
@@ -704,7 +763,7 @@ const TradeWidget: React.FC = () => {
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
-        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off">
+        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             autoFocus
@@ -721,7 +780,7 @@ const TradeWidget: React.FC = () => {
             tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
-            <img src={switchTokenPair} />
+            <SwitcherSVG />
           </IconWrapper>
           <TokenRow
             selectedToken={receiveTokenBalance}
@@ -777,6 +836,9 @@ const TradeWidget: React.FC = () => {
           <OrdersWidget />
         </div>
       </OrdersPanel>
+      {/* React Forms DevTool debugger */}
+      {process.env.NODE_ENV === 'development' &&
+        React.createElement(require('react-hook-form-devtools').DevTool, { control: methods.control })}
     </WrappedWidget>
   )
 }

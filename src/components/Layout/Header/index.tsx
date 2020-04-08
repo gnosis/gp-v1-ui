@@ -39,7 +39,7 @@ const CountDownStyled = styled.div`
   order: 2;
   font-family: var(--font-mono);
   font-size: 1.2rem;
-  color: #476481;
+  color: var(--color-text-primary);
   width: 16rem;
   letter-spacing: 0;
 
@@ -50,7 +50,7 @@ const CountDownStyled = styled.div`
   }
 
   > strong {
-    color: #218dff;
+    color: var(--color-text-active);
   }
 `
 

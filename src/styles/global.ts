@@ -12,7 +12,7 @@ const GlobalStyles = createGlobalStyle`
 
   html, body {  
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
@@ -25,6 +25,22 @@ const GlobalStyles = createGlobalStyle`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  *::selection {
+    background: var(--color-background-selection); /* WebKit/Blink Browsers */
+    color: var(--color-text-selection);
+  }
+  *::-moz-selection {
+    background: var(--color-background-selection); /* Gecko Browsers */
+  }
+  *::-webkit-selection {
+    background: var(--color-background-selection); /* Chrome Browsers */
+  }
+
+  *::-moz-placeholder {
+    line-height: revert;
+  }
+
   *, *:before, *:after {
     box-sizing: inherit;
   }
@@ -54,6 +70,8 @@ const GlobalStyles = createGlobalStyle`
   }
 
   button {
+    background-color: var(--color-background-CTA);
+    color: var(--color-text-CTA);
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
@@ -61,8 +79,9 @@ const GlobalStyles = createGlobalStyle`
     font-weight: var(--font-weight-bold);
     outline: 0;
 
-    :hover {
-      background-color: #0B66C6;
+    &:hover {
+      background-color: var(--color-background-button-hover);
+      color: var(--color-text-button-hover);
     }
 
     &:disabled,
@@ -92,8 +111,8 @@ const GlobalStyles = createGlobalStyle`
       }
     }
     &.secondary {
-      border-color: #696969;
-      color: #696969;
+      border-color: var(--color-button-secondary);
+      color: var(--color-button-secondary);
       :hover {
         border-color: black;
         color: black;
@@ -136,7 +155,7 @@ const GlobalStyles = createGlobalStyle`
       margin: 0 auto;
       background: transparent;
       appearance: none;
-      border: 0.2rem solid #9fb4c9;
+      border: 0.2rem solid var(--color-text-secondary);
       border-radius: 0.3rem;
       box-sizing: border-box;
       height: 1.4rem;
@@ -146,7 +165,7 @@ const GlobalStyles = createGlobalStyle`
       outline: 0;
       
         &:checked {
-          background: #218dff url(${checkWhite}) no-repeat center/.85rem;
+          background: var(--color-text-active) url(${checkWhite}) no-repeat center/.85rem;
           border: 0.2rem solid transparent;
         }
     }
@@ -175,7 +194,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0.4rem;
     width: 40rem;
     box-sizing: border-box;
-    color: #fff;
+    color: var(--color-background-pageWrapper);
   }
 
   .Toastify__toast-container--top-left {
@@ -252,8 +271,8 @@ const GlobalStyles = createGlobalStyle`
     font-family: var(--font-default);
     cursor: pointer;
     direction: ltr;
-    background: #ffffff;
-    color: #2f3e4e;
+    background: var(--color-background-pageWrapper);
+    color: var(--color-text-primary);
     box-shadow: 0 0 1rem 0 rgba(33, 48, 77, 0.1);
     border-radius: 0.6rem;
     font-size: 1.4rem;
@@ -850,7 +869,7 @@ const GlobalStyles = createGlobalStyle`
       display: flex;
       width: 100%;
       max-width: 60rem;
-      background: #ffffff;
+      background: var(--color-background-pageWrapper);
       flex-flow: column wrap;
       margin: 0;
       padding: 0 1.6rem 1.6rem;
@@ -863,13 +882,13 @@ const GlobalStyles = createGlobalStyle`
         line-height: 1;
         padding: 2.4rem 0;
         box-sizing: border-box;
-        color: #2f3e4e;
+        color: var(--color-text-primary);
         font-weight: var(--font-weight-bold);
       }
     
     // Individual outer container
     > div {
-      background: #ffffff;
+      background: var(--color-background-pageWrapper);
       border-radius: var(--border-radius);
       color: var(--color-text-primary);
       display: flex;
@@ -880,7 +899,7 @@ const GlobalStyles = createGlobalStyle`
     
     // Individual inner container
     > div > div {
-      background: #ffffff;
+      background: var(--color-background-pageWrapper);
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -890,13 +909,13 @@ const GlobalStyles = createGlobalStyle`
       outline: none;
       border-radius: 1.2rem;
       padding: 1rem;
-      border: 0.1rem solid #dfe6ef;
+      border: 0.1rem solid var(--color-background-banner);
       flex-flow: row nowrap;
       transition: border .2s ease-in-out;
       min-height: 5.6rem;
       
         &:hover {
-          border: 0.1rem solid #218dff;
+          border: 0.1rem solid var(--color-text-active);
         }
     }
     
@@ -922,13 +941,13 @@ const GlobalStyles = createGlobalStyle`
       text-align: left;
       padding: 0 1.2rem;
       margin: 0;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
     }
     
     // Client description
     > div > div > div:nth-of-type(3) {
       font-size: 1.5rem;
-      color: #476481;
+      color: var(--color-text-primary);
       white-space: nowrap;
     }
   }
@@ -946,7 +965,7 @@ const GlobalStyles = createGlobalStyle`
     font-size: 1.8rem;
     line-height: 1.2;
     padding: 0 2rem;
-    color: #476481;
+    color: var(--color-text-primary);
   }
   // End WalletConnect Modal
 
@@ -962,17 +981,18 @@ const GlobalStyles = createGlobalStyle`
     left: 0;
     right: 0;
     content: "";
-    background-color: rgba(47,62,78,0.5);
+    background-color: var(--color-background-modali);
     z-index: 1040;
   }
   /* End hack */
   
   .modali-open .modali-overlay {
-    background-color: rgba(47,62,78,0.5);
+    background-color: var(--color-background-modali);
     opacity: 1;
   }
   
   .modali-open .modali-wrapper-centered .modali {
+    background: var(--color-background-pageWrapper);
     box-shadow: 0 .2rem .4rem 0 rgba(0,0,0,0.14);
     border-radius: .6rem;
     border: 0;
@@ -985,13 +1005,13 @@ const GlobalStyles = createGlobalStyle`
       letter-spacing: 0;
       font-size: 1.6rem;
       text-align: left;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       margin: 0;
       display: flex;
       align-items: center;
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
-      border-bottom: 0.1rem solid #dfe6ef;
+      border-bottom: 0.1rem solid var(--color-background-banner);
     }
     
     .modali-header .modali-title {
@@ -1001,16 +1021,16 @@ const GlobalStyles = createGlobalStyle`
     }
     
     .modali-header .modali-close-button {
+      background: transparent;
       font-size: 4rem;
       line-height: 1;
-      color: #526877;
+      color: var(--color-text-CTA);
       font-weight: normal;
       opacity: .5;
       padding: 0;
       margin: auto 0 auto auto;
       
         &:hover {
-          background: transparent;
           opacity: 1;
         }
     }
@@ -1018,22 +1038,22 @@ const GlobalStyles = createGlobalStyle`
     .modali-body {
       font-size: 1.4rem;
       line-height: 1.3;
-      color: #476481;
+      background: inherit;
+      color: var(--color-text-primary);
     }
     
     .modali-footer {
       margin: 1.6rem auto 0;
       height: 5.6rem;
-      border-top: 0.1rem solid #dfe6ef;
+      border-top: 0.1rem solid var(--color-background-banner);
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0 1.6rem;
       box-sizing: border-box;
-      font-family: var(--font-mono);
 
-      .modali-button.modali-button-default {
+      .modali-button.modali-button-default, .modali-button.modali-button-cancel {
         margin: 0;
         border-radius: 0.6rem;
         outline: 0;
@@ -1045,32 +1065,26 @@ const GlobalStyles = createGlobalStyle`
         justify-content: center;
         text-decoration: none;
         text-transform: uppercase;
-        background: #218dff;
+        background: var(--color-background-CTA);
+        color: var(--color-text-CTA);
+        font-weight: var(--font-weight-bold);
+        font-size: 1.4rem;
+        
+        &:hover {
+          background-color: var(--color-background-button-hover);
+          color: var(--color-text-button-hover);
+        }
+      }
+      
+      .modali-button.modali-button-default {
         border-radius: 0.6rem;
         min-width: 14rem;
         padding: 0 1.6rem;
-        font-weight: var(--font-weight-bold);
-        color: #ffffff;
-        text-transform: uppercase;
-        font-size: 1.4rem;
-        margin: 0;
       }
-      
+
       .modali-button.modali-button-cancel {
-        margin: 0;
-        border-radius: 0.6rem;
-        outline: 0;
-        height: 3.6rem;
-        box-sizing: border-box;
-        letter-spacing: 0.03rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        text-transform: uppercase;
-        font-size: 1.4rem;
-        font-weight: var(--font-weight-bold);
-        color: #476481;
+        background: transparent;
+        color: var(--color-text-active);
       }
     }
   }

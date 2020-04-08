@@ -8,9 +8,9 @@ export const CreateStrategyWrapper = styled.div`
   width: calc(50% - 1.5rem);
   padding: 0;
   box-sizing: border-box;
-  background: rgba(223, 230, 239, 0.51);
+  background: var(--color-background);
   border-radius: 0.6rem;
-  padding: 1.6rem 1.6rem 0;
+  padding: 0 1.6rem;
   box-sizing: border-box;
   font-size: inherit;
   line-height: inherit;
@@ -22,7 +22,7 @@ export const CreateStrategyWrapper = styled.div`
 
   > strong {
     margin: 0 0 1rem 0;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
   }
   > p {
     margin: 0 0 2.4rem;
@@ -32,7 +32,7 @@ export const CreateStrategyWrapper = styled.div`
 
   > p > i {
     font-style: normal;
-    color: #218dff;
+    color: var(--color-text-active);
     font-weight: var(--font-weight-bold);
   }
 `

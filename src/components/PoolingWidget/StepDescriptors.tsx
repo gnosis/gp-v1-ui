@@ -19,8 +19,8 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
           subtext: (
             <>
               <p>
-                Select two or more stablecoins you want to include in your liquidity provision and you believe are worth
-                $1
+                By (de)-selecting, define <b>at least two</b> stablecoins you want to include in your liquidity
+                provision and believe are worth $1.
               </p>
               <p>Set your liquidity provision strategy once and allow your funds to market make.</p>
               <ul>
@@ -38,7 +38,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
                 </li>
               </ul>
               <p>
-                <a href="https://docs.gnosis.io/dfusion/docs/liquidity1" target="_blank" rel="noopener noreferrer">
+                <a href="https://docs.gnosis.io/protocol/docs/liquidity1" target="_blank" rel="noopener noreferrer">
                   Learn more about liquidity provision
                 </a>
               </p>
@@ -63,7 +63,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
                 <b>Only orders that have a deposited balance in the Exchange Wallet will be matched.</b>
               </p>
               <p>
-                <a href="https://docs.gnosis.io/dfusion/docs/liquidity1" target="_blank" rel="noopener noreferrer">
+                <a href="https://docs.gnosis.io/protocol/docs/liquidity1" target="_blank" rel="noopener noreferrer">
                   Learn more about the spread
                 </a>
               </p>

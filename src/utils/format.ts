@@ -92,3 +92,9 @@ export function parseBigNumber(value: string): BigNumber | null {
   const bigNumber = new BigNumber(value)
   return bigNumber.isNaN() ? null : bigNumber
 }
+
+export const formatTimeToFromBatch = (
+  value: string | number,
+  returnType: 'TIME' | 'BATCH' = 'TIME',
+  batchLength = 5,
+): number => (returnType === 'TIME' ? Number(value) * batchLength : Number(value) / batchLength)

@@ -23,7 +23,7 @@ import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-act
 
 import { Network, Receipt } from 'types'
 
-import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
+import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { useTokenList } from 'hooks/useTokenList'
 
@@ -38,6 +38,12 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
   // Else remove that b
   copyMap.delete(newToken.id)
   return copyMap
+}
+
+function setFullTokenMap(tokens: TokenDetails[]): Map<number, TokenDetails> {
+  const tokenMap = new Map()
+  tokens.forEach(token => tokenMap.set(token.id, token))
+  return tokenMap
 }
 
 // TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
@@ -90,21 +96,23 @@ interface PoolingFormData<T = string> {
 const validationSchema = joi.object({
   spread: joi
     .number()
-    .positive()
+    .unsafe()
+    .greater(0)
+    .less(100)
     .precision(INPUT_PRECISION_SIZE)
-    .greater(0.0)
-    .less(100.0)
-    // dont autocast numbers
-    // to their required precision, throw instead
-    .strict()
-    .required(),
+    .required()
+    .messages({
+      [NUMBER_VALIDATION_KEYS.REQUIRED]: 'Invalid spread amount',
+      [NUMBER_VALIDATION_KEYS.UNSAFE]: 'Invalid spread amount',
+      [NUMBER_VALIDATION_KEYS.LESS]: 'Spread must be between 0 and 100',
+      [NUMBER_VALIDATION_KEYS.GREATER]: 'Spread must be between 0 and 100',
+    }),
 })
 
-const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validationSchema, 'number')
+const validationResolver = resolverFactory<PoolingFormData>(validationSchema)
 
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
-  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
   const [spread, setSpread] = useSafeState(0.2)
   const [step, setStep] = useSafeState(1)
 
@@ -115,23 +123,6 @@ const PoolingInterface: React.FC = () => {
   const { networkId, userAddress } = useWalletConnection()
   // Avoid displaying an empty list of tokens when the wallet is not connected
   const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
-
-  const methods = useForm<PoolingFormData>({
-    defaultValues: {
-      spread: spread.toString(),
-    },
-    mode: 'onChange',
-    validationResolver: numberResolver,
-  })
-  const { handleSubmit, watch } = methods
-  // Watch input and set defaultValue to state spread
-  const spreadValue = watch('spread')
-
-  useEffect(() => {
-    // only update spread on step 2
-    if (step === 2) setSpread(Number(spreadValue))
-  }, [setSpread, spreadValue, step])
-
   // Get all the tokens for the current network
   const tokenList = useTokenList(fallBackNetworkId)
 
@@ -142,6 +133,24 @@ const PoolingInterface: React.FC = () => {
         .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
     )
   }, [tokenList])
+
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(setFullTokenMap(tokens))
+
+  const methods = useForm<PoolingFormData>({
+    defaultValues: {
+      spread: spread.toString(),
+    },
+    mode: 'onChange',
+    validationResolver,
+  })
+  const { handleSubmit, watch } = methods
+  // Watch input and set defaultValue to state spread
+  const spreadValue = watch('spread')
+
+  useEffect(() => {
+    // only update spread on step 2
+    if (step === 2) setSpread(Number(spreadValue))
+  }, [setSpread, spreadValue, step])
 
   const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
   const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])

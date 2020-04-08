@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-// import useSafeState from 'hooks/useSafeState'
+import useSafeState from 'hooks/useSafeState'
 import { MEDIA } from 'const'
 
 const FUSE_APP_THEME = 'FUSE_APP_THEME'
@@ -12,8 +12,7 @@ const TogglerWrapper = styled.div`
     margin: 2.4rem 0;
   }
 `
-// TODO: re-add with dark mode in future version
-/* const ToggleLabel = styled.label<{ selected: boolean }>`
+const ToggleLabel = styled.label<{ selected: boolean }>`
   color: ${(props): string => (props.selected ? 'var(--color-text-primary)' : 'var(--color-text-secondary)')};
   cursor: pointer;
   font-weight: ${(props): string => (props.selected ? 'bolder' : 'normal')};
@@ -35,10 +34,9 @@ const TogglerWrapper = styled.div`
   > input {
     display: none;
   }
-` */
+`
 
-// TODO: re-add with dark mode in future version
-// const toggleValues = ['auto', 'light', 'dark']
+const toggleValues = ['auto', 'light', 'dark']
 const toggleValue2class = {
   light: 'light-theme',
   dark: 'dark-theme',
@@ -46,21 +44,10 @@ const toggleValue2class = {
 const themeClasses = Object.values(toggleValue2class)
 
 const ThemeToggler: React.FC = () => {
-  // TODO: re-add with dark mode in future version
-  // const startTheme = localStorage.getItem(FUSE_APP_THEME) || 'auto'
-  // const [active, setActive] = useSafeState(startTheme)
+  const startTheme = localStorage.getItem(FUSE_APP_THEME) || 'auto'
+  const [active, setActive] = useSafeState(startTheme)
 
-  // TODO: remove with dark mode in future version
-  // removes persisted theme from storage and sets light mode
   useEffect(() => {
-    document.body.classList.remove(...themeClasses)
-
-    if (localStorage.getItem(FUSE_APP_THEME)) localStorage.removeItem(FUSE_APP_THEME)
-    document.body.classList.add(toggleValue2class.light)
-  }, [])
-
-  // TODO: re-add with dark mode in future version
-  /* useEffect(() => {
     const className = toggleValue2class[active]
 
     document.body.classList.remove(...themeClasses)
@@ -70,11 +57,11 @@ const ThemeToggler: React.FC = () => {
     } else {
       localStorage.removeItem(FUSE_APP_THEME)
     }
-  }, [active]) */
+  }, [active])
 
   return (
     <TogglerWrapper>
-      {/* Theme:{' '}
+      Theme:{' '}
       {toggleValues.map(value => (
         <ToggleLabel key={value} selected={value === active}>
           <input
@@ -86,7 +73,7 @@ const ThemeToggler: React.FC = () => {
           />
           {value}
         </ToggleLabel>
-      ))} */}
+      ))}
     </TogglerWrapper>
   )
 }
