@@ -1,14 +1,15 @@
 import { walletApi } from 'api'
 import { useEffect, useMemo } from 'react'
-import { Command } from 'types'
+import { Command, Network } from 'types'
 import useSafeState from './useSafeState'
 import { WalletInfo, isPromise } from 'api/wallet/WalletApi'
 
-const PendingState: { pending: true } & { [K in keyof WalletInfo]: undefined } = {
+const PendingState: { pending: true; networkIdOrDefault: number } & { [K in keyof WalletInfo]: undefined } = {
   pending: true,
   isConnected: undefined,
   userAddress: undefined,
   networkId: undefined,
+  networkIdOrDefault: Network.Mainnet,
 }
 
 export const useWalletConnection = (): (WalletInfo & { pending: false }) | typeof PendingState => {
@@ -19,6 +20,12 @@ export const useWalletConnection = (): (WalletInfo & { pending: false }) | typeo
   }, [setWalletInfo])
 
   return useMemo(() => {
-    return isPromise(walletInfo) ? PendingState : { ...walletInfo, pending: false }
+    return isPromise(walletInfo)
+      ? PendingState
+      : {
+          ...walletInfo,
+          networkIdOrDefault: walletInfo.networkId || Network.Mainnet,
+          pending: false,
+        }
   }, [walletInfo])
 }
