@@ -28,7 +28,7 @@ const ModalWrapper = styled(ModalBodyWrapper)`
           top: 0;
           bottom: 0;
           margin: 0;
-          color: #476481;
+          color: var(--color-svg-switcher);
           letter-spacing: -0.05rem;
           text-align: right;
           font-family: var(--font-default);
@@ -48,7 +48,7 @@ const ModalWrapper = styled(ModalBodyWrapper)`
 
     b {
       font-size: 1.3rem;
-      color: #2f3e4e;
+      color: : var(--color-background-modali);
       margin: 0 1.6rem 0 0;
       margin-bottom: 0.5rem;
       padding-left: -0.5;
