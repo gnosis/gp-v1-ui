@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
@@ -121,10 +121,12 @@ const draw = (
   baseToken: TokenDetails,
   quoteToken: TokenDetails,
   dataSource: string,
+  networkId: number,
 ): am4charts.XYChart => {
   am4core.useTheme(am4themesSpiritedaway)
   am4core.options.autoSetClassName = true
   const chart = am4core.create(chartElement, am4charts.XYChart)
+  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
   // Add data
   chart.dataSource.url = dataSource
@@ -148,7 +150,7 @@ const draw = (
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
   xAxis.dataFields.category = 'price'
-  xAxis.title.text = `Price (${baseToken.symbol}/${quoteToken.symbol})`
+  xAxis.title.text = `${networkDescription} Price (${baseToken.symbol}/${quoteToken.symbol})`
 
   const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
   yAxis.title.text = 'Volume'
@@ -199,8 +201,13 @@ const OrderBookWidget: React.FC<OrderBookProps> = props => {
 
   useEffect(() => {
     if (!mountPoint.current) return
-
-    const chart = draw(mountPoint.current, baseToken, quoteToken, orderbookUrl(baseToken, quoteToken, networkId))
+    const chart = draw(
+      mountPoint.current,
+      baseToken,
+      quoteToken,
+      orderbookUrl(baseToken, quoteToken, networkId),
+      networkId,
+    )
 
     return (): void => chart.dispose()
   }, [baseToken, quoteToken, networkId])
