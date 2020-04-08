@@ -9,10 +9,12 @@ const PendingState: { pending: true; networkIdOrDefault: number } & { [K in keyo
   isConnected: undefined,
   userAddress: undefined,
   networkId: undefined,
-  networkIdOrDefault: Network.Mainnet,
+  networkIdOrDefault: 1,
 }
 
-export const useWalletConnection = (): (WalletInfo & { pending: false }) | typeof PendingState => {
+export const useWalletConnection = ():
+  | (WalletInfo & { pending: false; networkIdOrDefault: number })
+  | typeof PendingState => {
   const [walletInfo, setWalletInfo] = useSafeState(() => walletApi.getWalletInfo())
 
   useEffect((): Command => {

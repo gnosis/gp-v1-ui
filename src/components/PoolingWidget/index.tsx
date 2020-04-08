@@ -120,11 +120,9 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
-  const { networkId, userAddress } = useWalletConnection()
-  // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
-  const tokenList = useTokenList(fallBackNetworkId)
+  const tokenList = useTokenList(networkIdOrDefault)
 
   const tokens = useMemo(() => {
     return (
