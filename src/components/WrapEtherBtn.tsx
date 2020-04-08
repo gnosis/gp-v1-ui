@@ -66,7 +66,9 @@ const ModalWrapper = styled(ModalBodyWrapper)`
 
     .more-info {
       font-size: 1.3rem;
-      padding-left: 1rem;
+      background: var(--color-background-validation-warning);
+      padding: 0.1rem 1rem;
+      margin: 1rem 0 0.25rem;
     }
   }
 `
@@ -117,12 +119,11 @@ function getModalParams(
     const description = (
       <>
         <p>
-          Wrap ETH into WETH, so it can later be deposited into the exchange.{' '}
+          Wrap ETH into WETH, so it can later be deposited into the exchange. {wethHelpVisible && WethHelp}
           <a onClick={(): void => showWethHelp(!wethHelpVisible)}>
             {wethHelpVisible ? '[-] Show less...' : '[+] Show more...'}
           </a>
         </p>
-        {wethHelpVisible && WethHelp}
       </>
     )
     const tooltipText = (
