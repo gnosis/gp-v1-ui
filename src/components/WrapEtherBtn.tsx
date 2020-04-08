@@ -99,7 +99,7 @@ function getModalParams(
         Gnosis Protocol allows the exchange of any ERC20 token. As ETH is not an ERC20 token, it must first be wrapped.
       </p>
       <p>
-        Wrapping is sending your ether into the WETH contract. That would mint the same amount of WETH as ETH you send
+        By wrapping ETH you will be minting your submitted amount as WETH.
         to it.
       </p>
       <p>You can exchange back ETH for WETH any time, this is called Unwrapping WETH.</p>
