@@ -60,13 +60,7 @@ const About: React.FC = () => {
         </div>
       </p>
       <p>
-        <strong>Gnosis Protocol</strong> introduces a new, fully decentralized exchange mechanism for ERC20 tokens with
-        the following properties:
-        <ul>
-          <li>Batch auctions</li>
-          <li>Multidimensional order books with ring trades</li>
-          <li>Uniform clearing prices in every batch</li>
-        </ul>
+        <strong>Gnosis Protocol</strong> is a fully permissionless DEX that enables ring trades to maximize liquidity.
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Read more here
         </a>
