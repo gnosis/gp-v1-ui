@@ -9,7 +9,7 @@ const PendingState: { pending: true; networkIdOrDefault: number } & { [K in keyo
   isConnected: undefined,
   userAddress: undefined,
   networkId: undefined,
-  networkIdOrDefault: 1,
+  networkIdOrDefault: Network.Mainnet,
 }
 
 export const useWalletConnection = ():
