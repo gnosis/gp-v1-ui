@@ -46,13 +46,19 @@ const ModalWrapper = styled(ModalBodyWrapper)`
       color: var(--color-error);
     }
 
-    b {
-      font-size: 1.3rem;
-      color: : var(--color-background-modali);
+    > b {
+      display: block;
       margin: 0 1.6rem 0 0;
       margin-bottom: 0.5rem;
       padding-left: -0.5;
-      display: block;
+      font-size: 1.3rem;
+      color: : var(--color-background-modali);
+    }
+
+    b {
+      
+      
+            
     }
 
     a {
