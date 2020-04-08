@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import BN from 'bn.js'
-import { assert } from '@gnosis.pm/dex-js'
+import { assert, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
-import { erc20Api, depositApi } from 'api'
+import { erc20Api, depositApi, walletApi } from 'api'
 
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
@@ -14,7 +14,8 @@ import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
 import { useTokenList } from './useTokenList'
 
-interface UseTokenBalanceResult {
+interface UseBalanceResult {
+  ethBalance: BN | null
   balances: TokenBalanceDetails[]
   error: boolean
 }
@@ -91,7 +92,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
         return balance
       })
       .catch(e => {
-        console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
+        console.error('[useBalances] Error for', token, userAddress, contractAddress, e)
 
         const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
 
@@ -108,30 +109,49 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   return balances.filter(Boolean) as TokenBalanceDetails[]
 }
 
-export const useTokenBalances = (): UseTokenBalanceResult => {
+export const useBalances = (): UseBalanceResult => {
   const walletInfo = useWalletConnection()
+  const [ethBalance, setEthBalance] = useSafeState<BN | null>(null)
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
   const tokens = useTokenList(walletInfo.networkId)
 
+  // Get token balances
   useEffect(() => {
-    // can return NULL (if no address or network)
-    walletInfo.isConnected &&
+    if (walletInfo.isConnected) {
       _getBalances(walletInfo, tokens)
         .then(balances => {
           logDebug(
-            '[useTokenBalances] Wallet balances',
+            '[useBalances] Wallet balances',
             balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
           )
           setBalances(balances)
           setError(false)
         })
         .catch(error => {
-          console.error('[useTokenBalances] Error loading balances', error)
+          console.error('[useBalances] Error loading token balances', error)
           setError(true)
         })
+    }
   }, [setBalances, setError, walletInfo, tokens])
 
-  return { balances, error }
+  // Get ether balances
+  useEffect(() => {
+    if (walletInfo.isConnected) {
+      walletApi
+        .getBalance()
+        .then(etherBalance => {
+          logDebug('[useBalances] Wallet balance: %s ETH', formatAmount(etherBalance, DEFAULT_PRECISION))
+          setEthBalance(etherBalance)
+          setError(false)
+        })
+        .catch(error => {
+          console.error('[useBalances] Error loading ether balance', error)
+          setError(true)
+        })
+    }
+  }, [setEthBalance, setError, walletInfo])
+
+  return { ethBalance, balances, error }
 }

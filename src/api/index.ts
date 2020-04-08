@@ -73,13 +73,7 @@ function createErc20Api(injectedDependencies: Erc20ApiDependencies): Erc20Api {
 function createWethApi(injectedDependencies: WethApiDependencies): WethApi {
   let wethApi
   if (process.env.MOCK_WETH === 'true') {
-    wethApi = new WethApiMock({
-      erc20ApiMock: new Erc20ApiMock({
-        balances: erc20Balances,
-        allowances: erc20Allowances,
-        tokens: unregisteredTokens,
-      }),
-    })
+    wethApi = new WethApiMock()
   } else {
     wethApi = new WethApiImpl(injectedDependencies)
   }

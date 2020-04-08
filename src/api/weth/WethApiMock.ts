@@ -1,14 +1,13 @@
 import { logDebug } from 'utils'
 import { Receipt } from 'types'
 import { waitAndSendReceipt } from 'utils/mock'
-import { Erc20ApiMock } from 'api/erc20/Erc20ApiMock'
 import { WethApi, WrapUnwrapParams } from './WethApi'
 
 import { RECEIPT } from '../../../test/data'
 
-interface WethApiMockParams {
-  erc20ApiMock: Erc20ApiMock
-}
+// interface WethApiMockParams {
+//   erc20ApiMock: Erc20ApiMock
+// }
 
 /**
  * Basic implementation of WETH API
@@ -16,11 +15,11 @@ interface WethApiMockParams {
 export class WethApiMock implements WethApi {
   // private _erc20ApiMock: Erc20ApiMock
 
-  public constructor(params: WethApiMockParams) {
-    console.log(params)
-    // const { erc20ApiMock } = params
-    // this._erc20ApiMock = erc20ApiMock
-  }
+  // public constructor() {
+  //   console.log(params)
+  //   // const { erc20ApiMock } = params
+  //   // this._erc20ApiMock = erc20ApiMock
+  // }
 
   async deposit(params: WrapUnwrapParams): Promise<Receipt> {
     const { networkId, amount, userAddress, txOptionalParams } = params

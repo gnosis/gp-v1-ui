@@ -12,6 +12,10 @@ export interface Result {
   unwrapWeth(amount: string): Promise<Receipt>
 }
 
+export interface Params {
+  txOptionalParams: TxOptionalParams
+}
+
 interface WrapUnwrapAuxParams {
   userAddress: string | undefined
   networkId: number | undefined
@@ -38,7 +42,8 @@ function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
   }
 }
 
-export const useWrapUnwrapEth = (txOptionalParams: TxOptionalParams): Result => {
+export const useWrapUnwrapEth = (params: Params): Result => {
+  const { txOptionalParams } = params
   const { userAddress, isConnected, networkId } = useWalletConnection()
   const [wrappingEth, setWrappingEth] = useSafeState(false)
   const [unwrappingWeth, setUnwrappingWeth] = useSafeState(false)

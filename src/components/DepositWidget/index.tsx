@@ -9,7 +9,7 @@ import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
 
-import { useTokenBalances } from 'hooks/useTokenBalances'
+import { useBalances } from 'hooks/useBalances'
 import { useRowActions } from './useRowActions'
 import { useDepositModals } from './useDepositModals'
 import useSafeState from 'hooks/useSafeState'
@@ -310,7 +310,7 @@ const NoTokensMessage = styled.tr`
 `
 
 type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
-  ReturnType<typeof useTokenBalances> & {
+  ReturnType<typeof useBalances> & {
     requestWithdrawConfirmation(
       amount: BN,
       tokenAddress: string,
@@ -448,7 +448,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 
 const DepositWidget: React.FC = () => {
-  const { balances, error } = useTokenBalances()
+  const { ethBalance, balances, error } = useBalances()
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
 
@@ -497,6 +497,7 @@ const DepositWidget: React.FC = () => {
   return (
     <section>
       <BalancesDisplayMemoed
+        ethBalance={ethBalance}
         balances={balances}
         error={error}
         {...restActions}

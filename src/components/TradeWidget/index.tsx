@@ -22,7 +22,7 @@ import FormMessage from './FormMessage'
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
-import { useTokenBalances } from 'hooks/useTokenBalances'
+import { useBalances } from 'hooks/useBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
@@ -369,12 +369,12 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances } = useTokenBalances()
+  const { balances } = useBalances()
 
   // If user is connected, use balances, otherwise get the default list
   const tokens = useMemo(
     // it's okay to tokenListApi.getTokens() here without subscribing to updates
-    // because balances from useTokenBalances is already subscribed
+    // because balances from useBalances is already subscribed
     () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(fallBackNetworkId)),
     [balances, fallBackNetworkId, isConnected],
   )

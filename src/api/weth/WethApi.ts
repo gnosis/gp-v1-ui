@@ -1,6 +1,5 @@
 import Web3 from 'web3'
 import { WethContract } from '@gnosis.pm/dex-js/build-esm/contracts/WethContract'
-import { Erc20ApiDependencies } from 'api/erc20/Erc20Api'
 import { Network, WithTxOptionalParams, Receipt } from 'types'
 import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
 import { wethAbi } from '@gnosis.pm/dex-js'
@@ -13,9 +12,7 @@ export interface WrapUnwrapParams extends WithTxOptionalParams {
 }
 
 /**
- * Interfaces the access to ERC20 token
- *
- * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
+ * Interfaces for Wrapping ETH and unwrapping WETH token
  */
 export interface WethApi {
   deposit(params: WrapUnwrapParams): Promise<Receipt>
@@ -45,10 +42,10 @@ function getWethAddressByNetwork(networkId: number): string {
 export class WethApiImpl implements WethApi {
   protected _contractPrototype: WethContract
   private web3: Web3
-  private fetchGasPrice: Erc20ApiDependencies['fetchGasPrice']
+  private fetchGasPrice: WethApiDependencies['fetchGasPrice']
   protected static _contractsCache: { [network: number]: { [address: string]: WethContract } } = {}
 
-  public constructor(injectedDependencies: Erc20ApiDependencies) {
+  public constructor(injectedDependencies: WethApiDependencies) {
     Object.assign(this, injectedDependencies)
     this._contractPrototype = new this.web3.eth.Contract(wethAbi) as WethContract
   }

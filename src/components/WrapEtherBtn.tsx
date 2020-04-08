@@ -7,8 +7,12 @@ import { useForm } from 'react-hook-form'
 import { DEFAULT_PRECISION, formatAmountFull } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
+import { composeOptionalParams } from 'utils/transaction'
 import { TooltipWrapper } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
+import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
+import { useBalances } from 'hooks/useBalances'
+import { WETH_ADDRESS_MAINNET } from 'const'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -90,17 +94,22 @@ export type WrapEtherBtnProps = Omit<WrapUnwrapEtherBtnProps, 'wrap'>
 interface WrapUnwrapInfo {
   title: string
   symbolSource: string
-  balance: BN
+  balance: BN | null
   tooltipText: React.ReactNode | string
   description: React.ReactNode
   amountLabel: string
 }
 
-function getModalParams(
-  wrap: boolean,
-  wethHelpVisible: boolean,
-  showWethHelp: React.Dispatch<React.SetStateAction<boolean>>,
-): WrapUnwrapInfo {
+interface GetModalParams {
+  wrap: boolean
+  wethHelpVisible: boolean
+  showWethHelp: React.Dispatch<React.SetStateAction<boolean>>
+  wethBalance?: BN
+  ethBalance: BN | null
+}
+
+function getModalParams(params: GetModalParams): WrapUnwrapInfo {
+  const { wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance } = params
   const WethHelp = (
     <div className="more-info">
       <p>
@@ -120,7 +129,6 @@ function getModalParams(
   )
 
   if (wrap) {
-    // TODO: Get ETH balance
     const description = (
       <>
         <p>
@@ -139,14 +147,11 @@ function getModalParams(
       </div>
     )
 
-    // TODO: Get ETH balance
-    const balance = new BN('1234567800000000000')
-
     return {
       title: 'Wrap ETH',
       amountLabel: 'Amount to Wrap',
       symbolSource: 'ETH',
-      balance,
+      balance: ethBalance,
       description,
       tooltipText,
     }
@@ -160,14 +165,13 @@ function getModalParams(
         {wethHelpVisible && WethHelp}
       </>
     )
-    // TODO: Get WETH balance
-    const balance = new BN('1234567800000000000')
+    console.log('Return wethBalance', wethBalance?.toString(10))
 
     return {
       title: 'Unwrap WETH',
       amountLabel: 'Amount to Unwrap',
       symbolSource: 'WETH',
-      balance,
+      balance: wethBalance || null,
       description,
       tooltipText: 'Unwrapping converts WETH back into ETH',
     }
@@ -181,7 +185,11 @@ interface WrapEtherFormData {
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  use
+  const { wrapEth, unwrapWeth } = useWrapUnwrapEth({ txOptionalParams: composeOptionalParams() })
+  const { ethBalance, balances } = useBalances()
+  const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
+  const wethBalance = wethBalanceDetails?.walletBalance
+
   const { register, errors, handleSubmit, setValue } = useForm<WrapEtherFormData>({
     mode: 'onChange',
   })
@@ -192,9 +200,15 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   // console.log('amountValue', amountValue)
 
   const { title, balance, symbolSource, tooltipText, description, amountLabel } = useMemo(
-    () => getModalParams(wrap, wethHelpVisible, showWethHelp),
-    [wrap, wethHelpVisible, showWethHelp],
+    () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance }),
+    [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance],
   )
+
+  console.log({
+    wethBalance: wethBalance?.toString(10),
+    ethBalance: ethBalance?.toString(10),
+    balance: balance?.toString(10),
+  })
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -206,9 +220,13 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
             {description}
             <b>Available {symbolSource}</b>
             <div>
-              <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
-                {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
-              </a>
+              {balance ? (
+                <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
+                  {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
+                </a>
+              ) : (
+                <span>...</span>
+              )}
             </div>
           </div>
           <div>
@@ -244,12 +262,12 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         onClick={handleSubmit((data: WrapEtherFormData): void => {
           const { wrapAmount } = data
           if (wrap) {
-            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`)
+            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH`)
 
-            alert(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`) // TODO: Do real thing
+            wrapEth(wrapAmount)
           } else {
-            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`)
-            alert(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`) // TODO: Do real thing
+            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} WETH`)
+            unwrapWeth(wrapAmount)
           }
           modalHook.hide()
         })}
