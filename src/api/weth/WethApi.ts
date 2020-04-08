@@ -1,0 +1,119 @@
+import Web3 from 'web3'
+import { WethContract } from '@gnosis.pm/dex-js/build-esm/contracts/WethContract'
+import { Erc20ApiDependencies } from 'api/erc20/Erc20Api'
+import { Network, WithTxOptionalParams, Receipt } from 'types'
+import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
+import { wethAbi } from '@gnosis.pm/dex-js'
+import { logDebug } from 'utils'
+
+export interface BaseParams extends WithTxOptionalParams {
+  networkId: number
+  amount: string
+  userAddress: string
+}
+export type DepositParams = BaseParams
+export type WithdrawParams = BaseParams
+
+/**
+ * Interfaces the access to ERC20 token
+ *
+ * See: https://theethereum.wiki/w/index.php/ERC20_Token_Standard
+ */
+export interface WethApi {
+  deposit(params: DepositParams): Promise<Receipt>
+  withdraw(params: WithdrawParams): Promise<Receipt>
+}
+
+export interface WethApiDependencies {
+  web3: Web3
+  fetchGasPrice(): Promise<string | undefined>
+}
+
+function getWethAddressByNetwork(networkId: number): string {
+  switch (networkId) {
+    case Network.Mainnet:
+      return WETH_ADDRESS_MAINNET
+    case Network.Rinkeby:
+      return WETH_ADDRESS_RINKEBY
+    default:
+      throw new Error(`WethApi was not deployed to network ${networkId}`)
+  }
+}
+
+/**
+ * Basic implementation of WETH API
+ * Note that there's already another API for all ERC20, so only the deposit/withdraw is implemented in this API
+ */
+export class WethApiImpl implements WethApi {
+  protected _contractPrototype: WethContract
+  private web3: Web3
+  private fetchGasPrice: Erc20ApiDependencies['fetchGasPrice']
+  protected static _contractsCache: { [network: number]: { [address: string]: WethContract } } = {}
+
+  public constructor(injectedDependencies: Erc20ApiDependencies) {
+    Object.assign(this, injectedDependencies)
+    this._contractPrototype = new this.web3.eth.Contract(wethAbi) as WethContract
+  }
+
+  public async deposit(params: DepositParams): Promise<Receipt> {
+    const { networkId, amount, userAddress, txOptionalParams } = params
+    const contract = await this._getContract(networkId)
+
+    const tx = contract.methods
+      .deposit()
+      .send({ from: userAddress, value: amount, gasPrice: await this.fetchGasPrice() })
+
+    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
+    }
+
+    logDebug(`[WethApi] Wrapped ${amount} ETH for user ${userAddress} in network ${networkId}`)
+
+    return tx
+  }
+
+  public async withdraw(params: WithdrawParams): Promise<Receipt> {
+    const { networkId, amount, userAddress, txOptionalParams } = params
+    const contract = await this._getContract(networkId)
+
+    const tx = contract.methods.withdraw(amount).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+
+    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+      tx.once('transactionHash', txOptionalParams.onSentTransaction)
+    }
+
+    logDebug(`[WethApi] Unwapping ${amount} WETH for user ${userAddress} in network ${networkId}`)
+
+    return tx
+  }
+
+  /********************************    private methods   ********************************/
+  protected async _getContract(networkId: number): Promise<WethContract> {
+    return this._getContractForNetwork(networkId)
+  }
+
+  protected _getContractForNetwork(networkId: number): WethContract {
+    const address = getWethAddressByNetwork(networkId)
+
+    return this._getContractAtAddress(networkId, address)
+  }
+
+  protected _getContractAtAddress(networkId: number, address: string): WethContract {
+    let contract: WethContract | undefined = undefined
+
+    if (WethApiImpl._contractsCache[networkId]) {
+      contract = WethApiImpl._contractsCache[networkId][address]
+    } else {
+      WethApiImpl._contractsCache[networkId] = {}
+    }
+
+    if (contract) {
+      return contract
+    }
+
+    const newContract = this._contractPrototype.clone()
+    newContract.options.address = address
+
+    return (WethApiImpl._contractsCache[networkId][address] = newContract)
+  }
+}

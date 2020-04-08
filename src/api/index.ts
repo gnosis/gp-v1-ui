@@ -3,15 +3,19 @@ import { WalletApiMock } from './wallet/WalletApiMock'
 import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
 import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
-import { Erc20Api, Params as Erc20ApiDependencies } from './erc20/Erc20Api'
+import { Erc20Api, Erc20ApiDependencies } from './erc20/Erc20Api'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiProxy } from './erc20/Erc20ApiProxy'
-import { DepositApi, Params as DepositApiDependencies } from './deposit/DepositApi'
+import { DepositApi, DepositApiDependencies } from './deposit/DepositApi'
 import { DepositApiMock } from './deposit/DepositApiMock'
 import { DepositApiProxy } from './deposit/DepositApiProxy'
 import { ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiProxy } from './exchange/ExchangeApiProxy'
+import { TheGraphApi } from './thegraph/TheGraphApi'
+import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
+import { WethApi, WethApiImpl, WethApiDependencies } from './weth/WethApi'
+import { WethApiMock } from './weth/WethApiMock'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -25,8 +29,6 @@ import {
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 import fetchGasPriceFactory from './gasStation'
-import { TheGraphApi } from './thegraph/TheGraphApi'
-import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
@@ -66,6 +68,24 @@ function createErc20Api(injectedDependencies: Erc20ApiDependencies): Erc20Api {
   }
   window['erc20Api'] = erc20Api // register for convenience
   return erc20Api
+}
+
+function createWethApi(injectedDependencies: WethApiDependencies): WethApi {
+  let wethApi
+  if (process.env.MOCK_WETH === 'true') {
+    wethApi = new WethApiMock({
+      erc20ApiMock: new Erc20ApiMock({
+        balances: erc20Balances,
+        allowances: erc20Allowances,
+        tokens: unregisteredTokens,
+      }),
+    })
+  } else {
+    wethApi = new WethApiImpl(injectedDependencies)
+  }
+  window['wethApi'] = wethApi // register for convenience
+
+  return wethApi
 }
 
 function createDepositApi(erc20Api: Erc20Api, injectedDependencies: DepositApiDependencies): DepositApi {
@@ -133,6 +153,7 @@ const injectedDependencies = {
 }
 
 export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
+export const wethApi: WethApi = createWethApi(injectedDependencies)
 export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDependencies)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()

@@ -52,7 +52,7 @@ export interface PendingFlux {
   batchId: number
 }
 
-export interface Params {
+export interface DepositApiDependencies {
   web3: Web3
   fetchGasPrice(): Promise<string | undefined>
 }
@@ -62,9 +62,9 @@ export class DepositApiImpl implements DepositApi {
   protected web3: Web3
   protected static _contractsCache: { [network: number]: { [address: string]: BatchExchangeContract } } = {}
 
-  protected fetchGasPrice: Params['fetchGasPrice']
+  protected fetchGasPrice: DepositApiDependencies['fetchGasPrice']
 
-  public constructor(injectedDependencies: Params) {
+  public constructor(injectedDependencies: DepositApiDependencies) {
     Object.assign(this, injectedDependencies)
 
     this._contractPrototype = new this.web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
