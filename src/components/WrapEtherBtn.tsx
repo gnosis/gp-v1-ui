@@ -250,7 +250,13 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
   return (
     <>
-      <TooltipWrapper as="button" type="button" className={className} onClick={toggleModal} tooltip={tooltipText}>
+      <TooltipWrapper
+        as="button"
+        type="button"
+        className={className ? 'not-implemented ' + className : 'not-implemented'}
+        onClick={toggleModal}
+        tooltip={tooltipText}
+      >
         {label || title}
       </TooltipWrapper>
       <Modali.Modal {...modalHook} />

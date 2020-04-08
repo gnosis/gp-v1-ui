@@ -119,7 +119,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
           {isWeth ? (
             <ul>
-              <li>
+              <li className="not-implemented">
                 0.1 ETH <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
               <li>
