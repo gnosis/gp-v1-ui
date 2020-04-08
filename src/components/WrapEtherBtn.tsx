@@ -136,7 +136,7 @@ function getModalParams(
     const balance = new BN('1234567800000000000')
 
     return {
-      title: 'Wrap Ether',
+      title: 'Wrap ETH',
       amountLabel: 'Amount to Wrap',
       symbolSource: 'ETH',
       balance,
@@ -157,7 +157,7 @@ function getModalParams(
     const balance = new BN('1234567800000000000')
 
     return {
-      title: 'Unwrap Ether',
+      title: 'Unwrap WETH',
       amountLabel: 'Amount to Unwrap',
       symbolSource: 'WETH',
       balance,
