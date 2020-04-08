@@ -176,11 +176,16 @@ const TokenRow: React.FC<Props> = ({
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
-        <b>INFO:</b>
-        <i>Sell amount exceeding your balance by</i>
+        <i>
+          Did you already deposit <b>{selectedToken.symbol}</b> in the exchange wallet?{' '}
+        </i>
+        <i>Sell amount exceeds your balance by</i>
         <strong>
           {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
+        <a href="/wallet" className="depositNow">
+          + Deposit {selectedToken.symbol} in your balances
+        </a>
         {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
