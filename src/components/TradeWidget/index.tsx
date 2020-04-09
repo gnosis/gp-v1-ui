@@ -32,7 +32,7 @@ import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
-import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
+import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
 import { TokenDetails } from 'types'
 
@@ -457,7 +457,7 @@ const TradeWidget: React.FC = () => {
   const validUntilValue = watch(validUntilId)
 
   // Avoid querying for a new price at every input change
-  const { value: debouncedSellValue } = useDebounce(sellValue, 200)
+  const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
 
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId: networkIdOrDefault,
