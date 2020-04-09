@@ -19,6 +19,7 @@ import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 import { useDebounce } from 'hooks/useDebounce'
+import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
   amount: BN
@@ -309,15 +310,20 @@ const NoTokensMessage = styled.tr`
   }
 `
 
-type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
-  ReturnType<typeof useTokenBalances> & {
-    requestWithdrawConfirmation(
-      amount: BN,
-      tokenAddress: string,
-      claimable: boolean,
-      onTxHash: (hash: string) => void,
-    ): Promise<void>
-  }
+interface BalanceDisplayProps extends TokenLocalState {
+  enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  balances: TokenBalanceDetails[]
+  error: boolean
+  requestWithdrawConfirmation(
+    amount: BN,
+    tokenAddress: string,
+    claimable: boolean,
+    onTxHash: (hash: string) => void,
+  ): Promise<void>
+}
+
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   balances,
   error,
@@ -407,7 +413,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             {displayedBalances && displayedBalances.length > 0
               ? displayedBalances.map(tokenBalances => (
                   <Row
-                    key={tokenBalances.addressMainnet}
+                    key={tokenBalances.address}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance, onTxHash): Promise<void> =>

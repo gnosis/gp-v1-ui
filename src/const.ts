@@ -45,12 +45,6 @@ export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
 export const PRICE_ESTIMATION_PRECISION = 5
 
-export const LEGALDOCUMENT = {
-  CONTACT_ADDRESS: '[INSERT ADDRESS]',
-  POC_URL: '/',
-  TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
-}
-
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',

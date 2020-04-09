@@ -4,7 +4,6 @@ import OrderBookWidget from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 import { useTokenList } from 'hooks/useTokenList'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { Network } from 'types'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
@@ -59,9 +58,8 @@ const OrderBookWrapper = styled.div`
 `
 
 const OrderBook: React.FC = () => {
-  const { networkId } = useWalletConnection()
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
-  const tokenList = useTokenList(fallBackNetworkId)
+  const { networkIdOrDefault } = useWalletConnection()
+  const tokenList = useTokenList(networkIdOrDefault)
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
 
@@ -94,7 +92,7 @@ const OrderBook: React.FC = () => {
         </span>
       </OrderBookWrapper>
 
-      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={fallBackNetworkId} />
+      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} />
     </OrderBookPage>
   )
 }

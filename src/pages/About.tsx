@@ -100,16 +100,6 @@ const About: React.FC = () => {
       <h2>Learn more about Gnosis Protocol</h2>
       <ul>
         <li>
-          dFusion Paper:{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf"
-          >
-            dfusion.v1.pdf
-          </a>
-        </li>
-        <li>
           Developer portal:{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
             https://docs.gnosis.io/protocol
