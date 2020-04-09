@@ -95,9 +95,11 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     logDebug('[TokenListApi]: Added new Token to userlist', token)
 
     this._tokensByNetwork[networkId] = this._tokensByNetwork[networkId].concat(token)
-    this._tokenAddressNetworkSet.add(
-      TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId }),
-    )
+    const key = TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId })
+
+    if (this._tokenAddressNetworkSet.has(key)) return
+
+    this._tokenAddressNetworkSet.add(key)
     this.persistNewUserToken(token, networkId)
 
     this.triggerSubscriptions(this._tokensByNetwork[networkId])
