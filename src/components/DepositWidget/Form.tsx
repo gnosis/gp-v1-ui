@@ -106,7 +106,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
         <h4>{title}</h4>
         <WalletDrawerInnerWrapper>
           <div className="message">
-            This action consists of 3 steps:
+            This action consists of 2 steps:
             <ol>
               <li>{title} here.</li>
               <li>Once the transaction is mined, wait for the batch to finish.</li>
