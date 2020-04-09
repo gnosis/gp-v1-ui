@@ -175,7 +175,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <Form
           title={
             <span>
-              Deposit <strong>{symbol}</strong> in Exchange Wallet
+              Deposit <strong>{symbol}</strong> in the Exchange Wallet
             </span>
           }
           totalAmountLabel="wallet balance"
@@ -193,7 +193,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <Form
           title={
             <span>
-              Withdraw <strong>{symbol}</strong> from Exchange Wallet
+              Withdraw <strong>{symbol}</strong> from the Exchange Wallet
             </span>
           }
           totalAmountLabel="Exchange wallet"

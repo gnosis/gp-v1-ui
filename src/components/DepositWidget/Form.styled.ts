@@ -9,6 +9,18 @@ export const WalletDrawerInnerWrapper = styled.div`
   padding: 2.4rem 0;
   box-sizing: border-box;
 
+  .message {
+    color: var(--color-text-primary);
+    background: var(--color-background-validation-warning);
+    border-radius: 0 0 0.3rem 0.3rem;
+    padding: 1rem;
+    font-size: 1.3rem;
+    margin: -1rem 1.6rem 1.6rem;
+    font-family: var(--font-default);
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
   p.error {
     color: var(--color-error);
     text-align: left;
@@ -163,6 +175,13 @@ export const WalletDrawerInnerWrapper = styled.div`
     left: 0;
     padding: 0 1.6rem;
     box-sizing: border-box;
+
+    @media ${MEDIA.mobile} {
+      position: relative;
+      top: initial;
+      bottom: initial;
+      left: initial;
+    }
 
     > button,
     > a {

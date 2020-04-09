@@ -15,7 +15,7 @@ const CardRowDrawer = styled.tr`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   z-index: 9999;
   width: 50rem;
-  height: 42rem;
+  height: 50rem;
   border-radius: 0.6rem;
   background: var(--color-background-pageWrapper);
 
@@ -23,7 +23,8 @@ const CardRowDrawer = styled.tr`
     width: 100%;
     bottom: 0;
     top: initial;
-    height: 80vh;
+    height: 100vh;
+    overflow-y: scroll;
   }
 
   // Inner td wrapper
@@ -36,6 +37,10 @@ const CardRowDrawer = styled.tr`
     width: 100%;
     height: 100%;
     border: 0;
+
+    @media ${MEDIA.mobile} {
+      box-shadow: none;
+    }
 
     > div {
       margin: 0;
@@ -59,6 +64,10 @@ const CardRowDrawer = styled.tr`
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
       border-bottom: 0.1rem solid var(--color-background-banner);
+
+      @media ${MEDIA.mobile} {
+        padding: 0 5rem 0 1.6rem;
+      }
     }
 
     .times {
