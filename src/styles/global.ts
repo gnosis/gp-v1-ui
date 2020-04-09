@@ -3,6 +3,7 @@ import fontFace from './fonts'
 import variables from './variables'
 import checkWhite from 'assets/img/check-white.svg'
 import greenCheck from 'assets/img/check-green.svg'
+import { MEDIA } from 'const'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables
@@ -1099,6 +1100,18 @@ const GlobalStyles = createGlobalStyle`
       @media (min-width: 500px) {
           min-width: initial !important;
       }
+      @media ${MEDIA.mobile},
+      @media ${MEDIA.tablet} {
+        width: 100%;
+      }
+  }
+  
+  body.modali-open .modali-wrapper-centered {
+    top: 0!important;
+  }
+  
+  body.modali-open .modali-body-style {
+    padding: 0;
   }
 `
 

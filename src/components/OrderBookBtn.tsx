@@ -13,15 +13,15 @@ import { MEDIA } from 'const'
 
 const ModalWrapper = styled(ModalBodyWrapper)`
   display: flex;
-  justify-content: center;
   min-height: 40rem;
   text-align: center;
   height: 100%;
   min-width: 100%;
   width: 100%;
   align-items: center;
+  align-content: flex-start;
   flex-flow: row wrap;
-  padding: 0 1.6rem 1.6rem;
+  padding: 0;
   justify-content: center;
 
   > span {
