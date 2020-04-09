@@ -38,6 +38,7 @@ export interface Params {
 
 function getDexPriceEstimatorUrl(networkId: number): string {
   const networkName = getNetworkFromId(networkId).toLowerCase()
+  // TODO: use prod endpoint when available https://github.com/gnosis/dex-react/issues/869
   return `https://price-estimate-${networkName}.dev.gnosisdev.com/api/v1/`
 }
 
