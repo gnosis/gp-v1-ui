@@ -5,7 +5,7 @@ export class SimpleCache<StoredValue, KeyParts> {
   private constructKey: (value: KeyParts) => string
 
   public constructor(
-    keyConstructor: (value: KeyParts) => string = String,
+    keyConstructor: (value: KeyParts) => string = JSON.stringify,
     options: NodeCache.Options = { useClones: false },
   ) {
     this.cache = new NodeCache(options)

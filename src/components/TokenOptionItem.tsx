@@ -2,13 +2,13 @@ import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress, toChecksumAddress } from 'web3-utils'
 import { TokenImgWrapper } from './TokenImg'
-import { tokenListApi, exchangeApi } from 'api'
+import { tokenListApi } from 'api'
 import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 import { TokenFromExchange } from 'services/factories'
-import { getTokenFromErc20 } from 'services'
-import { logDebug, safeFilledToken } from 'utils'
+import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
+import { safeFilledToken } from 'utils'
 import { toast } from 'toastify'
 import { SimpleCache } from 'api/proxy/SimpleCache'
 
@@ -29,6 +29,9 @@ const OptionItemWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     width: inherit;
+    align-items: center;
+    align-content: center;
+    flex-flow: row wrap;
 
     .tokenName {
       display: flex;
@@ -49,6 +52,14 @@ const OptionItemWrapper = styled.div`
     margin: 0;
     font-size: 1.6rem;
   }
+`
+
+const ExtraOptionsMessage = styled.a`
+  align-self: flex-end;
+  margin: auto 0;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  text-align: right;
 `
 
 interface OptionItemProps {
@@ -82,11 +93,6 @@ interface SearchItemProps {
   networkId: number
 }
 
-interface TokenAndNetwork {
-  tokenAddress: string
-  networkId: number
-}
-
 interface TokenDetailsAndNetwork {
   token: TokenDetails
   networkId: number
@@ -96,55 +102,6 @@ const addTokenToList = ({ token, networkId }: TokenDetailsAndNetwork): void => {
   tokenListApi.addToken({ token, networkId })
   const { symbol: tokenDisplayName } = safeFilledToken(token)
   toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
-}
-
-type ValidResons =
-  | TokenFromExchange.NOT_ERC20
-  | TokenFromExchange.NOT_REGISTERED_ON_CONTRACT
-  | TokenFromExchange.NOT_IN_TOKEN_LIST
-
-interface FetchTokenResult {
-  token: TokenDetails | null
-  reason: ValidResons | null
-}
-
-const fetchToken = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
-  try {
-    // check if registered token
-    const tokenInExchange = await exchangeApi.hasToken(params)
-
-    if (!tokenInExchange)
-      return {
-        token: null,
-        reason: TokenFromExchange.NOT_REGISTERED_ON_CONTRACT,
-      }
-
-    // get registered id
-    const tokenId = await exchangeApi.getTokenIdByAddress(params)
-
-    // get ERC20 data
-    const erc20Token = await getTokenFromErc20(params)
-
-    if (!erc20Token)
-      return {
-        token: null,
-        reason: TokenFromExchange.NOT_ERC20,
-      }
-
-    return {
-      token: {
-        ...erc20Token,
-        id: tokenId,
-      },
-      reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
-    }
-  } catch (error) {
-    logDebug('Error fetching token', params, error)
-    return {
-      token: null,
-      reason: null,
-    }
-  }
 }
 
 // cache fetched tokens
@@ -193,7 +150,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     let promise = promisedCache.get(cacheKey)
 
     if (!promise) {
-      promise = fetchToken({ tokenAddress: toChecksumAddress(value), networkId })
+      promise = fetchTokenData({ tokenAddress: toChecksumAddress(value), networkId })
       promisedCache.set(promise, cacheKey)
     }
 
@@ -241,13 +198,29 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   switch (reason) {
     // not registered --> advise to register
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
-      return <>Register token on Exchange first</>
+      if (!token)
+        return (
+          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+            Register token on Exchange first
+          </a>
+        )
+      return (
+        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+          <ExtraOptionsMessage
+            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Register token on Exchange first
+          </ExtraOptionsMessage>
+        </OptionItem>
+      )
     // not a ERC20 --> can't do much
     case TokenFromExchange.NOT_ERC20:
       return <>Not a valid ERC20 token</>
     // registered but not in list --> option to add
     case TokenFromExchange.NOT_IN_TOKEN_LIST:
-      if (!token) return <>{defaultText}</>
+      if (!token || !('id' in token)) return <>{defaultText}</>
 
       const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = e => {
         // prevent react-select reaction
