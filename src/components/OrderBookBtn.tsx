@@ -13,7 +13,8 @@ import { MEDIA } from 'const'
 
 const ModalWrapper = styled(ModalBodyWrapper)`
   display: flex;
-  min-height: 40rem;
+  /* min-height: 40rem; */
+  /* height: calc(100vh - 30rem); */
   text-align: center;
   height: 100%;
   min-width: 100%;
@@ -23,6 +24,10 @@ const ModalWrapper = styled(ModalBodyWrapper)`
   flex-flow: row wrap;
   padding: 0;
   justify-content: center;
+  
+  /* @media ${MEDIA.tabletPortrait} {
+    min-height:
+  } */
 
   > span {
     display: flex;
