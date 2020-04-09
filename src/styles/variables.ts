@@ -68,7 +68,8 @@ const LightColors = `
 
   // States
   --color-error: red;
-
+  --color-text-deleteOrders: #a71409;
+  --color-background-deleteOrders: #ffd6d6;
 `
 
 const DarkColors = `
@@ -123,7 +124,8 @@ const DarkColors = `
 
   // States
   --color-error: #cd3636;
-
+  --color-text-deleteOrders: #bdb6b5;
+  --color-background-deleteOrders: #621b1b;
 `
 
 const variables = css`

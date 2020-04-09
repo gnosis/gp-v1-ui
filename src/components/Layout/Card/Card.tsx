@@ -13,7 +13,7 @@ const CardRowDrawer = styled.tr`
   bottom: 0;
   margin: auto;
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
-  z-index: 9999;
+  z-index: 9998;
   width: 50rem;
   height: 50rem;
   border-radius: 0.6rem;
