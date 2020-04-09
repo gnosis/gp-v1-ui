@@ -14,7 +14,7 @@ Develop:
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/protocol) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
+Mesa is an interface for the [Gnosis Protocol](https://docs.gnosis.io/protocol).
 
 Gnosis Protocol introduces a new, fully decentralized exchange mechanism for ERC20 tokens with the following
 properties:
@@ -26,7 +26,7 @@ properties:
 This UI will allow to:
 
 - Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
-- See the balances for any token: Both in your wallet and the exchange
+- See the balances for any token: both in your wallet and the exchange
 - Deposit/Withdraw tokens from the exchange
 
 ## Running locally
@@ -39,7 +39,7 @@ yarn
 yarn start
 ```
 
-Open http://localhost:8080 in any browser.
+Open http://localhost:8080 in your browser.
 
 ## Mock mode (default)
 
@@ -50,18 +50,18 @@ The app will run by default in **mock mode**, that means that all service implem
 MOCK=false yarn start
 ```
 
-Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
+Alternatively, if you want to persist this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as a template).
 
 ## Autoconnect for mock mode (default)
 
-When running in **mock mode**, the wallet will be connected automatically, to change this behaviour run the app:
+When running in **mock mode**, the wallet will be connected automatically - to change this behaviour run the app via:
 
 ```bash
 # Disable autoconnect, for mock mode
 AUTOCONNECT=false yarn start
 ```
 
-Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
+Alternatively, if you want to persist this behaviour add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as a template).
 
 ## Build app
 
@@ -69,7 +69,7 @@ Alternatively, if you want to modify always this behaviour, add the env var into
 yarn build
 ```
 
-The static files will be generated in `./dist` dir.
+Static files will be generated inside the `./dist` dir.
 
 ## Run tests
 
@@ -100,5 +100,5 @@ If you use Visual Studio Code, it's recommended to install [Prettier - Code form
 
 ## Testnet faucets
 
-In order to get testing tokens, read up the information here:
+In order to get testing tokens, read up on the information here:
 [faucet](./docs/faucet-info.md)
