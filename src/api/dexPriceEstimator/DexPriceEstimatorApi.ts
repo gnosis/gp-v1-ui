@@ -72,7 +72,6 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
 
     try {
       const response = await this.query<GetPriceResponse>(networkId, queryString)
-      console.log('response:', response)
 
       if (!response) {
         return response

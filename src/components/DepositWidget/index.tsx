@@ -407,7 +407,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             {displayedBalances && displayedBalances.length > 0
               ? displayedBalances.map(tokenBalances => (
                   <Row
-                    key={tokenBalances.addressMainnet}
+                    key={tokenBalances.address}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance, onTxHash): Promise<void> =>

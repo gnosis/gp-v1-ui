@@ -56,11 +56,8 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
   const [priceEstimation, setPriceEstimation] = useSafeState<BigNumber | null>(null)
   const { networkId, baseTokenId, baseTokenDecimals, quoteTokenId, quoteTokenDecimals, amount } = params
 
-  console.log(`outside useEffect`, amount, baseTokenDecimals, baseTokenId, networkId, quoteTokenDecimals, quoteTokenId)
-
   useEffect(() => {
     let cancelled = false
-    console.log(`inside useEffect`, amount, baseTokenDecimals, baseTokenId, networkId, quoteTokenDecimals, quoteTokenId)
 
     async function estimatePrice(): Promise<void> {
       setIsPriceLoading(true)
@@ -79,10 +76,7 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
         const price = await dexPriceEstimatorApi.getPrice(getPriceParams)
 
         if (!cancelled) {
-          console.log(`not cancelled`)
           setPriceEstimation(price)
-        } else {
-          console.log(`cancelled`)
         }
       } catch (e) {
         console.error(
@@ -98,7 +92,6 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
 
     return (): void => {
       cancelled = true
-      console.log(`cancelled`)
     }
   }, [
     amount,
