@@ -10,6 +10,7 @@ import { DEFAULT_PRECISION, MEDIA } from 'const'
 import { TradeFormData } from '.'
 import { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
+import { OrderBookBtn } from 'components/OrderBookBtn'
 
 const Wrapper = styled.div`
   display: flex;
@@ -190,7 +191,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   return (
     <Wrapper>
       <strong>
-        Limit Price <button className="not-implemented">View orderbook</button>
+        Limit Price <OrderBookBtn baseToken={sellToken} quoteToken={receiveToken} />
       </strong>
       <PriceInputBox>
         <label>
