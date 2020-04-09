@@ -14,6 +14,7 @@ import {
 
 import { logDebug } from 'utils'
 import { TokenDetails } from 'types'
+import { toChecksumAddress } from 'web3-utils'
 
 const apis = {
   tokenListApi,
@@ -63,7 +64,7 @@ type AddTokenResult = AddTokenResultSuccess | AddTokenResultFailure
 export const isTokenAddedSuccess = (result: AddTokenResult): result is AddTokenResultSuccess => result.success
 
 export const addTokenToList = async ({ networkId, tokenAddress }: TokenAndNetwork): Promise<AddTokenResult> => {
-  const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
+  const checkSumAddress = toChecksumAddress(tokenAddress)
   const { token } = await getTokenFromExchangeByAddress({ networkId, tokenAddress: checkSumAddress })
   if (token) {
     logDebug('Added new Token to userlist', token)
@@ -94,7 +95,7 @@ export const addTokenToExchange = async ({
   networkId,
   tokenAddress,
 }: AddTokenToExchangeParams): Promise<AddTokenResult> => {
-  const checkSumAddress = web3.utils.toChecksumAddress(tokenAddress)
+  const checkSumAddress = toChecksumAddress(tokenAddress)
   const token = await addTokenToExchangeContract({ userAddress, networkId, tokenAddress: checkSumAddress })
   if (token) {
     logDebug('Added new Token to userlist', token)
@@ -129,7 +130,11 @@ export interface FetchTokenResult {
   reason: ValidResons | null
 }
 
-export const fetchTokenData = async (params: TokenAndNetwork): Promise<FetchTokenResult> => {
+export const fetchTokenData = async ({
+  tokenAddress: address,
+  networkId,
+}: TokenAndNetwork): Promise<FetchTokenResult> => {
+  const params = { tokenAddress: toChecksumAddress(address), networkId }
   try {
     const [tokenInExchange, erc20Token] = await Promise.all([
       // check if registered token

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
-import { isAddress, toChecksumAddress } from 'web3-utils'
+import { isAddress } from 'web3-utils'
 import { TokenImgWrapper } from './TokenImg'
 import { tokenListApi } from 'api'
 import styled from 'styled-components'
@@ -150,7 +150,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     let promise = promisedCache.get(cacheKey)
 
     if (!promise) {
-      promise = fetchTokenData({ tokenAddress: toChecksumAddress(value), networkId })
+      promise = fetchTokenData({ tokenAddress: value, networkId })
       promisedCache.set(promise, cacheKey)
     }
 
