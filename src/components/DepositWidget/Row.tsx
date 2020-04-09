@@ -113,8 +113,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               {formatAmount(pendingWithdraw.amount, decimals)}
             </>
           ) : (
-            <>{withdrawing && spinner}0</>
-          )}
+                <>{withdrawing && spinner}0</>
+              )}
         </td>
         <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
           {isWeth ? (
@@ -129,11 +129,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               </li>
             </ul>
           ) : (
-            <>
-              {(claiming || depositing) && spinner}
-              {formatAmount(walletBalance, decimals)}
-            </>
-          )}
+              <>
+                {(claiming || depositing) && spinner}
+                {formatAmount(walletBalance, decimals)}
+              </>
+            )}
         </td>
         <td data-label="Actions">
           {enabled || tokenEnabled ? (
@@ -146,19 +146,19 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <PlusSVG />
             </button>
           ) : (
-            <>
-              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
-                {enabling ? (
-                  <>
-                    <FontAwesomeIcon icon={faSpinner} spin />
+              <>
+                <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
+                  {enabling ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} spin />
                     Enabling {symbol}
-                  </>
-                ) : (
-                  <>Enable {symbol}</>
-                )}
-              </button>
-            </>
-          )}
+                    </>
+                  ) : (
+                      <>Enable {symbol}</>
+                    )}
+                </button>
+              </>
+            )}
           {!totalExchangeBalance.isZero() && (
             <button
               type="button"
@@ -193,7 +193,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <Form
           title={
             <span>
-              Withdraw <strong>{symbol}</strong> from Exchange Wallet
+              Withdraw <strong>{symbol}</strong> from the Exchange Wallet
             </span>
           }
           totalAmountLabel="Exchange wallet"
