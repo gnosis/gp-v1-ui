@@ -9,6 +9,8 @@ import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
+import Modali from 'modali'
+import { isAddress } from 'web3-utils'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -28,9 +30,8 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
-import { tokenListApi } from 'api'
+import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
 import { TokenDetails } from 'types'
 
@@ -51,6 +52,8 @@ import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimation } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
+import { useAddTokenModal } from 'hooks/useAddTokenModal'
+import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
 
@@ -355,6 +358,25 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   return receiveAmount
 }
 
+interface TokenAdderProps {
+  tokenAddress: string
+  networkId: number
+  onSelectChange: (selected: TokenDetails) => void
+}
+
+const TokenAdder: React.FC<TokenAdderProps> = ({ tokenAddress, networkId, onSelectChange }: TokenAdderProps) => {
+  const { addTokenToList, modalProps } = useAddTokenModal()
+
+  useEffect(() => {
+    addTokenToList({ tokenAddress, networkId }).then(newToken => {
+      if (newToken) onSelectChange(newToken)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // no deps, so that we only open modal once on mount
+
+  return <Modali.Modal {...modalProps} />
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -366,15 +388,10 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances } = useTokenBalances()
+  const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
-  const tokens = useMemo(
-    // it's okay to tokenListApi.getTokens() here without subscribing to updates
-    // because balances from useTokenBalances is already subscribed
-    () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(networkIdOrDefault)),
-    [balances, networkIdOrDefault, isConnected],
-  )
+  const tokens = isConnected && balances.length > 0 ? balances : tokenList
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
@@ -394,13 +411,17 @@ const TradeWidget: React.FC = () => {
   const [sellToken, setSellToken] = useState(
     () =>
       trade.sellToken ||
-      getToken('symbol', sellTokenSymbol, tokens) ||
+      (sellTokenSymbol && isAddress(sellTokenSymbol?.toLowerCase())
+        ? getToken('address', sellTokenSymbol, tokens)
+        : getToken('symbol', sellTokenSymbol, tokens)) ||
       (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
   const [receiveToken, setReceiveToken] = useState(
     () =>
       trade.buyToken ||
-      getToken('symbol', receiveTokenSymbol, tokens) ||
+      (receiveTokenSymbol && isAddress(receiveTokenSymbol?.toLowerCase())
+        ? getToken('address', receiveTokenSymbol, tokens)
+        : getToken('symbol', receiveTokenSymbol, tokens)) ||
       (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
@@ -756,8 +777,44 @@ const TradeWidget: React.FC = () => {
     receiveValue,
   ])
 
+  const { needToAddSellToken, needToAddReceiveToken } = useMemo(() => {
+    const needToAddSellToken =
+      sellTokenSymbol &&
+      !tokenListApi.hasToken({ tokenAddress: sellTokenSymbol, networkId: networkIdOrDefault }) &&
+      isAddress(sellTokenSymbol.toLowerCase())
+
+    const needToAddReceiveToken =
+      receiveTokenSymbol &&
+      receiveTokenSymbol.toLowerCase() !== sellTokenSymbol?.toLowerCase() &&
+      !tokenListApi.hasToken({ tokenAddress: receiveTokenSymbol, networkId: networkIdOrDefault }) &&
+      isAddress(receiveTokenSymbol.toLowerCase())
+
+    return {
+      needToAddSellToken,
+      needToAddReceiveToken,
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // no deps, so that we only calc once on mount
+
+  const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
+  const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
+      {needToAddSellToken && sellTokenSymbol && (
+        <TokenAdder
+          tokenAddress={sellTokenSymbol}
+          networkId={networkIdOrDefault}
+          onSelectChange={onSelectChangeSellToken}
+        />
+      )}
+      {needToAddReceiveToken && receiveTokenSymbol && (
+        <TokenAdder
+          tokenAddress={receiveTokenSymbol}
+          networkId={networkIdOrDefault}
+          onSelectChange={onSelectChangeReceiveToken}
+        />
+      )}
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
@@ -768,7 +825,7 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="Sell"
-            onSelectChange={onSelectChangeFactory(setSellToken, receiveTokenBalance)}
+            onSelectChange={onSelectChangeSellToken}
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
@@ -784,7 +841,7 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="Receive at least"
-            onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
+            onSelectChange={onSelectChangeReceiveToken}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={1}

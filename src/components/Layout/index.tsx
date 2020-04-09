@@ -70,7 +70,7 @@ const navigation = [
 
 const Layout: React.FC = ({ children }) => (
   <Wrapper>
-    <LegalBanner useFull={false} title="💀 This project is in beta. Use at your own risk." />
+    <LegalBanner title="💀 This project is in beta. Use at your own risk." />
     <Header navigation={navigation} />
     <main>{children}</main>
     <Footer />

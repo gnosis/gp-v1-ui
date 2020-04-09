@@ -75,7 +75,7 @@ export interface ExchangeApi extends DepositApi {
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
   getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
 
-  getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
+  getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
   hasToken(params: HasTokenParams): Promise<boolean>
 
