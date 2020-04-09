@@ -89,6 +89,11 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
+    onHide: () => {
+      // Reset the selection on close
+      setBaseToken(baseTokenDefault)
+      setQuoteToken(quoteTokenDefault)
+    },
     large: true,
     title: `${safeTokenName(baseToken)}-${safeTokenName(quoteToken)} Order book`,
     message: (
