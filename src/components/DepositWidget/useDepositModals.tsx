@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import BN from 'bn.js'
 
-import { ModalBodyWrapper } from './Styled'
+import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from '../Modal'
 import Modali, { useModali, ModalHook, toggleModaliComponent } from 'modali'
 
 const OverwriteModalBody: React.FC = () => {
@@ -25,11 +25,6 @@ const WithdrawAndClaimModalBody: React.FC = () => {
       <p>By sending this withdraw request, you will automatically receive all claimable amounts back to your wallet.</p>
     </ModalBodyWrapper>
   )
-}
-
-const defaultOptions = {
-  centered: true,
-  animated: true,
 }
 
 interface Params {
@@ -68,7 +63,7 @@ export function useDepositModals(params: Params): Result {
   )
 
   const [withdrawOverwriteModal, toggleWithdrawOverwriteModal] = useModali({
-    ...defaultOptions,
+    ...DEFAULT_MODAL_OPTIONS,
     title: 'Confirm withdraw overwrite',
     message: <OverwriteModalBody />,
     buttons: getButtons((): void => {
@@ -77,7 +72,7 @@ export function useDepositModals(params: Params): Result {
   })
 
   const [withdrawAndClaimModal, toggleWithdrawAndClaimModal] = useModali({
-    ...defaultOptions,
+    ...DEFAULT_MODAL_OPTIONS,
     title: 'Please note',
     message: <WithdrawAndClaimModalBody />,
     buttons: getButtons((): void => toggleWithdrawAndClaimModal()),

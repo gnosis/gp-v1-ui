@@ -122,8 +122,8 @@ const LinkWrapper = styled(EtherscanLink)`
 const VerifiedText = 'View verified contract'
 
 const Footer: React.FC = () => {
-  const { networkId } = useWalletConnection()
-  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
+  const { networkIdOrDefault: networkId } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress(networkId)
 
   return (
     <Wrapper>
