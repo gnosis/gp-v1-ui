@@ -92,7 +92,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
         return balance
       })
       .catch(e => {
-        console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
+        console.error('[useTokenBalances] Error for', networkId, token, userAddress, contractAddress, e)
 
         const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
 
@@ -115,11 +115,27 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   const [error, setError] = useSafeState(false)
 
   const tokens = useTokenList(walletInfo.networkId)
+  const [localTokens, setLocalTokens] = useSafeState(tokens)
 
   useEffect(() => {
-    // can return NULL (if no address or network)
-    walletInfo.isConnected &&
-      _getBalances(walletInfo, tokens)
+    // network has been updated
+    // local list of tokens is not longer valid, reset it to avoid using stale data
+    setLocalTokens([])
+  }, [setLocalTokens, walletInfo.networkId])
+
+  useEffect(() => {
+    // tokens have been updated async after network was updated
+    // if there's any, update localTokens copy
+    if (tokens.length > 0) {
+      // once updated, this will trigger balances update
+      setLocalTokens(tokens)
+    }
+  }, [setLocalTokens, tokens])
+
+  useEffect(() => {
+    // only try to update the balances if wallet is connected and localTokens copy is not empty
+    if (walletInfo.isConnected && localTokens.length > 0) {
+      _getBalances(walletInfo, localTokens)
         .then(balances => {
           logDebug(
             '[useTokenBalances] Wallet balances',
@@ -132,7 +148,8 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           console.error('[useTokenBalances] Error loading balances', error)
           setError(true)
         })
-  }, [setBalances, setError, walletInfo, tokens])
+    }
+  }, [setBalances, setError, walletInfo, localTokens])
 
   return { balances, error, tokens }
 }
