@@ -21,7 +21,7 @@ import { useForm, FormContext } from 'react-hook-form'
 
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
-import { Network, Receipt } from 'types'
+import { Receipt } from 'types'
 
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
@@ -120,11 +120,9 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
-  const { networkId, userAddress } = useWalletConnection()
-  // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
-  const tokenList = useTokenList(fallBackNetworkId)
+  const tokenList = useTokenList(networkIdOrDefault)
 
   const tokens = useMemo(() => {
     return (

@@ -47,12 +47,6 @@ export const PRICE_ESTIMATION_PRECISION = 5
 // The prices on the contract will update at max once every batch, which is 5min long
 export const PRICES_CACHE_TIME = 60 // in seconds
 
-export const LEGALDOCUMENT = {
-  CONTACT_ADDRESS: '[INSERT ADDRESS]',
-  POC_URL: '/',
-  TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
-}
-
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',
@@ -112,3 +106,4 @@ export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUS
 export const INPUT_PRECISION_SIZE = 6
 export const VALID_UNTIL_DEFAULT = '2880'
 export const VALID_FROM_DEFAULT = '30'
+export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'

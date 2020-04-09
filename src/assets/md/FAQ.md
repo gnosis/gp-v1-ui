@@ -4,7 +4,7 @@ Mesa is a decentralized application built on the **Gnosis Protocol**, a decentra
 
 **How are trades matched?**
 
-Orders are collected in batches every 5 minutes, and external participants called solvers (everyone can participate as a solver) propose a settlement solution to the smart contract. The smart contract selects the solution that maximizes [trader welfare](https://docs.gnosis.io/protocol/docs/devguide01/). The utility in this optimization function is the difference between what a trader is willing to pay and what they pay once a batch is cleared. After a solution is selected, orders are matched and settled accordingly and on-chain.
+Orders are collected in batches every 5 minutes, and external participants called solvers (everyone can participate as a solver) propose a settlement solution to the smart contract. The smart contract selects the solution that maximizes trader welfare. The utility in this optimization function is the difference between what a trader is willing to pay and what they pay once a batch is cleared. After a solution is selected, orders are matched and settled accordingly and on-chain.
 
 **What advantages does this bring?**
 
@@ -24,7 +24,7 @@ After enabling and depositing the tokens you would like to trade, click on the `
 
 As with normal limit orders, it is important to note that if the batch clears at a better price (for the opposite side of the trade) than that of your order, your order will not be matched. If there is not enough volume, your order may also be partially filled.
 
-**Can I create a trade without funding?**
+**Can I create an order without depositing into my exchange balance first?**
 
 Indeed, orders can be placed without a corresponding balance in the Exchange Wallet. However, **_only_** orders with a balance in the Exchange Wallet can be matched and filled.
 
