@@ -24,6 +24,7 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
 
   > a.depositNow {
     margin: 0.5rem 0;
+    flex: 1 1 100%;
   }
 
   .success {
