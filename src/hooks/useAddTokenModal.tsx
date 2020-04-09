@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { toChecksumAddress } from 'web3-utils'
 import Modali, { useModali, ModalHook } from 'modali'
-import { AddTokenToListParams, getTokenFromExchangeByAddress } from 'services'
+import { TokenAndNetwork, getTokenFromExchangeByAddress } from 'services'
 import { toast } from 'toastify'
 import { safeFilledToken, logDebug, Deferred, createDeferredPromise } from 'utils'
 import { TokenDetails } from 'types'
@@ -14,7 +14,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 
 const addTokenFromInput = async (
-  { networkId, tokenAddress }: AddTokenToListParams,
+  { networkId, tokenAddress }: TokenAndNetwork,
   tokenPromised: Promise<TokenDetails | null>,
 ): Promise<TokenDetails | null> => {
   try {

@@ -26,7 +26,7 @@ export const UserWalletItem = styled.div`
   font-family: var(--font-mono);
   letter-spacing: 0;
   font-weight: var(--font-weight-bold);
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: 0;
   flex: 1 1 auto;
   padding: 0;
@@ -71,7 +71,7 @@ export const LogInOutButton = styled.div`
   font-family: var(--font-mono);
   letter-spacing: 0;
   font-weight: var(--font-weight-bold);
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: 0;
   font-size: 1.2rem;
   padding: 0;
@@ -85,7 +85,7 @@ export const LogInOutButton = styled.div`
 export const UserAddress = styled.div`
   font-weight: var(--font-weight-bold);
   font-size: 1.6rem;
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: 0;
 
   @media ${MEDIA.mobile} {
@@ -157,7 +157,7 @@ export const UserWalletSlideWrapper = styled.div`
   position: absolute;
   background: inherit;
   left: 0;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   width: 19.8rem;
   display: flex;
   border-radius: 0.6rem;
@@ -199,7 +199,7 @@ export const UserWalletSlideWrapper = styled.div`
   }
 
   > button > b {
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     font-size: 1.6rem;
   }
 
@@ -233,7 +233,7 @@ export const MonospaceAddress = styled.div`
   line-height: 1.4;
 
   @media ${MEDIA.mobile} {
-    border: solid 0.1rem #dfe6ef;
+    border: solid 0.1rem var(--color-background-banner);
     border-radius: 0.6rem 0.6rem 0 0;
     padding: 1rem;
     box-sizing: border-box;
@@ -244,7 +244,7 @@ export const MonospaceAddress = styled.div`
 
   > b {
     font-weight: var(--font-weight-bold);
-    color: #2f3e4e;
+    color: var(--color-text-primary);
   }
 
   > svg {

@@ -17,7 +17,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ step, stepArray }) => {
             <ProgressStep
               data-title={stepName}
               className={stepChecker(step, index) ? 'active' : ''}
-              $bgColor={stepChecker(step, index) ? '#218DFF;' : '#9FB4C9'}
+              $bgColor={stepChecker(step, index) ? 'var(--color-text-active);' : 'var(--color-text-secondary)'}
             >
               <ProgressStepText>{index + 1}</ProgressStepText>
             </ProgressStep>

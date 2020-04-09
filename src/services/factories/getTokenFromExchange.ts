@@ -1,41 +1,12 @@
 import Web3 from 'web3'
 
 import { TokenDetails } from 'types'
-import { getImageUrl, logDebug, getToken } from 'utils'
+import { getToken } from 'utils'
 
-import { getErc20Info } from '../helpers'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TokenList } from 'api/tokenList/TokenListApi'
-
-interface TokenFromErc20Params {
-  tokenAddress: string
-  tokenId: number
-  networkId: number
-  erc20Api: Erc20Api
-  web3: Web3
-}
-
-async function getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenDetails | null> {
-  const { tokenAddress, tokenId } = params
-
-  // Get base info from the ERC20 contract
-  const erc20Info = await getErc20Info(params)
-  if (!erc20Info) {
-    logDebug('[services:factories:getTokenFromExchange] Could not get details for token token (%s)', tokenAddress)
-    return null
-  }
-
-  const token = {
-    ...erc20Info,
-    id: tokenId,
-    image: getImageUrl(tokenAddress),
-  }
-
-  // TODO: cache it
-
-  return token
-}
+import { TokenFromErc20Params, TokenFromErc20 } from './'
 
 interface FactoryParams {
   tokenListApi: TokenList
@@ -52,13 +23,17 @@ interface GetByAddressParams {
 export const enum TokenFromExchange {
   FROM_TOKEN_LIST = 'FROM TOKEN LIST',
   NOT_REGISTERED_ON_CONTRACT = 'NOT REGISTERED ON CONTRACT',
-  UNREGISTERED_ERC20 = 'UNREGISTERED ERC20',
+  NOT_IN_TOKEN_LIST = 'NOT IN TOKEN LIST',
   NOT_ERC20 = 'NOT ERC20',
 }
 
 export interface TokenFromExchangeResult {
   token: TokenDetails | null
   reason: TokenFromExchange
+}
+
+interface Injects {
+  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
 }
 
 /**
@@ -68,6 +43,7 @@ export interface TokenFromExchangeResult {
  */
 function getTokenFromExchangeByAddressFactory(
   factoryParams: FactoryParams,
+  { getTokenFromErc20 }: Injects,
 ): (params: GetByAddressParams) => Promise<TokenFromExchangeResult> {
   const { tokenListApi, exchangeApi } = factoryParams
 
@@ -108,11 +84,18 @@ function getTokenFromExchangeByAddressFactory(
     }
 
     // Not there, get it from the ERC20 contract
-    token = (await getTokenFromErc20({ ...factoryParams, tokenAddress, tokenId, networkId })) || undefined
+    const erc20token = await getTokenFromErc20({ tokenAddress, networkId })
+    if (erc20token) {
+      token = {
+        ...erc20token,
+        id: tokenId,
+      }
+    }
+
     if (token) {
       return {
         token,
-        reason: TokenFromExchange.UNREGISTERED_ERC20,
+        reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
       }
     }
 
@@ -135,6 +118,7 @@ interface GetByIdParams {
  */
 function getTokenFromExchangeByIdFactory(
   factoryParams: FactoryParams,
+  { getTokenFromErc20 }: Injects,
 ): (params: GetByIdParams) => Promise<TokenDetails | null> {
   const { tokenListApi, exchangeApi } = factoryParams
 
@@ -164,7 +148,15 @@ function getTokenFromExchangeByIdFactory(
     }
 
     // Not there, get it from the ERC20 contract
-    return getTokenFromErc20({ ...factoryParams, tokenId, tokenAddress, networkId })
+    const erc20token = await getTokenFromErc20({ tokenAddress, networkId })
+    if (erc20token) {
+      return {
+        ...erc20token,
+        id: tokenId,
+      }
+    }
+
+    return null
   }
 }
 

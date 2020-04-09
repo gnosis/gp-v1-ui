@@ -19,7 +19,7 @@ export const AddFundingWrapper = styled.div`
     border-radius: var(--border-radius);
     padding: 1rem 1rem 0;
     box-sizing: border-box;
-    margin: 0 0 1.6rem;
+    margin: 1.6rem 0;
 
     > span {
       padding: 0 1rem;

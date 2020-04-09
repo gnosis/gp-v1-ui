@@ -43,7 +43,7 @@ const About: React.FC = () => {
       <h1>About Mesa</h1>
       <p>
         Mesa it&apos;s an Open Source interface for{' '}
-        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
         </a>
         .<br />
@@ -67,7 +67,7 @@ const About: React.FC = () => {
           <li>Multidimensional order books with ring trades</li>
           <li>Uniform clearing prices in every batch</li>
         </ul>
-        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Read more here
         </a>
       </p>
@@ -117,8 +117,8 @@ const About: React.FC = () => {
         </li>
         <li>
           Developer portal:{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
-            https://docs.gnosis.io/dfusion
+          <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
+            https://docs.gnosis.io/protocol
           </a>
         </li>
         <li>

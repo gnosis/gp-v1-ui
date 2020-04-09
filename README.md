@@ -14,7 +14,7 @@ Develop:
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/dfusion) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
+Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/protocol) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
 
 Gnosis Protocol introduces a new, fully decentralized exchange mechanism for ERC20 tokens with the following
 properties:
@@ -25,18 +25,18 @@ properties:
 
 This UI will allow to:
 
-- Create orders in [Gnosis Protocol](https://docs.gnosis.io/dfusion)
+- Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
 - See the balances for any token: Both in your wallet and the exchange
 - Deposit/Withdraw tokens from the exchange
 
 ## Running locally
 
 ```bash
-# Install dependencies
-npm install
+# Install dependencies (we use Yarn but NPM should work too)
+yarn
 
 # Start dev server in http://localhost:8080
-npm start
+yarn start
 ```
 
 Open http://localhost:8080 in any browser.
@@ -47,7 +47,7 @@ The app will run by default in **mock mode**, that means that all service implem
 
 ```bash
 # Disable mock mode
-MOCK=false npm start
+MOCK=false yarn start
 ```
 
 Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
@@ -58,7 +58,7 @@ When running in **mock mode**, the wallet will be connected automatically, to ch
 
 ```bash
 # Disable autoconnect, for mock mode
-AUTOCONNECT=false npm start
+AUTOCONNECT=false yarn start
 ```
 
 Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
@@ -66,7 +66,7 @@ Alternatively, if you want to modify always this behaviour, add the env var into
 ## Build app
 
 ```bash
-npm run build
+yarn build
 ```
 
 The static files will be generated in `./dist` dir.
@@ -74,7 +74,7 @@ The static files will be generated in `./dist` dir.
 ## Run tests
 
 ```bash
-npm test
+yarn test
 ```
 
 ## Automatically fixing code
@@ -82,7 +82,7 @@ npm test
 Manually, by running:
 
 ```bash
-npm run lint:fix
+yarn lint:fix
 ```
 
 If you use Visual Studio Code, it's recommended to install [Prettier - Code formatter
