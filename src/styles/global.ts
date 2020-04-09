@@ -1088,6 +1088,18 @@ const GlobalStyles = createGlobalStyle`
       }
     }
   }
+  
+  // Heavier specification of the selector to ensure override from global.ts
+  // Ideally take out the modali default injected styles and only load from our end.
+  body.modali-open .modali.modali-size-large {
+    width: 80vw;
+    max-width: initial;
+    min-width: initial;
+    max-height: 100%;
+      @media (min-width: 500px) {
+          min-width: initial !important;
+      }
+  }
 `
 
 export default GlobalStyles
