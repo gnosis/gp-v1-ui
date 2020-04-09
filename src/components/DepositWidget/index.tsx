@@ -319,6 +319,7 @@ type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdr
     ): Promise<void>
   }
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
+  ethBalance,
   balances,
   error,
   enableToken,
@@ -408,6 +409,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               ? displayedBalances.map(tokenBalances => (
                   <Row
                     key={tokenBalances.addressMainnet}
+                    ethBalance={ethBalance}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance, onTxHash): Promise<void> =>
