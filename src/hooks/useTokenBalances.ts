@@ -114,7 +114,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
-  const tokens = useTokenList(walletInfo.networkIdOrDefault)
+  const tokens = useTokenList(walletInfo.networkId)
 
   useEffect(() => {
     // can return NULL (if no address or network)
