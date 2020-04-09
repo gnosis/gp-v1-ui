@@ -33,7 +33,7 @@ import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-act
 
 import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
-import { TokenDetails, Network } from 'types'
+import { TokenDetails } from 'types'
 
 import {
   getToken,
@@ -804,14 +804,14 @@ const TradeWidget: React.FC = () => {
       {needToAddSellToken && sellTokenSymbol && (
         <TokenAdder
           tokenAddress={sellTokenSymbol}
-          networkId={fallBackNetworkId}
+          networkId={networkIdOrDefault}
           onSelectChange={onSelectChangeSellToken}
         />
       )}
       {needToAddReceiveToken && receiveTokenSymbol && (
         <TokenAdder
           tokenAddress={receiveTokenSymbol}
-          networkId={fallBackNetworkId}
+          networkId={networkIdOrDefault}
           onSelectChange={onSelectChangeReceiveToken}
         />
       )}
