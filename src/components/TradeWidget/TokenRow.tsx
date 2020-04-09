@@ -177,7 +177,7 @@ const TokenRow: React.FC<Props> = ({
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
         <i>
-          Did you already deposit <b>{selectedToken.symbol}</b> in the exchange wallet?{' '}
+          Have you already deposited <b>{selectedToken.symbol}</b> into the exchange wallet?{' '}
         </i>
         <i>Sell amount exceeds your balance by</i>
         <strong>
