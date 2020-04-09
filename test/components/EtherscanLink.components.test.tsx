@@ -12,8 +12,8 @@ let networkId: Network | undefined
 
 jest.mock('hooks/useWalletConnection', () => {
   return {
-    useWalletConnection: (): WalletInfo => {
-      return { isConnected, networkId }
+    useWalletConnection: (): WalletInfo & { networkIdOrDefault: number } => {
+      return { isConnected, networkId, networkIdOrDefault: networkId || Network.Mainnet }
     },
   }
 })
@@ -30,10 +30,10 @@ describe('<EtherscanLink /> general', () => {
     expect(wrapper.prop('href')).toMatch(`https://etherscan.io/tx/${TX_HASH}`)
   })
 
-  it('does not render when networkId is missing', () => {
+  it('renders for mainnet if networkId is missing', () => {
     networkId = undefined
     const wrapper = render(<EtherscanLink type="tx" identifier={TX_HASH} />)
-    expect(wrapper.html()).toBeNull()
+    expect(wrapper.prop('href')).toMatch(`https://etherscan.io/tx/${TX_HASH}`)
   })
 
   it('renders provided label', () => {
