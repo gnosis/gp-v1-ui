@@ -19,7 +19,7 @@ const ViewOrderBookBtn = styled.button`
 
   svg {
     font-size: 1.7rem;
-    color: var(--color-text-active);
+    fill: var(--color-text-active);
     margin-left: 0.5rem;
   }
 `
