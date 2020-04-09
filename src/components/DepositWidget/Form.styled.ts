@@ -8,7 +8,7 @@ export const WalletDrawerInnerWrapper = styled.div`
   margin: 0;
   padding: 2.4rem 0;
   box-sizing: border-box;
-  
+
   .message {
     color: var(--color-text-primary);
     background: var(--color-background-validation-warning);
@@ -175,7 +175,7 @@ export const WalletDrawerInnerWrapper = styled.div`
     left: 0;
     padding: 0 1.6rem;
     box-sizing: border-box;
-    
+
     @media ${MEDIA.mobile} {
       position: relative;
       top: initial;

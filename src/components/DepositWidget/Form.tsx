@@ -111,7 +111,11 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
               <li>{title} here.</li>
               <li>Once the transaction is mined, wait for the batch to finish.</li>
             </ol>
-            Read more in our <a href="/faq" target="_blank" rel="noopener">FAQ</a>.
+            Read more in our{' '}
+            <a href="/faq" target="_blank" rel="noopener">
+              FAQ
+            </a>
+            .
           </div>
           {/* Withdraw Row */}
           <div className="wallet">

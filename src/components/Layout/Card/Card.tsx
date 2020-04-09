@@ -37,7 +37,7 @@ const CardRowDrawer = styled.tr`
     width: 100%;
     height: 100%;
     border: 0;
-    
+
     @media ${MEDIA.mobile} {
       box-shadow: none;
     }
@@ -64,7 +64,7 @@ const CardRowDrawer = styled.tr`
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
       border-bottom: 0.1rem solid var(--color-background-banner);
-      
+
       @media ${MEDIA.mobile} {
         padding: 0 5rem 0 1.6rem;
       }
