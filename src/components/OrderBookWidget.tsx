@@ -15,8 +15,6 @@ interface OrderBookProps {
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
-  /* min-height: 40rem; */
-  /* height: calc(100vh - 30rem); */
   min-height: calc(100vh - 30rem);
   text-align: center;
   width: 100%;
