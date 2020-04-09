@@ -192,6 +192,7 @@ const SubmitButton = styled.button`
 `
 
 const OrdersPanel = styled.div`
+  overflow: hidden;
   display: flex;
   flex-flow: column wrap;
   flex: 1;
