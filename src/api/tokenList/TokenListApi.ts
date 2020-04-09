@@ -6,6 +6,7 @@ import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
+  addTokens: (params: AddTokensParams) => void
   hasToken: (params: HasTokenParams) => boolean
 
   persistTokens: (params: PersistTokensParams) => void
@@ -18,6 +19,11 @@ export interface TokenListApiParams {
 export interface AddTokenParams {
   networkId: number
   token: TokenDetails
+}
+
+export interface AddTokensParams {
+  networkId: number
+  tokens: TokenDetails[]
 }
 
 export interface HasTokenParams {
@@ -92,15 +98,25 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   }
 
   public addToken({ networkId, token }: AddTokenParams): void {
-    logDebug('[TokenListApi]: Added new Token to userlist', token)
+    this.addTokens({ tokens: [token], networkId })
+  }
 
-    this._tokensByNetwork[networkId] = this._tokensByNetwork[networkId].concat(token)
-    const key = TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId })
+  public addTokens({ tokens, networkId }: AddTokensParams): void {
+    const addedTokens: TokenDetails[] = []
+    tokens.forEach(token => {
+      logDebug('[TokenListApi]: Added new Token to userlist', token)
 
-    if (this._tokenAddressNetworkSet.has(key)) return
+      const key = TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId })
 
-    this._tokenAddressNetworkSet.add(key)
-    this.persistNewUserToken(token, networkId)
+      if (this._tokenAddressNetworkSet.has(key)) return
+
+      this._tokenAddressNetworkSet.add(key)
+      addedTokens.push(token)
+    })
+    if (addedTokens.length === 0) return
+
+    this._tokensByNetwork[networkId] = this._tokensByNetwork[networkId].concat(addedTokens)
+    this.persistNewUserTokens(tokens, networkId)
 
     this.triggerSubscriptions(this._tokensByNetwork[networkId])
   }
@@ -111,12 +127,11 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     return listStringified ? JSON.parse(listStringified) : []
   }
 
-  private persistNewUserToken(token: TokenDetails, networkId: number): void {
+  private persistNewUserTokens(tokens: TokenDetails[], networkId: number): void {
     const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
     const listStringified = localStorage.getItem(storageKey)
-    const currentUserList: TokenDetails[] = listStringified ? JSON.parse(listStringified) : []
+    const currentUserList: TokenDetails[] = (listStringified ? JSON.parse(listStringified) : []).concat(tokens)
 
-    currentUserList.push(token)
     localStorage.setItem(storageKey, JSON.stringify(currentUserList))
   }
 
