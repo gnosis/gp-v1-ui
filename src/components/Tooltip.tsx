@@ -24,18 +24,20 @@ const TooltipArrow = styled.div<{ $bgColor?: string }>`
   ::before {
     content: '';
     transform: rotate(45deg);
-    background: ${({ $bgColor = '#2f3e4e' }): string => $bgColor};
+    background: ${({ $bgColor = 'var(--color-background-nav-active)' }): string => $bgColor};
   }
 `
 
 const TooltipInner = styled.div<{ $bgColor?: string }>`
-  background: ${({ $bgColor = '#2f3e4e' }): string => $bgColor};
-  color: white;
+  background: ${({ $bgColor = 'var(--color-background-nav-active)' }): string => $bgColor};
+  color: var(--color-text-primary);
   font-weight: var(--font-weight-normal);
   padding: 0.8rem 1rem;
   font-size: 1.2rem;
   border-radius: 0.6rem;
   letter-spacing: 0.03rem;
+  z-index: 9999;
+  line-height: 1.4;
 
   &[data-popper-placement^='top'] > ${TooltipArrow} {
     bottom: -${TOOLTIP_OFFSET / 2}px;

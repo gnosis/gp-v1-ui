@@ -1,20 +1,13 @@
 import styled from 'styled-components'
 
-export const ModalBodyWrapper = styled.div`
-  div > p {
-    font-size: inherit;
-    color: inherit;
-    padding: 0;
-  }
-`
-
 export const TokenRow = styled.tr`
-  .enableToken {
+  .enableToken,
+  .wrapUnwrapEther {
     height: auto;
     outline: 0;
     margin: 0;
     font-size: 1.2rem;
-    color: #218dff;
+    color: var(--color-text-active);
     letter-spacing: -0.03rem;
     text-align: center;
     font-family: var(--font-default);
@@ -23,26 +16,27 @@ export const TokenRow = styled.tr`
     align-items: center;
     padding: 0.4rem 1rem;
     box-sizing: border-box;
-    background: #deeeff;
-    border: 0.1rem solid #218dff;
+    background: var(--color-background);
+    border: 0.1rem solid var(--color-text-active);
     border-radius: 2rem;
     cursor: pointer;
     transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
 
-    > svg {
-      margin: 0 0.5rem 0 0;
+    &:hover {
+      background-color: var(--color-background-balance-button-hover);
+      border-color: var(--color-background-balance-button-hover);
+      color: var(--color-text-button-hover);
     }
 
-    &:hover {
-      background: #218dff;
-      color: #ffffff;
+    > svg {
+      margin: 0 0.5rem 0 0;
     }
   }
 
   .withdrawToken,
   .depositToken {
     outline: 0;
-    background: #218dff;
+    background: var(--color-text-active);
     border-radius: 2.4rem;
     height: 2.4rem;
     width: 2.4rem;
@@ -55,16 +49,48 @@ export const TokenRow = styled.tr`
   }
 
   .withdrawToken {
-    background: #218dff;
+    background: var(--color-text-active);
+    > svg {
+      fill: var(--color-svg-withdraw);
+    }
   }
 
   .depositToken {
-    background: #dfe6ef;
+    background: var(--color-background-banner);
+    > svg {
+      fill: var(--color-svg-deposit);
+    }
+  }
+
+  .depositToken,
+  .withdrawToken {
+    border: 0.1rem solid var(--color-text-CTA);
+    &:hover {
+      background-color: var(--color-background-button-hover);
+      border-color: var(--color-background-button-hover);
+      > svg {
+        fill: ghostwhite;
+      }
+    }
   }
 
   &.loading {
     background-color: #f7f7f7;
     border-bottom-color: #b9b9b9;
+  }
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    button.wrapUnwrapEther {
+      font-size: 1rem;
+      padding 0.2rem 0.5rem;
+      margin: 0.2rem 0;
+      display: inline;
+      min-width: 5rem;
+    }
   }
 `
 

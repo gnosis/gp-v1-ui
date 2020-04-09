@@ -2,8 +2,7 @@ import React, { useState } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
-import minus from 'assets/img/minus.svg'
-import plus from 'assets/img/plus.svg'
+import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
@@ -11,10 +10,11 @@ import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
 
 import useNoScroll from 'hooks/useNoScroll'
 
-import { ZERO, MEDIA } from 'const'
+import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 import { TokenLocalState } from 'reducers-actions'
+import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   tokenBalances: TokenBalanceDetails
@@ -38,6 +38,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     innerWidth,
     highlighted,
     enabling,
+    enabled,
     claiming,
     withdrawing,
     depositing,
@@ -54,7 +55,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     pendingWithdraw,
     claimable,
     walletBalance,
-    enabled,
+    enabled: tokenEnabled,
   } = tokenBalances
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
@@ -74,6 +75,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
+  const isWeth = addressMainnet === WETH_ADDRESS_MAINNET
 
   return (
     <>
@@ -115,18 +117,33 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           )}
         </td>
         <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
-          {(claiming || depositing) && spinner}
-          {formatAmount(walletBalance, decimals)}
+          {isWeth ? (
+            <ul>
+              <li className="not-implemented">
+                0.1 ETH <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
+              </li>
+              <li>
+                {(claiming || depositing) && spinner}
+                {formatAmount(walletBalance, decimals) + ' '}
+                WETH <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
+              </li>
+            </ul>
+          ) : (
+            <>
+              {(claiming || depositing) && spinner}
+              {formatAmount(walletBalance, decimals)}
+            </>
+          )}
         </td>
         <td data-label="Actions">
-          {enabled ? (
+          {enabled || tokenEnabled ? (
             <button
               type="button"
               className="withdrawToken"
               onClick={(): void => showForm('deposit')}
               disabled={isDepositFormVisible}
             >
-              <img src={plus} />
+              <PlusSVG />
             </button>
           ) : (
             <>
@@ -149,7 +166,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               disabled={isWithdrawFormVisible}
               className="depositToken"
             >
-              <img src={minus} />
+              <MinusSVG />
             </button>
           )}
         </td>

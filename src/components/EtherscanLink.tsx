@@ -35,9 +35,11 @@ export const EtherscanLink: React.FC<EtherscanLinkProps> = ({
   identifier,
   label,
   className,
-  networkId: netId,
+  networkId: networkIdFixed,
 }) => {
-  const { networkId = netId } = useWalletConnection()
+  const { networkIdOrDefault: networkIdWallet } = useWalletConnection()
+
+  const networkId = networkIdFixed || networkIdWallet
 
   if (!networkId || !identifier) {
     return null

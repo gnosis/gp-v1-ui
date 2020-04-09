@@ -45,12 +45,7 @@ const Wallet = React.lazy(() =>
     'pages/Wallet'
   ),
 )
-const SourceCode = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Extra_routes_chunk"*/
-    'pages/SourceCode'
-  ),
-)
+
 const NotFound = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
@@ -67,6 +62,12 @@ const FAQ = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
     'pages/FAQ'
+  ),
+)
+const OrderBook = React.lazy(() =>
+  import(
+    /* webpackChunkName: "OrderBook_chunk"*/
+    'pages/OrderBook'
   ),
 )
 
@@ -91,8 +92,8 @@ const App: React.FC = () => (
             <PrivateRoute path="/liquidity" exact component={Strategies} />
             <PrivateRoute path="/wallet" exact component={Wallet} />
             <Route path="/about" exact component={About} />
-            <Route path="/source-code" exact component={SourceCode} />
             <Route path="/faq" exact component={FAQ} />
+            <Route path="/book" exact component={OrderBook} />
             <Route path="/connect-wallet" exact component={ConnectWallet} />
             <Redirect from="/" to="/trade/DAI-USDC?sell=0&price=0" />
             <Route component={NotFound} />

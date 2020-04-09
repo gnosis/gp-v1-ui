@@ -1,6 +1,6 @@
 **What is Mesa?**
 
-Mesa is a decentralized application built on the **Gnosis Protocol**, a decentralized trading protocol for ERC-20s. Instead of using one order book per token pair, the Gnosis Protocol relies on batched auctions and a multidimensional orderbook. These mechanisms enable ring trades, in which liquidity amongst all assets tradable on the protocol is shared. Read more about the protocol’s mechanism on the Gnosis [DevPortal](https://dfusion-docs.dev.gnosisdev.com/docs/introduction1/).
+Mesa is a decentralized application built on the **Gnosis Protocol**, a decentralized trading protocol for ERC-20s. Instead of using one order book per token pair, the Gnosis Protocol relies on batched auctions and a multidimensional orderbook. These mechanisms enable ring trades, in which liquidity amongst all assets tradable on the protocol is shared. Read more about the protocol’s mechanism on the Gnosis [DevPortal](https://docs.gnosis.io/protocol/docs/introduction1/).
 
 **How are trades matched?**
 
@@ -8,11 +8,13 @@ Orders are collected in batches every 5 minutes, and external participants calle
 
 **What advantages does this bring?**
 
-Through this method of order matching, liquidity is shared amongst all assets tradable on the protocol. Users can easily provide liquidity, and the protocol guarantees that trades will only be filled at a user’s preferred price or a better one.  Additionally, with order batches, the risk of front running is greatly reduced.
+- Liquidity shared amongst all token pairs - thanks to ring trades 
+- Don't get front-run - thanks to batch actions
+- Get a fairer price - thanks to uniform clearing prices
 
 **Is Gnosis Protocol secure?**
 
-The Gnosis Protocol smart contracts have been audited externally. Check this section on their [DevPortal](https://dfusion-docs.dev.gnosisdev.com/docs/devguide04/) for further information, including the audit report and the code repository.
+The Gnosis Protocol smart contracts have been audited externally. Check this section on their [DevPortal](https://docs.gnosis.io/protocol/docs/devguide04/) for further information, including the audit report and the code repository.
 
 **Can I create a trade without depositing to the smart contract?**
 

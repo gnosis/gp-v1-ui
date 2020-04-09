@@ -5,6 +5,7 @@ import { logDebug, getImageUrl } from 'utils'
 import { getErc20Info } from '../helpers'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
+import { TokenDetails } from 'types'
 
 interface Params {
   exchangeApi: ExchangeApi
@@ -25,30 +26,30 @@ interface AddTokenToExchangeParams {
  */
 export function addTokenToExchangeFactory(
   factoryParams: Params,
-): (params: AddTokenToExchangeParams) => Promise<boolean> {
+): (params: AddTokenToExchangeParams) => Promise<TokenDetails | null> {
   const { exchangeApi } = factoryParams
 
-  return async ({ userAddress, tokenAddress, networkId }: AddTokenToExchangeParams): Promise<boolean> => {
-    const erc20Info = getErc20Info({ ...factoryParams, tokenAddress, networkId })
+  return async ({ userAddress, tokenAddress, networkId }: AddTokenToExchangeParams): Promise<TokenDetails | null> => {
+    const erc20Info = await getErc20Info({ ...factoryParams, tokenAddress, networkId })
 
     if (!erc20Info) {
       logDebug('[services:factories:addTokenToExchange] Address %s does not contain a valid ERC20 token', tokenAddress)
-      return false
+      return null
     }
 
     try {
       await exchangeApi.addToken({ userAddress, tokenAddress, networkId })
     } catch (e) {
       console.error('[services:factories:addTokenToExchange] Failed to add token (%s) to exchange', tokenAddress)
-      return false
+      return null
     }
 
     // TODO: I guess we might want to return the token and leave the proxy/cache layer to deal with it.
     // Revisit once we add it to the interface
     try {
-      const id = exchangeApi.getTokenIdByAddress({ tokenAddress, networkId })
+      const id = await exchangeApi.getTokenIdByAddress({ tokenAddress, networkId })
 
-      const token = {
+      const token: TokenDetails = {
         ...erc20Info,
         id,
         image: getImageUrl(tokenAddress),
@@ -56,15 +57,14 @@ export function addTokenToExchangeFactory(
 
       // TODO: cache new token
       logDebug('[services:factories:addTokenToExchange] New token: ', token)
+      return token
     } catch (e) {
       console.error(
         '[services:factories:addTokenToExchange] Failed to add new token (%s) to local list of tokens',
         tokenAddress,
         e,
       )
-      return false
+      return null
     }
-
-    return true
   }
 }

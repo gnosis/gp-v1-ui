@@ -32,15 +32,31 @@ export const INITIAL_ORDERS_STATE = { orders: [], offset: 0 }
 export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
     case 'UPDATE_OFFSET':
-    case 'OVERWRITE_ORDERS': {
       return { ...state, ...action.payload }
-    }
-    case 'APPEND_ORDERS': {
+    case 'OVERWRITE_ORDERS': {
       const {
         payload: { orders },
       } = action
+
+      // default sorting order is ascending by order id
+      // since we are starting from 0, reverse to have the latest on top
+      orders.reverse()
+
+      return { ...state, orders }
+    }
+    case 'APPEND_ORDERS': {
+      const {
+        payload: { orders: newOrders },
+      } = action
       const { orders: currentOrders } = state
-      return { ...state, orders: currentOrders.concat(orders) }
+
+      // reverse new orders
+      newOrders.reverse()
+
+      // existing orders are older, so new orders come first
+      const orders = newOrders.concat(currentOrders)
+
+      return { ...state, orders }
     }
     default:
       return state
