@@ -16,6 +16,7 @@ import { useNumberInput } from './useNumberInput'
 import InputWithTooltip from '../InputWithTooltip'
 import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { WrapEtherBtn } from 'components/WrapEtherBtn'
+import { Link } from 'react-router-dom'
 
 const Wrapper = styled.div`
   display: flex;
@@ -82,6 +83,10 @@ const Wrapper = styled.div`
     align-items: center;
     justify-items: center;
     color: var(--color-text-secondary);
+  }
+
+  a.btn {
+    margin: 0 1rem;
   }
 `
 
@@ -228,15 +233,9 @@ const TokenRow: React.FC<Props> = ({
           {!readOnly && (
             // TODO: Implement deposit in Trade widget
             //  https://github.com/gnosis/dex-react/issues/610
-            <TooltipWrapper
-              className="not-implemented"
-              as="button"
-              type="button"
-              tooltip="Deposit"
-              onClick={(): void => alert('Not implemented yet!')}
-            >
+            <Link className="btn" to="/wallet">
               + Deposit
-            </TooltipWrapper>
+            </Link>
           )}
           {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
