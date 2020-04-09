@@ -37,7 +37,10 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
         <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
       </ModalWrapper>
     ),
-    buttons: [<Modali.Button label="Close" key="yes" isStyleDefault onClick={(): void => modalHook.hide()} />],
+    buttons: [
+      <>&nbsp;</>,
+      <Modali.Button label="Close" key="yes" isStyleDefault onClick={(): void => modalHook.hide()} />,
+    ],
   })
 
   return (
