@@ -147,8 +147,12 @@ const subscribeToBlockchainUpdate = ({
       callback(blockchainPrompt)
     })
 
-    const unsubBlock = blockUpdate(blockHeader => {
-      blockchainPrompt = { ...blockchainPrompt, blockHeader }
+    const unsubBlock = blockUpdate(async blockHeader => {
+      // oftentimes on network change newBlockHeaders fires first
+      // reaffirm correct id
+      const chainId = await web3.eth.net.getId()
+
+      blockchainPrompt = { ...blockchainPrompt, blockHeader, chainId }
       logDebug('[WalletApiImpl] block changed:', blockHeader.number)
       callback(blockchainPrompt)
     })
