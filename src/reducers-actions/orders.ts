@@ -40,9 +40,10 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       // default sorting order is ascending by order id
       // since we are starting from 0, reverse to have the latest on top
-      const reversed = orders.slice(0).reverse()
+      // make a copy first (slice(0)) to avoid mutating current state
+      const reversedOrders = orders.slice(0).reverse()
 
-      return { ...state, orders: reversed }
+      return { ...state, orders: reversedOrders }
     }
     case 'APPEND_ORDERS': {
       const {
@@ -51,10 +52,10 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       const { orders: currentOrders } = state
 
       // reverse new orders
-      const reversed = newOrders.slice(0).reverse()
+      const reversedNewOrders = newOrders.slice(0).reverse()
 
       // existing orders are older, so new orders come first
-      const orders = reversed.concat(currentOrders)
+      const orders = reversedNewOrders.concat(currentOrders)
 
       return { ...state, orders }
     }
