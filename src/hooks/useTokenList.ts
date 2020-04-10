@@ -15,7 +15,6 @@ export const useTokenList = (networkId?: number): TokenDetails[] => {
   const [, forceUpdate] = useSafeState({})
 
   useEffect(() => {
-    // if (networkId === undefined) return setTokens(emptyArray)
     return subscribeToTokenList(() => forceUpdate({}))
   }, [networkId, forceUpdate])
 
