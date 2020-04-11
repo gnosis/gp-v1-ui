@@ -16,7 +16,7 @@ export const useTokenList = (networkId?: number): TokenDetails[] => {
 
   useEffect(() => {
     return subscribeToTokenList(() => forceUpdate({}))
-  }, [networkId, forceUpdate])
+  }, [forceUpdate])
 
   return tokens
 }
