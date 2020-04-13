@@ -93,11 +93,7 @@ interface SearchItemProps {
   value: string
   defaultText?: string
   networkId: number
-}
-
-interface TokenDetailsAndNetwork {
-  token: TokenDetails
-  networkId: number
+  focused?: boolean
 }
 
 const notifyOfNewToken = (token: TokenDetails): void => {
@@ -119,7 +115,7 @@ const promisedCache = new SimpleCache<Promise<FetchTokenResult>, TokenAndNetwork
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
   !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
 
-export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId }) => {
+export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId, focused = false }) => {
   const [isFetching, setIsFetching] = useSafeState(false)
   // cached values can be retieved on first render already
   const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(() => {
@@ -178,7 +174,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   }, [value.toLowerCase(), networkId, setFetchResult])
   // don't differentiate based on case
 
-  const { modalProps, addTokensToList } = useBetterAddTokenModal()
+  const { modalProps, addTokensToList } = useBetterAddTokenModal({ focused })
   console.log('modalProps', modalProps)
 
   if (isFetching) return <>Checking token address...</>
