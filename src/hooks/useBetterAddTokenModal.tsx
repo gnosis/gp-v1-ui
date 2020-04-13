@@ -82,15 +82,12 @@ const TokenDisplay = styled.div`
   }
 `
 
-const CenteredContent = styled.div`
+const NonTokenDisplay = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
-
-  ${TokenDisplay} {
-    margin: auto;
-  }
+  justify-content: space-between;
+  margin: auto;
 `
 
 interface GenerateMessageParams2 {
@@ -107,9 +104,14 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
       if (!token)
         return (
-          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
-            Register token on Exchange first
-          </a>
+          <NonTokenDisplay>
+            <span>
+              <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+                Register token
+              </a>{' '}
+              {tokenAddress} on Exchange first
+            </span>
+          </NonTokenDisplay>
         )
       return (
         <TokenDisplay>
@@ -137,7 +139,12 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
       )
     // not a ERC20 --> can't do much
     case TokenFromExchange.NOT_ERC20:
-      return <>Not a valid ERC20 token</>
+      return (
+        <NonTokenDisplay>
+          {tokenAddress}
+          <strong>is not a valid ERC20 token</strong>
+        </NonTokenDisplay>
+      )
     // registered but not in list --> option to add
     case TokenFromExchange.NOT_IN_TOKEN_LIST:
       if (!token || !('id' in token)) return null
