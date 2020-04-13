@@ -42,11 +42,6 @@ export const ModalBodyWrapper = styled(FocusedDiv)`
   justify-content: center;
 `
 
-interface TokensAddConfirmationProps {
-  tokenAddresses: string[]
-  networkId: number
-}
-
 const TokenDisplay = styled.div`
   display: grid;
 
@@ -178,7 +173,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
 
 const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin size="8x" />
 
-const generateMessage2 = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactNode => {
+const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactNode => {
   // in fetching state -- show spinner
   if (fetchResults.length === 0) return spinner
   return (
@@ -191,8 +186,16 @@ const generateMessage2 = ({ networkId, fetchResults }: GenerateMessageParams2): 
 }
 
 interface UseAddTokenModalResult {
-  addTokensToList: (params: TokensAddConfirmationProps) => Promise<TokenDetails[]>
+  addTokensToList: (
+    params: TokensAddConfirmationProps | TokensAddConfirmationProps2,
+    defaultReason?: FetchTokenResult['reason'],
+  ) => Promise<TokenDetails[]>
   modalProps: ModalHook
+}
+
+interface TokensAddConfirmationProps {
+  tokenAddresses: string[]
+  networkId: number
 }
 
 interface TokensAddConfirmationProps2 {
@@ -222,13 +225,12 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
     centered: true,
     title: 'Do you want to add new Tokens?',
     onHide: () => {
-      console.log('onHide')
       // always gets triggered on modal closing
       // whether on Confirm, X or Escape
       // it's ok to re-resolve a promise, nothing happens
       result.current?.resolve([])
     },
-    message: <ModalBodyWrapper tabIndex={-1}>{generateMessage2({ networkId, fetchResults })}</ModalBodyWrapper>,
+    message: <ModalBodyWrapper tabIndex={-1}>{generateMessage({ networkId, fetchResults })}</ModalBodyWrapper>,
     buttons: [
       // Cancel button only if there's anything to cancel
       canAddAnyToken ? (
@@ -250,10 +252,8 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
         isStyleDefault={canAddAnyToken}
         isStyleCancel={!canAddAnyToken}
         onClick={(): void => {
-          console.log('tokenListApi::adding tokens', { tokens, networkId })
           // add tokens
           tokenListApi.addTokens({ tokens, networkId })
-          console.log('tokenListApi::addedTokens', tokenListApi.getTokens(networkId))
 
           // resolve deferred promise
           result.current?.resolve(tokens)
@@ -301,14 +301,11 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
       const fetcher = (tokenAddress: string): Promise<FetchTokenResult> =>
         fetchTokenData({ tokenAddress, networkId: params.networkId })
       let results = await Promise.all(params.tokenAddresses.map(fetcher))
-      console.log('results', results)
 
       if (results.every(({ token, reason }) => !token && reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT)) {
-        console.log('Failed initial fetch. Retrying!')
         // initial fetch can fail if we are in-between providers
         // which happens when from URL -- default Prov -- Metamask switch happens on page load
         results = await Promise.all(params.tokenAddresses.map(fetcher))
-        console.log('results', results)
       }
 
       // only addable tokens, already registered on exchange
