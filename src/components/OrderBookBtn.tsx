@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
@@ -113,6 +113,12 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
   const tokenList = useTokenList(networkId)
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
+
+  // Update if any of the base tokens change
+  useEffect(() => {
+    setBaseToken(baseTokenDefault)
+    setQuoteToken(quoteTokenDefault)
+  }, [baseTokenDefault, quoteTokenDefault, setBaseToken, setQuoteToken])
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
