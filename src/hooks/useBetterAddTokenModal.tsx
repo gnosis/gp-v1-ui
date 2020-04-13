@@ -100,9 +100,12 @@ interface ExplainTokenReasonProps extends FetchTokenResult {
 }
 
 const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, networkId, tokenAddress }) => {
+  // display differently depending on whether token is
   switch (reason) {
+    // a valid token address but not registered on Exchange
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
       if (!token)
+        // this shouldn't happen, but just in case
         return (
           <NonTokenDisplay>
             <span>
@@ -139,6 +142,8 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
       )
     // not a ERC20 --> can't do much
     case TokenFromExchange.NOT_ERC20:
+      // shouldn't really happen
+      // because don't expect anyone to register a non-token on Exchange
       return (
         <NonTokenDisplay>
           {tokenAddress}
@@ -147,6 +152,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
       )
     // registered but not in list --> option to add
     case TokenFromExchange.NOT_IN_TOKEN_LIST:
+      // more type-guard than real use-case
       if (!token || !('id' in token)) return null
 
       return (
@@ -173,6 +179,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
 const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin size="8x" />
 
 const generateMessage2 = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactNode => {
+  // in fetching state -- show spinner
   if (fetchResults.length === 0) return spinner
   return (
     <>
@@ -199,10 +206,13 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
   // using deferred promise that will be resolved separately
   const result = useRef<Deferred<TokenDetails[]>>()
 
+  // addable tokens only
   const [tokens, setTokens] = useSafeState<TokenDetails[]>([])
+  // rtesults for all fetched tokens, addable or not
   const [fetchResults, setFetchResults] = useSafeState<FetchTokenResult[]>([])
 
   const canAddAnyToken = useMemo(
+    // check if any of the fetched tokens are addable to USER_LIST
     () => fetchResults.some(({ token, reason }) => token && reason === TokenFromExchange.NOT_IN_TOKEN_LIST),
     [fetchResults],
   )
@@ -213,10 +223,14 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
     title: 'Do you want to add new Tokens?',
     onHide: () => {
       console.log('onHide')
+      // always gets triggered on modal closing
+      // whether on Confirm, X or Escape
+      // it's ok to re-resolve a promise, nothing happens
       result.current?.resolve([])
     },
     message: <ModalBodyWrapper tabIndex={-1}>{generateMessage2({ networkId, fetchResults })}</ModalBodyWrapper>,
     buttons: [
+      // Cancel button only if there's anything to cancel
       canAddAnyToken ? (
         <Modali.Button
           label="Cancel"
@@ -230,6 +244,7 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
         <>&nbsp;</>
       ),
       <Modali.Button
+        // nothing to add -- Close
         label={canAddAnyToken ? 'Confirm' : 'Close'}
         key="yes"
         isStyleDefault={canAddAnyToken}
@@ -240,6 +255,7 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
           tokenListApi.addTokens({ tokens, networkId })
           console.log('tokenListApi::addedTokens', tokenListApi.getTokens(networkId))
 
+          // resolve deferred promise
           result.current?.resolve(tokens)
         }}
       />,
@@ -262,6 +278,8 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
     const deferred = createDeferredPromise<TokenDetails[]>()
     result.current = deferred
 
+    // if passed already known tokens
+    // show right away without fetching
     if ('tokens' in params) {
       if (params.tokens.length === 0) return []
 
@@ -275,6 +293,7 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
       )
       toggleRef.current()
     } else {
+      // if passed tokenAddresses only -- fetch
       if (params.tokenAddresses.length === 0) return []
 
       toggleRef.current()
@@ -286,10 +305,15 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
 
       if (results.every(({ token, reason }) => !token && reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT)) {
         console.log('Failed initial fetch. Retrying!')
+        // initial fetch can fail if we are in-between providers
+        // which happens when from URL -- default Prov -- Metamask switch happens on page load
         results = await Promise.all(params.tokenAddresses.map(fetcher))
         console.log('results', results)
       }
 
+      // only addable tokens, already registered on exchange
+      // but not in USER_LIST
+      // meaning they must have id
       const tokens = results
         .map(result => result.token)
         .filter((token): token is TokenDetails => !!token && 'id' in token)
@@ -312,6 +336,8 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
   }
 
   useEffect(() => {
+    // isModalVisible is changed after a delay
+    // safe to change state as modal is hidden at this point
     if (!modalProps.isModalVisible) {
       // reset hook state
       // only after modal closed to avoid rerendering not-yet closed modal
