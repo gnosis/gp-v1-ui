@@ -366,7 +366,7 @@ interface TokensAdderProps {
 
 const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, onTokensAdded }) => {
   console.log('TokensAdder::networkId', networkId)
-  const { addTokensToList, modalProps } = useBetterAddTokenModal()
+  const { addTokensToList, modalProps } = useBetterAddTokenModal({ focused: true })
 
   useEffect(() => {
     if (tokenAddresses.length === 0) return
