@@ -230,6 +230,10 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
     defaultReason: FetchTokenResult['reason'] = TokenFromExchange.NOT_IN_TOKEN_LIST,
   ): Promise<TokenDetails[]> => {
     setNetworkId(params.networkId)
+    // start deferred promise to be resolved later
+    const deferred = createDeferredPromise<TokenDetails[]>()
+    result.current = deferred
+
     if ('tokens' in params) {
       if (params.tokens.length === 0) return []
 
@@ -266,10 +270,6 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
         setTokens(tokens)
       })
     }
-
-    // start deferred promise to be resolved later
-    const deferred = createDeferredPromise<TokenDetails[]>()
-    result.current = deferred
 
     return deferred.promise.then(value => {
       // close modal
