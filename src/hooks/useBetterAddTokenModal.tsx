@@ -49,12 +49,13 @@ interface TokensAddConfirmationProps {
 
 const TokenDisplay = styled.div`
   display: grid;
+
   align-items: center;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(12rem, auto) 2rem 1fr;
   grid-template-rows: auto auto;
   grid-template-areas:
-    'image symbol'
-    'image name';
+    'image symbol . text-1'
+    'image name . text-2';
 
   .tokenImage {
     grid-area: image;
@@ -68,6 +69,16 @@ const TokenDisplay = styled.div`
 
   .tokenName {
     grid-area: name;
+  }
+
+  .tokenText {
+    &:first-of-type {
+      grid-area: text-1;
+    }
+
+    &:last-of-type {
+      grid-area: text-2;
+    }
   }
 `
 
@@ -91,7 +102,7 @@ interface ExplainTokenReasonProps extends FetchTokenResult {
   networkId: number
 }
 
-const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, networkId }) => {
+const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, networkId, tokenAddress }) => {
   switch (reason) {
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
       if (!token)
@@ -101,19 +112,28 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
           </a>
         )
       return (
-        <>
-          <TokenDisplay>
-            <TokenImg src={token.image} alt={token.name} className="tokenImage" />
-            <div className="tokenSymbol">
-              <strong>{token.symbol}</strong>
-            </div>
-            <div className="tokenName">{token.name}</div>
-          </TokenDisplay>
-          <EtherscanLink type="token" identifier={token.address} networkId={networkId} label="Check on etherscan" />
-          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+        <TokenDisplay>
+          <TokenImg src={token.image} alt={token.name} className="tokenImage" />
+          <div className="tokenSymbol">
+            <strong>{token.symbol}</strong>
+          </div>
+          <div className="tokenName">{token.name}</div>
+          <EtherscanLink
+            className="tokenText"
+            type="token"
+            identifier={token.address}
+            networkId={networkId}
+            label="Check on etherscan"
+          />
+          <a
+            className="tokenText"
+            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
             Register token on Exchange first
           </a>
-        </>
+        </TokenDisplay>
       )
     // not a ERC20 --> can't do much
     case TokenFromExchange.NOT_ERC20:
@@ -123,23 +143,27 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
       if (!token || !('id' in token)) return null
 
       return (
-        <>
-          <TokenDisplay>
-            <TokenImg src={token.image} alt={token.name} className="tokenImage" />
-            <div className="tokenSymbol">
-              <strong>{token.symbol}</strong>
-            </div>
-            <div className="tokenName">{token.name}</div>
-          </TokenDisplay>
-          <EtherscanLink type="token" identifier={token.address} networkId={networkId} label="Check on etherscan" />
-        </>
+        <TokenDisplay>
+          <TokenImg src={token.image} alt={token.name} className="tokenImage" />
+          <div className="tokenSymbol">
+            <strong>{token.symbol}</strong>
+          </div>
+          <div className="tokenName">{token.name}</div>
+          <EtherscanLink
+            type="token"
+            className="tokenText"
+            identifier={token.address}
+            networkId={networkId}
+            label="Check on etherscan"
+          />
+        </TokenDisplay>
       )
     default:
       return null
   }
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin size="10x" />
+const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin size="8x" />
 
 const generateMessage2 = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactNode => {
   if (fetchResults.length === 0) return spinner
@@ -179,15 +203,12 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
   const [modalProps, toggleModal] = useModali({
     animated: true,
     centered: true,
+    title: 'Do you want to add new Tokens?',
     onHide: () => {
       console.log('onHide')
       result.current?.resolve([])
     },
-    message: (
-      <ModalBodyWrapper tabIndex={-1}>
-        <CenteredContent>{generateMessage2({ networkId, fetchResults })}</CenteredContent>
-      </ModalBodyWrapper>
-    ),
+    message: <ModalBodyWrapper tabIndex={-1}>{generateMessage2({ networkId, fetchResults })}</ModalBodyWrapper>,
     buttons: [
       canAddAnyToken ? (
         <Modali.Button
