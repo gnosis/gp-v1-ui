@@ -169,8 +169,8 @@ const generateMessage2 = ({ networkId, fetchResults }: GenerateMessageParams2): 
   if (fetchResults.length === 0) return spinner
   return (
     <>
-      {fetchResults.map((result, index) => (
-        <ExplainTokenReason key={result.token ? result.token.address : index} {...result} networkId={networkId} />
+      {fetchResults.map(result => (
+        <ExplainTokenReason key={result.tokenAddress} {...result} networkId={networkId} />
       ))}
     </>
   )
@@ -263,6 +263,7 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
         params.tokens.map(token => ({
           token,
           reason: defaultReason,
+          tokenAddress: token.address,
         })),
       )
       toggleRef.current()

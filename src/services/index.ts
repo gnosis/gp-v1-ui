@@ -128,6 +128,7 @@ type ValidResons =
 export interface FetchTokenResult {
   token: TokenDetails | TokenFromErc20 | null
   reason: ValidResons | null
+  tokenAddress: string
 }
 
 export const fetchTokenData = async ({
@@ -147,12 +148,14 @@ export const fetchTokenData = async ({
       return {
         token: erc20Token,
         reason: erc20Token ? TokenFromExchange.NOT_REGISTERED_ON_CONTRACT : TokenFromExchange.NOT_ERC20,
+        tokenAddress: params.tokenAddress,
       }
 
     if (!erc20Token)
       return {
         token: null,
         reason: TokenFromExchange.NOT_ERC20,
+        tokenAddress: params.tokenAddress,
       }
 
     // get registered id
@@ -164,12 +167,14 @@ export const fetchTokenData = async ({
         id: tokenId,
       },
       reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
+      tokenAddress: params.tokenAddress,
     }
   } catch (error) {
     logDebug('Error fetching token', params, error)
     return {
       token: null,
       reason: null,
+      tokenAddress: params.tokenAddress,
     }
   }
 }
