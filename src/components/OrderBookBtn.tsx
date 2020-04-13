@@ -10,6 +10,19 @@ import TokenSelector from './TokenSelector'
 import useSafeState from 'hooks/useSafeState'
 import { useTokenList } from 'hooks/useTokenList'
 import { MEDIA } from 'const'
+import { faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+const ViewOrderBookBtn = styled.button`
+  margin: 0 0 0 auto;
+  text-align: right;
+
+  svg {
+    font-size: 1.7rem;
+    fill: var(--color-text-active);
+    margin-left: 0.5rem;
+  }
+`
 
 const ModalWrapper = styled(ModalBodyWrapper)`
   display: flex;
@@ -110,9 +123,9 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
 
   return (
     <>
-      <button className={className} onClick={toggleModal}>
-        {label || 'View Order Book'}
-      </button>
+      <ViewOrderBookBtn className={className} onClick={toggleModal}>
+        {label || 'View Order Book'} <FontAwesomeIcon className="chart-icon" icon={faChartLine} />
+      </ViewOrderBookBtn>
       <Modali.Modal {...modalHook} />
     </>
   )
