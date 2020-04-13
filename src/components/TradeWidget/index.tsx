@@ -329,21 +329,6 @@ export const DEFAULT_FORM_STATE = {
   validUntil: '2880',
 }
 
-function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): string {
-  const sellAmount = parseBigNumber(sellValue)
-
-  if (!sellAmount || sellAmount.isZero()) {
-    return 'First input the sell amount'
-  }
-
-  const receiveAmount = parseBigNumber(receiveValue)
-  if (!receiveAmount || receiveAmount.isZero()) {
-    return 'Input the price to get the receive tokens'
-  } else {
-    return 'Minimum amount of tokens you will receive if the order is fully executed at the given price'
-  }
-}
-
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   let receiveAmount = ''
   if (priceValue && sellValue) {
@@ -457,7 +442,6 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
-  const receiveValue = watch(receiveInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
 
@@ -778,11 +762,6 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  const receiveTokenTooltipText = useMemo(() => _getReceiveTokenTooltipText(sellValue, receiveValue), [
-    sellValue,
-    receiveValue,
-  ])
-
   const { needToAddSellToken, needToAddReceiveToken } = useMemo(() => {
     const needToAddSellToken =
       sellTokenSymbol &&
@@ -837,7 +816,6 @@ const TradeWidget: React.FC = () => {
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
-            tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
             <SwitcherSVG />
@@ -852,7 +830,6 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             tabIndex={1}
             readOnly
-            tooltipText={receiveTokenTooltipText}
           />
           <Price
             priceInputId={priceInputId}
