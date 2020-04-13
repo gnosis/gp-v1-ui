@@ -93,6 +93,20 @@ interface OrderBookBtnProps {
   className?: string
 }
 
+function onChangeToken(params: {
+  setChangedToken: React.Dispatch<React.SetStateAction<TokenDetails>>
+  currentToken: TokenDetails
+  newToken: TokenDetails
+  setOtherToken: React.Dispatch<React.SetStateAction<TokenDetails>>
+  otherToken: TokenDetails
+}): void {
+  const { setChangedToken, currentToken, newToken, setOtherToken, otherToken } = params
+  if (newToken.address === otherToken.address) {
+    setOtherToken(currentToken)
+  }
+  setChangedToken(newToken)
+}
+
 export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnProps) => {
   const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault, label, className } = props
   const { networkIdOrDefault: networkId } = useWalletConnection()
@@ -112,10 +126,36 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
     message: (
       <ModalWrapper>
         <span>
-          <p>Bid</p> <TokenSelector tokens={tokenList} selected={baseToken} onChange={setBaseToken} />
+          <p>Bid</p>{' '}
+          <TokenSelector
+            tokens={tokenList}
+            selected={baseToken}
+            onChange={(token): void =>
+              onChangeToken({
+                setChangedToken: setBaseToken,
+                currentToken: baseToken,
+                newToken: token,
+                setOtherToken: setQuoteToken,
+                otherToken: quoteToken,
+              })
+            }
+          />
         </span>
         <span>
-          <TokenSelector tokens={tokenList} selected={quoteToken} onChange={setQuoteToken} /> <p>Ask</p>
+          <TokenSelector
+            tokens={tokenList}
+            selected={quoteToken}
+            onChange={(token): void =>
+              onChangeToken({
+                setChangedToken: setQuoteToken,
+                currentToken: quoteToken,
+                newToken: token,
+                setOtherToken: setBaseToken,
+                otherToken: baseToken,
+              })
+            }
+          />{' '}
+          <p>Ask</p>
         </span>
         <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
       </ModalWrapper>
