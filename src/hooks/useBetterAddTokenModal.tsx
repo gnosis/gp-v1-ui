@@ -179,7 +179,10 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
   const [modalProps, toggleModal] = useModali({
     animated: true,
     centered: true,
-    title: 'Are you sure?',
+    onHide: () => {
+      console.log('onHide')
+      result.current?.resolve([])
+    },
     message: (
       <ModalBodyWrapper tabIndex={-1}>
         <CenteredContent>{generateMessage2({ networkId, fetchResults })}</CenteredContent>
@@ -218,6 +221,9 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
   // toggleModal recreated every time, keep ref to use in Promise.then
   const toggleRef = useRef(toggleModal)
   toggleRef.current = toggleModal
+  // same for modalProps.isShown
+  const isShownRef = useRef(modalProps.isShown)
+  isShownRef.current = modalProps.isShown
 
   const addTokensToList = async (
     params: TokensAddConfirmationProps | TokensAddConfirmationProps2,
@@ -267,7 +273,7 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
 
     return deferred.promise.then(value => {
       // close modal
-      toggleRef.current()
+      if (isShownRef.current) toggleRef.current()
 
       // reset hook state
       result.current = undefined
