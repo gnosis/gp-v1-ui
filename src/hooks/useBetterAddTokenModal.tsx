@@ -13,18 +13,23 @@ import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
 import { EtherscanLink } from 'components/EtherscanLink'
 
-type FocusedDivProps = JSX.IntrinsicElements['div']
+interface ExtraProps {
+  focused: boolean
+}
+
+type FocusedDivProps = JSX.IntrinsicElements['div'] & ExtraProps
 // hack to move focus to Modal onOpen
 // otherwise need to click inside first
 // before any button becomes clickable
-const FocusedDiv: React.FC<FocusedDivProps> = props => {
+const FocusedDiv: React.FC<FocusedDivProps> = ({ focused, ...rest }) => {
   const divRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    divRef.current?.focus()
+    if (focused) divRef.current?.focus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <div tabIndex={-1} ref={divRef} {...props} />
+  return <div tabIndex={-1} ref={divRef} {...rest} />
 }
 
 export const ModalBodyWrapper = styled(FocusedDiv)`
@@ -203,7 +208,15 @@ interface TokensAddConfirmationProps2 {
   networkId: number
 }
 
-export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
+interface AddTokenOptions {
+  focused: boolean
+}
+
+const defaultOptions = {
+  focused: false,
+}
+
+export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions): UseAddTokenModalResult => {
   const [networkId, setNetworkId] = useSafeState(0)
 
   // using deferred promise that will be resolved separately
@@ -230,7 +243,11 @@ export const useBetterAddTokenModal = (): UseAddTokenModalResult => {
       // it's ok to re-resolve a promise, nothing happens
       result.current?.resolve([])
     },
-    message: <ModalBodyWrapper tabIndex={-1}>{generateMessage({ networkId, fetchResults })}</ModalBodyWrapper>,
+    message: (
+      <ModalBodyWrapper tabIndex={-1} focused={options.focused}>
+        {generateMessage({ networkId, fetchResults })}
+      </ModalBodyWrapper>
+    ),
     buttons: [
       // Cancel button only if there's anything to cancel
       canAddAnyToken ? (
