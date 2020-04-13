@@ -48,14 +48,15 @@ export const OrdersWrapper = styled.div`
 export const ButtonWithIcon = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 6rem;
-  border: 0.1rem solid #a71409;
+  border: 0.1rem solid var(--color-text-deleteOrders);
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
   background: transparent;
-  color: #a71409;
+  color: var(--color-text-deleteOrders);
   outline: 0;
 
   &:hover {
-    background: #a71409;
+    background: var(--color-text-deleteOrders);
+    color: var(--color-background-pageWrapper);
   }
 
   > svg {
@@ -76,7 +77,7 @@ export const OrdersForm = styled.div`
     flex-flow: row nowrap;
     width: 100%;
     justify-content: center;
-    height: 6.4rem;
+    min-height: 6.4rem;
     border-bottom: 0.1rem solid var(--color-text-secondary);
     align-items: center;
 
@@ -147,7 +148,7 @@ export const OrdersForm = styled.div`
     display: grid;
     padding: 0 0 5rem;
     box-sizing: border-box;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   .checked {
@@ -161,14 +162,13 @@ export const OrdersForm = styled.div`
     flex-direction: column;
     position: sticky;
     top: 4rem;
-    z-index: 10;
+    z-index: 2;
     justify-content: flex-start;
     align-items: center;
-    background: var(--color-error);
-    color: #a71409;
-    height: 4rem;
+    background: var(--color-background-deleteOrders);
+    color: var(--color-text-deleteOrders);
     text-align: left;
-    padding: 0 0.9rem;
+    padding: 0.8rem 1.1rem;
     opacity: 1;
     font-size: 1rem;
     text-transform: uppercase;

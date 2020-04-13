@@ -96,7 +96,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   margin: auto;
   background: var(--color-background-pageWrapper);
   color: var(--color-text-primary);
-  z-index: 2;
+  z-index: 3;
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 50rem;
   min-width: 30rem;

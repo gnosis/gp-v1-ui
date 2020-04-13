@@ -192,6 +192,7 @@ const SubmitButton = styled.button`
 `
 
 const OrdersPanel = styled.div`
+  overflow: hidden;
   display: flex;
   flex-flow: column wrap;
   flex: 1;
@@ -391,7 +392,12 @@ const TradeWidget: React.FC = () => {
   const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
-  const tokens = isConnected && balances.length > 0 ? balances : tokenList
+  const tokens =
+    isConnected && balances.length > 0
+      ? balances
+      : tokenList.length > 0
+      ? tokenList
+      : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
