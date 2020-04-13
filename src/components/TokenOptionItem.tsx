@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress } from 'web3-utils'
+import Modali from 'modali'
 import { TokenImgWrapper } from './TokenImg'
 import { tokenListApi } from 'api'
 import styled from 'styled-components'
@@ -11,6 +12,7 @@ import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
 import { safeFilledToken } from 'utils'
 import { toast } from 'toastify'
 import { SimpleCache } from 'api/proxy/SimpleCache'
+import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -98,8 +100,7 @@ interface TokenDetailsAndNetwork {
   networkId: number
 }
 
-const addTokenToList = ({ token, networkId }: TokenDetailsAndNetwork): void => {
-  tokenListApi.addToken({ token, networkId })
+const notifyOfNewToken = (token: TokenDetails): void => {
   const { symbol: tokenDisplayName } = safeFilledToken(token)
   toast.success(`The token ${tokenDisplayName} has been enabled for trading`)
 }
@@ -177,6 +178,9 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   }, [value.toLowerCase(), networkId, setFetchResult])
   // don't differentiate based on case
 
+  const { modalProps, addTokensToList } = useBetterAddTokenModal()
+  console.log('modalProps', modalProps)
+
   if (isFetching) return <>Checking token address...</>
 
   if (
@@ -222,19 +226,25 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     case TokenFromExchange.NOT_IN_TOKEN_LIST:
       if (!token || !('id' in token)) return <>{defaultText}</>
 
-      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = e => {
+      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async e => {
         // prevent react-select reaction
         e.preventDefault()
-        addTokenToList({ token, networkId })
+        const [newToken] = await addTokensToList({ networkId, tokens: [token] }, reason)
+        if (!newToken) return
+
+        notifyOfNewToken(newToken)
 
         // clear cache as token is in list now
         fetchedCache.delete({ tokenAddress: token.address, networkId })
       }
 
       return (
-        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
-          <button onClick={handleAddToken}>Add Token</button>
-        </OptionItem>
+        <>
+          <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+            <button onClick={handleAddToken}>Add Token</button>
+          </OptionItem>
+          <Modali.Modal {...modalProps} />
+        </>
       )
     default:
       return <>{defaultText}</>
