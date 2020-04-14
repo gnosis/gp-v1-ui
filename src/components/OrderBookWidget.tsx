@@ -4,7 +4,7 @@ import { TokenDetails, Network } from 'types'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
-import { getNetworkFromId } from '@gnosis.pm/dex-js'
+import { getNetworkFromId, safeTokenName } from '@gnosis.pm/dex-js'
 
 interface OrderBookProps {
   baseToken: TokenDetails
@@ -123,6 +123,7 @@ const draw = (
   dataSource: string,
   networkId: number,
 ): am4charts.XYChart => {
+  const baseTokenLabel = safeTokenName(baseToken)
   am4core.useTheme(am4themesSpiritedaway)
   am4core.options.autoSetClassName = true
   const chart = am4core.create(chartElement, am4charts.XYChart)
@@ -164,7 +165,7 @@ const draw = (
   bidCurve.fill = bidCurve.stroke
   bidCurve.startLocation = 0.5
   bidCurve.fillOpacity = 0.1
-  bidCurve.tooltipText = 'Bid: [bold]{categoryX}[/]\nTotal volume: [bold]{totalVolume}[/]\nVolume: [bold]{volume}[/]'
+  bidCurve.tooltipText = `Bid: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume} ${baseTokenLabel}[/]`
 
   const askCurve = chart.series.push(new am4charts.StepLineSeries())
   askCurve.dataFields.categoryX = 'price'
@@ -174,21 +175,7 @@ const draw = (
   askCurve.fill = askCurve.stroke
   askCurve.fillOpacity = 0.1
   askCurve.startLocation = 0.5
-  askCurve.tooltipText = 'Ask: [bold]{categoryX}[/]\nTotal volume: [bold]{totalVolume}[/]\nVolume: [bold]{volume}[/]'
-
-  const series3 = chart.series.push(new am4charts.ColumnSeries())
-  series3.dataFields.categoryX = 'price'
-  series3.dataFields.valueY = 'bidValueY'
-  series3.strokeWidth = 0
-  series3.fill = am4core.color(colors.green)
-  series3.fillOpacity = 0.2
-
-  const series4 = chart.series.push(new am4charts.ColumnSeries())
-  series4.dataFields.categoryX = 'price'
-  series4.dataFields.valueY = 'askValueY'
-  series4.strokeWidth = 0
-  series4.fill = am4core.color(colors.red)
-  series4.fillOpacity = 0.2
+  askCurve.tooltipText = `Ask: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume} ${baseTokenLabel}[/]`
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
@@ -214,7 +201,8 @@ const OrderBookWidget: React.FC<OrderBookProps> = props => {
 
   return (
     <Wrapper ref={mountPoint}>
-      Show order book for token {baseToken.symbol} ({baseToken.id}) and {quoteToken.symbol} ({quoteToken.id})
+      Show order book for token {safeTokenName(baseToken)} ({baseToken.id}) and {safeTokenName(baseToken)} (
+      {quoteToken.id})
     </Wrapper>
   )
 }
