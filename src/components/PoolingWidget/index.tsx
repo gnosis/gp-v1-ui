@@ -26,6 +26,7 @@ import { Receipt } from 'types'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { useTokenList } from 'hooks/useTokenList'
+import { Link } from 'react-router-dom'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -296,7 +297,7 @@ const PoolingInterface: React.FC = () => {
                 Your liquidity is equal to the amount you have deposited into your exchange wallet.
                 <br />
                 <b>
-                  Be sure to deposit at least one stablecoin on the <a href="/wallet">Balances</a> tab.
+                  Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
                 </b>
               </p>
             </LiquidityMessage>
