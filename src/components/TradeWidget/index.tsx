@@ -28,10 +28,11 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
-import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
+import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
 import { TokenDetails } from 'types'
 
@@ -50,7 +51,7 @@ import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
 import { useAddTokenModal } from 'hooks/useAddTokenModal'
 import { tokenListApi } from 'api'
@@ -435,11 +436,6 @@ const TradeWidget: React.FC = () => {
 
   const [ordersVisible, setOrdersVisible] = useState(true)
 
-  const { priceEstimation, isPriceLoading } = usePriceEstimation({
-    baseTokenId: sellToken.id,
-    quoteTokenId: receiveToken.id,
-  })
-
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
@@ -460,6 +456,18 @@ const TradeWidget: React.FC = () => {
   const receiveValue = watch(receiveInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
+
+  // Avoid querying for a new price at every input change
+  const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
+
+  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
+    networkId: networkIdOrDefault,
+    baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
+    quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
+    amount: debouncedSellValue,
+  })
 
   // Updating global trade state on change
   useEffect(() => {

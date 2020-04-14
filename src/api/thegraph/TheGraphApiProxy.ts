@@ -1,8 +1,6 @@
 import { TheGraphApiImpl, Params, TheGraphApi } from './TheGraphApi'
 import { CacheMixin } from 'api/proxy'
-
-// The prices on the contract will update at max once every batch, which is 5min long
-const PRICES_CACHE_TIME = 60 // in seconds
+import { PRICES_CACHE_TIME } from 'const'
 
 export class TheGraphApiProxy extends TheGraphApiImpl {
   private cache: CacheMixin
