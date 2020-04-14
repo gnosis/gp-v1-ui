@@ -51,12 +51,23 @@ export function useOrders(): Result {
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
 
+  // allow to fresh start/refresh on demand
+  const forceOrdersRefresh = useCallback((): void => {
+    dispatch(updateOffset(0))
+    setIsLoading(true)
+  }, [dispatch, setIsLoading])
+
   useEffect(() => {
+    // TODO: implementing temporary solution to fix https://github.com/gnosis/dex-react/issues/909
+    // Always fetching from 0 instead of last fetched order on new blocks
+    forceOrdersRefresh()
+
     // continue loading new orders
     // from current offset
-    setIsLoading(true)
+    // TODO: uncomment me when issue above (https://github.com/gnosis/dex-react/issues/909) is fixed
+    // setIsLoading(true)
     // whenever new block is mined
-  }, [blockNumber, setIsLoading])
+  }, [blockNumber, forceOrdersRefresh])
 
   useEffect(() => {
     let cancelled = false
@@ -117,12 +128,6 @@ export function useOrders(): Result {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offset, isLoading])
-
-  // allow to fresh start/refresh on demand
-  const forceOrdersRefresh = useCallback((): void => {
-    dispatch(updateOffset(0))
-    setIsLoading(true)
-  }, [dispatch, setIsLoading])
 
   const runEffect = useRef(false)
 
