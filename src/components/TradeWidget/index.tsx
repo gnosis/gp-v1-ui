@@ -645,9 +645,12 @@ const TradeWidget: React.FC = () => {
       const validFromWithBatchID = currentBatch + validFrom
       const validUntilWithBatchID = currentBatch + validUntil
 
+      const isASAP = validFrom === 0
+      const isNever = validUntil === 0
+
       let success: boolean
       // ASAP ORDER
-      if (validFrom === 0) {
+      if (isASAP) {
         // ; for destructure reassign format
         ;({ success } = await placeOrder({
           networkId,
@@ -677,8 +680,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: validFrom === 0 ? undefined : formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: validUntil === 0 ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validFrom: undefined,
+                  validUntil: isNever ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
               )
             },
@@ -719,7 +722,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: validUntil === 0 ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validUntil: isNever ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
               )
             },
