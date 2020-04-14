@@ -13,7 +13,7 @@ import { TradeFormTokenId, TradeFormData } from './'
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
-import InputWithTooltip from '../InputWithTooltip'
+import { Input } from 'components/Input'
 import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { WrapEtherBtn } from 'components/WrapEtherBtn'
 import { Link } from 'react-router-dom'
@@ -130,7 +130,6 @@ interface Props {
   validateMaxAmount?: true
   tabIndex: number
   readOnly: boolean
-  tooltipText: string
   autoFocus?: boolean
 }
 
@@ -152,7 +151,6 @@ const TokenRow: React.FC<Props> = ({
   validateMaxAmount,
   tabIndex,
   readOnly = false,
-  tooltipText,
   autoFocus,
 }) => {
   const isEditable = isDisabled || readOnly
@@ -265,10 +263,9 @@ const TokenRow: React.FC<Props> = ({
         </span>
       </div>
       <InputBox>
-        <InputWithTooltip
+        <Input
           autoFocus={!readOnly && autoFocus}
           className={inputClassName}
-          tooltip={tooltipText}
           placeholder="0"
           name={inputId}
           type="text"
