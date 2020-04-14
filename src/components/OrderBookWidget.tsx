@@ -42,7 +42,9 @@ const Wrapper = styled.div`
     }
   }
 
-  .amcharts-Container .amcharts-Label {
+  .amcharts-AxisLabel,
+  .amcharts-CategoryAxis .amcharts-Label-group > .amcharts-Label,
+  .amcharts-ValueAxis-group .amcharts-Label-group > .amcharts-Label {
     fill: var(--color-text-primary);
   }
 `
