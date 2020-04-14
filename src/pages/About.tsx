@@ -129,7 +129,7 @@ const About: React.FC = () => {
         </li>
         <li>
           Protocol info:{' '}
-          <a target="_blank" rel="noopener noreferrer" href="http://duneanalytics.com/gnosisprotocol">
+          <a target="_blank" rel="noopener noreferrer" href="https://duneanalytics.com/gnosisprotocol">
             Dune analytics: Gnosis Protocol
           </a>
         </li>
