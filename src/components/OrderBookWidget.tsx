@@ -41,6 +41,10 @@ const Wrapper = styled.div`
       opacity: 1;
     }
   }
+
+  .amcharts-Container .amcharts-Label {
+    fill: var(--color-text-primary);
+  }
 `
 
 enum Offer {
