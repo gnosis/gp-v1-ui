@@ -3,9 +3,9 @@ import styled from 'styled-components'
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
 import OrderBookWidget from './OrderBookWidget'
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import { safeTokenName } from '@gnosis.pm/dex-js'
+import { safeTokenName, getNetworkFromId } from '@gnosis.pm/dex-js'
 import TokenSelector from './TokenSelector'
 import useSafeState from 'hooks/useSafeState'
 import { useTokenList } from 'hooks/useTokenList'
@@ -99,11 +99,12 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
   const tokenList = useTokenList(networkId)
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
+  const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
     large: true,
-    title: `${safeTokenName(baseToken)}-${safeTokenName(quoteToken)} Order book`,
+    title: `${safeTokenName(baseToken)}-${safeTokenName(quoteToken)} Order book${networkDescription}`,
     message: (
       <ModalWrapper>
         <span>
