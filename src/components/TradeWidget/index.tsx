@@ -28,10 +28,11 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
-import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
+import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
 import { TokenDetails } from 'types'
 
@@ -50,7 +51,7 @@ import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
 import { tokenListApi } from 'api'
 
@@ -192,6 +193,7 @@ const SubmitButton = styled.button`
 `
 
 const OrdersPanel = styled.div`
+  overflow: hidden;
   display: flex;
   flex-flow: column wrap;
   flex: 1;
@@ -328,21 +330,6 @@ export const DEFAULT_FORM_STATE = {
   validUntil: '2880',
 }
 
-function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): string {
-  const sellAmount = parseBigNumber(sellValue)
-
-  if (!sellAmount || sellAmount.isZero()) {
-    return 'First input the sell amount'
-  }
-
-  const receiveAmount = parseBigNumber(receiveValue)
-  if (!receiveAmount || receiveAmount.isZero()) {
-    return 'Input the price to get the receive tokens'
-  } else {
-    return 'Minimum amount of tokens you will receive if the order is fully executed at the given price'
-  }
-}
-
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   let receiveAmount = ''
   if (priceValue && sellValue) {
@@ -457,11 +444,6 @@ const TradeWidget: React.FC = () => {
 
   const [ordersVisible, setOrdersVisible] = useState(true)
 
-  const { priceEstimation, isPriceLoading } = usePriceEstimation({
-    baseTokenId: sellToken.id,
-    quoteTokenId: receiveToken.id,
-  })
-
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: {
@@ -479,9 +461,20 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
-  const receiveValue = watch(receiveInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
+
+  // Avoid querying for a new price at every input change
+  const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
+
+  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
+    networkId: networkIdOrDefault,
+    baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
+    quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
+    amount: debouncedSellValue,
+  })
 
   // Updating global trade state on change
   useEffect(() => {
@@ -800,11 +793,6 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  const receiveTokenTooltipText = useMemo(() => _getReceiveTokenTooltipText(sellValue, receiveValue), [
-    sellValue,
-    receiveValue,
-  ])
-
   const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
   const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
 
@@ -845,7 +833,6 @@ const TradeWidget: React.FC = () => {
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
-            tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
             <SwitcherSVG />
@@ -860,7 +847,6 @@ const TradeWidget: React.FC = () => {
             isDisabled={isSubmitting}
             tabIndex={1}
             readOnly
-            tooltipText={receiveTokenTooltipText}
           />
           <Price
             priceInputId={priceInputId}

@@ -147,8 +147,12 @@ const subscribeToBlockchainUpdate = ({
       callback(blockchainPrompt)
     })
 
-    const unsubBlock = blockUpdate(blockHeader => {
-      blockchainPrompt = { ...blockchainPrompt, blockHeader }
+    const unsubBlock = blockUpdate(async blockHeader => {
+      // oftentimes on network change newBlockHeaders fires first
+      // reaffirm correct id
+      const chainId = await web3.eth.net.getId()
+
+      blockchainPrompt = { ...blockchainPrompt, blockHeader, chainId }
       logDebug('[WalletApiImpl] block changed:', blockHeader.number)
       callback(blockchainPrompt)
     })
@@ -389,12 +393,31 @@ export class WalletApiImpl implements WalletApi {
   }
 
   private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
-    if (blockchainUpdate) this.blockchainState = blockchainUpdate
+    let chainIdChanged = false
+    if (blockchainUpdate) {
+      chainIdChanged = this.blockchainState.chainId !== blockchainUpdate.chainId
+      this.blockchainState = blockchainUpdate
+    }
 
     await Promise.resolve()
 
     const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
     const wInfoExtended = { ...walletInfo, blockNumber: blockchainUpdate?.blockHeader?.number }
+
+    if (
+      // listeners called because of blockchain update
+      blockchainUpdate &&
+      // networkId is defined and not 0, meaning there's no connection lost
+      wInfoExtended.networkId &&
+      // but chainId from blockchain update is different
+      wInfoExtended.networkId !== blockchainUpdate.chainId &&
+      // and that chainId just changed
+      chainIdChanged
+    ) {
+      // then consider blockchainUpdate.chainId a fresher value
+      wInfoExtended.networkId = blockchainUpdate.chainId
+      logDebug('[WalletApiImpl] chainId changed:', blockchainUpdate.chainId)
+    }
 
     this._listeners.forEach(listener => listener(wInfoExtended))
   }

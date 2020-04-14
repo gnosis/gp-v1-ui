@@ -8,12 +8,15 @@ import { getTokens, subscribeToTokenList } from 'services'
 const emptyArray: TokenDetails[] = []
 
 export const useTokenList = (networkId?: number): TokenDetails[] => {
-  const [tokens, setTokens] = useSafeState(networkId === undefined ? emptyArray : getTokens(networkId))
+  // sync get tokenList
+  const tokens = networkId === undefined ? emptyArray : getTokens(networkId)
+
+  // force update with a new value each time
+  const [, forceUpdate] = useSafeState({})
 
   useEffect(() => {
-    if (networkId === undefined) return setTokens(emptyArray)
-    return subscribeToTokenList(setTokens)
-  }, [networkId, setTokens])
+    return subscribeToTokenList(() => forceUpdate({}))
+  }, [forceUpdate])
 
   return tokens
 }
