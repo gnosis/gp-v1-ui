@@ -83,6 +83,7 @@ const NonTokenDisplay = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: auto;
+  font-size: 1.2em;
 `
 
 interface GenerateMessageParams2 {
@@ -171,11 +172,18 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
   }
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin size="8x" />
+const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin />
 
 const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactNode => {
   // in fetching state -- show spinner
-  if (fetchResults.length === 0) return spinner
+  if (fetchResults.length === 0)
+    return (
+      <NonTokenDisplay>
+        <span>
+          {spinner} <strong>Loading token data...</strong>
+        </span>
+      </NonTokenDisplay>
+    )
   return (
     <>
       {fetchResults.map(result => (
