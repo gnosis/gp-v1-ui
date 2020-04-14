@@ -677,8 +677,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validFrom: validFrom === 0 ? undefined : formatTimeToFromBatch(validFrom, 'TIME').toString(),
+                  validUntil: validUntil === 0 ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
               )
             },
@@ -719,7 +719,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validUntil: validUntil === 0 ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
               )
             },
