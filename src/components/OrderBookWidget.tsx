@@ -177,20 +177,6 @@ const draw = (
   askCurve.startLocation = 0.5
   askCurve.tooltipText = `Ask: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume} ${baseTokenLabel}[/]`
 
-  const series3 = chart.series.push(new am4charts.ColumnSeries())
-  series3.dataFields.categoryX = 'price'
-  series3.dataFields.valueY = 'bidValueY'
-  series3.strokeWidth = 0
-  series3.fill = am4core.color(colors.green)
-  series3.fillOpacity = 0.2
-
-  const series4 = chart.series.push(new am4charts.ColumnSeries())
-  series4.dataFields.categoryX = 'price'
-  series4.dataFields.valueY = 'askValueY'
-  series4.strokeWidth = 0
-  series4.fill = am4core.color(colors.red)
-  series4.fillOpacity = 0.2
-
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
   return chart
