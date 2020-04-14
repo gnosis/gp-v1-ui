@@ -364,7 +364,15 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         onKeyDown={onKeyDown}
         onInputChange={setInputText}
       />
-      <Modali.Modal {...modalProps} />
+      <div
+        onMouseDown={(e): void => {
+          // hack to stop modali events from interfering with TokenSelector
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <Modali.Modal {...modalProps} />
+      </div>
     </Wrapper>
   )
 }
