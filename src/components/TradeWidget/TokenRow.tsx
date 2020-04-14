@@ -87,6 +87,8 @@ const Wrapper = styled.div`
 
   a.btn {
     margin: 0 1rem;
+    display: flex;
+    align-items: center;
   }
 `
 
