@@ -281,6 +281,24 @@ const OrderValidity: React.FC<Props> = ({
     validUntilInputId,
     validUntilInputValue,
   ])
+
+  const onModalEnter: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
+    (e): void => {
+      if (e.key !== 'Enter') return
+      // prevents focus stealing by Sell Input
+      e.preventDefault()
+
+      // same as click on Set Order Params button
+      // only works when inputs are valid
+      if (!!validUntilError || !!validFromError) {
+        return
+      }
+
+      handleShowConfig()
+    },
+    [handleShowConfig, validFromError, validUntilError],
+  )
+
   const validFromRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
   const validUntilRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
 
@@ -337,7 +355,7 @@ const OrderValidity: React.FC<Props> = ({
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
       </div>
 
-      <OrderValidityInputsWrapper $visible={showOrderConfig}>
+      <OrderValidityInputsWrapper $visible={showOrderConfig} onKeyPress={onModalEnter}>
         <h4>
           Order settings <i onClick={handleShowConfig}>×</i>
         </h4>
