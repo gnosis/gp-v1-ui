@@ -177,7 +177,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
 
   return (
     <>
-      <ViewOrderBookBtn className={className} onClick={toggleModal}>
+      <ViewOrderBookBtn className={className} onClick={toggleModal} type="button">
         {label || 'View Order Book'} <FontAwesomeIcon className="chart-icon" icon={faChartLine} />
       </ViewOrderBookBtn>
       <Modali.Modal {...modalHook} />
