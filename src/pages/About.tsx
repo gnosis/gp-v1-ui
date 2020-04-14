@@ -100,16 +100,6 @@ const About: React.FC = () => {
       <h2>Learn more about Gnosis Protocol</h2>
       <ul>
         <li>
-          dFusion Paper:{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf"
-          >
-            dfusion.v1.pdf
-          </a>
-        </li>
-        <li>
           Developer portal:{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
             https://docs.gnosis.io/protocol
@@ -139,11 +129,7 @@ const About: React.FC = () => {
         </li>
         <li>
           Protocol info:{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://explore.duneanalytics.com/public/dashboards/I43OkDWnojXZYm8vmdBDcLz5UsS3Tn0cx1xU8Hcg"
-          >
+          <a target="_blank" rel="noopener noreferrer" href="https://duneanalytics.com/gnosisprotocol">
             Dune analytics: Gnosis Protocol
           </a>
         </li>

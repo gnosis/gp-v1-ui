@@ -15,6 +15,7 @@ export const DefineSpreadWrapper = styled(InputBox)`
     width: 100%;
     height: 5.6rem;
     padding: 0 1rem;
+    background: var(--color-background-input-lighter);
 
     &.warning {
       border-color: orange;

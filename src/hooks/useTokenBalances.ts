@@ -16,6 +16,7 @@ import { useTokenList } from './useTokenList'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]
+  tokens: TokenDetails[]
   error: boolean
 }
 
@@ -133,5 +134,5 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
         })
   }, [setBalances, setError, walletInfo, tokens])
 
-  return { balances, error }
+  return { balances, error, tokens }
 }

@@ -26,6 +26,7 @@ import { Receipt } from 'types'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { useTokenList } from 'hooks/useTokenList'
+import { Link } from 'react-router-dom'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -87,6 +88,25 @@ const ContentWrapper = styled.div`
   flex-flow: row wrap;
   font-size: inherit;
   line-height: inherit;
+`
+
+const LiquidityMessage = styled.div`
+  font-size: 1.3rem;
+  margin: 2.4rem 0 0;
+  display: flex;
+  width: 100%;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  color: var(--color-text-primary);
+  background: var(--color-background-validation-warning);
+  border-radius: 0 0 0.3rem 0.3rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+
+  > p {
+    text-align: center;
+    margin: 1rem auto;
+  }
 `
 
 interface PoolingFormData<T = string> {
@@ -271,6 +291,16 @@ const PoolingInterface: React.FC = () => {
               {/* Main Components here */}
               <SubComponents step={step} {...restProps} />
             </ContentWrapper>
+
+            <LiquidityMessage>
+              <p>
+                Your liquidity is equal to the amount you have deposited into your exchange wallet.
+                <br />
+                <b>
+                  Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
+                </b>
+              </p>
+            </LiquidityMessage>
 
             {/* BUTTONS */}
             <LiquidityButtons

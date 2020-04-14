@@ -43,13 +43,10 @@ export const HIGHLIGHT_TIME = 5000
 
 export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
+export const PRICE_ESTIMATION_DEBOUNCE_TIME = 200
 export const PRICE_ESTIMATION_PRECISION = 5
-
-export const LEGALDOCUMENT = {
-  CONTACT_ADDRESS: '[INSERT ADDRESS]',
-  POC_URL: '/',
-  TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
-}
+// The prices on the contract will update at max once every batch, which is 5min long
+export const PRICES_CACHE_TIME = 60 // in seconds
 
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,

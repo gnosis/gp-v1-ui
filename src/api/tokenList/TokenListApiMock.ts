@@ -1,5 +1,5 @@
 import { TokenDetails } from 'types'
-import { TokenList, AddTokenParams, HasTokenParams, PersistTokensParams } from './TokenListApi'
+import { TokenList, AddTokenParams, HasTokenParams, PersistTokensParams, AddTokensParams } from './TokenListApi'
 import GenericSubscriptions from './Subscriptions'
 
 export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> implements TokenList {
@@ -18,6 +18,11 @@ export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> imple
 
   public addToken({ token }: AddTokenParams): void {
     this._tokenList = this._tokenList.concat(token)
+    this.triggerSubscriptions(this.getTokens(1))
+  }
+
+  public addTokens({ tokens }: AddTokensParams): void {
+    this._tokenList = this._tokenList.concat(tokens)
     this.triggerSubscriptions(this.getTokens(1))
   }
 

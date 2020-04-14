@@ -12,6 +12,10 @@ import { DepositApiProxy } from './deposit/DepositApiProxy'
 import { ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiProxy } from './exchange/ExchangeApiProxy'
+import { TheGraphApi } from './thegraph/TheGraphApi'
+import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
+import { DexPriceEstimatorApi } from './dexPriceEstimator/DexPriceEstimatorApi'
+import { DexPriceEstimatorApiProxy } from './dexPriceEstimator/DexPriceEstimatorApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -25,8 +29,6 @@ import {
 import Web3 from 'web3'
 import { INITIAL_INFURA_ENDPOINT } from 'const'
 import fetchGasPriceFactory from './gasStation'
-import { TheGraphApi } from './thegraph/TheGraphApi'
-import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null =>
@@ -123,6 +125,16 @@ function createTheGraphApi(): TheGraphApi {
   return theGraphApi
 }
 
+function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
+  const networkIds = [Network.Mainnet, Network.Rinkeby]
+
+  const dexPriceEstimatorApi = new DexPriceEstimatorApiProxy({ networkIds })
+
+  window['dexPriceEstimatorApi'] = dexPriceEstimatorApi
+
+  return dexPriceEstimatorApi
+}
+
 // Build APIs
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
@@ -137,3 +149,4 @@ export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDepende
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
+export const dexPriceEstimatorApi: DexPriceEstimatorApi = createDexPriceEstimatorApi()

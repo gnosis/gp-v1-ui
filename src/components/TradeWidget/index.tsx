@@ -9,6 +9,8 @@ import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
+import Modali from 'modali'
+import { isAddress } from 'web3-utils'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -26,11 +28,11 @@ import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
-import { tokenListApi } from 'api'
+import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
 import { TokenDetails } from 'types'
 
@@ -49,10 +51,12 @@ import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
+import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
+import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -189,6 +193,7 @@ const SubmitButton = styled.button`
 `
 
 const OrdersPanel = styled.div`
+  overflow: hidden;
   display: flex;
   flex-flow: column wrap;
   flex: 1;
@@ -325,21 +330,6 @@ export const DEFAULT_FORM_STATE = {
   validUntil: '2880',
 }
 
-function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): string {
-  const sellAmount = parseBigNumber(sellValue)
-
-  if (!sellAmount || sellAmount.isZero()) {
-    return 'First input the sell amount'
-  }
-
-  const receiveAmount = parseBigNumber(receiveValue)
-  if (!receiveAmount || receiveAmount.isZero()) {
-    return 'Input the price to get the receive tokens'
-  } else {
-    return 'Minimum amount of tokens you will receive if the order is fully executed at the given price'
-  }
-}
-
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   let receiveAmount = ''
   if (priceValue && sellValue) {
@@ -355,6 +345,48 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   return receiveAmount
 }
 
+interface TokensAdderProps {
+  tokenAddresses: string[]
+  networkId: number
+  onTokensAdded: (newTokens: TokenDetails[]) => void
+}
+
+const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, onTokensAdded }) => {
+  const { addTokensToList, modalProps } = useBetterAddTokenModal({ focused: true })
+
+  useEffect(() => {
+    if (tokenAddresses.length === 0) return
+
+    addTokensToList({ tokenAddresses, networkId }).then(newTokens => {
+      if (newTokens.length > 0) {
+        onTokensAdded(newTokens)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // no deps, so that we only open modal once on mount
+
+  return tokenAddresses.length > 0 ? <Modali.Modal {...modalProps} /> : null
+}
+
+const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networkId: number): string[] => {
+  const tokenAddresses: string[] = []
+  const addedSet = new Set()
+
+  addresses.forEach(address => {
+    if (
+      address &&
+      !addedSet.has(address) &&
+      !tokenListApi.hasToken({ tokenAddress: address, networkId }) &&
+      isAddress(address.toLowerCase())
+    ) {
+      tokenAddresses.push(address)
+      addedSet.add(address)
+    }
+  })
+
+  return tokenAddresses
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -366,15 +398,15 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances } = useTokenBalances()
+  const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
-  const tokens = useMemo(
-    // it's okay to tokenListApi.getTokens() here without subscribing to updates
-    // because balances from useTokenBalances is already subscribed
-    () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(networkIdOrDefault)),
-    [balances, networkIdOrDefault, isConnected],
-  )
+  const tokens =
+    isConnected && balances.length > 0
+      ? balances
+      : tokenList.length > 0
+      ? tokenList
+      : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
   const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
@@ -394,24 +426,23 @@ const TradeWidget: React.FC = () => {
   const [sellToken, setSellToken] = useState(
     () =>
       trade.sellToken ||
-      getToken('symbol', sellTokenSymbol, tokens) ||
+      (sellTokenSymbol && isAddress(sellTokenSymbol?.toLowerCase())
+        ? getToken('address', sellTokenSymbol, tokens)
+        : getToken('symbol', sellTokenSymbol, tokens)) ||
       (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
   )
   const [receiveToken, setReceiveToken] = useState(
     () =>
       trade.buyToken ||
-      getToken('symbol', receiveTokenSymbol, tokens) ||
+      (receiveTokenSymbol && isAddress(receiveTokenSymbol?.toLowerCase())
+        ? getToken('address', receiveTokenSymbol, tokens)
+        : getToken('symbol', receiveTokenSymbol, tokens)) ||
       (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
   )
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
 
   const [ordersVisible, setOrdersVisible] = useState(true)
-
-  const { priceEstimation, isPriceLoading } = usePriceEstimation({
-    baseTokenId: sellToken.id,
-    quoteTokenId: receiveToken.id,
-  })
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
@@ -430,9 +461,20 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
-  const receiveValue = watch(receiveInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
+
+  // Avoid querying for a new price at every input change
+  const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
+
+  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
+    networkId: networkIdOrDefault,
+    baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
+    quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
+    amount: debouncedSellValue,
+  })
 
   // Updating global trade state on change
   useEffect(() => {
@@ -751,13 +793,30 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  const receiveTokenTooltipText = useMemo(() => _getReceiveTokenTooltipText(sellValue, receiveValue), [
-    sellValue,
-    receiveValue,
-  ])
+  const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
+  const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
+
+  const tokenAddressesToAdd: string[] = useMemo(
+    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  ) // no deps, so that we only calc once on mount
+
+  const onTokensAdded = (newTokens: TokenDetails[]): void => {
+    const [firstToken, secondToken] = tokenAddressesToAdd
+    const sellToken = firstToken && newTokens.find(({ address }) => firstToken.toLowerCase() === address.toLowerCase())
+    const receiveToken =
+      secondToken && newTokens.find(({ address }) => secondToken.toLowerCase() === address.toLowerCase())
+
+    batchUpdateState(() => {
+      if (sellToken) onSelectChangeSellToken(sellToken)
+      if (receiveToken) onSelectChangeReceiveToken(receiveToken)
+    })
+  }
 
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
+      <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
@@ -768,13 +827,12 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="Sell"
-            onSelectChange={onSelectChangeFactory(setSellToken, receiveTokenBalance)}
+            onSelectChange={onSelectChangeSellToken}
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
-            tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
             <SwitcherSVG />
@@ -784,12 +842,11 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="Receive at least"
-            onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
+            onSelectChange={onSelectChangeReceiveToken}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={1}
             readOnly
-            tooltipText={receiveTokenTooltipText}
           />
           <Price
             priceInputId={priceInputId}
