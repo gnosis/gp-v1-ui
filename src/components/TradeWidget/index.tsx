@@ -137,6 +137,11 @@ const WrappedForm = styled.form`
     flex-flow: row wrap;
     justify-content: flex-start;
 
+    @media ${MEDIA.mediumUp} {
+      max-height: 11rem;
+      overflow-y: auto;
+    }
+
     > b {
       margin: 0.3rem;
     }
