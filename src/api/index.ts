@@ -27,12 +27,11 @@ import {
   TOKEN_8,
 } from '../../test/data'
 import Web3 from 'web3'
-import { INITIAL_INFURA_ENDPOINT } from 'const'
+import { ETH_NODE_URL } from 'const'
 import fetchGasPriceFactory from './gasStation'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
-export const getDefaultProvider = (): string | null =>
-  process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
+export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
 
 function createWeb3Api(): Web3 {
   // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
