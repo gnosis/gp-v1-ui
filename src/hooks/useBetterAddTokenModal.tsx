@@ -178,7 +178,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
 
 const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin size="8x" />
 
-const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactNode => {
+const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactElement => {
   // in fetching state -- show spinner
   if (fetchResults.length === 0) return spinner
   return (
@@ -190,7 +190,7 @@ const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): R
   )
 }
 
-interface UseAddTokenModalResult {
+export interface UseAddTokenModalResult {
   addTokensToList: (
     params: TokensAddConfirmationProps | TokensAddConfirmationProps2,
     defaultReason?: FetchTokenResult['reason'],
@@ -208,7 +208,7 @@ interface TokensAddConfirmationProps2 {
   networkId: number
 }
 
-interface AddTokenOptions {
+export interface AddTokenOptions {
   focused: boolean
 }
 
