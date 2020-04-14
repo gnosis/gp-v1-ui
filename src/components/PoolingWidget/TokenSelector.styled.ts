@@ -10,7 +10,7 @@ export const TokenSelectorWrapper = styled.div`
   overflow-y: auto;
   border: 0.1rem solid var(--color-background-banner);
   border-radius: 0.6rem;
-  margin: 0 0 4rem auto;
+  margin: 0 0 0 auto;
   background: var(--color-background-pageWrapper);
 
   @media ${MEDIA.mobile} {

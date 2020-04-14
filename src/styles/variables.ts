@@ -24,6 +24,7 @@ const LightColors = `
   --color-background-selected-dark: #bfbfbf;
   --color-background-progressBar: lightskyblue;
   --color-background-input: #e7ecf3;
+  --color-background-input-lighter: #ffffff;
   --color-background-validation-warning: #fff0eb;
   --color-background-row-hover: #deeeff;
   --color-background-CTA: #218DFF;
@@ -84,6 +85,7 @@ const DarkColors = `
   --color-background-selected-dark: #2a2d2f;
   --color-background-progressBar: #4338b5;
   --color-background-input: #2a2d2f;
+  --color-background-input-lighter: #404040;
   --color-background-validation-warning: #4338b5;
   --color-background-row-hover: #09233e;
   --color-background-CTA: #2e2e2e;

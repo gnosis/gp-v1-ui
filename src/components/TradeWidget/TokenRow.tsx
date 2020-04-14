@@ -186,9 +186,9 @@ const TokenRow: React.FC<Props> = ({
         <strong>
           {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
-        <a href="/wallet" className="depositNow">
+        <Link to="/wallet" className="depositNow">
           + Deposit {selectedToken.symbol}
-        </a>
+        </Link>
         {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
