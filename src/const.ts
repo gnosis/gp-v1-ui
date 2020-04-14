@@ -92,9 +92,8 @@ export const MEDIA = {
 }
 
 export const ELLIPSIS = '...'
-// TODO change infuraID for production
-export const INFURA_ID = '8b4d9b4306294d2e92e0775ff1075066'
-export const INITIAL_INFURA_ENDPOINT = `wss://mainnet.infura.io/ws/v3/${INFURA_ID}`
+export const INFURA_ID = process.env.INFURA_ID || '607a7dfcb1ad4a0b83152e30ce20cfc5'
+export const ETH_NODE_URL = process.env.ETH_NODE_URL || `wss://mainnet.infura.io/ws/v3/${INFURA_ID}`
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
 
