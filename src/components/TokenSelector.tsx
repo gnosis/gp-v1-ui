@@ -5,6 +5,7 @@ import { MEDIA } from 'const'
 
 import { formatAmount } from '@gnosis.pm/dex-js'
 import { isAddress } from 'web3-utils'
+import Modali from 'modali'
 
 import { TokenDetails, TokenBalanceDetails, Network } from 'types'
 import { TokenImgWrapper } from './TokenImg'
@@ -15,6 +16,7 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { tokenListApi } from 'api'
 import useSafeState from 'hooks/useSafeState'
 import { SearchItem, OptionItem } from './TokenOptionItem'
+import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 
 const Wrapper = styled.div`
   display: flex;
@@ -312,6 +314,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   )
 
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const { modalProps, addTokensToList } = useBetterAddTokenModal()
 
   // mount and umount hooks for watching click events
   useEffect(() => {
@@ -342,7 +345,12 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         className="tokenSelectBox"
         classNamePrefix="react-select"
         noOptionsMessage={(): React.ReactNode => (
-          <SearchItem value={inputText} defaultText={NO_OPTIONS_MESSAGE} networkId={fallBackNetworkId} />
+          <SearchItem
+            value={inputText}
+            defaultText={NO_OPTIONS_MESSAGE}
+            networkId={fallBackNetworkId}
+            addTokensToList={addTokensToList}
+          />
         )}
         formatOptionLabel={formatOptionLabel}
         options={options}
@@ -356,6 +364,15 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         onKeyDown={onKeyDown}
         onInputChange={setInputText}
       />
+      <div
+        onMouseDown={(e): void => {
+          // hack to stop modali events from interfering with TokenSelector
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <Modali.Modal {...modalProps} />
+      </div>
     </Wrapper>
   )
 }

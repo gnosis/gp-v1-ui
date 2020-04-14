@@ -53,10 +53,10 @@ import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
-import { useAddTokenModal } from 'hooks/useAddTokenModal'
 import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
+import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -345,23 +345,46 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   return receiveAmount
 }
 
-interface TokenAdderProps {
-  tokenAddress: string
+interface TokensAdderProps {
+  tokenAddresses: string[]
   networkId: number
-  onSelectChange: (selected: TokenDetails) => void
+  onTokensAdded: (newTokens: TokenDetails[]) => void
 }
 
-const TokenAdder: React.FC<TokenAdderProps> = ({ tokenAddress, networkId, onSelectChange }: TokenAdderProps) => {
-  const { addTokenToList, modalProps } = useAddTokenModal()
+const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, onTokensAdded }) => {
+  const { addTokensToList, modalProps } = useBetterAddTokenModal({ focused: true })
 
   useEffect(() => {
-    addTokenToList({ tokenAddress, networkId }).then(newToken => {
-      if (newToken) onSelectChange(newToken)
+    if (tokenAddresses.length === 0) return
+
+    addTokensToList({ tokenAddresses, networkId }).then(newTokens => {
+      if (newTokens.length > 0) {
+        onTokensAdded(newTokens)
+      }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // no deps, so that we only open modal once on mount
 
-  return <Modali.Modal {...modalProps} />
+  return tokenAddresses.length > 0 ? <Modali.Modal {...modalProps} /> : null
+}
+
+const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networkId: number): string[] => {
+  const tokenAddresses: string[] = []
+  const addedSet = new Set()
+
+  addresses.forEach(address => {
+    if (
+      address &&
+      !addedSet.has(address) &&
+      !tokenListApi.hasToken({ tokenAddress: address, networkId }) &&
+      isAddress(address.toLowerCase())
+    ) {
+      tokenAddresses.push(address)
+      addedSet.add(address)
+    }
+  })
+
+  return tokenAddresses
 }
 
 const TradeWidget: React.FC = () => {
@@ -770,44 +793,30 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  const { needToAddSellToken, needToAddReceiveToken } = useMemo(() => {
-    const needToAddSellToken =
-      sellTokenSymbol &&
-      !tokenListApi.hasToken({ tokenAddress: sellTokenSymbol, networkId: networkIdOrDefault }) &&
-      isAddress(sellTokenSymbol.toLowerCase())
-
-    const needToAddReceiveToken =
-      receiveTokenSymbol &&
-      receiveTokenSymbol.toLowerCase() !== sellTokenSymbol?.toLowerCase() &&
-      !tokenListApi.hasToken({ tokenAddress: receiveTokenSymbol, networkId: networkIdOrDefault }) &&
-      isAddress(receiveTokenSymbol.toLowerCase())
-
-    return {
-      needToAddSellToken,
-      needToAddReceiveToken,
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // no deps, so that we only calc once on mount
-
   const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
   const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
 
+  const tokenAddressesToAdd: string[] = useMemo(
+    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  ) // no deps, so that we only calc once on mount
+
+  const onTokensAdded = (newTokens: TokenDetails[]): void => {
+    const [firstToken, secondToken] = tokenAddressesToAdd
+    const sellToken = firstToken && newTokens.find(({ address }) => firstToken.toLowerCase() === address.toLowerCase())
+    const receiveToken =
+      secondToken && newTokens.find(({ address }) => secondToken.toLowerCase() === address.toLowerCase())
+
+    batchUpdateState(() => {
+      if (sellToken) onSelectChangeSellToken(sellToken)
+      if (receiveToken) onSelectChangeReceiveToken(receiveToken)
+    })
+  }
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
-      {needToAddSellToken && sellTokenSymbol && (
-        <TokenAdder
-          tokenAddress={sellTokenSymbol}
-          networkId={networkIdOrDefault}
-          onSelectChange={onSelectChangeSellToken}
-        />
-      )}
-      {needToAddReceiveToken && receiveTokenSymbol && (
-        <TokenAdder
-          tokenAddress={receiveTokenSymbol}
-          networkId={networkIdOrDefault}
-          onSelectChange={onSelectChangeReceiveToken}
-        />
-      )}
+      <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
