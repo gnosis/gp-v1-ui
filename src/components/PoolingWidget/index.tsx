@@ -89,6 +89,25 @@ const ContentWrapper = styled.div`
   line-height: inherit;
 `
 
+const LiquidityMessage = styled.div`
+  font-size: 1.3rem;
+  margin: 2.4rem 0 0;
+  display: flex;
+  width: 100%;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  color: var(--color-text-primary);
+  background: var(--color-background-validation-warning);
+  border-radius: 0 0 0.3rem 0.3rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+
+  > p {
+    text-align: center;
+    margin: 1rem auto;
+  }
+`
+
 interface PoolingFormData<T = string> {
   spread: T
 }
@@ -271,6 +290,15 @@ const PoolingInterface: React.FC = () => {
               {/* Main Components here */}
               <SubComponents step={step} {...restProps} />
             </ContentWrapper>
+
+            <LiquidityMessage>
+              <p>
+                The amount you deposit into your exchange wallet is your liquidity:{' '}
+                <b>
+                  at least deposit one stablecoin in your <a href="/wallet">Balances</a>
+                </b>
+              </p>
+            </LiquidityMessage>
 
             {/* BUTTONS */}
             <LiquidityButtons

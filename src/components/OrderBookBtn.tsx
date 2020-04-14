@@ -16,6 +16,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 const ViewOrderBookBtn = styled.button`
   margin: 0 0 0 auto;
   text-align: right;
+  display: flex;
+  align-items: center;
 
   svg {
     font-size: 1.7rem;
