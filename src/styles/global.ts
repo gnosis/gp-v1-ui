@@ -1025,7 +1025,7 @@ const GlobalStyles = createGlobalStyle`
       background: transparent;
       font-size: 4rem;
       line-height: 1;
-      color: var(--color-text-CTA);
+      color: var(--color-modali-close);
       font-weight: normal;
       opacity: .5;
       padding: 0;
