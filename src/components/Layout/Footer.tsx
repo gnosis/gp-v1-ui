@@ -19,7 +19,7 @@ const Wrapper = styled.footer`
   background: transparent;
   font-weight: var(--font-weight-normal);
   font-size: 1.3rem;
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: -0.03rem;
   max-width: 85rem;
   margin: 0 auto;
@@ -42,7 +42,7 @@ const Wrapper = styled.footer`
     }
 
     > a:hover {
-      color: #218dff;
+      color: var(--color-text-active);
     }
   }
 `
@@ -122,8 +122,8 @@ const LinkWrapper = styled(EtherscanLink)`
 const VerifiedText = 'View verified contract'
 
 const Footer: React.FC = () => {
-  const { networkId } = useWalletConnection()
-  const contractAddress = networkId ? depositApi.getContractAddress(networkId) : null
+  const { networkIdOrDefault: networkId } = useWalletConnection()
+  const contractAddress = depositApi.getContractAddress(networkId)
 
   return (
     <Wrapper>

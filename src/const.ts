@@ -43,13 +43,10 @@ export const HIGHLIGHT_TIME = 5000
 
 export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
+export const PRICE_ESTIMATION_DEBOUNCE_TIME = 200
 export const PRICE_ESTIMATION_PRECISION = 5
-
-export const LEGALDOCUMENT = {
-  CONTACT_ADDRESS: '[INSERT ADDRESS]',
-  POC_URL: '/',
-  TITLE: 'We are in Beta - testing version on Rinkeby. Please click this banner to read the disclaimer.',
-}
+// The prices on the contract will update at max once every batch, which is 5min long
+export const PRICES_CACHE_TIME = 60 // in seconds
 
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
@@ -95,9 +92,8 @@ export const MEDIA = {
 }
 
 export const ELLIPSIS = '...'
-// TODO change infuraID for production
-export const INFURA_ID = '8b4d9b4306294d2e92e0775ff1075066'
-export const INITIAL_INFURA_ENDPOINT = `wss://rinkeby.infura.io/ws/v3/${INFURA_ID}`
+export const INFURA_ID = process.env.INFURA_ID || '607a7dfcb1ad4a0b83152e30ce20cfc5'
+export const ETH_NODE_URL = process.env.ETH_NODE_URL || `wss://mainnet.infura.io/ws/v3/${INFURA_ID}`
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
 
@@ -106,5 +102,8 @@ export const GP_ORDER_TX_HASHES = {
   4: 'GP_ORDER_TX_HASHES_4',
 }
 
-export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI', 'sUSD'])
+export const LIQUIDITY_TOKEN_LIST = new Set(['USDT', 'TUSD', 'USDC', 'PAX', 'GUSD', 'DAI'])
 export const INPUT_PRECISION_SIZE = 6
+export const VALID_UNTIL_DEFAULT = '2880'
+export const VALID_FROM_DEFAULT = '30'
+export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'

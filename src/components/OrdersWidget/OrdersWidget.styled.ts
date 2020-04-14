@@ -8,7 +8,7 @@ export const OrdersWrapper = styled.div`
   position: relative;
 
   /* In use when accessed as a dedicated page and not part of OrdersPanel */
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -48,15 +48,15 @@ export const OrdersWrapper = styled.div`
 export const ButtonWithIcon = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 6rem;
-  border: 0.1rem solid #a71409;
+  border: 0.1rem solid var(--color-text-deleteOrders);
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
   background: transparent;
-  color: #a71409;
+  color: var(--color-text-deleteOrders);
   outline: 0;
 
   &:hover {
-    background: #a71409;
-    color: #ffffff;
+    background: var(--color-text-deleteOrders);
+    color: var(--color-background-pageWrapper);
   }
 
   > svg {
@@ -65,21 +65,24 @@ export const ButtonWithIcon = styled.button`
 `
 
 export const OrdersForm = styled.div`
+  > form {
+    display: flex;
+    flex-flow: column nowrap;
+    height: 59rem;
+  }
+
   .infoContainer {
     margin: 1rem auto 0;
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
     justify-content: center;
-    height: 6.4rem;
-    border-bottom: 0.1rem solid #9fb4c9;
+    min-height: 6.4rem;
+    border-bottom: 0.1rem solid var(--color-text-secondary);
     align-items: center;
 
     @media ${MEDIA.mobile} {
       margin: 0 auto;
-    }
-
-    .warning {
     }
 
     .countContainer {
@@ -92,7 +95,7 @@ export const OrdersForm = styled.div`
       > button {
         font-weight: var(--font-weight-bold);
         font-size: 1.5rem;
-        color: #9fb4c9;
+        color: var(--color-text-secondary);
         letter-spacing: 0;
         text-align: center;
         background: transparent;
@@ -116,10 +119,10 @@ export const OrdersForm = styled.div`
         height: 1.8rem;
         font-weight: inherit;
         font-size: 1.1rem;
-        color: #ffffff;
+        color: var(--color-background-pageWrapper);
         letter-spacing: -0.046rem;
         text-align: center;
-        background: #9fb4c9;
+        background: var(--color-text-secondary);
         border-radius: 6rem;
         padding: 0 0.75rem;
         box-sizing: border-box;
@@ -131,12 +134,12 @@ export const OrdersForm = styled.div`
       }
 
       > button.selected {
-        border-bottom: 0.3rem solid #218dff;
-        color: #218dff;
+        border-bottom: 0.3rem solid var(--color-text-active);
+        color: var(--color-text-active);
       }
 
       > button.selected > i {
-        background: #218dff;
+        background: var(--color-text-active);
       }
     }
   }
@@ -145,16 +148,13 @@ export const OrdersForm = styled.div`
     display: grid;
     padding: 0 0 5rem;
     box-sizing: border-box;
+    overflow-y: auto;
   }
 
   .checked {
     display: flex;
     justify-content: left;
     align-items: center;
-
-    > input {
-      // width: auto;
-    }
   }
 
   .deleteContainer {
@@ -162,14 +162,13 @@ export const OrdersForm = styled.div`
     flex-direction: column;
     position: sticky;
     top: 4rem;
-    z-index: 10;
+    z-index: 2;
     justify-content: flex-start;
     align-items: center;
-    background: #ffd4d1;
-    color: #a71409;
-    height: 4rem;
+    background: var(--color-background-deleteOrders);
+    color: var(--color-text-deleteOrders);
     text-align: left;
-    padding: 0 0.9rem;
+    padding: 0.8rem 1.1rem;
     opacity: 1;
     font-size: 1rem;
     text-transform: uppercase;

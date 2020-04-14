@@ -20,12 +20,13 @@ import useGlobalState from 'hooks/useGlobalState'
 import { useForm, FormContext } from 'react-hook-form'
 
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { tokenListApi } from 'api'
 
-import { Network, Receipt } from 'types'
+import { Receipt } from 'types'
 
-import { maxAmountsForSpread, stringOrNumberResolverFactory } from 'utils'
+import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
+import { useTokenList } from 'hooks/useTokenList'
+import { Link } from 'react-router-dom'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -38,6 +39,12 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
   // Else remove that b
   copyMap.delete(newToken.id)
   return copyMap
+}
+
+function setFullTokenMap(tokens: TokenDetails[]): Map<number, TokenDetails> {
+  const tokenMap = new Map()
+  tokens.forEach(token => tokenMap.set(token.id, token))
+  return tokenMap
 }
 
 // TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
@@ -83,6 +90,25 @@ const ContentWrapper = styled.div`
   line-height: inherit;
 `
 
+const LiquidityMessage = styled.div`
+  font-size: 1.3rem;
+  margin: 2.4rem 0 0;
+  display: flex;
+  width: 100%;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  color: var(--color-text-primary);
+  background: var(--color-background-validation-warning);
+  border-radius: 0 0 0.3rem 0.3rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+
+  > p {
+    text-align: center;
+    margin: 1rem auto;
+  }
+`
+
 interface PoolingFormData<T = string> {
   spread: T
 }
@@ -90,21 +116,23 @@ interface PoolingFormData<T = string> {
 const validationSchema = joi.object({
   spread: joi
     .number()
-    .positive()
+    .unsafe()
+    .greater(0)
+    .less(100)
     .precision(INPUT_PRECISION_SIZE)
-    .greater(0.0)
-    .less(100.0)
-    // dont autocast numbers
-    // to their required precision, throw instead
-    .strict()
-    .required(),
+    .required()
+    .messages({
+      [NUMBER_VALIDATION_KEYS.REQUIRED]: 'Invalid spread amount',
+      [NUMBER_VALIDATION_KEYS.UNSAFE]: 'Invalid spread amount',
+      [NUMBER_VALIDATION_KEYS.LESS]: 'Spread must be between 0 and 100',
+      [NUMBER_VALIDATION_KEYS.GREATER]: 'Spread must be between 0 and 100',
+    }),
 })
 
-const numberResolver = stringOrNumberResolverFactory<PoolingFormData>(validationSchema, 'number')
+const validationResolver = resolverFactory<PoolingFormData>(validationSchema)
 
 const PoolingInterface: React.FC = () => {
   const [, dispatch] = useGlobalState()
-  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(new Map())
   const [spread, setSpread] = useSafeState(0.2)
   const [step, setStep] = useSafeState(1)
 
@@ -112,16 +140,26 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
-  const { networkId, userAddress } = useWalletConnection()
-  // Avoid displaying an empty list of tokens when the wallet is not connected
-  const fallBackNetworkId = networkId ? networkId : Network.Mainnet // fallback to mainnet
+  const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
+  // Get all the tokens for the current network
+  const tokenList = useTokenList(networkIdOrDefault)
+
+  const tokens = useMemo(() => {
+    return (
+      tokenList
+        // Filter out the tokens not in the list
+        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
+    )
+  }, [tokenList])
+
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(setFullTokenMap(tokens))
 
   const methods = useForm<PoolingFormData>({
     defaultValues: {
       spread: spread.toString(),
     },
     mode: 'onChange',
-    validationResolver: numberResolver,
+    validationResolver,
   })
   const { handleSubmit, watch } = methods
   // Watch input and set defaultValue to state spread
@@ -131,16 +169,6 @@ const PoolingInterface: React.FC = () => {
     // only update spread on step 2
     if (step === 2) setSpread(Number(spreadValue))
   }, [setSpread, spreadValue, step])
-
-  const tokens = useMemo(() => {
-    return (
-      // Get all the tokens for the current network
-      tokenListApi
-        .getTokens(fallBackNetworkId)
-        // Filter out the tokens not in the list
-        .filter(({ symbol }) => symbol && LIQUIDITY_TOKEN_LIST.has(symbol))
-    )
-  }, [fallBackNetworkId])
 
   const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
   const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])
@@ -263,6 +291,16 @@ const PoolingInterface: React.FC = () => {
               {/* Main Components here */}
               <SubComponents step={step} {...restProps} />
             </ContentWrapper>
+
+            <LiquidityMessage>
+              <p>
+                Your liquidity is equal to the amount you have deposited into your exchange wallet.
+                <br />
+                <b>
+                  Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
+                </b>
+              </p>
+            </LiquidityMessage>
 
             {/* BUTTONS */}
             <LiquidityButtons

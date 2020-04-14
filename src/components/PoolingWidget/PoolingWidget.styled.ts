@@ -13,7 +13,7 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
   align-content: flex-start;
   position: relative;
   max-width: 85rem;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -31,13 +31,13 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
     font-size: 1.3rem;
   }
 
-  > h2 {
+  form > h2 {
     margin: 1rem auto 2.4rem;
     width: 100%;
     text-align: center;
     font-weight: var(--font-weight-bold);
     font-size: 2rem;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0;
   }
 `
@@ -56,7 +56,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     height: 2.5rem;
     width: 2.5rem;
     border-radius: 2.5rem;
-    color: #ffffff;
+    color: var(--color-background-pageWrapper);
     font-weight: var(--font-weight-normal);
     font-size: inherit;
     letter-spacing: 0;
@@ -70,7 +70,7 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
     content: attr(data-title);
     font-weight: var(--font-weight-normal);
     font-size: inherit;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0;
 
     @media ${MEDIA.mobile} {
@@ -90,12 +90,12 @@ export const ProgressStep = styled.div<{ $bgColor?: string }>`
 export const ProgressStepText = styled.p`
   font-weight: var(--font-weight-bold);
   margin: 0;
-  color: #2f3e4e;
+  color: var(--color-text-primary);
   font-size: inherit;
   line-height: inherit;
 
   > i {
-    color: #476481;
+    color: var(--color-text-primary);
     font-style: normal;
     font-weight: var(--font-weight-normal);
     font-size: inherit;
@@ -112,7 +112,7 @@ export const StepSeparator = styled.div<{ $bgColor?: string }>`
   height: 0.1rem;
   width: 13rem;
   margin: 0 1rem;
-  background: #dfe6ef;
+  background: var(--color-background-banner);
 `
 
 export const StepButtonsWrapper = styled.div`
@@ -123,7 +123,7 @@ export const StepButtonsWrapper = styled.div`
   position: absolute;
   bottom: 0;
   left: 0;
-  border-top: 0.1rem solid #dfe6ef;
+  border-top: 0.1rem solid var(--color-background-banner);
   justify-content: space-between;
   align-items: center;
 
@@ -151,7 +151,7 @@ export const StepButtonsWrapper = styled.div`
     text-transform: uppercase;
     background: transparent;
     font-size: 1.4rem;
-    color: #218dff;
+    color: var(--color-text-active);
     letter-spacing: 0;
     line-height: 1;
     transition: color 0.2s ease-in-out;
@@ -164,7 +164,7 @@ export const StepButtonsWrapper = styled.div`
 
     &:hover {
       background: 0;
-      color: #0b66c6;
+      color: var(--color-background-button-hover);
     }
 
     &::before {
@@ -179,12 +179,10 @@ export const StepButtonsWrapper = styled.div`
 
   > button:last-of-type:not(#backButton),
   > a.finish {
-    background: #218dff;
     border-radius: 0.6rem;
     min-width: 14rem;
     padding: 0 1.6rem;
     font-weight: var(--font-weight-bold);
-    color: #ffffff;
     text-transform: uppercase;
     font-size: 1.4rem;
     margin: 0 1.6rem 0 auto;
@@ -197,10 +195,6 @@ export const StepButtonsWrapper = styled.div`
 
     > svg {
       margin: 0 0.8rem 0 0;
-    }
-
-    &:hover:not(:disabled) {
-      background: #0b66c6;
     }
 
     &:disabled,
@@ -268,7 +262,7 @@ export const StepDescriptionWrapper = styled.div`
   }
 
   .liqContent {
-    color: #456483;
+    color: var(--color-text-primary);
     font-size: inherit;
     line-height: inherit;
     margin: 1.6rem 0 0;

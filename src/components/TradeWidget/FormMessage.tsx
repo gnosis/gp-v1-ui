@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
-import { formatSchemaErrorMessage } from 'utils'
 
 export const FormMessageWrapper = styled.div<{ $margin?: string; $padding?: string }>`
   margin: ${({ $margin = '0' }): string => $margin};
@@ -15,12 +14,16 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   align-items: center;
   font-size: inherit;
   margin: 0 0 0 0.3rem;
-  color: #476481;
+  color: var(--color-text-primary);
   width: 100%;
 
   > a {
-    color: #218dff;
+    color: var(--color-text-active);
     margin: 0 0 0 0.3rem;
+  }
+
+  > a.depositNow {
+    margin: 0.5rem;
   }
 
   .success {
@@ -36,11 +39,11 @@ const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
   }
 
   &.error {
-    color: red;
+    color: var(--color-error);
   }
   &.warning {
-    color: #476481;
-    background: #fff0eb;
+    color: var(--color-text-primary);
+    background: var(--color-background-validation-warning);
     border-radius: 0 0 0.3rem 0.3rem;
     padding: 0.5rem;
     box-sizing: border-box;
@@ -60,16 +63,11 @@ interface FormInputErrorProps {
 
 export const FormInputError: React.FC<FormInputErrorProps> = ({
   errorMessage,
-  schemaError = true,
   visibilityHidden = true,
   wrapperMargin = '0.5rem 0',
 }) => {
   const message = useMemo(() => {
     if (errorMessage) {
-      if (schemaError) {
-        return formatSchemaErrorMessage(errorMessage)
-      }
-
       return errorMessage
     } else {
       if (visibilityHidden) {
@@ -78,7 +76,7 @@ export const FormInputError: React.FC<FormInputErrorProps> = ({
 
       return null
     }
-  }, [errorMessage, schemaError, visibilityHidden])
+  }, [errorMessage, visibilityHidden])
 
   return (
     <FormMessageWrapper $margin={wrapperMargin}>

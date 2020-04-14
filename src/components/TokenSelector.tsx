@@ -4,12 +4,19 @@ import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
 import { formatAmount } from '@gnosis.pm/dex-js'
+import { isAddress } from 'web3-utils'
+import Modali from 'modali'
 
-import { TokenDetails, TokenBalanceDetails } from 'types'
-import TokenImg from './TokenImg'
+import { TokenDetails, TokenBalanceDetails, Network } from 'types'
+import { TokenImgWrapper } from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 import { MenuList } from './TokenSelectorComponents'
 import searchIcon from 'assets/img/search.svg'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import { tokenListApi } from 'api'
+import useSafeState from 'hooks/useSafeState'
+import { SearchItem, OptionItem } from './TokenOptionItem'
+import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 
 const Wrapper = styled.div`
   display: flex;
@@ -25,47 +32,9 @@ const Wrapper = styled.div`
     margin-left: 0; // to fix extra space on Select search box
   }
 
-  .optionItem {
-    display: flex;
-    width: 100%;
-    align-items: center;
-
-    img {
-      width: 3.6rem;
-      height: 3.6rem;
-      object-fit: contain;
-      margin: 0;
-    }
-
-    .tokenDetails {
-      display: flex;
-      justify-content: space-between;
-      width: inherit;
-
-      .tokenName {
-        display: flex;
-        flex-direction: column;
-        margin-left: 1rem;
-      }
-
-      .tokenBalance {
-        font-weight: bold;
-        align-self: center;
-      }
-    }
-
-    > div > div {
-      font-weight: var(--font-weight-normal);
-      font-size: 1.3rem;
-      color: #476481;
-      line-height: 1.1;
-    }
-
-    > div > div > strong {
-      font-weight: var(--font-weight-bold);
-      margin: 0;
-      font-size: 1.6rem;
-    }
+  .tokenBalance {
+    font-weight: bold;
+    align-self: center;
   }
 
   .tokenSelectBox {
@@ -112,7 +81,7 @@ const Wrapper = styled.div`
           max-width: 100%;
           font-size: 1.4rem;
           font-weight: var(--font-weight-normal);
-          background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+          background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
           border-radius: 0;
           padding: 0px 1.6rem 0px 4.8rem;
           height: 3em;
@@ -152,12 +121,6 @@ const Wrapper = styled.div`
   }
 `
 
-const TokenImgWrapper = styled(TokenImg)`
-  width: 2.4rem;
-  height: 2.4rem;
-  margin: 0 0.5rem 0 0;
-`
-
 const StyledSelect = styled(Select)`
   display: flex;
   align-items: center;
@@ -167,27 +130,19 @@ const SelectedTokenWrapper = styled.span`
   display: flex;
   align-items: center;
   font-size: 1.4rem;
-  color: #476481;
+  color: var(--color-text-primary);
   letter-spacing: -0.05rem;
   text-align: right;
 `
 
 function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.ReactNode {
+  const { name, symbol, image, decimals } = token
   return (
-    <div className="optionItem">
-      <TokenImgWrapper src={token.image} alt={token.name} />
-      <div className="tokenDetails">
-        <div className="tokenName">
-          <div>
-            <strong>{token.symbol}</strong>
-          </div>
-          <div>{token.name}</div>
-        </div>
-        {'totalExchangeBalance' in token && (
-          <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, token.decimals)}</div>
-        )}
-      </div>
-    </div>
+    <OptionItem name={name} symbol={symbol} image={image}>
+      {'totalExchangeBalance' in token && (
+        <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, decimals)}</div>
+      )}
+    </OptionItem>
   )
 }
 
@@ -211,18 +166,18 @@ function formatOptionLabel(
 
 const customSelectStyles = {
   control: (): CSSProperties & { '&:hover': CSSProperties } => ({
-    borderColor: '#B8C7D7',
+    borderColor: 'var(--color-background-selected)',
     borderStyle: 'solid',
     borderWidth: '.1rem',
     margin: 'auto 0',
     borderRadius: '15rem',
-    background: '#e6ecf3',
+    background: 'var(--color-background)',
     cursor: 'pointer',
     display: 'flex',
     flexFlow: 'row nowrap',
     '&:hover': {
       opacity: '1',
-      borderColor: '#476481',
+      borderColor: 'var(--color-text-primary)',
     },
   }),
   menu: (provided: CSSProperties): CSSProperties => ({
@@ -238,7 +193,7 @@ const customSelectStyles = {
     minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',
-    zIndex: 9999,
+    zIndex: 999,
     boxShadow: '0 999vh 0 999vw rgba(47, 62, 78, 0.50)',
     borderRadius: '0.6rem',
   }),
@@ -259,7 +214,7 @@ const customSelectStyles = {
     ...provided,
     background: 'none',
     cursor: 'pointer',
-    borderBottom: '0.1rem solid #dfe6ef',
+    borderBottom: '0.1rem solid var(--color-background-banner)',
     display: 'flex',
     alignItems: 'center',
     minHeight: '5.6rem',
@@ -279,7 +234,7 @@ const customSelectStyles = {
   }),
   dropdownIndicator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
-    color: '#476481',
+    color: 'var(--color-text-primary)',
     opacity: '1',
   }),
   singleValue: (provided: CSSProperties): CSSProperties => ({
@@ -296,7 +251,7 @@ const customSelectStyles = {
 
 const components = { MenuList }
 
-const noOptionsMessage = (): string => 'No results'
+const NO_OPTIONS_MESSAGE = 'No results'
 
 interface Props {
   label?: string
@@ -316,6 +271,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // isFocused is used to force the menu to remain open and give focus to the search input
   const [isFocused, setIsFocused] = useState(false)
 
+  const { networkId } = useWalletConnection()
+
   const onSelectChange = useCallback(
     (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
       // When an option is chosen, give control back to react-select
@@ -331,36 +288,52 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   // When the search input is focused, force menu to remain open
   const onMenuInputFocus = useCallback(() => setIsFocused(true), [])
 
-  const onKeyDown = useCallback((e): void => {
-    if (e.key === 'Escape') {
-      // Close menu on `Escape`
-      e.stopPropagation()
-      setIsFocused(false)
-    } else if (!e.target.value && e.key === ' ') {
-      // Prevent a space when input in empty.
-      // That closes the menu. (/shrug)
-      e.preventDefault()
-    }
-  }, [])
+  const [inputText, setInputText] = useSafeState('')
+
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement> & { target: HTMLInputElement }): void => {
+      if (e.key === 'Escape') {
+        // Close menu on `Escape`
+        e.stopPropagation()
+        setIsFocused(false)
+      } else if (!e.target.value && e.key === ' ') {
+        // Prevent a space when input in empty.
+        // That closes the menu. (/shrug)
+        e.preventDefault()
+      } else if (e.key === 'Enter' && networkId && isAddress(e.target.value.toLowerCase())) {
+        const tokenAddress = e.target.value
+        if (tokenListApi.hasToken({ tokenAddress, networkId })) return
+
+        // prevents double-catch of this event
+        // double because it's captured from onKeyDown in MenuList
+        // and in general on Select, I guess
+        e.stopPropagation()
+      }
+    },
+    [networkId],
+  )
 
   const wrapperRef = useRef<HTMLDivElement>(null)
-
-  const onDocumentClick = useCallback(e => {
-    const menu = wrapperRef.current?.querySelector('.react-select__menu')
-    // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
-    // If neither, hand focus back to react-select but turning isFocused off
-    if (!wrapperRef.current?.contains(e.target) || !menu) {
-      setIsFocused(false)
-    }
-  }, [])
+  const { modalProps, addTokensToList } = useBetterAddTokenModal()
 
   // mount and umount hooks for watching click events
   useEffect(() => {
+    const onDocumentClick = (e: MouseEvent): void => {
+      const menu = wrapperRef.current?.querySelector('.react-select__menu')
+      // whenever there's a click on the page, check whether the menu is visible and click was on the wrapper
+      // If neither, hand focus back to react-select but turning isFocused off
+      if (!wrapperRef.current?.contains(e.target as Node) || !menu) {
+        setIsFocused(false)
+      }
+    }
+
     window.addEventListener('mousedown', onDocumentClick)
 
     return (): void => window.removeEventListener('mousedown', onDocumentClick)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const fallBackNetworkId = networkId || Network.Mainnet
 
   return (
     <Wrapper ref={wrapperRef}>
@@ -371,7 +344,14 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         styles={customSelectStyles}
         className="tokenSelectBox"
         classNamePrefix="react-select"
-        noOptionsMessage={noOptionsMessage}
+        noOptionsMessage={(): React.ReactNode => (
+          <SearchItem
+            value={inputText}
+            defaultText={NO_OPTIONS_MESSAGE}
+            networkId={fallBackNetworkId}
+            addTokensToList={addTokensToList}
+          />
+        )}
         formatOptionLabel={formatOptionLabel}
         options={options}
         value={{ token: selected }}
@@ -382,7 +362,17 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         menuIsOpen={isFocused || undefined} // set to `true` to make it permanently open and work with styles
         onMenuInputFocus={onMenuInputFocus}
         onKeyDown={onKeyDown}
+        onInputChange={setInputText}
       />
+      <div
+        onMouseDown={(e): void => {
+          // hack to stop modali events from interfering with TokenSelector
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <Modali.Modal {...modalProps} />
+      </div>
     </Wrapper>
   )
 }

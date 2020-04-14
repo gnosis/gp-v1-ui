@@ -10,36 +10,31 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
-# Mesa - Gnosis Protocol UI
+# Mesa - a dapp for Gnosis Protocol
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa it's an interface for [Gnosis Protocol](https://docs.gnosis.io/dfusion) (see the [dFusion paper](https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf)).
+Mesa is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
 
-Gnosis Protocol introduces a new, fully decentralized exchange mechanism for ERC20 tokens with the following
-properties:
+Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximize liquidity.
 
-- Batch auctions
-- Multidimensional order books with ring trades
-- Uniform clearing prices in every batch
+Mesa allows users to:
 
-This UI will allow to:
-
-- Create orders in [Gnosis Protocol](https://docs.gnosis.io/dfusion)
-- See the balances for any token: Both in your wallet and the exchange
-- Deposit/Withdraw tokens from the exchange
+- Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
+- See the balances for any token: available in their wallet and on the exchange
+- Deposit and withdraw tokens to/from the exchange wallet
 
 ## Running locally
 
 ```bash
-# Install dependencies
-npm install
+# Install dependencies (we use Yarn but NPM should work too)
+yarn
 
 # Start dev server in http://localhost:8080
-npm start
+yarn start
 ```
 
-Open http://localhost:8080 in any browser.
+Open http://localhost:8080 in your browser.
 
 ## Mock mode (default)
 
@@ -47,34 +42,34 @@ The app will run by default in **mock mode**, that means that all service implem
 
 ```bash
 # Disable mock mode
-MOCK=false npm start
+MOCK=false yarn start
 ```
 
-Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
+Alternatively, if you want to persist this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as a template).
 
 ## Autoconnect for mock mode (default)
 
-When running in **mock mode**, the wallet will be connected automatically, to change this behaviour run the app:
+When running in **mock mode**, the wallet will be connected automatically - to change this behaviour run the app via:
 
 ```bash
 # Disable autoconnect, for mock mode
-AUTOCONNECT=false npm start
+AUTOCONNECT=false yarn start
 ```
 
-Alternatively, if you want to modify always this behaviour, add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as an example of the content).
+Alternatively, if you want to persist this behaviour add the env var into a local `.env` file (i.e. use [.env.example](.env.example) as a template).
 
 ## Build app
 
 ```bash
-npm run build
+yarn build
 ```
 
-The static files will be generated in `./dist` dir.
+Static files will be generated inside the `./dist` dir.
 
 ## Run tests
 
 ```bash
-npm test
+yarn test
 ```
 
 ## Automatically fixing code
@@ -82,7 +77,7 @@ npm test
 Manually, by running:
 
 ```bash
-npm run lint:fix
+yarn lint:fix
 ```
 
 If you use Visual Studio Code, it's recommended to install [Prettier - Code formatter
@@ -100,5 +95,5 @@ If you use Visual Studio Code, it's recommended to install [Prettier - Code form
 
 ## Testnet faucets
 
-In order to get testing tokens, read up the information here:
+In order to get testing tokens, read up on the information here:
 [faucet](./docs/faucet-info.md)

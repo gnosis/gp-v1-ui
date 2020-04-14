@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import BN from 'bn.js'
 import { assert } from '@gnosis.pm/dex-js'
 
-import { tokenListApi, erc20Api, depositApi } from 'api'
+import { erc20Api, depositApi } from 'api'
 
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
@@ -12,9 +12,11 @@ import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
+import { useTokenList } from './useTokenList'
 
 interface UseTokenBalanceResult {
   balances: TokenBalanceDetails[]
+  tokens: TokenDetails[]
   error: boolean
 }
 
@@ -73,16 +75,14 @@ const constructCacheKey = ({ token, userAddress, contractAddress, networkId }: C
   return token.address + '|' + userAddress + '|' + contractAddress + '|' + networkId
 }
 
-async function _getBalances(walletInfo: WalletInfo): Promise<TokenBalanceDetails[]> {
+async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Promise<TokenBalanceDetails[]> {
   const { userAddress, networkId } = walletInfo
-  if (!userAddress || !networkId) {
+  if (!userAddress || !networkId || tokens.length === 0) {
     return []
   }
 
   const contractAddress = depositApi.getContractAddress(networkId)
   assert(contractAddress, 'No valid contract address found. Stopping.')
-
-  const tokens = tokenListApi.getTokens(networkId)
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
     fetchBalancesForToken(token, userAddress, contractAddress, networkId)
@@ -114,10 +114,12 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
+  const tokens = useTokenList(walletInfo.networkId)
+
   useEffect(() => {
     // can return NULL (if no address or network)
     walletInfo.isConnected &&
-      _getBalances(walletInfo)
+      _getBalances(walletInfo, tokens)
         .then(balances => {
           logDebug(
             '[useTokenBalances] Wallet balances',
@@ -130,7 +132,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           console.error('[useTokenBalances] Error loading balances', error)
           setError(true)
         })
-  }, [setBalances, setError, walletInfo])
+  }, [setBalances, setError, walletInfo, tokens])
 
-  return { balances, error }
+  return { balances, error, tokens }
 }

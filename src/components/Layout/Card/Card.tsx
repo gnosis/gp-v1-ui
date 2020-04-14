@@ -13,17 +13,18 @@ const CardRowDrawer = styled.tr`
   bottom: 0;
   margin: auto;
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
-  z-index: 9999;
+  z-index: 9998;
   width: 50rem;
-  height: 42rem;
+  height: 50rem;
   border-radius: 0.6rem;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
 
   @media ${MEDIA.mobile} {
     width: 100%;
     bottom: 0;
     top: initial;
-    height: 80vh;
+    height: 100vh;
+    overflow-y: scroll;
   }
 
   // Inner td wrapper
@@ -36,6 +37,10 @@ const CardRowDrawer = styled.tr`
     width: 100%;
     height: 100%;
     border: 0;
+
+    @media ${MEDIA.mobile} {
+      box-shadow: none;
+    }
 
     > div {
       margin: 0;
@@ -52,13 +57,17 @@ const CardRowDrawer = styled.tr`
       letter-spacing: 0;
       font-size: 1.6rem;
       text-align: left;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       margin: 0;
       display: flex;
       align-items: center;
       font-family: var(--font-default);
       font-weight: var(--font-weight-regular);
-      border-bottom: 0.1rem solid #dfe6ef;
+      border-bottom: 0.1rem solid var(--color-background-banner);
+
+      @media ${MEDIA.mobile} {
+        padding: 0 5rem 0 1.6rem;
+      }
     }
 
     .times {
@@ -127,10 +136,11 @@ export const CardTable = styled.table<{
   
   > thead {
     position: sticky;
-    background: #ecf2f7;
+    z-index: 2;
+    background: var(--color-background-row-hover);
     top: 0;
     font-size: 1.1rem;
-    color: #2F3E4E;
+    color: var(--color-text-primary);
     letter-spacing: 0;
     font-weight: var(--font-weight-bold);
   }
@@ -155,10 +165,9 @@ export const CardTable = styled.table<{
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
       text-align: center;
       transition: all 0.2s ease-in-out;
-      z-index: 1;
 
       &:hover {
-        background: #deeeff;
+        background: var(--color-background-row-hover);
       }
       
       &.highlight {
@@ -214,7 +223,7 @@ export const CardTable = styled.table<{
     font-size: 1.1rem;
     font-family: var(--font-mono);
     font-weight: var(--font-weight-regular);
-    color: #476481;
+    color: var(--color-text-primary);
     letter-spacing: -0.085rem;
     line-height: 1.2;
   }

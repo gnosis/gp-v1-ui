@@ -9,8 +9,20 @@ export const WalletDrawerInnerWrapper = styled.div`
   padding: 2.4rem 0;
   box-sizing: border-box;
 
+  .message {
+    color: var(--color-text-primary);
+    background: var(--color-background-validation-warning);
+    border-radius: 0 0 0.3rem 0.3rem;
+    padding: 1rem;
+    font-size: 1.3rem;
+    margin: -1rem 1.6rem 1.6rem;
+    font-family: var(--font-default);
+    letter-spacing: 0;
+    line-height: 1.4;
+  }
+
   p.error {
-    color: red;
+    color: var(--color-error);
     text-align: left;
     margin: 1rem 0 0;
     width: 100%;
@@ -51,7 +63,7 @@ export const WalletDrawerInnerWrapper = styled.div`
       }
       > p {
         font-size: 1.3rem;
-        color: #218dff;
+        color: var(--color-text-active);
         padding: 0.5rem 0 0;
         text-align: right;
         margin: 0;
@@ -64,7 +76,7 @@ export const WalletDrawerInnerWrapper = styled.div`
     > b {
       font-family: var(--font-default);
       font-size: 1.3rem;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
       letter-spacing: 0;
       text-align: right;
       padding: 0;
@@ -97,7 +109,7 @@ export const WalletDrawerInnerWrapper = styled.div`
       align-items: center;
       font-style: normal;
       font-family: var(--font-default);
-      color: #476481;
+      color: var(--color-text-primary);
       letter-spacing: -0.05rem;
       text-align: right;
       font-weight: var(--font-weight-bold);
@@ -107,7 +119,7 @@ export const WalletDrawerInnerWrapper = styled.div`
     > div > input {
       margin: 0;
       max-width: 100%;
-      background: #e7ecf3;
+      background: var(--color-background-input);
       border-radius: 0.6rem 0.6rem 0 0;
       border: 0;
       font-size: 1.6rem;
@@ -121,7 +133,7 @@ export const WalletDrawerInnerWrapper = styled.div`
       width: 100%;
       font-family: var(--font-mono);
       font-size: 1.6rem;
-      color: #476481;
+      color: var(--color-text-primary);
       letter-spacing: -0.08rem;
 
       &::placeholder {
@@ -130,13 +142,13 @@ export const WalletDrawerInnerWrapper = styled.div`
       }
 
       &:focus {
-        border-bottom: 0.2rem solid #218dff;
-        border-color: #218dff;
-        color: #218dff;
+        border-bottom: 0.2rem solid var(--color-text-active);
+        border-color: var(--color-text-active);
+        color: var(--color-text-active);
       }
 
       &.error {
-        border-color: #ff0000a3;
+        border-color: var(--color-error);
       }
 
       &.warning {
@@ -145,7 +157,7 @@ export const WalletDrawerInnerWrapper = styled.div`
 
       &:disabled {
         opacity: 1;
-        background: rgba(230, 236, 243, 0.7);
+        background: var(--color-background-pageWrapper);
       }
     }
   }
@@ -153,7 +165,7 @@ export const WalletDrawerInnerWrapper = styled.div`
   .actions {
     margin: auto;
     height: 5.6rem;
-    border-top: 0.1rem solid #dfe6ef;
+    border-top: 0.1rem solid var(--color-background-banner);
     width: 100%;
     display: flex;
     justify-content: space-between;
@@ -163,6 +175,13 @@ export const WalletDrawerInnerWrapper = styled.div`
     left: 0;
     padding: 0 1.6rem;
     box-sizing: border-box;
+
+    @media ${MEDIA.mobile} {
+      position: relative;
+      top: initial;
+      bottom: initial;
+      left: initial;
+    }
 
     > button,
     > a {
@@ -185,12 +204,10 @@ export const WalletDrawerInnerWrapper = styled.div`
     }
 
     > button {
-      background: #218dff;
       border-radius: 0.6rem;
       min-width: 14rem;
       padding: 0 1.6rem;
       font-weight: var(--font-weight-bold);
-      color: #ffffff;
       text-transform: uppercase;
       font-size: 1.4rem;
       margin: 0;
@@ -204,10 +221,6 @@ export const WalletDrawerInnerWrapper = styled.div`
       > img,
       > svg {
         margin: 0 0 0 0.8rem;
-      }
-
-      &:hover {
-        background: #0b66c6;
       }
     }
   }

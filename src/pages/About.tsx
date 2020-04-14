@@ -43,7 +43,7 @@ const About: React.FC = () => {
       <h1>About Mesa</h1>
       <p>
         Mesa it&apos;s an Open Source interface for{' '}
-        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
         </a>
         .<br />
@@ -60,14 +60,8 @@ const About: React.FC = () => {
         </div>
       </p>
       <p>
-        <strong>Gnosis Protocol</strong> introduces a new, fully decentralized exchange mechanism for ERC20 tokens with
-        the following properties:
-        <ul>
-          <li>Batch auctions</li>
-          <li>Multidimensional order books with ring trades</li>
-          <li>Uniform clearing prices in every batch</li>
-        </ul>
-        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
+        <strong>Gnosis Protocol</strong> is a fully permissionless DEX that enables ring trades to maximize liquidity.
+        <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Read more here
         </a>
       </p>
@@ -106,19 +100,9 @@ const About: React.FC = () => {
       <h2>Learn more about Gnosis Protocol</h2>
       <ul>
         <li>
-          dFusion Paper:{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/gnosis/dex-research/blob/master/dFusion/dfusion.v1.pdf"
-          >
-            dfusion.v1.pdf
-          </a>
-        </li>
-        <li>
           Developer portal:{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/dfusion">
-            https://docs.gnosis.io/dfusion
+          <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
+            https://docs.gnosis.io/protocol
           </a>
         </li>
         <li>
@@ -145,11 +129,7 @@ const About: React.FC = () => {
         </li>
         <li>
           Protocol info:{' '}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://explore.duneanalytics.com/public/dashboards/I43OkDWnojXZYm8vmdBDcLz5UsS3Tn0cx1xU8Hcg"
-          >
+          <a target="_blank" rel="noopener noreferrer" href="https://duneanalytics.com/gnosisprotocol">
             Dune analytics: Gnosis Protocol
           </a>
         </li>

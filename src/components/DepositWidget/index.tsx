@@ -19,6 +19,7 @@ import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 import { useDebounce } from 'hooks/useDebounce'
+import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
   amount: BN
@@ -32,7 +33,7 @@ const BalancesWidget = styled(Widget)`
   padding: 0 0 2.4rem;
   min-width: 85rem;
   max-width: 140rem;
-  background: #ffffff;
+  background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
@@ -80,7 +81,7 @@ const BalancesWidget = styled(Widget)`
   }
 
   ${CardTable}.balancesOverview > thead {
-    background: #ffffff;
+    background: var(--color-background);
     border-radius: 0.6rem;
 
     @media ${MEDIA.mobile} {
@@ -107,7 +108,7 @@ const BalancesWidget = styled(Widget)`
 
   ${CardTable}.balancesOverview > thead > tr:not([class^="Card__CardRowDrawer"]) > th {
     font-size: 1.1rem;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0;
     text-align: right;
     padding: 0.8rem;
@@ -153,7 +154,7 @@ const BalancesWidget = styled(Widget)`
 
     &[data-label='Token'] > div > b {
       display: block;
-      color: #2f3e4e;
+      color: var(--color-text-primary);
     }
 
     &::before {
@@ -167,7 +168,7 @@ const BalancesWidget = styled(Widget)`
         letter-spacing: 0;
         white-space: nowrap;
         padding: 0 0.5rem 0 0;
-        color: #2f3e4e;
+        color: var(--color-text-primary);
       }
     }
   }
@@ -185,7 +186,7 @@ const BalanceTools = styled.div`
 
   > .balances-manageTokens {
     font-size: 1.4rem;
-    color: #218dff;
+    color: var(--color-text-active);
     letter-spacing: 0;
     text-align: right;
     font-weight: var(--font-weight-normal);
@@ -209,7 +210,7 @@ const BalanceTools = styled.div`
     display: flex;
     flex-flow: row nowrap;
     font-size: 1.4rem;
-    color: #2f3e4e;
+    color: var(--color-text-primary);
     letter-spacing: 0;
     font-weight: var(--font-weight-regular);
     margin: 0 2rem 0 auto;
@@ -243,7 +244,7 @@ const BalanceTools = styled.div`
       margin: 0;
       width: 35rem;
       max-width: 100%;
-      background: #e7ecf3 url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+      background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
       border: 0;
       font-size: 1.4rem;
@@ -262,17 +263,16 @@ const BalanceTools = styled.div`
       &::placeholder {
         font-size: inherit;
         color: inherit;
-        line-height: inherit;
       }
 
       &:focus {
-        border-bottom: 0.2rem solid #218dff;
-        border-color: #218dff;
-        color: #218dff;
+        border-bottom: 0.2rem solid var(--color-text-active);
+        border-color: var(--color-text-active);
+        color: var(--color-text-active);
       }
 
       &.error {
-        border-color: #ff0000a3;
+        border-color: var(--color-error);
       }
 
       &.warning {
@@ -297,7 +297,7 @@ const NoTokensMessage = styled.tr`
     }
 
     a {
-      color: #218dff;
+      color: var(--color-text-active);
     }
 
     > td {
@@ -310,15 +310,20 @@ const NoTokensMessage = styled.tr`
   }
 `
 
-type BalanceDisplayProps = Omit<ReturnType<typeof useRowActions>, 'requestWithdrawToken'> &
-  ReturnType<typeof useTokenBalances> & {
-    requestWithdrawConfirmation(
-      amount: BN,
-      tokenAddress: string,
-      claimable: boolean,
-      onTxHash: (hash: string) => void,
-    ): Promise<void>
-  }
+interface BalanceDisplayProps extends TokenLocalState {
+  enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  balances: TokenBalanceDetails[]
+  error: boolean
+  requestWithdrawConfirmation(
+    amount: BN,
+    tokenAddress: string,
+    claimable: boolean,
+    onTxHash: (hash: string) => void,
+  ): Promise<void>
+}
+
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   balances,
   error,
@@ -408,7 +413,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             {displayedBalances && displayedBalances.length > 0
               ? displayedBalances.map(tokenBalances => (
                   <Row
-                    key={tokenBalances.addressMainnet}
+                    key={tokenBalances.address}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance, onTxHash): Promise<void> =>

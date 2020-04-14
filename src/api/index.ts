@@ -12,6 +12,10 @@ import { DepositApiProxy } from './deposit/DepositApiProxy'
 import { ExchangeApi } from './exchange/ExchangeApi'
 import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiProxy } from './exchange/ExchangeApiProxy'
+import { TheGraphApi } from './thegraph/TheGraphApi'
+import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
+import { DexPriceEstimatorApi } from './dexPriceEstimator/DexPriceEstimatorApi'
+import { DexPriceEstimatorApiProxy } from './dexPriceEstimator/DexPriceEstimatorApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -23,14 +27,11 @@ import {
   TOKEN_8,
 } from '../../test/data'
 import Web3 from 'web3'
-import { INITIAL_INFURA_ENDPOINT } from 'const'
+import { ETH_NODE_URL } from 'const'
 import fetchGasPriceFactory from './gasStation'
-import { TheGraphApi } from './thegraph/TheGraphApi'
-import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
-export const getDefaultProvider = (): string | null =>
-  process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
+export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
 
 function createWeb3Api(): Web3 {
   // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
@@ -97,13 +98,13 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
 }
 
 function createTokenListApi(): TokenList {
-  const networks = [Network.Mainnet, Network.Rinkeby]
+  const networkIds = [Network.Mainnet, Network.Rinkeby]
 
   let tokenListApi: TokenList
   if (process.env.MOCK_TOKEN_LIST === 'true') {
     tokenListApi = new TokenListApiMock(tokenList)
   } else {
-    tokenListApi = new TokenListApiImpl(networks)
+    tokenListApi = new TokenListApiImpl({ networkIds })
   }
 
   window['tokenListApi'] = tokenListApi // register for convenience
@@ -123,6 +124,16 @@ function createTheGraphApi(): TheGraphApi {
   return theGraphApi
 }
 
+function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
+  const networkIds = [Network.Mainnet, Network.Rinkeby]
+
+  const dexPriceEstimatorApi = new DexPriceEstimatorApiProxy({ networkIds })
+
+  window['dexPriceEstimatorApi'] = dexPriceEstimatorApi
+
+  return dexPriceEstimatorApi
+}
+
 // Build APIs
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
@@ -137,3 +148,4 @@ export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDepende
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
+export const dexPriceEstimatorApi: DexPriceEstimatorApi = createDexPriceEstimatorApi()
