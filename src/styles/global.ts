@@ -76,6 +76,7 @@ const GlobalStyles = createGlobalStyle`
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    transition-property: color, background-color, border-color, opacity;
     border: 0;
     font-weight: var(--font-weight-bold);
     outline: 0;
@@ -1025,7 +1026,7 @@ const GlobalStyles = createGlobalStyle`
       background: transparent;
       font-size: 4rem;
       line-height: 1;
-      color: var(--color-text-CTA);
+      color: var(--color-modali-close);
       font-weight: normal;
       opacity: .5;
       padding: 0;

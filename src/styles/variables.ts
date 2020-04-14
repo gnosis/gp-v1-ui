@@ -50,6 +50,7 @@ const LightColors = `
   --color-button-disabled: #666;
   --color-button-danger: #e55353;
   --color-button-secondary: #696969;
+  --color-modali-close: #526877;
 
   // Components
   --color-background-banner: #DFE6EF;
@@ -110,6 +111,7 @@ const DarkColors = `
   --color-button-disabled: #3d4043;
   --color-button-danger: #9c1818;
   --color-button-secondary: #696969;
+  --color-modali-close: #218DFF;
 
   // Components
   --color-background-banner: #252729;
