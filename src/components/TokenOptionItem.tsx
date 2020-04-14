@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress } from 'web3-utils'
-import Modali from 'modali'
 import { TokenImgWrapper } from './TokenImg'
 import { tokenListApi } from 'api'
 import styled from 'styled-components'
@@ -12,7 +11,7 @@ import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
 import { safeFilledToken } from 'utils'
 import { toast } from 'toastify'
 import { SimpleCache } from 'api/proxy/SimpleCache'
-import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
+import { UseAddTokenModalResult } from 'hooks/useBetterAddTokenModal'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -93,7 +92,7 @@ interface SearchItemProps {
   value: string
   defaultText?: string
   networkId: number
-  focused?: boolean
+  addTokensToList: UseAddTokenModalResult['addTokensToList']
 }
 
 const notifyOfNewToken = (token: TokenDetails): void => {
@@ -111,11 +110,75 @@ const constructCacheKey = ({ tokenAddress, networkId }: TokenAndNetwork): string
 const fetchedCache = new SimpleCache<FetchTokenResult, TokenAndNetwork>(constructCacheKey)
 const promisedCache = new SimpleCache<Promise<FetchTokenResult>, TokenAndNetwork>(constructCacheKey)
 
+interface GenerateMessageParams {
+  fetchResult: FetchTokenResult
+  addTokensToList: UseAddTokenModalResult['addTokensToList']
+  networkId: number
+  defaultText?: string
+}
+
+const generateMessage = ({
+  fetchResult,
+  addTokensToList,
+  networkId,
+  defaultText,
+}: GenerateMessageParams): React.ReactElement => {
+  const { token, reason } = fetchResult
+
+  switch (reason) {
+    // not registered --> advise to register
+    case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
+      if (!token)
+        return (
+          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+            Register token on Exchange first
+          </a>
+        )
+      return (
+        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+          <ExtraOptionsMessage
+            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            Register token on Exchange first
+          </ExtraOptionsMessage>
+        </OptionItem>
+      )
+    // not a ERC20 --> can't do much
+    case TokenFromExchange.NOT_ERC20:
+      return <>Not a valid ERC20 token</>
+    // registered but not in list --> option to add
+    case TokenFromExchange.NOT_IN_TOKEN_LIST:
+      if (!token || !('id' in token)) return <>{defaultText}</>
+
+      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async e => {
+        // prevent react-select reaction
+        e.preventDefault()
+        const [newToken] = await addTokensToList({ networkId, tokens: [token] }, reason)
+        if (!newToken) return
+
+        notifyOfNewToken(newToken)
+
+        // clear cache as token is in list now
+        fetchedCache.delete({ tokenAddress: token.address, networkId })
+      }
+
+      return (
+        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+          <button onClick={handleAddToken}>Add Token</button>
+        </OptionItem>
+      )
+    default:
+      return <>{defaultText}</>
+  }
+}
+
 // checks if token address is a valid address and not already in the list
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
   !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
 
-export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId, focused = false }) => {
+export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId, addTokensToList }) => {
   const [isFetching, setIsFetching] = useSafeState(false)
   // cached values can be retieved on first render already
   const [fetchResult, setFetchResult] = useSafeState<FetchTokenResult | null>(() => {
@@ -174,9 +237,6 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
   }, [value.toLowerCase(), networkId, setFetchResult])
   // don't differentiate based on case
 
-  const { modalProps, addTokensToList } = useBetterAddTokenModal({ focused })
-  console.log('modalProps', modalProps)
-
   if (isFetching) return <>Checking token address...</>
 
   if (
@@ -193,56 +253,5 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     return <>{defaultText}</>
   }
 
-  const { token, reason } = fetchResult
-
-  switch (reason) {
-    // not registered --> advise to register
-    case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
-      if (!token)
-        return (
-          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
-            Register token on Exchange first
-          </a>
-        )
-      return (
-        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
-          <ExtraOptionsMessage
-            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Register token on Exchange first
-          </ExtraOptionsMessage>
-        </OptionItem>
-      )
-    // not a ERC20 --> can't do much
-    case TokenFromExchange.NOT_ERC20:
-      return <>Not a valid ERC20 token</>
-    // registered but not in list --> option to add
-    case TokenFromExchange.NOT_IN_TOKEN_LIST:
-      if (!token || !('id' in token)) return <>{defaultText}</>
-
-      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async e => {
-        // prevent react-select reaction
-        e.preventDefault()
-        const [newToken] = await addTokensToList({ networkId, tokens: [token] }, reason)
-        if (!newToken) return
-
-        notifyOfNewToken(newToken)
-
-        // clear cache as token is in list now
-        fetchedCache.delete({ tokenAddress: token.address, networkId })
-      }
-
-      return (
-        <>
-          <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
-            <button onClick={handleAddToken}>Add Token</button>
-          </OptionItem>
-          <Modali.Modal {...modalProps} />
-        </>
-      )
-    default:
-      return <>{defaultText}</>
-  }
+  return generateMessage({ fetchResult, addTokensToList, networkId, defaultText })
 }
