@@ -68,7 +68,7 @@ export const OrdersForm = styled.div`
   > form {
     display: flex;
     flex-flow: column nowrap;
-    height: 54rem;
+    height: 59rem;
   }
 
   .infoContainer {
