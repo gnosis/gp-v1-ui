@@ -293,9 +293,10 @@ const PoolingInterface: React.FC = () => {
 
             <LiquidityMessage>
               <p>
-                The amount you deposit into your exchange wallet is your liquidity:{' '}
+                Your liquidity is equal to the amount you have deposited into your exchange wallet.
+                <br />{' '}
                 <b>
-                  at least deposit one stablecoin in your <a href="/wallet">Balances</a>
+                  Be sure to deposit at least one stablecoin on the <a href="/wallet">Balances</a> tab.
                 </b>
               </p>
             </LiquidityMessage>
