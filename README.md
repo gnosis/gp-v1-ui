@@ -10,24 +10,19 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
-# Mesa - Gnosis Protocol UI
+# Mesa - a dapp for Gnosis Protocol
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa is an interface for the [Gnosis Protocol](https://docs.gnosis.io/protocol).
+Mesa is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
 
-Gnosis Protocol introduces a new, fully decentralized exchange mechanism for ERC20 tokens with the following
-properties:
+Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximize liquidity.
 
-- Batch auctions
-- Multidimensional order books with ring trades
-- Uniform clearing prices in every batch
-
-This UI will allow to:
+Mesa allows users to:
 
 - Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
-- See the balances for any token: both in your wallet and the exchange
-- Deposit/Withdraw tokens from the exchange
+- See the balances for any token: available in their wallet and on the exchange
+- Deposit and withdraw tokens to/from the exchange wallet
 
 ## Running locally
 
