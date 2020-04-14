@@ -12,6 +12,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
 import { EtherscanLink } from 'components/EtherscanLink'
+import { useWalletConnection } from './useWalletConnection'
 
 interface ExtraProps {
   focused: boolean
@@ -294,6 +295,14 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
   const isShownRef = useRef(modalProps.isShown)
   isShownRef.current = modalProps.isShown
 
+  const walletInfo = useWalletConnection()
+  // persist for access inside addTokensToList
+  const networkRef = useRef(walletInfo.networkId)
+  networkRef.current = walletInfo.networkId
+  useEffect(() => {
+    if (walletInfo.networkId) setNetworkId(walletInfo.networkId)
+  }, [setNetworkId, walletInfo.networkId])
+
   const addTokensToList = async (
     params: TokensAddConfirmationProps | TokensAddConfirmationProps2,
     defaultReason: FetchTokenResult['reason'] = TokenFromExchange.NOT_IN_TOKEN_LIST,
@@ -324,7 +333,9 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
       toggleRef.current()
       // setTokenAddresses(params.tokenAddresses)
       const fetcher = (tokenAddress: string): Promise<FetchTokenResult> =>
-        fetchTokenData({ tokenAddress, networkId: params.networkId })
+        // networkId could have changed when between Default prov -> Rinkeby prov
+        // no problem on mainnet
+        fetchTokenData({ tokenAddress, networkId: networkRef.current || params.networkId })
       let results = await Promise.all(params.tokenAddresses.map(fetcher))
 
       if (results.every(({ token, reason }) => !token && reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT)) {
