@@ -164,7 +164,7 @@ const draw = (
   bidCurve.fill = bidCurve.stroke
   bidCurve.startLocation = 0.5
   bidCurve.fillOpacity = 0.1
-  bidCurve.tooltipText = 'Bid: [bold]{categoryX}[/]\nTotal volume: [bold]{totalVolume}[/]\nVolume: [bold]{volume}[/]'
+  bidCurve.tooltipText = 'Bid: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume}[/]'
 
   const askCurve = chart.series.push(new am4charts.StepLineSeries())
   askCurve.dataFields.categoryX = 'price'
@@ -174,7 +174,7 @@ const draw = (
   askCurve.fill = askCurve.stroke
   askCurve.fillOpacity = 0.1
   askCurve.startLocation = 0.5
-  askCurve.tooltipText = 'Ask: [bold]{categoryX}[/]\nTotal volume: [bold]{totalVolume}[/]\nVolume: [bold]{volume}[/]'
+  askCurve.tooltipText = 'Ask: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume}[/]'
 
   const series3 = chart.series.push(new am4charts.ColumnSeries())
   series3.dataFields.categoryX = 'price'
