@@ -63,7 +63,7 @@ const WrappedWidget = styled(Widget)`
   min-width: 0;
   margin: 0 auto;
   max-width: 160rem;
-  height: 58rem;
+  height: 63rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
@@ -74,7 +74,7 @@ const WrappedWidget = styled(Widget)`
     rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
   border-radius: 0.6rem;
   margin: 0 auto;
-  min-height: 54rem;
+  min-height: 63rem;
   font-size: 1.6rem;
   line-height: 1;
 
@@ -117,6 +117,12 @@ const WrappedForm = styled.form`
     max-width: 100%;
   }
 
+  > div {
+    @media ${MEDIA.mobile} {
+      width: 100%;
+    }
+  }
+
   > p {
     font-size: 1.3rem;
     color: var(--color-text-primary);
@@ -141,6 +147,7 @@ const WrappedForm = styled.form`
     > strong {
       margin: 0.3rem 0 0.3rem 0.3rem;
       font-size: 1.3rem;
+      word-break: break-word;
     }
   }
 `
