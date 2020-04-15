@@ -70,7 +70,7 @@ export function useCheckWhenTimeRemainingInBatch(
 
     id = window.setTimeout(() => {
       // not can go on interval
-      id = window.setInterval(checkAndReport, checkIntervalSeconds * 1000)
+      id = window.setInterval(checkAndReport, BATCH_TIME * 1000)
 
       checkAndReport()
     }, nextCheckInSeconds * 1000)
