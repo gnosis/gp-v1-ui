@@ -89,7 +89,7 @@ const GlobalStyles = createGlobalStyle`
     &:disabled,
     &[disabled]{
       &:hover {
-        background-color: initial;
+        background-color: var(--color-background-button-disabled-hover);
       }
       opacity: .35;
       pointer-events: none;
