@@ -10,6 +10,7 @@ import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from 'const'
+import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 
 interface Result {
   orders: AuctionElement[]
@@ -125,6 +126,15 @@ export function useOrders(): Result {
   }, [dispatch, setIsLoading])
 
   const runEffect = useRef(false)
+
+  const forceRefreshUnlessOnMount = useCallback(() => {
+    // don't refresh when first mounted
+    // fetchOrders already runs onMount
+    if (runEffect.current) forceOrdersRefresh()
+  }, [forceOrdersRefresh])
+
+  useCheckWhenTimeRemainingInBatch(60, forceRefreshUnlessOnMount)
+  useCheckWhenTimeRemainingInBatch(60, v => console.log('CHECK:', v, runEffect.current))
 
   useEffect(() => {
     if (!runEffect.current) {
