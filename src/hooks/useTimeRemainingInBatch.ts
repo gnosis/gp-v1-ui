@@ -49,7 +49,6 @@ export function useCheckWhenTimeRemainingInBatch(
     let id: number
 
     if (currentCheck.checkTime) {
-      // setCheckResult(currentCheck)
       callbackRef.current(currentCheck)
     }
 
