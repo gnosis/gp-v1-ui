@@ -44,7 +44,7 @@ function getDexPriceEstimatorUrl(networkId: number): string {
     case Network.Mainnet:
       return `https://dex-price-estimator.gnosis.io/${basePath}`
     case Network.Rinkeby:
-      return `https://price-estimate-rinkeby.dev.gnosisdev.com/${basePath}`
+      return `https://dex-price-estimator.rinkeby.gnosis.io/${basePath}`
     default:
       throw new Error(`dex-price-estimator not available for network ${networkId}`)
   }
