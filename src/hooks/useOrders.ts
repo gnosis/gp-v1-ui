@@ -40,6 +40,9 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
   )
 }
 
+const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
+// solutions submitted at this point
+
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
   const [
@@ -133,8 +136,8 @@ export function useOrders(): Result {
     if (runEffect.current) forceOrdersRefresh()
   }, [forceOrdersRefresh])
 
-  useCheckWhenTimeRemainingInBatch(60, forceRefreshUnlessOnMount)
-  useCheckWhenTimeRemainingInBatch(60, v => console.log('CHECK:', v, runEffect.current))
+  useCheckWhenTimeRemainingInBatch(REFRESH_WHEN_SECONDS_LEFT, forceRefreshUnlessOnMount)
+  useCheckWhenTimeRemainingInBatch(REFRESH_WHEN_SECONDS_LEFT, v => console.log('CHECK:', v, runEffect.current))
 
   useEffect(() => {
     if (!runEffect.current) {
