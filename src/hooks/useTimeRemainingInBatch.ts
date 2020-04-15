@@ -22,7 +22,6 @@ interface SecondsRemainingResult {
 
 const checkIfTime = (seconds: number): SecondsRemainingResult => {
   const secondsRemaining = getSecondsRemainingInBatch()
-  console.log('CHECK:secondsRemaining', secondsRemaining)
   return {
     secondsRemaining,
     checkTime: secondsRemaining < seconds,
@@ -54,8 +53,6 @@ export function useCheckWhenTimeRemainingInBatch(
       callbackRef.current(currentCheck)
     }
 
-    console.log('CHECK:checkIntervalSeconds', checkIntervalSeconds)
-
     // const nextCheckInSeconds = currentCheck.secondsRemaining + checkIntervalSeconds
     // first check on timeout not interval
     // as we start at random time in the BATCH
@@ -67,8 +64,6 @@ export function useCheckWhenTimeRemainingInBatch(
           currentCheck.secondsRemaining - seconds) + 1 // plus one second
     // because condition in contract is >= 1 minutes and we check for <
     // so we don't fall on the exact second and query blockchain
-    console.log('CHECK:check again in', nextCheckInSeconds)
-
     const checkAndReport = (): void => {
       const currentCheck = checkIfTime(seconds)
       callbackRef.current(currentCheck)

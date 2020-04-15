@@ -137,7 +137,6 @@ export function useOrders(): Result {
   }, [forceOrdersRefresh])
 
   useCheckWhenTimeRemainingInBatch(REFRESH_WHEN_SECONDS_LEFT, forceRefreshUnlessOnMount)
-  useCheckWhenTimeRemainingInBatch(REFRESH_WHEN_SECONDS_LEFT, v => console.log('CHECK:', v, runEffect.current))
 
   useEffect(() => {
     if (!runEffect.current) {
