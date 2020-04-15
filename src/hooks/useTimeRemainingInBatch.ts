@@ -39,8 +39,8 @@ export function useCheckWhenTimeRemainingInBatch(
   useEffect(() => {
     // how often to check
     // when there are ${seconds} seconds left in the batch
-    const checkIntervalSeconds = BATCH_TIME - seconds
-    if (checkIntervalSeconds <= 0) {
+    const checkSecondsFromBatchStart = BATCH_TIME - seconds
+    if (checkSecondsFromBatchStart <= 0) {
       console.warn(`seconds given ${seconds} > BATCH_TIME ${BATCH_TIME}`)
       return
     }
@@ -58,7 +58,7 @@ export function useCheckWhenTimeRemainingInBatch(
     const nextCheckInSeconds =
       (currentCheck.checkTime
         ? //  if currently past check time -- interval + seconds remaining in BATCH
-          currentCheck.secondsRemaining + checkIntervalSeconds
+          currentCheck.secondsRemaining + checkSecondsFromBatchStart
         : // if not yet check time -- what's left to that time
           currentCheck.secondsRemaining - seconds) + 1 // plus one second
     // because condition in contract is >= 1 minutes and we check for <
