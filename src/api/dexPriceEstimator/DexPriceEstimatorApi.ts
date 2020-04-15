@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js'
-import { getNetworkFromId, assert, TEN_BIG_NUMBER, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
+import { assert, TEN_BIG_NUMBER, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
+import { Network } from 'types'
 
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
@@ -37,9 +38,16 @@ export interface Params {
 }
 
 function getDexPriceEstimatorUrl(networkId: number): string {
-  const networkName = getNetworkFromId(networkId).toLowerCase()
-  // TODO: use prod endpoint when available https://github.com/gnosis/dex-react/issues/869
-  return `https://price-estimate-${networkName}.dev.gnosisdev.com/api/v1/`
+  const basePath = 'api/v1/'
+
+  switch (networkId) {
+    case Network.Mainnet:
+      return `https://dex-price-estimator.gnosis.io/${basePath}`
+    case Network.Rinkeby:
+      return `https://dex-price-estimator.rinkeby.gnosis.io/${basePath}`
+    default:
+      throw new Error(`dex-price-estimator not available for network ${networkId}`)
+  }
 }
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
