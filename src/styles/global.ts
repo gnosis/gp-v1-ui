@@ -960,7 +960,13 @@ const GlobalStyles = createGlobalStyle`
     .walletconnect-modal__headerLogo {
       max-width: 24rem;
       height: auto;
-      margin: 5rem auto 2.4rem;
+      margin: 2.4rem auto;
+    }
+    
+    .walletconnect-qrcode__image {
+      height: calc(100vh - 14rem);
+      padding: 1rem;
+      max-height: 40rem;
     }
   }
   #walletconnect-qrcode-text {
