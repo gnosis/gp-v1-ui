@@ -113,8 +113,8 @@ function createTokenListApi(): TokenList {
 
 function createTheGraphApi(): TheGraphApi {
   const urls = {
-    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion',
-    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion-rinkeby',
+    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol',
+    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby',
   }
 
   const theGraphApi = new TheGraphApiProxy({ urls })
