@@ -94,7 +94,7 @@ export const PriceInputBox = styled.div`
 
   input:not([type='checkbox']) {
     margin: 0;
-    width: auto;
+    width: 100%;
     max-width: 100%;
     background: var(--color-background-input);
     border-radius: 0.6rem 0.6rem 0 0;

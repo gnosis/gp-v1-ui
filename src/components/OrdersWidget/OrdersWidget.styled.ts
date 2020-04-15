@@ -69,6 +69,10 @@ export const OrdersForm = styled.div`
     display: flex;
     flex-flow: column nowrap;
     height: 59rem;
+
+    @media ${MEDIA.tablet} {
+      height: auto;
+    }
   }
 
   .infoContainer {
@@ -109,6 +113,7 @@ export const OrdersForm = styled.div`
         transition: border 0.2s ease-in-out;
         align-items: center;
         border-bottom: 0.3rem solid transparent;
+        min-height: 6.4rem;
 
         @media ${MEDIA.mobile} {
           font-size: 1.3rem;
