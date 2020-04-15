@@ -137,7 +137,7 @@ const Footer: React.FC = () => {
       {/* VERSION */}
       <div className="version">
         Web{' '}
-        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/dOrgTech/dex-react/tree/v' + VERSION}>
           v{VERSION}
         </a>{' '}
         - Contracts{' '}

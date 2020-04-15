@@ -42,18 +42,18 @@ const About: React.FC = () => {
     <AboutWrapper>
       <h1>About Mesa</h1>
       <p>
-        Mesa it&apos;s an Open Source interface for{' '}
+        Mesa is an Open Source interface for {' '} maintained, owned and hosted by the Dxdao.
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
         </a>
         .<br />
         <div id="code-link">
           Check out the{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react">
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/dOrgTech/dex-react">
             Source Code
           </a>{' '}
           and{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react/releases">
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/dOrgTech/dex-react/releases">
             Releases
           </a>
           .
@@ -70,7 +70,7 @@ const About: React.FC = () => {
       <ul>
         <li>
           Mesa:&nbsp;
-          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/dOrgTech/dex-react/tree/v' + VERSION}>
             v{VERSION}
           </a>{' '}
         </li>
@@ -96,7 +96,36 @@ const About: React.FC = () => {
           </a>
         </li>
       </ul>
-
+      <h2>Learn More About Dxdao:</h2>
+      <ul>
+        <li>
+          Join the community:&nbsp;
+          <a target="_blank" rel="noopener noreferrer" href={'https://keybase.io/team/dx_dao'}>
+            Keybase chat
+          </a>{' '}
+        </li>
+        <li>
+          Stay up to date:&nbsp;
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={'https://t.me/dxDAO'}
+          >
+            Telegram Community chat
+          </a>{' '}
+          <span className="contract-addresses">({ContractAddresses})</span>
+        </li>
+        <li>
+          Forum:&nbsp;
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={'https://daotalk.org/c/daos/dx-dao/'}
+          >
+            Daotalk.org
+          </a>
+        </li>
+      </ul>
       <h2>Learn more about Gnosis Protocol</h2>
       <ul>
         <li>
@@ -147,7 +176,6 @@ const About: React.FC = () => {
             @gnosis/dex-telegram
           </a>
         </li>
-
         <li>
           Visualization tools:{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-visualization-tools">
