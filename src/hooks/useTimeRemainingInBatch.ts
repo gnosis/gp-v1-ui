@@ -52,7 +52,6 @@ export function useCheckWhenTimeRemainingInBatch(
       callbackRef.current(currentCheck)
     }
 
-
     // first check on timeout not interval
     // as we start at random time in the BATCH
     const nextCheckInSeconds =
