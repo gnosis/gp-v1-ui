@@ -447,6 +447,26 @@ const chooseTokenWithFallback = ({
   )
 }
 
+function buildUrl(params: {
+  sell: string
+  price: string
+  from: string
+  expires: string
+  sellSymbol: string
+  buySymbol: string
+}): string {
+  const { sell, price, from, expires, sellSymbol, buySymbol } = params
+
+  const searchQuery = buildSearchQuery({
+    sell,
+    price,
+    from,
+    expires,
+  })
+
+  return `/trade/${encodeURIComponent(sellSymbol)}-${encodeURIComponent(buySymbol)}?${searchQuery}`
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -469,7 +489,9 @@ const TradeWidget: React.FC = () => {
       : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
+  const { sell: dirtySellTokenSymbol, buy: dirtyReceiveTokenSymbol } = useParams()
+  const sellTokenSymbol = decodeURIComponent(dirtySellTokenSymbol || '')
+  const receiveTokenSymbol = decodeURIComponent(dirtyReceiveTokenSymbol || '')
   const {
     sellAmount: sellParam,
     price: priceParam,
@@ -621,13 +643,15 @@ const TradeWidget: React.FC = () => {
     setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
-  const searchQuery = buildSearchQuery({
+  const url = buildUrl({
     sell: sellValue,
     price: priceValue,
     from: validFromValue,
     expires: validUntilValue,
+    sellSymbol: sellToken.symbol as string,
+    buySymbol: receiveToken.symbol as string,
   })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
+  // Updates page URL with parameters from context
   useURLParams(url, true)
 
   // TESTING
