@@ -30,6 +30,7 @@ const LightColors = `
   --color-background-CTA: #218DFF;
   --color-background-selection: #218DFF;
   --color-background-button-hover: #0B66C6;
+  --color-background-button-disabled-hover: #2772c3;
   --color-background-balance-button-hover: #218DFF;
 
   // Borders
@@ -92,6 +93,7 @@ const DarkColors = `
   --color-background-CTA: #2e2e2e;
   --color-background-selection: #181a1b;
   --color-background-button-hover: #0B66C6;
+  --color-background-button-disabled-hover: #2772c3;
   --color-background-balance-button-hover: #0B66C6;
 
   // Borders

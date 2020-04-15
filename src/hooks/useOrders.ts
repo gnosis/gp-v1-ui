@@ -10,6 +10,7 @@ import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from 'const'
+import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 
 interface Result {
   orders: AuctionElement[]
@@ -38,6 +39,9 @@ function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
       ),
   )
 }
+
+const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
+// solutions submitted at this point
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
@@ -125,6 +129,14 @@ export function useOrders(): Result {
   }, [dispatch, setIsLoading])
 
   const runEffect = useRef(false)
+
+  const forceRefreshUnlessOnMount = useCallback(() => {
+    // don't refresh when first mounted
+    // fetchOrders already runs onMount
+    if (runEffect.current) forceOrdersRefresh()
+  }, [forceOrdersRefresh])
+
+  useCheckWhenTimeRemainingInBatch(REFRESH_WHEN_SECONDS_LEFT, forceRefreshUnlessOnMount)
 
   useEffect(() => {
     if (!runEffect.current) {

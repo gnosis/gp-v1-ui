@@ -1,20 +1,20 @@
 **What is Mesa?**
 
-Mesa is a decentralized application built on the **Gnosis Protocol**, a decentralized trading protocol for ERC-20s. Instead of using one order book per token pair, the Gnosis Protocol relies on batched auctions and a multidimensional orderbook. These mechanisms enable ring trades, in which liquidity amongst all assets tradable on the protocol is shared. Read more about the protocol’s mechanism on the Gnosis [DevPortal](https://docs.gnosis.io/protocol/docs/introduction1/).
+Mesa is a decentralized application built on the **Gnosis Protocol**, a fully permissionless DEX that enables ring trades to maximize liquidity.  
+Gnosis Protocol enables ring trades to maximize liquidity. Ring trades are order settlements which share liquidity across all orders, rather than a single token pair, and uniquely suited for trading prediction market tokens and the long tail of all tokenized assets.
+ Read more about the protocol’s mechanism on the Gnosis [Developer Portal](https://docs.gnosis.io/protocol/docs/introduction1/).
 
 **How are trades matched?**
 
-Orders are collected in batches every 5 minutes, and external participants called solvers (everyone can participate as a solver) propose a settlement solution to the smart contract. The smart contract selects the solution that maximizes [trader welfare](https://dfusion-docs.dev.gnosisdev.com/docs/devguide01/). The utility in this optimization function is the difference between what a trader is willing to pay and what they pay once a batch is cleared. After a solution is selected, orders are matched and settled accordingly and on-chain. 
+Orders are collected in batches every 5 minutes, and external participants called solvers (everyone can participate as a solver) propose a settlement solution to the smart contract. The smart contract selects the solution that maximizes [trader welfare](https://docs.gnosis.io/protocol/docs/devguide01/). The utility in this optimization function is the difference between what a trader is willing to pay and what they pay once a batch is cleared. After a solution is selected, orders are matched and settled accordingly and on-chain. 
 
-**What advantages does this bring?**
+**What advantages do ring trades bring?**
 
-- Liquidity shared amongst all token pairs - thanks to ring trades 
-- Don't get front-run - thanks to batch actions
-- Get a fairer price - thanks to uniform clearing prices
+Ring trades are order settlements which share liquidity across all orders, rather than a single token pair and hence maximize liquidity.
 
 **Is Gnosis Protocol secure?**
 
-The Gnosis Protocol smart contracts have been audited externally. Check this section on their [DevPortal](https://docs.gnosis.io/protocol/docs/devguide04/) for further information, including the audit report and the code repository.
+The Gnosis Protocol smart contracts have been audited externally. Check this section on their [Developer Portal](https://docs.gnosis.io/protocol/docs/devguide04/) for further information, including the audit report and the code repository.
 
 **Can I create a trade without depositing to the smart contract?**
 
@@ -30,4 +30,4 @@ To provide liquidity, click on the `Liquidity` page, and follow three simple ste
 
 Importantly, don’t forget that **all** orders placed by an Ethereum address share the same deposited liquidity! Consider participating with separate addresses for separate strategies when partaking in the liquidity provision and when trading normally. 
 
-Learn more about liquidity provision on [this section](https://dfusion-docs.dev.gnosisdev.com/docs/introduction1/) of the the Gnosis DevPortal.
+Learn more about liquidity provision on [this section](https://docs.gnosis.io/protocol/docs/liquidity1/) of the the Gnosis Developer Portal.

@@ -78,12 +78,16 @@ const WrappedWidget = styled(Widget)`
   font-size: 1.6rem;
   line-height: 1;
 
-  @media ${MEDIA.mobile} {
+  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     flex-flow: column wrap;
     max-height: initial;
     min-height: initial;
     width: 100%;
     height: initial;
+  }
+
+  @media ${MEDIA.tablet} {
+    width: 96%;
   }
 `
 
@@ -109,6 +113,12 @@ const WrappedForm = styled.form`
     flex: none;
     padding: 0;
     opacity: 0;
+  }
+
+  @media ${MEDIA.tablet} {
+    max-width: initial;
+    flex: 1 1 50%;
+    padding: 1.6rem 1.6rem 3.2rem;
   }
 
   @media ${MEDIA.mobile} {
@@ -223,6 +233,12 @@ const OrdersPanel = styled.div`
     min-width: 85rem;
   }
 
+  @media ${MEDIA.tablet} {
+    flex: 1 1 50%;
+    min-width: initial;
+    border-radius: 0;
+  }
+
   // Connect Wallet banner in the orders panel
   ${Wrapper} {
     background: transparent;
@@ -246,6 +262,12 @@ const OrdersPanel = styled.div`
     display: flex;
     flex-flow: row wrap;
     border-radius: 0 0.6rem 0.6rem 0;
+
+    @media ${MEDIA.tablet} {
+      width: 100%;
+      border-radius: 0;
+      margin: 2.4rem auto 0;
+    }
 
     @media ${MEDIA.mobile} {
       display: none;
@@ -310,6 +332,10 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
     width: 1.6rem;
     margin: 0;
     transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
+
+    @media ${MEDIA.tablet} {
+      display: none;
+    }
   }
 
   &:hover {
