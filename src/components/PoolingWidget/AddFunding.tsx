@@ -40,7 +40,7 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
     <p>
       <strong>What now?</strong>
       <br />
-      Go to the <Link to="wallet">Wallet page</Link> to deposit at least one of the tokens you selected in your
+      Go to the <Link to="wallet">Balances page</Link> to deposit at least one of the tokens you selected in your
       liquidity provision.
     </p>
     <ul>
