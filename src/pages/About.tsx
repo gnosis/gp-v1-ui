@@ -42,11 +42,11 @@ const About: React.FC = () => {
     <AboutWrapper>
       <h1>About Mesa</h1>
       <p>
-        Mesa is an Open Source interface for {' '} maintained, owned and hosted by the Dxdao.
+        Mesa is an Open Source interface for
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
         </a>
-        .<br />
+        {' '} maintained, owned and hosted by the Dxdao.<br />
         <div id="code-link">
           Check out the{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://github.com/dOrgTech/dex-react">
@@ -101,7 +101,7 @@ const About: React.FC = () => {
         <li>
           Join the community:&nbsp;
           <a target="_blank" rel="noopener noreferrer" href={'https://keybase.io/team/dx_dao'}>
-            Keybase chat
+            Keybase
           </a>{' '}
         </li>
         <li>
@@ -111,9 +111,8 @@ const About: React.FC = () => {
             rel="noopener noreferrer"
             href={'https://t.me/dxDAO'}
           >
-            Telegram Community chat
-          </a>{' '}
-          <span className="contract-addresses">({ContractAddresses})</span>
+            Telegram
+          </a>
         </li>
         <li>
           Forum:&nbsp;
