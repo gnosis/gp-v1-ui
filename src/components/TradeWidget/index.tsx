@@ -502,14 +502,19 @@ const TradeWidget: React.FC = () => {
 
   useEffect(() => {
     console.log('TRADE', trade)
+    //  when switching networks
+    // trade stays filled with last tokens
+    // which may not be available on the new network
     if (trade.sellToken) {
+      // check if it should be different
       const sellTokenOrFallback = chooseTokenWithFallback({
+        // don't consider token from trade from wrong network valid
         token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
           ? trade.sellToken
           : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault),
-        tokenSymbol: sellTokenSymbol,
-        defaultTokenSymbol: 'DAI',
+        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
+        tokenSymbol: sellTokenSymbol, // from url params
+        defaultTokenSymbol: 'DAI', // default sellToken
       })
       console.log('NEW', { sellTokenOrFallback })
       setSellToken(sellTokenOrFallback)
@@ -522,7 +527,7 @@ const TradeWidget: React.FC = () => {
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault),
         tokenSymbol: receiveTokenSymbol,
-        defaultTokenSymbol: 'USDC',
+        defaultTokenSymbol: 'USDC', // default buyToken
       })
       console.log('NEW', { buyTokenOrFallback })
       setReceiveToken(buyTokenOrFallback)
