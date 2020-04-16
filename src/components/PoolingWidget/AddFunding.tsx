@@ -24,7 +24,7 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
         </strong>
         <p>
           {txReceipt
-            ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
+            ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions below.'
             : ''}
         </p>
       </span>
