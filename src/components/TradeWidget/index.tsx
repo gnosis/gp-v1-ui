@@ -57,6 +57,7 @@ import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
+import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -452,10 +453,10 @@ function buildUrl(params: {
   price: string
   from: string
   expires: string
-  sellSymbol: string
-  buySymbol: string
+  sellToken: TokenDetails
+  buyToken: TokenDetails
 }): string {
-  const { sell, price, from, expires, sellSymbol, buySymbol } = params
+  const { sell, price, from, expires, sellToken, buyToken } = params
 
   const searchQuery = buildSearchQuery({
     sell,
@@ -464,7 +465,10 @@ function buildUrl(params: {
     expires,
   })
 
-  return `/trade/${encodeURIComponent(sellSymbol)}-${encodeURIComponent(buySymbol)}?${searchQuery}`
+  const url = `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
+
+  console.log(`new url`, url)
+  return url
 }
 
 const TradeWidget: React.FC = () => {
@@ -489,9 +493,9 @@ const TradeWidget: React.FC = () => {
       : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: dirtySellTokenSymbol, buy: dirtyReceiveTokenSymbol } = useParams()
-  const sellTokenSymbol = decodeURIComponent(dirtySellTokenSymbol || '')
-  const receiveTokenSymbol = decodeURIComponent(dirtyReceiveTokenSymbol || '')
+  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
+  const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
   const {
     sellAmount: sellParam,
     price: priceParam,
@@ -648,8 +652,8 @@ const TradeWidget: React.FC = () => {
     price: priceValue,
     from: validFromValue,
     expires: validUntilValue,
-    sellSymbol: sellToken.symbol as string,
-    buySymbol: receiveToken.symbol as string,
+    sellToken: sellToken,
+    buyToken: receiveToken,
   })
   // Updates page URL with parameters from context
   useURLParams(url, true)
