@@ -501,7 +501,6 @@ const TradeWidget: React.FC = () => {
   )
 
   useEffect(() => {
-    console.log('TRADE', trade)
     //  when switching networks
     // trade stays filled with last tokens
     // which may not be available on the new network
@@ -516,7 +515,6 @@ const TradeWidget: React.FC = () => {
         tokenSymbol: sellTokenSymbol, // from url params
         defaultTokenSymbol: 'DAI', // default sellToken
       })
-      console.log('NEW', { sellTokenOrFallback })
       setSellToken(sellTokenOrFallback)
     }
 
@@ -529,11 +527,8 @@ const TradeWidget: React.FC = () => {
         tokenSymbol: receiveTokenSymbol,
         defaultTokenSymbol: 'USDC', // default buyToken
       })
-      console.log('NEW', { buyTokenOrFallback })
       setReceiveToken(buyTokenOrFallback)
     }
-
-    console.log('networkIdOrDefault', networkIdOrDefault)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkIdOrDefault])
   // don't need to depend on more than network as everything else updates together
