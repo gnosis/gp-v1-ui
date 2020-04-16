@@ -15,7 +15,16 @@ import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 
-import { safeTokenName, formatAmount, formatDateFromBatchId, batchIdToDate, isOrderFilled } from 'utils'
+import {
+  safeTokenName,
+  formatAmount,
+  formatDateFromBatchId,
+  batchIdToDate,
+  isOrderFilled,
+  dateToBatchId,
+  formatSeconds,
+  getSecondsRemainingInBatch,
+} from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
@@ -141,6 +150,8 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
 
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
   const isScheduled = batchIdToDate(order.validFrom) > now
+  const isActiveNextBatch = dateToBatchId(now) === order.validFrom
+  const isFirstActiveBatch = dateToBatchId(now) === order.validFrom + 1
   const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
     order.priceDenominator,
     order.priceNumerator,
@@ -151,12 +162,39 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   ])
   const isFilled = useMemo(() => isOrderFilled(order), [order])
   // Display isLowBalance warning only for active and partial fill orders
-  const isLowBalance = isOverBalance && !isUnlimited && !isFilled && !isScheduled && !isPendingOrder && !isExpiredOrder
+  const isLowBalance =
+    isOverBalance &&
+    !isUnlimited &&
+    !isFilled &&
+    !isScheduled &&
+    !isActiveNextBatch &&
+    !isPendingOrder &&
+    !isExpiredOrder
 
   const pending = useMemo(() => isPendingOrder && <PendingLink transactionHash={transactionHash} />, [
     isPendingOrder,
     transactionHash,
   ])
+
+  // Dima's trick to force component update
+  const [, forceUpdate] = useSafeState({})
+
+  // Updates the component every second, if it has one of the states where it should happen
+  useEffect(() => {
+    let timer: null | NodeJS.Timeout = null
+
+    if (isActiveNextBatch || isFirstActiveBatch) {
+      timer = setInterval(() => forceUpdate({}), 1000)
+    } else if (!!timer) {
+      clearTimeout(timer)
+    }
+
+    return (): void => {
+      if (timer) clearTimeout(timer)
+    }
+  }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
+
+  const secondsCountdown = formatSeconds(getSecondsRemainingInBatch())
 
   return (
     <td className="status">
@@ -164,6 +202,10 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
         pending
       ) : isExpiredOrder ? (
         'Expired'
+      ) : isActiveNextBatch ? (
+        `Active in next batch: ${secondsCountdown}`
+      ) : isFirstActiveBatch ? (
+        `Looking for match: ${secondsCountdown}`
       ) : isScheduled ? (
         <>
           Scheduled
