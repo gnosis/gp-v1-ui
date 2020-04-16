@@ -425,6 +425,28 @@ const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networ
   return tokenAddresses
 }
 
+interface ChooseTokenInput {
+  tokens: TokenDetails[]
+  token: TokenDetails | null
+  tokenSymbol?: string
+  defaultTokenSymbol: 'DAI' | 'USDC'
+}
+
+const chooseTokenWithFallback = ({
+  tokens,
+  token,
+  tokenSymbol,
+  defaultTokenSymbol,
+}: ChooseTokenInput): TokenDetails => {
+  return (
+    token ||
+    (tokenSymbol && isAddress(tokenSymbol?.toLowerCase())
+      ? getToken('address', tokenSymbol, tokens)
+      : getToken('symbol', tokenSymbol, tokens)) ||
+    (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
+  )
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -461,21 +483,21 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [sellToken, setSellToken] = useState(
-    () =>
-      trade.sellToken ||
-      (sellTokenSymbol && isAddress(sellTokenSymbol?.toLowerCase())
-        ? getToken('address', sellTokenSymbol, tokens)
-        : getToken('symbol', sellTokenSymbol, tokens)) ||
-      (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
+  const [sellToken, setSellToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.sellToken,
+      tokens,
+      tokenSymbol: sellTokenSymbol,
+      defaultTokenSymbol: 'DAI',
+    }),
   )
-  const [receiveToken, setReceiveToken] = useState(
-    () =>
-      trade.buyToken ||
-      (receiveTokenSymbol && isAddress(receiveTokenSymbol?.toLowerCase())
-        ? getToken('address', receiveTokenSymbol, tokens)
-        : getToken('symbol', receiveTokenSymbol, tokens)) ||
-      (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
+  const [receiveToken, setReceiveToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.buyToken,
+      tokens,
+      tokenSymbol: receiveTokenSymbol,
+      defaultTokenSymbol: 'USDC',
+    }),
   )
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
