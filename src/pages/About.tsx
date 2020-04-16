@@ -123,8 +123,8 @@ const About: React.FC = () => {
         </li>
         <li>
           Subgraph API:{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://thegraph.com/explorer/subgraph/gnosis/dfusion">
-            https://thegraph.com/explorer/subgraph/gnosis/dfusion
+          <a target="_blank" rel="noopener noreferrer" href="https://thegraph.com/explorer/subgraph/gnosis/protocol">
+            https://thegraph.com/explorer/subgraph/gnosis/protocol
           </a>
         </li>
         <li>
