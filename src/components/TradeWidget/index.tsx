@@ -499,6 +499,41 @@ const TradeWidget: React.FC = () => {
       defaultTokenSymbol: 'USDC',
     }),
   )
+
+  useEffect(() => {
+    console.log('TRADE', trade)
+    if (trade.sellToken) {
+      const sellTokenOrFallback = chooseTokenWithFallback({
+        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
+          ? trade.sellToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault),
+        tokenSymbol: sellTokenSymbol,
+        defaultTokenSymbol: 'DAI',
+      })
+      console.log('NEW', { sellTokenOrFallback })
+      setSellToken(sellTokenOrFallback)
+    }
+
+    if (trade.buyToken) {
+      const buyTokenOrFallback = chooseTokenWithFallback({
+        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
+          ? trade.buyToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault),
+        tokenSymbol: receiveTokenSymbol,
+        defaultTokenSymbol: 'USDC',
+      })
+      console.log('NEW', { buyTokenOrFallback })
+      setReceiveToken(buyTokenOrFallback)
+    }
+
+    console.log('networkIdOrDefault', networkIdOrDefault)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkIdOrDefault])
+  // don't need to depend on more than network as everything else updates together
+  // also avoids excessive setStates
+
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
 
