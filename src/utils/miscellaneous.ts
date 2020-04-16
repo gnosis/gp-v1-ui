@@ -72,15 +72,17 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
 }
 
-export const isOrderActive = (order: AuctionElement, now: Date): boolean => batchIdToDate(order.validUntil) >= now
-export const isPendingOrderActive = (order: AuctionElement, now: Date): boolean =>
-  batchIdToDate(order.validUntil) >= now || order.validUntil === 0
-
 export function isOrderFilled(order: AuctionElement): boolean {
   // consider an oder filled when less than `negligibleAmount` is left
   const negligibleAmount = order.priceDenominator.divRound(ORDER_FILLED_FACTOR)
   return !order.remainingAmount.gte(negligibleAmount)
 }
+
+export const isOrderActive = (order: AuctionElement, now: Date): boolean =>
+  batchIdToDate(order.validUntil) >= now && !isOrderFilled(order)
+
+export const isPendingOrderActive = (order: AuctionElement, now: Date): boolean =>
+  batchIdToDate(order.validUntil) >= now || order.validUntil === 0
 
 export async function silentPromise<T>(promise: Promise<T>, customMessage?: string): Promise<T | undefined> {
   try {
