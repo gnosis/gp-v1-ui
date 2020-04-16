@@ -34,7 +34,7 @@ import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-act
 
 import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 
 import {
   getToken,
@@ -824,7 +824,7 @@ const TradeWidget: React.FC = () => {
       const walletInfo = await connectWallet()
 
       // Then place the order if connection was successful
-      if (walletInfo && walletInfo.networkId && walletInfo.userAddress) {
+      if (walletInfo && walletInfo.networkId === Network.Mainnet && walletInfo.userAddress) {
         await _placeOrder({
           ...orderParams,
           networkId: walletInfo.networkId,
