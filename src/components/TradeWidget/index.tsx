@@ -428,21 +428,21 @@ const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networ
 interface ChooseTokenInput {
   tokens: TokenDetails[]
   token: TokenDetails | null
-  tokenSymbol?: string
+  tokenSymbolFromUrl?: string
   defaultTokenSymbol: 'DAI' | 'USDC'
 }
 
 const chooseTokenWithFallback = ({
   tokens,
   token,
-  tokenSymbol,
+  tokenSymbolFromUrl,
   defaultTokenSymbol,
 }: ChooseTokenInput): TokenDetails => {
   return (
     token ||
-    (tokenSymbol && isAddress(tokenSymbol?.toLowerCase())
-      ? getToken('address', tokenSymbol, tokens)
-      : getToken('symbol', tokenSymbol, tokens)) ||
+    (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())
+      ? getToken('address', tokenSymbolFromUrl, tokens)
+      : getToken('symbol', tokenSymbolFromUrl, tokens)) ||
     (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
   )
 }
@@ -487,7 +487,7 @@ const TradeWidget: React.FC = () => {
     chooseTokenWithFallback({
       token: trade.sellToken,
       tokens,
-      tokenSymbol: sellTokenSymbol,
+      tokenSymbolFromUrl: sellTokenSymbol,
       defaultTokenSymbol: 'DAI',
     }),
   )
@@ -495,7 +495,7 @@ const TradeWidget: React.FC = () => {
     chooseTokenWithFallback({
       token: trade.buyToken,
       tokens,
-      tokenSymbol: receiveTokenSymbol,
+      tokenSymbolFromUrl: receiveTokenSymbol,
       defaultTokenSymbol: 'USDC',
     }),
   )
@@ -512,7 +512,7 @@ const TradeWidget: React.FC = () => {
           ? trade.sellToken
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
-        tokenSymbol: sellTokenSymbol, // from url params
+        tokenSymbolFromUrl: sellTokenSymbol, // from url params
         defaultTokenSymbol: 'DAI', // default sellToken
       })
       setSellToken(sellTokenOrFallback)
@@ -524,7 +524,7 @@ const TradeWidget: React.FC = () => {
           ? trade.buyToken
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault),
-        tokenSymbol: receiveTokenSymbol,
+        tokenSymbolFromUrl: receiveTokenSymbol,
         defaultTokenSymbol: 'USDC', // default buyToken
       })
       setReceiveToken(buyTokenOrFallback)
