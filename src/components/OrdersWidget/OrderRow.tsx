@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useRef } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
@@ -155,6 +155,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   const isScheduled = batchIdToDate(order.validFrom) > now
   const isActiveNextBatch = batchId === order.validFrom
   const isFirstActiveBatch = batchId === order.validFrom + 1 && secondsRemainingInBatch > 60 // up until minute 4
+
   const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
     order.priceDenominator,
     order.priceNumerator,
@@ -182,18 +183,18 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   // Dima's trick to force component update
   const [, forceUpdate] = useSafeState({})
 
+  const countDownInterval = useRef<null | NodeJS.Timeout>(null)
+
   // Updates the component every second, if it has one of the states where it should happen
   useEffect(() => {
-    let timer: null | NodeJS.Timeout = null
-
     if (isActiveNextBatch || isFirstActiveBatch) {
-      timer = setInterval(() => forceUpdate({}), 1000)
-    } else if (!!timer) {
-      clearTimeout(timer)
+      countDownInterval.current = setInterval(() => forceUpdate({}), 1000)
+    } else if (!!countDownInterval.current) {
+      clearInterval(countDownInterval.current)
     }
 
     return (): void => {
-      if (timer) clearTimeout(timer)
+      if (countDownInterval.current) clearInterval(countDownInterval.current)
     }
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
