@@ -148,11 +148,13 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
 }) => {
   const now = new Date()
   const batchId = dateToBatchId(now)
+  const secondsRemainingInBatch = getSecondsRemainingInBatch()
+  const secondsCountdown = formatSeconds(secondsRemainingInBatch)
 
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
   const isScheduled = batchIdToDate(order.validFrom) > now
   const isActiveNextBatch = batchId === order.validFrom
-  const isFirstActiveBatch = batchId === order.validFrom + 1
+  const isFirstActiveBatch = batchId === order.validFrom + 1 && secondsRemainingInBatch > 60 // up until minute 4
   const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
     order.priceDenominator,
     order.priceNumerator,
@@ -194,8 +196,6 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
       if (timer) clearTimeout(timer)
     }
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
-
-  const secondsCountdown = formatSeconds(getSecondsRemainingInBatch())
 
   return (
     <td className="status">
