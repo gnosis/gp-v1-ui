@@ -147,11 +147,12 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   transactionHash,
 }) => {
   const now = new Date()
+  const batchId = dateToBatchId(now)
 
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
   const isScheduled = batchIdToDate(order.validFrom) > now
-  const isActiveNextBatch = dateToBatchId(now) === order.validFrom
-  const isFirstActiveBatch = dateToBatchId(now) === order.validFrom + 1
+  const isActiveNextBatch = batchId === order.validFrom
+  const isFirstActiveBatch = batchId === order.validFrom + 1
   const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
     order.priceDenominator,
     order.priceNumerator,
