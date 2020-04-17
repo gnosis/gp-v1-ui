@@ -5,7 +5,7 @@ import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 import { getNetworkFromId, safeTokenName } from '@gnosis.pm/dex-js'
-import { ORDER_BOOK_HOPS_DEFAULT } from 'const'
+import { dexPriceEstimatorApi } from 'api'
 
 interface OrderBookProps {
   baseToken: TokenDetails
@@ -69,11 +69,6 @@ interface ProcessedItem {
   price: number
 }
 
-const orderbookUrl = (baseToken: TokenDetails, quoteToken: TokenDetails, hops: number, networkId?: number): string => {
-  const network = getNetworkFromId(networkId || 1)
-  return `https://price-estimate-${network}.dev.gnosisdev.com/api/v1/markets/${baseToken.id}-${quoteToken.id}?atoms=true&hops=${hops}`
-}
-
 /**
  * This method turns the raw data that the backend returns into data that can be displayed by the chart.
  * This involves aggregating the total volume and accounting for decimals
@@ -128,8 +123,8 @@ const draw = (
   chartElement: HTMLElement,
   baseToken: TokenDetails,
   quoteToken: TokenDetails,
-  dataSource: string,
   networkId: number,
+  hops?: number,
 ): am4charts.XYChart => {
   const baseTokenLabel = safeTokenName(baseToken)
   am4core.useTheme(am4themesSpiritedaway)
@@ -138,7 +133,12 @@ const draw = (
   const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
   // Add data
-  chart.dataSource.url = dataSource
+  chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+    baseTokenId: baseToken.id,
+    quoteTokenId: quoteToken.id,
+    hops,
+    networkId,
+  })
   chart.dataSource.adapter.add('parsedData', data => {
     const processed = processData(data.bids, baseToken, quoteToken, Offer.Bid).concat(
       processData(data.asks, baseToken, quoteToken, Offer.Ask),
@@ -191,18 +191,12 @@ const draw = (
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken, networkId, hops = ORDER_BOOK_HOPS_DEFAULT } = props
+  const { baseToken, quoteToken, networkId, hops } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!mountPoint.current) return
-    const chart = draw(
-      mountPoint.current,
-      baseToken,
-      quoteToken,
-      orderbookUrl(baseToken, quoteToken, hops, networkId),
-      networkId,
-    )
+    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops)
 
     return (): void => chart.dispose()
   }, [baseToken, quoteToken, networkId, hops])

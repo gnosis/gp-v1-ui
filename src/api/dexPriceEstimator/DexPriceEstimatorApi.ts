@@ -1,9 +1,11 @@
 import BigNumber from 'bignumber.js'
 import { assert, TEN_BIG_NUMBER, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
 import { Network } from 'types'
+import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
+  getOrderBookUrl(params: OrderBookParams): string
 }
 
 interface GetPriceParams {
@@ -12,6 +14,13 @@ interface GetPriceParams {
   quoteToken: Token
   amountInUnits?: BigNumber | string
   inWei?: boolean
+}
+
+interface OrderBookParams {
+  networkId: number
+  baseTokenId: number
+  quoteTokenId: number
+  hops?: number
 }
 
 interface Token {
@@ -95,6 +104,16 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
   }
 
+  public getOrderBookUrl(params: OrderBookParams): string {
+    const { networkId, baseTokenId, quoteTokenId, hops = ORDER_BOOK_HOPS_DEFAULT } = params
+    assert(hops >= 0, 'Hops should be positive')
+    assert(hops <= ORDER_BOOK_HOPS_MAX, 'Hops should be not be greater than ' + ORDER_BOOK_HOPS_MAX)
+
+    const baseUrl = this._getBaseUrl(networkId)
+
+    return `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+  }
+
   private parsePricesResponse(
     baseAmountInAtoms: string,
     baseDecimals: number,
@@ -109,8 +128,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   }
 
   private async query<T>(networkId: number, queryString: string): Promise<T | null> {
-    const baseUrl = this.urlsByNetwork[networkId]
-    assert(baseUrl, `Dex-price-estimator not available for network id ${networkId}`)
+    const baseUrl = this._getBaseUrl(networkId)
 
     const url = baseUrl + queryString
 
@@ -127,5 +145,12 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
 
     return JSON.parse(body)
+  }
+
+  private _getBaseUrl(networkId: number): string {
+    const baseUrl = this.urlsByNetwork[networkId]
+    assert(baseUrl, `Dex-price-estimator not available for network id ${networkId}`)
+
+    return baseUrl
   }
 }
