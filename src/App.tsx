@@ -88,14 +88,14 @@ const App: React.FC = () => (
         <React.Suspense fallback={null}>
           <Switch>
             <PrivateRoute path="/orders" exact component={Orders} />
-            <Route path="/trade/:sell-:buy" component={Trade} />
+            <Route path="/trade/:sell\+:buy" component={Trade} />
             <PrivateRoute path="/liquidity" exact component={Strategies} />
             <PrivateRoute path="/wallet" exact component={Wallet} />
             <Route path="/about" exact component={About} />
             <Route path="/faq" exact component={FAQ} />
             <Route path="/book" exact component={OrderBook} />
             <Route path="/connect-wallet" exact component={ConnectWallet} />
-            <Redirect from="/" to="/trade/DAI-USDC?sell=0&price=0" />
+            <Redirect from="/" to="/trade/DAI\+USDC?sell=0&price=0" />
             <Route component={NotFound} />
           </Switch>
         </React.Suspense>

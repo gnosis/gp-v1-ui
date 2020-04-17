@@ -435,6 +435,8 @@ function buildUrl(params: {
   buyToken: TokenDetails
 }): string {
   const { sell, price, from, expires, sellToken, buyToken } = params
+  console.log('sellToken', sellToken)
+  console.log('buyToken', buyToken)
 
   const searchQuery = buildSearchQuery({
     sell,
@@ -443,7 +445,7 @@ function buildUrl(params: {
     expires,
   })
 
-  const url = `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
+  const url = `/trade/${encodeTokenSymbol(sellToken)}\+${encodeTokenSymbol(buyToken)}?${searchQuery}`
 
   console.log(`new url`, url)
   return url
@@ -472,8 +474,12 @@ const TradeWidget: React.FC = () => {
 
   // Listen on manual changes to URL search query
   const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  console.log('encodedSellTokenSymbol', encodedSellTokenSymbol)
+  console.log('decodeReceiveTokenSymbol', decodeReceiveTokenSymbol)
   const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
+  console.log('sellTokenSymbol', sellTokenSymbol)
   const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
+  console.log('receiveTokenSymbol', receiveTokenSymbol)
   const {
     sellAmount: sellParam,
     price: priceParam,
