@@ -225,7 +225,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
         </>
       ) : isFirstActiveBatch ? (
         <>
-          {`Waiting for settlement: `} <StatusCountdown />
+          {`Pending solver submission: `} <StatusCountdown />
         </>
       ) : isScheduled ? (
         <>
