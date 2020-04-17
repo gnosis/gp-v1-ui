@@ -207,7 +207,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
       ) : isActiveNextBatch ? (
         `Active in next batch: ${secondsCountdown}`
       ) : isFirstActiveBatch ? (
-        `Looking for match: ${secondsCountdown}`
+        `Waiting for settlement: ${secondsCountdown}`
       ) : isScheduled ? (
         <>
           Scheduled
