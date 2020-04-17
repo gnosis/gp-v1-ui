@@ -23,7 +23,7 @@ import {
   isOrderFilled,
   dateToBatchId,
   formatSeconds,
-  getSecondsRemainingInBatch,
+  getTimeRemainingInBatch,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
@@ -148,12 +148,12 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
 }) => {
   const now = new Date()
   const batchId = dateToBatchId(now)
-  const secondsRemainingInBatch = getSecondsRemainingInBatch()
+  const msRemainingInBatch = getTimeRemainingInBatch(true)
 
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
   const isScheduled = batchIdToDate(order.validFrom) > now
   const isActiveNextBatch = batchId === order.validFrom
-  const isFirstActiveBatch = batchId === order.validFrom + 1 && secondsRemainingInBatch > 60 // up until minute 4
+  const isFirstActiveBatch = batchId === order.validFrom + 1 && msRemainingInBatch > 60 * 1000 // up until minute 4
 
   const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
     order.priceDenominator,

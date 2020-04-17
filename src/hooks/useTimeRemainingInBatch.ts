@@ -1,13 +1,13 @@
 import useSafeState from './useSafeState'
-import { getSecondsRemainingInBatch } from 'utils'
+import { getTimeRemainingInBatch } from 'utils'
 import { useEffect, useRef } from 'react'
 import { BATCH_TIME } from 'const'
 
 export function useTimeRemainingInBatch(): number {
-  const [timeRemaining, setTimeRemaining] = useSafeState(getSecondsRemainingInBatch())
+  const [timeRemaining, setTimeRemaining] = useSafeState(getTimeRemainingInBatch())
 
   useEffect(() => {
-    const interval = setInterval(() => setTimeRemaining(getSecondsRemainingInBatch()), 1000)
+    const interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
 
     return (): void => clearInterval(interval)
   }, [setTimeRemaining])
@@ -21,7 +21,7 @@ interface SecondsRemainingResult {
 }
 
 const checkIfTime = (seconds: number): SecondsRemainingResult => {
-  const secondsRemaining = getSecondsRemainingInBatch()
+  const secondsRemaining = getTimeRemainingInBatch()
   return {
     secondsRemaining,
     checkTime: secondsRemaining < seconds,
