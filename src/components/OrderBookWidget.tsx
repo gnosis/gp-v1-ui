@@ -5,11 +5,13 @@ import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 import { getNetworkFromId, safeTokenName } from '@gnosis.pm/dex-js'
+import { ORDER_BOOK_HOPS_DEFAULT } from 'const'
 
 interface OrderBookProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   networkId: number
+  hops?: number
 }
 
 const Wrapper = styled.div`
@@ -67,9 +69,9 @@ interface ProcessedItem {
   price: number
 }
 
-const orderbookUrl = (baseToken: TokenDetails, quoteToken: TokenDetails, networkId?: number): string => {
+const orderbookUrl = (baseToken: TokenDetails, quoteToken: TokenDetails, hops: number, networkId?: number): string => {
   const network = getNetworkFromId(networkId || 1)
-  return `https://price-estimate-${network}.dev.gnosisdev.com/api/v1/markets/${baseToken.id}-${quoteToken.id}?atoms=true`
+  return `https://price-estimate-${network}.dev.gnosisdev.com/api/v1/markets/${baseToken.id}-${quoteToken.id}?atoms=true&hops=${hops}`
 }
 
 /**
@@ -189,7 +191,7 @@ const draw = (
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken, networkId } = props
+  const { baseToken, quoteToken, networkId, hops = ORDER_BOOK_HOPS_DEFAULT } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -198,12 +200,12 @@ const OrderBookWidget: React.FC<OrderBookProps> = props => {
       mountPoint.current,
       baseToken,
       quoteToken,
-      orderbookUrl(baseToken, quoteToken, networkId),
+      orderbookUrl(baseToken, quoteToken, hops, networkId),
       networkId,
     )
 
     return (): void => chart.dispose()
-  }, [baseToken, quoteToken, networkId])
+  }, [baseToken, quoteToken, networkId, hops])
 
   return (
     <Wrapper ref={mountPoint}>
