@@ -36,13 +36,9 @@ const BannerCloser = styled.span`
 }
 `
 
-interface LegalBannerProps {
-  title: string
-}
-
 const DISCLAIMER = 'GP_DISCLAIMER'
 
-const LegalBanner: React.FC<LegalBannerProps> = ({ title }) => {
+const LegalBanner: React.FC = ({ children }) => {
   const [open, setOpen] = useState(localStorage.getItem(DISCLAIMER) || 'OPEN')
 
   useEffect(() => {
@@ -53,7 +49,7 @@ const LegalBanner: React.FC<LegalBannerProps> = ({ title }) => {
 
   return open === 'OPEN' ? (
     <Wrapper>
-      <p>{title}</p>
+      {children}
       <BannerCloser onClick={openCloseDisclaimer}>✕</BannerCloser>
     </Wrapper>
   ) : null
