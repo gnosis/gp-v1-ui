@@ -149,7 +149,6 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   const now = new Date()
   const batchId = dateToBatchId(now)
   const secondsRemainingInBatch = getSecondsRemainingInBatch()
-  const secondsCountdown = formatSeconds(secondsRemainingInBatch)
 
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
   const isScheduled = batchIdToDate(order.validFrom) > now
@@ -205,9 +204,9 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
       ) : isExpiredOrder ? (
         'Expired'
       ) : isActiveNextBatch ? (
-        `Active in next batch: ${secondsCountdown}`
+        `Active in next batch: ${formatSeconds(secondsRemainingInBatch)}`
       ) : isFirstActiveBatch ? (
-        `Waiting for settlement: ${secondsCountdown}`
+        `Waiting for settlement: ${formatSeconds(secondsRemainingInBatch)}`
       ) : isScheduled ? (
         <>
           Scheduled
