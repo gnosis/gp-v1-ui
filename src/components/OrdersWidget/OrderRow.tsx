@@ -29,6 +29,7 @@ import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from './OrderRow.styled'
+import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
@@ -140,6 +141,13 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = (
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
 
+const StatusCountdown: React.FC = () => {
+  // If it's rendered, it means it should display the countdown
+  const timeRemainingInBatch = useTimeRemainingInBatch()
+
+  return <>{formatSeconds(timeRemainingInBatch)}</>
+}
+
 const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
   order,
   isOverBalance,
@@ -182,19 +190,27 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   // Dima's trick to force component update
   const [, forceUpdate] = useSafeState({})
 
-  const countDownInterval = useRef<null | NodeJS.Timeout>(null)
+  const refreshTimeout = useRef<null | NodeJS.Timeout>(null)
 
-  // Updates the component every second, if it has one of the states where it should happen
+  // Sets a timeout to update at least once at the end of each countdown
   useEffect(() => {
-    if (isActiveNextBatch || isFirstActiveBatch) {
-      countDownInterval.current = setInterval(() => forceUpdate({}), 1000)
-    } else if (!!countDownInterval.current) {
-      clearInterval(countDownInterval.current)
+    function clear(): void {
+      if (refreshTimeout.current) clearTimeout(refreshTimeout.current)
+      refreshTimeout.current = null
     }
 
-    return (): void => {
-      if (countDownInterval.current) clearInterval(countDownInterval.current)
+    clear()
+
+    const ms = getTimeRemainingInBatch(true)
+    console.log(`timeout useEffect activated, ${ms}ms left`)
+
+    if (isActiveNextBatch) {
+      refreshTimeout.current = setTimeout(() => forceUpdate({}), ms)
+    } else if (isFirstActiveBatch) {
+      refreshTimeout.current = setTimeout(() => forceUpdate({}), Math.max(0, ms - 60 * 1000))
     }
+
+    return clear
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
@@ -204,9 +220,13 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
       ) : isExpiredOrder ? (
         'Expired'
       ) : isActiveNextBatch ? (
-        `Active in next batch: ${formatSeconds(secondsRemainingInBatch)}`
+        <>
+          {`Active in next batch: `} <StatusCountdown />
+        </>
       ) : isFirstActiveBatch ? (
-        `Waiting for settlement: ${formatSeconds(secondsRemainingInBatch)}`
+        <>
+          {`Waiting for settlement: `} <StatusCountdown />
+        </>
       ) : isScheduled ? (
         <>
           Scheduled
