@@ -7,7 +7,13 @@ export function useTimeRemainingInBatch(): number {
   const [timeRemaining, setTimeRemaining] = useSafeState(getTimeRemainingInBatch())
 
   useEffect(() => {
-    const interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
+    // timeout to start the timer exactly at half second
+    let interval = setTimeout(() => {
+      // update once
+      setTimeRemaining(getTimeRemainingInBatch())
+      // update every second from now on
+      interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
+    }, Date.now() % 500)
 
     return (): void => clearInterval(interval)
   }, [setTimeRemaining])
