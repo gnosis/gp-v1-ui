@@ -57,6 +57,7 @@ import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
+import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -447,6 +448,29 @@ const chooseTokenWithFallback = ({
   )
 }
 
+function buildUrl(params: {
+  sell: string
+  price: string
+  from: string
+  expires: string
+  sellToken: TokenDetails
+  buyToken: TokenDetails
+}): string {
+  const { sell, price, from, expires, sellToken, buyToken } = params
+
+  const searchQuery = buildSearchQuery({
+    sell,
+    price,
+    from,
+    expires,
+  })
+
+  const url = `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
+
+  console.log(`new url`, url)
+  return url
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -469,7 +493,9 @@ const TradeWidget: React.FC = () => {
       : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
+  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
+  const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
   const {
     sellAmount: sellParam,
     price: priceParam,
@@ -621,13 +647,15 @@ const TradeWidget: React.FC = () => {
     setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
-  const searchQuery = buildSearchQuery({
+  const url = buildUrl({
     sell: sellValue,
     price: priceValue,
     from: validFromValue,
     expires: validUntilValue,
+    sellToken: sellToken,
+    buyToken: receiveToken,
   })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
+  // Updates page URL with parameters from context
   useURLParams(url, true)
 
   // TESTING
