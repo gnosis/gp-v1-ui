@@ -7,15 +7,29 @@ export function useTimeRemainingInBatch(): number {
   const [timeRemaining, setTimeRemaining] = useSafeState(getTimeRemainingInBatch())
 
   useEffect(() => {
-    // timeout to start the timer exactly at half second
-    let interval = setTimeout(() => {
+    let interval: null | NodeJS.Timeout = null
+
+    function updateImmediatelyAndStartInterval(): void {
       // update once
       setTimeRemaining(getTimeRemainingInBatch())
       // update every second from now on
       interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
-    }, Date.now() % 500)
+    }
 
-    return (): void => clearInterval(interval)
+    // timeout to start the timer exactly at half second
+    const intervalStart = Date.now() % 500
+
+    if (intervalStart === 0) {
+      // to avoid possible scheduling delays, execute right now if exactly at 500ms mark
+      updateImmediatelyAndStartInterval()
+    } else {
+      // otherwise, schedule starting
+      interval = setTimeout(updateImmediatelyAndStartInterval, intervalStart)
+    }
+
+    return (): void => {
+      if (interval) clearInterval(interval)
+    }
   }, [setTimeRemaining])
 
   return timeRemaining

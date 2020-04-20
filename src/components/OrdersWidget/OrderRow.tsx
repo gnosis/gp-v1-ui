@@ -202,12 +202,20 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
     clear()
 
     const ms = getTimeRemainingInBatch(true)
-    console.log(`timeout useEffect activated, ${ms}ms left`)
 
     if (isActiveNextBatch) {
       refreshTimeout.current = setTimeout(() => forceUpdate({}), ms)
     } else if (isFirstActiveBatch) {
-      refreshTimeout.current = setTimeout(() => forceUpdate({}), Math.max(0, ms - 60 * 1000))
+      // we want to display this for 4min (1min less than batch duration)
+      const timeout = ms - 60 * 1000
+
+      if (timeout <= 0) {
+        // already less than 1min less left, update right now
+        forceUpdate({})
+      } else {
+        // more than 1min left, update when it's over
+        refreshTimeout.current = setTimeout(() => forceUpdate({}), timeout)
+      }
     }
 
     return clear
