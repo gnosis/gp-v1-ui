@@ -425,6 +425,28 @@ const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networ
   return tokenAddresses
 }
 
+interface ChooseTokenInput {
+  tokens: TokenDetails[]
+  token: TokenDetails | null
+  tokenSymbolFromUrl?: string
+  defaultTokenSymbol: 'DAI' | 'USDC'
+}
+
+const chooseTokenWithFallback = ({
+  tokens,
+  token,
+  tokenSymbolFromUrl,
+  defaultTokenSymbol,
+}: ChooseTokenInput): TokenDetails => {
+  return (
+    token ||
+    (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())
+      ? getToken('address', tokenSymbolFromUrl, tokens)
+      : getToken('symbol', tokenSymbolFromUrl, tokens)) ||
+    (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
+  )
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -461,22 +483,57 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [sellToken, setSellToken] = useState(
-    () =>
-      trade.sellToken ||
-      (sellTokenSymbol && isAddress(sellTokenSymbol?.toLowerCase())
-        ? getToken('address', sellTokenSymbol, tokens)
-        : getToken('symbol', sellTokenSymbol, tokens)) ||
-      (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
+  const [sellToken, setSellToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.sellToken,
+      tokens,
+      tokenSymbolFromUrl: sellTokenSymbol,
+      defaultTokenSymbol: 'DAI',
+    }),
   )
-  const [receiveToken, setReceiveToken] = useState(
-    () =>
-      trade.buyToken ||
-      (receiveTokenSymbol && isAddress(receiveTokenSymbol?.toLowerCase())
-        ? getToken('address', receiveTokenSymbol, tokens)
-        : getToken('symbol', receiveTokenSymbol, tokens)) ||
-      (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
+  const [receiveToken, setReceiveToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.buyToken,
+      tokens,
+      tokenSymbolFromUrl: receiveTokenSymbol,
+      defaultTokenSymbol: 'USDC',
+    }),
   )
+
+  useEffect(() => {
+    //  when switching networks
+    // trade stays filled with last tokens
+    // which may not be available on the new network
+    if (trade.sellToken) {
+      // check if it should be different
+      const sellTokenOrFallback = chooseTokenWithFallback({
+        // don't consider token from trade from wrong network valid
+        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
+          ? trade.sellToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
+        tokenSymbolFromUrl: sellTokenSymbol, // from url params
+        defaultTokenSymbol: 'DAI', // default sellToken
+      })
+      setSellToken(sellTokenOrFallback)
+    }
+
+    if (trade.buyToken) {
+      const buyTokenOrFallback = chooseTokenWithFallback({
+        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
+          ? trade.buyToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault),
+        tokenSymbolFromUrl: receiveTokenSymbol,
+        defaultTokenSymbol: 'USDC', // default buyToken
+      })
+      setReceiveToken(buyTokenOrFallback)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkIdOrDefault])
+  // don't need to depend on more than network as everything else updates together
+  // also avoids excessive setStates
+
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
 
