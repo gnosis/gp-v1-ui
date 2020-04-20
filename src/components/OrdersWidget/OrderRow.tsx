@@ -234,6 +234,8 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
         pending
       ) : isExpiredOrder ? (
         'Expired'
+      ) : isFilled ? (
+        'Filled'
       ) : isActiveNextBatch ? (
         <>
           {`Active in next batch: `} <StatusCountdown />
@@ -248,8 +250,6 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
           <br />
           {formatDateFromBatchId(order.validFrom)}
         </>
-      ) : isFilled ? (
-        'Filled'
       ) : isActive ? (
         'Active'
       ) : (
