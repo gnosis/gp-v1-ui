@@ -79,10 +79,14 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
         payload: { orders },
       } = action
 
-      // default sorting order is ascending by order id
-      // since we are starting from 0, reverse to have the latest on top
-      // make a copy first (slice(0)) to avoid mutating current state
-      const reversedOrders = orders.slice(0).reverse()
+      const reversedOrders = orders
+        // make a copy first (slice(0)) to avoid mutating current state
+        .slice(0)
+        // default sorting order is ascending by order id
+        // since we are starting from 0, reverse to have the latest on top
+        .reverse()
+        // remove deleted orders
+        .filter(order => !isOrderDeleted(order))
 
       return { ...state, orders: reversedOrders }
     }
@@ -100,7 +104,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       const filteredAndUpdatedOrders = currentOrders.reduce((acc: AuctionElement[], order) => {
         if (activeOrders[order.id] !== undefined) {
           // It's on activeOrders map? it has been updated.
-          // Get the updated from newOrders by the index in the activeOrders map
+          // Get the updated from newOrders list by the index in the activeOrders map
           acc.push(newOrders[activeOrders[order.id]])
           // Remove from activeOrders map so we know it's not a new order
           delete activeOrders[order.id]
@@ -113,7 +117,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
         return acc
       }, [])
 
-      // Anything is left on activeOrders map is a new order
+      // Anything left on activeOrders map is a new order
       const reversedNewOrders = Object.values(activeOrders)
         // Use their indexes to fetch from newOrders list
         .map(index => newOrders[index])
@@ -132,7 +136,10 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       const { orders: currentOrders } = state
 
       // reverse new orders
-      const reversedNewOrders = newOrders.slice(0).reverse()
+      const reversedNewOrders = newOrders
+        .slice(0)
+        .reverse()
+        .filter(order => !isOrderDeleted(order))
 
       // existing orders are older, so new orders come first
       const orders = reversedNewOrders.concat(currentOrders)
