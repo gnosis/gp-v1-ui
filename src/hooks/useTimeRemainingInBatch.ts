@@ -16,11 +16,11 @@ export function useTimeRemainingInBatch(): number {
       interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
     }
 
-    // timeout to start the timer exactly at half second
-    const intervalStart = Date.now() % 500
+    // timeout to start the timer exactly at second mark
+    const intervalStart = Date.now() % 1000
 
     if (intervalStart === 0) {
-      // to avoid possible scheduling delays, execute right now if exactly at 500ms mark
+      // to avoid possible scheduling delays, execute right now if exactly at second mark
       updateImmediatelyAndStartInterval()
     } else {
       // otherwise, schedule starting
