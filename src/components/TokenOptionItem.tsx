@@ -130,14 +130,14 @@ const generateMessage = ({
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
       if (!token)
         return (
-          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+          <a href="https://docs.gnosis.io/protocol/docs/addtoken1/" rel="noopener noreferrer" target="_blank">
             Register token on Exchange first
           </a>
         )
       return (
         <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
           <ExtraOptionsMessage
-            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            href="https://docs.gnosis.io/protocol/docs/addtoken1/"
             rel="noopener noreferrer"
             target="_blank"
           >
