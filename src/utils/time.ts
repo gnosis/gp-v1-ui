@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns'
 
-import { BATCH_TIME } from 'const'
+import { BATCH_TIME, BATCH_TIME_IN_MS } from 'const'
 
 /**
  * Epoch in seconds
@@ -26,7 +26,7 @@ export function dateToBatchId(date?: Date): number {
 }
 
 export function batchIdToDate(batchId: number): Date {
-  const timestamp = batchId * BATCH_TIME * 1000
+  const timestamp = batchId * BATCH_TIME_IN_MS
   return new Date(timestamp)
 }
 
@@ -36,11 +36,18 @@ export function formatDateFromBatchId(batchId: number): string {
 }
 
 /**
- * Calculates seconds remaining in current batch
- * Assumes local time is accurate and can be used as source of truth
+ * Calculates time remaining in current batch.
+ * Assumes local time is accurate and can be used as source of truth.
+ * By default returns time in seconds.
+ *
+ * @param inMilliseconds  Optional parameter indicating time unit. Defaults to false == in seconds
  */
-export function getSecondsRemainingInBatch(): number {
-  return BATCH_TIME - (getEpoch() % BATCH_TIME)
+export function getTimeRemainingInBatch(params?: { inMilliseconds: boolean }): number {
+  const { inMilliseconds = false } = params || {}
+
+  const timeRemainingInMs = BATCH_TIME_IN_MS - (Date.now() % BATCH_TIME_IN_MS)
+
+  return inMilliseconds ? timeRemainingInMs : Math.floor(timeRemainingInMs / 1000)
 }
 
 export function formatSeconds(seconds: number): string {

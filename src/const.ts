@@ -11,6 +11,9 @@ export {
   DEFAULT_PRECISION,
 } from '@gnosis.pm/dex-js'
 export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
+import { BATCH_TIME } from '@gnosis.pm/dex-js'
+
+export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
 
 export const ZERO_BIG_NUMBER = new BigNumber(0)
 export const TEN_BIG_NUMBER = new BigNumber(10)

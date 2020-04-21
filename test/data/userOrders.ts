@@ -34,7 +34,25 @@ export const exchangeOrders = {
       buyTokenId: 7, // DAI
       sellTokenId: 5, // PAX
       validFrom: BATCH_ID,
-      validUntil: dateToBatchId(addMinutes(NOW, 2)),
+      validUntil: dateToBatchId(addMinutes(NOW, 2)), // about to expire
+      priceNumerator: new BN('10500000000000000000000'),
+      priceDenominator: new BN('10000000000000000000000'),
+      remainingAmount: new BN('5876842900000000000000'),
+    },
+    {
+      buyTokenId: 7, // DAI
+      sellTokenId: 5, // PAX
+      validFrom: dateToBatchId(new Date()), // first batch active
+      validUntil: dateToBatchId(addDays(NOW, 5)),
+      priceNumerator: new BN('10500000000000000000000'),
+      priceDenominator: new BN('10000000000000000000000'),
+      remainingAmount: new BN('5876842900000000000000'),
+    },
+    {
+      buyTokenId: 7, // DAI
+      sellTokenId: 5, // PAX
+      validFrom: dateToBatchId(addMinutes(NOW, 6)), // active next batch
+      validUntil: dateToBatchId(addDays(NOW, 5)),
       priceNumerator: new BN('10500000000000000000000'),
       priceDenominator: new BN('10000000000000000000000'),
       remainingAmount: new BN('5876842900000000000000'),
