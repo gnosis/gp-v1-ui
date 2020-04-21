@@ -42,7 +42,9 @@ export function formatDateFromBatchId(batchId: number): string {
  *
  * @param inMilliseconds  Optional parameter indicating time unit. Defaults to false == in seconds
  */
-export function getTimeRemainingInBatch(inMilliseconds = false): number {
+export function getTimeRemainingInBatch(params?: { inMilliseconds: boolean }): number {
+  const { inMilliseconds = false } = params || {}
+
   const timeRemainingInMs = BATCH_TIME_IN_MS - (Date.now() % BATCH_TIME_IN_MS)
 
   return inMilliseconds ? timeRemainingInMs : Math.floor(timeRemainingInMs / 1000)

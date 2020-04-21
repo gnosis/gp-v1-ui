@@ -163,7 +163,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
 }) => {
   const now = new Date()
   const batchId = dateToBatchId(now)
-  const msRemainingInBatch = getTimeRemainingInBatch(true)
+  const msRemainingInBatch = getTimeRemainingInBatch({ inMilliseconds: true })
 
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
   const isScheduled = batchIdToDate(order.validFrom) > now
@@ -208,7 +208,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
 
     clear()
 
-    const ms = getTimeRemainingInBatch(true)
+    const ms = getTimeRemainingInBatch({ inMilliseconds: true })
 
     if (isActiveNextBatch) {
       refreshTimeout.current = setTimeout(() => forceUpdate({}), ms)
