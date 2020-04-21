@@ -28,6 +28,7 @@ export function useTimeRemainingInBatch(): number {
     }
 
     return (): void => {
+      // `clearInterval` works for both interval AND timeouts
       if (interval) clearInterval(interval)
     }
   }, [setTimeRemaining])
