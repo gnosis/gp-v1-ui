@@ -84,13 +84,9 @@ If you use Visual Studio Code, it's recommended to install [Prettier - Code form
 ](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and add the following to your `settings.json`
 
 ```json
-"eslint.autoFixOnSave":  true,
-"eslint.validate":  [
-  "javascript",
-  "javascriptreact",
-  {"language":  "typescript",  "autoFix":  true  },
-  {"language":  "typescriptreact",  "autoFix":  true  }
-]
+"editor.codeActionsOnSave": {
+  "source.fixAll.eslint": true
+}
 ```
 
 ## Testnet faucets
