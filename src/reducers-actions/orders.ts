@@ -1,7 +1,8 @@
 import { Actions } from 'reducers-actions'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { ZERO } from '@gnosis.pm/dex-js'
 
-export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_OFFSET'
+export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
 export interface OrdersState {
   orders: AuctionElement[]
@@ -22,12 +23,52 @@ export const appendOrders = (orders: AuctionElement[]): UpdateOrdersActionType =
   payload: { orders },
 })
 
+export const updateOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+  type: 'UPDATE_ORDERS',
+  payload: { orders },
+})
+
 export const updateOffset = (offset: number): UpdateOffsetActionType => ({
   type: 'UPDATE_OFFSET',
   payload: { offset },
 })
 
 export const INITIAL_ORDERS_STATE = { orders: [], offset: 0 }
+
+/**
+ * When orders are `deleted` from the contract, they are still returned, but with all fields set to zero.
+ * We will not display such orders.
+ *
+ * This function checks whether the order has been zeroed out.
+ * @param order The order object to check
+ */
+function isOrderDeleted(order: AuctionElement): boolean {
+  return (
+    order.buyTokenId === 0 &&
+    order.sellTokenId === 0 &&
+    order.priceDenominator.eq(ZERO) &&
+    order.priceNumerator.eq(ZERO) &&
+    order.validFrom === 0 &&
+    order.validUntil === 0
+  )
+}
+
+function classifyOrders(
+  allOrders: AuctionElement[],
+): { activeOrders: { [id: string]: number }; deletedOrdersIds: Set<string> } {
+  const activeOrders: { [id: string]: number } = {}
+  const deletedOrdersIds = new Set<string>()
+
+  allOrders.forEach((order, index) => {
+    if (isOrderDeleted(order)) {
+      deletedOrdersIds.add(order.id)
+    } else {
+      activeOrders[order.id] = index
+    }
+  })
+
+  return { activeOrders, deletedOrdersIds }
+}
 
 export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
@@ -44,6 +85,45 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       const reversedOrders = orders.slice(0).reverse()
 
       return { ...state, orders: reversedOrders }
+    }
+    case 'UPDATE_ORDERS': {
+      const {
+        payload: { orders: newOrders },
+      } = action
+      const { orders: currentOrders } = state
+
+      // Classify new orders between existing and deleted,
+      // keeping track of the ids and indexes
+      const { activeOrders, deletedOrdersIds } = classifyOrders(newOrders)
+
+      // Filter deleted orders and update existing orders
+      const filteredAndUpdatedOrders = currentOrders.reduce((acc: AuctionElement[], order) => {
+        if (activeOrders[order.id] !== undefined) {
+          // It's on activeOrders map? it has been updated.
+          // Get the updated from newOrders by the index in the activeOrders map
+          acc.push(newOrders[activeOrders[order.id]])
+          // Remove from activeOrders map so we know it's not a new order
+          delete activeOrders[order.id]
+        } else if (!deletedOrdersIds.has(order.id)) {
+          // Not in the deletedOrdersIds set? it has not been modified.
+          // Keep the same
+          acc.push(order)
+        }
+        // Else? It has been deleted, do not include it
+        return acc
+      }, [])
+
+      // Anything is left on activeOrders map is a new order
+      const reversedNewOrders = Object.values(activeOrders)
+        // Use their indexes to fetch from newOrders list
+        .map(index => newOrders[index])
+        // Reverse the result to have newest on top
+        .reverse()
+
+      // Add new orders first
+      const orders = reversedNewOrders.concat(filteredAndUpdatedOrders)
+
+      return { ...state, orders }
     }
     case 'APPEND_ORDERS': {
       const {
