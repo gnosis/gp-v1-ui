@@ -108,7 +108,7 @@ module.exports = ({ stats = false } = {}) => ({
       'react-dom': '@hot-loader/react-dom',
       'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
     },
-    modules: ['src', 'node_modules'],
+    modules: ['custom', 'src', 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
   },
   plugins: [

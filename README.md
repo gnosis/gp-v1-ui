@@ -84,16 +84,37 @@ If you use Visual Studio Code, it's recommended to install [Prettier - Code form
 ](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) and add the following to your `settings.json`
 
 ```json
-"eslint.autoFixOnSave":  true,
-"eslint.validate":  [
-  "javascript",
-  "javascriptreact",
-  {"language":  "typescript",  "autoFix":  true  },
-  {"language":  "typescriptreact",  "autoFix":  true  }
-]
+"editor.codeActionsOnSave": {
+  "source.fixAll.eslint": true
+}
 ```
 
 ## Testnet faucets
 
 In order to get testing tokens, read up on the information here:
 [faucet](./docs/faucet-info.md)
+
+## Customizing components
+
+This app employs overrides from an alternative source (`custom/` directory) for easy swap in of imported files.
+
+Override works for absolute paths that make use of baseUrl
+That is if there are two files:
+
+```js
+src/pages/About.tsx
+custom/pages/About.tsx
+
+import About from 'pages/About'
+// will try resolving from custom/ first and failing that from src/
+```
+
+If you also need to change contents of `index.html`, you will have to modify `webpack.config.babel.js`:
+
+```js
+new HtmlWebPackPlugin({
+  template: './src/html/index.html',
+  title: ...
+```
+
+A good idea would be to conditionally change `template` path based on external config or an env variable.
