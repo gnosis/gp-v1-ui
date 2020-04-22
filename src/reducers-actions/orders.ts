@@ -137,9 +137,8 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       // reverse new orders
       const reversedNewOrders = newOrders
-        .slice(0)
-        .reverse()
         .filter(order => !isOrderDeleted(order))
+        .reverse()
 
       // existing orders are older, so new orders come first
       const orders = reversedNewOrders.concat(currentOrders)
