@@ -80,13 +80,11 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       } = action
 
       const reversedOrders = orders
-        // make a copy first (slice(0)) to avoid mutating current state
-        .slice(0)
+        // remove deleted orders
+        .filter(order => !isOrderDeleted(order))
         // default sorting order is ascending by order id
         // since we are starting from 0, reverse to have the latest on top
         .reverse()
-        // remove deleted orders
-        .filter(order => !isOrderDeleted(order))
 
       return { ...state, orders: reversedOrders }
     }
