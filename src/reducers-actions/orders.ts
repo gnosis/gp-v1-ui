@@ -53,23 +53,6 @@ function isOrderDeleted(order: AuctionElement): boolean {
   )
 }
 
-function classifyOrders(
-  allOrders: AuctionElement[],
-): { activeOrders: { [id: string]: number }; deletedOrdersIds: Set<string> } {
-  const activeOrders: { [id: string]: number } = {}
-  const deletedOrdersIds = new Set<string>()
-
-  allOrders.forEach((order, index) => {
-    if (isOrderDeleted(order)) {
-      deletedOrdersIds.add(order.id)
-    } else {
-      activeOrders[order.id] = index
-    }
-  })
-
-  return { activeOrders, deletedOrdersIds }
-}
-
 export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
     case 'UPDATE_OFFSET':
@@ -94,38 +77,36 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       } = action
       const { orders: currentOrders } = state
 
-      // Classify new orders between existing and deleted,
-      // keeping track of the ids and indexes
-      const { activeOrders, deletedOrdersIds } = classifyOrders(newOrders)
+      // First, newest (by id) on top
+      const reversedNewOrders = newOrders.slice(0).reverse()
+      // Track seen orders to avoid duplicates
+      const processedOrderIds = new Set<string>()
 
-      // Filter deleted orders and update existing orders
-      const filteredAndUpdatedOrders = currentOrders.reduce((acc: AuctionElement[], order) => {
-        if (activeOrders[order.id] !== undefined) {
-          // It's on activeOrders map? it has been updated.
-          // Get the updated from newOrders list by the index in the activeOrders map
-          acc.push(newOrders[activeOrders[order.id]])
-          // Remove from activeOrders map so we know it's not a new order
-          delete activeOrders[order.id]
-        } else if (!deletedOrdersIds.has(order.id)) {
-          // Not in the deletedOrdersIds set? it has not been modified.
-          // Keep the same
-          acc.push(order)
+      // First we process reversedNewOrders, then currentOrders.
+      // Thanks to processedOrderIds newOrders override currentOrders with same id
+      const updatedOrders = reversedNewOrders.concat(currentOrders).reduce<AuctionElement[]>((acc, order) => {
+        // already included a potentially updated order
+        // or the order was deleted
+        if (processedOrderIds.has(order.id)) {
+          return acc
         }
-        // Else? It has been deleted, do not include it
+
+        // don't include deleted orders
+        if (isOrderDeleted(order)) {
+          // but consider them processed
+          processedOrderIds.add(order.id)
+          return acc
+        }
+
+        // this order is either one of the newOrders
+        // or one of the currentOrders that wasn't overridden by newOrders
+        // and it's not deleted
+        acc.push(order)
+        processedOrderIds.add(order.id)
         return acc
       }, [])
 
-      // Anything left on activeOrders map is a new order
-      const reversedNewOrders = Object.values(activeOrders)
-        // Use their indexes to fetch from newOrders list
-        .map(index => newOrders[index])
-        // Reverse the result to have newest on top
-        .reverse()
-
-      // Add new orders first
-      const orders = reversedNewOrders.concat(filteredAndUpdatedOrders)
-
-      return { ...state, orders }
+      return { ...state, orders: updatedOrders }
     }
     case 'APPEND_ORDERS': {
       const {
@@ -134,9 +115,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       const { orders: currentOrders } = state
 
       // reverse new orders
-      const reversedNewOrders = newOrders
-        .filter(order => !isOrderDeleted(order))
-        .reverse()
+      const reversedNewOrders = newOrders.filter(order => !isOrderDeleted(order)).reverse()
 
       // existing orders are older, so new orders come first
       const orders = reversedNewOrders.concat(currentOrders)
