@@ -14,6 +14,7 @@ import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 import useKeyPress from 'hooks/useKeyDown'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { Link } from 'react-router-dom'
 
 export interface FormProps {
   tokenBalances: TokenBalanceDetails
@@ -111,11 +112,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
               <li>{title} here</li>
               <li>Once the transaction is mined, wait for the batch to finish</li>
             </ol>
-            Read more in our{' '}
-            <a href="/faq" target="_blank" rel="noopener">
-              FAQ
-            </a>
-            .
+            Read more in our <Link to="/faq">FAQ</Link>.
           </div>
           {/* Withdraw Row */}
           <div className="wallet">

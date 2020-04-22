@@ -67,7 +67,7 @@ export function useCheckWhenTimeRemainingInBatch(
     }
 
     const currentCheck = checkIfTime(seconds)
-    let id: number
+    let id: NodeJS.Timeout
 
     if (currentCheck.checkTime) {
       callbackRef.current(currentCheck)
@@ -88,14 +88,15 @@ export function useCheckWhenTimeRemainingInBatch(
       callbackRef.current(currentCheck)
     }
 
-    id = window.setTimeout(() => {
+    id = setTimeout(() => {
       // now can go on interval
-      id = window.setInterval(checkAndReport, BATCH_TIME * 1000)
+      id = setInterval(checkAndReport, BATCH_TIME * 1000)
 
       checkAndReport()
     }, nextCheckInSeconds * 1000)
 
     return (): void => {
+      // clears both timeout and interval
       clearInterval(id)
     }
   }, [seconds])

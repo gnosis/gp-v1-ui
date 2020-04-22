@@ -111,7 +111,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
         return (
           <NonTokenDisplay>
             <span>
-              <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+              <a href="https://docs.gnosis.io/protocol/docs/addtoken1/" rel="noopener noreferrer" target="_blank">
                 Register token
               </a>{' '}
               {tokenAddress} on Exchange first
@@ -134,7 +134,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
           />
           <a
             className="tokenText"
-            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            href="https://docs.gnosis.io/protocol/docs/addtoken1/"
             rel="noopener noreferrer"
             target="_blank"
           >
