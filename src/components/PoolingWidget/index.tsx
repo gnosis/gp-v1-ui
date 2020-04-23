@@ -194,10 +194,10 @@ const PoolingInterface: React.FC = () => {
             setTxHash(txHash)
 
             batchedUpdates(() => {
-              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
+              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }, index) => {
                 const pendingOrder = {
                   txHash,
-                  id: 'PENDING ORDER',
+                  id: `${Date.now()}_${index}`,
                   buyTokenId,
                   sellTokenId,
                   priceNumerator: buyAmount,

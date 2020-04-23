@@ -74,8 +74,15 @@ export const EMPTY_PENDING_ORDERS_STATE = {
   4: {},
 }
 
-export const PendingOrdersInitialState: PendingOrdersState = localStorage.getItem('GP_ORDER_TX_HASHES')
-  ? JSON.parse(localStorage.getItem('GP_ORDER_TX_HASHES') as string)
+const GP_PENDING_ORDER_KEY = 'GP_ORDER_TX_HASHES'
+
+export function setStorageItem(key: string, data: any): void {
+  const formattedData = JSON.stringify(data)
+  return localStorage.setItem(key, formattedData)
+}
+
+export const PendingOrdersInitialState: PendingOrdersState = localStorage.getItem(GP_PENDING_ORDER_KEY)
+  ? JSON.parse(localStorage.getItem(GP_PENDING_ORDER_KEY) as string)
   : EMPTY_PENDING_ORDERS_STATE
 
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
@@ -87,6 +94,8 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
       const newPendingTxArray = userPendingOrdersArr.concat(orders)
       const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
 
+      setStorageItem(GP_PENDING_ORDER_KEY, newState)
+
       return newState
     }
     case ActionTypes.REMOVE_PENDING_ORDERS: {
@@ -97,6 +106,8 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
         ({ txHash }: { txHash: string }) => txHash !== pendingTxHash,
       )
       const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
+
+      setStorageItem(GP_PENDING_ORDER_KEY, newState)
 
       return newState
     }
