@@ -59,12 +59,12 @@ const OrderBookWrapper = styled.div`
   }
 
   ${InputBox} {
-    padding 0 0 0 3rem;
+    padding: 0 0 0 3rem;
 
     input {
       padding: 0 1rem;
     }
-    
+
     label {
       margin: 0 1rem;
       text-transform: capitalize;
