@@ -3,9 +3,9 @@
 
 
 "@amcharts/amcharts4@^4.9.12":
-  version "4.9.12"
-  resolved "https://registry.yarnpkg.com/@amcharts/amcharts4/-/amcharts4-4.9.12.tgz#3d3453ac42f9a2b8412abe9748212bc7d1d986d8"
-  integrity sha512-Xme+H3wtGDtnssvLESm5yHV2fkb/RRbfFNag0MAO8/iKHAj6j/UtC0uyaCNlWIEEjIlQs+X0k2BCIFcE5MiDog==
+  version "4.9.17"
+  resolved "https://registry.yarnpkg.com/@amcharts/amcharts4/-/amcharts4-4.9.17.tgz#9a2d2176323a0337adea0070d8a337b263b95e13"
+  integrity sha512-6D5g3mjnLZ5tevGsA/ZLKLpFK0coAZy4YWtfJ23JniqO4a7fZ/gdQ6OzSyZZpmjZk70lMxU/7wlTfTJMUrvJ2Q==
   dependencies:
     "@types/regression" "^2.0.0"
     canvg "^3.0.0"
