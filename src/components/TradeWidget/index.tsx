@@ -150,7 +150,6 @@ const WrappedForm = styled.form`
 
     @media ${MEDIA.mediumUp} {
       max-height: 11rem;
-      overflow-y: auto;
     }
 
     > b {
