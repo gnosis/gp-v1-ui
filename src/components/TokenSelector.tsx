@@ -330,6 +330,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
       // If neither, hand focus back to react-select but turning isFocused off
       if (!wrapperRef.current?.contains(e.target as Node) || !menu) {
         setIsFocused(false)
+        setInputText('')
       }
     }
 
@@ -342,7 +343,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   const fallBackNetworkId = networkId || Network.Mainnet
 
   return (
-    <Wrapper ref={wrapperRef}>
+    <Wrapper ref={wrapperRef} onKeyDown={stopEnterPropagation}>
       <StyledSelect
         blurInputOnSelect
         isSearchable
@@ -369,6 +370,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         onMenuInputFocus={onMenuInputFocus}
         onKeyDown={onKeyDown}
         onInputChange={setInputText}
+        inputValue={inputText}
       />
       <div
         onMouseDown={(e): void => {
