@@ -74,12 +74,9 @@ export function getTokensFactory(factoryParams: {
         if (toRemove.has(token.address)) {
           // removing tokens not registered in the exchange for this network
           return acc
-        } else if (updated.has(token.address)) {
-          // updating
-          acc.push(updated.get(token.address) as TokenDetails)
         } else {
-          // not changed OR failed to fetch
-          acc.push(token)
+          // changed or old token
+          acc.push(updated.get(token.address) || token)
         }
         return acc
       }, [])
