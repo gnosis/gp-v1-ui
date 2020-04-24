@@ -92,3 +92,10 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
     return
   }
 }
+
+export function setStorageItem(key: string, data: unknown): void {
+  // localStorage API accepts only strings
+  // TODO: consider switching to localForage API (accepts all types)
+  const formattedData = JSON.stringify(data)
+  return localStorage.setItem(key, formattedData)
+}

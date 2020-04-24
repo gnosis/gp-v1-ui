@@ -4,6 +4,7 @@ import useGlobalState from './useGlobalState'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
+import { toBN } from '@gnosis.pm/dex-js'
 
 function usePendingOrders(): PendingTxObj[] {
   const { userAddress, networkId } = useWalletConnection()
@@ -13,7 +14,21 @@ function usePendingOrders(): PendingTxObj[] {
 
   useEffect(() => {
     if (userAddress && networkId) {
-      setPendingOrders(pendingOrdersGlobal[networkId][userAddress] || [])
+      // returned values from global state are JSON BN values
+      const preParsedOrders = pendingOrdersGlobal[networkId][userAddress]
+      if (preParsedOrders && preParsedOrders.length > 0) {
+        // JSON BN objects need to be re-cast back to BN via toBN
+        const properlyParsedOrders = preParsedOrders.map(
+          ({ priceNumerator, priceDenominator, remainingAmount, sellTokenBalance, ...rest }) => ({
+            ...rest,
+            priceNumerator: toBN(priceNumerator.toString()),
+            priceDenominator: toBN(priceDenominator.toString()),
+            remainingAmount: toBN(remainingAmount.toString()),
+            sellTokenBalance: toBN(sellTokenBalance.toString()),
+          }),
+        )
+        setPendingOrders(properlyParsedOrders)
+      }
     }
   }, [networkId, pendingOrdersGlobal, setPendingOrders, userAddress])
   return pendingOrders

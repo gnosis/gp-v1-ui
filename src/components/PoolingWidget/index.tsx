@@ -196,17 +196,17 @@ const PoolingInterface: React.FC = () => {
             batchedUpdates(() => {
               orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }, index) => {
                 const pendingOrder = {
-                  txHash,
                   id: `${Date.now()}_${index}`,
                   buyTokenId,
                   sellTokenId,
                   priceNumerator: buyAmount,
                   priceDenominator: sellAmount,
                   user: userAddress,
-                  remainingAmount: ZERO,
+                  remainingAmount: sellAmount,
                   sellTokenBalance: ZERO,
                   validFrom: 0,
                   validUntil: 0,
+                  txHash,
                 }
 
                 setIsSubmitting(false)
