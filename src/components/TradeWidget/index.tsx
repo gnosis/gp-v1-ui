@@ -464,10 +464,7 @@ function buildUrl(params: {
     expires,
   })
 
-  const url = `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
-
-  console.log(`new url`, url)
-  return url
+  return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
 }
 
 const TradeWidget: React.FC = () => {
