@@ -4,11 +4,21 @@ import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TokenDetails, Command } from 'types'
 import { logDebug } from 'utils'
 
-export function getTokensFactory(factoryParams: {
-  tokenListApi: TokenList
-  exchangeApi: ExchangeApi
-}): (tokenId: number) => TokenDetails[] {
+import { TokenFromErc20Params, TokenFromErc20 } from './'
+
+interface Injects {
+  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
+}
+
+export function getTokensFactory(
+  factoryParams: {
+    tokenListApi: TokenList
+    exchangeApi: ExchangeApi
+  },
+  injects: Injects,
+): (tokenId: number) => TokenDetails[] {
   const { tokenListApi, exchangeApi } = factoryParams
+  const { getTokenFromErc20 } = injects
 
   const updatedIdsForNetwork = new Set<number>()
 

@@ -36,7 +36,7 @@ export const getPriceEstimation = getPriceEstimationFactory(apis)
 
 export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
-export const getTokens = getTokensFactory(apis)
+export const getTokens = getTokensFactory(apis, { getTokenFromErc20 })
 
 export interface TokenAndNetwork {
   networkId: number
