@@ -92,3 +92,44 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
     return
   }
 }
+
+export interface RetryParams<T> {
+  fn: (...fnParams: unknown[]) => Promise<T>
+  fnParams?: unknown[]
+  retriesLeft?: number
+  delay?: number
+  exponentialBackOff?: boolean
+}
+
+/**
+ * Retry function with delay.
+ *
+ * Inspired by: https://gitlab.com/snippets/1775781
+ *
+ * @param fn Function to retry
+ * @param fnParams Optional parameters list to pass to function
+ * @param retriesLeft How many retries. Defaults to 3
+ * @param delay How long to wait between retries. Defaults to 1s
+ * @param exponentialBackOff Whether to use exponential back off, doubling wait interval. Defaults to true
+ */
+export async function retry<T>(params: RetryParams<T>): Promise<T> {
+  const { fn, fnParams, retriesLeft = 3, delay = 1000, exponentialBackOff = true } = params
+
+  try {
+    return fn(...fnParams)
+  } catch (error) {
+    if (retriesLeft) {
+      await new Promise(r => setTimeout(r, delay))
+
+      return retry({
+        fn,
+        fnParams,
+        retriesLeft: retriesLeft - 1,
+        delay: exponentialBackOff ? delay * 2 : delay,
+        exponentialBackOff,
+      })
+    } else {
+      throw new Error(`Max retries reached for function ${fn.name}`)
+    }
+  }
+}
