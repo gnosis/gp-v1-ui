@@ -88,7 +88,7 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
   try {
     return await promise
   } catch (e) {
-    console.error(customMessage || 'Failed to fetch promise', e)
+    logDebug(customMessage || 'Failed to fetch promise', e.message)
     return
   }
 }
