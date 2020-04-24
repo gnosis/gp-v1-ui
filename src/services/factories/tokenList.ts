@@ -18,7 +18,7 @@ export function getTokensFactory(factoryParams: {
     failed?: true
   }
 
-  async function updateTokenId(networkId: number, token: TokenDetails): Promise<UpdateTokenIdResult> {
+  async function updateTokenIdOrIndicateFailure(networkId: number, token: TokenDetails): Promise<UpdateTokenIdResult> {
     try {
       const hasToken = await exchangeApi.hasToken({ networkId, tokenAddress: token.address })
       if (!hasToken) {
@@ -47,7 +47,7 @@ export function getTokensFactory(factoryParams: {
       )
     }
 
-    const promises = tokens.map(token => updateTokenId(networkId, token))
+    const promises = tokens.map(token => updateTokenIdOrIndicateFailure(networkId, token))
 
     const results = await Promise.all(promises)
 
