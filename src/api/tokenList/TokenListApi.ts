@@ -143,6 +143,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     // update copy in local storage
     const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
     localStorage.setItem(storageKey, JSON.stringify(tokenList))
+    // update address network set
+    tokenList.forEach(({ address: tokenAddress }) =>
+      this._tokenAddressNetworkSet.add(TokenListApiImpl.constructAddressNetworkKey({ tokenAddress, networkId })),
+    )
     // notify subscribers
     this.triggerSubscriptions(tokenList)
   }
