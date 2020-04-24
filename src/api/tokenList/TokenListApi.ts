@@ -55,8 +55,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     networkIds.forEach(networkId => {
       // initial value
       const tokenList = TokenListApiImpl.mergeTokenLists(
-        getTokensByNetwork(networkId),
+        // load first the local list, as this might be more up to date
         this.loadUserTokenList(networkId),
+        // then default list
+        getTokensByNetwork(networkId),
       )
       this._tokensByNetwork[networkId] = tokenList
 
