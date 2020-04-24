@@ -2,7 +2,7 @@ import { TokenList } from 'api/tokenList/TokenListApi'
 import { SubscriptionCallback } from 'api/tokenList/Subscriptions'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TokenDetails, Command } from 'types'
-import { logDebug } from 'utils'
+import { logDebug, retry } from 'utils'
 
 import { TokenFromErc20Params, TokenFromErc20 } from './'
 
@@ -20,7 +20,7 @@ export function getTokensFactory(
   const { tokenListApi, exchangeApi } = factoryParams
   const { getTokenFromErc20 } = injects
 
-  const updatedIdsForNetwork = new Set<number>()
+  const updatedTokensForNetwork = new Set<number>()
 
   interface UpdateTokenIdResult {
     token: TokenDetails
@@ -42,7 +42,7 @@ export function getTokensFactory(
     }
   }
 
-  async function updateWithRetries(
+  async function updateTokenIds(
     networkId: number,
     tokens: TokenDetails[],
     maxRetries = 3,
@@ -103,27 +103,119 @@ export function getTokensFactory(
       // calculate how long to wait next time
       const nextDelay = retryDelay * (exponentialBackOff ? 2 : 1)
       // try again failed tokens after retryDelay
-      setTimeout(() => updateWithRetries(networkId, failedToUpdate, maxRetries - 1, nextDelay), retryDelay)
+      setTimeout(() => updateTokenIds(networkId, failedToUpdate, maxRetries - 1, nextDelay), retryDelay)
     }
   }
 
-  async function updateTokenIds(networkId: number): Promise<void> {
-    // Set as updated on start to prevent concurrent queries
-    updatedIdsForNetwork.add(networkId)
+  async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenFromErc20 | string> {
+    // Simple wrapper function to return original address instead of null for make logging easier
+    const erc20Details = await getTokenFromErc20({ networkId, tokenAddress })
+    return erc20Details || tokenAddress
+  }
+
+  async function fetchAddressesAndIds(networkId: number, numTokens: number): Promise<Map<string, number>> {
+    logDebug(`[${networkId}] Fetching addresses for ids from 0 to ${numTokens - 1}`)
+
+    const promises = [...Array(numTokens).keys()].map((_, tokenId) =>
+      exchangeApi.getTokenAddressById({ networkId, tokenId }),
+    )
+
+    const tokenAddresses = await Promise.all(promises)
+
+    return new Map(tokenAddresses.map((tokenAddress, id) => [tokenAddress, id]))
+  }
+
+  async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
+    // Fetch addresses from contract given numTokens count
+    const addressesAndIds = await retry({
+      fn: fetchAddressesAndIds,
+      fnParams: [networkId, numTokens],
+    })
+    logDebug(`[${networkId}] Token id and address mapping:`)
+    addressesAndIds.forEach((id, address) => logDebug(`[${networkId}] ${id} : ${address}`))
+
+    // Create a map of current token list addresses and tokens
+    const localAddressesMap = new Map<string, TokenDetails>(
+      tokenListApi
+        // Get a copy of the current token list
+        .getTokens(networkId)
+        // Remove tokens that are on the list but not registered on the contract
+        .filter(({ address }) => addressesAndIds.has(address))
+        // Map it with token address as key for easy access
+        .map(token => [token.address, token]),
+    )
+
+    const promises: Promise<TokenFromErc20 | string>[] = []
+
+    // Go over all value (id) and key (tokenAddress) pairs registered on the contract
+    addressesAndIds.forEach((id, tokenAddress) => {
+      if (!localAddressesMap.has(tokenAddress)) {
+        // New token not in our local list, fetch erc20 details for it
+        logDebug(`[${networkId}] Address ${tokenAddress} with id ${id} not in local list, fetching`)
+        promises.push(getErc20DetailsOrAddress(networkId, tokenAddress))
+      } else {
+        // Token already exists, update id
+        logDebug(`[${networkId}] Address ${tokenAddress} already in the list, updating id to ${id}`)
+        const token = localAddressesMap.get(tokenAddress) as TokenDetails
+        token.id = id
+      }
+    })
+
+    const partialTokens = await Promise.all(promises)
+
+    // For all newly fetched tokens
+    partialTokens.forEach(partialToken => {
+      if (typeof partialToken === 'string') {
+        // We replaced potential null responses with original tokenAddress string for logging purposes
+        logDebug(`[${networkId}] Address ${partialToken} is not a valid ERC20 token`)
+      } else if (partialToken) {
+        // If we got a valid response
+        logDebug(
+          `[${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
+        )
+        // Get id from address/id mapping
+        const id = addressesAndIds.get(partialToken.address) as number
+        // build token object
+        const token: TokenDetails = { ...partialToken, id }
+        // add to local address map
+        localAddressesMap.set(partialToken.address, token)
+      }
+    })
+
+    // Convert map values to a list. Map keeps insertion order, so new tokens are added at the end
+    const tokenList = Array.from(localAddressesMap.values())
+
+    // Persist it \o/
+    tokenListApi.persistTokens({ networkId, tokenList })
+  }
+
+  async function updateTokens(networkId: number): Promise<void> {
+    updatedTokensForNetwork.add(networkId)
 
     try {
-      await updateWithRetries(networkId, tokenListApi.getTokens(networkId))
+      const numTokens = await retry<number>({ fn: exchangeApi.getNumTokens.bind(exchangeApi), fnParams: [networkId] })
+      const tokens = tokenListApi.getTokens(networkId)
+
+      logDebug(`[${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
+      if (numTokens > tokens.length) {
+        // When there are more tokens in the contract than locally, fetch the new tokens
+        await updateTokenDetails(networkId, numTokens)
+      } else {
+        // Otherwise, only update the ids
+        await updateTokenIds(networkId, tokens)
+      }
     } catch (e) {
       // Failed to update after retries.
       logDebug(e.message)
       // Clear flag so on next query we try again.
-      updatedIdsForNetwork.delete(networkId)
+      updatedTokensForNetwork.delete(networkId)
     }
   }
 
   return function(networkId: number): TokenDetails[] {
-    if (!updatedIdsForNetwork.has(networkId)) {
-      updateTokenIds(networkId)
+    if (!updatedTokensForNetwork.has(networkId)) {
+      console.log(`[${networkId}] Will update tokens for network`)
+      updateTokens(networkId)
     }
     return tokenListApi.getTokens(networkId)
   }
