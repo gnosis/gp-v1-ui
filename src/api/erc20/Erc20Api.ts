@@ -268,19 +268,6 @@ export class Erc20ApiImpl implements Erc20Api {
 
     return erc20Details ? erc20Details[prop] : undefined
   }
-
-  private async withLocalErc20Details<P extends keyof Erc20Props>(
-    params: BaseParams,
-    fn: (params: BaseParams) => Promise<Erc20Props[P]>,
-    prop: P,
-  ): Promise<Erc20Props[P]> {
-    const erc20Prop = this._getLocalErc20Property(params.tokenAddress, prop)
-
-    if (erc20Prop) {
-      return erc20Prop
-    }
-    return fn(params)
-  }
 }
 
 export default Erc20ApiImpl
