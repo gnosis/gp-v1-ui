@@ -20,7 +20,8 @@ export function getTokensFactory(
   const { tokenListApi, exchangeApi } = factoryParams
   const { getTokenFromErc20 } = injects
 
-  const updatedTokensForNetwork = new Set<number>()
+  // Set containing ids for networks which we successfully updated the tokens from the contract
+  const areTokensUpdated = new Set<number>()
 
   interface UpdateTokenIdResult {
     token: TokenDetails
@@ -190,7 +191,7 @@ export function getTokensFactory(
   }
 
   async function updateTokens(networkId: number): Promise<void> {
-    updatedTokensForNetwork.add(networkId)
+    areTokensUpdated.add(networkId)
 
     try {
       const numTokens = await retry<number>({ fn: exchangeApi.getNumTokens.bind(exchangeApi), fnParams: [networkId] })
@@ -208,12 +209,12 @@ export function getTokensFactory(
       // Failed to update after retries.
       logDebug(`[tokenListFactory][${networkId}] Failed to update tokens: ${e.message}`)
       // Clear flag so on next query we try again.
-      updatedTokensForNetwork.delete(networkId)
+      areTokensUpdated.delete(networkId)
     }
   }
 
   return function(networkId: number): TokenDetails[] {
-    if (!updatedTokensForNetwork.has(networkId)) {
+    if (!areTokensUpdated.has(networkId)) {
       logDebug(`[tokenListFactory][${networkId}] Will update tokens for network`)
       updateTokens(networkId)
     }
