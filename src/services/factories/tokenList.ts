@@ -37,7 +37,7 @@ export function getTokensFactory(
       token.id = await exchangeApi.getTokenIdByAddress({ networkId, tokenAddress: token.address })
       return { token }
     } catch (e) {
-      logDebug(`[network:${networkId}][address:${token.address}] Failed to fetch id from contract`, e.message)
+      logDebug(`[tokenListFactory][${networkId}][address:${token.address}] Failed to fetch id from contract`, e.message)
       return { token, failed: true }
     }
   }
@@ -78,7 +78,7 @@ export function getTokensFactory(
 
     // only bother update the list if there was anything updated/removed
     if (toRemove.size > 0 || updated.size > 0) {
-      logDebug(`[network:${networkId}] Updated ${updated.size} ids and removed ${toRemove.size} tokens`)
+      logDebug(`[tokenListFactory][${networkId}] Updated ${updated.size} ids and removed ${toRemove.size} tokens`)
       // build a new list from current list of tokens
       const tokenList = tokenListApi.getTokens(networkId).reduce<TokenDetails[]>((acc, token) => {
         if (toRemove.has(token.address)) {
@@ -98,7 +98,7 @@ export function getTokensFactory(
     // if something failed...
     if (failedToUpdate.length > 0) {
       logDebug(
-        `[network:${networkId}] Failed to fetch ids for ${failedToUpdate.length} tokens. Trying again in ${retryDelay}ms`,
+        `[tokenListFactory][${networkId}] Failed to fetch ids for ${failedToUpdate.length} tokens. Trying again in ${retryDelay}ms`,
       )
       // calculate how long to wait next time
       const nextDelay = retryDelay * (exponentialBackOff ? 2 : 1)
@@ -114,7 +114,7 @@ export function getTokensFactory(
   }
 
   async function fetchAddressesAndIds(networkId: number, numTokens: number): Promise<Map<string, number>> {
-    logDebug(`[${networkId}] Fetching addresses for ids from 0 to ${numTokens - 1}`)
+    logDebug(`[tokenListFactory][${networkId}] Fetching addresses for ids from 0 to ${numTokens - 1}`)
 
     const promises = Array.from({ length: numTokens }, (_, tokenId) =>
       exchangeApi.getTokenAddressById({ networkId, tokenId }),
@@ -131,8 +131,8 @@ export function getTokensFactory(
       fn: fetchAddressesAndIds,
       fnParams: [networkId, numTokens],
     })
-    logDebug(`[${networkId}] Token id and address mapping:`)
-    addressesAndIds.forEach((id, address) => logDebug(`[${networkId}] ${id} : ${address}`))
+    logDebug(`[tokenListFactory][${networkId}] Token id and address mapping:`)
+    addressesAndIds.forEach((id, address) => logDebug(`[tokenListFactory][${networkId}] ${id} : ${address}`))
 
     // Create a map of current token list addresses and tokens
     const localAddressesMap = new Map<string, TokenDetails>(
@@ -151,11 +151,11 @@ export function getTokensFactory(
     addressesAndIds.forEach((id, tokenAddress) => {
       if (!localAddressesMap.has(tokenAddress)) {
         // New token not in our local list, fetch erc20 details for it
-        logDebug(`[${networkId}] Address ${tokenAddress} with id ${id} not in local list, fetching`)
+        logDebug(`[tokenListFactory][${networkId}] Address ${tokenAddress} with id ${id} not in local list, fetching`)
         promises.push(getErc20DetailsOrAddress(networkId, tokenAddress))
       } else {
         // Token already exists, update id
-        logDebug(`[${networkId}] Address ${tokenAddress} already in the list, updating id to ${id}`)
+        logDebug(`[tokenListFactory][${networkId}] Address ${tokenAddress} already in the list, updating id to ${id}`)
         const token = localAddressesMap.get(tokenAddress) as TokenDetails
         token.id = id
       }
@@ -167,11 +167,11 @@ export function getTokensFactory(
     partialTokens.forEach(partialToken => {
       if (typeof partialToken === 'string') {
         // We replaced potential null responses with original tokenAddress string for logging purposes
-        logDebug(`[${networkId}] Address ${partialToken} is not a valid ERC20 token`)
+        logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
       } else if (partialToken) {
         // If we got a valid response
         logDebug(
-          `[${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
+          `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
         )
         // Get id from address/id mapping
         const id = addressesAndIds.get(partialToken.address) as number
@@ -196,7 +196,7 @@ export function getTokensFactory(
       const numTokens = await retry<number>({ fn: exchangeApi.getNumTokens.bind(exchangeApi), fnParams: [networkId] })
       const tokens = tokenListApi.getTokens(networkId)
 
-      logDebug(`[${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
+      logDebug(`[tokenListFactory][${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
       if (numTokens > tokens.length) {
         // When there are more tokens in the contract than locally, fetch the new tokens
         await updateTokenDetails(networkId, numTokens)
@@ -206,7 +206,7 @@ export function getTokensFactory(
       }
     } catch (e) {
       // Failed to update after retries.
-      logDebug(e.message)
+      logDebug(`[tokenListFactory][${networkId}] Failed to update tokens: ${e.message}`)
       // Clear flag so on next query we try again.
       updatedTokensForNetwork.delete(networkId)
     }
@@ -214,7 +214,7 @@ export function getTokensFactory(
 
   return function(networkId: number): TokenDetails[] {
     if (!updatedTokensForNetwork.has(networkId)) {
-      console.log(`[${networkId}] Will update tokens for network`)
+      logDebug(`[tokenListFactory][${networkId}] Will update tokens for network`)
       updateTokens(networkId)
     }
     return tokenListApi.getTokens(networkId)
