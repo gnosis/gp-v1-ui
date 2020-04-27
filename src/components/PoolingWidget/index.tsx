@@ -19,7 +19,7 @@ import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
 import useGlobalState from 'hooks/useGlobalState'
 import { useForm, FormContext } from 'react-hook-form'
 
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { Receipt } from 'types'
 
@@ -178,7 +178,7 @@ const PoolingInterface: React.FC = () => {
   const sendTransaction = useCallback(async () => {
     if (!networkId || !userAddress) return
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-    let pendingTxHash: string | undefined
+    // let pendingTxHash: string | undefined
     try {
       setIsSubmitting(true)
       setTxReceipt(undefined)
@@ -189,7 +189,7 @@ const PoolingInterface: React.FC = () => {
         orders,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
-            pendingTxHash = txHash
+            // pendingTxHash = txHash
 
             setTxHash(txHash)
 
