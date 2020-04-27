@@ -93,9 +93,12 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
   }
 }
 
-export interface RetryParams<T> {
+interface RetryFnParams<T> {
   fn: (...fnParams: unknown[]) => Promise<T>
   fnParams?: unknown[]
+}
+
+interface RetryOptions {
   retriesLeft?: number
   delay?: number
   exponentialBackOff?: boolean
@@ -112,8 +115,9 @@ export interface RetryParams<T> {
  * @param delay How long to wait between retries. Defaults to 1s
  * @param exponentialBackOff Whether to use exponential back off, doubling wait interval. Defaults to true
  */
-export async function retry<T>(params: RetryParams<T>): Promise<T> {
-  const { fn, fnParams, retriesLeft = 3, delay = 1000, exponentialBackOff = true } = params
+export async function retry<T>(params: RetryFnParams<T>, options?: RetryOptions): Promise<T> {
+  const { fn, fnParams } = params
+  const { retriesLeft = 3, delay = 1000, exponentialBackOff = true } = options || {}
 
   try {
     return fn(...fnParams)
@@ -121,9 +125,7 @@ export async function retry<T>(params: RetryParams<T>): Promise<T> {
     if (retriesLeft) {
       await new Promise(r => setTimeout(r, delay))
 
-      return retry({
-        fn,
-        fnParams,
+      return retry(params, {
         retriesLeft: retriesLeft - 1,
         delay: exponentialBackOff ? delay * 2 : delay,
         exponentialBackOff,
