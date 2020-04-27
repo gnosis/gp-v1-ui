@@ -30,7 +30,7 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
@@ -467,7 +467,6 @@ function buildUrl(params: {
 
   const url = `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
 
-  console.log(`new url`, url)
   return url
 }
 
@@ -869,10 +868,10 @@ const TradeWidget: React.FC = () => {
       }
       if (success && pendingTxHash) {
         // remove pending tx
-        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+        // dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
       }
     },
-    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
+    [placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
   )
 
   async function onSubmit(data: FieldValues): Promise<void> {

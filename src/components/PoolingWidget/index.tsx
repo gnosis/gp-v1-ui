@@ -225,7 +225,7 @@ const PoolingInterface: React.FC = () => {
       // Error handle
       setTxError(e)
     } finally {
-      pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+      // pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
     }
   }, [
     dispatch,

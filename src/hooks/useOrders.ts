@@ -7,12 +7,14 @@ import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/or
 
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
-import { exchangeApi } from 'api'
+import { exchangeApi, web3 } from 'api'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
+import { removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 interface Result {
   orders: AuctionElement[]
+  pendingOrders: AuctionElement[]
   forceOrdersRefresh: () => void
   isLoading: boolean
 }
@@ -20,14 +22,39 @@ interface Result {
 const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 // solutions submitted at this point
 
+// cache block number
+// const getLastBlockNumber = () =>
+
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
   const [
     {
       orders: { orders, offset },
+      pendingOrders,
     },
     dispatch,
   ] = useGlobalState()
+
+  useEffect(() => {
+    if (networkId && userAddress) {
+      const managePendingOrders = async (): Promise<void> => {
+        const latestBlock = await web3.eth.getBlock(blockNumber || 'latest')
+
+        const transactionsSet = new Set(latestBlock.transactions)
+
+        dispatch(
+          removePendingOrdersAction({
+            userAddress,
+            networkId,
+            blockTransactions: transactionsSet,
+          }),
+        )
+      }
+
+      // const parsedPendingOrders = parsePendingOrders(pendingOrders[networkId][userAddress])
+      managePendingOrders()
+    }
+  }, [blockNumber, networkId, userAddress, dispatch])
 
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
@@ -118,5 +145,12 @@ export function useOrders(): Result {
     dispatch(overwriteOrders([]))
   }, [userAddress, networkId, forceOrdersRefresh, dispatch])
 
-  return { orders, isLoading, forceOrdersRefresh }
+  return {
+    orders,
+    isLoading,
+    forceOrdersRefresh,
+    get pendingOrders(): AuctionElement[] {
+      return networkId && userAddress && pendingOrders ? pendingOrders[networkId][userAddress] : []
+    },
+  }
 }

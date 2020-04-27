@@ -8,7 +8,7 @@ import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
 import { useDeleteOrders } from './useDeleteOrders'
-import usePendingOrders from 'hooks/usePendingOrders'
+// import usePendingOrders from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
@@ -53,7 +53,7 @@ function emptyState(): FilteredOrdersState {
 }
 
 function classifyOrders(
-  orders: AuctionElement[],
+  orders: AuctionElement[] = [],
   state: FilteredOrdersState,
   ordersType: 'orders' | 'pendingOrders',
 ): void {
@@ -72,10 +72,9 @@ function classifyOrders(
 }
 
 const OrdersWidget: React.FC = () => {
-  const { orders: allOrders, forceOrdersRefresh } = useOrders()
-  const allPendingOrders = usePendingOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
+  const { orders: allOrders, forceOrdersRefresh, pendingOrders: allPendingOrders } = useOrders()
 
   // allOrders and markedForDeletion, split by tab
   const [filteredOrders, setFilteredOrders] = useSafeState<FilteredOrdersState>(emptyState())

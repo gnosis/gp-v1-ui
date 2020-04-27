@@ -15,7 +15,7 @@ function usePendingOrders(): PendingTxObj[] {
   useEffect(() => {
     if (userAddress && networkId) {
       // returned values from global state are JSON BN values
-      const preParsedOrders = pendingOrdersGlobal[networkId][userAddress]
+      const preParsedOrders = pendingOrdersGlobal ? pendingOrdersGlobal[networkId][userAddress] : []
       if (preParsedOrders && preParsedOrders.length > 0) {
         // JSON BN objects need to be re-cast back to BN via toBN
         const properlyParsedOrders = preParsedOrders.map(
