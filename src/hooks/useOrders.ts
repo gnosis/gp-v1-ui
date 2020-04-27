@@ -24,6 +24,7 @@ const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 
 // cache block number
 // const getLastBlockNumber = () =>
+const emptyArray: AuctionElement[] = []
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
@@ -150,7 +151,7 @@ export function useOrders(): Result {
     isLoading,
     forceOrdersRefresh,
     get pendingOrders(): AuctionElement[] {
-      return networkId && userAddress && pendingOrders ? pendingOrders[networkId][userAddress] : []
+      return networkId && userAddress ? pendingOrders[networkId][userAddress] : emptyArray
     },
   }
 }

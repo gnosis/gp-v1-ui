@@ -70,7 +70,6 @@ function classifyOrders(
     }
   })
 }
-
 const OrdersWidget: React.FC = () => {
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
