@@ -116,7 +116,7 @@ export function getTokensFactory(
   async function fetchAddressesAndIds(networkId: number, numTokens: number): Promise<Map<string, number>> {
     logDebug(`[${networkId}] Fetching addresses for ids from 0 to ${numTokens - 1}`)
 
-    const promises = [...Array(numTokens).keys()].map((_, tokenId) =>
+    const promises = Array.from({ length: numTokens }, (_, tokenId) =>
       exchangeApi.getTokenAddressById({ networkId, tokenId }),
     )
 
