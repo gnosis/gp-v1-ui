@@ -100,7 +100,7 @@ interface RetryFnParams<T> {
 
 interface RetryOptions {
   retriesLeft?: number
-  delay?: number
+  interval?: number
   exponentialBackOff?: boolean
 }
 
@@ -112,22 +112,22 @@ interface RetryOptions {
  * @param fn Function to retry
  * @param fnParams Optional parameters list to pass to function
  * @param retriesLeft How many retries. Defaults to 3
- * @param delay How long to wait between retries. Defaults to 1s
+ * @param interval How long to wait between retries. Defaults to 1s
  * @param exponentialBackOff Whether to use exponential back off, doubling wait interval. Defaults to true
  */
 export async function retry<T>(params: RetryFnParams<T>, options?: RetryOptions): Promise<T> {
   const { fn, fnParams } = params
-  const { retriesLeft = 3, delay = 1000, exponentialBackOff = true } = options || {}
+  const { retriesLeft = 3, interval = 1000, exponentialBackOff = true } = options || {}
 
   try {
     return fn(...fnParams)
   } catch (error) {
     if (retriesLeft) {
-      await new Promise(r => setTimeout(r, delay))
+      await delay(interval)
 
       return retry(params, {
         retriesLeft: retriesLeft - 1,
-        delay: exponentialBackOff ? delay * 2 : delay,
+        interval: exponentialBackOff ? interval * 2 : interval,
         exponentialBackOff,
       })
     } else {
