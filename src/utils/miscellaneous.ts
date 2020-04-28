@@ -93,11 +93,6 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
   }
 }
 
-interface RetryFnParams<T> {
-  fn: (...fnParams: unknown[]) => Promise<T>
-  fnParams?: unknown[]
-}
-
 interface RetryOptions {
   retriesLeft?: number
   interval?: number
@@ -109,29 +104,28 @@ interface RetryOptions {
  *
  * Inspired by: https://gitlab.com/snippets/1775781
  *
- * @param fn Function to retry
- * @param fnParams Optional parameters list to pass to function
+ * @param fn Parameterless function to retry
  * @param retriesLeft How many retries. Defaults to 3
  * @param interval How long to wait between retries. Defaults to 1s
  * @param exponentialBackOff Whether to use exponential back off, doubling wait interval. Defaults to true
  */
-export async function retry<T>(params: RetryFnParams<T>, options?: RetryOptions): Promise<T> {
-  const { fn, fnParams } = params
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function retry<T extends () => any>(fn: T, options?: RetryOptions): Promise<ReturnType<T>> {
   const { retriesLeft = 3, interval = 1000, exponentialBackOff = true } = options || {}
 
   try {
-    return fn(...fnParams)
+    return await fn()
   } catch (error) {
     if (retriesLeft) {
       await delay(interval)
 
-      return retry(params, {
+      return retry(fn, {
         retriesLeft: retriesLeft - 1,
         interval: exponentialBackOff ? interval * 2 : interval,
         exponentialBackOff,
       })
     } else {
-      throw new Error(`Max retries reached for function ${fn.name}`)
+      throw new Error(`Max retries reached`)
     }
   }
 }

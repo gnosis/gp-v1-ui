@@ -132,10 +132,8 @@ export function getTokensFactory(
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
     // Fetch addresses from contract given numTokens count
-    const addressesAndIds = await retry({
-      fn: fetchAddressesAndIds,
-      fnParams: [networkId, numTokens],
-    })
+    const addressesAndIds = await retry(() => fetchAddressesAndIds(networkId, numTokens))
+
     logDebug(`[tokenListFactory][${networkId}] Token id and address mapping:`)
     addressesAndIds.forEach((id, address) => logDebug(`[tokenListFactory][${networkId}] ${id} : ${address}`))
 
@@ -198,7 +196,7 @@ export function getTokensFactory(
     areTokensUpdated.add(networkId)
 
     try {
-      const numTokens = await retry<number>({ fn: exchangeApi.getNumTokens.bind(exchangeApi), fnParams: [networkId] })
+      const numTokens = await retry(() => exchangeApi.getNumTokens(networkId))
       const tokens = tokenListApi.getTokens(networkId)
 
       logDebug(`[tokenListFactory][${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
