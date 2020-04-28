@@ -8,7 +8,6 @@ import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
 import { useDeleteOrders } from './useDeleteOrders'
-// import usePendingOrders from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
@@ -53,7 +52,7 @@ function emptyState(): FilteredOrdersState {
 }
 
 function classifyOrders(
-  orders: AuctionElement[] = [],
+  orders: AuctionElement[],
   state: FilteredOrdersState,
   ordersType: 'orders' | 'pendingOrders',
 ): void {

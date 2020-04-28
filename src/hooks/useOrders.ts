@@ -36,8 +36,12 @@ export function useOrders(): Result {
     dispatch,
   ] = useGlobalState()
 
+  const currentPendingOrders: AuctionElement[] =
+    (networkId && userAddress && pendingOrders[networkId] && pendingOrders[networkId][userAddress]) || emptyArray
+
   useEffect(() => {
-    if (networkId && userAddress) {
+    // Don't fire if there are no pending orders...
+    if (networkId && userAddress && currentPendingOrders.length > 0) {
       const managePendingOrders = async (): Promise<void> => {
         const latestBlock = await web3.eth.getBlock(blockNumber || 'latest')
 
@@ -55,7 +59,7 @@ export function useOrders(): Result {
       // const parsedPendingOrders = parsePendingOrders(pendingOrders[networkId][userAddress])
       managePendingOrders()
     }
-  }, [blockNumber, networkId, userAddress, dispatch])
+  }, [currentPendingOrders.length, blockNumber, networkId, userAddress, dispatch])
 
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
@@ -148,10 +152,8 @@ export function useOrders(): Result {
 
   return {
     orders,
+    pendingOrders: currentPendingOrders,
     isLoading,
     forceOrdersRefresh,
-    get pendingOrders(): AuctionElement[] {
-      return networkId && userAddress ? pendingOrders[networkId][userAddress] : emptyArray
-    },
   }
 }
