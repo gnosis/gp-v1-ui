@@ -128,7 +128,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    return await erc20.methods.name().call()
+    return erc20.methods.name().call()
   }
 
   public async symbol({ tokenAddress, networkId }: SymbolParams): Promise<string> {
