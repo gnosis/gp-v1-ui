@@ -117,13 +117,15 @@ export function getTokensFactory(
   async function fetchAddressesAndIds(networkId: number, numTokens: number): Promise<Map<string, number>> {
     logDebug(`[tokenListFactory][${networkId}] Fetching addresses for ids from 0 to ${numTokens - 1}`)
 
-    const promises = Array.from({ length: numTokens }, (_, tokenId) =>
-      exchangeApi.getTokenAddressById({ networkId, tokenId }),
+    const promises = Array.from({ length: numTokens }, async (_, tokenId) => {
+        const tokenAddress = await exchangeApi.getTokenAddressById({ networkId, tokenId })
+        return [tokenAddress, tokenId]
+      }
     )
 
-    const tokenAddresses = await Promise.all(promises)
+    const tokenAddressIdPairs = await Promise.all(promises)
 
-    return new Map(tokenAddresses.map((tokenAddress, id) => [tokenAddress, id]))
+    return new Map(tokenAddressIdPairs)
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
