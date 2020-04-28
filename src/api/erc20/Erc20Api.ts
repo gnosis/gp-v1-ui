@@ -139,7 +139,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    return await erc20.methods.symbol().call()
+    return erc20.methods.symbol().call()
   }
 
   public async decimals({ tokenAddress, networkId }: DecimalsParams): Promise<number> {
