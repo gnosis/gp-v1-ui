@@ -33,9 +33,14 @@ export function useOrders(): Result {
     dispatch,
   ] = useGlobalState()
 
+  // Handle Pending Orders
+  // pending orders are saved in global app state as well as local storage
+  // users can refresh page after creating orders and see them after reload thanks for local storage
+  // uses this effect hook to:
+  //   1. listen to block updates and filter recently mined transactions based on their hash
+  //   2. remove any orders that may have been re-sent at a higher gas price
   const currentPendingOrders: PendingTxObj[] =
     (networkId && userAddress && pendingOrders[networkId] && pendingOrders[networkId][userAddress]) || emptyArray
-
   useEffect(() => {
     // Don't fire if there are no pending orders...
     if (networkId && userAddress && currentPendingOrders.length > 0) {
@@ -76,6 +81,7 @@ export function useOrders(): Result {
     }
   }, [currentPendingOrders, blockNumber, networkId, userAddress, dispatch])
 
+  // Updates local storage key with updated pending orders
   useEffect(() => {
     setStorageItem(GP_PENDING_ORDER_KEY, pendingOrders)
   }, [pendingOrders])
