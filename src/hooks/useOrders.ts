@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useRef } from 'react'
-// eslint-disable-next-line @typescript-eslint/camelcase
-import { unstable_batchedUpdates } from 'react-dom'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 
 import useGlobalState from './useGlobalState'
 import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/orders'
@@ -113,7 +112,7 @@ export function useOrders(): Result {
         // ensures we don't have multiple reruns for each update
         // i.e. offset change -> render
         //      isLoading change -> another render
-        unstable_batchedUpdates(() => {
+        batchedUpdates(() => {
           if (orders.length > 0) {
             // update
             dispatch(updateOrders(orders))
