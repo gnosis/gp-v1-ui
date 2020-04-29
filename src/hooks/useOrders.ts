@@ -8,23 +8,21 @@ import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/or
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi, web3 } from 'api'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 import { removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { setStorageItem } from 'utils'
 
 interface Result {
   orders: AuctionElement[]
-  pendingOrders: AuctionElement[]
+  pendingOrders: PendingTxObj[]
   forceOrdersRefresh: () => void
   isLoading: boolean
 }
 
+export const GP_PENDING_ORDER_KEY = 'GP_ORDER_TX_HASHES'
 const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
-// solutions submitted at this point
-
-// cache block number
-// const getLastBlockNumber = () =>
-const emptyArray: AuctionElement[] = []
+const emptyArray: PendingTxObj[] = []
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
@@ -36,30 +34,52 @@ export function useOrders(): Result {
     dispatch,
   ] = useGlobalState()
 
-  const currentPendingOrders: AuctionElement[] =
+  const currentPendingOrders: PendingTxObj[] =
     (networkId && userAddress && pendingOrders[networkId] && pendingOrders[networkId][userAddress]) || emptyArray
 
   useEffect(() => {
     // Don't fire if there are no pending orders...
     if (networkId && userAddress && currentPendingOrders.length > 0) {
       const managePendingOrders = async (): Promise<void> => {
-        const latestBlock = await web3.eth.getBlock(blockNumber || 'latest')
+        const [latestBlock, pendingOrderStatuses] = await Promise.all([
+          web3.eth.getBlock(blockNumber || 'latest'),
+          Promise.all(currentPendingOrders.map(({ txHash }) => web3.eth.getTransaction(txHash))),
+        ])
 
-        const transactionsSet = new Set(latestBlock.transactions)
+        const transactionsToRemoveArray = pendingOrderStatuses
+          // order.status === null? transaction has been dropped
+          // add latter txHash to arr of removable transactions
+          .reduce<string[]>(
+            (acc, status, index) => (!status ? acc.concat(currentPendingOrders[index].txHash) : acc),
+            latestBlock.transactions,
+          )
 
-        dispatch(
-          removePendingOrdersAction({
-            userAddress,
-            networkId,
-            blockTransactions: transactionsSet,
-          }),
+        const transactionsSet = new Set(transactionsToRemoveArray)
+
+        const filteredPendingOrders = currentPendingOrders.filter(
+          ({ txHash }: { txHash: string }) => !transactionsSet.has(txHash),
         )
+
+        // don't dispatch unneccessarily
+        if (filteredPendingOrders.length !== currentPendingOrders.length) {
+          // Remove from global
+          dispatch(
+            removePendingOrdersAction({
+              networkId,
+              userAddress,
+              filteredOrders: filteredPendingOrders,
+            }),
+          )
+        }
       }
 
-      // const parsedPendingOrders = parsePendingOrders(pendingOrders[networkId][userAddress])
       managePendingOrders()
     }
-  }, [currentPendingOrders.length, blockNumber, networkId, userAddress, dispatch])
+  }, [currentPendingOrders, blockNumber, networkId, userAddress, dispatch])
+
+  useEffect(() => {
+    setStorageItem(GP_PENDING_ORDER_KEY, pendingOrders)
+  }, [pendingOrders])
 
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)

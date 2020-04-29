@@ -1,7 +1,7 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
 import { setStorageItem, toBN } from 'utils'
-// import { setStorageItem } from 'utils'
+import { GP_PENDING_ORDER_KEY } from 'hooks/useOrders'
 
 export const enum ActionTypes {
   SAVE_PENDING_ORDERS = 'SAVE_PENDING_ORDERS',
@@ -19,9 +19,8 @@ type SavePendingOrdersActionType = Actions<
 type RemovePendingOrdersActionType = Actions<
   ActionTypes,
   {
-    // pendingTxHash: string
     networkId: number
-    blockTransactions: Set<string>
+    filteredOrders: PendingTxObj[]
   }
 >
 
@@ -29,8 +28,8 @@ type ReducerType = Actions<
   ActionTypes,
   {
     orders: PendingTxObj | PendingTxObj[]
+    filteredOrders: PendingTxObj[]
     networkId: number
-    blockTransactions: Set<string>
     userAddress: string
   }
 >
@@ -46,9 +45,8 @@ export const savePendingOrdersAction = (payload: {
 
 export const removePendingOrdersAction = (payload: {
   networkId: number
-  // pendingTxHash: string
   userAddress: string
-  blockTransactions: Set<string>
+  filteredOrders: PendingTxObj[]
 }): RemovePendingOrdersActionType => ({
   type: ActionTypes.REMOVE_PENDING_ORDERS,
   payload,
@@ -78,8 +76,6 @@ export const EMPTY_PENDING_ORDERS_STATE = {
   4: {},
 }
 
-const GP_PENDING_ORDER_KEY = 'GP_ORDER_TX_HASHES'
-
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
   switch (action.type) {
     case ActionTypes.SAVE_PENDING_ORDERS: {
@@ -93,15 +89,9 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
       return newState
     }
     case ActionTypes.REMOVE_PENDING_ORDERS: {
-      const { networkId, blockTransactions, userAddress } = action.payload
+      const { networkId, filteredOrders, userAddress } = action.payload
 
-      const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
-      const newPendingTxArray = userPendingOrdersArr.filter(
-        ({ txHash }: { txHash: string }) => !blockTransactions.has(txHash),
-      )
-      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
-
-      setStorageItem(GP_PENDING_ORDER_KEY, newState)
+      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: filteredOrders } }
 
       return newState
     }
