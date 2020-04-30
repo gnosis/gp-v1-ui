@@ -1,28 +1,37 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
 
-export const OrdersWrapper = styled.div`
+export const OrdersWrapper = styled.div<{ $isWidget?: boolean }>`
   width: 100%;
   display: flex;
   flex-flow: column wrap;
   position: relative;
 
-  /* In use when accessed as a dedicated page and not part of OrdersPanel */
-  background: var(--color-background-pageWrapper);
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
-  border-radius: 0.6rem;
-  min-height: 54rem;
-  min-width: 85rem;
-  max-width: 140rem;
-  /* ====================================================================== */
+  
+  ${({ $isWidget }): string =>
+    $isWidget
+      ? `
+    // Orders component as Widget (e.g inside the OrdersPanel)
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    min-width: initial;
+    max-width: initial;`
+      : `
+    // As a standalone page
+    background: var(--color-background-pageWrapper);
+    box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+      rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+      rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+      rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+    border-radius: 0.6rem;
+    min-width: 85rem;
+    max-width: 140rem;
+    `}
 
   @media ${MEDIA.mobile} {
     max-width: 100%;
     min-width: initial;
-    min-height: 25rem;
     width: 100%;
   }
 
@@ -45,17 +54,17 @@ export const OrdersWrapper = styled.div`
   }
 `
 
-export const ButtonWithIcon = styled.button`
+export const ButtonWithIcon = styled.button<{ $color?: string }>`
   padding: 0.5rem 1rem;
   border-radius: 6rem;
-  border: 0.1rem solid var(--color-text-deleteOrders);
+  border: 0.1rem solid;
   transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
   background: transparent;
-  color: var(--color-text-deleteOrders);
+  color: ${({ $color = 'var(--color-text-deleteOrders)' }): string => $color};
   outline: 0;
 
   &:hover {
-    background: var(--color-text-deleteOrders);
+    background: ${({ $color = 'var(--color-text-deleteOrders)' }): string => $color};
     color: var(--color-background-pageWrapper);
   }
 
@@ -64,17 +73,17 @@ export const ButtonWithIcon = styled.button`
   }
 `
 
-export const OrdersForm = styled.div`
-  > form {
-    display: flex;
-    flex-flow: column nowrap;
-    height: 59rem;
+export const OrdersWidgetForm = styled.form`
+  display: flex;
+  flex-flow: column nowrap;
+  height: 59rem;
 
-    @media ${MEDIA.tablet} {
-      height: auto;
-    }
+  @media ${MEDIA.tablet} {
+    height: auto;
   }
+`
 
+export const OrdersWidgetInnerWrapper = styled.div`
   .infoContainer {
     margin: 1rem auto 0;
     display: flex;

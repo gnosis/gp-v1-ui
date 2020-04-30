@@ -1,7 +1,6 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
-// eslint-disable-next-line @typescript-eslint/camelcase
-import { unstable_batchedUpdates } from 'react-dom'
-import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
+import { faTrashAlt, faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 
@@ -10,16 +9,15 @@ import useSafeState from 'hooks/useSafeState'
 import { useDeleteOrders } from './useDeleteOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
-import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
+import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive, isPendingOrderActive } from 'utils'
 
-import { CardTable } from 'components/Layout/Card'
-import OrderRow from './OrderRow'
-import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersWidgetInnerWrapper, OrdersWidgetForm } from './OrdersWidget.styled'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
+import { OrdersTable } from './OrdersTable'
 
-type OrderTabs = 'active' | 'liquidity' | 'closed'
+export type OrderTabs = 'active' | 'liquidity' | 'closed'
 
 interface ShowOrdersButtonProps {
   type: OrderTabs
@@ -69,14 +67,30 @@ function classifyOrders(
     }
   })
 }
-const OrdersWidget: React.FC = () => {
+
+interface OrdersWidgetProps {
+  defaultOrderTab?: OrderTabs
+  orderTabsToShow?: OrderTabs[]
+  shouldHideOrders?: boolean
+  isWidget?: boolean
+}
+
+const OrdersWidget: React.FC<OrdersWidgetProps> = ({
+  defaultOrderTab = 'active',
+  orderTabsToShow = ['active', 'liquidity', 'closed'],
+  isWidget,
+  shouldHideOrders,
+}) => {
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
   const { orders: allOrders, forceOrdersRefresh, pendingOrders: allPendingOrders } = useOrders()
 
+  // Widget vertical expand
+  const [hideOrders, setHideOrders] = useSafeState<boolean>(!!shouldHideOrders)
+
   // allOrders and markedForDeletion, split by tab
   const [filteredOrders, setFilteredOrders] = useSafeState<FilteredOrdersState>(emptyState())
-  const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
+  const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>(defaultOrderTab)
 
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
@@ -118,9 +132,7 @@ const OrdersWidget: React.FC = () => {
   }, [allOrders, allPendingOrders, setFilteredOrders])
 
   const ordersCount = displayedOrders.length + displayedPendingOrders.length
-
   const noOrders = allOrders.length === 0
-
   const overBalanceOrders = useMemo(
     () =>
       new Set<string>(
@@ -175,7 +187,7 @@ const OrdersWidget: React.FC = () => {
       const success = await deleteOrders(Array.from(markedForDeletion))
 
       if (success) {
-        unstable_batchedUpdates(() => {
+        batchedUpdates(() => {
           // reset selections
 
           setFilteredOrders(curr => {
@@ -202,7 +214,7 @@ const OrdersWidget: React.FC = () => {
   )
 
   return (
-    <OrdersWrapper>
+    <OrdersWrapper $isWidget={isWidget}>
       {!isConnected ? (
         <ConnectWalletBanner />
       ) : (
@@ -213,96 +225,58 @@ const OrdersWidget: React.FC = () => {
         )
       )}
       {!noOrders && networkId && (
-        <OrdersForm>
-          <form action="submit" onSubmit={onSubmit}>
-            <div className="infoContainer">
-              <div className="countContainer">
+        <OrdersWidgetInnerWrapper>
+          <div className="infoContainer">
+            <div className="countContainer">
+              {orderTabsToShow.map((tabName: OrderTabs) => (
                 <ShowOrdersButton
-                  type="active"
-                  isActive={selectedTab === 'active'}
-                  count={filteredOrders.active.orders.length + filteredOrders.active.pendingOrders.length}
-                  onClick={setSelectedTabFactory('active')}
+                  key={tabName}
+                  type={tabName}
+                  isActive={selectedTab === tabName}
+                  count={filteredOrders[tabName].orders.length + filteredOrders[tabName].pendingOrders.length}
+                  onClick={setSelectedTabFactory(tabName)}
                 />
-                <ShowOrdersButton
-                  type="liquidity"
-                  isActive={selectedTab === 'liquidity'}
-                  count={filteredOrders.liquidity.orders.length + filteredOrders.liquidity.pendingOrders.length}
-                  onClick={setSelectedTabFactory('liquidity')}
-                />
-                <ShowOrdersButton
-                  type="closed"
-                  isActive={selectedTab === 'closed'}
-                  count={filteredOrders.closed.orders.length + filteredOrders.closed.pendingOrders.length}
-                  onClick={setSelectedTabFactory('closed')}
-                />
-              </div>
+              ))}
             </div>
-            <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
-              <b>↴</b>
-              <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
-                <FontAwesomeIcon icon={faTrashAlt} />{' '}
-                {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
+            {isWidget && (
+              <ButtonWithIcon
+                onClick={(): void => setHideOrders(hideOrders => !hideOrders)}
+                $color="var(--color-background-CTA)"
+              >
+                <FontAwesomeIcon icon={hideOrders ? faChevronCircleDown : faChevronCircleUp} />
               </ButtonWithIcon>
-            </div>
-            {ordersCount > 0 ? (
-              <div className="ordersContainer">
-                <CardTable
-                  // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
-                  $columns="minmax(2rem,.4fr)  minmax(11rem,1fr)  minmax(11rem,1.3fr)  minmax(5rem,.9fr)  minmax(auto,1.4fr)"
-                  // $cellSeparation="0 .5rem;"
-                  $rowSeparation="0"
-                >
-                  <thead>
-                    <tr>
-                      <th className="checked">
-                        <input
-                          type="checkbox"
-                          onChange={toggleSelectAll}
-                          checked={markedForDeletion.size === displayedOrders.length}
-                          disabled={deleting}
-                        />
-                      </th>
-                      <th>Limit price</th>
-                      <th className="filled">Filled / Total</th>
-                      <th>Expires</th>
-                      <th className="status">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayedPendingOrders.map((order: PendingTxObj) => (
-                      <OrderRow
-                        key={order.id}
-                        order={order}
-                        networkId={networkId}
-                        isOverBalance={false}
-                        pending
-                        disabled={deleting}
-                        isPendingOrder
-                        transactionHash={order.txHash}
-                      />
-                    ))}
-                    {displayedOrders.map(order => (
-                      <OrderRow
-                        key={order.id}
-                        order={order}
-                        networkId={networkId}
-                        isOverBalance={overBalanceOrders.has(order.id)}
-                        isMarkedForDeletion={markedForDeletion.has(order.id)}
-                        toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id, selectedTab)}
-                        pending={deleting && markedForDeletion.has(order.id)}
-                        disabled={deleting}
-                      />
-                    ))}
-                  </tbody>
-                </CardTable>
-              </div>
-            ) : (
-              <div className="noOrders">
-                <span>You have no {selectedTab} orders</span>
-              </div>
             )}
-          </form>
-        </OrdersForm>
+          </div>
+          {/* Show/Hide Orders table */}
+          {!hideOrders && (
+            <OrdersWidgetForm action="submit" onSubmit={onSubmit}>
+              <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
+                <b>↴</b>
+                <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
+                  <FontAwesomeIcon icon={faTrashAlt} />{' '}
+                  {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
+                </ButtonWithIcon>
+              </div>
+              {ordersCount > 0 ? (
+                <OrdersTable
+                  displayedPendingOrders={displayedPendingOrders}
+                  displayedOrders={displayedOrders}
+                  toggleSelectAll={toggleSelectAll}
+                  markedForDeletion={markedForDeletion}
+                  deleting={deleting}
+                  networkId={networkId}
+                  selectedTab={selectedTab}
+                  overBalanceOrders={overBalanceOrders}
+                  toggleMarkForDeletionFactory={toggleMarkForDeletionFactory}
+                />
+              ) : (
+                <div className="noOrders">
+                  <span>You have no {selectedTab} orders</span>
+                </div>
+              )}
+            </OrdersWidgetForm>
+          )}
+        </OrdersWidgetInnerWrapper>
       )}
     </OrdersWrapper>
   )
