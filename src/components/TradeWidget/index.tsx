@@ -16,7 +16,6 @@ import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
-import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
 import FormMessage from './FormMessage'
@@ -243,16 +242,6 @@ const OrdersPanel = styled.div`
   ${Wrapper} {
     background: transparent;
     box-shadow: none;
-  }
-
-  // Orders widget when inside the OrdersPanel
-  ${OrdersWrapper} {
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
-    min-height: initial;
-    min-width: initial;
-    max-width: initial;
   }
 
   > div {
@@ -999,7 +988,7 @@ const TradeWidget: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget />
+          <OrdersWidget isWidget />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}

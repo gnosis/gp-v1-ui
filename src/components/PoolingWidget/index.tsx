@@ -12,6 +12,7 @@ import SubComponents from './SubComponents'
 import Widget from 'components/Layout/Widget'
 import LiquidityButtons from './LiquidityButtons'
 import { PoolingInterfaceWrapper } from './PoolingWidget.styled'
+import OrdersWidget from 'pages/Orders'
 
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -286,6 +287,8 @@ const PoolingInterface: React.FC = () => {
               {/* Main Components here */}
               <SubComponents step={step} {...restProps} />
             </ContentWrapper>
+
+            <OrdersWidget isWidget shouldHideOrders defaultOrderTab="liquidity" orderTabsToShow={['liquidity']} />
 
             <LiquidityMessage>
               <p>
