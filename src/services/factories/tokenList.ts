@@ -12,21 +12,88 @@ export function getTokensFactory(factoryParams: {
 
   const updatedIdsForNetwork = new Set<number>()
 
-  interface GetTokenIdResult {
-    value: number | null
+  interface UpdateTokenIdResult {
+    token: TokenDetails
     remove?: true
+    failed?: true
   }
 
-  async function getTokenId(networkId: number, tokenAddress: string): Promise<GetTokenIdResult> {
+  async function updateTokenIdOrIndicateFailure(networkId: number, token: TokenDetails): Promise<UpdateTokenIdResult> {
     try {
-      const hasToken = await exchangeApi.hasToken({ networkId, tokenAddress })
+      const hasToken = await exchangeApi.hasToken({ networkId, tokenAddress: token.address })
       if (!hasToken) {
-        return { value: null, remove: true }
+        return { token, remove: true }
       }
-      return { value: await exchangeApi.getTokenIdByAddress({ networkId, tokenAddress }) }
+      token.id = await exchangeApi.getTokenIdByAddress({ networkId, tokenAddress: token.address })
+      return { token }
     } catch (e) {
-      logDebug(`[network:${networkId}][address:${tokenAddress}] Failed to fetch id from contract`, e.message)
-      return { value: null }
+      logDebug(`[network:${networkId}][address:${token.address}] Failed to fetch id from contract`, e.message)
+      return { token, failed: true }
+    }
+  }
+
+  async function updateWithRetries(
+    networkId: number,
+    tokens: TokenDetails[],
+    maxRetries = 3,
+    retryDelay = 1000,
+    exponentialBackOff = true,
+  ): Promise<void> {
+    if (maxRetries <= 0) {
+      throw new Error(
+        `[network:${networkId}] Max retries exceeded trying to fetch token ids for tokens ${tokens.map(
+          t => t.address,
+        )}`,
+      )
+    }
+
+    const promises = tokens.map(token => updateTokenIdOrIndicateFailure(networkId, token))
+
+    const results = await Promise.all(promises)
+
+    const updated = new Map<string, TokenDetails>()
+    const failedToUpdate: TokenDetails[] = []
+    const toRemove = new Set<string>()
+
+    // classify results into map/list/set for easier access
+    results.forEach(({ token, remove, failed }) => {
+      if (remove) {
+        toRemove.add(token.address)
+      } else if (failed) {
+        failedToUpdate.push(token)
+      } else {
+        updated.set(token.address, token)
+      }
+    })
+
+    // only bother update the list if there was anything updated/removed
+    if (toRemove.size > 0 || updated.size > 0) {
+      logDebug(`[network:${networkId}] Updated ${updated.size} ids and removed ${toRemove.size} tokens`)
+      // build a new list from current list of tokens
+      const tokenList = tokenListApi.getTokens(networkId).reduce<TokenDetails[]>((acc, token) => {
+        if (toRemove.has(token.address)) {
+          // removing tokens not registered in the exchange for this network
+          return acc
+        } else {
+          // changed or old token
+          acc.push(updated.get(token.address) || token)
+        }
+        return acc
+      }, [])
+
+      // persist updated list
+      tokenListApi.persistTokens({ networkId, tokenList })
+    }
+
+    // if something failed...
+    if (failedToUpdate.length > 0) {
+      logDebug(
+        `[network:${networkId}] Failed to fetch ids for ${failedToUpdate.length} tokens. Trying again in ${retryDelay}ms`,
+      )
+      // calculate how long to wait next time
+      const nextDelay = retryDelay * (exponentialBackOff ? 2 : 1)
+      // try again failed tokens after retryDelay
+      setTimeout(() => updateWithRetries(networkId, failedToUpdate, maxRetries - 1, nextDelay), retryDelay)
     }
   }
 
@@ -34,36 +101,14 @@ export function getTokensFactory(factoryParams: {
     // Set as updated on start to prevent concurrent queries
     updatedIdsForNetwork.add(networkId)
 
-    const promises = tokenListApi.getTokens(networkId).map(token => getTokenId(networkId, token.address))
-
-    const results = await Promise.all(promises)
-
-    let failedToUpdate = false
-
-    const tokenList = results.reduce((tokens: TokenDetails[], result: GetTokenIdResult, index: number) => {
-      if (result.value !== null) {
-        // We got a result, yay
-        const token = tokenListApi.getTokens(networkId)[index]
-        token.id = result.value
-        tokens.push(token)
-      } else if (!result.remove) {
-        // Failed to query, but don't remove from the list
-        tokens.push(tokenListApi.getTokens(networkId)[index])
-        // Try again next time
-        // TODO: try again only for the ones that failed
-        failedToUpdate = true
-      }
-      return tokens
-    }, [])
-
-    // If any token failed, clear flag to try again next time
-    if (failedToUpdate) {
+    try {
+      await updateWithRetries(networkId, tokenListApi.getTokens(networkId))
+    } catch (e) {
+      // Failed to update after retries.
+      logDebug(e.message)
+      // Clear flag so on next query we try again.
       updatedIdsForNetwork.delete(networkId)
-      // TODO: update only the ones that failed
     }
-
-    // persist
-    tokenListApi.persistTokens({ networkId, tokenList })
   }
 
   return function(networkId: number): TokenDetails[] {

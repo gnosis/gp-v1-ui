@@ -262,6 +262,12 @@ interface Props {
   tabIndex?: number
 }
 
+const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = e => {
+  if (e.key === 'Enter') {
+    e.preventDefault()
+  }
+}
+
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(
     () => tokens.map(token => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
@@ -324,6 +330,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
       // If neither, hand focus back to react-select but turning isFocused off
       if (!wrapperRef.current?.contains(e.target as Node) || !menu) {
         setIsFocused(false)
+        setInputText('')
       }
     }
 
@@ -336,7 +343,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   const fallBackNetworkId = networkId || Network.Mainnet
 
   return (
-    <Wrapper ref={wrapperRef}>
+    <Wrapper ref={wrapperRef} onKeyDown={stopEnterPropagation}>
       <StyledSelect
         blurInputOnSelect
         isSearchable
@@ -363,6 +370,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
         onMenuInputFocus={onMenuInputFocus}
         onKeyDown={onKeyDown}
         onInputChange={setInputText}
+        inputValue={inputText}
       />
       <div
         onMouseDown={(e): void => {

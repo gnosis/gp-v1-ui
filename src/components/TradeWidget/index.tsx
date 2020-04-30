@@ -150,7 +150,6 @@ const WrappedForm = styled.form`
 
     @media ${MEDIA.mediumUp} {
       max-height: 11rem;
-      overflow-y: auto;
     }
 
     > b {
@@ -465,9 +464,7 @@ function buildUrl(params: {
     expires,
   })
 
-  const url = `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
-
-  return url
+  return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
 }
 
 const TradeWidget: React.FC = () => {
