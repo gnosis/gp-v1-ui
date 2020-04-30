@@ -238,7 +238,7 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
                 />
               ))}
             </div>
-            {isWidget && (
+            {isWidget && shouldHideOrders && (
               <ButtonWithIcon
                 onClick={(): void => setHideOrders(hideOrders => !hideOrders)}
                 $color="var(--color-background-CTA)"
