@@ -178,7 +178,6 @@ const PoolingInterface: React.FC = () => {
   const sendTransaction = useCallback(async () => {
     if (!networkId || !userAddress) return
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-    // let pendingTxHash: string | undefined
     try {
       setIsSubmitting(true)
       setTxReceipt(undefined)
@@ -189,8 +188,6 @@ const PoolingInterface: React.FC = () => {
         orders,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
-            // pendingTxHash = txHash
-
             setTxHash(txHash)
 
             batchedUpdates(() => {
