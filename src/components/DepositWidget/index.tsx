@@ -20,6 +20,7 @@ import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 import { useDebounce } from 'hooks/useDebounce'
 import { TokenLocalState } from 'reducers-actions'
+import { useManageTokens } from 'hooks/useManageTokens'
 
 interface WithdrawState {
   amount: BN
@@ -377,6 +378,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
     })
   }, [hideZeroBalances, filteredBalances])
 
+  const { modalProps, toggleModal } = useManageTokens()
+
   return (
     <BalancesWidget>
       <BalanceTools>
@@ -392,7 +395,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
           <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
           <b>Hide zero balances</b>
         </label>
-        <button type="button" className="balances-manageTokens not-implemented">
+        <button type="button" className="balances-manageTokens" onClick={toggleModal}>
           Manage Tokens
         </button>
       </BalanceTools>
@@ -447,6 +450,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
           </tbody>
         </CardTable>
       )}
+      <Modali.Modal {...modalProps} />
     </BalancesWidget>
   )
 }
