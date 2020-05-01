@@ -32,6 +32,8 @@ import Web3 from 'web3'
 import { ETH_NODE_URL } from 'const'
 import fetchGasPriceFactory from './gasStation'
 
+import config from 'config'
+
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
 
@@ -137,13 +139,7 @@ function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
 }
 
 function createTcrApi(web3: Web3): TcrApi {
-  // TODO: load config from config file
-  const config = {
-    1: { listId: 1, contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0' },
-    4: { contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b' },
-  }
-
-  const tcrApi = new TcrApiProxy({ web3, config })
+  const tcrApi = new TcrApiProxy({ web3, config: config.tcr })
 
   window['tcrApi'] = tcrApi
 
