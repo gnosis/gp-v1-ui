@@ -116,12 +116,7 @@ function createTokenListApi(): TokenList {
 }
 
 function createTheGraphApi(): TheGraphApi {
-  const urls = {
-    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol',
-    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby',
-  }
-
-  const theGraphApi = new TheGraphApiProxy({ urls })
+  const theGraphApi = new TheGraphApiProxy({ config: config.theGraphApi })
 
   window['theGraphApi'] = theGraphApi
 
@@ -129,9 +124,7 @@ function createTheGraphApi(): TheGraphApi {
 }
 
 function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
-  const networkIds = [Network.Mainnet, Network.Rinkeby]
-
-  const dexPriceEstimatorApi = new DexPriceEstimatorApiProxy({ networkIds })
+  const dexPriceEstimatorApi = new DexPriceEstimatorApiProxy({ config: config.dexPriceEstimator })
 
   window['dexPriceEstimatorApi'] = dexPriceEstimatorApi
 
