@@ -2,5 +2,13 @@
   "tcr": {
     "1": { "listId": 1, "contractAddress": "0x1854dae560abb0f399d8badca456663ca5c309d0" },
     "4": { "contractAddress": "0xBb840456546496E7640DC09ba9fE06E67C157E1b" }
+  },
+  "dexPriceEstimator": {
+    "1": "https://dex-price-estimator.gnosis.io/",
+    "4": "https://dex-price-estimator.rinkeby.gnosis.io/"
+  },
+  "theGraphApi": {
+    "1": "https://api.thegraph.com/subgraphs/name/gnosis/protocol",
+    "4": "https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby"
   }
 }

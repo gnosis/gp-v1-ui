@@ -12,20 +12,18 @@ import defaultConfig from '../config.json'
  * When forking, update the file at `/custom/config.json`.
  */
 
-// Load optional overwrites
-let customConfig: Config
-try {
-  customConfig = JSON.parse(fs.readFileSync('../custom/config.json', 'utf8'))
-} catch (e) {
-  customConfig = {}
-}
-
 const config: Config = defaultConfig
 
-// Merge with default settings
-Object.keys(customConfig).forEach(key => {
-  config[key] = customConfig[key]
-})
+// Load optional overwrites, if any
+try {
+  const customConfig = JSON.parse(fs.readFileSync('../custom/config.json', 'utf8'))
+  // Merge with default settings
+  Object.keys(customConfig).forEach(key => {
+    config[key] = customConfig[key]
+  })
+} catch (e) {
+  // No custom config is set, ignore.
+}
 
 // Export global config object
 export default config

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 import { assert, TEN_BIG_NUMBER, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
-import { Network } from 'types'
 import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
+import { DexPriceEstimatorConfig } from 'types/config'
 
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
@@ -43,31 +43,21 @@ interface GetPriceResponse {
 }
 
 export interface Params {
-  networkIds: number[]
+  config: DexPriceEstimatorConfig
 }
 
-function getDexPriceEstimatorUrl(networkId: number): string {
-  const basePath = 'api/v1/'
-
-  switch (networkId) {
-    case Network.Mainnet:
-      return `https://dex-price-estimator.gnosis.io/${basePath}`
-    case Network.Rinkeby:
-      return `https://dex-price-estimator.rinkeby.gnosis.io/${basePath}`
-    default:
-      throw new Error(`dex-price-estimator not available for network ${networkId}`)
-  }
+function getDexPriceEstimatorUrl(baseUlr: string): string {
+  return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
 }
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
-  private urlsByNetwork: { [networkId: number]: string }
+  private urlsByNetwork: { [networkId: number]: string } = {}
 
   public constructor(params: Params) {
-    const { networkIds } = params
+    const { config } = params
 
-    this.urlsByNetwork = {}
-    networkIds.forEach(networkId => {
-      this.urlsByNetwork[networkId] = getDexPriceEstimatorUrl(networkId)
+    Object.keys(config).forEach(networkId => {
+      this.urlsByNetwork[networkId] = getDexPriceEstimatorUrl(config[networkId])
     })
   }
 
