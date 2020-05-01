@@ -3,13 +3,7 @@ import { AbiItem } from 'web3-utils'
 
 import { TcrContract } from '@gnosis.pm/dex-js/build-esm/contracts/TcrContract'
 import { tcrAbi } from '@gnosis.pm/dex-js'
-
-export interface TcrConfig {
-  [networkId: number]: {
-    listId?: number
-    contractAddress: string
-  }
-}
+import { TcrConfig } from 'types/config'
 
 interface TcrDetails {
   listId: number
@@ -26,7 +20,7 @@ export interface TcrApi {
 
 export interface Params {
   web3: Web3
-  config: TcrConfig
+  config?: TcrConfig
 }
 
 export class TcrApiImpl implements TcrApi {
@@ -34,7 +28,7 @@ export class TcrApiImpl implements TcrApi {
   private contractCache: ContractPerNetwork = {}
 
   public constructor(params: Params) {
-    const { web3, config } = params
+    const { web3, config = {} } = params
 
     this.web3 = web3
 
