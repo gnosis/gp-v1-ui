@@ -13,7 +13,7 @@ import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { isOrderActive, isPendingOrderActive } from 'utils'
 
-import { OrdersWrapper, ButtonWithIcon, OrdersWidgetInnerWrapper, OrdersWidgetForm } from './OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersWidgetInnerWrapper, OrderWidgetDataWrapper } from './OrdersWidget.styled'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { OrdersTable } from './OrdersTable'
 
@@ -23,7 +23,7 @@ interface ShowOrdersButtonProps {
   type: OrderTabs
   isActive: boolean
   count: number
-  onClick: (event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>) => void
+  onClick: (event: React.SyntheticEvent<HTMLButtonElement>) => void
 }
 
 const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
@@ -73,6 +73,9 @@ interface OrdersWidgetProps {
   orderTabsToShow?: OrderTabs[]
   shouldHideOrders?: boolean
   isWidget?: boolean
+  mobileHeight?: string
+  tabletHeight?: string
+  webHeight?: string
 }
 
 const OrdersWidget: React.FC<OrdersWidgetProps> = ({
@@ -80,6 +83,9 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
   orderTabsToShow = ['active', 'liquidity', 'closed'],
   isWidget,
   shouldHideOrders,
+  mobileHeight,
+  tabletHeight,
+  webHeight,
 }) => {
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
@@ -103,8 +109,8 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
   )
 
   const setSelectedTabFactory = useCallback(
-    (type: OrderTabs): ((event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>) => void) => (
-      event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>,
+    (type: OrderTabs): ((event: React.SyntheticEvent<HTMLButtonElement>) => void) => (
+      event: React.SyntheticEvent<HTMLButtonElement>,
     ): void => {
       // form is being submitted when clicking on tab buttons, thus preventing default
       event.preventDefault()
@@ -180,8 +186,8 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
 
   const { deleteOrders, deleting } = useDeleteOrders()
 
-  const onSubmit = useCallback(
-    async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
+  const handleClick = useCallback(
+    async (event: React.SyntheticEvent<HTMLButtonElement>): Promise<void> => {
       event.preventDefault()
 
       const success = await deleteOrders(Array.from(markedForDeletion))
@@ -214,7 +220,12 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
   )
 
   return (
-    <OrdersWrapper $isWidget={isWidget}>
+    <OrdersWrapper
+      $isWidget={isWidget}
+      $mobileHeight={hideOrders ? '6.4rem' : mobileHeight}
+      $tabletHeight={hideOrders ? '6.4rem' : tabletHeight}
+      $webHeight={hideOrders ? '6.4rem' : webHeight}
+    >
       {!isConnected ? (
         <ConnectWalletBanner />
       ) : (
@@ -239,20 +250,21 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
               ))}
             </div>
             {isWidget && shouldHideOrders && (
-              <ButtonWithIcon
+              <button
                 onClick={(): void => setHideOrders(hideOrders => !hideOrders)}
-                $color="var(--color-background-CTA)"
+                style={{ borderRadius: 'var(--border-radius)' }}
+                type="button"
               >
-                <FontAwesomeIcon icon={hideOrders ? faChevronCircleDown : faChevronCircleUp} />
-              </ButtonWithIcon>
+                <FontAwesomeIcon icon={hideOrders ? faChevronCircleDown : faChevronCircleUp} size="xs" />
+              </button>
             )}
           </div>
           {/* Show/Hide Orders table */}
           {!hideOrders && (
-            <OrdersWidgetForm action="submit" onSubmit={onSubmit}>
+            <OrderWidgetDataWrapper>
               <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
                 <b>↴</b>
-                <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
+                <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} onClick={handleClick} type="button">
                   <FontAwesomeIcon icon={faTrashAlt} />{' '}
                   {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
                 </ButtonWithIcon>
@@ -274,7 +286,7 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
                   <span>You have no {selectedTab} orders</span>
                 </div>
               )}
-            </OrdersWidgetForm>
+            </OrderWidgetDataWrapper>
           )}
         </OrdersWidgetInnerWrapper>
       )}

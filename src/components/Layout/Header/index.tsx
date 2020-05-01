@@ -21,7 +21,7 @@ export interface HeaderProps {
   }[]
 }
 
-const TopWrapper = styled.div`
+export const TopWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
   width: 100%;

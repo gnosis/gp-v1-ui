@@ -288,7 +288,16 @@ const PoolingInterface: React.FC = () => {
               <SubComponents step={step} {...restProps} />
             </ContentWrapper>
 
-            <OrdersWidget isWidget shouldHideOrders defaultOrderTab="liquidity" orderTabsToShow={['liquidity']} />
+            <h5>Your current liquidity orders</h5>
+            <OrdersWidget
+              isWidget
+              shouldHideOrders
+              defaultOrderTab="liquidity"
+              orderTabsToShow={['liquidity']}
+              webHeight="30rem"
+              tabletHeight="30rem"
+              mobileHeight="30rem"
+            />
 
             <LiquidityMessage>
               <p>

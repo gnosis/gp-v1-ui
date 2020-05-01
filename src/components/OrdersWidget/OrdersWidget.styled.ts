@@ -1,7 +1,24 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
 
-export const OrdersWrapper = styled.div<{ $isWidget?: boolean }>`
+export const OrdersWrapper = styled.div<{
+  $isWidget?: boolean
+  $mobileHeight?: string
+  $tabletHeight?: string
+  $webHeight?: string
+}>`
+  height: ${({ $webHeight = 'auto' }): string | undefined => $webHeight};
+
+  @media ${MEDIA.mobile} {
+    height: ${({ $mobileHeight = 'auto' }): string | undefined => $mobileHeight};
+  }
+
+  @media ${MEDIA.tablet} {
+    height: ${({ $tabletHeight = 'auto' }): string | undefined => $tabletHeight};
+  }
+
+  transition: height 0.2s ease-in;
+
   width: 100%;
   display: flex;
   flex-flow: column wrap;
@@ -39,7 +56,7 @@ export const OrdersWrapper = styled.div<{ $isWidget?: boolean }>`
     width: 100%;
     position: relative;
     display: flex;
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
     flex: 1 1 auto;
     min-width: initial;
   }
@@ -73,25 +90,22 @@ export const ButtonWithIcon = styled.button<{ $color?: string }>`
   }
 `
 
-export const OrdersWidgetForm = styled.form`
+export const OrderWidgetDataWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
-  height: 59rem;
-
-  @media ${MEDIA.tablet} {
-    height: auto;
-  }
+  min-height: 5%;
 `
 
 export const OrdersWidgetInnerWrapper = styled.div`
+  height: 100%;
+
   .infoContainer {
-    margin: 1rem auto 0;
+    margin: 0 auto;
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
     justify-content: center;
-    min-height: 6.4rem;
-    border-bottom: 0.1rem solid var(--color-text-secondary);
+    height: 6.4rem;
     align-items: center;
 
     @media ${MEDIA.mobile} {
@@ -122,7 +136,7 @@ export const OrdersWidgetInnerWrapper = styled.div`
         transition: border 0.2s ease-in-out;
         align-items: center;
         border-bottom: 0.3rem solid transparent;
-        min-height: 6.4rem;
+        // min-height: 6.4rem;
 
         @media ${MEDIA.mobile} {
           font-size: 1.3rem;

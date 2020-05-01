@@ -16,6 +16,8 @@ import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
+import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
+import { TopWrapper as CenterWrapper } from 'components/Layout/Header'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
 import FormMessage from './FormMessage'
@@ -79,7 +81,7 @@ const WrappedWidget = styled(Widget)`
   line-height: 1;
 
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
-    flex-flow: column wrap;
+    flex-flow: column nowrap;
     max-height: initial;
     min-height: initial;
     width: 100%;
@@ -216,7 +218,7 @@ const SubmitButton = styled.button`
 const OrdersPanel = styled.div`
   overflow: hidden;
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: column nowrap;
   flex: 1;
   min-width: 48rem;
   max-width: 100%;
@@ -246,7 +248,7 @@ const OrdersPanel = styled.div`
 
   > div {
     width: 100%;
-    width: calc(100% - 1.6rem);
+    // width: calc(100% - 1.6rem);
     box-sizing: border-box;
     display: flex;
     flex-flow: row wrap;
@@ -272,32 +274,30 @@ const OrdersPanel = styled.div`
     }
   }
 
-  > div > h5 {
-    width: 100%;
-    margin: 0 auto;
-    padding: 1.6rem 0 1rem;
-    font-weight: var(--font-weight-bold);
-    font-size: 1.6rem;
-    color: var(--color-text-primary);
-    letter-spacing: 0.03rem;
-    text-align: center;
-    box-sizing: border-box;
-    text-align: center;
-  }
+  > ${CenterWrapper} {
+    height: 8%;
 
-  > div > h5 > a {
-    font-size: 1.3rem;
-    font-weight: var(--font-weight-normal);
-    color: var(--color-text-active);
-    text-decoration: underline;
+    > h5 {
+      width: 100%;
+      margin: 0 auto;
+      font-weight: var(--font-weight-bold);
+      font-size: 1.6rem;
+      color: var(--color-text-primary);
+      letter-spacing: 0.03rem;
+      text-align: center;
+      box-sizing: border-box;
+      text-align: center;
+      > a {
+        font-size: 1.3rem;
+        font-weight: var(--font-weight-normal);
+        color: var(--color-text-active);
+        text-decoration: underline;
+      }
+    }
   }
-
-  > div > h5 > a {
-    font-size: 1.3rem;
-    font-weight: var(--font-weight-normal);
-    color: var(--color-text-active);
-    text-decoration: underline;
-  }
+  // ${OrdersWrapper} {
+  //   height: 92%;
+  // }
 `
 
 const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
@@ -978,18 +978,18 @@ const TradeWidget: React.FC = () => {
           </SubmitButton>
         </WrappedForm>
       </FormContext>
+      {/* Toggle panel visibility (arrow) */}
+      <OrdersToggler
+        type="button"
+        onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+        $isOpen={ordersVisible}
+      />
       <OrdersPanel>
-        {/* Toggle panel visibility (arrow) */}
-        <OrdersToggler
-          type="button"
-          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
-          $isOpen={ordersVisible}
-        />
         {/* Actual orders content */}
-        <div>
+        <CenterWrapper>
           <h5>Your orders</h5>
-          <OrdersWidget isWidget />
-        </div>
+        </CenterWrapper>
+        <OrdersWidget isWidget tabletHeight="58rem" />
       </OrdersPanel>
       {/* React Forms DevTool debugger */}
       {process.env.NODE_ENV === 'development' &&
