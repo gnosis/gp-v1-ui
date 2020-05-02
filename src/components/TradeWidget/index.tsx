@@ -16,7 +16,6 @@ import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
-import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TopWrapper as CenterWrapper } from 'components/Layout/Header'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
@@ -216,7 +215,7 @@ const SubmitButton = styled.button`
 `
 
 const OrdersPanel = styled.div`
-  overflow: hidden;
+  height: 100%;
   display: flex;
   flex-flow: column nowrap;
   flex: 1;
@@ -295,9 +294,6 @@ const OrdersPanel = styled.div`
       }
     }
   }
-  // ${OrdersWrapper} {
-  //   height: 92%;
-  // }
 `
 
 const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
@@ -989,7 +985,7 @@ const TradeWidget: React.FC = () => {
         <CenterWrapper>
           <h5>Your orders</h5>
         </CenterWrapper>
-        <OrdersWidget isWidget tabletHeight="58rem" />
+        <OrdersWidget isWidget webHeight="92%" />
       </OrdersPanel>
       {/* React Forms DevTool debugger */}
       {process.env.NODE_ENV === 'development' &&

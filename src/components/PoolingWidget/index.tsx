@@ -294,9 +294,7 @@ const PoolingInterface: React.FC = () => {
               shouldHideOrders
               defaultOrderTab="liquidity"
               orderTabsToShow={['liquidity']}
-              webHeight="30rem"
-              tabletHeight="30rem"
-              mobileHeight="30rem"
+              height="30rem"
             />
 
             <LiquidityMessage>
