@@ -7,14 +7,14 @@ export const OrdersWrapper = styled.div<{
   $tabletHeight?: string
   $webHeight?: string
 }>`
-  height: ${({ $webHeight = 'auto' }): string | undefined => $webHeight};
+  height: ${({ $webHeight = '60rem' }): string | undefined => $webHeight};
 
   @media ${MEDIA.mobile} {
     height: ${({ $mobileHeight = 'auto' }): string | undefined => $mobileHeight};
   }
 
   @media ${MEDIA.tablet} {
-    height: ${({ $tabletHeight = 'auto' }): string | undefined => $tabletHeight};
+    height: ${({ $tabletHeight = '60rem' }): string | undefined => $tabletHeight};
   }
 
   transition: height 0.2s ease-in;
@@ -66,6 +66,7 @@ export const OrdersWrapper = styled.div<{
   }
 
   .noOrdersInfo {
+    margin: auto;
     text-align: center;
     line-height: 1.4;
   }
@@ -136,7 +137,6 @@ export const OrdersWidgetInnerWrapper = styled.div`
         transition: border 0.2s ease-in-out;
         align-items: center;
         border-bottom: 0.3rem solid transparent;
-        // min-height: 6.4rem;
 
         @media ${MEDIA.mobile} {
           font-size: 1.3rem;

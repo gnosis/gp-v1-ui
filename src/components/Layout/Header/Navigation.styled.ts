@@ -33,6 +33,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     text-align: center;
     box-sizing: border-box;
     height: 5.4rem;
+    min-width: 17.7rem;
     line-height: 1;
     display: flex;
     justify-content: center;
@@ -44,6 +45,7 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
       padding: 0;
       font-size: 1.3rem;
       width: 100%;
+      min-width: auto;
       height: 4rem;
     }
 
