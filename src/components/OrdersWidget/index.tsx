@@ -1,6 +1,6 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
-import { faTrashAlt, faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt, faChevronCircleDown, faChevronCircleUp, faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 
@@ -22,13 +22,13 @@ export type OrderTabs = 'active' | 'liquidity' | 'closed'
 interface ShowOrdersButtonProps {
   type: OrderTabs
   isActive: boolean
-  count: number
+  count: number | React.ReactNode
   onClick: (event: React.SyntheticEvent<HTMLButtonElement>) => void
 }
 
 const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
   <button type="button" className={isActive ? 'selected' : ''} onClick={onClick}>
-    {type} <i>{count}</i>
+    {type} <i>{typeof count === 'function' ? count() : count}</i>
   </button>
 )
 
@@ -73,6 +73,7 @@ interface OrdersWidgetProps {
   orderTabsToShow?: OrderTabs[]
   shouldHideOrders?: boolean
   isWidget?: boolean
+  height?: string
   mobileHeight?: string
   tabletHeight?: string
   webHeight?: string
@@ -83,6 +84,7 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
   orderTabsToShow = ['active', 'liquidity', 'closed'],
   isWidget,
   shouldHideOrders,
+  height,
   mobileHeight,
   tabletHeight,
   webHeight,
@@ -222,9 +224,9 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
   return (
     <OrdersWrapper
       $isWidget={isWidget}
-      $mobileHeight={hideOrders ? '6.4rem' : mobileHeight}
-      $tabletHeight={hideOrders ? '6.4rem' : tabletHeight}
-      $webHeight={hideOrders ? '6.4rem' : webHeight}
+      $mobileHeight={hideOrders ? '6.4rem' : height || mobileHeight}
+      $tabletHeight={hideOrders ? '6.4rem' : height || tabletHeight}
+      $webHeight={hideOrders ? '6.4rem' : height || webHeight}
     >
       {!isConnected ? (
         <ConnectWalletBanner />
@@ -239,15 +241,20 @@ const OrdersWidget: React.FC<OrdersWidgetProps> = ({
         <OrdersWidgetInnerWrapper>
           <div className="infoContainer">
             <div className="countContainer">
-              {orderTabsToShow.map((tabName: OrderTabs) => (
-                <ShowOrdersButton
-                  key={tabName}
-                  type={tabName}
-                  isActive={selectedTab === tabName}
-                  count={filteredOrders[tabName].orders.length + filteredOrders[tabName].pendingOrders.length}
-                  onClick={setSelectedTabFactory(tabName)}
-                />
-              ))}
+              {orderTabsToShow.map((tabName: OrderTabs) => {
+                const orderCount = filteredOrders[tabName].orders.length + filteredOrders[tabName].pendingOrders.length
+                return (
+                  <ShowOrdersButton
+                    key={tabName}
+                    type={tabName}
+                    isActive={selectedTab === tabName}
+                    // orders exist just the loading of the other tabs still reflect 0
+                    // indicating a loading state
+                    count={orderCount === 0 ? <FontAwesomeIcon icon={faSpinner} spin size="xs" /> : orderCount}
+                    onClick={setSelectedTabFactory(tabName)}
+                  />
+                )
+              })}
             </div>
             {isWidget && shouldHideOrders && (
               <button
