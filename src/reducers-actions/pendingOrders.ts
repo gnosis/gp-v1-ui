@@ -1,7 +1,7 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
 import { setStorageItem, toBN } from 'utils'
-import { GP_PENDING_ORDER_KEY } from 'hooks/useOrders'
+import { GP_PENDING_ORDER_KEY } from 'const'
 
 export const enum ActionTypes {
   SAVE_PENDING_ORDERS = 'SAVE_PENDING_ORDERS',
