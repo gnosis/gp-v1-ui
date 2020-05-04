@@ -728,7 +728,7 @@ const TradeWidget: React.FC = () => {
       toast.info(<TxNotification txHash={txHash} />)
 
       const pendingOrder: PendingTxObj = {
-        id: `${Date.now()}`, // Uses a temporal unique id
+        id: String(Date.now()), // Uses a temporal unique id
         buyTokenId,
         sellTokenId,
         priceNumerator,
