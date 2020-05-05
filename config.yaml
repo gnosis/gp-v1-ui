@@ -1,4 +1,5 @@
-name: Mesa
+# TODO: Rename Dapp into Gnosis Protocol DApp
+name: Mesa - Gnosis Protocol DApp
 
 # Whitelisted tokens from Gnosis Contract retrieved from a smart contract
 tcr:

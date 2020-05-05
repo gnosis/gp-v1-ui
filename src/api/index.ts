@@ -32,7 +32,10 @@ import Web3 from 'web3'
 import { ETH_NODE_URL } from 'const'
 import fetchGasPriceFactory from './gasStation'
 
-import { MultiTcrConfig } from 'types/config'
+import { MultiTcrConfig, Config } from 'types/config'
+
+// FIXME: Why do I have to redeclare this if it's already declared in "types/global"??
+declare let CONFIG: Config
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)

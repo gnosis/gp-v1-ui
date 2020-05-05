@@ -1,6 +1,6 @@
-import { Config } from 'types/config'
+// import { Config } from 'types/config'
 
 declare let VERSION: string
 declare let DEX_JS_VERSION: string
 declare let CONTRACT_VERSION: string
-declare let CONFIG: Config
+// declare let CONFIG: Config
