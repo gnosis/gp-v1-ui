@@ -46,7 +46,7 @@ export class TcrApiImpl implements TcrApi {
 
       this.contractCache[networkId] = {
         // listId is optional, defaults to 0
-        listId: config[networkId].listId ?? 0,
+        listId: config[networkId].listId || 0,
         contract,
       }
     })
