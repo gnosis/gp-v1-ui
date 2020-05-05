@@ -2,7 +2,6 @@ import { assert, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 import BigNumber from 'bignumber.js'
 
 import { TEN_BIG_NUMBER } from 'const'
-import { TheGraphApiConfig } from 'types/config'
 
 export interface TheGraphApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
@@ -53,15 +52,21 @@ type GqlResult = PricesResponse | GqlError
 
 const isGqlError = (gqlResult: GqlResult): gqlResult is GqlError => 'errors' in gqlResult
 
-export interface Params {
-  config: TheGraphApiConfig
+export interface PriceEstimatorEndpoint {
+  networkId: number
+  url: string
 }
 
-export class TheGraphApiImpl {
-  private urlByNetwork: TheGraphApiConfig
+export type TheGraphApiImplParams = PriceEstimatorEndpoint[]
 
-  public constructor(params: Params) {
-    this.urlByNetwork = params.config
+export class TheGraphApiImpl {
+  private urlByNetwork: { [networkId: number]: string } = {}
+
+  public constructor(params: TheGraphApiImplParams) {
+    this.urlByNetwork = params.reduce((acc, endpoint) => {
+      acc[endpoint.networkId] = endpoint.url
+      return acc
+    }, {})
   }
 
   public async getPrice({ tokenId, ...params }: GetPriceParams): Promise<BigNumber | null> {
