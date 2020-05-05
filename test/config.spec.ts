@@ -1,6 +1,11 @@
+import { Config, MultiTcrConfig, DexPriceEstimatimatorConfig, TheGraphApiConfig } from 'types/config'
+
+// FIXME: Why do I have to redeclare this if it's already declared in "types/global"??
+declare let CONFIG: Config
+
 describe('get config', () => {
   it('tcr config has the expected defaults', () => {
-    expect(CONFIG.tcr).toEqual({
+    const expected: MultiTcrConfig = {
       type: 'multi-tcr',
       config: [
         {
@@ -13,11 +18,13 @@ describe('get config', () => {
           contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b',
         },
       ],
-    })
+    }
+
+    expect(CONFIG.tcr).toEqual(expected)
   })
 
   it('dexPriceEstimator config has the expected defaults', () => {
-    expect(CONFIG.dexPriceEstimator).toEqual({
+    const expected: DexPriceEstimatimatorConfig = {
       type: 'dex-price-estimator',
       config: [
         {
@@ -29,11 +36,12 @@ describe('get config', () => {
           url: 'https://dex-price-estimator.rinkeby.gnosis.io',
         },
       ],
-    })
+    }
+    expect(CONFIG.dexPriceEstimator).toEqual(expected)
   })
 
   it('theGraphApi config has the expected defaults', () => {
-    expect(CONFIG.theGraphApi).toEqual({
+    const expected: TheGraphApiConfig = {
       type: 'the-graph',
       config: [
         {
@@ -45,6 +53,7 @@ describe('get config', () => {
           url: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby',
         },
       ],
-    })
+    }
+    expect(CONFIG.theGraphApi).toEqual(expected)
   })
 })
