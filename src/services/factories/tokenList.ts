@@ -15,7 +15,7 @@ export function getTokensFactory(
   factoryParams: {
     tokenListApi: TokenList
     exchangeApi: ExchangeApi
-    tcrApi: TcrApi
+    tcrApi: TcrApi | undefined
   },
   injects: Injects,
 ): (tokenId: number) => TokenDetails[] {
@@ -133,7 +133,7 @@ export function getTokensFactory(
   }
 
   async function fetchTcrAddresses(networkId: number): Promise<Set<string>> {
-    return new Set(await tcrApi.getTokens(networkId))
+    return tcrApi ? new Set(await tcrApi.getTokens(networkId)) : new Set()
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
