@@ -19,7 +19,7 @@ type SavePendingOrdersActionType = Actions<
 type RemovePendingOrdersActionType = Actions<
   ActionTypes,
   {
-    filteredOrders: PendingTxObj[]
+    orders: PendingTxObj[]
     networkId: number
   }
 >
@@ -28,7 +28,6 @@ type ReducerType = Actions<
   ActionTypes,
   {
     orders: PendingTxObj[]
-    filteredOrders: PendingTxObj[]
     networkId: number
     userAddress: string
   }
@@ -46,7 +45,7 @@ export const savePendingOrdersAction = (payload: {
 export const removePendingOrdersAction = (payload: {
   networkId: number
   userAddress: string
-  filteredOrders: PendingTxObj[]
+  orders: PendingTxObj[]
 }): RemovePendingOrdersActionType => ({
   type: ActionTypes.REMOVE_PENDING_ORDERS,
   payload,
@@ -88,9 +87,9 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
       return newState
     }
     case ActionTypes.REMOVE_PENDING_ORDERS: {
-      const { networkId, filteredOrders, userAddress } = action.payload
+      const { networkId, orders, userAddress } = action.payload
 
-      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: filteredOrders } }
+      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: orders } }
 
       return newState
     }
