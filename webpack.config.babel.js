@@ -17,6 +17,8 @@ dotenv.config()
 const isProduction = process.env.NODE_ENV == 'production'
 
 const baseUrl = isProduction ? '' : '/'
+const config = loadConfig()
+const { name: appName } = config
 
 module.exports = ({ stats = false } = {}) => ({
   devtool: isProduction ? 'source-map' : 'eval-source-map',
@@ -115,7 +117,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
-      title: 'Mesa',
+      title: config.name,
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
@@ -135,9 +137,9 @@ module.exports = ({ stats = false } = {}) => ({
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
-        appName: 'Mesa',
-        appDescription: 'Mesa',
-        developerName: 'Mesa',
+        appName: appName,
+        appDescription: appName,
+        developerName: appName,
         developerURL: null, // prevent retrieving from the nearest package.json
         background: '#dfe6ef',
         themeColor: '#476481',
@@ -163,7 +165,7 @@ module.exports = ({ stats = false } = {}) => ({
       VERSION: JSON.stringify(require('./package.json').version),
       DEX_JS_VERSION: JSON.stringify(require('@gnosis.pm/dex-js/package.json').version),
       CONTRACT_VERSION: JSON.stringify(require('@gnosis.pm/dex-contracts/package.json').version),
-      CONFIG: JSON.stringify(loadConfig()),
+      CONFIG: JSON.stringify(config),
 
       // MOCK: Use mock or real API implementation
       'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),

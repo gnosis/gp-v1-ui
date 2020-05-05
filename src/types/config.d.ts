@@ -25,6 +25,7 @@ export type TheGraphApiConfig = {
 }
 
 export interface Config {
+  // name: string
   tcr: MultiTcrConfig | NoTcrConfig
   dexPriceEstimator: DexPriceEstimatimatorConfig
   theGraphApi: TheGraphApiConfig
