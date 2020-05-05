@@ -741,7 +741,7 @@ const TradeWidget: React.FC = () => {
         txHash,
       }
 
-      return dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
+      return dispatch(savePendingOrdersAction({ orders: [pendingOrder], networkId, userAddress }))
     },
     [dispatch, reset, setIsSubmitting],
   )
