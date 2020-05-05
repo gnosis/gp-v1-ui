@@ -30,3 +30,5 @@ export interface Config {
   dexPriceEstimator: DexPriceEstimatimatorConfig
   theGraphApi: TheGraphApiConfig
 }
+
+declare let CONFIG: Config
