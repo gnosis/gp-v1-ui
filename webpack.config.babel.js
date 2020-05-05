@@ -6,9 +6,10 @@ import PreloadWebpackPlugin from 'preload-webpack-plugin'
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
 import markdownIt from 'markdown-it'
 import linkAttributes from 'markdown-it-link-attributes'
+import path from 'path'
 
 import dotenv from 'dotenv'
-import path from 'path'
+import loadConfig from './src/loadConfig'
 
 // Setup env vars
 dotenv.config()
@@ -162,6 +163,7 @@ module.exports = ({ stats = false } = {}) => ({
       VERSION: JSON.stringify(require('./package.json').version),
       DEX_JS_VERSION: JSON.stringify(require('@gnosis.pm/dex-js/package.json').version),
       CONTRACT_VERSION: JSON.stringify(require('@gnosis.pm/dex-contracts/package.json').version),
+      CONFIG: JSON.stringify(loadConfig()),
 
       // MOCK: Use mock or real API implementation
       'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
