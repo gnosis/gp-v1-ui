@@ -190,9 +190,9 @@ const PoolingInterface: React.FC = () => {
           onSentTransaction: (txHash: string): void => {
             setTxHash(txHash)
 
-            batchedUpdates(() => {
-              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }, index) => {
-                const pendingOrder = {
+            const batchedOrders = orders.map(
+              ({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }, index) => {
+                return {
                   id: `${Date.now()}_${index}`,
                   buyTokenId,
                   sellTokenId,
@@ -205,10 +205,12 @@ const PoolingInterface: React.FC = () => {
                   validUntil: 0,
                   txHash,
                 }
+              },
+            )
 
-                setIsSubmitting(false)
-                dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
-              })
+            batchedUpdates(() => {
+              setIsSubmitting(false)
+              dispatch(savePendingOrdersAction({ orders: batchedOrders, networkId, userAddress }))
             })
           },
         },
