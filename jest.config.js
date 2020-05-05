@@ -18,5 +18,10 @@ module.exports = {
   globalSetup: '<rootDir>/test/globalSetup.ts',
   globals: {
     CONFIG: config,
+    'ts-jest': {
+      diagnostics: {
+        warnOnly: true,
+      },
+    },
   },
 }
