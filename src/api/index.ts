@@ -155,7 +155,7 @@ function createTcrApi(web3: Web3): TcrApi | undefined {
       tcrApi = undefined
     case 'multi-tcr':
       const multiTcrApiConfig = CONFIG.tcr as MultiTcrConfig
-      tcrApi = new MultiTcrApiProxy({ web3, lists: multiTcrApiConfig.config })
+      tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
       break
 
     default:

@@ -46,7 +46,7 @@ export interface PriceEstimatorEndpoint {
   url: string
 }
 
-export type DexPriceEstimatimatorParams = PriceEstimatorEndpoint[]
+export type DexPriceEstimatorParams = PriceEstimatorEndpoint[]
 
 function getDexPriceEstimatorUrl(baseUlr: string): string {
   return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
@@ -55,7 +55,7 @@ function getDexPriceEstimatorUrl(baseUlr: string): string {
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
 
-  public constructor(params: DexPriceEstimatimatorParams) {
+  public constructor(params: DexPriceEstimatorParams) {
     params.forEach(endpoint => {
       this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(endpoint.url)
     })
