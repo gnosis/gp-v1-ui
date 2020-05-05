@@ -1,6 +1,6 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
-import { setStorageItem, toBN } from 'utils'
+import { toBN } from 'utils'
 import { GP_PENDING_ORDER_KEY } from 'const'
 
 export const enum ActionTypes {
@@ -11,7 +11,7 @@ export const enum ActionTypes {
 type SavePendingOrdersActionType = Actions<
   ActionTypes,
   {
-    orders: PendingTxObj | PendingTxObj[]
+    orders: PendingTxObj[]
     networkId: number
   }
 >
@@ -19,15 +19,15 @@ type SavePendingOrdersActionType = Actions<
 type RemovePendingOrdersActionType = Actions<
   ActionTypes,
   {
-    networkId: number
     filteredOrders: PendingTxObj[]
+    networkId: number
   }
 >
 
 type ReducerType = Actions<
   ActionTypes,
   {
-    orders: PendingTxObj | PendingTxObj[]
+    orders: PendingTxObj[]
     filteredOrders: PendingTxObj[]
     networkId: number
     userAddress: string
@@ -35,7 +35,7 @@ type ReducerType = Actions<
 >
 
 export const savePendingOrdersAction = (payload: {
-  orders: PendingTxObj | PendingTxObj[]
+  orders: PendingTxObj[]
   networkId: number
   userAddress: string
 }): SavePendingOrdersActionType => ({
@@ -82,10 +82,9 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
       const { networkId, orders, userAddress } = action.payload
 
       const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
-      const newPendingTxArray = userPendingOrdersArr.concat(orders as PendingTxObj)
+      const newPendingTxArray = userPendingOrdersArr.concat(orders)
       const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
 
-      setStorageItem(GP_PENDING_ORDER_KEY, newState)
       return newState
     }
     case ActionTypes.REMOVE_PENDING_ORDERS: {
