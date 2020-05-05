@@ -10,8 +10,7 @@ import { exchangeApi, web3 } from 'api'
 import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 import { removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { setStorageItem } from 'utils'
-import { GP_PENDING_ORDER_KEY, REFRESH_WHEN_SECONDS_LEFT, EMPTY_ARRAY } from 'const'
+import { REFRESH_WHEN_SECONDS_LEFT, EMPTY_ARRAY } from 'const'
 
 interface Result {
   orders: AuctionElement[]
@@ -76,7 +75,7 @@ export function useOrders(): Result {
             removePendingOrdersAction({
               networkId,
               userAddress,
-              filteredOrders: blockTransactionsFilteredPendingOrders,
+              orders: blockTransactionsFilteredPendingOrders,
             }),
           )
         }
@@ -85,11 +84,6 @@ export function useOrders(): Result {
       managePendingOrders()
     }
   }, [currentPendingOrders, blockNumber, networkId, userAddress, dispatch])
-
-  // Updates local storage key with updated pending orders
-  useEffect(() => {
-    setStorageItem(GP_PENDING_ORDER_KEY, pendingOrders)
-  }, [pendingOrders])
 
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
