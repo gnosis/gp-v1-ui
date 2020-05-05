@@ -1,22 +1,19 @@
 import { TheGraphApiImplParams } from 'api/thegraph/TheGraphApi'
+import { MultiTcrApiParams } from 'api/tcr/MultiTcrApi'
+import { DexPriceEstimatorParams } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 export type MultiTcrConfig = {
   type: 'multi-tcr'
-  config: MultiTcrApiParams
+  config: Omit<MultiTcrApiParams, 'web3'>
 }
 
 export type NoTcrConfig = {
   type: 'none'
 }
 
-export type MultiTcrConfig = {
-  type: 'multi-tcr'
-  config: MultiTcrApiParams
-}
-
-export type DexPriceEstimatimatorConfig = {
+export type DexPriceEstimatorConfig = {
   type: 'dex-price-estimator'
-  config: DexPriceEstimatimatorParams
+  config: DexPriceEstimatorParams
 }
 
 export type TheGraphApiConfig = {
@@ -27,8 +24,6 @@ export type TheGraphApiConfig = {
 export interface Config {
   // name: string
   tcr: MultiTcrConfig | NoTcrConfig
-  dexPriceEstimator: DexPriceEstimatimatorConfig
+  dexPriceEstimator: DexPriceEstimatorConfig
   theGraphApi: TheGraphApiConfig
 }
-
-declare let CONFIG: Config
