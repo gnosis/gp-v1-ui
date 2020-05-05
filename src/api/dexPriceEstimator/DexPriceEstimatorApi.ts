@@ -1,7 +1,6 @@
 import BigNumber from 'bignumber.js'
 import { assert, TEN_BIG_NUMBER, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
 import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
-import { DexPriceEstimatorConfig } from 'types/config'
 
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
@@ -42,9 +41,12 @@ interface GetPriceResponse {
   sellAmountInQuote: string
 }
 
-export interface Params {
-  config: DexPriceEstimatorConfig
+export interface PriceEstimatorEndpoint {
+  networkId: number
+  url: string
 }
+
+export type DexPriceEstimatimatorParams = PriceEstimatorEndpoint[]
 
 function getDexPriceEstimatorUrl(baseUlr: string): string {
   return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
@@ -53,11 +55,9 @@ function getDexPriceEstimatorUrl(baseUlr: string): string {
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
 
-  public constructor(params: Params) {
-    const { config } = params
-
-    Object.keys(config).forEach(networkId => {
-      this.urlsByNetwork[networkId] = getDexPriceEstimatorUrl(config[networkId])
+  public constructor(params: DexPriceEstimatimatorParams) {
+    params.forEach(endpoint => {
+      this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(endpoint.url)
     })
   }
 

@@ -1,18 +1,31 @@
-interface NetworkIdBasedConfig<T> {
-  [networkId: number]: T
+import { TheGraphApiImplParams } from 'api/thegraph/TheGraphApi'
+
+export type MultiTcrConfig = {
+  type: 'multi-tcr'
+  config: MultiTcrApiParams
 }
 
-export type TcrConfig = NetworkIdBasedConfig<{
-  listId?: number
-  contractAddress: string
-}>
+export type NoTcrConfig = {
+  type: 'none'
+}
 
-export type DexPriceEstimatorConfig = NetworkIdBasedConfig<string>
+export type MultiTcrConfig = {
+  type: 'multi-tcr'
+  config: MultiTcrApiParams
+}
 
-export type TheGraphApiConfig = NetworkIdBasedConfig<string>
+export type DexPriceEstimatimatorConfig = {
+  type: 'dex-price-estimator'
+  config: DexPriceEstimatimatorParams
+}
+
+export type TheGraphApiConfig = {
+  type: 'the-graph'
+  config: TheGraphApiImplParams
+}
 
 export interface Config {
-  tcr?: TcrConfig
-  dexPriceEstimator: DexPriceEstimatorConfig
+  tcr: MultiTcrConfig | NoTcrConfig
+  dexPriceEstimator: DexPriceEstimatimatorConfig
   theGraphApi: TheGraphApiConfig
 }
