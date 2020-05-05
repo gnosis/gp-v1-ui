@@ -10,7 +10,7 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
-# Mesa - a dapp for Gnosis Protocol
+# ISSUE 1000 I AM GOD
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
