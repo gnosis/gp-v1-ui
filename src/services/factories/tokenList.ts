@@ -133,7 +133,7 @@ export function getTokensFactory(
   }
 
   async function fetchTcrAddresses(networkId: number): Promise<Set<string>> {
-    return tcrApi ? new Set(await tcrApi.getTokens(networkId)) : new Set()
+    return new Set(tcrApi && await tcrApi.getTokens(networkId))
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
