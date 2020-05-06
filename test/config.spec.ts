@@ -1,7 +1,4 @@
-import { Config, MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig } from 'types/config'
-
-// FIXME: Why do I have to redeclare this if it's already declared in "types/global"??
-declare let CONFIG: Config
+import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig } from 'types/config'
 
 describe('get config', () => {
   it('tcr config has the expected defaults', () => {
