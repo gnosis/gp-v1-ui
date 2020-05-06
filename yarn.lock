@@ -1160,10 +1160,10 @@
   dependencies:
     bn.js "^5.1.1"
 
-"@gnosis.pm/dex-js@0.2.3-RC.2":
-  version "0.2.3-RC.2"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.2.3-RC.2.tgz#8fbbf81330f99e1b33bfd9f229b3e63a776785e1"
-  integrity sha512-WbJh3utuS3GpNj0aHUmjWa1f4jIaCmCh5cJ+3UVbp4vqoXMhHlypD0kS1YdMMEmit94habDcfTcMBTMPWyt9Zw==
+"@gnosis.pm/dex-js@0.3.0-RC.0":
+  version "0.3.0-RC.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.3.0-RC.0.tgz#4ee9e310b2aecbe9c8095f2d82c001ec33381cf0"
+  integrity sha512-AHK8aT+mAeocHQA4Mf22D29a18GCii97smIwA9+B/CV45x5P7wlDUWcZYOHlewGf6SYmf+vTWT8DZcBqe6Q/Hw==
   dependencies:
     "@gnosis.pm/dex-contracts" "^0.2.0"
     bignumber.js "^9.0.0"
