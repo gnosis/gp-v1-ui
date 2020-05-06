@@ -154,7 +154,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                     Enabling {symbol}
                   </>
                 ) : (
-                  <>Enable {symbol}</>
+                  <>Enable {symbol} Deposit</>
                 )}
               </button>
             </>
