@@ -1160,10 +1160,10 @@
   dependencies:
     bn.js "^5.1.1"
 
-"@gnosis.pm/dex-js@0.2.3-RC.2":
-  version "0.2.3-RC.2"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.2.3-RC.2.tgz#8fbbf81330f99e1b33bfd9f229b3e63a776785e1"
-  integrity sha512-WbJh3utuS3GpNj0aHUmjWa1f4jIaCmCh5cJ+3UVbp4vqoXMhHlypD0kS1YdMMEmit94habDcfTcMBTMPWyt9Zw==
+"@gnosis.pm/dex-js@0.3.0-RC.0":
+  version "0.3.0-RC.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.3.0-RC.0.tgz#4ee9e310b2aecbe9c8095f2d82c001ec33381cf0"
+  integrity sha512-AHK8aT+mAeocHQA4Mf22D29a18GCii97smIwA9+B/CV45x5P7wlDUWcZYOHlewGf6SYmf+vTWT8DZcBqe6Q/Hw==
   dependencies:
     "@gnosis.pm/dex-contracts" "^0.2.0"
     bignumber.js "^9.0.0"
@@ -7155,12 +7155,12 @@ front-matter@^3.0.1:
     js-yaml "^3.13.1"
 
 frontmatter-markdown-loader@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/frontmatter-markdown-loader/-/frontmatter-markdown-loader-3.2.1.tgz#93e67d9536c664ffb6e664bfe0aec0eaf8b2ad7d"
-  integrity sha512-pSkTFCGRd9me10ZE+wkJ3+gMweqtI27iDeAGfmt4J7J/oA0cv42pTTYQAsLqW2qJuvf/YG3jvHMFpWK7iNx2zw==
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/frontmatter-markdown-loader/-/frontmatter-markdown-loader-3.4.1.tgz#e5902adad863c89a71fe4c110e04aec7691daad6"
+  integrity sha512-hJccfbuxCgdbCb1fI4CjpHgOnz9jPt1iWXFXlSBQauuaYS9w+UEmvkEMbK+SwhCR2KpbLdU61HPiOvekqus0tA==
   dependencies:
     front-matter "^3.0.1"
-    loader-utils "^1.2.3"
+    loader-utils "^2.0.0"
     markdown-it "^10.0.0"
 
 fs-constants@^1.0.0:
@@ -9913,6 +9913,15 @@ loader-utils@^1.0.2, loader-utils@^1.1.0, loader-utils@^1.2.3, loader-utils@^1.4
     emojis-list "^3.0.0"
     json5 "^1.0.1"
 
+loader-utils@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-2.0.0.tgz#e4cace5b816d425a166b5f097e10cd12b36064b0"
+  integrity sha512-rP4F0h2RaWSvPEkD7BLDFQnvSf+nK+wr3ESUjNTyAGobqrijmW92zc+SO6d4p4B1wh7+B/Jg1mkQe5NYUEHtHQ==
+  dependencies:
+    big.js "^5.2.2"
+    emojis-list "^3.0.0"
+    json5 "^2.1.2"
+
 locate-path@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/locate-path/-/locate-path-2.0.0.tgz#2b568b265eec944c6d9c0de9c3dbbbca0354cd8e"
@@ -12373,9 +12382,9 @@ react-hook-form@^5.2.0:
   integrity sha512-EqGCSl3DxSUBtL/9lFvrFQLJ7ICdVKrfjcMHay2SvmU4trR8aqrd7YuiLSojBKmZBRdBnCcxG+LzLWF9z474NA==
 
 react-hot-loader@^4.12.19:
-  version "4.12.19"
-  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.19.tgz#99a1c763352828f404fa51cd887c5e16bb5b74d1"
-  integrity sha512-p8AnA4QE2GtrvkdmqnKrEiijtVlqdTIDCHZOwItkI9kW51bt5XnQ/4Anz8giiWf9kqBpEQwsmnChDCAFBRyR/Q==
+  version "4.12.21"
+  resolved "https://registry.yarnpkg.com/react-hot-loader/-/react-hot-loader-4.12.21.tgz#332e830801fb33024b5a147d6b13417f491eb975"
+  integrity sha512-Ynxa6ROfWUeKWsTHxsrL2KMzujxJVPjs385lmB2t5cHUxdoRPGind9F00tOkdc1l5WBleOF4XEAMILY1KPIIDA==
   dependencies:
     fast-levenshtein "^2.0.6"
     global "^4.3.0"
@@ -12529,9 +12538,9 @@ react-transition-group@^4:
     prop-types "^15.6.2"
 
 react@^16.12.0, react@^16.8.6:
-  version "16.13.0"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.13.0.tgz#d046eabcdf64e457bbeed1e792e235e1b9934cf7"
-  integrity sha512-TSavZz2iSLkq5/oiE7gnFzmURKZMltmi193rm5HEoUDAXpzT9Kzw6oNZnGoai/4+fUnm7FqS5dwgUL34TujcWQ==
+  version "16.13.1"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
+  integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
@@ -14709,10 +14718,10 @@ ts-jest@^25.1.0:
     semver "^5.5"
     yargs-parser "^16.1.0"
 
-ts-loader@^6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-6.2.1.tgz#67939d5772e8a8c6bdaf6277ca023a4812da02ef"
-  integrity sha512-Dd9FekWuABGgjE1g0TlQJ+4dFUfYGbYcs52/HQObE0ZmUNjQlmLAS7xXsSzy23AMaMwipsx5sNHvoEpT2CZq1g==
+ts-loader@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-7.0.2.tgz#465bc904aea4c331e9550e7c7d75dd17a0b7c24c"
+  integrity sha512-DwpZFB67RoILQHx42dMjSgv2STpacsQu5X+GD/H9ocd8IhU0m8p3b/ZrIln2KmcucC6xep2PdEMEblpWT71euA==
   dependencies:
     chalk "^2.3.0"
     enhanced-resolve "^4.0.0"

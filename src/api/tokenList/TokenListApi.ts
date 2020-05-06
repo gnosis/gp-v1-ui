@@ -55,8 +55,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     networkIds.forEach(networkId => {
       // initial value
       const tokenList = TokenListApiImpl.mergeTokenLists(
-        getTokensByNetwork(networkId),
+        // load first the local list, as this might be more up to date
         this.loadUserTokenList(networkId),
+        // then default list
+        getTokensByNetwork(networkId),
       )
       this._tokensByNetwork[networkId] = tokenList
 
@@ -141,6 +143,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     // update copy in local storage
     const storageKey = TokenListApiImpl.getLocalStorageKey(networkId)
     localStorage.setItem(storageKey, JSON.stringify(tokenList))
+    // update address network set
+    tokenList.forEach(({ address: tokenAddress }) =>
+      this._tokenAddressNetworkSet.add(TokenListApiImpl.constructAddressNetworkKey({ tokenAddress, networkId })),
+    )
     // notify subscribers
     this.triggerSubscriptions(tokenList)
   }
