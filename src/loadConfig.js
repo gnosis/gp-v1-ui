@@ -7,9 +7,7 @@ const CONFIG_FILE = 'config.yaml'
 
 function parseJsonOrYaml(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8')
-  if (filePath.endsWith('.json')) {
-    return JSON.parse(content)
-  } else if (filePath.endsWith('.yaml')) {
+  if (filePath.endsWith('.yaml') || filePath.endsWith('.json')) {
     return YAML.parse(content)
   } else {
     throw new Error('Unknown file extension. Supported JSON or YAML: ' + filePath)
