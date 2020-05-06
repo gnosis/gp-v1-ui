@@ -117,7 +117,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: './src/html/index.html',
-      title: config.name,
+      title: appName,
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
