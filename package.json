@@ -116,7 +116,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-styled-components": "^1.10.7",
     "babel-plugin-transform-imports": "^2.0.0",
-    "console-feed": "^2.8.11",
+    "console-feed": "^3.0.0",
     "coveralls": "^3.0.9",
     "css-loader": "^3.4.2",
     "dotenv": "^8.2.0",
