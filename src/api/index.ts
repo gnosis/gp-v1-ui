@@ -16,6 +16,8 @@ import { TheGraphApi } from './thegraph/TheGraphApi'
 import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 import { DexPriceEstimatorApi } from './dexPriceEstimator/DexPriceEstimatorApi'
 import { DexPriceEstimatorApiProxy } from './dexPriceEstimator/DexPriceEstimatorApiProxy'
+import { TcrApi } from './tcr/TcrApi'
+import { TcrApiProxy } from './tcr/TcrApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -134,6 +136,20 @@ function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
   return dexPriceEstimatorApi
 }
 
+function createTcrApi(web3: Web3): TcrApi {
+  // TODO: load config from config file
+  const config = {
+    1: { listId: 1, contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0' },
+    4: { contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b' },
+  }
+
+  const tcrApi = new TcrApiProxy({ web3, config })
+
+  window['tcrApi'] = tcrApi
+
+  return tcrApi
+}
+
 // Build APIs
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
@@ -149,3 +165,4 @@ export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDepe
 export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
 export const dexPriceEstimatorApi: DexPriceEstimatorApi = createDexPriceEstimatorApi()
+export const tcrApi: TcrApi = createTcrApi(web3)

@@ -1,6 +1,7 @@
 import { TokenList } from 'api/tokenList/TokenListApi'
 import { SubscriptionCallback } from 'api/tokenList/Subscriptions'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
+import { TcrApi } from 'api/tcr/TcrApi'
 import { TokenDetails, Command } from 'types'
 import { logDebug, retry } from 'utils'
 
@@ -14,10 +15,11 @@ export function getTokensFactory(
   factoryParams: {
     tokenListApi: TokenList
     exchangeApi: ExchangeApi
+    tcrApi: TcrApi
   },
   injects: Injects,
 ): (tokenId: number) => TokenDetails[] {
-  const { tokenListApi, exchangeApi } = factoryParams
+  const { tokenListApi, exchangeApi, tcrApi } = factoryParams
   const { getTokenFromErc20 } = injects
 
   // Set containing ids for networks which we successfully updated the tokens from the contract
@@ -130,19 +132,40 @@ export function getTokensFactory(
     return new Map(tokenAddressIdPairs)
   }
 
+  async function fetchTcrAddresses(networkId: number): Promise<Set<string>> {
+    return new Set(await tcrApi.getTokens(networkId))
+  }
+
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
-    // Fetch addresses from contract given numTokens count
-    const addressesAndIds = await retry(() => fetchAddressesAndIds(networkId, numTokens))
+    const [tcrAddressesSet, addressesAndIds] = await Promise.all(
+      // Double await yes! `retry` returns a Promise<Promise<>>
+      await Promise.all([
+        // Fetch addresses from TCR
+        retry(() => fetchTcrAddresses(networkId)),
+        // Fetch addresses from contract given numTokens count
+        retry(() => fetchAddressesAndIds(networkId, numTokens)),
+      ]),
+    )
+
+    logDebug(`[tokenListFactory][${networkId}] TCR contains ${tcrAddressesSet.size} addresses`)
 
     logDebug(`[tokenListFactory][${networkId}] Token id and address mapping:`)
-    addressesAndIds.forEach((id, address) => logDebug(`[tokenListFactory][${networkId}] ${id} : ${address}`))
+    addressesAndIds.forEach((id, address) => {
+      // Remove addresses that are not on the TCR, if any
+      let removed = false
+      if (tcrAddressesSet.size > 0 && !tcrAddressesSet.has(address)) {
+        addressesAndIds.delete(address)
+        removed = true
+      }
+      logDebug(`[tokenListFactory][${networkId}] ${id} : ${address}. On TCR? ${!removed}`)
+    })
 
     // Create a map of current token list addresses and tokens
     const localAddressesMap = new Map<string, TokenDetails>(
       tokenListApi
         // Get a copy of the current token list
         .getTokens(networkId)
-        // Remove tokens that are on the list but not registered on the contract
+        // Remove tokens that are on the list but not registered on the contract neither on TCR
         .filter(({ address }) => addressesAndIds.has(address))
         // Map it with token address as key for easy access
         .map(token => [token.address, token]),
