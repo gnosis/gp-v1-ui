@@ -110,6 +110,7 @@ const SearchInput: React.FC<SearchInputProps> = props => {
   return (
     <SearchWrapper>
       <input
+        autoFocus
         autoCorrect="off"
         autoComplete="off"
         spellCheck="false"
