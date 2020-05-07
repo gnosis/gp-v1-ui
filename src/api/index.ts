@@ -116,11 +116,11 @@ function createTokenListApi(): TokenList {
 }
 
 function createTheGraphApi(): TheGraphApi {
-  const { type, config: theGraphApiConfig } = CONFIG.theGraphApi
+  const { type, config } = CONFIG.theGraphApi
   let theGraphApi: TheGraphApi
   switch (type) {
     case 'the-graph':
-      theGraphApi = new TheGraphApiProxy(theGraphApiConfig)
+      theGraphApi = new TheGraphApiProxy(config)
       break
 
     default:
@@ -132,11 +132,11 @@ function createTheGraphApi(): TheGraphApi {
 }
 
 function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
-  const { type, config: dexPriceEstimatorConfig } = CONFIG.dexPriceEstimator
+  const { type, config } = CONFIG.dexPriceEstimator
   let dexPriceEstimatorApi: DexPriceEstimatorApi
   switch (type) {
     case 'dex-price-estimator':
-      dexPriceEstimatorApi = new DexPriceEstimatorApiProxy(dexPriceEstimatorConfig)
+      dexPriceEstimatorApi = new DexPriceEstimatorApiProxy(config)
       break
 
     default:
