@@ -21,6 +21,7 @@ import { TokenBalanceDetails } from 'types'
 import { useDebounce } from 'hooks/useDebounce'
 import { TokenLocalState } from 'reducers-actions'
 import { useManageTokens } from 'hooks/useManageTokens'
+import useGlobalState from 'hooks/useGlobalState'
 
 interface WithdrawState {
   amount: BN
@@ -356,19 +357,25 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
     setHideZeroBalances(false)
   }
 
-  const filteredBalances = useMemo(() => {
-    if (!debouncedSearch || !balances || balances.length === 0) return balances
+  const [{ localTokens }] = useGlobalState()
 
-    const searchTxt = debouncedSearch.toLowerCase()
+  const filteredBalances = useMemo(() => {
+    if ((!debouncedSearch && localTokens.disabled.size === 0) || !balances || balances.length === 0) return balances
+
+    const searchTxt = debouncedSearch.trim().toLowerCase()
 
     return balances.filter(({ symbol, name, address }) => {
+      if (localTokens.disabled.has(address)) return false
+
+      if (searchTxt === '') return true
+
       return (
         symbol?.toLowerCase().includes(searchTxt) ||
         name?.toLowerCase().includes(searchTxt) ||
         address.toLowerCase().includes(searchTxt)
       )
     })
-  }, [debouncedSearch, balances])
+  }, [debouncedSearch, balances, localTokens.disabled])
 
   const displayedBalances = useMemo(() => {
     if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
