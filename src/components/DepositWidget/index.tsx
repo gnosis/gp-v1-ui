@@ -450,7 +450,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               : (search || hideZeroBalances) && (
                   <NoTokensMessage>
                     <td>
-                      No tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                      No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
                     </td>
                   </NoTokensMessage>
                 )}
