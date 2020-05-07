@@ -1,4 +1,4 @@
-import combineReducers /*, { Reducer, AnyAction, Action as CAction }*/ from 'combine-reducers'
+import combineReducers, { Reducer, AnyAction, Action } from 'combine-reducers'
 import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as tokens } from './tokenRow'
 import {
   reducer as PendingOrderReducer,
@@ -43,6 +43,26 @@ export const INITIAL_STATE = (): GlobalState => {
     orders,
     trade,
     localTokens,
+  }
+}
+
+/**********************************
+ * Side Effect after a reducer has run its course
+ *
+ * Allows to post-process state/slice of state
+ * to log, save to Storage, etc.
+ */
+
+const addSideEffect = <S, A extends Action = AnyAction>(
+  reducer: Reducer<S, A>,
+  sideEffect: (newState: S, action: A) => void,
+): Reducer<S, A> => {
+  return (state: S, action: A): S => {
+    const newState = reducer(state, action)
+
+    sideEffect(newState, action)
+
+    return newState
   }
 }
 
