@@ -1,7 +1,11 @@
 import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig } from 'types/config'
 
-describe('get config', () => {
-  it('tcr config has the expected defaults', () => {
+describe('Test config defaults', () => {
+  it('name', () => {
+    expect(CONFIG.name).toEqual('Mesa - Gnosis Protocol DApp')
+  })
+
+  it('tcr config', () => {
     const expected: MultiTcrConfig = {
       type: 'multi-tcr',
       config: {
@@ -22,7 +26,7 @@ describe('get config', () => {
     expect(CONFIG.tcr).toEqual(expected)
   })
 
-  it('dexPriceEstimator config has the expected defaults', () => {
+  it('dexPriceEstimator config', () => {
     const expected: DexPriceEstimatorConfig = {
       type: 'dex-price-estimator',
       config: [
@@ -39,7 +43,7 @@ describe('get config', () => {
     expect(CONFIG.dexPriceEstimator).toEqual(expected)
   })
 
-  it('theGraphApi config has the expected defaults', () => {
+  it('theGraphApi config', () => {
     const expected: TheGraphApiConfig = {
       type: 'the-graph',
       config: [
