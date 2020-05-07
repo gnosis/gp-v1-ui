@@ -15,7 +15,7 @@ export function getTokensFactory(
   factoryParams: {
     tokenListApi: TokenList
     exchangeApi: ExchangeApi
-    tcrApi: TcrApi | undefined
+    tcrApi?: TcrApi
   },
   injects: Injects,
 ): (tokenId: number) => TokenDetails[] {
