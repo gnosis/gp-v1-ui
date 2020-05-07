@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import Modali, { useModali, ModalHook } from 'modali'
 import { TokenDetails } from 'types'
 // import TokenImg from '../components/TokenImg'
@@ -10,6 +10,8 @@ import { OptionItem, SearchItem } from 'components/TokenOptionItem'
 import { useDebounce } from './useDebounce'
 import searchIcon from 'assets/img/search.svg'
 import { useBetterAddTokenModal } from './useBetterAddTokenModal'
+import useGlobalState from 'hooks/useGlobalState'
+import { updateLocalTokens } from 'reducers-actions/localTokens'
 
 const OptionWrapper = styled.div`
   font-family: var(--font-default);
@@ -59,11 +61,11 @@ const TokenListWrapper = styled.div`
 
 interface TokenListProps {
   tokens: TokenDetails[]
-  enabledTokens: Set<string>
+  disabledTokens: Set<string>
   onToggleToken: (address: string, enabled: boolean) => void
 }
 
-const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, enabledTokens }) => {
+const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTokens }) => {
   return (
     <>
       {tokens.map(token => {
@@ -74,7 +76,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, enabledTok
               <label>
                 <input
                   type="checkbox"
-                  checked={enabledTokens.has(address)}
+                  checked={!disabledTokens.has(address)}
                   onChange={(e): void => {
                     onToggleToken(address, e.target.checked)
                   }}
@@ -172,22 +174,33 @@ const ManageTokensContainer: React.FC = () => {
     [tokensShown, setDebouncedSearch],
   )
 
-  const [tokensEnabledState, setEnabledTokens] = useState(() => new Set(tokens.map(token => token.address)))
+  const [{ localTokens }, dispatch] = useGlobalState()
+
+  const [tokensDisabledState, setDisabledTokens] = useState(localTokens.disabled)
+  const disabledTokensRef = useRef<typeof localTokens.disabled>(localTokens.disabled)
+  // keep track to access on unmount
+  disabledTokensRef.current = tokensDisabledState
+
   const toggleTokenState = useCallback((address: string, enabled: boolean): void => {
-    setEnabledTokens(oldSet => {
-      const newSet = new Set(oldSet)
+    setDisabledTokens(oldSet => {
+      const newDisabledSet = new Set(oldSet)
 
-      if (enabled) newSet.add(address)
-      else newSet.delete(address)
+      if (enabled) newDisabledSet.delete(address)
+      else newDisabledSet.add(address)
 
-      return newSet
+      return newDisabledSet
     })
   }, [])
 
-  useEffect(() => {
-    // when modal closed
-    // update enabled/disabled tokens
-  }, [])
+  useEffect(
+    () => (): void => {
+      // when modal closed
+      // update enabled/disabled tokens
+
+      dispatch(updateLocalTokens({ disabled: disabledTokensRef.current }))
+    },
+    [dispatch],
+  )
 
   return (
     <div>
@@ -203,7 +216,7 @@ const ManageTokensContainer: React.FC = () => {
             />
           </SearchItemWrapper>
         ) : (
-          <TokenList tokens={filteredTokens} enabledTokens={tokensEnabledState} onToggleToken={toggleTokenState} />
+          <TokenList tokens={filteredTokens} disabledTokens={tokensDisabledState} onToggleToken={toggleTokenState} />
         )}
       </TokenListWrapper>
       <Modali.Modal {...modalProps} />
