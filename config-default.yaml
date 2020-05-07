@@ -11,6 +11,8 @@
 # TODO: Rename Dapp into Gnosis Protocol DApp
 name: Mesa - Gnosis Protocol DApp
 
+logoPath: './src/assets/img/logo.svg'
+
 # Whitelisted tokens from Gnosis Contract retrieved from a smart contract
 tcr:
   type: 'multi-tcr' # json-file, kleros, multi-tcr, none (for full list, it's not the default)
