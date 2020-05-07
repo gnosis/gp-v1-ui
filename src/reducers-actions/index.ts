@@ -1,4 +1,4 @@
-import combineReducers from 'combine-reducers'
+import combineReducers /*, { Reducer, AnyAction, Action as CAction }*/ from 'combine-reducers'
 import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as tokens } from './tokenRow'
 import {
   reducer as PendingOrderReducer,
@@ -7,6 +7,12 @@ import {
 } from './pendingOrders'
 import { reducer as OrdersReducer, OrdersState, INITIAL_ORDERS_STATE as orders } from './orders'
 import { reducer as TradeReducer, TradeState, INITIAL_TRADE_STATE as trade } from './trade'
+import {
+  reducer as LocalTokensReducer,
+  LocalTokensState,
+  INITIAL_LOCAL_TOKENS_STATE as localTokens,
+  // ActionTypes as LocalTokensActionTypes,
+} from './localTokens'
 
 export * from './tokenRow'
 
@@ -20,6 +26,7 @@ export interface GlobalState {
   pendingOrders: PendingOrdersState
   orders: OrdersState
   trade: TradeState
+  localTokens: LocalTokensState
 }
 
 /**********************************
@@ -35,6 +42,7 @@ export const INITIAL_STATE = (): GlobalState => {
     pendingOrders,
     orders,
     trade,
+    localTokens,
   }
 }
 
@@ -49,4 +57,61 @@ export const rootReducer = combineReducers({
   pendingOrders: PendingOrderReducer,
   orders: OrdersReducer,
   trade: TradeReducer,
+  localTokens: LocalTokensReducer,
 })
+
+// const composeReducers = <S, A extends CAction = AnyAction>(...reducers: Reducer<S, A>[]): Reducer<S, A> => {
+//   if (reducers.length === 0) return (state: S): S => state
+
+//   if (reducers.length === 1) return reducers[1]
+
+//   return reducers.reduce((prev, curr) => {
+//     return (state: S, action: A): S => {
+//       const newState = prev(state, action)
+//       return curr(newState, action)
+//     }
+//   })
+// }
+
+// const savePending = (state: GlobalState): void => {
+//   console.log('Saving', state.pendingOrders)
+//   // save to storage
+// }
+
+// const postReducer = (state: GlobalState, action: AnyAction): GlobalState => {
+//   switch (action.type) {
+//     case PendingOrdersActionTypes.SAVE_PENDING_ORDERS:
+//       // save to storage
+//       savePending(state)
+//       return state
+
+//     default:
+//       return state
+//   }
+// }
+
+// const composed = composeReducers(rootReducer, postReducer)
+
+// const addSideEffect = <S, A extends CAction = AnyAction>(
+//   reducer: Reducer<S, A>,
+//   sideEffect: (newState: S, action: A) => void,
+// ): Reducer<S, A> => {
+//   return (state: S, action: A): S => {
+//     const newState = reducer(state, action)
+
+//     sideEffect(newState, action)
+
+//     return newState
+//   }
+// }
+
+// const postEffect = (state: GlobalState, action: AnyAction): void => {
+//   switch (action.type) {
+//     case PendingOrdersActionTypes.SAVE_PENDING_ORDERS:
+//       // save to storage
+//       savePending(state)
+//       break
+//   }
+// }
+
+// const withLogger = addSideEffect(rootReducer, postEffect)
