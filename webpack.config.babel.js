@@ -158,6 +158,16 @@ module.exports = ({ stats = false } = {}) => ({
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
       BASE_URL: baseUrl,
+      // MOCK: Use mock or real API implementation
+      MOCK: 'false',
+      MOCK_WALLET: process.env.MOCK || 'false',
+      MOCK_TOKEN_LIST: process.env.MOCK || 'false',
+      MOCK_ERC20: process.env.MOCK || 'false',
+      MOCK_DEPOSIT: process.env.MOCK || 'false',
+      MOCK_EXCHANGE: process.env.MOCK || 'false',
+      MOCK_WEB3: process.env.MOCK || 'false',
+      // AUTOCONNECT: only applies for mock implementation
+      AUTOCONNECT: 'true',
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance
@@ -166,18 +176,6 @@ module.exports = ({ stats = false } = {}) => ({
       DEX_JS_VERSION: JSON.stringify(require('@gnosis.pm/dex-js/package.json').version),
       CONTRACT_VERSION: JSON.stringify(require('@gnosis.pm/dex-contracts/package.json').version),
       CONFIG: JSON.stringify(config),
-
-      // MOCK: Use mock or real API implementation
-      'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
-      'process.env.MOCK_WALLET': JSON.stringify(process.env.MOCK_WALLET || process.env.MOCK || 'false'),
-      'process.env.MOCK_TOKEN_LIST': JSON.stringify(process.env.MOCK_TOKEN_LIST || process.env.MOCK || 'false'),
-      'process.env.MOCK_ERC20': JSON.stringify(process.env.MOCK_ERC20 || process.env.MOCK || 'false'),
-      'process.env.MOCK_DEPOSIT': JSON.stringify(process.env.MOCK_MOCK_DEPOSIT || process.env.MOCK || 'false'),
-      'process.env.MOCK_EXCHANGE': JSON.stringify(process.env.MOCK_EXCHANGE || process.env.MOCK || 'false'),
-      'process.env.MOCK_WEB3': JSON.stringify(process.env.MOCK_WEB3 || process.env.MOCK || 'false'),
-
-      // AUTOCONNECT: only applies for mock implementation
-      'process.env.AUTOCONNECT': JSON.stringify(process.env.AUTOCONNECT || 'true'),
     }),
   ].filter(Boolean),
   optimization: {
