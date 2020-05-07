@@ -5,6 +5,10 @@ describe('Test config defaults', () => {
     expect(CONFIG.name).toEqual('Mesa - Gnosis Protocol DApp')
   })
 
+  it('logoPath', () => {
+    expect(CONFIG.logoPath).toEqual('./src/assets/img/logo.svg')
+  })
+
   it('tcr config', () => {
     const expected: MultiTcrConfig = {
       type: 'multi-tcr',

@@ -23,6 +23,7 @@ export interface TheGraphApiConfig {
 
 export interface Config {
   name: string
+  logoPath: string
   tcr: MultiTcrConfig | NoTcrConfig
   dexPriceEstimator: DexPriceEstimatorConfig
   theGraphApi: TheGraphApiConfig
