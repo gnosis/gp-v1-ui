@@ -11,7 +11,7 @@ import {
   reducer as LocalTokensReducer,
   LocalTokensState,
   INITIAL_LOCAL_TOKENS_STATE as localTokens,
-  // ActionTypes as LocalTokensActionTypes,
+  sideEffect as LocalTokensSideEffect,
 } from './localTokens'
 
 export * from './tokenRow'
@@ -77,7 +77,7 @@ export const rootReducer = combineReducers({
   pendingOrders: PendingOrderReducer,
   orders: OrdersReducer,
   trade: TradeReducer,
-  localTokens: LocalTokensReducer,
+  localTokens: addSideEffect(LocalTokensReducer, LocalTokensSideEffect),
 })
 
 // const composeReducers = <S, A extends CAction = AnyAction>(...reducers: Reducer<S, A>[]): Reducer<S, A> => {

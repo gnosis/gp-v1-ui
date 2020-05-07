@@ -82,3 +82,12 @@ export function reducer(state: LocalTokensState, action: ReducerActionType): Loc
       return state
   }
 }
+
+export function sideEffect(state: LocalTokensState, action: ReducerActionType): void {
+  switch (action.type) {
+    case ActionTypes.ENABLE_TOKEN:
+    case ActionTypes.DISABLE_TOKEN:
+    case ActionTypes.UPDATE_ALL_DISABLED:
+      saveDisabledToStorage(state)
+  }
+}
