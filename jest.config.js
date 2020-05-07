@@ -1,4 +1,4 @@
-const config = require('./src/loadConfig')()
+const config = require('./src/loadConfig')(true)
 
 module.exports = {
   roots: ['<rootDir>/test'],

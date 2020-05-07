@@ -26,11 +26,11 @@ function getCustomConfigFilePath() {
   return fileName ? path.join(customPath, fileName) : ''
 }
 
-function loadConfig() {
+function loadConfig(isTesting = false) {
   const configPath = path.resolve(CONFIG_FILE)
   let config = parseJsonOrYaml(configPath)
   const configOverridePath = getCustomConfigFilePath()
-  if (configOverridePath) {
+  if (!isTesting && configOverridePath) {
     const configOverride = parseJsonOrYaml(configOverridePath)
     config = { ...config, ...configOverride }
   } else {
