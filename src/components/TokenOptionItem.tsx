@@ -32,7 +32,7 @@ const OptionItemWrapper = styled.div`
     width: inherit;
     align-items: center;
     align-content: center;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
 
     .tokenName {
       display: flex;
