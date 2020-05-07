@@ -1,4 +1,4 @@
-import { TokenDetails } from 'types'
+import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
@@ -110,7 +110,7 @@ interface RetryOptions {
  * @param exponentialBackOff Whether to use exponential back off, doubling wait interval. Defaults to true
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function retry<T extends () => any>(fn: T, options?: RetryOptions): Promise<ReturnType<T>> {
+export async function retry<T extends () => any>(fn: T, options?: RetryOptions): Promise<Unpromise<ReturnType<T>>> {
   const { retriesLeft = 3, interval = 1000, exponentialBackOff = true } = options || {}
 
   try {
