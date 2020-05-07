@@ -1,9 +1,7 @@
 import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import Modali, { useModali, ModalHook } from 'modali'
 import { TokenDetails } from 'types'
-// import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
-// import { tokenListApi } from 'api'
 import { useWalletConnection } from './useWalletConnection'
 import { useTokenList } from './useTokenList'
 import { OptionItem, SearchItem } from 'components/TokenOptionItem'
@@ -235,16 +233,6 @@ export const useManageTokens = (): UseManageTokensResult => {
     centered: true,
     title: 'Manage your Token list',
     message: <ManageTokensContainer />,
-    // buttons: [
-    //   <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => {}} />,
-    //   <Modali.Button
-    //     // nothing to add -- Close
-    //     label="Close"
-    //     key="yes"
-    //     isStyleDefault
-    //     onClick={(): void => {}}
-    //   />,
-    // ],
   })
 
   return {
