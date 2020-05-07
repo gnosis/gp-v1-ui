@@ -1,3 +1,13 @@
+#######################################################################################
+##                                  DEFAULT CONFIG                                   ##
+#######################################################################################
+# - Defines the default configuration
+# - **WARNING**: Do not modify this file
+#   - For custom config create a new file "custom/config.yaml"
+#   - You can override in the custom file any config that is defined here
+#   - For redefining components, or for more information, follow the instructions in Github:
+#       https://github.com/gnosis/dex-react
+
 # TODO: Rename Dapp into Gnosis Protocol DApp
 name: Mesa - Gnosis Protocol DApp
 
