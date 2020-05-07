@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import Modali, { useModali, ModalHook } from 'modali'
 import { TokenDetails } from 'types'
 // import TokenImg from '../components/TokenImg'
@@ -59,9 +59,11 @@ const TokenListWrapper = styled.div`
 
 interface TokenListProps {
   tokens: TokenDetails[]
+  enabledTokens: Set<string>
+  onToggleToken: (address: string, enabled: boolean) => void
 }
 
-const TokenList: React.FC<TokenListProps> = ({ tokens }) => {
+const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, enabledTokens }) => {
   return (
     <>
       {tokens.map(token => {
@@ -70,7 +72,13 @@ const TokenList: React.FC<TokenListProps> = ({ tokens }) => {
           <OptionWrapper key={address}>
             <OptionItem name={name} symbol={symbol} image={image}>
               <label>
-                <input type="checkbox" defaultChecked={true} />
+                <input
+                  type="checkbox"
+                  checked={enabledTokens.has(address)}
+                  onChange={(e): void => {
+                    onToggleToken(address, e.target.checked)
+                  }}
+                />
               </label>
             </OptionItem>
           </OptionWrapper>
@@ -164,6 +172,23 @@ const ManageTokensContainer: React.FC = () => {
     [tokensShown, setDebouncedSearch],
   )
 
+  const [tokensEnabledState, setEnabledTokens] = useState(() => new Set(tokens.map(token => token.address)))
+  const toggleTokenState = useCallback((address: string, enabled: boolean): void => {
+    setEnabledTokens(oldSet => {
+      const newSet = new Set(oldSet)
+
+      if (enabled) newSet.add(address)
+      else newSet.delete(address)
+
+      return newSet
+    })
+  }, [])
+
+  useEffect(() => {
+    // when modal closed
+    // update enabled/disabled tokens
+  }, [])
+
   return (
     <div>
       <SearchInput onChange={handleSearch} value={search} />
@@ -178,7 +203,7 @@ const ManageTokensContainer: React.FC = () => {
             />
           </SearchItemWrapper>
         ) : (
-          <TokenList tokens={filteredTokens} />
+          <TokenList tokens={filteredTokens} enabledTokens={tokensEnabledState} onToggleToken={toggleTokenState} />
         )}
       </TokenListWrapper>
       <Modali.Modal {...modalProps} />
