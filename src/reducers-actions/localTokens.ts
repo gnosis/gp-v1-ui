@@ -1,4 +1,5 @@
 import { Actions } from 'reducers-actions'
+import { STORAGE_KEY_DISABLED_TOKENS_ADDRESSES } from 'const'
 
 export interface LocalTokensState {
   disabled: Set<string>
@@ -32,9 +33,22 @@ export const updateLocalTokens = (payload: Partial<LocalTokensState>): UpdateAll
   type: ActionTypes.UPDATE_ALL_DISABLED,
   payload,
 })
+export const saveDisabledToStorage = ({ disabled }: LocalTokensState): void => {
+  const disabledAddressesArray = Array.from(disabled)
+  localStorage.setItem(STORAGE_KEY_DISABLED_TOKENS_ADDRESSES, JSON.stringify(disabledAddressesArray))
+}
+
+const initializeDisabled = (): Set<string> => {
+  const disabledTokensFromStorage = localStorage.getItem(STORAGE_KEY_DISABLED_TOKENS_ADDRESSES)
+  const initialDisabledSet = disabledTokensFromStorage
+    ? new Set<string>(JSON.parse(disabledTokensFromStorage))
+    : new Set<string>()
+
+  return initialDisabledSet
+}
 
 export const INITIAL_LOCAL_TOKENS_STATE: LocalTokensState = {
-  disabled: new Set(),
+  disabled: initializeDisabled(),
 }
 
 export function reducer(state: LocalTokensState, action: ReducerActionType): LocalTokensState {

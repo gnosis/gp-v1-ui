@@ -100,6 +100,8 @@ export const ETH_NODE_URL = process.env.ETH_NODE_URL || `wss://mainnet.infura.io
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
 
+export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
+
 export const GP_ORDER_TX_HASHES = {
   1: 'GP_ORDER_TX_HASHES_1',
   4: 'GP_ORDER_TX_HASHES_4',
