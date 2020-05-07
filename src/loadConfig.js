@@ -6,9 +6,9 @@ const CONFIG_FILE_OVERRIDE = 'custom/config.yaml'
 const CONFIG_FILE = 'config-default.yaml'
 
 function parseJsonOrYaml(filePath) {
-  const content = fs.readFileSync(filePath, 'utf-8')
   const extension = path.extname(filePath)
   if (extension === '.yaml' || extension === '.yml' || extension === '.json') {
+    const content = fs.readFileSync(filePath, 'utf-8')
     return YAML.parse(content)
   } else {
     throw new Error(`Unknown file extension "${extension}". Supported JSON or YAML: ${filePath} `)
