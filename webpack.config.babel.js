@@ -189,8 +189,4 @@ module.exports = ({ stats = false } = {}) => ({
     },
     runtimeChunk: true,
   },
-  node: {
-    // to be able to use `fs` module
-    fs: 'empty',
-  },
 })
