@@ -20,11 +20,10 @@ The Gnosis Protocol smart contracts have been audited externally. Check this sec
 
 Indeed, orders can be placed without a corresponding balance in the Exchange Wallet. However, **_only_** orders with a balance in the Exchange Wallet can be matched and filled.
 
-**Why do I need to **Enable Deposit**?**
+**Why do I need to _Enable Deposit_?**
 
-In order to transfer funds from your wallet into the Exchange Wallet, the Exchange smart contract needs to be allowed to do so. This is what we call **Enable Deposit**.
-Without this, you won't be able to deposit into the contract.
-**Enable Deposit** does not in any way interfere on your capacity to request withdraws.
+In order to participate on the Gnosis Protocol as liquidity provider or as trader, you need to transfer funds from your wallet into the Exchange Wallet. With the button **Enable Deposit**, you set this allowance for the Gnosis Protocol smart contract.
+Note that you only need to **Enable Deposit** for the token(s) you want to actively deposit. You can withdraw any token you receive from trading without having to enable first.
 
 **What is the Liquidity page?**
 
