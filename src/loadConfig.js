@@ -3,7 +3,7 @@ const fs = require('fs')
 const YAML = require('yaml')
 
 const CONFIG_FILE_OVERRIDE = 'custom/config.yaml'
-const CONFIG_FILE = 'config.yaml'
+const CONFIG_FILE = 'config-default.yaml'
 
 function parseJsonOrYaml(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8')
