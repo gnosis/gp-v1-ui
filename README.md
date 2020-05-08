@@ -111,7 +111,31 @@ import About from 'pages/About'
 
 ## Config
 
-### TCR (Optional)
+Default app configs can be found on [the default config file](./config-default.yaml)
+
+We recommend against editing this file directly, though.
+
+If you wish to replace any default config, create a file named `config` inside the [`custom` folder](./custom).
+
+Both JSON and YAML formats are supported.
+
+Simply replace any config found on [config-default](./config-default.yaml).
+
+Below we provide details for each config.
+
+### `name`
+
+A single string that controls the page title and favicon metadata.
+
+### `logoPath`
+
+Path to favicon logo.
+
+### `templatePath`
+
+Path to the template html file.
+
+### `tcr`
 
 Tokens are dynamically loaded from the contract, but it might not be desirable to display everything in the interface.
 
@@ -125,25 +149,67 @@ function getTokens(uint256 _listId) public view returns (address[] memory)
 
 For a sample implementation, refer to [dxDAO's TCR](https://github.com/nicoelzer/dxDAO-Token-Registry/blob/master/contracts/dxTokenRegistry.sol).
 
-<!-- TODO: use a central place for all configs https://github.com/gnosis/dex-react/issues/978 -->
+**Config format:**
 
-Add the relevant config to [this file](./src/api/index.ts).
+```yaml
+tcr:
+  type: 'multi-tcr'
+  config:
+    lists:
+      - networkId: number
+        listId: number
+        contractAddress: string
 
-Config format:
-
-```ts
-{
-  <networkId>: {
-    listId: 4
-    contractAddress: '0xa2d...'
-  }
-}
+# OR, for no filtering
+tcr:
+  type: 'none'
 ```
 
 Where:
 
-- `<networkId>` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `type` currently is either `multi-tcr` or `none` for no filter.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
 - `listId` is optional and defaults to `0`
-- `contractAddress` the address of the contract deployed in network `<networkId>`
+- `contractAddress` the address of the contract deployed in network `networkId`
 
 **Note**: For networks where a TCR contract is not provided, the tokens will not be filtered.
+
+### `dexPriceEstimator`
+
+Endpoints for service that provides price estimation and data for the orderbook graph.
+
+**Config format:**
+
+```yaml
+dexPriceEstimator:
+  type: 'dex-price-estimator'
+  config:
+    - networkId: number
+      url: string
+```
+
+Where:
+
+- `type` can only be `dex-price-estimator`.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `url` the endpoint for given `networkId`
+
+### `theGraphApi`
+
+Endpoints for Gnosis Protocol Subgraph.
+
+**Config format:**
+
+```yaml
+theGraphApi:
+  type: 'the-graph'
+  config:
+    - networkId: number
+      url: string
+```
+
+Where:
+
+- `type` can only be `the-graph`.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `url` the endpoint for given `networkId`
