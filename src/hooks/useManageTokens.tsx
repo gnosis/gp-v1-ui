@@ -10,6 +10,7 @@ import searchIcon from 'assets/img/search.svg'
 import { useBetterAddTokenModal } from './useBetterAddTokenModal'
 import useGlobalState from 'hooks/useGlobalState'
 import { updateLocalTokens } from 'reducers-actions/localTokens'
+import { Toggle } from 'components/Toggle'
 
 const OptionWrapper = styled.div`
   font-family: var(--font-default);
@@ -25,6 +26,7 @@ const OptionWrapper = styled.div`
   align-items: center;
   min-height: 5.6rem;
   transition: background 0.2s ease-in-out;
+  cursor: pointer;
 
   flex: 50% 0 0;
 
@@ -49,12 +51,6 @@ const TokenListWrapper = styled.div`
   flex-flow: row wrap;
   align-items: flex-start;
   align-content: flex-start;
-
-  label {
-    padding: 1em;
-    margin: 0 10% 0 auto;
-    cursor: pointer;
-  }
 `
 
 interface TokenListProps {
@@ -68,18 +64,25 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
     <>
       {tokens.map(token => {
         const { name, symbol, image, address } = token
+
+        const checked = !disabledTokens.has(address)
+
         return (
-          <OptionWrapper key={address}>
+          <OptionWrapper
+            key={address}
+            // allow to toggle by clicking on the whole element
+            onClick={(e): void => {
+              e.preventDefault() // prevents double trigger from checkbox clicks
+              onToggleToken(address, !checked)
+            }}
+          >
             <OptionItem name={name} symbol={symbol} image={image}>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={!disabledTokens.has(address)}
-                  onChange={(e): void => {
-                    onToggleToken(address, e.target.checked)
-                  }}
-                />
-              </label>
+              <Toggle
+                type="checkbox"
+                checked={checked}
+                // onChange noop prevents React warning
+                onChange={(): void => void 0}
+              />
             </OptionItem>
           </OptionWrapper>
         )
