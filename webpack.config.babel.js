@@ -116,7 +116,7 @@ module.exports = ({ stats = false } = {}) => ({
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: './src/html/index.html',
+      template: config.templatePath,
       title: appName,
       ipfsHack: isProduction,
       minify: isProduction && {

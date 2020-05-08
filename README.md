@@ -109,16 +109,6 @@ import About from 'pages/About'
 // will try resolving from custom/ first and failing that from src/
 ```
 
-If you also need to change contents of `index.html`, you will have to modify `webpack.config.babel.js`:
-
-```js
-new HtmlWebPackPlugin({
-  template: './src/html/index.html',
-  title: ...
-```
-
-A good idea would be to conditionally change `template` path based on external config or an env variable.
-
 ## Config
 
 ### TCR (Optional)

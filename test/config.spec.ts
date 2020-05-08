@@ -9,6 +9,10 @@ describe('Test config defaults', () => {
     expect(CONFIG.logoPath).toEqual('./src/assets/img/logo.svg')
   })
 
+  it('templatePath', () => {
+    expect(CONFIG.templatePath).toEqual('./src/html/index.html')
+  })
+
   it('tcr config', () => {
     const expected: MultiTcrConfig = {
       type: 'multi-tcr',

@@ -13,6 +13,8 @@ name: Mesa - Gnosis Protocol DApp
 
 logoPath: './src/assets/img/logo.svg'
 
+templatePath: './src/html/index.html'
+
 # Whitelisted tokens from Gnosis Contract retrieved from a smart contract
 tcr:
   type: 'multi-tcr' # json-file, kleros, multi-tcr, none (for full list, it's not the default)
