@@ -19,17 +19,20 @@ function parseJsonOrYaml(filePath) {
 
 function getCustomConfigFilePath() {
   const customPath = path.resolve(CUSTOM_FOLDER_PATH)
-  const regex = new RegExp(`${CONFIG_FILE_OVERRIDE_NAME}\.(${SUPPORTED_EXTENSIONS})`)
 
-  const fileName = fs.readdirSync(customPath).find(fileName => regex.test(fileName))
+  const customConfig = SUPPORTED_EXTENSIONS.split('|')
+    .map(extension => path.join(customPath, `${CONFIG_FILE_OVERRIDE_NAME}.${extension}`))
+    .find(fs.existsSync)
 
-  return fileName ? path.join(customPath, fileName) : ''
+  return customConfig
 }
 
 function loadConfig(isTesting = false) {
   const configPath = path.resolve(CONFIG_FILE)
   let config = parseJsonOrYaml(configPath)
+
   const configOverridePath = getCustomConfigFilePath()
+
   if (!isTesting && configOverridePath) {
     const configOverride = parseJsonOrYaml(configOverridePath)
     config = { ...config, ...configOverride }
