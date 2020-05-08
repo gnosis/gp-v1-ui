@@ -118,7 +118,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     if (addedTokens.length === 0) return
 
     this._tokensByNetwork[networkId] = this._tokensByNetwork[networkId].concat(addedTokens)
-    this.persistNewUserTokens(tokens, networkId)
+    this.persistNewUserTokens(addedTokens, networkId)
 
     this.triggerSubscriptions(this._tokensByNetwork[networkId])
   }
