@@ -95,7 +95,7 @@ export function getTokensFactory(
       }, [])
 
       // persist updated list
-      tokenListApi.persistTokens({ networkId, tokenList })
+      tokenListApi.addTokens({ networkId, tokens: tokenList })
     }
 
     // if something failed...
@@ -209,7 +209,7 @@ export function getTokensFactory(
     const tokenList = Array.from(localAddressesMap.values())
 
     // Persist it \o/
-    tokenListApi.persistTokens({ networkId, tokenList })
+    tokenListApi.addTokens({ networkId, tokens: tokenList })
   }
 
   async function updateTokens(networkId: number): Promise<void> {
