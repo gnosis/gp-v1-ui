@@ -1,4 +1,4 @@
-import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig } from 'types/config'
+import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig, InfuraProviderConfig } from 'types/config'
 
 describe('Test config defaults', () => {
   it('name', () => {
@@ -66,5 +66,17 @@ describe('Test config defaults', () => {
       ],
     }
     expect(CONFIG.theGraphApi).toEqual(expected)
+  })
+
+  it('ethNodeConfig', () => {
+    const expected: InfuraProviderConfig = {
+      type: 'infura',
+      config: {
+        infuraId: '607a7dfcb1ad4a0b83152e30ce20cfc5',
+        infuraEndpoint: 'wss://mainnet.infura.io/ws/v3/',
+      },
+    }
+
+    expect(CONFIG.defaultProviderConfig).toEqual(expected)
   })
 })

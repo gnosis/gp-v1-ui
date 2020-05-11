@@ -21,6 +21,16 @@ export interface TheGraphApiConfig {
   config: TheGraphApiImplParams
 }
 
+export interface InfuraProviderConfig {
+  type: 'infura'
+  config: { infuraId: string; infuraEndpoint: string }
+}
+
+export interface UrlProviderConfig {
+  type: 'url'
+  config: { ethNodeUrl: string }
+}
+
 export interface Config {
   name: string
   logoPath: string
@@ -28,4 +38,5 @@ export interface Config {
   tcr: MultiTcrConfig | NoTcrConfig
   dexPriceEstimator: DexPriceEstimatorConfig
   theGraphApi: TheGraphApiConfig
+  defaultProviderConfig: InfuraProviderConfig | UrlProviderConfig
 }

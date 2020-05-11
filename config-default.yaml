@@ -46,3 +46,18 @@ theGraphApi:
 
     - networkId: 4
       url: https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby
+
+# Eth node config
+defaultProviderConfig:
+  type: 'infura' # Choices: infura | url
+  config:
+    # It'll be appended to `ethNodeUrl`
+    infuraId: 607a7dfcb1ad4a0b83152e30ce20cfc5
+    # Eth node websocket url to use.
+    # When `infuraId` not set, is used as is
+    infuraEndpoint: wss://mainnet.infura.io/ws/v3/
+  #
+  # Example for type `url`
+  # type: 'url'
+  # config:
+  #   ethNodeUrl: <local eth node>
