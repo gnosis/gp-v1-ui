@@ -156,3 +156,9 @@ declare module '*.woff2'
 declare module '*.md' {
   export const react: React.FC
 }
+
+declare namespace Intl {
+  interface NumberFormatOptions {
+    notation?: 'standard' | 'scientific' | 'engineering' | 'compact'
+  }
+}
