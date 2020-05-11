@@ -139,6 +139,8 @@ Path to the template html file.
 
 Tokens are dynamically loaded from the contract, but it might not be desirable to display everything in the interface.
 
+Gnosis Protocol is a fully permissionless trading protocol for ERC-20, as such, anyone can [enable a token for trading](https://docs.gnosis.io/protocol/docs/addtoken1/). Tokens of dubious value or nature or those not compatible with the ERC-20 standard may also be added. Accordingly, it is the responsibility of the Site operator to determine which tokens listed on the permissionless Gnosis Protocol are displayed on their Site.
+
 To dynamically control which tokens are displayed without the need of a redeployment, it's possible to use a Token Curated Registry (TCR) contract per network.
 
 The only requirement is that this contract implements the following method:
