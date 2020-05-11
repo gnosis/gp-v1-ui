@@ -137,15 +137,12 @@ export function getTokensFactory(
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
-    const [tcrAddressesSet, addressesAndIds] = await Promise.all(
-      // Double await yes! `retry` returns a Promise<Promise<>>
-      await Promise.all([
-        // Fetch addresses from TCR
-        retry(() => fetchTcrAddresses(networkId)),
-        // Fetch addresses from contract given numTokens count
-        retry(() => fetchAddressesAndIds(networkId, numTokens)),
-      ]),
-    )
+    const [tcrAddressesSet, addressesAndIds] = await Promise.all([
+      // Fetch addresses from TCR
+      retry(() => fetchTcrAddresses(networkId)),
+      // Fetch addresses from contract given numTokens count
+      retry(() => fetchAddressesAndIds(networkId, numTokens)),
+    ])
 
     logDebug(`[tokenListFactory][${networkId}] TCR contains ${tcrAddressesSet.size} addresses`)
 
