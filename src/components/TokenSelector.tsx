@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
-import { formatAmount } from '@gnosis.pm/dex-js'
+import { formatAmount } from 'utils'
 import { isAddress } from 'web3-utils'
 import Modali from 'modali'
 
