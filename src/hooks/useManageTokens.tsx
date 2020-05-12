@@ -144,6 +144,7 @@ const ManageTokensContainer: React.FC = () => {
   const addTokensSafeModali: UseAddTokenModalResult['addTokensToList'] = useCallback(
     (...args) => {
       return addTokensToList(...args).finally(() => {
+        // hack for second Modali closing
         document.body.classList.add('modali-open')
       })
     },
