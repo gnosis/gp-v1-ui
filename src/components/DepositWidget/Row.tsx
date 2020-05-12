@@ -151,10 +151,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                 {enabling ? (
                   <>
                     <FontAwesomeIcon icon={faSpinner} spin />
-                    Enabling {symbol}
+                    Enabling
                   </>
                 ) : (
-                  <>Enable {symbol}</>
+                  <>Enable Deposit</>
                 )}
               </button>
             </>
