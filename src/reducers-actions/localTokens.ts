@@ -5,32 +5,28 @@ export interface LocalTokensState {
   disabled: Set<string>
 }
 
-export const enum ActionTypes {
-  ENABLE_TOKEN = 'ENABLE_TOKEN',
-  DISABLE_TOKEN = 'DISABLE_TOKEN',
-  UPDATE_ALL_DISABLED = 'UPDATE_ALL_DISABLED',
-}
+export type ActionTypes = 'ENABLE_TOKEN' | 'DISABLE_TOKEN' | 'UPDATE_ALL_DISABLED'
 
 interface TokenAddressPayload {
   tokenAddress: string
 }
 
-type EnableLocalToken = Actions<ActionTypes.ENABLE_TOKEN, TokenAddressPayload>
-type DisableLocalToken = Actions<ActionTypes.DISABLE_TOKEN, TokenAddressPayload>
-type UpdateAllDisabled = Actions<ActionTypes.UPDATE_ALL_DISABLED, Partial<LocalTokensState>>
+type EnableLocalToken = Actions<'ENABLE_TOKEN', TokenAddressPayload>
+type DisableLocalToken = Actions<'DISABLE_TOKEN', TokenAddressPayload>
+type UpdateAllDisabled = Actions<'UPDATE_ALL_DISABLED', Pick<LocalTokensState, 'disabled'>>
 
 type ReducerActionType = EnableLocalToken | DisableLocalToken | UpdateAllDisabled
 
 export const enableToken = (payload: TokenAddressPayload): EnableLocalToken => ({
-  type: ActionTypes.ENABLE_TOKEN,
+  type: 'ENABLE_TOKEN',
   payload,
 })
 export const disableToken = (payload: TokenAddressPayload): DisableLocalToken => ({
-  type: ActionTypes.DISABLE_TOKEN,
+  type: 'DISABLE_TOKEN',
   payload,
 })
-export const updateLocalTokens = (payload: Partial<LocalTokensState>): UpdateAllDisabled => ({
-  type: ActionTypes.UPDATE_ALL_DISABLED,
+export const updateLocalTokens = (payload: Pick<LocalTokensState, 'disabled'>): UpdateAllDisabled => ({
+  type: 'UPDATE_ALL_DISABLED',
   payload,
 })
 export const saveDisabledToStorage = ({ disabled }: LocalTokensState): void => {
@@ -55,7 +51,7 @@ export function reducer(state: LocalTokensState, action: ReducerActionType): Loc
   const { disabled } = state
 
   switch (action.type) {
-    case ActionTypes.ENABLE_TOKEN: {
+    case 'ENABLE_TOKEN': {
       const { tokenAddress } = action.payload
       // don't update unnecessarily
       if (!disabled.has(tokenAddress)) return state
@@ -66,7 +62,7 @@ export function reducer(state: LocalTokensState, action: ReducerActionType): Loc
       return { ...state, disabled: newSet }
     }
 
-    case ActionTypes.DISABLE_TOKEN: {
+    case 'DISABLE_TOKEN': {
       const { tokenAddress } = action.payload
       // don't update unnecessarily
       if (disabled.has(tokenAddress)) return state
@@ -76,7 +72,7 @@ export function reducer(state: LocalTokensState, action: ReducerActionType): Loc
       return { ...state, disabled: newSet }
     }
 
-    case ActionTypes.UPDATE_ALL_DISABLED:
+    case 'UPDATE_ALL_DISABLED':
       return { ...state, ...action.payload }
     default:
       return state
@@ -85,9 +81,9 @@ export function reducer(state: LocalTokensState, action: ReducerActionType): Loc
 
 export function sideEffect(state: LocalTokensState, action: ReducerActionType): void {
   switch (action.type) {
-    case ActionTypes.ENABLE_TOKEN:
-    case ActionTypes.DISABLE_TOKEN:
-    case ActionTypes.UPDATE_ALL_DISABLED:
+    case 'ENABLE_TOKEN':
+    case 'DISABLE_TOKEN':
+    case 'UPDATE_ALL_DISABLED':
       saveDisabledToStorage(state)
   }
 }
