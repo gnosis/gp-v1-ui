@@ -215,3 +215,36 @@ Where:
 - `type` can only be `the-graph`.
 - `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
 - `url` the endpoint for given `networkId`
+
+### defaultProviderConfig
+
+Endpoint for default Ethereum network provider.
+
+Used when a wallet is not connected and for read operations when connected thru Wallet Connect.
+
+**Config format:**
+
+```yaml
+defaultProviderConfig:
+  type: 'infura'
+  config:
+    infuraId: 607a7dfcb1ad4a0b83152e30ce20cfc5
+    infuraEndpoint: wss://mainnet.infura.io/ws/v3/
+```
+
+OR
+
+```yaml
+defaultProviderConfig:
+  type: 'url'
+  config:
+    ethNodeUrl: http://localhost:8383
+```
+
+Where:
+
+- `infuraId` is your Infura id. Appended to `infuraEndpoint`.
+- `infuraEndpoint` is the base url to Infura endpoint -- without the `infuraId`.
+- `ethNodeUrl` is the url to an Ethereum node.
+
+**Note**: Both values can be provided as environment variables. Respectively, `INFURA_ID` and `ETH_NODE_URL`.

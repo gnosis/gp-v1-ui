@@ -50,10 +50,8 @@ theGraphApi:
 defaultProviderConfig:
   type: 'infura' # Choices: infura | url
   config:
-    # It'll be appended to `ethNodeUrl`
+    # It'll be appended to `infuraEndpoint`
     infuraId: 607a7dfcb1ad4a0b83152e30ce20cfc5
-    # Eth node websocket url to use.
-    # When `infuraId` not set, is used as is
     infuraEndpoint: wss://mainnet.infura.io/ws/v3/
   #
   # Example for type `url`
