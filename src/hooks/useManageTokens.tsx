@@ -7,7 +7,7 @@ import { useTokenList } from './useTokenList'
 import { OptionItem, SearchItem } from 'components/TokenOptionItem'
 import { useDebounce } from './useDebounce'
 import searchIcon from 'assets/img/search.svg'
-import { useBetterAddTokenModal } from './useBetterAddTokenModal'
+import { useBetterAddTokenModal, UseAddTokenModalResult } from './useBetterAddTokenModal'
 import useGlobalState from 'hooks/useGlobalState'
 import { updateLocalTokens } from 'reducers-actions/localTokens'
 import { Toggle } from 'components/Toggle'
@@ -144,6 +144,14 @@ const ManageTokensContainer: React.FC = () => {
   const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
 
   const { modalProps, addTokensToList } = useBetterAddTokenModal()
+  const addTokensSafeModali: UseAddTokenModalResult['addTokensToList'] = useCallback(
+    (...args) => {
+      return addTokensToList(...args).finally(() => {
+        document.body.classList.add('modali-open')
+      })
+    },
+    [addTokensToList],
+  )
 
   const filteredTokens = useMemo(() => {
     if (!debouncedSearch || !tokens || tokens.length === 0) return tokens
@@ -213,7 +221,7 @@ const ManageTokensContainer: React.FC = () => {
               value={search}
               defaultText="Nothing found"
               networkId={networkIdOrDefault}
-              addTokensToList={addTokensToList}
+              addTokensToList={addTokensSafeModali}
             />
           </SearchItemWrapper>
         ) : (
