@@ -128,9 +128,6 @@ const SearchInput: React.FC<SearchInputProps> = props => {
         type="text"
         placeholder="Search by token Name, Symbol or Address"
         {...props}
-        // value={inputValue}
-        // onChange={onChange}
-        // onKeyPress={wrappedOnKeyDown}
       />
     </SearchWrapper>
   )
