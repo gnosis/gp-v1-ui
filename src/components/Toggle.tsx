@@ -25,7 +25,7 @@ const defaultSize: ToggleSize = { width: '2.8em', height: '1em' }
 const ToggleStyled = styled(ToggleBase).attrs(props => ({ ...defaultSize, ...props, theme: undefined }))<ToggleSize>`
   --span-width: ${(props): string => props.width};
   --span-height: ${(props): string => props.height};
-  /* easier to set vers once, then copy the whole func into each calc() */
+  /* easier to set vars once, than copy the whole func into each calc() */
   padding: 1em;
   cursor: pointer;
 
