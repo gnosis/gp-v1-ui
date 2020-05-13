@@ -68,7 +68,7 @@ describe('Test config defaults', () => {
     expect(CONFIG.theGraphApi).toEqual(expected)
   })
 
-  it('ethNodeConfig', () => {
+  it('defaultProviderConfig', () => {
     const expected: InfuraProviderConfig = {
       type: 'infura',
       config: {

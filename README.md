@@ -111,9 +111,35 @@ import About from 'pages/About'
 
 ## Config
 
-### TCR (Optional)
+Default app configs can be found on [the default config file](./config-default.yaml)
+
+We recommend against editing this file directly, though.
+
+If you wish to replace any default config, create a file named `config` inside the [`custom` folder](./custom).
+
+Both JSON and YAML formats are supported.
+
+Simply replace any config found on [config-default](./config-default.yaml).
+
+Below we provide details for each config.
+
+### `name`
+
+A single string that controls the page title and favicon metadata.
+
+### `logoPath`
+
+Path to favicon logo.
+
+### `templatePath`
+
+Path to the template html file.
+
+### `tcr`
 
 Tokens are dynamically loaded from the contract, but it might not be desirable to display everything in the interface.
+
+Gnosis Protocol is a fully permissionless trading protocol for ERC-20, as such, anyone can [enable a token for trading](https://docs.gnosis.io/protocol/docs/addtoken1/). Tokens of dubious value or nature or those not compatible with the ERC-20 standard may also be added. Accordingly, it is the responsibility of the Site operator to determine which tokens listed on the permissionless Gnosis Protocol are displayed on their Site.
 
 To dynamically control which tokens are displayed without the need of a redeployment, it's possible to use a Token Curated Registry (TCR) contract per network.
 
@@ -125,25 +151,100 @@ function getTokens(uint256 _listId) public view returns (address[] memory)
 
 For a sample implementation, refer to [dxDAO's TCR](https://github.com/nicoelzer/dxDAO-Token-Registry/blob/master/contracts/dxTokenRegistry.sol).
 
-<!-- TODO: use a central place for all configs https://github.com/gnosis/dex-react/issues/978 -->
+**Config format:**
 
-Add the relevant config to [this file](./src/api/index.ts).
+```yaml
+tcr:
+  type: 'multi-tcr'
+  config:
+    lists:
+      - networkId: number
+        listId: number
+        contractAddress: string
 
-Config format:
-
-```ts
-{
-  <networkId>: {
-    listId: 4
-    contractAddress: '0xa2d...'
-  }
-}
+# OR, for no filtering
+tcr:
+  type: 'none'
 ```
 
 Where:
 
-- `<networkId>` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `type` currently is either `multi-tcr` or `none` for no filter.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
 - `listId` is optional and defaults to `0`
-- `contractAddress` the address of the contract deployed in network `<networkId>`
+- `contractAddress` the address of the contract deployed in network `networkId`
 
 **Note**: For networks where a TCR contract is not provided, the tokens will not be filtered.
+
+### `dexPriceEstimator`
+
+Endpoints for service that provides price estimation and data for the orderbook graph.
+
+**Config format:**
+
+```yaml
+dexPriceEstimator:
+  type: 'dex-price-estimator'
+  config:
+    - networkId: number
+      url: string
+```
+
+Where:
+
+- `type` can only be `dex-price-estimator`.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `url` the endpoint for given `networkId`
+
+### `theGraphApi`
+
+Endpoints for Gnosis Protocol Subgraph.
+
+**Config format:**
+
+```yaml
+theGraphApi:
+  type: 'the-graph'
+  config:
+    - networkId: number
+      url: string
+```
+
+Where:
+
+- `type` can only be `the-graph`.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `url` the endpoint for given `networkId`
+
+### defaultProviderConfig
+
+Endpoint for default Ethereum network provider.
+
+Used when a wallet is not connected and for read operations when connected thru Wallet Connect.
+
+**Config format:**
+
+```yaml
+defaultProviderConfig:
+  type: 'infura'
+  config:
+    infuraId: 607a7dfcb1ad4a0b83152e30ce20cfc5
+    infuraEndpoint: wss://mainnet.infura.io/ws/v3/
+```
+
+OR
+
+```yaml
+defaultProviderConfig:
+  type: 'url'
+  config:
+    ethNodeUrl: http://localhost:8383
+```
+
+Where:
+
+- `infuraId` is your Infura id. Appended to `infuraEndpoint`.
+- `infuraEndpoint` is the base url to Infura endpoint -- without the `infuraId`.
+- `ethNodeUrl` is the url to an Ethereum node.
+
+**Note**: Both values can be provided as environment variables. Respectively, `INFURA_ID` and `ETH_NODE_URL`.
