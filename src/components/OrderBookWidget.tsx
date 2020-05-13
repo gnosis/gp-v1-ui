@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { TokenDetails, Network } from 'types'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
-import { getNetworkFromId, safeTokenName } from '@gnosis.pm/dex-js'
+import { getNetworkFromId, safeTokenName, parseAmount } from '@gnosis.pm/dex-js'
+import { smartFormat } from 'utils'
 import { dexPriceEstimatorApi } from 'api'
 
 interface OrderBookProps {
@@ -66,7 +68,7 @@ interface ProcessedItem {
   totalVolume: number
   askValueY: number | null
   bidValueY: number | null
-  price: number
+  price: string
 }
 
 /**
@@ -81,12 +83,30 @@ const processData = (
 ): ProcessedItem[] => {
   let totalVolume = 0
   const isBid = type == Offer.Bid
+  // get lowest & average price of token vs token
+  // allows to get an idea of how to format numeros
+  const priceList = list.map(listItem => listItem.price)
+  const lowestPrice = Math.min(...priceList)
+
   return (
     list
       // Account fo decimals
       .map(element => {
+        const decimals = quoteToken.decimals - baseToken.decimals
+        // get the full native string amount to pass into parsedPrice
+        // as price comes in from API as number type
+        const price = (element.price / 10 ** decimals).toLocaleString([], { maximumSignificantDigits: 18 })
+        // return it as a BN via our parseAmount
+        const parsedPrice = parseAmount(price, 18)
         return {
-          price: element.price / 10 ** (quoteToken.decimals - baseToken.decimals),
+          price: smartFormat({
+            amount: parsedPrice!,
+            precision: 18,
+            decimals: 7,
+            // TODO: check math
+            // set small limit to lowest list price
+            smallLimit: lowestPrice / 10 ** decimals / 2,
+          }),
           volume: element.volume / 10 ** baseToken.decimals,
         }
       })
@@ -143,7 +163,8 @@ const draw = (
     const processed = processData(data.bids, baseToken, quoteToken, Offer.Bid).concat(
       processData(data.asks, baseToken, quoteToken, Offer.Ask),
     )
-    processed.sort((lhs, rhs) => lhs.price - rhs.price)
+    // push string '< smallLimit' to front of array
+    processed.sort((lhs, rhs) => (isNaN(+lhs.price) ? -1 : +lhs.price - +rhs.price))
     return processed
   })
 
