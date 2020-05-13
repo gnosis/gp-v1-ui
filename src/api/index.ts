@@ -150,11 +150,12 @@ function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
 function createTcrApi(web3: Web3): TcrApi | undefined {
   const { type } = CONFIG.tcr
   let tcrApi: TcrApi | undefined
-  switch (type) {
+  switch (CONFIG.tcr.type) {
     case 'none':
       tcrApi = undefined
+      break
     case 'multi-tcr':
-      const multiTcrApiConfig = CONFIG.tcr as MultiTcrConfig
+      const multiTcrApiConfig = CONFIG.tcr
       tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
       break
 
