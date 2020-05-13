@@ -7,7 +7,7 @@ import { erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, logDebug } from 'utils'
+import { smartFormat, logDebug } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
@@ -123,7 +123,7 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
         .then(balances => {
           logDebug(
             '[useTokenBalances] Wallet balances',
-            balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
+            balances ? balances.map(b => smartFormat(b.walletBalance, b.decimals)) : null,
           )
           setBalances(balances)
           setError(false)

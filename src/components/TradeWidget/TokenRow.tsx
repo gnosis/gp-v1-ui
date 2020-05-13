@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form'
 import TokenSelector from 'components/TokenSelector'
 import { InputBox } from 'components/InputBox'
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
+import { smartFormat, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 import { ZERO } from 'const'
 
 import { TradeFormTokenId, TradeFormData } from './'
@@ -243,12 +243,12 @@ const TokenRow: React.FC<Props> = ({
             {readOnly ? (
               <FormMessage className={balanceClassName}>
                 {' '}
-                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {balance ? smartFormat(balance.totalExchangeBalance, balance.decimals) : '0'}
               </FormMessage>
             ) : (
               <FormMessage className={balanceClassName}>
                 {' '}
-                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {balance ? smartFormat(balance.totalExchangeBalance, balance.decimals) : '0'}
                 {validateMaxAmount && (
                   <>
                     <TooltipWrapper tooltip="Fill maximum">

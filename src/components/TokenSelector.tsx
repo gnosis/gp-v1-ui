@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
 import { MEDIA } from 'const'
 
-import { formatAmount } from 'utils'
+import { smartFormat } from 'utils'
 import { isAddress } from 'web3-utils'
 import Modali from 'modali'
 
@@ -140,7 +140,7 @@ function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.Rea
   return (
     <OptionItem name={name} symbol={symbol} image={image}>
       {'totalExchangeBalance' in token && (
-        <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, decimals)}</div>
+        <div className="tokenBalance">{smartFormat(token.totalExchangeBalance, decimals)}</div>
       )}
     </OptionItem>
   )

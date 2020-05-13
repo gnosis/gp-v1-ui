@@ -11,7 +11,7 @@ import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
 import useNoScroll from 'hooks/useNoScroll'
 
 import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
-import { formatAmount, formatAmountFull } from 'utils'
+import { smartFormat, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 import { TokenLocalState } from 'reducers-actions'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
@@ -92,7 +92,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           title={formatAmountFull({ amount: totalExchangeBalance, precision: decimals }) || ''}
         >
           {depositing && spinner}
-          {formatAmount(totalExchangeBalance, decimals)}
+          {smartFormat(totalExchangeBalance, decimals)}
         </td>
         <td
           data-label="Pending Withdrawals"
@@ -102,7 +102,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
                 {(claiming || withdrawing) && spinner}
-                {formatAmount(pendingWithdraw.amount, decimals)}
+                {smartFormat(pendingWithdraw.amount, decimals)}
                 <RowClaimSpan className={claiming || withdrawing ? 'disabled' : 'success'}>Claim</RowClaimSpan>
               </RowClaimButton>
             </>
@@ -110,7 +110,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>
               {withdrawing && spinner}
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
-              {formatAmount(pendingWithdraw.amount, decimals)}
+              {smartFormat(pendingWithdraw.amount, decimals)}
             </>
           ) : (
             <>{withdrawing && spinner}0</>
@@ -124,14 +124,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               </li>
               <li>
                 {(claiming || depositing) && spinner}
-                {formatAmount(walletBalance, decimals) + ' '}
+                {smartFormat(walletBalance, decimals) + ' '}
                 WETH <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
               </li>
             </ul>
           ) : (
             <>
               {(claiming || depositing) && spinner}
-              {formatAmount(walletBalance, decimals)}
+              {smartFormat(walletBalance, decimals)}
             </>
           )}
         </td>

@@ -17,7 +17,7 @@ import { TokenDetails } from 'types'
 
 import {
   safeTokenName,
-  formatAmount,
+  smartFormat,
   formatDateFromBatchId,
   batchIdToDate,
   isOrderFilled,
@@ -105,10 +105,10 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
   const filledAmount = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return formatAmount(filledAmount, sellToken.decimals) || '0'
+    return smartFormat(filledAmount, sellToken.decimals) || '0'
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
-  const totalAmount = useMemo(() => formatAmount(order.priceDenominator, sellToken.decimals) || '0', [
+  const totalAmount = useMemo(() => smartFormat(order.priceDenominator, sellToken.decimals) || '0', [
     order.priceDenominator,
     sellToken.decimals,
   ])
