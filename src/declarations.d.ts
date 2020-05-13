@@ -156,3 +156,5 @@ declare module '*.woff2'
 declare module '*.md' {
   export const react: React.FC
 }
+
+declare module 'eth-json-rpc-middleware/*'

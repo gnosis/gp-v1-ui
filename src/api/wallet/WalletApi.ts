@@ -26,6 +26,7 @@ import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
+import { composeProvider } from './composeProvider'
 
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
@@ -244,8 +245,11 @@ export class WalletApiImpl implements WalletApi {
 
     closeOpenWebSocketConnection(this._web3)
 
+    const composedProvider = composeProvider(provider)
+    console.log('composedProvider', composedProvider)
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._web3.setProvider(provider as any)
+    this._web3.setProvider(composedProvider as any)
     logDebug('[WalletApiImpl] Connected')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
