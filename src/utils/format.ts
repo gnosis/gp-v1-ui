@@ -1,7 +1,10 @@
 import BigNumber from 'bignumber.js'
-import { formatAmount as formatAmountDexJS } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
+import { formatAmount } from '@gnosis.pm/dex-js'
+import { DEFAULT_SMALL_LIMIT } from 'const'
+
 export {
+  formatAmount,
   formatAmountFull,
   adjustPrecision,
   parseAmount,
@@ -101,6 +104,7 @@ export const formatTimeToFromBatch = (
 
 // TODO: move
 // Locale is an empty array because we want it to use user's locale
+const ltFractionFormatter = new Intl.NumberFormat([], { maximumFractionDigits: 18 })
 const lt1kFormatter = new Intl.NumberFormat([], { maximumFractionDigits: 5 })
 const lt10kFormatter = new Intl.NumberFormat([], { maximumFractionDigits: 4 })
 const lt100kFormatter = new Intl.NumberFormat([], { maximumFractionDigits: 3 })
@@ -110,13 +114,30 @@ const lt100mFormatter = new Intl.NumberFormat([], { maximumFractionDigits: 0 })
 // same format for billions and trillions
 const lt1000tFormatter = new Intl.NumberFormat([], { maximumFractionDigits: 3, notation: 'compact' })
 
-export const formatAmountForDisplay = (number: string): string => {
+interface FormatAmountParams<T> {
+  amount: T
+  precision: number
+  decimals?: number
+  thousandSeparator?: boolean
+  isLocaleAware?: boolean
+}
+
+interface SmartFormatParams<T> extends Exclude<FormatAmountParams<T>, 'thousandSeparator' | 'isLocaleAware'> {
+  smallLimit: number
+}
+
+export const formatAmountForDisplay = (
+  number: string,
+  { smallLimit }: Pick<SmartFormatParams<BN>, 'smallLimit'>,
+): string => {
   let numberFloat: number | string = parseFloat(number)
 
   if (numberFloat === 0) {
     numberFloat = '0.000'
-  } else if (numberFloat < 0.001) {
-    numberFloat = '< 0.001'
+  } else if (numberFloat < smallLimit) {
+    numberFloat = `< ${smallLimit}`
+  } else if (numberFloat < 1) {
+    numberFloat = ltFractionFormatter.format(numberFloat)
   } else if (numberFloat < 1000) {
     numberFloat = lt1kFormatter.format(numberFloat)
   } else if (numberFloat < 10000) {
@@ -138,13 +159,55 @@ export const formatAmountForDisplay = (number: string): string => {
   return numberFloat
 }
 
-export const formatAmount = (amount: BN, amountPrecision: number): string => {
-  const stringAmount = formatAmountDexJS({
+/**
+ * smartFormat
+ * @description prettier formatting based on Gnosis Safe - uses same signature as formatAmount
+ * @param amount
+ * @param amountPrecision
+ */
+export function smartFormat(amount: BN, amountPrecision: number): string
+export function smartFormat(amount: null | undefined, amountPrecision: number): null
+export function smartFormat(params: SmartFormatParams<BN>): string
+export function smartFormat(params: SmartFormatParams<null | undefined>): null
+export function smartFormat(
+  params: SmartFormatParams<BN | null | undefined> | BN | null | undefined,
+  _amountPrecision?: number,
+): string | null {
+  let amount: BN
+  let precision: number
+  // TODO: set defaults
+  // decimals default should come from @gnosis.pm
+  let decimals = 4
+  let smallLimit = DEFAULT_SMALL_LIMIT
+
+  if (!params || ('amount' in params && !params.amount)) {
+    return null
+  } else if (BN.isBN(params)) {
+    amount = params
+    precision = _amountPrecision as number
+  } else {
+    amount = params.amount as BN
+    precision = params.precision
+    decimals = params.decimals ?? decimals
+    smallLimit = params.smallLimit ?? smallLimit
+  }
+
+  const stringAmount = formatAmount({
     amount,
-    precision: amountPrecision,
+    precision,
+    decimals,
     isLocaleAware: false,
     thousandSeparator: false,
   })
 
-  return formatAmountForDisplay(stringAmount)
+  return formatAmountForDisplay(stringAmount, { smallLimit })
+}
+
+if (process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { parseAmount, toBN } = require('@gnosis.pm/dex-js')
+
+  window['parseAmount'] = parseAmount
+  window['smartFormat'] = smartFormat
+  window['toBN'] = toBN
 }
