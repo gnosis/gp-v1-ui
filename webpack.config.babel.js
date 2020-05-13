@@ -22,6 +22,12 @@ const { name: appName } = config
 
 module.exports = ({ stats = false } = {}) => ({
   devtool: isProduction ? 'source-map' : 'eval-source-map',
+  entry: {
+    inlinedConfig: './src/inlineConfig.ts',
+    actualUseCase: './src/actualUseCase.ts',
+    duplication: './src/duplication.ts',
+    destructure: './src/destructure.ts',
+  },
   output: {
     path: __dirname + '/dist',
     chunkFilename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
