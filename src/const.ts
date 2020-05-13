@@ -102,7 +102,7 @@ let infuraId
 if (process.env.INFURA_ID) {
   infuraId = process.env.INFURA_ID
 } else if (CONFIG.defaultProviderConfig.type === 'infura') {
-  const { config } = CONFIG.defaultProviderConfig as InfuraProviderConfig
+  const { config } = CONFIG.defaultProviderConfig
   infuraId = config.infuraId
 } else {
   infuraId = ''
@@ -114,10 +114,10 @@ let ethNodeUrl
 if (process.env.ETH_NODE_URL) {
   ethNodeUrl = process.env.ETH_NODE_URL
 } else if (CONFIG.defaultProviderConfig.type === 'infura') {
-  const { config } = CONFIG.defaultProviderConfig as InfuraProviderConfig
+  const { config } = CONFIG.defaultProviderConfig
   ethNodeUrl = config.infuraEndpoint + config.infuraId
 } else if (CONFIG.defaultProviderConfig.type === 'url') {
-  const { config } = CONFIG.defaultProviderConfig as UrlProviderConfig
+  const { config } = CONFIG.defaultProviderConfig
   ethNodeUrl = config.ethNodeUrl
 } else {
   throw new Error('Default provider URL is not set. Either provide ETH_NODE_URL env var or use the config.')
