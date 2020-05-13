@@ -25,6 +25,7 @@ module.exports = ({ stats = false } = {}) => ({
   entry: {
     inlinedConfig: './src/inlineConfig.ts',
     actualUseCase: './src/actualUseCase.ts',
+    wrongUseCase: './src/wrongUseCase.ts',
     duplication: './src/duplication.ts',
     destructure: './src/destructure.ts',
   },
