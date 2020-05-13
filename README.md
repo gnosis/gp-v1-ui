@@ -109,12 +109,41 @@ import About from 'pages/About'
 // will try resolving from custom/ first and failing that from src/
 ```
 
-If you also need to change contents of `index.html`, you will have to modify `webpack.config.babel.js`:
+## Config
 
-```js
-new HtmlWebPackPlugin({
-  template: './src/html/index.html',
-  title: ...
+### TCR (Optional)
+
+Tokens are dynamically loaded from the contract, but it might not be desirable to display everything in the interface.
+
+To dynamically control which tokens are displayed without the need of a redeployment, it's possible to use a Token Curated Registry (TCR) contract per network.
+
+The only requirement is that this contract implements the following method:
+
+```sol
+function getTokens(uint256 _listId) public view returns (address[] memory)
 ```
 
-A good idea would be to conditionally change `template` path based on external config or an env variable.
+For a sample implementation, refer to [dxDAO's TCR](https://github.com/nicoelzer/dxDAO-Token-Registry/blob/master/contracts/dxTokenRegistry.sol).
+
+<!-- TODO: use a central place for all configs https://github.com/gnosis/dex-react/issues/978 -->
+
+Add the relevant config to [this file](./src/api/index.ts).
+
+Config format:
+
+```ts
+{
+  <networkId>: {
+    listId: 4
+    contractAddress: '0xa2d...'
+  }
+}
+```
+
+Where:
+
+- `<networkId>` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `listId` is optional and defaults to `0`
+- `contractAddress` the address of the contract deployed in network `<networkId>`
+
+**Note**: For networks where a TCR contract is not provided, the tokens will not be filtered.

@@ -1,0 +1,63 @@
+#######################################################################################
+##                                  DEFAULT CONFIG                                   ##
+#######################################################################################
+# - Defines the default configuration
+# - **WARNING**: Do not modify this file
+#   - For custom config create a new file "custom/config.yaml"
+#   - You can override in the custom file any config that is defined here
+#   - For redefining components, or for more information, follow the instructions in Github:
+#       https://github.com/gnosis/dex-react
+
+# TODO: Rename Dapp into Gnosis Protocol DApp
+name: Mesa - Gnosis Protocol DApp
+
+logoPath: './src/assets/img/logo.svg'
+
+templatePath: './src/html/index.html'
+
+# Whitelisted tokens from Gnosis Contract retrieved from a smart contract
+tcr:
+  type: 'multi-tcr' # json-file, kleros, multi-tcr, none (for full list, it's not the default)
+  config:
+    lists:
+      - networkId: 1
+        listId: 1
+        contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0'
+
+      - networkId: 4
+        contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b'
+
+# Gets a price estimation for a given volume
+dexPriceEstimator:
+  type: 'dex-price-estimator' # dex-price-estimator, the-graph
+  config:
+    - networkId: 1
+      url: https://dex-price-estimator.gnosis.io
+
+    - networkId: 4
+      url: https://dex-price-estimator.rinkeby.gnosis.io
+
+# Subgraph abstraction, used for getting the last price
+theGraphApi:
+  type: 'the-graph' # json-file, kleros, multi-tcr, none (for full list, it's not the default)
+  config:
+    - networkId: 1
+      url: https://api.thegraph.com/subgraphs/name/gnosis/protocol
+
+    - networkId: 4
+      url: https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby
+
+# Eth node config
+defaultProviderConfig:
+  type: 'infura' # Choices: infura | url
+  config:
+    # It'll be appended to `ethNodeUrl`
+    infuraId: 607a7dfcb1ad4a0b83152e30ce20cfc5
+    # Eth node websocket url to use.
+    # When `infuraId` not set, is used as is
+    infuraEndpoint: wss://mainnet.infura.io/ws/v3/
+  #
+  # Example for type `url`
+  # type: 'url'
+  # config:
+  #   ethNodeUrl: <local eth node>
