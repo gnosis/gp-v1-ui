@@ -982,7 +982,7 @@ const GlobalStyles = createGlobalStyle`
     display: none
   }
 
-  body.modali-open::after {
+  .modali-wrapper::before {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -990,8 +990,13 @@ const GlobalStyles = createGlobalStyle`
     right: 0;
     content: "";
     background-color: var(--color-background-modali);
-    z-index: 1040;
   }
+
+  /* Hack to not darken view further when two modali are open */
+  .modali-wrapper:nth-last-of-type(n+3)::before {
+    display: none;
+  }
+
   /* End hack */
   
   .modali-open .modali-overlay {

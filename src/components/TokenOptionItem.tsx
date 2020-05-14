@@ -32,7 +32,7 @@ const OptionItemWrapper = styled.div`
     width: inherit;
     align-items: center;
     align-content: center;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
 
     .tokenName {
       display: flex;
@@ -176,7 +176,7 @@ const generateMessage = ({
 
 // checks if token address is a valid address and not already in the list
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
-  !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
+  !!tokenAddress && !tokenListApi.hasToken({ tokenAddress, networkId }) && isAddress(tokenAddress.toLowerCase())
 
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId, addTokensToList }) => {
   const [isFetching, setIsFetching] = useSafeState(false)
@@ -191,7 +191,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
 
   useEffect(() => {
     // if truthy value, not already in the list and a valid address
-    if (checkIfAddableAddress(value, networkId)) return
+    if (!checkIfAddableAddress(value, networkId)) return
 
     // when cache is hit, token display is immediate
     const cacheKey = { tokenAddress: value, networkId }
