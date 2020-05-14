@@ -95,8 +95,34 @@ export const MEDIA = {
 }
 
 export const ELLIPSIS = '...'
-export const INFURA_ID = process.env.INFURA_ID || '607a7dfcb1ad4a0b83152e30ce20cfc5'
-export const ETH_NODE_URL = process.env.ETH_NODE_URL || `wss://mainnet.infura.io/ws/v3/${INFURA_ID}`
+
+// TODO: should this be on loadConfig?
+let infuraId
+if (process.env.INFURA_ID) {
+  infuraId = process.env.INFURA_ID
+} else if (CONFIG.defaultProviderConfig.type === 'infura') {
+  const { config } = CONFIG.defaultProviderConfig
+  infuraId = config.infuraId
+} else {
+  infuraId = ''
+}
+
+export const INFURA_ID = infuraId
+
+let ethNodeUrl
+if (process.env.ETH_NODE_URL) {
+  ethNodeUrl = process.env.ETH_NODE_URL
+} else if (CONFIG.defaultProviderConfig.type === 'infura') {
+  const { config } = CONFIG.defaultProviderConfig
+  ethNodeUrl = config.infuraEndpoint + config.infuraId
+} else if (CONFIG.defaultProviderConfig.type === 'url') {
+  const { config } = CONFIG.defaultProviderConfig
+  ethNodeUrl = config.ethNodeUrl
+} else {
+  throw new Error('Default provider URL is not set. Either provide ETH_NODE_URL env var or use the config.')
+}
+
+export const ETH_NODE_URL = ethNodeUrl
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
 
