@@ -23,6 +23,7 @@ const Wrapper = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   flex-flow: column wrap;
+  width: 100%;
 
   > div:first-of-type {
     width: 100%;
@@ -176,17 +177,20 @@ const TokenRow: React.FC<Props> = ({
   const balanceClassName = !error && sellAmountOverMax ? 'warning' : 'success'
   const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
+  const fullOverMaxAmount = overMax.gt(ZERO) && formatAmountFull({ amount: overMax, precision: selectedToken.decimals })
+
   const errorOrWarning = error?.message ? (
     <FormInputError errorMessage={error.message as string} />
   ) : (
     overMax.gt(ZERO) && (
       <FormMessage className="warning">
         <i>
-          Have you already deposited <b>{selectedToken.symbol}</b> into the exchange wallet?{' '}
+          Have you already deposited <b title={selectedToken.symbol}>{selectedToken.symbol}</b> into the exchange
+          wallet?{' '}
         </i>
         <i>Sell amount exceeds your balance by</i>
-        <strong>
-          {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
+        <strong title={fullOverMaxAmount as string}>
+          {fullOverMaxAmount} {selectedToken.symbol}.
         </strong>
         <Link to="/wallet" className="depositNow">
           + Deposit {selectedToken.symbol}

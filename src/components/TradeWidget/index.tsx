@@ -149,7 +149,7 @@ const WrappedForm = styled.form`
     justify-content: flex-start;
 
     @media ${MEDIA.mediumUp} {
-      max-height: 11rem;
+      max-height: 7rem;
     }
 
     > b {
@@ -158,11 +158,24 @@ const WrappedForm = styled.form`
     > i {
       margin: 0.3rem 0 0.3rem 0;
       font-style: normal;
+      > b {
+        max-width: 26%;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+      }
     }
     > strong {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      max-width: 49%;
       margin: 0.3rem 0 0.3rem 0.3rem;
       font-size: 1.3rem;
-      word-break: break-word;
     }
   }
 `
