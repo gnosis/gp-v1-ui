@@ -245,7 +245,7 @@ const DEFAULT_AVAILABLE_SLIPPAGE = [{ value: 0.1 }, { value: 0.5, suggested: tru
 const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ availableSlippage = DEFAULT_AVAILABLE_SLIPPAGE }) => {
   return (
     <MaximumSlippageWrapper>
-      <small>Limit additional slippage</small>{' '}
+      <small>Limit additional price slippage</small>{' '}
       <HelpTooltip iconSize="xs" tooltip={'Set additional slippage parameters'} />
       <div>
         {availableSlippage.map(({ value, suggested }, index) => (
