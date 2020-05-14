@@ -17,7 +17,7 @@ import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 import { DexPriceEstimatorApi } from './dexPriceEstimator/DexPriceEstimatorApi'
 import { DexPriceEstimatorApiProxy } from './dexPriceEstimator/DexPriceEstimatorApiProxy'
 import { TcrApi } from './tcr/TcrApi'
-import { TcrApiProxy } from './tcr/TcrApiProxy'
+import { MultiTcrApiProxy } from './tcr/MultiTcrApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -114,39 +114,54 @@ function createTokenListApi(): TokenList {
 }
 
 function createTheGraphApi(): TheGraphApi {
-  const urls = {
-    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol',
-    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby',
+  const { type, config } = CONFIG.theGraphApi
+  let theGraphApi: TheGraphApi
+  switch (type) {
+    case 'the-graph':
+      theGraphApi = new TheGraphApiProxy(config)
+      break
+
+    default:
+      throw new Error('Unknown implementation for TheGraphApi: ' + type)
   }
 
-  const theGraphApi = new TheGraphApiProxy({ urls })
-
   window['theGraphApi'] = theGraphApi
-
   return theGraphApi
 }
 
 function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
-  const networkIds = [Network.Mainnet, Network.Rinkeby]
+  const { type, config } = CONFIG.dexPriceEstimator
+  let dexPriceEstimatorApi: DexPriceEstimatorApi
+  switch (type) {
+    case 'dex-price-estimator':
+      dexPriceEstimatorApi = new DexPriceEstimatorApiProxy(config)
+      break
 
-  const dexPriceEstimatorApi = new DexPriceEstimatorApiProxy({ networkIds })
+    default:
+      throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)
+  }
 
   window['dexPriceEstimatorApi'] = dexPriceEstimatorApi
-
   return dexPriceEstimatorApi
 }
 
-function createTcrApi(web3: Web3): TcrApi {
-  // TODO: load config from config file
-  const config = {
-    1: { listId: 1, contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0' },
-    4: { contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b' },
+function createTcrApi(web3: Web3): TcrApi | undefined {
+  const { type } = CONFIG.tcr
+  let tcrApi: TcrApi | undefined
+  switch (CONFIG.tcr.type) {
+    case 'none':
+      tcrApi = undefined
+      break
+    case 'multi-tcr':
+      const multiTcrApiConfig = CONFIG.tcr
+      tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
+      break
+
+    default:
+      throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)
   }
 
-  const tcrApi = new TcrApiProxy({ web3, config })
-
   window['tcrApi'] = tcrApi
-
   return tcrApi
 }
 
@@ -165,4 +180,4 @@ export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDepe
 export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
 export const dexPriceEstimatorApi: DexPriceEstimatorApi = createDexPriceEstimatorApi()
-export const tcrApi: TcrApi = createTcrApi(web3)
+export const tcrApi: TcrApi | undefined = createTcrApi(web3)
