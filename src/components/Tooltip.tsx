@@ -4,7 +4,7 @@ import { usePopperOnClick, usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePop
 import { State, Placement } from '@popperjs/core'
 import styled from 'styled-components'
 import { isElement, isFragment } from 'react-is'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon, FontAwesomeIconProps } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 
 // visibility necessary for correct boundingRect calculation by popper
@@ -188,6 +188,7 @@ interface HelpTooltipProps {
   tooltip: ReactNode
   placement?: Placement
   offset?: number
+  iconSize?: FontAwesomeIconProps['size']
 }
 
 const HelperSpan = styled.span`
@@ -206,7 +207,7 @@ export const HelpTooltipContainer = styled(LongTooltipContainer)`
   color: black;
 `
 
-export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = 'top', offset }) => {
+export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = 'top', offset, iconSize }) => {
   const {
     targetProps: { ref, onClick },
     tooltipProps,
@@ -223,7 +224,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({ tooltip, placement = '
   return (
     <>
       <HelperSpan ref={ref} onClick={handleClick}>
-        <FontAwesomeIcon icon={faQuestionCircle} />
+        <FontAwesomeIcon icon={faQuestionCircle} size={iconSize} />
       </HelperSpan>
       <Tooltip {...tooltipProps} bgColor="#bfd6ef">
         {tooltip}
