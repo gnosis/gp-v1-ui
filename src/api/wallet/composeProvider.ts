@@ -139,13 +139,8 @@ export const composeProvider = (provider: Provider): Provider => {
   // Logger middleware
   engine.push((req, res, next) => {
     console.log('CPROV::Logger middleware')
-    console.log('CPROV::req', req)
-    console.log('CPROV::res', res)
-
-    // if (req.method === 'eth_subscribe' && req.params[0] === 'newHeads') {
-    //   req.params[0] = 'newBlockHeaders'
-    //   console.log('CPROV::OVERRRIDE')
-    // }
+    console.log('CPROV::req', { ...req })
+    console.log('CPROV::res', { ...res })
 
     if (req.method === 'eth_gasPrice') {
       console.log('CPROV::ETH_GASPRICE')
@@ -153,7 +148,7 @@ export const composeProvider = (provider: Provider): Provider => {
 
     next(done => {
       // triggered at the end of all middlewares
-      console.log('CPROV::FINAL res', res)
+      console.log('CPROV::FINAL res', { ...res })
       done()
     })
   })
