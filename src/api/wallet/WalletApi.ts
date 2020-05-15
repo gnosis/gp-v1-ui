@@ -21,7 +21,7 @@ import {
   Subscriptions,
 } from '@gnosis.pm/dapp-ui'
 
-import { logDebug, toBN, gasPriceEncoder } from 'utils'
+import { logDebug, toBN, txDataEncoder } from 'utils'
 import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
@@ -480,7 +480,7 @@ export class WalletApiImpl implements WalletApi {
       screenSize,
     }
 
-    const encoded = gasPriceEncoder(flagObject)
+    const encoded = txDataEncoder(flagObject)
 
     logDebug('Encoded object', flagObject)
     logDebug('User Wallet print', encoded)

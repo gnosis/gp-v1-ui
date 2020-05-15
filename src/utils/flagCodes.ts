@@ -206,6 +206,6 @@ export const decoderFactory = <T extends string>({
 
 // OUR encoder and decoder
 
-export const gasPriceEncoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
+export const txDataEncoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
 
 export const gasPriceDecoder = decoderFactory({ sentinel: SENTINEL, flags: FLAGS, prefix: '\\d+', postfix: '$' })
