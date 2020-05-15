@@ -132,7 +132,20 @@ const connectToReemit = ({ from, to, events }: ConnectToReemitParams): void => {
   events.forEach(event => from.on(event, to.emit.bind(to, event)))
 }
 
-export const composeProvider = (provider: Provider): Provider => {
+const createConditionalMiddleware = (
+  condition: (req: JsonRpcRequest<any>) => boolean,
+  handle: (req: JsonRpcRequest<any>, res: JsonRpcResponse<any>) => boolean | Promise<boolean>, // handled -- true, not --false
+): JsonRpcMiddleware => {
+  return async (req, res, next, end): Promise<void> => {
+    // if not condition, skip and got to next middleware
+    if (!condition(req)) return next()
+
+    // if handled fully, end here
+    if (await handle(req, res)) return end()
+    // otherwise continue to next middleware
+    next()
+  }
+}
   const engine = new (RpcEngine as any)() as JsonRpcEngine
   console.log('CPROV::engine', engine, engine.push)
 
