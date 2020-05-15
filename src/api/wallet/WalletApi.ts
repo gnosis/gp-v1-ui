@@ -251,7 +251,6 @@ export class WalletApiImpl implements WalletApi {
     const earmarkingFunction = async (data?: string): Promise<string> => earmarkTxData(data, await this.userPrintAsync)
 
     const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTxData: earmarkingFunction })
-    console.log('composedProvider', composedProvider)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(composedProvider as any)
