@@ -5,6 +5,11 @@ import {
   PendingOrdersState,
   PendingOrdersInitialState as pendingOrders,
 } from './pendingOrders'
+import {
+  reducer as PriceSlippageReducer,
+  PriceSlippageState,
+  PRICE_SLIPPAGE_INITIAL_STATE as priceSlippage,
+} from './priceSlippage'
 import { reducer as OrdersReducer, OrdersState, INITIAL_ORDERS_STATE as orders } from './orders'
 import { reducer as TradeReducer, TradeState, INITIAL_TRADE_STATE as trade } from './trade'
 
@@ -15,9 +20,14 @@ export interface Actions<T, P> {
   payload: P
 }
 
+export type ActionCreator<T, P> = (payload: P) => Actions<T, P>
+
+export type ReducerCreator<S, A> = (state: S, action: A) => S
+
 export interface GlobalState {
   tokens: TokenLocalState
   pendingOrders: PendingOrdersState
+  priceSlippage: PriceSlippageState
   orders: OrdersState
   trade: TradeState
 }
@@ -33,6 +43,7 @@ export const INITIAL_STATE = (): GlobalState => {
   return {
     tokens,
     pendingOrders,
+    priceSlippage,
     orders,
     trade,
   }
@@ -47,6 +58,7 @@ export const INITIAL_STATE = (): GlobalState => {
 export const rootReducer = combineReducers({
   tokens: TokenRowReducer,
   pendingOrders: PendingOrderReducer,
+  priceSlippage: PriceSlippageReducer,
   orders: OrdersReducer,
   trade: TradeReducer,
 })
