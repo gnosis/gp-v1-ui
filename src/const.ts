@@ -139,3 +139,10 @@ export const VALID_FROM_DEFAULT = '30'
 export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
+
+export const SLIPPAGE_MAP = new Map([
+  ['0.1', false],
+  ['0.5', true],
+  ['1', false],
+])
+export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
