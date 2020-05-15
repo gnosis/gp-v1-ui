@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-ignore */
 import RpcEngine, {
   JsonRpcEngine,
   JsonRpcMiddleware,
@@ -7,7 +5,6 @@ import RpcEngine, {
   JsonRpcResponse,
   JsonRpcError,
 } from 'json-rpc-engine'
-// import providerAsMiddleware from 'eth-json-rpc-middleware/providerAsMiddleware'
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { Provider } from '@gnosis.pm/dapp-ui'
 import { WebsocketProvider, TransactionConfig } from 'web3-core'
@@ -60,11 +57,11 @@ const connectToReemit = ({ from, to, events }: ConnectToReemitParams): void => {
   events.forEach(event => from.on(event, to.emit.bind(to, event)))
 }
 
-const createConditionalMiddleware = (
-  condition: (req: JsonRpcRequest<any>) => boolean,
-  handle: (req: JsonRpcRequest<any>, res: JsonRpcResponse<any>) => boolean | Promise<boolean>, // handled -- true, not --false
+const createConditionalMiddleware = <T extends unknown>(
+  condition: (req: JsonRpcRequest<T>) => boolean,
+  handle: (req: JsonRpcRequest<T>, res: JsonRpcResponse<T>) => boolean | Promise<boolean>, // handled -- true, not --false
 ): JsonRpcMiddleware => {
-  return async (req, res, next, end): Promise<void> => {
+  return async (req: JsonRpcRequest<T>, res: JsonRpcResponse<T>, next, end): Promise<void> => {
     // if not condition, skip and got to next middleware
     if (!condition(req)) return next()
 
@@ -84,10 +81,11 @@ export const composeProvider = (
   provider: Provider,
   { fetchGasPrice, earmarkTxData }: ExtraMiddlewareHandlers,
 ): Provider => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
 
   engine.push(
-    createConditionalMiddleware(
+    createConditionalMiddleware<[]>(
       req => req.method === 'eth_gasPrice',
       async (_req, res) => {
         const fetchedPrice = await fetchGasPrice()
@@ -106,9 +104,9 @@ export const composeProvider = (
   )
 
   engine.push(
-    createConditionalMiddleware(
+    createConditionalMiddleware<TransactionConfig[]>(
       req => req.method === 'eth_sendTransaction',
-      async (req: JsonRpcRequest<TransactionConfig[]>) => {
+      async req => {
         const txConfig = req.params?.[0]
         // no parameters, which shouldn't happen
         if (!txConfig) return false
