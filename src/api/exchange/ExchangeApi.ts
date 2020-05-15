@@ -195,7 +195,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -223,7 +223,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
-      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+      .send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -264,7 +264,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const tx = contract.methods
       .placeValidFromOrders(buyTokens, sellTokens, validFroms, validUntils, buyAmountsStr, sellAmountsStr)
-      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+      .send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -290,7 +290,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams,
   }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
 
     if (txOptionalParams && txOptionalParams.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
