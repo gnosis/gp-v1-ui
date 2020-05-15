@@ -208,4 +208,11 @@ export const decoderFactory = <T extends string>({
 
 export const txDataEncoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
 
-export const gasPriceDecoder = decoderFactory({ sentinel: SENTINEL, flags: FLAGS, prefix: '\\d+', postfix: '$' })
+// not used in FE
+// export const txDataDecoder = decoderFactory({
+//   sentinel: SENTINEL,
+//   flags: FLAGS,
+//   // tx data is a hex string
+//   prefix: '0x[\\da-fA-F]*',
+//   postfix: '$',
+// })
