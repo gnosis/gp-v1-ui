@@ -20,6 +20,8 @@ import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 import { useDebounce } from 'hooks/useDebounce'
 import { TokenLocalState } from 'reducers-actions'
+import { useManageTokens } from 'hooks/useManageTokens'
+import useGlobalState from 'hooks/useGlobalState'
 
 interface WithdrawState {
   amount: BN
@@ -355,19 +357,25 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
     setHideZeroBalances(false)
   }
 
-  const filteredBalances = useMemo(() => {
-    if (!debouncedSearch || !balances || balances.length === 0) return balances
+  const [{ localTokens }] = useGlobalState()
 
-    const searchTxt = debouncedSearch.toLowerCase()
+  const filteredBalances = useMemo(() => {
+    if ((!debouncedSearch && localTokens.disabled.size === 0) || !balances || balances.length === 0) return balances
+
+    const searchTxt = debouncedSearch.trim().toLowerCase()
 
     return balances.filter(({ symbol, name, address }) => {
+      if (localTokens.disabled.has(address)) return false
+
+      if (searchTxt === '') return true
+
       return (
         symbol?.toLowerCase().includes(searchTxt) ||
         name?.toLowerCase().includes(searchTxt) ||
         address.toLowerCase().includes(searchTxt)
       )
     })
-  }, [debouncedSearch, balances])
+  }, [debouncedSearch, balances, localTokens.disabled])
 
   const displayedBalances = useMemo(() => {
     if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
@@ -376,6 +384,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
       return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
     })
   }, [hideZeroBalances, filteredBalances])
+
+  const { modalProps, toggleModal } = useManageTokens()
 
   return (
     <BalancesWidget>
@@ -392,7 +402,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
           <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
           <b>Hide zero balances</b>
         </label>
-        <button type="button" className="balances-manageTokens not-implemented">
+        <button type="button" className="balances-manageTokens" onClick={toggleModal}>
           Manage Tokens
         </button>
       </BalanceTools>
@@ -440,13 +450,14 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               : (search || hideZeroBalances) && (
                   <NoTokensMessage>
                     <td>
-                      No tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                      No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
                     </td>
                   </NoTokensMessage>
                 )}
           </tbody>
         </CardTable>
       )}
+      <Modali.Modal {...modalProps} />
     </BalancesWidget>
   )
 }
