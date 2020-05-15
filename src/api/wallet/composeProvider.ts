@@ -11,7 +11,7 @@ import RpcEngine, {
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { Provider } from '@gnosis.pm/dapp-ui'
 import Web3 from 'web3'
-import { WebsocketProvider } from 'web3-core'
+import { WebsocketProvider, TransactionConfig } from 'web3-core'
 import { EventEmitter } from 'events'
 import { numberToHex } from 'web3-utils'
 
@@ -156,9 +156,13 @@ const createConditionalMiddleware = (
 
 interface ExtraMiddlewareHandlers {
   fetchGasPrice(): Promise<string | undefined>
+  earmarkTxData(data?: string): Promise<string>
 }
 
-export const composeProvider = (provider: Provider, { fetchGasPrice }: ExtraMiddlewareHandlers): Provider => {
+export const composeProvider = (
+  provider: Provider,
+  { fetchGasPrice, earmarkTxData }: ExtraMiddlewareHandlers,
+): Provider => {
   const engine = new (RpcEngine as any)() as JsonRpcEngine
   console.log('CPROV::engine', engine, engine.push)
 
@@ -194,6 +198,27 @@ export const composeProvider = (provider: Provider, { fetchGasPrice }: ExtraMidd
         }
 
         // not handled
+        return false
+      },
+    ),
+  )
+
+  engine.push(
+    createConditionalMiddleware(
+      req => req.method === 'eth_sendTransaction',
+      async (req: JsonRpcRequest<TransactionConfig[]>) => {
+        const txConfig = req.params?.[0]
+        // no parameters, which shouldn't happen
+        if (!txConfig) return false
+
+        console.log('Original data', txConfig.data)
+
+        const earmarkedData = await earmarkTxData(txConfig.data)
+        console.log('earmarkedData', earmarkedData)
+
+        txConfig.data = earmarkedData
+        // don't mark as handled
+        // pass modified tx on
         return false
       },
     ),
