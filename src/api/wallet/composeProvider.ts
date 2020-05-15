@@ -1,12 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
-import RpcEngine, { JsonRpcEngine, JsonRpcMiddleware, JsonRpcResponse, JsonRpcError } from 'json-rpc-engine'
+import RpcEngine, {
+  JsonRpcEngine,
+  JsonRpcMiddleware,
+  JsonRpcRequest,
+  JsonRpcResponse,
+  JsonRpcError,
+} from 'json-rpc-engine'
 // import providerAsMiddleware from 'eth-json-rpc-middleware/providerAsMiddleware'
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { Provider } from '@gnosis.pm/dapp-ui'
 import Web3 from 'web3'
 import { WebsocketProvider } from 'web3-core'
 import { EventEmitter } from 'events'
+import { numberToHex } from 'web3-utils'
 
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider | WebsocketProvider): JsonRpcMiddleware {
@@ -146,6 +153,12 @@ const createConditionalMiddleware = (
     next()
   }
 }
+
+interface ExtraMiddlewareHandlers {
+  fetchGasPrice(): Promise<string | undefined>
+}
+
+export const composeProvider = (provider: Provider, { fetchGasPrice }: ExtraMiddlewareHandlers): Provider => {
   const engine = new (RpcEngine as any)() as JsonRpcEngine
   console.log('CPROV::engine', engine, engine.push)
 
@@ -165,6 +178,26 @@ const createConditionalMiddleware = (
       done()
     })
   })
+
+  engine.push(
+    createConditionalMiddleware(
+      req => req.method === 'eth_gasPrice',
+      async (_req, res) => {
+        const fetchedPrice = await fetchGasPrice()
+        console.log('fetchedPrice', fetchedPrice, numberToHex(fetchedPrice!))
+
+        // got price
+        if (fetchedPrice) {
+          res.result = numberToHex(fetchedPrice)
+          // handled
+          return true
+        }
+
+        // not handled
+        return false
+      },
+    ),
+  )
 
   const walletMware = providerAsMiddleware(provider)
 
