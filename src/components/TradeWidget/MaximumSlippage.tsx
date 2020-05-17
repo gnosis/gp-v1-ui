@@ -2,9 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { HelpTooltip } from 'components/Tooltip'
-import { MEDIA } from 'const'
+import { MEDIA, SLIPPAGE_MAP } from 'const'
+import { PriceSlippageState } from 'reducers-actions/priceSlippage'
 
-const MaximumSlippageWrapper = styled.div`
+const Wrapper = styled.div`
   background: var(--color-background-input);
   border-radius: var(--border-radius-top);
   padding: 1rem;
@@ -21,8 +22,12 @@ const MaximumSlippageWrapper = styled.div`
     margin: 1rem auto 0.2rem;
     width: 100%;
 
+    > button {
+      border-radius: 3rem;
+    }
+
     > button,
-    > label > input[type='text'] {
+    > label > input {
       flex: 1;
 
       background: var(--color-background-pageWrapper);
@@ -30,7 +35,6 @@ const MaximumSlippageWrapper = styled.div`
       font-size: inherit;
       font-weight: normal;
 
-      border-radius: 3rem;
       height: 3rem;
 
       padding: 0.65rem 1.5rem;
@@ -41,6 +45,7 @@ const MaximumSlippageWrapper = styled.div`
       white-space: nowrap;
 
       &.selected,
+      &.selected ~ small,
       &:hover:not(input),
       &:focus,
       &:focus ~ small {
@@ -48,8 +53,12 @@ const MaximumSlippageWrapper = styled.div`
       }
 
       &.selected,
-      &:hover:not(input),
+      &:hover:not(input):not(.selected),
       &:focus {
+        background: var(--color-background-button-hover);
+      }
+
+      &.selected {
         background: var(--color-background-CTA);
       }
 
@@ -83,7 +92,7 @@ const MaximumSlippageWrapper = styled.div`
         }
       }
 
-      > input[type='text'] {
+      > input {
         margin: 0;
         padding-right: 3.4rem;
         width: 100%;
@@ -96,36 +105,47 @@ const MaximumSlippageWrapper = styled.div`
   }
 `
 
-interface SlippageParam {
-  value: number
-  suggested?: boolean
-}
-
 interface MaximumSlippageProps {
-  availableSlippage?: SlippageParam[]
+  priceSlippage: PriceSlippageState
+  setNewSlippage: (customSlippage: string | React.ChangeEvent<HTMLInputElement>) => void
 }
 
-const DEFAULT_AVAILABLE_SLIPPAGE = [{ value: 0.1 }, { value: 0.5, suggested: true }, { value: 1 }]
+const slippagePercentages = Array.from(SLIPPAGE_MAP.keys())
 
-const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ availableSlippage = DEFAULT_AVAILABLE_SLIPPAGE }) => {
+const checkCustomPriceSlippage = (slippagePercentage: string): boolean =>
+  !!slippagePercentage && !SLIPPAGE_MAP.has(slippagePercentage)
+
+const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ setNewSlippage, priceSlippage }) => {
   return (
-    <MaximumSlippageWrapper>
+    <Wrapper>
       <small>Limit additional price slippage</small>{' '}
       <HelpTooltip iconSize="xs" tooltip={'Set additional slippage parameters'} />
       <div>
-        {availableSlippage.map(({ value, suggested }, index) => (
-          <button key={value + index} type="button" onClick={(): void => alert(`Slippage Value:: ${value}`)}>
+        {slippagePercentages.map((slippage, index) => (
+          <button
+            key={slippage + index}
+            type="button"
+            onClick={(): void => setNewSlippage(slippage)}
+            className={slippage === priceSlippage ? 'selected' : ''}
+          >
             <small>
-              {value}%{suggested && ' (suggested)'}
+              {slippage}%{SLIPPAGE_MAP.get(slippage) && ' (suggested)'}
             </small>
           </button>
         ))}
         <label>
-          <input type="text" placeholder="Custom" />
+          <input
+            type="number"
+            step="0.1"
+            placeholder="Custom"
+            value={priceSlippage}
+            className={checkCustomPriceSlippage(priceSlippage) ? 'selected' : ''}
+            onChange={(e): void => setNewSlippage(e.target.value)}
+          />
           <small>%</small>
         </label>
       </div>
-    </MaximumSlippageWrapper>
+    </Wrapper>
   )
 }
 
