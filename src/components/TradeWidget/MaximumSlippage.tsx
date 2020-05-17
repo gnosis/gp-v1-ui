@@ -123,7 +123,7 @@ const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ setNewSlippage, price
       <div>
         {slippagePercentages.map((slippage, index) => (
           <button
-            key={slippage + index}
+            key={index}
             type="button"
             onClick={(): void => setNewSlippage(slippage)}
             className={slippage === priceSlippage ? 'selected' : ''}
