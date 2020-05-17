@@ -1,17 +1,28 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { HelpTooltip } from 'components/Tooltip'
 import { MEDIA, SLIPPAGE_MAP } from 'const'
 import { PriceSlippageState } from 'reducers-actions/priceSlippage'
 
 const Wrapper = styled.div`
-  background: var(--color-background-input);
-  border-radius: var(--border-radius-top);
-  padding: 1rem;
+  font-size: 1.6rem;
   width: 100%;
 
-  font-size: 1.2rem;
+  > strong {
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+    color: var(--color-text-primary);
+    width: 100%;
+    margin: 0 0 1rem;
+    padding: 0;
+    box-sizing: border-box;
+    font-size: 1.5rem;
+
+    @media ${MEDIA.mobile} {
+      font-size: 1.3rem;
+    }
+  }
 
   > div {
     display: flex;
@@ -20,22 +31,31 @@ const Wrapper = styled.div`
     justify-content: space-evenly;
 
     margin: 1rem auto 0.2rem;
+    height: 4.4rem;
     width: 100%;
 
     > button {
       border-radius: 3rem;
+
+      > small {
+        font-size: x-small;
+        margin-left: 0.4rem;
+      }
     }
 
     > button,
     > label > input {
+      display: flex;
       flex: 1;
+      align-items: center;
+      justify-content: space-evenly;
 
-      background: var(--color-background-pageWrapper);
+      background: var(--color-background-input);
       color: var(--color-text-primary);
       font-size: inherit;
       font-weight: normal;
 
-      height: 3rem;
+      height: 100%;
 
       padding: 0.65rem 1.5rem;
       &:not(:last-child) {
@@ -49,25 +69,25 @@ const Wrapper = styled.div`
       &:hover:not(input),
       &:focus,
       &:focus ~ small {
-        color: var(--color-background-pageWrapper);
+        color: var(--color-text-button-hover);
       }
 
-      &.selected,
       &:hover:not(input):not(.selected),
       &:focus {
-        background: var(--color-background-button-hover);
+        background-color: var(--color-background-button-hover);
       }
 
       &.selected {
-        background: var(--color-background-CTA);
+        background: var(--color-text-active);
       }
 
-      transition: background 0.2s ease-in-out;
+      transition: all 0.2s ease-in-out;
     }
 
     > label {
       position: relative;
       flex: 1.6;
+      height: 100%;
 
       > small {
         position: absolute;
@@ -93,6 +113,7 @@ const Wrapper = styled.div`
       }
 
       > input {
+        border-radius: var(--border-radius-top);
         margin: 0;
         padding-right: 3.4rem;
         width: 100%;
@@ -118,8 +139,7 @@ const checkCustomPriceSlippage = (slippagePercentage: string): boolean =>
 const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ setNewSlippage, priceSlippage }) => {
   return (
     <Wrapper>
-      <small>Limit additional price slippage</small>{' '}
-      <HelpTooltip iconSize="xs" tooltip={'Set additional slippage parameters'} />
+      <strong>Limit additional price slippage</strong>
       <div>
         {slippagePercentages.map((slippage, index) => (
           <button
@@ -128,9 +148,7 @@ const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ setNewSlippage, price
             onClick={(): void => setNewSlippage(slippage)}
             className={slippage === priceSlippage ? 'selected' : ''}
           >
-            <small>
-              {slippage}%{SLIPPAGE_MAP.get(slippage) && ' (suggested)'}
-            </small>
+            {slippage}%{SLIPPAGE_MAP.get(slippage) && <small>(suggested)</small>}
           </button>
         ))}
         <label>
