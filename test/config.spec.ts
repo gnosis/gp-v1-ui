@@ -34,7 +34,7 @@ describe('Test config defaults', () => {
     expect(CONFIG.tcr).toEqual(expected)
   })
 
-  it('dexPriceEstimator config', () => {
+  it.skip('dexPriceEstimator config', () => {
     const expected: DexPriceEstimatorConfig = {
       type: 'dex-price-estimator',
       config: [
