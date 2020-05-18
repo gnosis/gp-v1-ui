@@ -1,21 +1,24 @@
 import React, { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
+
+// types, const and utils
+import { TokenDetails, TokenBalanceDetails } from 'types'
+import { ZERO, MEDIA } from 'const'
+import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
+
+// components
 import TokenSelector from 'components/TokenSelector'
 import { InputBox } from 'components/InputBox'
-import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
-import { ZERO } from 'const'
-
-import { TradeFormTokenId, TradeFormData } from './'
-
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
-import FormMessage, { FormInputError } from './FormMessage'
-import { useNumberInput } from './useNumberInput'
 import { Input } from 'components/Input'
-import { MEDIA } from 'const'
-import { Link } from 'react-router-dom'
+
+// TradeWidget: subcomponents
+import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
+import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 
 const Wrapper = styled.div`
   display: flex;

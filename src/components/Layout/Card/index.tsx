@@ -1,1 +1,1 @@
-export * from './Card'
+export * from 'components/Layout/Card/Card'

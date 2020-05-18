@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import { withRouter, RouteComponentProps } from 'react-router'
 
-import { UserWalletWrapper } from './UserWallet.styled'
+import { UserWalletWrapper } from 'components/UserWallet/UserWallet.styled'
 
 const LazyUserWallet = React.lazy(async () => {
   const UserWalletProm = import(

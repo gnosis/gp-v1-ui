@@ -1,11 +1,17 @@
 import React, { ReactNode, CSSProperties, useCallback } from 'react'
-import Portal from './Portal'
-import { usePopperOnClick, usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 import { State, Placement } from '@popperjs/core'
 import styled from 'styled-components'
 import { isElement, isFragment } from 'react-is'
+
+// assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
+
+// components
+import Portal from 'components/Portal'
+
+// hooks
+import { usePopperOnClick, usePopperDefault, TOOLTIP_OFFSET } from 'hooks/usePopper'
 
 // visibility necessary for correct boundingRect calculation by popper
 const TooltipOuter = styled.div<Pick<TooltipBaseProps, 'isShown'>>`

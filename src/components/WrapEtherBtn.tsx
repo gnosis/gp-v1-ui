@@ -1,13 +1,19 @@
 import React, { useMemo } from 'react'
-import styled from 'styled-components'
-import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
-import Modali, { useModali } from 'modali'
-import { InputBox } from 'components/InputBox'
 import { useForm } from 'react-hook-form'
-import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
+import styled from 'styled-components'
+import Modali, { useModali } from 'modali'
 import BN from 'bn.js'
+
+// utils
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
+import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
+
+// components
+import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import { TooltipWrapper } from 'components/Tooltip'
+import { InputBox } from 'components/InputBox'
+
+// hooks
 import useSafeState from 'hooks/useSafeState'
 import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
 import { useTokenBalances } from 'hooks/useTokenBalances'
