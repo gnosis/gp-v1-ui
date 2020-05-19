@@ -10,12 +10,8 @@ import { DISABLE_SPINNER_DELAY } from 'const'
 export interface Result {
   wrappingEth: boolean
   unwrappingWeth: boolean
-  wrapEth(amount: string): Promise<Receipt>
-  unwrapWeth(amount: string): Promise<Receipt>
-}
-
-export interface Params {
-  txOptionalParams: TxOptionalParams
+  wrapEth(amount: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
+  unwrapWeth(amount: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
 interface WrapUnwrapAuxParams {
@@ -55,8 +51,7 @@ async function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
   }
 }
 
-export const useWrapUnwrapEth = (params: Params): Result => {
-  const { txOptionalParams } = params
+export const useWrapUnwrapEth = (): Result => {
   const { userAddress, isConnected, networkId } = useWalletConnection()
   const [wrappingEth, setWrappingEth] = useSafeState(false)
   const [unwrappingWeth, setUnwrappingWeth] = useSafeState(false)
@@ -64,26 +59,27 @@ export const useWrapUnwrapEth = (params: Params): Result => {
     userAddress,
     networkId,
     isConnected,
-    txOptionalParams,
   }
 
-  async function wrapEth(amount: string): Promise<Receipt> {
+  async function wrapEth(amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> {
     logDebug('[useWrapUnwrapEth] Wrap ETH: ' + amount)
     return wrapUnwrapAux({
       ...baseParams,
       amount,
       setLoadingFlag: setWrappingEth,
       execute: params => wethApi.deposit(params),
+      txOptionalParams,
     })
   }
 
-  async function unwrapWeth(amount: string): Promise<Receipt> {
+  async function unwrapWeth(amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> {
     logDebug('[useWrapUnwrapEth] Unwrap ETH: ' + amount)
     return wrapUnwrapAux({
       ...baseParams,
       amount,
       setLoadingFlag: setUnwrappingWeth,
       execute: params => wethApi.withdraw(params),
+      txOptionalParams,
     })
   }
 

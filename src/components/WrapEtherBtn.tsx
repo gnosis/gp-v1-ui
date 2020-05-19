@@ -7,7 +7,6 @@ import { useForm } from 'react-hook-form'
 import { DEFAULT_PRECISION, formatAmountFull, toWei } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
-import { composeOptionalParams } from 'utils/transaction'
 import { TooltipWrapper } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
 import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
@@ -16,6 +15,8 @@ import { WETH_ADDRESS_MAINNET } from 'const'
 import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { composeOptionalParams } from 'utils/transaction'
+import { toast } from 'toastify'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -192,9 +193,7 @@ interface WrapEtherFormData {
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth({
-    txOptionalParams: composeOptionalParams(),
-  })
+  const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
   const { ethBalance, balances } = useBalances()
   const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
   const wethBalance = wethBalanceDetails?.walletBalance
@@ -261,16 +260,31 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         onClick={handleSubmit((data: WrapEtherFormData): void => {
           const { wrapAmount: wrapAmountEther } = data
           const wrapAmount = toWei(wrapAmountEther)
+
+          // Hide modal once the transaction is sent
+          const txOptionalParams = composeOptionalParams(() => modalHook.hide())
+
           new BigNumber(wrapAmount)
+          let wrapUnwrapPromise, successMessage: string, errorMessage: string
           if (wrap) {
             logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH`)
 
-            wrapEth(wrapAmount)
+            wrapUnwrapPromise = wrapEth(wrapAmount, txOptionalParams)
+            successMessage = `Successfully wrapped ${wrapAmountEther} ETH`
+            errorMessage = `Error wrapping ${wrapAmountEther} ETH`
           } else {
             logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} WETH`)
-            unwrapWeth(wrapAmount)
+            wrapUnwrapPromise = unwrapWeth(wrapAmount, txOptionalParams)
+            successMessage = `Successfully unwrapped ${wrapAmountEther} WETH`
+            errorMessage = `Error unwrapping ${wrapAmountEther} WETH`
           }
-          modalHook.hide()
+
+          wrapUnwrapPromise
+            .then(() => toast.success(successMessage))
+            .catch(error => {
+              console.error(errorMessage, error)
+              toast.error(errorMessage)
+            })
         })}
       />,
     ],
