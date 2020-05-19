@@ -15,7 +15,6 @@ import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import { Input } from 'components/Input'
 import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
-import { WrapEtherBtn } from 'components/WrapEtherBtn'
 import { Link } from 'react-router-dom'
 
 const Wrapper = styled.div`
@@ -231,13 +230,14 @@ const TokenRow: React.FC<Props> = ({
         <strong>{selectLabel}</strong>
         <span>
           {!readOnly && (
-            // TODO: Implement deposit in Trade widget
+            // TODO: Implement deposit in Trade widget. When ready, show also the Wrap Ether button
             //  https://github.com/gnosis/dex-react/issues/610
             <Link className="btn" to="/wallet">
               + Deposit
             </Link>
           )}
-          {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
+          {/* The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented  */}
+          {/* {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />} */}
           <span>
             Balance:
             {readOnly ? (
