@@ -14,6 +14,8 @@ import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
 import { useBalances } from 'hooks/useBalances'
 import { WETH_ADDRESS_MAINNET } from 'const'
 import BigNumber from 'bignumber.js'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -284,7 +286,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         onClick={toggleModal}
         tooltip={tooltipText}
       >
-        {loading ? 'Loading...' : label || title}
+        {loading && <FontAwesomeIcon icon={faSpinner} spin />} {label || title}
       </TooltipWrapper>
       <Modali.Modal {...modalHook} />
     </>

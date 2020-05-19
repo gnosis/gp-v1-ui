@@ -5,6 +5,7 @@ import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { WrapUnwrapParams } from 'api/weth/WethApi'
 import { logDebug } from 'utils'
+import { DISABLE_SPINNER_DELAY } from 'const'
 
 export interface Result {
   wrappingEth: boolean
@@ -50,7 +51,7 @@ async function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
     })
     return receipt
   } finally {
-    setLoadingFlag(false)
+    setTimeout(() => setLoadingFlag(false), DISABLE_SPINNER_DELAY)
   }
 }
 
