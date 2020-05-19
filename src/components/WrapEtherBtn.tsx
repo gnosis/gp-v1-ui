@@ -4,7 +4,7 @@ import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
 import { InputBox } from 'components/InputBox'
 import { useForm } from 'react-hook-form'
-import { DEFAULT_PRECISION, formatAmountFull, toWei } from '@gnosis.pm/dex-js'
+import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
 import { TooltipWrapper } from 'components/Tooltip'
@@ -198,7 +198,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
   const wethBalance = wethBalanceDetails?.walletBalance
 
-  const { register, errors, handleSubmit, setValue } = useForm<WrapEtherFormData>({
+  const { register, errors, handleSubmit, setValue, watch } = useForm<WrapEtherFormData>({
     mode: 'onChange',
   })
   const amountError = errors[INPUT_ID_AMOUNT]
@@ -207,6 +207,11 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth }),
     [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth],
   )
+
+  // Show Warning: Check if the user is Wrapping all his balance
+  const amountValue = watch(INPUT_ID_AMOUNT)
+  const amount = parseAmount(amountValue, DEFAULT_PRECISION) || ZERO
+  const wrapAllBalance = wrap && balance && !amount.isZero() && amount.eq(balance)
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -239,14 +244,38 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
                   required
                   ref={register({
                     pattern: { value: validInputPattern, message: 'Invalid amount' },
-                    validate: { positive: validatePositiveConstructor('Invalid amount') },
+                    validate: {
+                      positive: validatePositiveConstructor('Invalid amount'),
+                      max: (value: string): string | true => {
+                        const amount = parseAmount(value, DEFAULT_PRECISION) || ZERO
+
+                        if (balance && amount.gt(balance)) {
+                          // Not enough balance
+                          return "The amount cannot be bigger than what's available"
+                        } else {
+                          // Enough balance
+                          return true
+                        }
+                      },
+                    },
                     required: 'The amount is required',
                     min: 0,
                   })}
                 />
               </InputBox>
             </div>
-            {amountError && <p className="error">Invalid amount</p>}
+            {amountError && <p className="error">{amountError.message}</p>}
+            {wrapAllBalance && (
+              <p className="error">
+                You are wrapping all your ETH balance. This would only make sense if your wallet doesn&apos;t need ETH
+                to pay the gas (as in some wallets that use tokens as payment). <br />
+                <br />
+                Normally you would want to wrap a smaller fraction of your ETH.
+                <br />
+                <br />
+                Are you sure you want to continue?
+              </p>
+            )}
           </div>
         </form>
       </ModalWrapper>
