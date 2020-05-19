@@ -8,7 +8,7 @@ import RpcEngine, {
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { Provider } from '@gnosis.pm/dapp-ui'
 import { WebsocketProvider, TransactionConfig } from 'web3-core'
-import { EventEmitter } from 'events'
+// import { EventEmitter } from 'events'
 import { numberToHex } from 'web3-utils'
 
 // custom providerAsMiddleware
@@ -32,30 +32,30 @@ function providerAsMiddleware(provider: Provider | WebsocketProvider): JsonRpcMi
 
 //  EIP 1193 events (including deprecated) + 'data' + WS events + WC events
 // a good idea is to include all known events
-const EVENTS_TO_REEMIT = [
-  'connect',
-  'disconnect',
-  'close',
-  'chainChanged',
-  'networkChanged',
-  'accountsChanged',
-  'message',
-  'notification',
-  'data',
-  'open',
-  'reconnect',
-  'error',
-]
+// const EVENTS_TO_REEMIT = [
+//   'connect',
+//   'disconnect',
+//   'close',
+//   'chainChanged',
+//   'networkChanged',
+//   'accountsChanged',
+//   'message',
+//   'notification',
+//   'data',
+//   'open',
+//   'reconnect',
+//   'error',
+// ]
 
-interface ConnectToReemitParams {
-  from: EventEmitter
-  to: EventEmitter
-  events: string[]
-}
+// interface ConnectToReemitParams {
+//   from: EventEmitter
+//   to: EventEmitter
+//   events: string[]
+// }
 
-const connectToReemit = ({ from, to, events }: ConnectToReemitParams): void => {
-  events.forEach(event => from.on(event, to.emit.bind(to, event)))
-}
+// const connectToReemit = ({ from, to, events }: ConnectToReemitParams): void => {
+//   events.forEach(event => from.on(event, to.emit.bind(to, event)))
+// }
 
 const createConditionalMiddleware = <T extends unknown>(
   condition: (req: JsonRpcRequest<T>) => boolean,
@@ -128,11 +128,25 @@ export const composeProvider = (
   const composedProvider: Provider = providerFromEngine(engine)
 
   // reemit all(likely) events from provider on composedProvider
-  connectToReemit({
-    from: provider,
-    to: composedProvider,
-    events: EVENTS_TO_REEMIT,
+  // connectToReemit({
+  //   from: provider,
+  //   to: composedProvider,
+  //   events: EVENTS_TO_REEMIT,
+  // })
+
+  // return composedProvider
+
+  const providerProxy = new Proxy(composedProvider, {
+    get: function(target, prop, receiver): unknown {
+      console.log('Proxy::prop access', prop)
+      if (prop === 'sendAsync' || prop === 'send') {
+        // composedProvider handles it
+        return Reflect.get(target, prop, receiver)
+      }
+      // MMask or other provider handles it
+      return Reflect.get(provider, prop, receiver)
+    },
   })
 
-  return composedProvider
+  return providerProxy
 }
