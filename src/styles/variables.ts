@@ -24,11 +24,13 @@ const LightColors = `
   --color-background-selected-dark: #bfbfbf;
   --color-background-progressBar: lightskyblue;
   --color-background-input: #e7ecf3;
+  --color-background-input-lighter: #ffffff;
   --color-background-validation-warning: #fff0eb;
   --color-background-row-hover: #deeeff;
   --color-background-CTA: #218DFF;
   --color-background-selection: #218DFF;
   --color-background-button-hover: #0B66C6;
+  --color-background-button-disabled-hover: #2772c3;
   --color-background-balance-button-hover: #218DFF;
 
   // Borders
@@ -49,6 +51,7 @@ const LightColors = `
   --color-button-disabled: #666;
   --color-button-danger: #e55353;
   --color-button-secondary: #696969;
+  --color-modali-close: #526877;
 
   // Components
   --color-background-banner: #DFE6EF;
@@ -68,7 +71,8 @@ const LightColors = `
 
   // States
   --color-error: red;
-
+  --color-text-deleteOrders: #a71409;
+  --color-background-deleteOrders: #ffd6d6;
 `
 
 const DarkColors = `
@@ -83,11 +87,13 @@ const DarkColors = `
   --color-background-selected-dark: #2a2d2f;
   --color-background-progressBar: #4338b5;
   --color-background-input: #2a2d2f;
+  --color-background-input-lighter: #404040;
   --color-background-validation-warning: #4338b5;
   --color-background-row-hover: #09233e;
   --color-background-CTA: #2e2e2e;
   --color-background-selection: #181a1b;
   --color-background-button-hover: #0B66C6;
+  --color-background-button-disabled-hover: #2772c3;
   --color-background-balance-button-hover: #0B66C6;
 
   // Borders
@@ -107,6 +113,7 @@ const DarkColors = `
   --color-button-disabled: #3d4043;
   --color-button-danger: #9c1818;
   --color-button-secondary: #696969;
+  --color-modali-close: #218DFF;
 
   // Components
   --color-background-banner: #252729;
@@ -123,7 +130,8 @@ const DarkColors = `
 
   // States
   --color-error: #cd3636;
-
+  --color-text-deleteOrders: #bdb6b5;
+  --color-background-deleteOrders: #621b1b;
 `
 
 const variables = css`

@@ -3,6 +3,7 @@ import fontFace from './fonts'
 import variables from './variables'
 import checkWhite from 'assets/img/check-white.svg'
 import greenCheck from 'assets/img/check-green.svg'
+import { MEDIA } from 'const'
 
 const GlobalStyles = createGlobalStyle`
   // global root variables
@@ -75,6 +76,7 @@ const GlobalStyles = createGlobalStyle`
     font-family: inherit;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    transition-property: color, background-color, border-color, opacity;
     border: 0;
     font-weight: var(--font-weight-bold);
     outline: 0;
@@ -87,7 +89,7 @@ const GlobalStyles = createGlobalStyle`
     &:disabled,
     &[disabled]{
       &:hover {
-        background-color: initial;
+        background-color: var(--color-background-button-disabled-hover);
       }
       opacity: .35;
       pointer-events: none;
@@ -958,7 +960,13 @@ const GlobalStyles = createGlobalStyle`
     .walletconnect-modal__headerLogo {
       max-width: 24rem;
       height: auto;
-      margin: 5rem auto 2.4rem;
+      margin: 2.4rem auto;
+    }
+    
+    .walletconnect-qrcode__image {
+      height: calc(100vh - 14rem);
+      padding: 1rem;
+      max-height: 40rem;
     }
   }
   #walletconnect-qrcode-text {
@@ -974,7 +982,7 @@ const GlobalStyles = createGlobalStyle`
     display: none
   }
 
-  body.modali-open::after {
+  .modali-wrapper::before {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -982,8 +990,13 @@ const GlobalStyles = createGlobalStyle`
     right: 0;
     content: "";
     background-color: var(--color-background-modali);
-    z-index: 1040;
   }
+
+  /* Hack to not darken view further when two modali are open */
+  .modali-wrapper:nth-last-of-type(n+3)::before {
+    display: none;
+  }
+
   /* End hack */
   
   .modali-open .modali-overlay {
@@ -1024,7 +1037,7 @@ const GlobalStyles = createGlobalStyle`
       background: transparent;
       font-size: 4rem;
       line-height: 1;
-      color: var(--color-text-CTA);
+      color: var(--color-modali-close);
       font-weight: normal;
       opacity: .5;
       padding: 0;
@@ -1087,6 +1100,30 @@ const GlobalStyles = createGlobalStyle`
         color: var(--color-text-active);
       }
     }
+  }
+  
+  // Heavier specification of the selector to ensure override from global.ts
+  // Ideally take out the modali default injected styles and only load from our end.
+  body.modali-open .modali.modali-size-large {
+    width: 80vw;
+    max-width: initial;
+    min-width: initial;
+    max-height: 100%;
+      @media (min-width: 500px) {
+          min-width: initial !important;
+      }
+      @media ${MEDIA.mobile},
+      @media ${MEDIA.tablet} {
+        width: 100%;
+      }
+  }
+  
+  body.modali-open .modali-wrapper-centered {
+    top: 0!important;
+  }
+  
+  body.modali-open .modali-body-style {
+    padding: 0;
   }
 `
 

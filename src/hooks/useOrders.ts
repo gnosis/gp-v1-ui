@@ -3,13 +3,13 @@ import { useEffect, useCallback, useRef } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 
 import useGlobalState from './useGlobalState'
-import { overwriteOrders, appendOrders, updateOffset } from 'reducers-actions/orders'
+import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/orders'
 
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
-import { ZERO } from 'const'
+import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 
 interface Result {
   orders: AuctionElement[]
@@ -17,27 +17,8 @@ interface Result {
   isLoading: boolean
 }
 
-/**
- * Filter out deleted orders.
- *
- * When orders are `deleted` from the contract, they are still returned, but with all fields set to zero.
- * We will not display such orders.
- *
- * @param orders all orders returned by the contract
- */
-function filterDeletedOrders(orders: AuctionElement[]): AuctionElement[] {
-  return orders.filter(
-    order =>
-      !(
-        order.buyTokenId === 0 &&
-        order.sellTokenId === 0 &&
-        order.priceDenominator.eq(ZERO) &&
-        order.priceNumerator.eq(ZERO) &&
-        order.validFrom === 0 &&
-        order.validUntil === 0
-      ),
-  )
-}
+const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
+// solutions submitted at this point
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
@@ -77,19 +58,13 @@ export function useOrders(): Result {
         // check cancelled bool from parent scope
         if (cancelled) return
 
-        // Apply filters (remove deleted orders)
-        const filteredOrders = filterDeletedOrders(orders)
-
         // ensures we don't have multiple reruns for each update
         // i.e. offset change -> render
         //      isLoading change -> another render
         unstable_batchedUpdates(() => {
-          if (offset === 0) {
-            // fresh start/refresh: replace whatever is stored
-            dispatch(overwriteOrders(filteredOrders))
-          } else if (filteredOrders.length > 0) {
-            // incremental update: append
-            dispatch(appendOrders(filteredOrders))
+          if (orders.length > 0) {
+            // update
+            dispatch(updateOrders(orders))
           }
 
           if (!nextIndex) {
@@ -125,6 +100,14 @@ export function useOrders(): Result {
   }, [dispatch, setIsLoading])
 
   const runEffect = useRef(false)
+
+  const forceRefreshUnlessOnMount = useCallback(() => {
+    // don't refresh when first mounted
+    // fetchOrders already runs onMount
+    if (runEffect.current) forceOrdersRefresh()
+  }, [forceOrdersRefresh])
+
+  useCheckWhenTimeRemainingInBatch(REFRESH_WHEN_SECONDS_LEFT, forceRefreshUnlessOnMount)
 
   useEffect(() => {
     if (!runEffect.current) {

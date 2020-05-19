@@ -1,4 +1,4 @@
-import combineReducers from 'combine-reducers'
+import combineReducers, { Reducer, AnyAction, Action } from 'combine-reducers'
 import { reducer as TokenRowReducer, TokenLocalState, TokenRowInitialState as tokens } from './tokenRow'
 import {
   reducer as PendingOrderReducer,
@@ -7,6 +7,12 @@ import {
 } from './pendingOrders'
 import { reducer as OrdersReducer, OrdersState, INITIAL_ORDERS_STATE as orders } from './orders'
 import { reducer as TradeReducer, TradeState, INITIAL_TRADE_STATE as trade } from './trade'
+import {
+  reducer as LocalTokensReducer,
+  LocalTokensState,
+  INITIAL_LOCAL_TOKENS_STATE as localTokens,
+  sideEffect as LocalTokensSideEffect,
+} from './localTokens'
 
 export * from './tokenRow'
 
@@ -20,6 +26,7 @@ export interface GlobalState {
   pendingOrders: PendingOrdersState
   orders: OrdersState
   trade: TradeState
+  localTokens: LocalTokensState
 }
 
 /**********************************
@@ -35,6 +42,27 @@ export const INITIAL_STATE = (): GlobalState => {
     pendingOrders,
     orders,
     trade,
+    localTokens,
+  }
+}
+
+/**********************************
+ * Side Effect after a reducer has run its course
+ *
+ * Allows to post-process state/slice of state
+ * to log, save to Storage, etc.
+ */
+
+const addSideEffect = <S, A extends Action = AnyAction>(
+  reducer: Reducer<S, A>,
+  sideEffect: (newState: S, action: A) => void,
+): Reducer<S, A> => {
+  return (state: S, action: A): S => {
+    const newState = reducer(state, action)
+
+    sideEffect(newState, action)
+
+    return newState
   }
 }
 
@@ -49,4 +77,5 @@ export const rootReducer = combineReducers({
   pendingOrders: PendingOrderReducer,
   orders: OrdersReducer,
   trade: TradeReducer,
+  localTokens: addSideEffect(LocalTokensReducer, LocalTokensSideEffect),
 })

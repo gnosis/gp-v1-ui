@@ -31,7 +31,7 @@ export const PoolingInterfaceWrapper = styled(PageWrapper)`
     font-size: 1.3rem;
   }
 
-  > h2 {
+  form > h2 {
     margin: 1rem auto 2.4rem;
     width: 100%;
     text-align: center;

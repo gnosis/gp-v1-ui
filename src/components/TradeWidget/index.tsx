@@ -9,6 +9,8 @@ import { FieldValues } from 'react-hook-form/dist/types'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
+import Modali from 'modali'
+import { isAddress } from 'web3-utils'
 
 import TokenRow from './TokenRow'
 import OrderValidity from './OrderValidity'
@@ -26,13 +28,13 @@ import { useBalances } from 'hooks/useBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { MEDIA, PRICE_ESTIMATION_PRECISION } from 'const'
 
-import { tokenListApi } from 'api'
+import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 
 import {
   getToken,
@@ -49,17 +51,20 @@ import { ZERO } from 'const'
 import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimation } from 'hooks/usePriceEstimation'
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { updateTradeState } from 'reducers-actions/trade'
+import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
+import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
+import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
   max-width: 160rem;
-  height: 58rem;
+  height: 63rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
@@ -70,16 +75,20 @@ const WrappedWidget = styled(Widget)`
     rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
   border-radius: 0.6rem;
   margin: 0 auto;
-  min-height: 54rem;
+  min-height: 63rem;
   font-size: 1.6rem;
   line-height: 1;
 
-  @media ${MEDIA.mobile} {
+  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     flex-flow: column wrap;
     max-height: initial;
     min-height: initial;
     width: 100%;
     height: initial;
+  }
+
+  @media ${MEDIA.tablet} {
+    width: 96%;
   }
 `
 
@@ -107,10 +116,22 @@ const WrappedForm = styled.form`
     opacity: 0;
   }
 
+  @media ${MEDIA.tablet} {
+    max-width: initial;
+    flex: 1 1 50%;
+    padding: 1.6rem 1.6rem 3.2rem;
+  }
+
   @media ${MEDIA.mobile} {
     width: 100%;
     flex: 1 1 100%;
     max-width: 100%;
+  }
+
+  > div {
+    @media ${MEDIA.mobile} {
+      width: 100%;
+    }
   }
 
   > p {
@@ -127,6 +148,10 @@ const WrappedForm = styled.form`
     flex-flow: row wrap;
     justify-content: flex-start;
 
+    @media ${MEDIA.mediumUp} {
+      max-height: 11rem;
+    }
+
     > b {
       margin: 0.3rem;
     }
@@ -137,6 +162,7 @@ const WrappedForm = styled.form`
     > strong {
       margin: 0.3rem 0 0.3rem 0.3rem;
       font-size: 1.3rem;
+      word-break: break-word;
     }
   }
 `
@@ -189,6 +215,7 @@ const SubmitButton = styled.button`
 `
 
 const OrdersPanel = styled.div`
+  overflow: hidden;
   display: flex;
   flex-flow: column wrap;
   flex: 1;
@@ -204,6 +231,12 @@ const OrdersPanel = styled.div`
   .expanded & {
     flex: 1 1 100%;
     min-width: 85rem;
+  }
+
+  @media ${MEDIA.tablet} {
+    flex: 1 1 50%;
+    min-width: initial;
+    border-radius: 0;
   }
 
   // Connect Wallet banner in the orders panel
@@ -229,6 +262,12 @@ const OrdersPanel = styled.div`
     display: flex;
     flex-flow: row wrap;
     border-radius: 0 0.6rem 0.6rem 0;
+
+    @media ${MEDIA.tablet} {
+      width: 100%;
+      border-radius: 0;
+      margin: 2.4rem auto 0;
+    }
 
     @media ${MEDIA.mobile} {
       display: none;
@@ -293,6 +332,10 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
     width: 1.6rem;
     margin: 0;
     transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
+
+    @media ${MEDIA.tablet} {
+      display: none;
+    }
   }
 
   &:hover {
@@ -325,21 +368,6 @@ export const DEFAULT_FORM_STATE = {
   validUntil: '2880',
 }
 
-function _getReceiveTokenTooltipText(sellValue: string, receiveValue: string): string {
-  const sellAmount = parseBigNumber(sellValue)
-
-  if (!sellAmount || sellAmount.isZero()) {
-    return 'First input the sell amount'
-  }
-
-  const receiveAmount = parseBigNumber(receiveValue)
-  if (!receiveAmount || receiveAmount.isZero()) {
-    return 'Input the price to get the receive tokens'
-  } else {
-    return 'Minimum amount of tokens you will receive if the order is fully executed at the given price'
-  }
-}
-
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   let receiveAmount = ''
   if (priceValue && sellValue) {
@@ -355,6 +383,90 @@ function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   return receiveAmount
 }
 
+interface TokensAdderProps {
+  tokenAddresses: string[]
+  networkId: number
+  onTokensAdded: (newTokens: TokenDetails[]) => void
+}
+
+const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, onTokensAdded }) => {
+  const { addTokensToList, modalProps } = useBetterAddTokenModal({ focused: true })
+
+  useEffect(() => {
+    if (tokenAddresses.length === 0) return
+
+    addTokensToList({ tokenAddresses, networkId }).then(newTokens => {
+      if (newTokens.length > 0) {
+        onTokensAdded(newTokens)
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // no deps, so that we only open modal once on mount
+
+  return tokenAddresses.length > 0 ? <Modali.Modal {...modalProps} /> : null
+}
+
+const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networkId: number): string[] => {
+  const tokenAddresses: string[] = []
+  const addedSet = new Set()
+
+  addresses.forEach(address => {
+    if (
+      address &&
+      !addedSet.has(address) &&
+      !tokenListApi.hasToken({ tokenAddress: address, networkId }) &&
+      isAddress(address.toLowerCase())
+    ) {
+      tokenAddresses.push(address)
+      addedSet.add(address)
+    }
+  })
+
+  return tokenAddresses
+}
+
+interface ChooseTokenInput {
+  tokens: TokenDetails[]
+  token: TokenDetails | null
+  tokenSymbolFromUrl?: string
+  defaultTokenSymbol: 'DAI' | 'USDC'
+}
+
+const chooseTokenWithFallback = ({
+  tokens,
+  token,
+  tokenSymbolFromUrl,
+  defaultTokenSymbol,
+}: ChooseTokenInput): TokenDetails => {
+  return (
+    token ||
+    (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())
+      ? getToken('address', tokenSymbolFromUrl, tokens)
+      : getToken('symbol', tokenSymbolFromUrl, tokens)) ||
+    (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
+  )
+}
+
+function buildUrl(params: {
+  sell: string
+  price: string
+  from: string
+  expires: string
+  sellToken: TokenDetails
+  buyToken: TokenDetails
+}): string {
+  const { sell, price, from, expires, sellToken, buyToken } = params
+
+  const searchQuery = buildSearchQuery({
+    sell,
+    price,
+    from,
+    expires,
+  })
+
+  return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -366,18 +478,20 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances } = useBalances()
+  const { balances, tokens: tokenList } = useBalances()
 
   // If user is connected, use balances, otherwise get the default list
-  const tokens = useMemo(
-    // it's okay to tokenListApi.getTokens() here without subscribing to updates
-    // because balances from useTokenBalances is already subscribed
-    () => (isConnected && balances.length > 0 ? balances : tokenListApi.getTokens(networkIdOrDefault)),
-    [balances, networkIdOrDefault, isConnected],
-  )
+  const tokens =
+    isConnected && balances.length > 0
+      ? balances
+      : tokenList.length > 0
+      ? tokenList
+      : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
+  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
+  const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
   const {
     sellAmount: sellParam,
     price: priceParam,
@@ -391,27 +505,61 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [sellToken, setSellToken] = useState(
-    () =>
-      trade.sellToken ||
-      getToken('symbol', sellTokenSymbol, tokens) ||
-      (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
+  const [sellToken, setSellToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.sellToken,
+      tokens,
+      tokenSymbolFromUrl: sellTokenSymbol,
+      defaultTokenSymbol: 'DAI',
+    }),
   )
-  const [receiveToken, setReceiveToken] = useState(
-    () =>
-      trade.buyToken ||
-      getToken('symbol', receiveTokenSymbol, tokens) ||
-      (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
+  const [receiveToken, setReceiveToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.buyToken,
+      tokens,
+      tokenSymbolFromUrl: receiveTokenSymbol,
+      defaultTokenSymbol: 'USDC',
+    }),
   )
+
+  useEffect(() => {
+    //  when switching networks
+    // trade stays filled with last tokens
+    // which may not be available on the new network
+    if (trade.sellToken) {
+      // check if it should be different
+      const sellTokenOrFallback = chooseTokenWithFallback({
+        // don't consider token from trade from wrong network valid
+        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
+          ? trade.sellToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
+        tokenSymbolFromUrl: sellTokenSymbol, // from url params
+        defaultTokenSymbol: 'DAI', // default sellToken
+      })
+      setSellToken(sellTokenOrFallback)
+    }
+
+    if (trade.buyToken) {
+      const buyTokenOrFallback = chooseTokenWithFallback({
+        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
+          ? trade.buyToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault),
+        tokenSymbolFromUrl: receiveTokenSymbol,
+        defaultTokenSymbol: 'USDC', // default buyToken
+      })
+      setReceiveToken(buyTokenOrFallback)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkIdOrDefault])
+  // don't need to depend on more than network as everything else updates together
+  // also avoids excessive setStates
+
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
 
   const [ordersVisible, setOrdersVisible] = useState(true)
-
-  const { priceEstimation, isPriceLoading } = usePriceEstimation({
-    baseTokenId: sellToken.id,
-    quoteTokenId: receiveToken.id,
-  })
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
@@ -430,9 +578,20 @@ const TradeWidget: React.FC = () => {
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
   const sellValue = watch(sellInputId)
-  const receiveValue = watch(receiveInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
+
+  // Avoid querying for a new price at every input change
+  const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
+
+  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
+    networkId: networkIdOrDefault,
+    baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
+    quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
+    amount: debouncedSellValue,
+  })
 
   // Updating global trade state on change
   useEffect(() => {
@@ -484,13 +643,15 @@ const TradeWidget: React.FC = () => {
     setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
-  const searchQuery = buildSearchQuery({
+  const url = buildUrl({
     sell: sellValue,
     price: priceValue,
     from: validFromValue,
     expires: validUntilValue,
+    sellToken: sellToken,
+    buyToken: receiveToken,
   })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
+  // Updates page URL with parameters from context
   useURLParams(url, true)
 
   // TESTING
@@ -618,9 +779,12 @@ const TradeWidget: React.FC = () => {
       const validFromWithBatchID = currentBatch + validFrom
       const validUntilWithBatchID = currentBatch + validUntil
 
+      const isASAP = validFrom === 0
+      const isNever = validUntil === 0
+
       let success: boolean
       // ASAP ORDER
-      if (validFrom === 0) {
+      if (isASAP) {
         // ; for destructure reassign format
         ;({ success } = await placeOrder({
           networkId,
@@ -650,8 +814,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validFrom: undefined,
+                  validUntil: isNever ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
               )
             },
@@ -692,7 +856,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validUntil: isNever ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
                 },
               )
             },
@@ -741,7 +905,7 @@ const TradeWidget: React.FC = () => {
       const walletInfo = await connectWallet()
 
       // Then place the order if connection was successful
-      if (walletInfo && walletInfo.networkId && walletInfo.userAddress) {
+      if (walletInfo && walletInfo.networkId === Network.Mainnet && walletInfo.userAddress) {
         await _placeOrder({
           ...orderParams,
           networkId: walletInfo.networkId,
@@ -751,13 +915,30 @@ const TradeWidget: React.FC = () => {
     }
   }
 
-  const receiveTokenTooltipText = useMemo(() => _getReceiveTokenTooltipText(sellValue, receiveValue), [
-    sellValue,
-    receiveValue,
-  ])
+  const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
+  const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
+
+  const tokenAddressesToAdd: string[] = useMemo(
+    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  ) // no deps, so that we only calc once on mount
+
+  const onTokensAdded = (newTokens: TokenDetails[]): void => {
+    const [firstToken, secondToken] = tokenAddressesToAdd
+    const sellToken = firstToken && newTokens.find(({ address }) => firstToken.toLowerCase() === address.toLowerCase())
+    const receiveToken =
+      secondToken && newTokens.find(({ address }) => secondToken.toLowerCase() === address.toLowerCase())
+
+    batchUpdateState(() => {
+      if (sellToken) onSelectChangeSellToken(sellToken)
+      if (receiveToken) onSelectChangeReceiveToken(receiveToken)
+    })
+  }
 
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
+      <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
@@ -768,13 +949,12 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={sellTokenBalance}
             selectLabel="Sell"
-            onSelectChange={onSelectChangeFactory(setSellToken, receiveTokenBalance)}
+            onSelectChange={onSelectChangeSellToken}
             inputId={sellInputId}
             isDisabled={isSubmitting}
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
-            tooltipText="Maximum amount of tokens you want to sell"
           />
           <IconWrapper onClick={swapTokens}>
             <SwitcherSVG />
@@ -784,12 +964,11 @@ const TradeWidget: React.FC = () => {
             tokens={tokens}
             balance={receiveTokenBalance}
             selectLabel="Receive at least"
-            onSelectChange={onSelectChangeFactory(setReceiveToken, sellTokenBalance)}
+            onSelectChange={onSelectChangeReceiveToken}
             inputId={receiveInputId}
             isDisabled={isSubmitting}
             tabIndex={1}
             readOnly
-            tooltipText={receiveTokenTooltipText}
           />
           <Price
             priceInputId={priceInputId}

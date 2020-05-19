@@ -17,6 +17,7 @@ import { useTokenList } from './useTokenList'
 interface UseBalanceResult {
   ethBalance: BN | null
   balances: TokenBalanceDetails[]
+  tokens: TokenDetails[]
   error: boolean
 }
 
@@ -153,5 +154,5 @@ export const useBalances = (): UseBalanceResult => {
     }
   }, [setEthBalance, setError, walletInfo])
 
-  return { ethBalance, balances, error }
+  return { ethBalance, balances, error, tokens }
 }

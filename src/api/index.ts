@@ -16,6 +16,10 @@ import { TheGraphApi } from './thegraph/TheGraphApi'
 import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
 import { WethApi, WethApiImpl, WethApiDependencies } from './weth/WethApi'
 import { WethApiMock } from './weth/WethApiMock'
+import { DexPriceEstimatorApi } from './dexPriceEstimator/DexPriceEstimatorApi'
+import { DexPriceEstimatorApiProxy } from './dexPriceEstimator/DexPriceEstimatorApiProxy'
+import { TcrApi } from './tcr/TcrApi'
+import { MultiTcrApiProxy } from './tcr/MultiTcrApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -27,12 +31,11 @@ import {
   TOKEN_8,
 } from '../../test/data'
 import Web3 from 'web3'
-import { INITIAL_INFURA_ENDPOINT } from 'const'
+import { ETH_NODE_URL } from 'const'
 import fetchGasPriceFactory from './gasStation'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
-export const getDefaultProvider = (): string | null =>
-  process.env.NODE_ENV === 'test' ? null : INITIAL_INFURA_ENDPOINT
+export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
 
 function createWeb3Api(): Web3 {
   // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
@@ -125,16 +128,55 @@ function createTokenListApi(): TokenList {
 }
 
 function createTheGraphApi(): TheGraphApi {
-  const urls = {
-    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion',
-    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/dfusion-rinkeby',
+  const { type, config } = CONFIG.theGraphApi
+  let theGraphApi: TheGraphApi
+  switch (type) {
+    case 'the-graph':
+      theGraphApi = new TheGraphApiProxy(config)
+      break
+
+    default:
+      throw new Error('Unknown implementation for TheGraphApi: ' + type)
   }
 
-  const theGraphApi = new TheGraphApiProxy({ urls })
-
   window['theGraphApi'] = theGraphApi
-
   return theGraphApi
+}
+
+function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
+  const { type, config } = CONFIG.dexPriceEstimator
+  let dexPriceEstimatorApi: DexPriceEstimatorApi
+  switch (type) {
+    case 'dex-price-estimator':
+      dexPriceEstimatorApi = new DexPriceEstimatorApiProxy(config)
+      break
+
+    default:
+      throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)
+  }
+
+  window['dexPriceEstimatorApi'] = dexPriceEstimatorApi
+  return dexPriceEstimatorApi
+}
+
+function createTcrApi(web3: Web3): TcrApi | undefined {
+  const { type } = CONFIG.tcr
+  let tcrApi: TcrApi | undefined
+  switch (CONFIG.tcr.type) {
+    case 'none':
+      tcrApi = undefined
+      break
+    case 'multi-tcr':
+      const multiTcrApiConfig = CONFIG.tcr
+      tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
+      break
+
+    default:
+      throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)
+  }
+
+  window['tcrApi'] = tcrApi
+  return tcrApi
 }
 
 // Build APIs
@@ -152,3 +194,5 @@ export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDepende
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
+export const dexPriceEstimatorApi: DexPriceEstimatorApi = createDexPriceEstimatorApi()
+export const tcrApi: TcrApi | undefined = createTcrApi(web3)

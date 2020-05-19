@@ -1,21 +1,25 @@
 import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
-import { TokenDetails } from 'types'
+import { TokenDetails, Network } from 'types'
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
-import { getNetworkFromId } from '@gnosis.pm/dex-js'
+import { getNetworkFromId, safeTokenName } from '@gnosis.pm/dex-js'
+import { dexPriceEstimatorApi } from 'api'
 
 interface OrderBookProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   networkId: number
+  hops?: number
 }
 
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
-  min-height: 40rem;
+  /* min-height: 40rem; */
+  /* height: calc(100vh - 30rem); */
+  min-height: calc(100vh - 30rem);
   text-align: center;
   width: 100%;
   height: 100%;
@@ -39,6 +43,12 @@ const Wrapper = styled.div`
       opacity: 1;
     }
   }
+
+  .amcharts-AxisLabel,
+  .amcharts-CategoryAxis .amcharts-Label-group > .amcharts-Label,
+  .amcharts-ValueAxis-group .amcharts-Label-group > .amcharts-Label {
+    fill: var(--color-text-primary);
+  }
 `
 
 enum Offer {
@@ -57,11 +67,6 @@ interface ProcessedItem {
   askValueY: number | null
   bidValueY: number | null
   price: number
-}
-
-const orderbookUrl = (baseToken: TokenDetails, quoteToken: TokenDetails, networkId?: number): string => {
-  const network = getNetworkFromId(networkId || 1)
-  return `https://price-estimate-${network}.dev.gnosisdev.com/api/v1/markets/${baseToken.id}-${quoteToken.id}?atoms=true`
 }
 
 /**
@@ -118,14 +123,22 @@ const draw = (
   chartElement: HTMLElement,
   baseToken: TokenDetails,
   quoteToken: TokenDetails,
-  dataSource: string,
+  networkId: number,
+  hops?: number,
 ): am4charts.XYChart => {
+  const baseTokenLabel = safeTokenName(baseToken)
   am4core.useTheme(am4themesSpiritedaway)
   am4core.options.autoSetClassName = true
   const chart = am4core.create(chartElement, am4charts.XYChart)
+  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
   // Add data
-  chart.dataSource.url = dataSource
+  chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+    baseTokenId: baseToken.id,
+    quoteTokenId: quoteToken.id,
+    hops,
+    networkId,
+  })
   chart.dataSource.adapter.add('parsedData', data => {
     const processed = processData(data.bids, baseToken, quoteToken, Offer.Bid).concat(
       processData(data.asks, baseToken, quoteToken, Offer.Ask),
@@ -146,7 +159,7 @@ const draw = (
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
   xAxis.dataFields.category = 'price'
-  xAxis.title.text = `Price (${baseToken.symbol}/${quoteToken.symbol})`
+  xAxis.title.text = `${networkDescription} Price (${baseToken.symbol}/${quoteToken.symbol})`
 
   const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
   yAxis.title.text = 'Volume'
@@ -160,7 +173,7 @@ const draw = (
   bidCurve.fill = bidCurve.stroke
   bidCurve.startLocation = 0.5
   bidCurve.fillOpacity = 0.1
-  bidCurve.tooltipText = 'Bid: [bold]{categoryX}[/]\nTotal volume: [bold]{totalVolume}[/]\nVolume: [bold]{volume}[/]'
+  bidCurve.tooltipText = `Bid: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume} ${baseTokenLabel}[/]`
 
   const askCurve = chart.series.push(new am4charts.StepLineSeries())
   askCurve.dataFields.categoryX = 'price'
@@ -170,21 +183,7 @@ const draw = (
   askCurve.fill = askCurve.stroke
   askCurve.fillOpacity = 0.1
   askCurve.startLocation = 0.5
-  askCurve.tooltipText = 'Ask: [bold]{categoryX}[/]\nTotal volume: [bold]{totalVolume}[/]\nVolume: [bold]{volume}[/]'
-
-  const series3 = chart.series.push(new am4charts.ColumnSeries())
-  series3.dataFields.categoryX = 'price'
-  series3.dataFields.valueY = 'bidValueY'
-  series3.strokeWidth = 0
-  series3.fill = am4core.color(colors.green)
-  series3.fillOpacity = 0.2
-
-  const series4 = chart.series.push(new am4charts.ColumnSeries())
-  series4.dataFields.categoryX = 'price'
-  series4.dataFields.valueY = 'askValueY'
-  series4.strokeWidth = 0
-  series4.fill = am4core.color(colors.red)
-  series4.fillOpacity = 0.2
+  askCurve.tooltipText = `Ask: [bold]{categoryX}[/]\nVolume: [bold]{totalVolume} ${baseTokenLabel}[/]`
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
@@ -192,20 +191,20 @@ const draw = (
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken, networkId } = props
+  const { baseToken, quoteToken, networkId, hops } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!mountPoint.current) return
-
-    const chart = draw(mountPoint.current, baseToken, quoteToken, orderbookUrl(baseToken, quoteToken, networkId))
+    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops)
 
     return (): void => chart.dispose()
-  }, [baseToken, quoteToken, networkId])
+  }, [baseToken, quoteToken, networkId, hops])
 
   return (
     <Wrapper ref={mountPoint}>
-      Show order book for token {baseToken.symbol} ({baseToken.id}) and {quoteToken.symbol} ({quoteToken.id})
+      Show order book for token {safeTokenName(baseToken)} ({baseToken.id}) and {safeTokenName(baseToken)} (
+      {quoteToken.id})
     </Wrapper>
   )
 }

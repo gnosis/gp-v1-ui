@@ -33,9 +33,9 @@ const NEW_TOKEN = {
 // TODO: These tests are dumb. Either do something meaningful or remove them entirely
 
 describe('MOCK: Basic functions', () => {
-  test('Mock API Token list has length 7', () => {
+  test('Mock API Token list has length 8', () => {
     const tokens = instanceMock.getTokens(1)
-    expect(tokens.length).toBe(7)
+    expect(tokens.length).toBe(8)
   })
   test('Mock API Token list has expected token', () => {
     const tokens = instanceMock.getTokens(1)
