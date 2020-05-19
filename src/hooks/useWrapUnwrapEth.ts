@@ -4,6 +4,7 @@ import { wethApi } from 'api'
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { WrapUnwrapParams } from 'api/weth/WethApi'
+import { logDebug } from 'utils'
 
 export interface Result {
   wrappingEth: boolean
@@ -55,15 +56,17 @@ export const useWrapUnwrapEth = (params: Params): Result => {
   }
 
   async function wrapEth(amount: string): Promise<Receipt> {
+    logDebug('[useWrapUnwrapEth] Wrap ETH: ' + amount)
     return wrapUnwrapAux({
       ...baseParams,
       amount,
       setLoadingFlag: setWrappingEth,
-      execute: params => wethApi.withdraw(params),
+      execute: params => wethApi.deposit(params),
     })
   }
 
   async function unwrapWeth(amount: string): Promise<Receipt> {
+    logDebug('[useWrapUnwrapEth] Unwrap ETH: ' + amount)
     return wrapUnwrapAux({
       ...baseParams,
       amount,
