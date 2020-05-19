@@ -316,6 +316,7 @@ interface BalanceDisplayProps extends TokenLocalState {
   enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  ethBalance: BN | null
   balances: TokenBalanceDetails[]
   error: boolean
   requestWithdrawConfirmation(
@@ -424,7 +425,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             {displayedBalances && displayedBalances.length > 0
               ? displayedBalances.map(tokenBalances => (
                   <Row
-                    key={tokenBalances.addressMainnet}
+                    key={tokenBalances.address}
                     ethBalance={ethBalance}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}

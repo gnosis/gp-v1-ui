@@ -165,7 +165,6 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
         {wethHelpVisible && WethHelp}
       </>
     )
-    console.log('Return wethBalance', wethBalance?.toString(10))
 
     return {
       title: 'Unwrap WETH',
@@ -193,22 +192,12 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const { register, errors, handleSubmit, setValue } = useForm<WrapEtherFormData>({
     mode: 'onChange',
   })
-  // const formRef = useRef<HTMLFormElement | null>(null)
-  // const amountValue = watch(INPUT_ID_AMOUNT)
   const amountError = errors[INPUT_ID_AMOUNT]
-
-  // console.log('amountValue', amountValue)
 
   const { title, balance, symbolSource, tooltipText, description, amountLabel } = useMemo(
     () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance }),
     [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance],
   )
-
-  console.log({
-    wethBalance: wethBalance?.toString(10),
-    ethBalance: ethBalance?.toString(10),
-    balance: balance?.toString(10),
-  })
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,

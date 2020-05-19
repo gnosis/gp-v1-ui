@@ -1,9 +1,11 @@
 import Web3 from 'web3'
-import { WethContract } from '@gnosis.pm/dex-js/build-esm/contracts/WethContract'
+
 import { Network, WithTxOptionalParams, Receipt } from 'types'
 import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
 import { wethAbi } from '@gnosis.pm/dex-js'
 import { logDebug } from 'utils'
+
+import { WethContract } from '@gnosis.pm/dex-js/build-esm/contracts/WethContract'
 
 export interface WrapUnwrapParams extends WithTxOptionalParams {
   networkId: number
