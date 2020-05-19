@@ -99,6 +99,7 @@ interface WrapUnwrapInfo {
   tooltipText: React.ReactNode | string
   description: React.ReactNode
   amountLabel: string
+  loading: boolean
 }
 
 interface GetModalParams {
@@ -107,10 +108,12 @@ interface GetModalParams {
   showWethHelp: React.Dispatch<React.SetStateAction<boolean>>
   wethBalance?: BN
   ethBalance: BN | null
+  wrappingEth: boolean
+  unwrappingWeth: boolean
 }
 
 function getModalParams(params: GetModalParams): WrapUnwrapInfo {
-  const { wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance } = params
+  const { wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, unwrappingWeth, wrappingEth } = params
   const WethHelp = (
     <div className="more-info">
       <p>
@@ -155,6 +158,7 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
       balance: ethBalance,
       description,
       tooltipText,
+      loading: wrappingEth,
     }
   } else {
     const description = (
@@ -174,6 +178,7 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
       balance: wethBalance || null,
       description,
       tooltipText: 'Unwrapping converts WETH back into ETH',
+      loading: unwrappingWeth,
     }
   }
 }
@@ -185,7 +190,9 @@ interface WrapEtherFormData {
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { wrapEth, unwrapWeth } = useWrapUnwrapEth({ txOptionalParams: composeOptionalParams() })
+  const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth({
+    txOptionalParams: composeOptionalParams(),
+  })
   const { ethBalance, balances } = useBalances()
   const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
   const wethBalance = wethBalanceDetails?.walletBalance
@@ -195,9 +202,9 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   })
   const amountError = errors[INPUT_ID_AMOUNT]
 
-  const { title, balance, symbolSource, tooltipText, description, amountLabel } = useMemo(
-    () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance }),
-    [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance],
+  const { title, balance, symbolSource, tooltipText, description, amountLabel, loading } = useMemo(
+    () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth }),
+    [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth],
   )
 
   const [modalHook, toggleModal] = useModali({
@@ -277,7 +284,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         onClick={toggleModal}
         tooltip={tooltipText}
       >
-        {label || title}
+        {loading ? 'Loading...' : label || title}
       </TooltipWrapper>
       <Modali.Modal {...modalHook} />
     </>

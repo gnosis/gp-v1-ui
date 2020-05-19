@@ -27,7 +27,7 @@ interface WrapUnwrapAuxParams {
   execute: (params: WrapUnwrapParams) => Promise<Receipt>
 }
 
-function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
+async function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
   const { networkId, isConnected, userAddress, amount, txOptionalParams, setLoadingFlag, execute } = params
   try {
     assert(networkId, 'No valid networkId found')
@@ -35,9 +35,20 @@ function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
     assert(userAddress, 'No valid user address found')
     assert(amount, 'No valid amount')
 
-    setLoadingFlag(true)
-
-    return execute({ userAddress, networkId, amount, txOptionalParams })
+    const receipt = await execute({
+      userAddress,
+      networkId,
+      amount,
+      txOptionalParams: {
+        onSentTransaction: (txHash: string): void => {
+          setLoadingFlag(true)
+          if (txOptionalParams.onSentTransaction) {
+            txOptionalParams.onSentTransaction(txHash)
+          }
+        },
+      },
+    })
+    return receipt
   } finally {
     setLoadingFlag(false)
   }
@@ -74,6 +85,8 @@ export const useWrapUnwrapEth = (params: Params): Result => {
       execute: params => wethApi.withdraw(params),
     })
   }
+
+  console.log('wrappingEth, unwrappingWeth', wrappingEth, unwrappingWeth)
 
   return { wrappingEth, unwrappingWeth, wrapEth, unwrapWeth }
 }
