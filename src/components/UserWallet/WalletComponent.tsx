@@ -3,7 +3,7 @@ import { RouteComponentProps, useRouteMatch } from 'react-router'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
 
 import { EtherscanLink } from '../EtherscanLink'
 import {
@@ -27,6 +27,7 @@ import { useConnectWallet } from 'hooks/useConnectWallet'
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
 import WalletImg from 'assets/img/eth-network.svg'
+import { Spinner } from 'components/Spinner'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string
@@ -80,7 +81,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     if (loadingLabel) {
       content = (
         <>
-          <FontAwesomeIcon icon={faSpinner} spin />
+          <Spinner />
           {' ' + loadingLabel}
         </>
       )
