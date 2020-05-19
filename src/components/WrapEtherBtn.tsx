@@ -4,7 +4,7 @@ import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
 import { InputBox } from 'components/InputBox'
 import { useForm } from 'react-hook-form'
-import { DEFAULT_PRECISION, formatAmountFull } from '@gnosis.pm/dex-js'
+import { DEFAULT_PRECISION, formatAmountFull, toWei, fromWei } from '@gnosis.pm/dex-js'
 import BN from 'bn.js'
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
 import { composeOptionalParams } from 'utils/transaction'
@@ -13,6 +13,7 @@ import useSafeState from 'hooks/useSafeState'
 import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
 import { useBalances } from 'hooks/useBalances'
 import { WETH_ADDRESS_MAINNET } from 'const'
+import BigNumber from 'bignumber.js'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -249,7 +250,9 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         key="yes"
         isStyleDefault
         onClick={handleSubmit((data: WrapEtherFormData): void => {
-          const { wrapAmount } = data
+          const { wrapAmount: wrapAmountEther } = data
+          const wrapAmount = toWei(wrapAmountEther)
+          new BigNumber(wrapAmount)
           if (wrap) {
             logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH`)
 
