@@ -14,7 +14,7 @@ import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/To
 import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import { Input } from 'components/Input'
-import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
+import { MEDIA } from 'const'
 import { Link } from 'react-router-dom'
 
 const Wrapper = styled.div`
@@ -222,7 +222,8 @@ const TokenRow: React.FC<Props> = ({
     [register],
   )
 
-  const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
+  // TODO: The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented
+  // const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
 
   return (
     <Wrapper>
