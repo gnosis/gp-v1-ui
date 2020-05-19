@@ -282,7 +282,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         as="button"
         type="button"
         className={className}
-        // className={className ? 'not-implemented ' + className : 'not-implemented'}
+        style={{ minWidth: '7em' }}
         onClick={toggleModal}
         tooltip={tooltipText}
       >
