@@ -1,7 +1,7 @@
-import { GlobalState } from 'reducers-actions'
 import { logDebug, setStorageItem } from 'utils'
-import { GP_PENDING_ORDER_KEY } from 'const'
+import { STORAGE_PENDING_ORDER_KEY } from 'const'
 import { Middleware } from './types'
+import { PendingOrdersState } from 'reducers-actions/pendingOrders'
 
 const pendingOrdersAndLocalStorage: Middleware = getState => next => (action): void => {
   if (action.type === 'SAVE_PENDING_ORDERS' || action.type === 'REMOVE_PENDING_ORDERS') {
@@ -18,18 +18,18 @@ const pendingOrdersAndLocalStorage: Middleware = getState => next => (action): v
 
     const { networkId, orders, userAddress } = action.payload
 
-    let newState: GlobalState['pendingOrders']
-    const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
+    let newState: PendingOrdersState
+    const userPendingOrders = state[networkId][userAddress] ? state[networkId][userAddress] : []
     // add/remove pending orders to localStorage
     if (action.type === 'SAVE_PENDING_ORDERS') {
       // save 'em
-      const newPendingTxArray = userPendingOrdersArr.concat(orders)
+      const newPendingTxArray = userPendingOrders.concat(orders)
       newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
     } else {
       // delete 'em
       newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: orders } }
     }
-    setStorageItem(GP_PENDING_ORDER_KEY, newState)
+    setStorageItem(STORAGE_PENDING_ORDER_KEY, newState)
   }
   // Run next dispatch
   return next(action)

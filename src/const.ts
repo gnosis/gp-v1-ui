@@ -100,9 +100,9 @@ export const ETH_NODE_URL = process.env.ETH_NODE_URL || `wss://mainnet.infura.io
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
 
-export const GP_ORDER_TX_HASHES = {
-  1: 'GP_ORDER_TX_HASHES_1',
-  4: 'GP_ORDER_TX_HASHES_4',
+export const STORAGE_PENDING_ORDER_TX_HASHES = {
+  1: 'STORAGE_PENDING_ORDER_TX_HASHES_1',
+  4: 'STORAGE_PENDING_ORDER_TX_HASHES_4',
 }
 
 const LIQUIDITY_TOKEN_LIST_VALUES = process.env.LIQUIDITY_TOKEN_LIST || 'USDT,TUSD,USDC,PAX,GUSD,DAI,sUSD'
@@ -113,7 +113,7 @@ export const VALID_FROM_DEFAULT = '30'
 export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
-export const GP_PENDING_ORDER_KEY = 'GP_ORDER_TX_HASHES'
+export const STORAGE_PENDING_ORDER_KEY = 'STORAGE_PENDING_ORDER_TX_HASHES'
 export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 // for stable reference
 // to avoid updates on setState([])

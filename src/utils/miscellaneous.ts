@@ -1,8 +1,11 @@
+import isEqual from 'lodash.isequal'
 import { TokenDetails } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
 import { ORDER_FILLED_FACTOR } from 'const'
+
+export const isDeepEqual: typeof isEqual = isEqual
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {

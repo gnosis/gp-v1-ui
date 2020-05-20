@@ -1,7 +1,7 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
 import { toBN } from 'utils'
-import { GP_PENDING_ORDER_KEY } from 'const'
+import { STORAGE_PENDING_ORDER_KEY } from 'const'
 
 export type ActionTypes = 'SAVE_PENDING_ORDERS' | 'REMOVE_PENDING_ORDERS'
 
@@ -127,6 +127,6 @@ function grabAndParseLocalStorageOrders(localPendingOrders: PendingOrdersState):
   return castLocalState
 }
 
-export const PendingOrdersInitialState: PendingOrdersState = localStorage.getItem(GP_PENDING_ORDER_KEY)
-  ? grabAndParseLocalStorageOrders(JSON.parse(localStorage.getItem(GP_PENDING_ORDER_KEY) as string))
+export const PendingOrdersInitialState: PendingOrdersState = localStorage.getItem(STORAGE_PENDING_ORDER_KEY)
+  ? grabAndParseLocalStorageOrders(JSON.parse(localStorage.getItem(STORAGE_PENDING_ORDER_KEY) as string))
   : EMPTY_PENDING_ORDERS_STATE
