@@ -15,9 +15,9 @@ export interface Result {
 }
 
 interface WrapUnwrapAuxParams {
-  userAddress: string | undefined
-  networkId: number | undefined
-  isConnected: boolean | undefined
+  userAddress?: string
+  networkId?: number
+  isConnected?: boolean
   amount: string
   txOptionalParams: TxOptionalParams
   setLoadingFlag: React.Dispatch<React.SetStateAction<boolean>>
