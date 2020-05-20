@@ -1,5 +1,5 @@
 import isEqual from 'lodash.isequal'
-import { TokenDetails } from 'types'
+import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
@@ -91,7 +91,7 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
   try {
     return await promise
   } catch (e) {
-    console.error(customMessage || 'Failed to fetch promise', e)
+    logDebug(customMessage || 'Failed to fetch promise', e.message)
     return
   }
 }
@@ -116,4 +116,40 @@ export function compose(...funcs: Function[]): Function {
     return funcs[0]
   }
   return funcs.reduce((a, b) => (...args: unknown[]): Function => a(b(...args)))
+}
+interface RetryOptions {
+  retriesLeft?: number
+  interval?: number
+  exponentialBackOff?: boolean
+}
+
+/**
+ * Retry function with delay.
+ *
+ * Inspired by: https://gitlab.com/snippets/1775781
+ *
+ * @param fn Parameterless function to retry
+ * @param retriesLeft How many retries. Defaults to 3
+ * @param interval How long to wait between retries. Defaults to 1s
+ * @param exponentialBackOff Whether to use exponential back off, doubling wait interval. Defaults to true
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function retry<T extends () => any>(fn: T, options?: RetryOptions): Promise<Unpromise<ReturnType<T>>> {
+  const { retriesLeft = 3, interval = 1000, exponentialBackOff = true } = options || {}
+
+  try {
+    return await fn()
+  } catch (error) {
+    if (retriesLeft) {
+      await delay(interval)
+
+      return retry(fn, {
+        retriesLeft: retriesLeft - 1,
+        interval: exponentialBackOff ? interval * 2 : interval,
+        exponentialBackOff,
+      })
+    } else {
+      throw new Error(`Max retries reached`)
+    }
+  }
 }

@@ -24,10 +24,6 @@ interface GetPricesResult {
   [tokenId: number]: BigNumber | null
 }
 
-interface UrlByNetwork {
-  [network: number]: string
-}
-
 interface PriceEntry {
   priceInOwlNumerator: string
   priceInOwlDenominator: string
@@ -56,15 +52,21 @@ type GqlResult = PricesResponse | GqlError
 
 const isGqlError = (gqlResult: GqlResult): gqlResult is GqlError => 'errors' in gqlResult
 
-export interface Params {
-  urls: UrlByNetwork
+export interface PriceEstimatorEndpoint {
+  networkId: number
+  url: string
 }
 
-export class TheGraphApiImpl {
-  private urlByNetwork: UrlByNetwork
+export type TheGraphApiImplParams = PriceEstimatorEndpoint[]
 
-  public constructor(params: Params) {
-    this.urlByNetwork = params.urls
+export class TheGraphApiImpl {
+  private urlByNetwork: { [networkId: number]: string } = {}
+
+  public constructor(params: TheGraphApiImplParams) {
+    this.urlByNetwork = params.reduce((acc, endpoint) => {
+      acc[endpoint.networkId] = endpoint.url
+      return acc
+    }, {})
   }
 
   public async getPrice({ tokenId, ...params }: GetPriceParams): Promise<BigNumber | null> {

@@ -1,4 +1,4 @@
-import { tokenListApi, exchangeApi, erc20Api, web3, theGraphApi } from 'api'
+import { tokenListApi, exchangeApi, erc20Api, web3, theGraphApi, tcrApi } from 'api'
 
 import {
   getTokenFromExchangeByAddressFactory,
@@ -22,6 +22,7 @@ const apis = {
   erc20Api,
   web3,
   theGraphApi,
+  tcrApi,
 }
 
 export const getTokenFromErc20 = getTokenFromErc20Factory(apis)
@@ -36,7 +37,7 @@ export const getPriceEstimation = getPriceEstimationFactory(apis)
 
 export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
-export const getTokens = getTokensFactory(apis)
+export const getTokens = getTokensFactory(apis, { getTokenFromErc20 })
 
 export interface TokenAndNetwork {
   networkId: number
