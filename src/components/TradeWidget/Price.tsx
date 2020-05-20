@@ -11,10 +11,6 @@ import { TradeFormData } from '.'
 import FormMessage, { FormInputError } from './FormMessage'
 import { useNumberInput } from './useNumberInput'
 import { OrderBookBtn } from 'components/OrderBookBtn'
-import MaximumSlippage from './MaximumSlippage'
-
-import { setPriceSlippage } from 'reducers-actions/priceSlippage'
-import useGlobalState from 'hooks/useGlobalState'
 
 const Wrapper = styled.div`
   display: flex;
@@ -164,7 +160,6 @@ export function invertPriceFromString(priceValue: string): string {
 
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
-  const [{ priceSlippage }, dispatch] = useGlobalState()
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
@@ -202,19 +197,10 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     precision: DEFAULT_PRECISION,
   })
 
-  // PRICE SLIPPAGE
-  const dispatchNewSlippage = (payload: string): void => dispatch(setPriceSlippage(payload))
-
   return (
     <Wrapper>
       <strong>
-        Limit Price{' '}
-        {priceSlippage && (
-          <FormMessage className="warning">
-            <small>{priceSlippage}% slippage</small>
-          </FormMessage>
-        )}
-        <OrderBookBtn baseToken={sellToken} quoteToken={receiveToken} />
+        Limit Price <OrderBookBtn baseToken={sellToken} quoteToken={receiveToken} />
       </strong>
       <PriceInputBox>
         <label>
@@ -255,7 +241,6 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
         <FormInputError errorMessage={errorPriceInverse?.message} />
       </PriceInputBox>
       {/*  MAX SLIPPAGE CONTROL */}
-      <MaximumSlippage setNewSlippage={dispatchNewSlippage} priceSlippage={priceSlippage} />
     </Wrapper>
   )
 }
