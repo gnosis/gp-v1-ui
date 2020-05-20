@@ -92,7 +92,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
         return balance
       })
       .catch(e => {
-        console.error('[useBalances] Error for', token, userAddress, contractAddress, e)
+        console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
 
         const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
 
@@ -109,7 +109,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   return balances.filter(Boolean) as TokenBalanceDetails[]
 }
 
-export const useBalances = (): UseBalanceResult => {
+export const useTokenBalances = (): UseBalanceResult => {
   const walletInfo = useWalletConnection()
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
@@ -122,14 +122,14 @@ export const useBalances = (): UseBalanceResult => {
       _getBalances(walletInfo, tokens)
         .then(balances => {
           logDebug(
-            '[useBalances] Wallet balances',
+            '[useTokenBalances] Wallet balances',
             balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
           )
           setBalances(balances)
           setError(false)
         })
         .catch(error => {
-          console.error('[useBalances] Error loading token balances', error)
+          console.error('[useTokenBalances] Error loading token balances', error)
           setError(true)
         })
     }

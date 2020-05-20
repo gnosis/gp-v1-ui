@@ -10,7 +10,7 @@ import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
 import { TooltipWrapper } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
 import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
-import { useBalances } from 'hooks/useBalances'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 import { WETH_ADDRESS_MAINNET } from 'const'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -195,7 +195,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
   const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
   const { ethBalance } = useEthBalances()
-  const { balances } = useBalances()
+  const { balances } = useTokenBalances()
   const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
   const wethBalance = wethBalanceDetails?.walletBalance
 

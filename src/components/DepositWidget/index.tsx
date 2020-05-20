@@ -9,7 +9,7 @@ import { Row } from './Row'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
 
-import { useBalances } from 'hooks/useBalances'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useRowActions } from './useRowActions'
 import { useDepositModals } from './useDepositModals'
 import useSafeState from 'hooks/useSafeState'
@@ -470,7 +470,7 @@ const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 
 const DepositWidget: React.FC = () => {
   const { ethBalance } = useEthBalances()
-  const { balances, error } = useBalances()
+  const { balances, error } = useTokenBalances()
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
 

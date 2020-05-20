@@ -24,7 +24,7 @@ import FormMessage from './FormMessage'
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
 import useURLParams from 'hooks/useURLParams'
-import { useBalances } from 'hooks/useBalances'
+import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
@@ -478,7 +478,7 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances, tokens: tokenList } = useBalances()
+  const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
   const tokens =
