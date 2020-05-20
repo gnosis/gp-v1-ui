@@ -1,11 +1,11 @@
 import React, { useEffect, ChangeEvent, ReactNode } from 'react'
 import BN from 'bn.js'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IconDefinition, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import plus from 'assets/img/plus.svg'
 
 import { CardDrawer } from 'components/Layout/Card'
 import { WalletDrawerInnerWrapper } from './Form.styled'
+import { Spinner } from 'components/Spinner'
 
 import useSafeState from 'hooks/useSafeState'
 import useScrollIntoView from 'hooks/useScrollIntoView'
@@ -167,7 +167,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <a onClick={cancelForm}>Cancel</a>
             <button type="button" disabled={!!errors.amountInput || loading} onClick={_onClick}>
               {submitBtnLabel}
-              {loading ? <FontAwesomeIcon icon={faSpinner} spin={loading} /> : <img src={plus} />}
+              {loading ? <Spinner spin={loading} /> : <img src={plus} />}
             </button>
           </div>
         </WalletDrawerInnerWrapper>

@@ -1,11 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 
 import { SubComponentProps } from './SubComponents'
 import { StepButtonsWrapper } from './PoolingWidget.styled'
 import { TooltipWrapper } from 'components/Tooltip'
+import { Spinner } from 'components/Spinner'
 
 interface LiquidityButtonsProps extends Pick<SubComponentProps, 'step' | 'txReceipt' | 'nextStep' | 'isSubmitting'> {
   disableBack: boolean
@@ -52,7 +51,7 @@ const LiquidityButtons: React.FC<LiquidityButtonsProps> = ({
     ) : (
       // NOT YET SUBMITTED TX
       <button type="button" className="finish" onClick={handleSubmit} disabled={disableSubmit}>
-        {showLoader && <FontAwesomeIcon icon={faSpinner} spin />}Submit transaction
+        {showLoader && <Spinner />}Submit transaction
       </button>
     )}
   </StepButtonsWrapper>
