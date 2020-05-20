@@ -14,7 +14,7 @@ export interface Result {
   unwrapWeth(amount: string, txOptionalParams?: TxOptionalParams): Promise<Receipt>
 }
 
-interface WrapUnwrapAuxParams {
+interface WrapUnwrapHelperParams {
   userAddress?: string
   networkId?: number
   isConnected?: boolean
@@ -24,7 +24,7 @@ interface WrapUnwrapAuxParams {
   execute: (params: WrapUnwrapParams) => Promise<Receipt>
 }
 
-async function wrapUnwrapAux(params: WrapUnwrapAuxParams): Promise<Receipt> {
+async function _wrapUnwrap(params: WrapUnwrapHelperParams): Promise<Receipt> {
   const { networkId, isConnected, userAddress, amount, txOptionalParams, setLoadingFlag, execute } = params
   try {
     assert(networkId, 'No valid networkId found')
@@ -63,7 +63,7 @@ export const useWrapUnwrapEth = (): Result => {
 
   async function wrapEth(amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> {
     logDebug('[useWrapUnwrapEth] Wrap ETH: ' + amount)
-    return wrapUnwrapAux({
+    return _wrapUnwrap({
       ...baseParams,
       amount,
       setLoadingFlag: setWrappingEth,
@@ -74,7 +74,7 @@ export const useWrapUnwrapEth = (): Result => {
 
   async function unwrapWeth(amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> {
     logDebug('[useWrapUnwrapEth] Unwrap ETH: ' + amount)
-    return wrapUnwrapAux({
+    return _wrapUnwrap({
       ...baseParams,
       amount,
       setLoadingFlag: setUnwrappingWeth,
