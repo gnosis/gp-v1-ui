@@ -1,4 +1,4 @@
-import React, { useContext, useReducer, useRef, useMemo } from 'react'
+import React, { useContext, useCallback, useReducer, useRef, useMemo } from 'react'
 import { GlobalState } from 'reducers-actions'
 import { AnyAction } from 'combine-reducers'
 
@@ -26,7 +26,11 @@ export function withGlobalContext<P>(
     }, [deepState])
 
     // apply middlewares and pass a state getting fn via ref and NO DEPS
-    const enhancedDispatch = enhanceDispatchWithMiddleware(() => stateRef.current, dispatch)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const enhancedDispatch = useCallback(
+      enhanceDispatchWithMiddleware(() => stateRef.current, dispatch),
+      [],
+    )
 
     process.env.NODE_ENV === 'development' && (window['eDispatch'] = enhancedDispatch)
 
