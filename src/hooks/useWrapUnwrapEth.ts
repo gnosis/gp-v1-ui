@@ -6,6 +6,7 @@ import useSafeState from './useSafeState'
 import { WrapUnwrapParams } from 'api/weth/WethApi'
 import { logDebug } from 'utils'
 import { DISABLE_SPINNER_DELAY } from 'const'
+import { useMemo } from 'react'
 
 export interface Result {
   wrappingEth: boolean
@@ -61,27 +62,34 @@ export const useWrapUnwrapEth = (): Result => {
     isConnected,
   }
 
-  async function wrapEth(amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> {
-    logDebug('[useWrapUnwrapEth] Wrap ETH: ' + amount)
-    return _wrapUnwrap({
-      ...baseParams,
-      amount,
-      setLoadingFlag: setWrappingEth,
-      execute: params => wethApi.deposit(params),
-      txOptionalParams,
-    })
-  }
+  const wrapEth = useMemo(
+    () => async (amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> => {
+      logDebug('[useWrapUnwrapEth] Wrap ETH: ' + amount)
 
-  async function unwrapWeth(amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> {
-    logDebug('[useWrapUnwrapEth] Unwrap ETH: ' + amount)
-    return _wrapUnwrap({
-      ...baseParams,
-      amount,
-      setLoadingFlag: setUnwrappingWeth,
-      execute: params => wethApi.withdraw(params),
-      txOptionalParams,
-    })
-  }
+      return _wrapUnwrap({
+        ...baseParams,
+        amount,
+        setLoadingFlag: setWrappingEth,
+        execute: params => wethApi.deposit(params),
+        txOptionalParams,
+      })
+    },
+    [baseParams, setWrappingEth],
+  )
+
+  const unwrapWeth = useMemo(
+    () => async (amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> => {
+      logDebug('[useWrapUnwrapEth] Unwrap ETH: ' + amount)
+      return _wrapUnwrap({
+        ...baseParams,
+        amount,
+        setLoadingFlag: setUnwrappingWeth,
+        execute: params => wethApi.withdraw(params),
+        txOptionalParams,
+      })
+    },
+    [baseParams, setUnwrappingWeth],
+  )
 
   console.log('wrappingEth, unwrappingWeth', wrappingEth, unwrappingWeth)
 
