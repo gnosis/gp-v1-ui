@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import BN from 'bn.js'
-import { assert, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+import { assert } from '@gnosis.pm/dex-js'
 
-import { erc20Api, depositApi, walletApi } from 'api'
+import { erc20Api, depositApi } from 'api'
 
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
@@ -15,7 +15,6 @@ import { PendingFlux } from 'api/deposit/DepositApi'
 import { useTokenList } from './useTokenList'
 
 interface UseBalanceResult {
-  ethBalance: BN | null
   balances: TokenBalanceDetails[]
   tokens: TokenDetails[]
   error: boolean
@@ -112,7 +111,6 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
 
 export const useBalances = (): UseBalanceResult => {
   const walletInfo = useWalletConnection()
-  const [ethBalance, setEthBalance] = useSafeState<BN | null>(null)
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
@@ -137,22 +135,5 @@ export const useBalances = (): UseBalanceResult => {
     }
   }, [setBalances, setError, walletInfo, tokens])
 
-  // Get ether balances
-  useEffect(() => {
-    if (walletInfo.isConnected) {
-      walletApi
-        .getBalance()
-        .then(etherBalance => {
-          logDebug('[useBalances] Wallet balance: %s ETH', formatAmount(etherBalance, DEFAULT_PRECISION))
-          setEthBalance(etherBalance)
-          setError(false)
-        })
-        .catch(error => {
-          console.error('[useBalances] Error loading ether balance', error)
-          setError(true)
-        })
-    }
-  }, [setEthBalance, setError, walletInfo])
-
-  return { ethBalance, balances, error, tokens }
+  return { balances, error, tokens }
 }

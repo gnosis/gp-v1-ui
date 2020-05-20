@@ -22,6 +22,7 @@ import { useDebounce } from 'hooks/useDebounce'
 import { TokenLocalState } from 'reducers-actions'
 import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
+import { useEthBalances } from 'hooks/useEthBalance'
 
 interface WithdrawState {
   amount: BN
@@ -468,7 +469,8 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 
 const DepositWidget: React.FC = () => {
-  const { ethBalance, balances, error } = useBalances()
+  const { ethBalance } = useEthBalances()
+  const { balances, error } = useBalances()
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
 

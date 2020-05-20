@@ -12,11 +12,11 @@ import useSafeState from 'hooks/useSafeState'
 import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
 import { useBalances } from 'hooks/useBalances'
 import { WETH_ADDRESS_MAINNET } from 'const'
-import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { composeOptionalParams } from 'utils/transaction'
 import { toast } from 'toastify'
+import { useEthBalances } from 'hooks/useEthBalance'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -194,7 +194,8 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
   const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
-  const { ethBalance, balances } = useBalances()
+  const { ethBalance } = useEthBalances()
+  const { balances } = useBalances()
   const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
   const wethBalance = wethBalanceDetails?.walletBalance
 
