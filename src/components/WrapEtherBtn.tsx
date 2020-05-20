@@ -192,6 +192,7 @@ interface WrapEtherFormData {
 
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
+  const [isModalVisible, setIsModalVisible] = useSafeState(false)
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
   const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
   const { ethBalance } = useEthBalances()
@@ -236,6 +237,14 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
     title,
+    onShow: () => {
+      console.log('setIsModalVisible(true)')
+      setIsModalVisible(true)
+    },
+    onHide: () => {
+      console.log('setIsModalVisible(false)')
+      setIsModalVisible(false)
+    },
     message: (
       <ModalWrapper>
         <form>
@@ -303,7 +312,17 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           const wrapAmount = toWei(wrapAmountEther)
 
           // Hide modal once the transaction is sent
-          const txOptionalParams = composeOptionalParams(() => modalHook.hide())
+          const txOptionalParams = composeOptionalParams(() => {
+            logDebug('[WrapEtherBtn] Close modal on sentTransaction. IsModalVisible? ', {
+              'modalHook.isModalVisible': modalHook.isModalVisible,
+              'hook isModalVisible': isModalVisible,
+            })
+            // Hide modal if it's visible
+            // Unfortunatelly "modalHook.isModalVisible" doesn't have the right value, so we need to keep the state ourselves
+            if (isModalVisible) {
+              modalHook.hide()
+            }
+          })
 
           let wrapUnwrapPromise, successMessage: string, errorMessage: string
           if (wrap) {
