@@ -3,10 +3,7 @@ import { Actions } from 'reducers-actions'
 import { toBN } from 'utils'
 import { GP_PENDING_ORDER_KEY } from 'const'
 
-export const enum ActionTypes {
-  SAVE_PENDING_ORDERS = 'SAVE_PENDING_ORDERS',
-  REMOVE_PENDING_ORDERS = 'REMOVE_PENDING_ORDERS',
-}
+export type ActionTypes = 'SAVE_PENDING_ORDERS' | 'REMOVE_PENDING_ORDERS'
 
 type SavePendingOrdersActionType = Actions<
   ActionTypes,
@@ -38,7 +35,7 @@ export const savePendingOrdersAction = (payload: {
   networkId: number
   userAddress: string
 }): SavePendingOrdersActionType => ({
-  type: ActionTypes.SAVE_PENDING_ORDERS,
+  type: 'SAVE_PENDING_ORDERS',
   payload,
 })
 
@@ -47,7 +44,7 @@ export const removePendingOrdersAction = (payload: {
   userAddress: string
   orders: PendingTxObj[]
 }): RemovePendingOrdersActionType => ({
-  type: ActionTypes.REMOVE_PENDING_ORDERS,
+  type: 'REMOVE_PENDING_ORDERS',
   payload,
 })
 
@@ -77,7 +74,7 @@ export const EMPTY_PENDING_ORDERS_STATE = {
 
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
   switch (action.type) {
-    case ActionTypes.SAVE_PENDING_ORDERS: {
+    case 'SAVE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
 
       const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
@@ -86,7 +83,7 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
 
       return newState
     }
-    case ActionTypes.REMOVE_PENDING_ORDERS: {
+    case 'REMOVE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
 
       const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: orders } }

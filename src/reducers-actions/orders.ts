@@ -2,12 +2,7 @@ import { Actions } from 'reducers-actions'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from '@gnosis.pm/dex-js'
 
-export const enum ActionTypes {
-  OVERWRITE_ORDERS = 'OVERWRITE_ORDERS',
-  APPEND_ORDERS = 'APPEND_ORDERS',
-  UPDATE_ORDERS = 'UPDATE_ORDERS',
-  UPDATE_OFFSET = 'UPDATE_OFFSET',
-}
+export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
 export interface OrdersState {
   orders: AuctionElement[]
@@ -19,22 +14,22 @@ type UpdateOffsetActionType = Actions<ActionTypes, Pick<OrdersState, 'offset'>>
 type ReducerActionType = Actions<ActionTypes, OrdersState>
 
 export const overwriteOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
-  type: ActionTypes.OVERWRITE_ORDERS,
+  type: 'OVERWRITE_ORDERS',
   payload: { orders },
 })
 
 export const appendOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
-  type: ActionTypes.APPEND_ORDERS,
+  type: 'APPEND_ORDERS',
   payload: { orders },
 })
 
 export const updateOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
-  type: ActionTypes.UPDATE_ORDERS,
+  type: 'UPDATE_ORDERS',
   payload: { orders },
 })
 
 export const updateOffset = (offset: number): UpdateOffsetActionType => ({
-  type: ActionTypes.UPDATE_OFFSET,
+  type: 'UPDATE_OFFSET',
   payload: { offset },
 })
 
@@ -60,9 +55,9 @@ function isOrderDeleted(order: AuctionElement): boolean {
 
 export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
-    case ActionTypes.UPDATE_OFFSET:
+    case 'UPDATE_OFFSET':
       return { ...state, ...action.payload }
-    case ActionTypes.OVERWRITE_ORDERS: {
+    case 'OVERWRITE_ORDERS': {
       const {
         payload: { orders },
       } = action
@@ -76,7 +71,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       return { ...state, orders: reversedOrders }
     }
-    case ActionTypes.UPDATE_ORDERS: {
+    case 'UPDATE_ORDERS': {
       const {
         payload: { orders: newOrders },
       } = action
@@ -113,7 +108,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       return { ...state, orders: updatedOrders }
     }
-    case ActionTypes.APPEND_ORDERS: {
+    case 'APPEND_ORDERS': {
       const {
         payload: { orders: newOrders },
       } = action
