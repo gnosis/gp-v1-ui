@@ -1,47 +1,12 @@
-import React, { useContext, useReducer, useCallback, useRef, useMemo } from 'react'
+import React, { useContext, useReducer, useRef, useMemo } from 'react'
 import { GlobalState } from 'reducers-actions'
 import { AnyAction } from 'combine-reducers'
-import { isEqual } from 'lodash'
 
-import { pendingOrdersAndLocalStorage, Middleware } from 'middlewares'
-import { compose } from 'utils'
+import useDeepCompareRef from './useDeepCompareRef'
+
+import enhanceDispatchWithMiddleware from 'middlewares'
 
 const GlobalStateContext = React.createContext({})
-
-const dispatchThatReturnsAction = (dispatch: React.Dispatch<AnyAction>) => (action: AnyAction): AnyAction => {
-  dispatch(action)
-  return action
-}
-
-const applyMiddlewares = (...middlewares: Middleware[]) => (
-  getState: () => GlobalState,
-  dispatch: React.Dispatch<AnyAction>,
-): React.Dispatch<AnyAction> => {
-  // fire off each middleware
-  const middlewareChain = middlewares
-    // ==============> e.g logger(getState, dispatch)
-    // returns ======> e.g loggerDispatch(next)(action)
-    .map(middleware => middleware(getState, dispatch))
-
-  const enhancedDispatch = compose(...middlewareChain)(dispatchThatReturnsAction(dispatch))
-
-  return enhancedDispatch
-}
-
-function useDeepCompareRef<R>(value?: R): R | undefined {
-  const ref = useRef<R | undefined>()
-
-  if (!isEqual(value, ref.current)) {
-    ref.current = value
-  }
-
-  return ref.current
-}
-
-// Not working... looping infinitely
-// function useDeepCheckCallback(callback: (...args: any[]) => any, deps: unknown[]): (...args: any[]) => any {
-//   return useCallback(callback, useDeepCompareRef<any>(deps))
-// }
 
 export function withGlobalContext<P>(
   WrappedComponent: React.FC<P>,
@@ -59,12 +24,9 @@ export function withGlobalContext<P>(
     useMemo(() => {
       stateRef.current = deepState as GlobalState
     }, [deepState])
-    const enhanceDispatchWithMiddleware = applyMiddlewares(pendingOrdersAndLocalStorage)
+
     // apply middlewares and pass a state getting fn via ref and NO DEPS
-    const enhancedDispatch = useCallback(
-      enhanceDispatchWithMiddleware(() => stateRef.current, dispatch),
-      [],
-    )
+    const enhancedDispatch = enhanceDispatchWithMiddleware(() => stateRef.current, dispatch)
 
     process.env.NODE_ENV === 'development' && (window['eDispatch'] = enhancedDispatch)
 
