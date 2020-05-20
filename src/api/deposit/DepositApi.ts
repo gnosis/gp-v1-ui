@@ -146,7 +146,7 @@ export class DepositApiImpl implements DepositApi {
       .deposit(tokenAddress, amount.toString())
       .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 

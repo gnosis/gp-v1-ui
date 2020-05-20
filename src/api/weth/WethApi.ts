@@ -60,7 +60,7 @@ export class WethApiImpl implements WethApi {
       .deposit()
       .send({ from: userAddress, value: amount, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -75,7 +75,7 @@ export class WethApiImpl implements WethApi {
 
     const tx = contract.methods.withdraw(amount).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 

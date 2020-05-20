@@ -193,7 +193,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract(networkId)
     const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -221,7 +221,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
       .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -288,7 +288,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract(networkId)
     const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
