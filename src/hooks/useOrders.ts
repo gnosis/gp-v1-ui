@@ -68,7 +68,7 @@ export function useOrders(): Result {
           )
         }
 
-        // don't dispatch unneccessarily
+        // Dispatch if a pending transaction was mined
         if (blockTransactionsFilteredPendingOrders.length !== currentPendingOrders.length) {
           // Remove from global
           dispatch(
