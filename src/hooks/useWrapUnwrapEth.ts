@@ -91,7 +91,5 @@ export const useWrapUnwrapEth = (): Result => {
     [baseParams, setUnwrappingWeth],
   )
 
-  console.log('wrappingEth, unwrappingWeth', wrappingEth, unwrappingWeth)
-
   return { wrappingEth, unwrappingWeth, wrapEth, unwrapWeth }
 }
