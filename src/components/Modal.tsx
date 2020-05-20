@@ -7,6 +7,8 @@ export const DEFAULT_MODAL_OPTIONS = {
 }
 
 export const ModalBodyWrapper = styled.div`
+  padding: 0.5rem 1.5rem;
+
   div > p {
     font-size: inherit;
     color: inherit;
