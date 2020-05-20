@@ -304,7 +304,6 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           // Hide modal once the transaction is sent
           const txOptionalParams = composeOptionalParams(() => modalHook.hide())
 
-          new BigNumber(wrapAmount)
           let wrapUnwrapPromise, successMessage: string, errorMessage: string
           if (wrap) {
             logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH`)
