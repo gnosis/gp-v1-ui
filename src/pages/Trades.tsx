@@ -1,56 +1,51 @@
 import React from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck, faClock } from '@fortawesome/free-solid-svg-icons'
+import { useWalletConnection } from 'hooks/useWalletConnection'
+import { useTrades } from 'hooks/useTrades'
+import { calculatePrice, formatPrice, formatAmountFull } from '@gnosis.pm/dex-js'
+import { EtherscanLink } from 'components/EtherscanLink'
 
 const Trades: React.FC = () => {
+  const { networkId } = useWalletConnection()
+  const trades = useTrades()
+
   return (
     <ContentPage>
-      <CardTable $columns="10rem 10rem 1fr 1fr .9fr" $rowSeparation="0">
+      <CardTable $columns="repeat(6, 1fr)" $rowSeparation="0">
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Price</th>
-            <th>Sold</th>
-            <th>Bought</th>
+            <th>Limit Price</th>
+            <th>Fill Price</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Tx</th>
             <th>Settled</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>
-              2020/05/02 <br /> 17:23:22 UTC
-            </td>
-            <td>0.99 USDC/DAI</td>
-            <td>99 USDC</td>
-            <td>100 DAI</td>
-            <td>
-              <FontAwesomeIcon icon={faClock} />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              2020/05/02 <br /> 17:21:22 UTC
-            </td>
-            <td>1.01 DAI/USDC</td>
-            <td>100 DAI</td>
-            <td>101 USDC</td>
-            <td>
-              <FontAwesomeIcon icon={faCheck} />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              2020/05/02 <br /> 17:21:20 UTC
-            </td>
-            <td>1.1 DAI/USDC</td>
-            <td>10 DAI</td>
-            <td>11 USDC</td>
-            <td>
-              <FontAwesomeIcon icon={faCheck} />
-            </td>
-          </tr>
+          {trades.map((trade, index) => (
+            <tr key={index} data-order-id={trade.orderId} data-trade-id={trade.id}>
+              {/* TODO: entries marked with NA are not yet available from the event.
+                        Need to enrich event data first */}
+              <td>NA</td>
+              <td>
+                {/* TODO: fix decimals */}
+                {/* TODO: add BUY SYMBOL/SELL SYMBOL */}
+                {formatPrice(
+                  calculatePrice({ numerator: { amount: trade.buyAmount }, denominator: { amount: trade.sellAmount } }),
+                )}
+              </td>
+              {/* TODO: fix decimals */}
+              {/* TODO: add SELL SYMBOL */}
+              <td>{formatAmountFull(trade.sellAmount)}</td>
+              <td>NA</td>
+              <td>
+                <EtherscanLink type={'tx'} identifier={trade.txHash} networkId={networkId} />
+              </td>
+              <td>NA</td>
+            </tr>
+          ))}
         </tbody>
       </CardTable>
     </ContentPage>
