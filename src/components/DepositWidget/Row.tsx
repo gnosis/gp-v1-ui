@@ -122,12 +122,12 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           {isWeth ? (
             <ul>
               <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
-                {ethBalance ? formatAmount(ethBalance, decimals) : ''} ETH{' '}
+                {ethBalance ? formatAmount(ethBalance, decimals) : '-'} ETH{' '}
                 <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
               <li title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
                 {(claiming || depositing) && spinner}
-                {formatAmount(walletBalance, decimals) + ' '}
+                {formatAmount(walletBalance, decimals) + '-'}
                 WETH <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
               </li>
             </ul>
