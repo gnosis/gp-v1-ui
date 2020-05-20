@@ -168,7 +168,10 @@ const MaximumSlippage: React.FC<MaximumSlippageProps> = ({ setNewSlippage, price
 }
 
 /*
+  // PRICE SLIPPAGE
+  const dispatchNewSlippage = (payload: string): void => dispatch(setPriceSlippage(payload))
   // to add in Price component to show current selected slippage
+  
   {priceSlippage && (
     <FormMessage className="warning">
       <small>{priceSlippage}% slippage</small>
