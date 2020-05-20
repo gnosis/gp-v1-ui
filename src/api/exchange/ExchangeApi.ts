@@ -1,12 +1,14 @@
 import BN from 'bn.js'
+import { EventData } from 'web3-eth-contract'
 
-import { assert } from '@gnosis.pm/dex-js'
+import { assert, ContractEventEmitter, TokenDetails, ContractEventLog } from '@gnosis.pm/dex-js'
 
 import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { logDebug } from 'utils'
 import { decodeAuctionElements } from './utils/decodeAuctionElements'
 import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
+import BigNumber from 'bignumber.js'
 
 interface BaseParams {
   networkId: number
@@ -30,6 +32,12 @@ export interface GetTokenIdByAddressParams extends BaseParams {
 }
 
 export type HasTokenParams = GetTokenIdByAddressParams
+
+export type PastEventsParams = GetOrdersParams
+
+export interface SubscriptionParams extends PastEventsParams {
+  callback: (trade: BaseTradeEvent) => void
+}
 
 interface WithTxOptionalParams {
   txOptionalParams?: TxOptionalParams
@@ -79,6 +87,11 @@ export interface ExchangeApi extends DepositApi {
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
   hasToken(params: HasTokenParams): Promise<boolean>
 
+  // event related
+  getPastTrades(params: PastEventsParams): Promise<BaseTradeEvent[]>
+  subscribeToTradeEvent(params: SubscriptionParams): Promise<() => void>
+  unsubscribeToTradeEvent(): void
+
   addToken(params: AddTokenParams): Promise<Receipt>
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
   placeValidFromOrders(params: PlaceValidFromOrdersParams): Promise<Receipt>
@@ -101,19 +114,154 @@ export interface Order {
   remainingAmount: BN
 }
 
+/**
+ * BaseTradeEvent uses only info available on the emitted Trade event
+ */
+export interface BaseTradeEvent {
+  // order related
+  orderId: string
+  sellTokenId: number
+  buyTokenId: number
+  sellAmount: BN
+  buyAmount: BN
+  // block related
+  txHash: string
+  txIndex: number
+  blockNumber: number
+  id: string // txHash + | + txIndex
+}
+
+/**
+ * TradeEvent enriches BaseTradeEvent with block, order and token data
+ */
+export interface TradeEvent extends BaseTradeEvent {
+  batchId: number
+  hashKey: string // orderId + batchId, to find reverts
+  indexOnBatch: number // tracks trade position on batch, in case of reverts
+  time: Date
+  buyToken: TokenDetails
+  sellToken: TokenDetails
+  limitPrice: BigNumber
+  fillPrice: BigNumber
+  reverted: boolean
+}
+
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
   nextIndex?: number
 }
 
+// TODO: move to const/config
+const CONTRACT_DEPLOYMENT_BLOCK = {
+  1: 9340147,
+  4: 5844678,
+}
+
+interface Subscriptions {
+  // TODO: didn't manage to infer this type from the contract. How can I do that?
+  trade?: ContractEventEmitter<{
+    owner: string
+    orderId: string
+    sellToken: string
+    buyToken: string
+    executedSellAmount: string
+    executedBuyAmount: string
+  }>
+}
 /**
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
+  private subscriptions: Subscriptions = {}
+
   public constructor(injectedDependencies: Params) {
     super(injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
+  }
+
+  public async getPastTrades({ userAddress, networkId }: PastEventsParams): Promise<BaseTradeEvent[]> {
+    const contract = await this._getContract(networkId)
+
+    // to get all past events
+    const tradeEvents = await contract.getPastEvents('Trade', {
+      fromBlock: CONTRACT_DEPLOYMENT_BLOCK[networkId],
+      filter: { owner: userAddress },
+    })
+
+    logDebug(
+      `[ExchangeApiImpl] Fetched ${tradeEvents.length} trades for address ${userAddress} on network ${networkId}`,
+    )
+
+    return tradeEvents.filter(event => !event['removed']).map(this.parseTradeEvent)
+  }
+
+  public async subscribeToTradeEvent(params: SubscriptionParams): Promise<() => void> {
+    const { userAddress, networkId, callback } = params
+
+    const subscription = await this.getTradeSubscription(params)
+
+    logDebug(`[ExchangeApiImpl] subscribing to trade events for address ${userAddress} and networkId ${networkId}`)
+
+    subscription?.on('data', event => callback(this.parseTradeEvent(event)))
+
+    return this.unsubscribeToTradeEvent
+  }
+
+  public unsubscribeToTradeEvent(): void {
+    // TODO: is this how I unsubscribe?
+    this.subscriptions.trade = undefined
+  }
+
+  // TODO: can I get the ContractEventEmitter type directly?
+  private async getTradeSubscription(params: PastEventsParams): Promise<Subscriptions['trade']> {
+    const { userAddress, networkId } = params
+
+    const contract = await this._getContract(networkId)
+
+    if (!this.subscriptions.trade) {
+      this.subscriptions.trade = contract.events.Trade({
+        filter: { owner: userAddress },
+      })
+    }
+
+    return this.subscriptions.trade
+  }
+
+  private parseTradeEvent(
+    event:
+      | EventData // getPastEvents return type
+      | ContractEventLog<{
+          // Trade event subscription return type
+          owner: string
+          orderId: string
+          sellToken: string
+          buyToken: string
+          executedSellAmount: string
+          executedBuyAmount: string
+        }>,
+  ): BaseTradeEvent {
+    const {
+      returnValues: { orderId, sellToken: sellTokenId, buyToken: buyTokenId, executedSellAmount, executedBuyAmount },
+      transactionHash: txHash,
+      transactionIndex: txIndex,
+      blockNumber,
+    } = event
+
+    const trade: BaseTradeEvent = {
+      orderId,
+      sellTokenId: +sellTokenId,
+      buyTokenId: +buyTokenId,
+      sellAmount: new BN(executedSellAmount),
+      buyAmount: new BN(executedBuyAmount),
+      txHash,
+      txIndex,
+      blockNumber,
+      id: `${txHash}|${txIndex}`,
+    }
+    console.log(trade)
+
+    return trade
   }
 
   public async getOrders({ userAddress, networkId }: GetOrdersParams): Promise<AuctionElement[]> {
