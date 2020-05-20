@@ -213,6 +213,25 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const amount = parseAmount(amountValue, DEFAULT_PRECISION) || ZERO
   const wrapAllBalance = wrap && balance && !amount.isZero() && amount.eq(balance)
 
+  // Show available balance
+  //  * For wrapping, we just show the value
+  //  * For unwrapping, we allow to clicl to unwrap all
+  let availableBalanceComponent
+  if (balance) {
+    const amountFull = formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || '-'
+    availableBalanceComponent = wrap ? (
+      <span>
+        {amountFull} {symbolSource}
+      </span>
+    ) : (
+      <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
+        {amountFull} {symbolSource}
+      </a>
+    )
+  } else {
+    availableBalanceComponent = <span>...</span>
+  }
+
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
     title,
@@ -222,15 +241,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           <div>
             {description}
             <b>Available {symbolSource}</b>
-            <div>
-              {balance ? (
-                <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
-                  {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
-                </a>
-              ) : (
-                <span>...</span>
-              )}
-            </div>
+            <div>{availableBalanceComponent}</div>
           </div>
           <div>
             <b>{amountLabel}</b>
