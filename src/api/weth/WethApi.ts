@@ -43,9 +43,9 @@ function getWethAddressByNetwork(networkId: number): string {
  */
 export class WethApiImpl implements WethApi {
   protected _contractPrototype: WethContract
+  protected static _contractsCache: { [network: number]: { [address: string]: WethContract } } = {}
   private web3: Web3
   private fetchGasPrice: WethApiDependencies['fetchGasPrice']
-  protected static _contractsCache: { [network: number]: { [address: string]: WethContract } } = {}
 
   public constructor(injectedDependencies: WethApiDependencies) {
     Object.assign(this, injectedDependencies)
