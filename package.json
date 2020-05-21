@@ -54,7 +54,7 @@
     "react-select": "^3.0.8",
     "react-toastify": "^5.5.0",
     "styled-components": "^5.0.0",
-    "web3": "^1.2.8"
+    "web3": "1.2.7"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
