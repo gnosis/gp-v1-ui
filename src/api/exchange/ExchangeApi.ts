@@ -198,10 +198,10 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const subscription = await this.getTradeSubscription(params)
 
-    logDebug(`[ExchangeApiImpl] subscribing to trade events for address ${userAddress} and networkId ${networkId}`)
-
     // Remove any active subscription
     this.unsubscribeToTradeEvent()
+
+    logDebug(`[ExchangeApiImpl] subscribing to trade events for address ${userAddress} and networkId ${networkId}`)
 
     // Two ways of subscribing
 
