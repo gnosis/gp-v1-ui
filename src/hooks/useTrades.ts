@@ -14,7 +14,7 @@ export function useTrades(): BaseTradeEvent[] {
 
   const handleSubscription = useCallback(
     (trade: BaseTradeEvent): void => {
-      console.warn(`new trade event!!! ${trade.orderId}`)
+      console.warn(`new trade event!!! ${trade.orderId}`, trade)
       setTrades(currTrades => {
         currTrades.push(trade)
         return currTrades
@@ -37,5 +37,5 @@ export function useTrades(): BaseTradeEvent[] {
   }, [userAddress, networkId, setTrades, handleSubscription])
 
   // latest first
-  return trades.reverse()
+  return trades.slice(0).reverse()
 }
