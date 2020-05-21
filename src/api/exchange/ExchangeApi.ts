@@ -163,13 +163,13 @@ type TradeSubscription = ReturnType<BatchExchangeContract['events']['Trade']>
 // type TradeEventData = TradeSubscription extends Subscription<infer U> ? U : never
 
 interface Subscriptions {
-  trade?: TradeSubscription
+  trade: { [networkId: number]: TradeSubscription }
 }
 /**
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  private subscriptions: Subscriptions = {}
+  private subscriptions: Subscriptions = { trade: {} }
 
   public constructor(injectedDependencies: Params) {
     super(injectedDependencies)
@@ -199,6 +199,9 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const subscription = await this.getTradeSubscription(params)
 
     logDebug(`[ExchangeApiImpl] subscribing to trade events for address ${userAddress} and networkId ${networkId}`)
+
+    // Remove any active subscription
+    this.unsubscribeToTradeEvent()
 
     // Two ways of subscribing
 
@@ -235,12 +238,14 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // Argument of type '{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }' is not assignable to parameter of type 'Trade | ContractEventLog<{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }>'.
     //   Type '{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }' is missing the following properties from type 'ContractEventLog<{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }>': returnValues, event, address, logIndex, and 4 more.ts(2345)
 
-    return this.unsubscribeToTradeEvent
+    return (): void => this.unsubscribeToTradeEvent()
   }
 
   public unsubscribeToTradeEvent(): void {
-    this.subscriptions.trade?.unsubscribe()
-    this.subscriptions.trade = undefined
+    Object.keys(this.subscriptions.trade).forEach(networkId => {
+      logDebug(`[ExchangeApiImpl] Unsubscribing trade events for network ${networkId}`)
+      this.subscriptions.trade[networkId].unsubscribe()
+    })
   }
 
   private async getTradeSubscription(params: PastEventsParams): Promise<TradeSubscription> {
@@ -248,13 +253,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const contract = await this._getContract(networkId)
 
-    if (!this.subscriptions.trade) {
-      this.subscriptions.trade = contract.events.Trade({
+    if (!this.subscriptions.trade[networkId]) {
+      this.subscriptions.trade[networkId] = contract.events.Trade({
         filter: { owner: userAddress },
       })
     }
 
-    return this.subscriptions.trade
+    return this.subscriptions.trade[networkId]
   }
 
   private parseTradeEvent(event: Trade): BaseTradeEvent {
