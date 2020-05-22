@@ -20,7 +20,7 @@ const Trades: React.FC = () => {
             <th>Amount</th>
             {/* <th>Type</th> */}
             <th>Time</th>
-            <th>batchId</th>
+            <th>BatchId | OrderId</th>
             <th>Tx</th>
             {/* <th>Settled</th> */}
           </tr>
@@ -30,14 +30,21 @@ const Trades: React.FC = () => {
             <tr key={index} data-order-id={trade.orderId} data-trade-id={trade.id}>
               {/* TODO: entries marked with NA are not yet available from the event.
                         Need to enrich event data first */}
-              <td>{formatPrice(trade.limitPrice)}</td>
-              <td>{formatPrice(trade.fillPrice)}</td>
-              {/* TODO: fix decimals */}
-              {/* TODO: add SELL SYMBOL */}
-              <td>{formatAmountFull({ amount: trade.sellAmount, precision: trade.sellToken.decimals })}</td>
+              <td>
+                {formatPrice(trade.limitPrice)} {trade.sellToken.symbol}/{trade.buyToken.symbol}
+              </td>
+              <td>
+                {formatPrice(trade.fillPrice)} {trade.sellToken.symbol}/{trade.buyToken.symbol}
+              </td>
+              <td>
+                {formatAmountFull({ amount: trade.sellAmount, precision: trade.sellToken.decimals })}{' '}
+                {trade.sellToken.symbol}
+              </td>
               {/* <td>NA</td> */}
               <td>{new Date(trade.timestamp).toISOString()}</td>
-              <td>{trade.batchId}</td>
+              <td>
+                {trade.batchId} | {trade.orderId}
+              </td>
               <td>
                 <EtherscanLink type={'tx'} identifier={trade.txHash} networkId={networkId} />
               </td>
