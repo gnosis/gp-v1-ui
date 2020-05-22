@@ -1,21 +1,28 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
+
+// Assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
-import Form from './Form'
-import TokenImg from 'components/TokenImg'
-import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
-import { Spinner } from 'components/Spinner'
-
-import useNoScroll from 'hooks/useNoScroll'
-
+// const, utils, types
 import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
-import { TokenLocalState } from 'reducers-actions'
+
+// Components
+import TokenImg from 'components/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
+import { Spinner } from 'components/Spinner'
+
+// DepositWidget: subcomponents
+import Form from 'components/DepositWidget/Form'
+import { TokenRow, RowClaimButton, RowClaimSpan } from 'components/DepositWidget/Styled'
+
+// Hooks and reducers
+import useNoScroll from 'hooks/useNoScroll'
+import { TokenLocalState } from 'reducers-actions'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   ethBalance: BN | null

@@ -1,11 +1,15 @@
 import React from 'react'
 
-import { DefineSpreadWrapper } from './DefineSpread.styled'
+import { DefineSpreadWrapper } from 'components/PoolingWidget/DefineSpread.styled'
 
-import { useFormContext, FieldError } from 'react-hook-form'
-import { FormInputError } from 'components/TradeWidget/FormMessage'
+// components
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { Input } from 'components/Input'
+
+// TradeWidget: subcomponent
+import { FormInputError } from 'components/TradeWidget/FormMessage'
+
+import { useFormContext, FieldError } from 'react-hook-form'
 
 interface DefineSpreadProps {
   isSubmitting: boolean

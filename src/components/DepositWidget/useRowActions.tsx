@@ -1,15 +1,19 @@
+import { useMemo } from 'react'
 import { toast } from 'toastify'
 import BN from 'bn.js'
 import { assert } from '@gnosis.pm/dex-js'
 
-import { depositApi, erc20Api } from 'api'
+// types, consts and utils
 import { TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-
 import { formatAmount, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
 import { composeOptionalParams } from 'utils/transaction'
 
+// Api
+import { depositApi, erc20Api } from 'api'
+
+// Hooks and reducers
+import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
 import {
   TokenLocalState,
@@ -19,7 +23,6 @@ import {
   setHighlightAndWithdrawing,
   setEnabledAction,
 } from 'reducers-actions'
-import { useMemo } from 'react'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
 

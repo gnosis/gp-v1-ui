@@ -1,28 +1,35 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import Modali from 'modali'
+import styled from 'styled-components'
 import BN from 'bn.js'
 
-import styled from 'styled-components'
+// Assets
 import searchIcon from 'assets/img/search.svg'
-import { CardTable } from 'components/Layout/Card'
-import { Row } from './Row'
-import ErrorMsg from 'components/ErrorMsg'
-import Widget from 'components/Layout/Widget'
 
-import { useTokenBalances } from 'hooks/useTokenBalances'
-import { useRowActions } from './useRowActions'
-import { useDepositModals } from './useDepositModals'
-import useSafeState from 'hooks/useSafeState'
-import useWindowSizes from 'hooks/useWindowSizes'
-
+// Utils, const, types
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
+
+// Components
+import { CardTable } from 'components/Layout/Card'
+import ErrorMsg from 'components/ErrorMsg'
+import Widget from 'components/Layout/Widget'
+
+// DepositWidget: subcomponents
+import { Row } from 'components/DepositWidget/Row'
+import { useRowActions } from 'components/DepositWidget/useRowActions'
+import { useDepositModals } from 'components/DepositWidget/useDepositModals'
+
+// Hooks and reducers
+import { useTokenBalances } from 'hooks/useTokenBalances'
+import useSafeState from 'hooks/useSafeState'
+import useWindowSizes from 'hooks/useWindowSizes'
 import { useDebounce } from 'hooks/useDebounce'
-import { TokenLocalState } from 'reducers-actions'
 import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
 import { useEthBalances } from 'hooks/useEthBalance'
+import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
   amount: BN

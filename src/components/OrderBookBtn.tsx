@@ -1,17 +1,25 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
-import OrderBookWidget from './OrderBookWidget'
-import { TokenDetails, Network } from 'types'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-import { safeTokenName, getNetworkFromId } from '@gnosis.pm/dex-js'
-import TokenSelector from './TokenSelector'
-import useSafeState from 'hooks/useSafeState'
-import { useTokenList } from 'hooks/useTokenList'
-import { MEDIA } from 'const'
+
+// assets
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
+// const, types, utils
+import { MEDIA } from 'const'
+import { TokenDetails, Network } from 'types'
+import { safeTokenName, getNetworkFromId } from '@gnosis.pm/dex-js'
+
+// components
+import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
+import OrderBookWidget from 'components/OrderBookWidget'
+import TokenSelector from 'components/TokenSelector'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
+import { useTokenList } from 'hooks/useTokenList'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const ViewOrderBookBtn = styled.button`
   margin: 0 0 0 auto;
