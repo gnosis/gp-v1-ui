@@ -10,15 +10,15 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
-# Mesa - a dapp for Gnosis Protocol
+# Gnosis Protocol Web
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
+`Gnosis Protocol Web` is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
 
 Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximize liquidity.
 
-Mesa allows users to:
+`Gnosis Protocol Web` allows users to:
 
 - Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
 - See the balances for any token: available in their wallet and on the exchange

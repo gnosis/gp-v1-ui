@@ -139,8 +139,8 @@ interface Props {
 
 const BalanceTooltip = (
   <HelpTooltipContainer>
-    This balance reflects the amount deposited in the Exchange Wallet on Mesa. Only orders with a balance will be
-    considered for matching.
+    This balance reflects the amount deposited in the Exchange Wallet on Gnosis Protocol. Only orders with a balance
+    will be considered for matching.
   </HelpTooltipContainer>
 )
 
