@@ -1,13 +1,14 @@
 import BN from 'bn.js'
 import { Subscription } from 'web3-core-subscriptions'
 
-import { assert, BatchExchangeEvents } from '@gnosis.pm/dex-js'
+import { assert, BatchExchangeEvents, TokenDetails } from '@gnosis.pm/dex-js'
 
 import { DepositApiImpl, DepositApi, DepositApiDependencies } from 'api/deposit/DepositApi'
 import { Receipt, WithTxOptionalParams } from 'types'
 import { logDebug } from 'utils'
-import { decodeAuctionElements } from './utils/decodeAuctionElements'
+import { decodeAuctionElements, decodeOrder } from './utils/decodeAuctionElements'
 import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
+import BigNumber from 'bignumber.js'
 
 interface BaseParams {
   networkId: number
@@ -15,6 +16,10 @@ interface BaseParams {
 
 export interface GetOrdersParams extends BaseParams {
   userAddress: string
+}
+
+export interface GetOrderParams extends GetOrdersParams {
+  orderId: string
 }
 
 export interface GetOrdersPaginatedParams extends GetOrdersParams {
@@ -77,6 +82,7 @@ export interface ExchangeApi extends DepositApi {
   getNumTokens(networkId: number): Promise<number>
   getFeeDenominator(networkId: number): Promise<number>
 
+  getOrder(params: GetOrderParams): Promise<Order>
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
   getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
 
@@ -126,6 +132,20 @@ export interface BaseTradeEvent {
   txIndex: number
   blockNumber: number
   id: string // txHash + | + txIndex
+}
+
+/**
+ * Trade enriches BaseTradeEvent with block, order and token data
+ */
+export interface Trade extends BaseTradeEvent {
+  batchId: number
+  hashKey: string // orderId + batchId, to find reverts
+  // indexOnBatch: number // tracks trade position on batch, in case of reverts
+  timestamp: number
+  buyToken: TokenDetails
+  sellToken: TokenDetails
+  limitPrice: BigNumber
+  fillPrice: BigNumber
 }
 
 export interface GetOrdersPaginatedResult {
@@ -251,6 +271,15 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     }
 
     return trade
+  }
+
+  public async getOrder({ userAddress, networkId, orderId }: GetOrderParams): Promise<Order> {
+    const contract = await this._getContract(networkId)
+    logDebug(`[ExchangeApiImpl] Getting order ${orderId} for account ${userAddress}`)
+
+    const rawOrder = await contract.methods.orders(userAddress, orderId).call()
+
+    return decodeOrder(rawOrder)
   }
 
   public async getOrders({ userAddress, networkId }: GetOrdersParams): Promise<AuctionElement[]> {
