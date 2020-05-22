@@ -177,6 +177,7 @@ module.exports = ({ stats = false } = {}) => ({
       DEX_JS_VERSION: JSON.stringify(require('@gnosis.pm/dex-js/package.json').version),
       CONTRACT_VERSION: JSON.stringify(require('@gnosis.pm/dex-contracts/package.json').version),
       CONFIG: JSON.stringify(config),
+      APP_NAME: JSON.stringify(appName),
     }),
   ].filter(Boolean),
   optimization: {
