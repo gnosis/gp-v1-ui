@@ -3,7 +3,7 @@ import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
-import { calculatePrice, formatPrice, formatAmountFull } from '@gnosis.pm/dex-js'
+import { formatPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 const Trades: React.FC = () => {
@@ -18,9 +18,11 @@ const Trades: React.FC = () => {
             <th>Limit Price</th>
             <th>Fill Price</th>
             <th>Amount</th>
-            <th>Type</th>
+            {/* <th>Type</th> */}
+            <th>Time</th>
+            <th>batchId</th>
             <th>Tx</th>
-            <th>Settled</th>
+            {/* <th>Settled</th> */}
           </tr>
         </thead>
         <tbody>
@@ -28,22 +30,18 @@ const Trades: React.FC = () => {
             <tr key={index} data-order-id={trade.orderId} data-trade-id={trade.id}>
               {/* TODO: entries marked with NA are not yet available from the event.
                         Need to enrich event data first */}
-              <td>NA</td>
-              <td>
-                {/* TODO: fix decimals */}
-                {/* TODO: add BUY SYMBOL/SELL SYMBOL */}
-                {formatPrice(
-                  calculatePrice({ numerator: { amount: trade.buyAmount }, denominator: { amount: trade.sellAmount } }),
-                )}
-              </td>
+              <td>{formatPrice(trade.limitPrice)}</td>
+              <td>{formatPrice(trade.fillPrice)}</td>
               {/* TODO: fix decimals */}
               {/* TODO: add SELL SYMBOL */}
-              <td>{formatAmountFull(trade.sellAmount)}</td>
-              <td>NA</td>
+              <td>{formatAmountFull({ amount: trade.sellAmount, precision: trade.sellToken.decimals })}</td>
+              {/* <td>NA</td> */}
+              <td>{new Date(trade.timestamp).toISOString()}</td>
+              <td>{trade.batchId}</td>
               <td>
                 <EtherscanLink type={'tx'} identifier={trade.txHash} networkId={networkId} />
               </td>
-              <td>NA</td>
+              {/* <td>NA</td> */}
             </tr>
           ))}
         </tbody>
