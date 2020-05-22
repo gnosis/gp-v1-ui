@@ -1,6 +1,6 @@
 **What is Gnosis Protocol Web?**
 
-`Gnosis Protocol Web` is a decentralized application built on the **Gnosis Protocol**, a fully permissionless DEX that enables ring trades to maximize liquidity.  
+**Gnosis Protocol Web** is a decentralized application built on the **Gnosis Protocol**, a fully permissionless DEX that enables ring trades to maximize liquidity.  
 Gnosis Protocol enables ring trades to maximize liquidity. Ring trades are order settlements which share liquidity across all orders, rather than a single token pair, and uniquely suited for trading prediction market tokens and the long tail of all tokenized assets.
 Read more about the protocol’s mechanism on the Gnosis [Developer Portal](https://docs.gnosis.io/protocol/docs/introduction1/).
 
@@ -27,7 +27,7 @@ Note that you only need to **Enable Deposit** for the token(s) you want to activ
 
 **What is the Liquidity page?**
 
-Liquidity provision is a way in which `Gnosis Protocol Web` users can easily provide liquidity and get rewarded with little effort and low risk. It works by letting users place standing orders to market-make between selected tokens.
+Liquidity provision is a way in which **Gnosis Protocol Web** users can easily provide liquidity and get rewarded with little effort and low risk. It works by letting users place standing orders to market-make between selected tokens.
 
 To provide liquidity, click on the `Liquidity` page, and follow three simple steps: select your stablecoin tokens, define your spread, and finally, submit your orders.
 
