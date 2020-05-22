@@ -3,7 +3,7 @@ import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
-import { formatPrice, formatAmountFull } from '@gnosis.pm/dex-js'
+import { formatPrice, formatAmount } from '@gnosis.pm/dex-js'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 const Trades: React.FC = () => {
@@ -37,7 +37,7 @@ const Trades: React.FC = () => {
                 {formatPrice(trade.fillPrice)} {trade.sellToken.symbol}/{trade.buyToken.symbol}
               </td>
               <td>
-                {formatAmountFull({ amount: trade.sellAmount, precision: trade.sellToken.decimals })}{' '}
+                {formatAmount({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
                 {trade.sellToken.symbol}
               </td>
               {/* <td>NA</td> */}
