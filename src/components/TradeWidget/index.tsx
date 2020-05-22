@@ -2,11 +2,9 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
 
 import styled from 'styled-components'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
 import BN from 'bn.js'
 import Modali from 'modali'
@@ -31,6 +29,7 @@ import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { Spinner } from 'components/Spinner'
 
 import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 
@@ -994,7 +993,7 @@ const TradeWidget: React.FC = () => {
             disabled={isSubmitting}
             tabIndex={1}
           >
-            {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}
+            {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Please select different tokens' : 'Submit limit order'}
           </SubmitButton>
         </WrappedForm>

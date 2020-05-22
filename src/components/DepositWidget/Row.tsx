@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
 import Form from './Form'
 import TokenImg from 'components/TokenImg'
 import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
+import { Spinner } from 'components/Spinner'
 
 import useNoScroll from 'hooks/useNoScroll'
 
@@ -26,7 +27,7 @@ export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   innerHeight?: number
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+const spinner = <Spinner style={{ marginRight: 7 }} />
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
@@ -150,7 +151,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
                 {enabling ? (
                   <>
-                    <FontAwesomeIcon icon={faSpinner} spin />
+                    <Spinner />
                     Enabling
                   </>
                 ) : (
