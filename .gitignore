@@ -11,3 +11,5 @@ package-lock.json
 # yalc
 .yalc
 yalc.lock
+build
+build-esm

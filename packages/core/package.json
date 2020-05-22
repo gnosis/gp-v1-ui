@@ -1,0 +1,28 @@
+{
+  "name": "@gnosis.pm/dex-react-core",
+  "version": "0.11.1",
+  "license": "MIT",
+  "main": "build/index.js",
+  "module": "build-esm/index.js",
+  "jsnext:main": "build-esm/index.js",
+  "types": "build-esm/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "build/**/*",
+    "build-esm/**/*"
+  ],
+  "scripts": {
+    "build": "npm run build:commonjs && npm run build:esm",
+    "build:commonjs": "rimraf build && ttsc",
+    "build:esm": "rimraf build-esm && ttsc -m es6 -t esnext --outDir build-esm",
+    "build:watch": "npx ttsc --watch",
+    "build:watch2": "npx ttsc -m es6 -t esnext --outDir build-esm --watch",
+    "sandbox": "DEBUG=ERROR-*,WARN-*,INFO-*,DEBUG-*,-DEBUG-helper*,-DEBUG-util* nodemon -r dotenv/config -r tsconfig-paths/register",
+    "lint": "eslint src test --ext .ts,.js",
+    "lint:fix": "eslint --fix src test --ext .ts,.js",
+    "verify": "npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "@gnosis.pm/dex-react-dev": "0.11.1"
+  }
+}

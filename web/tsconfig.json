@@ -2,41 +2,31 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "target": "es2015",
+    "target": "es5",
     "downlevelIteration": true,
     "importHelpers": true,
     "sourceMap": true,
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
+    "jsx": "react",
+    "resolveJsonModule": true,
     "allowJs": false,
     "checkJs": false,
-    "declaration": true,
-    "declarationMap": true,
-    "resolveJsonModule": true,
     "lib": ["dom", "es2015", "es2016", "es2017", "esnext"],
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true,
+    "noImplicitAny": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
+    "noImplicitThis": true,
     "noUnusedLocals": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "types": ["jest", "node"],
-    "baseUrl": "src",
-    "outDir": "./build",
+    "baseUrl": ".",
     "paths": {
-      "*": [
-        "*"
-      ]
-    },
-    "plugins": [ {
-      "transform": "typescript-transform-paths",
-      "afterDeclarations": true 
-    },
-      {"transform": "typescript-transform-paths"}
-    ]
-  },
-  "include": ["src/index.ts"],
-  "exclude": ["node_modules", "coverage", "build"]
+      "*": ["custom/*", "src/*"]
+    }
+  }
 }

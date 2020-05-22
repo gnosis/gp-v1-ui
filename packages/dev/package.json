@@ -1,0 +1,54 @@
+{
+  "name": "@gnosis.pm/dex-react-dev",
+  "version": "0.11.1",
+  "description": "",
+  "scripts": {
+    "build": "cd web && yarn build",
+    "lint": "eslint packages/**/src packages/**/test --ext .ts,.js",
+    "lint:fix": "eslint --fix packages/**/src packages/**/test --ext .ts,.js",
+    "test": "jest packages/**/**/test",
+    "verify": "npm run lint && npm run test"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run verify"
+    }
+  },
+  "dependencies": {
+    "@types/bignumber.js": "^5.0.0",
+    "@types/debug": "^4.1.5",
+    "@types/dotenv": "^8.2.0",
+    "@types/jest": "^25.1.1",
+    "@types/node": "^13.1.4",
+    "@typescript-eslint/eslint-plugin": "^2.6.1",
+    "@typescript-eslint/parser": "^2.6.1",
+    "coveralls": "^3.0.7",
+    "debug": "^4.1.1",
+    "dotenv": "^8.1.0",
+    "eslint": "^6.6.0",
+    "eslint-utils": ">=2.0.0",
+    "eslint-config-prettier": "^6.5.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jest": "^23.0.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.0.10",
+    "jest": "^25.1.0",
+    "nodemon": "^2.0.1",
+    "prettier": "^2.0.2",
+    "rimraf": "^3.0.0",
+    "ts-jest": "^25.2.0",
+    "ts-node": "^8.4.1",
+    "tsconfig-paths": "^3.9.0",
+    "ttypescript": "^1.5.8",
+    "typechain": "^1.0.3",
+    "typechain-target-web3-v1": "^1.0.4",
+    "typescript": "^3.7.3",
+    "typescript-transform-paths": "^1.1.13",
+    "web3": "^1.2.4",
+    "tslib": "^1.11.0"
+  }
+}
