@@ -10,6 +10,7 @@ import {
   getTokenFromErc20Factory,
   TokenFromExchange,
   TokenFromErc20,
+  getTradesFactory,
 } from './factories'
 
 import { logDebug } from 'utils'
@@ -38,6 +39,8 @@ export const getPriceEstimation = getPriceEstimationFactory(apis)
 export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
 export const getTokens = getTokensFactory(apis, { getTokenFromErc20 })
+
+export const getTrades = getTradesFactory({ ...apis, getTokens })
 
 export interface TokenAndNetwork {
   networkId: number
