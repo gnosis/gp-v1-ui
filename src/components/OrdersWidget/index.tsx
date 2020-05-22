@@ -1,24 +1,32 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
+
+// Assets
 import { faTrashAlt } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 
+// Const and utils
+import { isOrderUnlimited } from '@gnosis.pm/dex-js'
+import { isOrderActive, isPendingOrderActive } from 'utils'
+
+// Hooks
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
-import { useDeleteOrders } from './useDeleteOrders'
 import usePendingOrders from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
+// Api
 import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
-import { isOrderActive, isPendingOrderActive } from 'utils'
-
-import { CardTable } from 'components/Layout/Card'
-import OrderRow from './OrderRow'
-import { OrdersWrapper, ButtonWithIcon, OrdersForm } from './OrdersWidget.styled'
+// Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
+import { CardTable } from 'components/Layout/Card'
+
+// OrderWidget
+import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
+import OrderRow from 'components/OrdersWidget/OrderRow'
+import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 

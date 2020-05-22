@@ -3,14 +3,18 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
 
+// types, utils
 import { TokenDetails } from 'types'
 import { parseBigNumber } from 'utils'
 import { DEFAULT_PRECISION, MEDIA } from 'const'
 
-import { TradeFormData } from '.'
-import { FormInputError } from './FormMessage'
-import { useNumberInput } from './useNumberInput'
+// Components
 import { OrderBookBtn } from 'components/OrderBookBtn'
+
+// TradeWidget: subcomponents
+import { TradeFormData } from 'components/TradeWidget'
+import { FormInputError } from 'components/TradeWidget/FormMessage'
+import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 
 const Wrapper = styled.div`
   display: flex;

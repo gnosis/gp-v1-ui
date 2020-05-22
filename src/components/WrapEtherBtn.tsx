@@ -1,14 +1,28 @@
 import React, { useMemo } from 'react'
-import styled from 'styled-components'
-import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
-import Modali, { useModali } from 'modali'
-import { InputBox } from 'components/InputBox'
 import { useForm } from 'react-hook-form'
-import { DEFAULT_PRECISION, formatAmountFull } from '@gnosis.pm/dex-js'
+import styled from 'styled-components'
+import Modali, { useModali } from 'modali'
 import BN from 'bn.js'
+
+// utils
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
+import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
+
+// components
+import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import { TooltipWrapper } from 'components/Tooltip'
+import { InputBox } from 'components/InputBox'
+
+// hooks
 import useSafeState from 'hooks/useSafeState'
+import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
+import { useTokenBalances } from 'hooks/useTokenBalances'
+import { WETH_ADDRESS_MAINNET } from 'const'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { composeOptionalParams } from 'utils/transaction'
+import { toast } from 'toastify'
+import { useEthBalances } from 'hooks/useEthBalance'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -90,17 +104,25 @@ export type WrapEtherBtnProps = Omit<WrapUnwrapEtherBtnProps, 'wrap'>
 interface WrapUnwrapInfo {
   title: string
   symbolSource: string
-  balance: BN
+  balance: BN | null
   tooltipText: React.ReactNode | string
   description: React.ReactNode
   amountLabel: string
+  loading: boolean
 }
 
-function getModalParams(
-  wrap: boolean,
-  wethHelpVisible: boolean,
-  showWethHelp: React.Dispatch<React.SetStateAction<boolean>>,
-): WrapUnwrapInfo {
+interface GetModalParams {
+  wrap: boolean
+  wethHelpVisible: boolean
+  showWethHelp: React.Dispatch<React.SetStateAction<boolean>>
+  wethBalance?: BN
+  ethBalance: BN | null
+  wrappingEth: boolean
+  unwrappingWeth: boolean
+}
+
+function getModalParams(params: GetModalParams): WrapUnwrapInfo {
+  const { wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, unwrappingWeth, wrappingEth } = params
   const WethHelp = (
     <div className="more-info">
       <p>
@@ -120,7 +142,6 @@ function getModalParams(
   )
 
   if (wrap) {
-    // TODO: Get ETH balance
     const description = (
       <>
         <p>
@@ -139,16 +160,14 @@ function getModalParams(
       </div>
     )
 
-    // TODO: Get ETH balance
-    const balance = new BN('1234567800000000000')
-
     return {
       title: 'Wrap ETH',
       amountLabel: 'Amount to Wrap',
       symbolSource: 'ETH',
-      balance,
+      balance: ethBalance,
       description,
       tooltipText,
+      loading: wrappingEth,
     }
   } else {
     const description = (
@@ -160,16 +179,15 @@ function getModalParams(
         {wethHelpVisible && WethHelp}
       </>
     )
-    // TODO: Get WETH balance
-    const balance = new BN('1234567800000000000')
 
     return {
       title: 'Unwrap WETH',
       amountLabel: 'Amount to Unwrap',
       symbolSource: 'WETH',
-      balance,
+      balance: wethBalance || null,
       description,
       tooltipText: 'Unwrapping converts WETH back into ETH',
+      loading: unwrappingWeth,
     }
   }
 }
@@ -181,19 +199,45 @@ interface WrapEtherFormData {
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
-  const { register, errors, handleSubmit, setValue } = useForm<WrapEtherFormData>({
+  const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
+  const { ethBalance } = useEthBalances()
+  const { balances } = useTokenBalances()
+  const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
+  const wethBalance = wethBalanceDetails?.walletBalance
+
+  const { register, errors, handleSubmit, setValue, watch } = useForm<WrapEtherFormData>({
     mode: 'onChange',
   })
-  // const formRef = useRef<HTMLFormElement | null>(null)
-  // const amountValue = watch(INPUT_ID_AMOUNT)
   const amountError = errors[INPUT_ID_AMOUNT]
 
-  // console.log('amountValue', amountValue)
-
-  const { title, balance, symbolSource, tooltipText, description, amountLabel } = useMemo(
-    () => getModalParams(wrap, wethHelpVisible, showWethHelp),
-    [wrap, wethHelpVisible, showWethHelp],
+  const { title, balance, symbolSource, tooltipText, description, amountLabel, loading } = useMemo(
+    () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth }),
+    [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth],
   )
+
+  // Show Warning: Check if the user is Wrapping all his balance
+  const amountValue = watch(INPUT_ID_AMOUNT)
+  const amount = parseAmount(amountValue, DEFAULT_PRECISION) || ZERO
+  const wrapAllBalance = wrap && balance && !amount.isZero() && amount.eq(balance)
+
+  // Show available balance
+  //  * For wrapping, we just show the value
+  //  * For unwrapping, we allow to clicl to unwrap all
+  let availableBalanceComponent
+  if (balance) {
+    const amountFull = formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || '-'
+    availableBalanceComponent = wrap ? (
+      <span>
+        {amountFull} {symbolSource}
+      </span>
+    ) : (
+      <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
+        {amountFull} {symbolSource}
+      </a>
+    )
+  } else {
+    availableBalanceComponent = <span>...</span>
+  }
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -204,11 +248,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           <div>
             {description}
             <b>Available {symbolSource}</b>
-            <div>
-              <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
-                {formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || ''} {symbolSource}
-              </a>
-            </div>
+            <div>{availableBalanceComponent}</div>
           </div>
           <div>
             <b>{amountLabel}</b>
@@ -222,14 +262,38 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
                   required
                   ref={register({
                     pattern: { value: validInputPattern, message: 'Invalid amount' },
-                    validate: { positive: validatePositiveConstructor('Invalid amount') },
+                    validate: {
+                      positive: validatePositiveConstructor('Invalid amount'),
+                      max: (value: string): string | true => {
+                        const amount = parseAmount(value, DEFAULT_PRECISION) || ZERO
+
+                        if (balance && amount.gt(balance)) {
+                          // Not enough balance
+                          return "The amount cannot be bigger than what's available"
+                        } else {
+                          // Enough balance
+                          return true
+                        }
+                      },
+                    },
                     required: 'The amount is required',
                     min: 0,
                   })}
                 />
               </InputBox>
             </div>
-            {amountError && <p className="error">Invalid amount</p>}
+            {amountError && <p className="error">{amountError.message}</p>}
+            {wrapAllBalance && (
+              <p className="error">
+                You are wrapping all your ETH balance. This would only make sense if your wallet doesn&apos;t need ETH
+                to pay the gas (as in some wallets that use tokens as payment). <br />
+                <br />
+                Normally you would want to wrap a smaller fraction of your ETH.
+                <br />
+                <br />
+                Are you sure you want to continue?
+              </p>
+            )}
           </div>
         </form>
       </ModalWrapper>
@@ -241,15 +305,32 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         key="yes"
         isStyleDefault
         onClick={handleSubmit((data: WrapEtherFormData): void => {
-          const { wrapAmount } = data
+          const { wrapAmount: wrapAmountEther } = data
+          const wrapAmount = toWei(wrapAmountEther)
+
+          // Hide modal once the transaction is sent
+          const txOptionalParams = composeOptionalParams(() => modalHook.hide())
+
+          let wrapUnwrapPromise, successMessage: string, errorMessage: string
           if (wrap) {
-            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`)
-            alert(`[WrapEtherBtn] Wrap ${wrapAmount} ETH!`) // TODO: Do real thing
+            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH`)
+
+            wrapUnwrapPromise = wrapEth(wrapAmount, txOptionalParams)
+            successMessage = `Successfully wrapped ${wrapAmountEther} ETH`
+            errorMessage = `Error wrapping ${wrapAmountEther} ETH`
           } else {
-            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`)
-            alert(`[WrapEtherBtn] Unwrap ${wrapAmount} ETH!`) // TODO: Do real thing
+            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} WETH`)
+            wrapUnwrapPromise = unwrapWeth(wrapAmount, txOptionalParams)
+            successMessage = `Successfully unwrapped ${wrapAmountEther} WETH`
+            errorMessage = `Error unwrapping ${wrapAmountEther} WETH`
           }
-          modalHook.hide()
+
+          wrapUnwrapPromise
+            .then(() => toast.success(successMessage))
+            .catch(error => {
+              console.error(errorMessage, error)
+              toast.error(errorMessage)
+            })
         })}
       />,
     ],
@@ -260,12 +341,12 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       <TooltipWrapper
         as="button"
         type="button"
-        // className={className}
-        className={className ? 'not-implemented ' + className : 'not-implemented'}
+        className={className}
+        style={{ minWidth: '7em' }}
         onClick={toggleModal}
         tooltip={tooltipText}
       >
-        {label || title}
+        {loading && <FontAwesomeIcon icon={faSpinner} spin />} {label || title}
       </TooltipWrapper>
       <Modali.Modal {...modalHook} />
     </>
