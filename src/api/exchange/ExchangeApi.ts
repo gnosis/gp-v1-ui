@@ -32,9 +32,11 @@ export interface GetTokenIdByAddressParams extends BaseParams {
 
 export type HasTokenParams = GetTokenIdByAddressParams
 
-export type PastEventsParams = GetOrdersParams
+export interface PastEventsParams extends GetOrdersParams {
+  fromBlock?: number
+}
 
-export interface SubscriptionParams extends PastEventsParams {
+export interface SubscriptionParams extends GetOrdersParams {
   callback: (trade: BaseTradeEvent) => void
 }
 
@@ -155,17 +157,32 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     ;(window as any).exchange = this._contractPrototype
   }
 
-  public async getPastTrades({ userAddress, networkId }: PastEventsParams): Promise<BaseTradeEvent[]> {
+  public async getPastTrades({
+    userAddress,
+    networkId,
+    fromBlock: _fromBlock,
+  }: PastEventsParams): Promise<BaseTradeEvent[]> {
     const contract = await this._getContract(networkId)
 
-    // to get all past events
+    // Optionally fetch events from a given block.
+    // Could be used to fetch from 0 (although, why?) OR
+    // pagination of sorts OR
+    // updating trades based on polling
+    const fromBlock = _fromBlock ?? CONTRACT_DEPLOYMENT_BLOCK[networkId]
+
     const tradeEvents = await contract.getPastEvents('Trade', {
-      fromBlock: CONTRACT_DEPLOYMENT_BLOCK[networkId],
       filter: { owner: userAddress },
+      fromBlock,
     })
 
+    const toBlock = tradeEvents[tradeEvents.length - 1]?.blockNumber
+
     logDebug(
-      `[ExchangeApiImpl] Fetched ${tradeEvents.length} trades for address ${userAddress} on network ${networkId}`,
+      `[ExchangeApiImpl] Fetched ${
+        tradeEvents.length
+      } trades for address ${userAddress} on network ${networkId} from block ${fromBlock}${
+        toBlock ? `to block ${toBlock}` : ''
+      }`,
     )
 
     return tradeEvents.filter(event => !event['removed']).map(this.parseTradeEvent)
