@@ -18,6 +18,7 @@ import { TokenLocalState } from 'reducers-actions'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
+  ethBalance: BN | null
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onSubmitWithdraw: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
@@ -31,6 +32,7 @@ const spinner = <Spinner style={{ marginRight: 7 }} />
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
+    ethBalance,
     tokenBalances,
     onSubmitDeposit,
     onSubmitWithdraw,
@@ -117,13 +119,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>{withdrawing && spinner}0</>
           )}
         </td>
-        <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
+        <td data-label="Wallet">
           {isWeth ? (
             <ul>
-              <li className="not-implemented">
-                0.1 ETH <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
+              <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
+                {ethBalance ? formatAmount(ethBalance, decimals) : '-'} ETH{' '}
+                <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
-              <li>
+              <li title={formatAmountFull({ amount: walletBalance, precision: decimals }) || undefined}>
                 {(claiming || depositing) && spinner}
                 {formatAmount(walletBalance, decimals) + ' '}
                 WETH <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />

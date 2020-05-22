@@ -22,6 +22,7 @@ import { useDebounce } from 'hooks/useDebounce'
 import { TokenLocalState } from 'reducers-actions'
 import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
+import { useEthBalances } from 'hooks/useEthBalance'
 
 interface WithdrawState {
   amount: BN
@@ -316,6 +317,7 @@ interface BalanceDisplayProps extends TokenLocalState {
   enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  ethBalance: BN | null
   balances: TokenBalanceDetails[]
   error: boolean
   requestWithdrawConfirmation(
@@ -327,6 +329,7 @@ interface BalanceDisplayProps extends TokenLocalState {
 }
 
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
+  ethBalance,
   balances,
   error,
   enableToken,
@@ -424,6 +427,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               ? displayedBalances.map(tokenBalances => (
                   <Row
                     key={tokenBalances.address}
+                    ethBalance={ethBalance}
                     tokenBalances={tokenBalances}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance, onTxHash): Promise<void> =>
@@ -465,6 +469,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 
 const DepositWidget: React.FC = () => {
+  const { ethBalance } = useEthBalances()
   const { balances, error } = useTokenBalances()
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
@@ -514,6 +519,7 @@ const DepositWidget: React.FC = () => {
   return (
     <section>
       <BalancesDisplayMemoed
+        ethBalance={ethBalance}
         balances={balances}
         error={error}
         {...restActions}
