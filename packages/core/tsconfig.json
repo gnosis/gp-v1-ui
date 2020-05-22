@@ -1,8 +1,8 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "@gnosis.pm/dex-react-dev/tsconfig-base.json",
   "include": ["src/index.ts"],
   "compilerOptions": {
-    "baseUrl": "./src",
+    "baseUrl": "src",
     "outDir": "build"
   }
 }
