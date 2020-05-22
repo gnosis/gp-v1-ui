@@ -1,10 +1,7 @@
 import BN from 'bn.js'
-import BigNumber from 'bignumber.js'
-// import { Subscription } from 'web3-core-subscriptions'
+import { Subscription } from 'web3-core-subscriptions'
 
-import { assert, TokenDetails, BatchExchangeContract } from '@gnosis.pm/dex-js'
-import { Trade } from '@gnosis.pm/dex-js/build-esm/contracts/gen/BatchExchange'
-
+import { assert, BatchExchangeEvents } from '@gnosis.pm/dex-js'
 import { DepositApiImpl, DepositApi, Params } from 'api/deposit/DepositApi'
 import { Receipt, TxOptionalParams } from 'types'
 import { logDebug } from 'utils'
@@ -132,21 +129,6 @@ export interface BaseTradeEvent {
   id: string // txHash + | + txIndex
 }
 
-/**
- * TradeEvent enriches BaseTradeEvent with block, order and token data
- */
-export interface TradeEvent extends BaseTradeEvent {
-  batchId: number
-  hashKey: string // orderId + batchId, to find reverts
-  indexOnBatch: number // tracks trade position on batch, in case of reverts
-  time: Date
-  buyToken: TokenDetails
-  sellToken: TokenDetails
-  limitPrice: BigNumber
-  fillPrice: BigNumber
-  reverted: boolean
-}
-
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
   nextIndex?: number
@@ -158,9 +140,8 @@ const CONTRACT_DEPLOYMENT_BLOCK = {
   4: 5844678,
 }
 
-// Syntactic sugar. Aliasing event types to make code cleaner
-type TradeSubscription = ReturnType<BatchExchangeContract['events']['Trade']>
-// type TradeEventData = TradeSubscription extends Subscription<infer U> ? U : never
+type TradeEvent = BatchExchangeEvents['Trade']
+type TradeSubscription = Subscription<TradeEvent>
 
 interface Subscriptions {
   trade: { [networkId: number]: TradeSubscription }
@@ -202,40 +183,14 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     logDebug(`[ExchangeApiImpl] subscribing to trade events for address ${userAddress} and networkId ${networkId}`)
 
     const subscription = await this.getTradeSubscription(params)
-    // Two ways of subscribing
 
-    // 1: with error handling
-    subscription.subscribe((error, event) => {
-      if (error) {
+    subscription
+      .on('data', event => callback(this.parseTradeEvent(event)))
+      .on('error', error => {
         console.error(
           `[ExchangeApiImpl] Failed to receive Trade event for address ${userAddress} on network ${networkId}: ${error}`,
         )
-      } else {
-        // TODO: this double casting hack solves the type problem, but is this the right way?
-        callback(this.parseTradeEvent((event as unknown) as Trade))
-      }
-    })
-    // 2: Without, watching only `data` events
-    // subscription.on('data', event => callback(this.parseTradeEvent(event)))
-
-    // TODO: doesn't matter how I subscribe, TS says the type returned by the event does not contain metadata fields, only event fields.
-    // What TS says it returns:
-    // (parameter) event: {
-    //     owner: string;
-    //     orderId: string;
-    //     sellToken: string;
-    //     buyToken: string;
-    //     executedSellAmount: string;
-    //     executedBuyAmount: string;
-    //     0: string;
-    //     1: string;
-    //     2: string;
-    //     3: string;
-    //     4: string;
-    //     5: string;
-    // }
-    // Argument of type '{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }' is not assignable to parameter of type 'Trade | ContractEventLog<{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }>'.
-    //   Type '{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }' is missing the following properties from type 'ContractEventLog<{ owner: string; orderId: string; sellToken: string; buyToken: string; executedSellAmount: string; executedBuyAmount: string; 0: string; 1: string; 2: string; 3: string; 4: string; 5: string; }>': returnValues, event, address, logIndex, and 4 more.ts(2345)
+      })
 
     return (): void => this.unsubscribeToTradeEvent()
   }
@@ -261,7 +216,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return this.subscriptions.trade[networkId]
   }
 
-  private parseTradeEvent(event: Trade): BaseTradeEvent {
+  private parseTradeEvent(event: TradeEvent): BaseTradeEvent {
     const {
       returnValues: { orderId, sellToken: sellTokenId, buyToken: buyTokenId, executedSellAmount, executedBuyAmount },
       transactionHash: txHash,
