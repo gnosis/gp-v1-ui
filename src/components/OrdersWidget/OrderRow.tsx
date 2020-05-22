@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
-import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
 import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
@@ -14,6 +14,7 @@ import { EtherscanLink } from 'components/EtherscanLink'
 import { getTokenFromExchangeById } from 'services'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
+import { Spinner } from 'components/Spinner'
 
 import {
   safeTokenName,
@@ -35,7 +36,7 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
   return (
     <>
-      <FontAwesomeIcon icon={faSpinner} size="sm" spin /> Pending...
+      <Spinner size="sm" /> Pending...
       <br />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
     </>
