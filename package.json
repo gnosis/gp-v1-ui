@@ -3,6 +3,9 @@
   "name": "@gnosis.pm/dex-react-mono",
   "version": "0.11.1",
   "description": "",
+  "scripts": {
+    "clean": "rm -rf **/node_modules"
+  },
   "workspaces": {
     "packages": [
       "web",
@@ -11,10 +14,5 @@
     "nohoist": [
       "**"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run verify"
-    }
   }
 }
