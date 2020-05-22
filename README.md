@@ -124,7 +124,7 @@ Both JSON and YAML formats are supported.
 
 Simply replace any config found on [config-default](./config-default.yaml).
 
-> NOTE: If you are forking the project, you might want to delete the [custom/.gitignore](custom/.gitignore) file so you
+> **NOTE**: If you are forking the project, you might want to delete the [custom/.gitignore](custom/.gitignore) file so you
 > can commit a config file and components inside the custom directory.
 
 Below we provide details for each config.
