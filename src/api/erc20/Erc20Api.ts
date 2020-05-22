@@ -7,7 +7,7 @@ import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
 
-import ERC20_DETAILS from './erc20Details.json'
+import ERC20_DETAILS from 'api/erc20/erc20Details.json'
 
 import Web3 from 'web3'
 
