@@ -12,9 +12,9 @@ import { DEFAULT_PRECISION, MEDIA } from 'const'
 import { OrderBookBtn } from 'components/OrderBookBtn'
 
 // TradeWidget: subcomponents
-import { TradeFormData } from 'components/TradeWidget/'
-import { FormInputError } from 'components/TradeWidget//FormMessage'
-import { useNumberInput } from 'components/TradeWidget//useNumberInput'
+import { TradeFormData } from 'components/TradeWidget'
+import { FormInputError } from 'components/TradeWidget/FormMessage'
+import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 
 const Wrapper = styled.div`
   display: flex;
