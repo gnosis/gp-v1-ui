@@ -18,17 +18,20 @@ const pendingOrdersAndLocalStorage: Middleware = getState => next => (action): v
 
     const { networkId, orders, userAddress } = action.payload
 
-    let newState: PendingOrdersState
-    const userPendingOrders = state[networkId][userAddress] ? state[networkId][userAddress] : []
-    // add/remove pending orders to localStorage
-    if (action.type === 'SAVE_PENDING_ORDERS') {
-      // save 'em
-      const newPendingTxArray = userPendingOrders.concat(orders)
-      newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
-    } else {
-      // delete 'em
-      newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: orders } }
+    const currentPendingOrders = state[networkId][userAddress] ? state[networkId][userAddress] : []
+
+    // if saving new pending orders, concat new orders to current state pending orders
+    // else we are deleting and we can use the filtered result passed as payload (orders)
+    const newCalculatedState = action.type === 'SAVE_PENDING_ORDERS' ? currentPendingOrders.concat(orders) : orders
+
+    const newState: PendingOrdersState = {
+      ...state,
+      [networkId]: {
+        ...state[networkId],
+        [userAddress]: newCalculatedState,
+      },
     }
+
     setStorageItem(STORAGE_PENDING_ORDER_KEY, newState)
   }
   // Run next dispatch
