@@ -79,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
       <nav>
         {/* LOGO */}
         {/* <NavLink className="logo" to="/order">
-          {APP_NAME}
+          {CONFIG.name}
         </NavLink> */}
         <TopWrapper>
           {/* USER WALLET */}
