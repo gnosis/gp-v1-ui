@@ -9,14 +9,21 @@ export {
   FEE_PERCENTAGE,
   DEFAULT_DECIMALS,
   DEFAULT_PRECISION,
+  ZERO,
+  ONE,
+  TWO,
+  TEN,
+  ALLOWANCE_MAX_VALUE,
+  ALLOWANCE_FOR_ENABLED_TOKEN,
 } from '@gnosis.pm/dex-js'
-export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
 import { BATCH_TIME } from '@gnosis.pm/dex-js'
 
 export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
 
 export const ZERO_BIG_NUMBER = new BigNumber(0)
+export const ONE_BIG_NUMBER = new BigNumber(1)
 export const TEN_BIG_NUMBER = new BigNumber(10)
+export const ONE_HUNDRED_BIG_NUMBER = new BigNumber(100)
 
 // How much of the order needs to be matched to consider it filled
 // Will divide the total sell amount by this factor.
@@ -143,6 +150,12 @@ export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
 
+export const SLIPPAGE_MAP = new Map([
+  ['0.1', false],
+  ['0.5', true],
+  ['1', false],
+])
+export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
 // Delay disabling loading indicators, since in a normal workflow, when a transaction is mined, the spinner is stopped,
 // however, the new state, that flows top down once a bock is mined, can have a small delayed
 // This delay mitigates the strange effect of stopping the loading before the data is updated
