@@ -9,25 +9,16 @@ import { getTrades } from 'services'
 // TODO: move trades/revert logic to a service
 export function useTrades(): Trade[] {
   const [trades, setTrades] = useState<Trade[]>([])
-  const { userAddress, networkId } = useWalletConnection()
-
-  // const handleSubscription = useCallback(
-  //   (trade: BaseTradeEvent): void => {
-  //     console.warn(`new trade event!!! ${trade.orderId}`, trade)
-  //     setTrades(currTrades => {
-  //       currTrades.push(trade)
-  //       return currTrades
-  //     })
-  //   },
-  //   [setTrades],
-  // )
+  const { userAddress, networkId, blockNumber } = useWalletConnection()
 
   useEffect(() => {
-    if (userAddress && networkId) {
-      // TODO: polling/bloomfilter check for new trades
-      getTrades({ userAddress, networkId }).then(setTrades)
+    if (userAddress && networkId && blockNumber) {
+      // TODO: right now checking for new trades on every block.
+      // TODO: for optimization, use a polling interval OR bloomfilter
+      // TODO: no duplicate check, do that, preferably on global state directly
+      getTrades({ userAddress, networkId }).then(newTrades => setTrades(currTrades => currTrades.concat(newTrades)))
     }
-  }, [userAddress, networkId, setTrades])
+  }, [userAddress, networkId, blockNumber, setTrades])
 
   // latest first
   return trades.slice(0).reverse()
