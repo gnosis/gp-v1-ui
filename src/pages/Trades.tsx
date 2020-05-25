@@ -5,6 +5,12 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
 import { formatPrice, formatAmount } from '@gnosis.pm/dex-js'
 import { EtherscanLink } from 'components/EtherscanLink'
+import { Trade } from 'api/exchange/ExchangeApi'
+import { isTradeFilled } from 'utils'
+
+function classifyTrade(trade: Trade): string {
+  return isTradeFilled(trade) ? 'Filled' : 'Partial'
+}
 
 const Trades: React.FC = () => {
   const { networkId } = useWalletConnection()
@@ -12,14 +18,14 @@ const Trades: React.FC = () => {
 
   return (
     <ContentPage>
-      <CardTable $columns="repeat(6, 1fr)" $rowSeparation="0">
+      <CardTable $columns="repeat(8, 1fr)" $rowSeparation="0">
         <thead>
           <tr>
             <th>Market</th>
             <th>Limit Price</th>
             <th>Fill Price</th>
             <th>Amount</th>
-            {/* <th>Type</th> */}
+            <th>Type</th>
             <th>Time</th>
             <th>BatchId | OrderId</th>
             <th>Tx</th>
@@ -40,7 +46,7 @@ const Trades: React.FC = () => {
                 {formatAmount({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
                 {trade.sellToken.symbol}
               </td>
-              {/* <td>NA</td> */}
+              <td>{classifyTrade(trade)}</td>
               <td>{new Date(trade.timestamp).toISOString()}</td>
               <td>
                 {trade.batchId} | {trade.orderId}
