@@ -1,0 +1,3 @@
+# Ignore everything in "custom" directory
+#  NOTE: Forks that want to override the config or add conmponents, should delete this .gitignore file
+*

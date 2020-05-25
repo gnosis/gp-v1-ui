@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
-import { StepDescriptionWrapper, ProgressStepText } from './PoolingWidget.styled'
-import { ProgressBarProps } from './ProgressBar'
+
+// PoolingWidge: subcomponent
+import { StepDescriptionWrapper, ProgressStepText } from 'components/PoolingWidget/PoolingWidget.styled'
+import { ProgressBarProps } from 'components/PoolingWidget/ProgressBar'
 
 import checkIcon from 'assets/img/li-check.svg'
 

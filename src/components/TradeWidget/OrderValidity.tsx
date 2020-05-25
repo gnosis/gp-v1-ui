@@ -3,18 +3,25 @@ import React, { useCallback, Dispatch, SetStateAction, useRef, useEffect } from 
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-import { ZERO } from '@gnosis.pm/dex-js'
 
-import { TradeFormTokenId, TradeFormData } from './'
-import { PriceInputBox } from './Price'
-
-import useSafeState from 'hooks/useSafeState'
-import { formatTimeInHours, makeMultipleOf } from 'utils'
-
+// assets
 import cog from 'assets/img/cog.svg'
+
+// utils, const
+import { ZERO } from '@gnosis.pm/dex-js'
+import { formatTimeInHours, makeMultipleOf } from 'utils'
 import { MEDIA, VALID_UNTIL_DEFAULT, VALID_FROM_DEFAULT } from 'const'
+
+// components
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
-import { FormInputError } from './FormMessage'
+
+// TradeWidget: subcomponents
+import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
+import { PriceInputBox } from 'components/TradeWidget/Price'
+import { FormInputError } from 'components/TradeWidget/FormMessage'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
 
 const Wrapper = styled.div`
   display: flex;

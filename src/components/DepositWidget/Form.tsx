@@ -3,15 +3,21 @@ import BN from 'bn.js'
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import plus from 'assets/img/plus.svg'
 
+// Types and utils
+import { TokenBalanceDetails } from 'types'
+import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
+
+// Components
 import { CardDrawer } from 'components/Layout/Card'
-import { WalletDrawerInnerWrapper } from './Form.styled'
 import { Spinner } from 'components/Spinner'
 
+// DepositWidget: subcomponents
+import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
+
+// Hooks
 import useSafeState from 'hooks/useSafeState'
 import useScrollIntoView from 'hooks/useScrollIntoView'
 
-import { TokenBalanceDetails } from 'types'
-import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 import useKeyPress from 'hooks/useKeyDown'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { Link } from 'react-router-dom'

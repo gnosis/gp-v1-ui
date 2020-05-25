@@ -1,13 +1,16 @@
 import React from 'react'
 import { TokenDetails } from '@gnosis.pm/dex-js'
 
-import { BlueBoldText, SpreadInformationWrapper } from './DefineSpread.styled'
-import DefineSpread from './DefineSpread'
-import { CreateStrategyWrapper } from './CreateStrategy.styled'
-import AddFunding from './AddFunding'
+// types, util, const
 import { Receipt } from 'types'
 import { formatPartialNumber } from 'utils'
 import { INPUT_PRECISION_SIZE } from 'const'
+
+// PoolingWidget: subcomponents
+import { BlueBoldText, SpreadInformationWrapper } from 'components/PoolingWidget/DefineSpread.styled'
+import DefineSpread from 'components/PoolingWidget/DefineSpread'
+import { CreateStrategyWrapper } from 'components/PoolingWidget/CreateStrategy.styled'
+import AddFunding from 'components/PoolingWidget/AddFunding'
 
 export interface CreateStrategyProps {
   isSubmitting: boolean

@@ -1,16 +1,21 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import UserWallet from 'components/UserWallet'
-import { NavigationLinks } from './Navigation'
-import { HeaderWrapper } from './Header.styled'
-
-import useNavigation from './useNavigation'
-import useOpenCloseNav from './useOpenCloseNav'
-
+// utils, const
 import { formatSeconds } from 'utils'
-import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import { MEDIA } from 'const'
+
+// Components
+import UserWallet from 'components/UserWallet'
+
+// Header: Subcomponents
+import { NavigationLinks } from 'components/Layout/Header/Navigation'
+import { HeaderWrapper } from 'components/Layout/Header/Header.styled'
+import useNavigation from 'components/Layout/Header/useNavigation'
+import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
+
+// hooks
+import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 
 export interface HeaderProps {
   [key: string]: {

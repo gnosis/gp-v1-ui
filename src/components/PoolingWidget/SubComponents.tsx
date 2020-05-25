@@ -1,11 +1,13 @@
 import React from 'react'
 
-import TokenSelector from './TokenSelector'
-import { TokenSelectorProps } from './TokenSelector'
-
-import { TokenDetails } from '@gnosis.pm/dex-js'
-import { CreateStrategy } from './CreateStrategy'
+// types
 import { Receipt } from 'types'
+import { TokenDetails } from '@gnosis.pm/dex-js'
+
+// PoolingWidget: subcomponents
+import TokenSelector from 'components/PoolingWidget/TokenSelector'
+import { TokenSelectorProps } from 'components/PoolingWidget/TokenSelector'
+import { CreateStrategy } from 'components/PoolingWidget/CreateStrategy'
 
 export interface SubComponentProps extends TokenSelectorProps {
   isSubmitting: boolean

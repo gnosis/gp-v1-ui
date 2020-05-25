@@ -2,10 +2,14 @@ import React, { useCallback } from 'react'
 import { RouteComponentProps, useRouteMatch } from 'react-router'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import QRCode from 'qrcode.react'
+
+// assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
 
-import { EtherscanLink } from '../EtherscanLink'
+// components
+import { EtherscanLink } from 'components/EtherscanLink'
+
 import {
   UserWalletItem,
   UserWalletWrapper,

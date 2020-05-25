@@ -3,14 +3,18 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
 
+// types, utils
 import { TokenDetails } from 'types'
 import { parseBigNumber } from 'utils'
 import { DEFAULT_PRECISION, MEDIA } from 'const'
 
-import { TradeFormData } from '.'
-import { FormInputError } from './FormMessage'
-import { useNumberInput } from './useNumberInput'
+// Components
 import { OrderBookBtn } from 'components/OrderBookBtn'
+
+// TradeWidget: subcomponents
+import { TradeFormData } from 'components/TradeWidget'
+import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 
 const Wrapper = styled.div`
   display: flex;
@@ -21,6 +25,7 @@ const Wrapper = styled.div`
 
   > strong {
     display: flex;
+    align-items: center;
     text-transform: capitalize;
     color: var(--color-text-primary);
     width: 100%;
@@ -28,8 +33,16 @@ const Wrapper = styled.div`
     padding: 0;
     box-sizing: border-box;
     font-size: 1.5rem;
+
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
+    }
+
+    > ${FormMessage} {
+      width: min-content;
+      white-space: nowrap;
+      font-size: x-small;
+      margin: 0 0.5rem;
     }
 
     > button {
@@ -231,6 +244,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
       </PriceInputBox>
+      {/*  MAX SLIPPAGE CONTROL */}
     </Wrapper>
   )
 }

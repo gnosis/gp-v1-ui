@@ -1,20 +1,22 @@
 import React, { useMemo, useEffect, useRef } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-import lowBalanceIcon from 'assets/img/lowBalance.svg'
-
-import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
-import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
-
-// import Highlight from 'components/Highlight'
-import { EtherscanLink } from 'components/EtherscanLink'
-
-import { getTokenFromExchangeById } from 'services'
-import useSafeState from 'hooks/useSafeState'
+// types, utils and services
 import { TokenDetails } from 'types'
+import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
+import { getTokenFromExchangeById } from 'services'
+
+// assets
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import lowBalanceIcon from 'assets/img/lowBalance.svg'
+import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+
+// components
+import { EtherscanLink } from 'components/EtherscanLink'
 import { Spinner } from 'components/Spinner'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
 
 import {
   safeTokenName,
@@ -84,7 +86,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   return (
     <td data-label="Price">
       <div className="order-details">
-        {/* <Highlight color={pending ? 'grey' : ''} /> */}
         {price} {displayTokenSymbolOrLink(sellToken)}
         {'/'}
         {displayTokenSymbolOrLink(buyToken)}
