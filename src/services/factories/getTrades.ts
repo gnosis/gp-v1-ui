@@ -31,7 +31,17 @@ export function getTradesFactory(factoryParams: {
     const { userAddress, networkId } = params
     const fromBlock = params.fromBlock ?? nextFromBlock[params.networkId]
 
-    const tradeEvents = await exchangeApi.getPastTrades({ ...params, fromBlock })
+    const [tradeEvents, currentBlock] = await Promise.all([
+      exchangeApi.getPastTrades({ ...params, fromBlock }),
+      web3.eth.getBlock('latest'),
+    ])
+    // set latest block to start from there next time, if no `fromBlock` is provided
+    nextFromBlock[networkId] = currentBlock.number
+
+    // Minor optimization: return early when empty
+    if (tradeEvents.length === 0) {
+      return []
+    }
 
     const blocksSet = new Set<number>()
     const orderIdsSet = new Set<string>()
@@ -85,8 +95,6 @@ export function getTradesFactory(factoryParams: {
         remainingAmount: order.priceDenominator.sub(event.sellAmount),
       }
       acc.push(trade)
-
-      // console.log(trade)
 
       return acc
     }, [])
