@@ -1,12 +1,19 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import ThemeToggler from 'components/ThemeToggler'
+
 import { MEDIA } from 'const'
 import { depositApi } from 'api'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-import { EtherscanLink } from 'components/EtherscanLink'
+
+// Assets
 import verified from 'assets/img/verified.svg'
+
+// Components
+import ThemeToggler from 'components/ThemeToggler'
+import { EtherscanLink } from 'components/EtherscanLink'
+
+// Hooks
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const Wrapper = styled.footer`
   position: relative;

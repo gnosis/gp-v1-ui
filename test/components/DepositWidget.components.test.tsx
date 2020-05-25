@@ -4,7 +4,7 @@ import BN from 'bn.js'
 
 import { Row, RowProps } from 'components/DepositWidget/Row'
 
-import { ZERO, ONE } from 'const'
+import { ZERO, ONE, TEN } from 'const'
 import { TokenBalanceDetails } from 'types'
 import { TokenLocalState } from 'reducers-actions'
 import { createFlux } from '../data'
@@ -18,6 +18,7 @@ const fakeRowState: Record<keyof TokenLocalState, boolean> = {
   highlighted: false,
 }
 
+const initialEthBalance = TEN
 const initialTokenBalanceDetails = {
   id: 1,
   name: 'Test token',
@@ -33,11 +34,19 @@ const initialTokenBalanceDetails = {
   enabled: false,
 }
 
-function _createRow(params: Partial<TokenBalanceDetails> = {}, rowProps = fakeRowState): React.ReactElement<RowProps> {
+function _createRow({
+  ethBalance = initialEthBalance,
+  balances = {},
+  rowProps = fakeRowState,
+}: {
+  ethBalance?: BN
+  balances?: Partial<TokenBalanceDetails>
+  rowProps?: Record<keyof TokenLocalState, boolean>
+} = {}): React.ReactElement<RowProps> {
   const tokenBalanceDetails: TokenBalanceDetails = {
     ...initialTokenBalanceDetails,
     // override with partial params
-    ...params,
+    ...balances,
   }
 
   const onSubmitDeposit = jest.fn<Promise<void>, [BN, Function]>()
@@ -46,6 +55,7 @@ function _createRow(params: Partial<TokenBalanceDetails> = {}, rowProps = fakeRo
   const onSubmitWithdraw = jest.fn<Promise<void>, [BN, Function]>()
   return (
     <Row
+      ethBalance={ethBalance}
       tokenBalances={tokenBalanceDetails}
       onEnableToken={onEnableToken}
       onClaim={onClaim}
@@ -75,12 +85,12 @@ describe('<Row /> enabled token', () => {
   }
 
   it('contains 5 <td> elements', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow({ balances: tokenBalanceDetails }))
     expect(wrapper.find('td')).toHaveLength(5)
   })
 
   it('contains 1 <button> elements (deposit)', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow({ balances: tokenBalanceDetails }))
     expect(wrapper.find('button')).toHaveLength(1)
   })
 })
@@ -92,7 +102,7 @@ describe('<Row /> enabled token and wallet balance', () => {
   }
 
   it('contains 2 <button> elements (deposit + withdraw)', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow({ balances: tokenBalanceDetails }))
     expect(wrapper.find('button')).toHaveLength(2)
   })
 })
@@ -104,7 +114,7 @@ describe('<Row /> disabled token and wallet balance', () => {
   }
 
   it('contains 2 <button> elements (enable + withdraw)', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow({ balances: tokenBalanceDetails }))
     expect(wrapper.find('button')).toHaveLength(2)
   })
 })
@@ -118,7 +128,7 @@ describe('<Row /> claimable token', () => {
   }
 
   it('contains 2 <button> elements (claim, deposit, withdraw)', () => {
-    const wrapper = render(_createRow(tokenBalanceDetails))
+    const wrapper = render(_createRow({ balances: tokenBalanceDetails }))
     expect(wrapper.find('button')).toHaveLength(3)
   })
 })
@@ -126,9 +136,11 @@ describe('<Row /> claimable token', () => {
 describe('<Row /> style', () => {
   it('is highlighted', () => {
     const wrapper = render(
-      _createRow(undefined, {
-        ...fakeRowState,
-        highlighted: true,
+      _createRow({
+        rowProps: {
+          ...fakeRowState,
+          highlighted: true,
+        },
       }),
     )
     expect(wrapper.attr('class')).toMatch(/highlight/)
@@ -136,10 +148,12 @@ describe('<Row /> style', () => {
 
   it('is enabling', () => {
     const wrapper = render(
-      _createRow(undefined, {
-        ...fakeRowState,
-        highlighted: false,
-        enabling: true,
+      _createRow({
+        rowProps: {
+          ...fakeRowState,
+          highlighted: false,
+          enabling: true,
+        },
       }),
     )
     expect(wrapper.attr('class')).toMatch(/enabling/)

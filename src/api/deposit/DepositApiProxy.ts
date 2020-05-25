@@ -1,11 +1,11 @@
 import { CacheMixin } from 'api/proxy'
 
-import { DepositApiImpl, DepositApi, Params } from './DepositApi'
+import { DepositApiImpl, DepositApi, DepositApiDependencies } from './DepositApi'
 
 export class DepositApiProxy extends DepositApiImpl {
   private cache: CacheMixin
 
-  public constructor(injectedDependencies: Params) {
+  public constructor(injectedDependencies: DepositApiDependencies) {
     super(injectedDependencies)
 
     this.cache = new CacheMixin()

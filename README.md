@@ -101,13 +101,16 @@ This app employs overrides from an alternative source (`custom/` directory) for 
 Override works for absolute paths that make use of baseUrl
 That is if there are two files:
 
-```js
-src/pages/About.tsx
-custom/pages/About.tsx
+- `src/pages/About.tsx`
+- `custom/pages/About.tsx`
 
+```js
 import About from 'pages/About'
 // will try resolving from custom/ first and failing that from src/
 ```
+
+> **NOTE**: If you are forking the project, you might want to delete the [custom/.gitignore](custom/.gitignore) file so you
+> can commit a config file and components inside the custom directory.
 
 ## Config
 
@@ -120,6 +123,9 @@ If you wish to replace any default config, create a file named `config` inside t
 Both JSON and YAML formats are supported.
 
 Simply replace any config found on [config-default](./config-default.yaml).
+
+> NOTE: If you are forking the project, you might want to delete the [custom/.gitignore](custom/.gitignore) file so you
+> can commit a config file and components inside the custom directory.
 
 Below we provide details for each config.
 

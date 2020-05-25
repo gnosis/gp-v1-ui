@@ -1,12 +1,15 @@
 import React from 'react'
 
+// assets
 import TokenImg from 'components/TokenImg'
-import { ProgressStepText } from './PoolingWidget.styled'
-import { TokenSelectorWrapper, TokenBox, CheckboxWrapper } from './TokenSelector.styled'
-
 import checkIcon from 'assets/img/li-check.svg'
 
+// types
 import { TokenDetails } from '@gnosis.pm/dex-js'
+
+// PoolingWidget: subcomponent
+import { ProgressStepText } from 'components/PoolingWidget/PoolingWidget.styled'
+import { TokenSelectorWrapper, TokenBox, CheckboxWrapper } from 'components/PoolingWidget/TokenSelector.styled'
 
 export interface TokenSelectorProps {
   handleTokenSelect: (tokenData: TokenDetails) => void

@@ -14,7 +14,7 @@ import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
 import { useTokenList } from './useTokenList'
 
-interface UseTokenBalanceResult {
+interface UseBalanceResult {
   balances: TokenBalanceDetails[]
   tokens: TokenDetails[]
   error: boolean
@@ -109,16 +109,16 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   return balances.filter(Boolean) as TokenBalanceDetails[]
 }
 
-export const useTokenBalances = (): UseTokenBalanceResult => {
+export const useTokenBalances = (): UseBalanceResult => {
   const walletInfo = useWalletConnection()
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
   const tokens = useTokenList(walletInfo.networkId)
 
+  // Get token balances
   useEffect(() => {
-    // can return NULL (if no address or network)
-    walletInfo.isConnected &&
+    if (walletInfo.isConnected) {
       _getBalances(walletInfo, tokens)
         .then(balances => {
           logDebug(
@@ -129,9 +129,10 @@ export const useTokenBalances = (): UseTokenBalanceResult => {
           setError(false)
         })
         .catch(error => {
-          console.error('[useTokenBalances] Error loading balances', error)
+          console.error('[useTokenBalances] Error loading token balances', error)
           setError(true)
         })
+    }
   }, [setBalances, setError, walletInfo, tokens])
 
   return { balances, error, tokens }

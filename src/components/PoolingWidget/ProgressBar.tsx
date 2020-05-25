@@ -1,5 +1,10 @@
 import React from 'react'
-import { BarWrapper, ProgressStep, ProgressStepText, StepSeparator } from './PoolingWidget.styled'
+import {
+  BarWrapper,
+  ProgressStep,
+  ProgressStepText,
+  StepSeparator,
+} from 'components/PoolingWidget/PoolingWidget.styled'
 import { LAST_STEP } from '.'
 
 export interface ProgressBarProps {

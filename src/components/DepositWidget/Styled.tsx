@@ -84,6 +84,10 @@ export const TokenRow = styled.tr`
     margin: 0;
     padding: 0;
 
+    li {
+      white-space: nowrap;
+    }
+
     button.wrapUnwrapEther {
       font-size: 1rem;
       padding 0.2rem 0.5rem;

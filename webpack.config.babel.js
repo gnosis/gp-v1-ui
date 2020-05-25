@@ -163,6 +163,7 @@ module.exports = ({ stats = false } = {}) => ({
       MOCK_WALLET: process.env.MOCK || 'false',
       MOCK_TOKEN_LIST: process.env.MOCK || 'false',
       MOCK_ERC20: process.env.MOCK || 'false',
+      MOCK_WETH: process.env.MOCK || 'false',
       MOCK_DEPOSIT: process.env.MOCK || 'false',
       MOCK_EXCHANGE: process.env.MOCK || 'false',
       MOCK_WEB3: process.env.MOCK || 'false',

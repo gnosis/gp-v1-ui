@@ -1,17 +1,23 @@
 import React, { useEffect, ChangeEvent, ReactNode } from 'react'
 import BN from 'bn.js'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IconDefinition, faSpinner } from '@fortawesome/free-solid-svg-icons'
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons'
 import plus from 'assets/img/plus.svg'
 
-import { CardDrawer } from 'components/Layout/Card'
-import { WalletDrawerInnerWrapper } from './Form.styled'
+// Types and utils
+import { TokenBalanceDetails } from 'types'
+import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 
+// Components
+import { CardDrawer } from 'components/Layout/Card'
+import { Spinner } from 'components/Spinner'
+
+// DepositWidget: subcomponents
+import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
+
+// Hooks
 import useSafeState from 'hooks/useSafeState'
 import useScrollIntoView from 'hooks/useScrollIntoView'
 
-import { TokenBalanceDetails } from 'types'
-import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 import useKeyPress from 'hooks/useKeyDown'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { Link } from 'react-router-dom'
@@ -167,7 +173,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
             <a onClick={cancelForm}>Cancel</a>
             <button type="button" disabled={!!errors.amountInput || loading} onClick={_onClick}>
               {submitBtnLabel}
-              {loading ? <FontAwesomeIcon icon={faSpinner} spin={loading} /> : <img src={plus} />}
+              {loading ? <Spinner spin={loading} /> : <img src={plus} />}
             </button>
           </div>
         </WalletDrawerInnerWrapper>
