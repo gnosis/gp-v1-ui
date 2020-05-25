@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import styled from 'styled-components'
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
 import Modali, { useModali } from 'modali'
@@ -61,12 +61,6 @@ const ModalWrapper = styled(ModalBodyWrapper)`
       padding-left: -0.5;
       font-size: 1.3rem;
       color: : var(--color-background-modali);
-    }
-
-    b {
-      
-      
-            
     }
 
     a {
@@ -192,7 +186,6 @@ interface WrapEtherFormData {
 
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
   const { wrap, label, className } = props
-  const [isModalVisible, setIsModalVisible] = useSafeState(false)
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
   const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
   const { ethBalance } = useEthBalances()
@@ -234,17 +227,12 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
     availableBalanceComponent = <span>...</span>
   }
 
+  const toggleRef = useRef<() => void>()
+  const isModalShownRef = useRef(false)
+
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
     title,
-    onShow: () => {
-      console.log('setIsModalVisible(true)')
-      setIsModalVisible(true)
-    },
-    onHide: () => {
-      console.log('setIsModalVisible(false)')
-      setIsModalVisible(false)
-    },
     message: (
       <ModalWrapper>
         <form>
@@ -313,15 +301,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
           // Hide modal once the transaction is sent
           const txOptionalParams = composeOptionalParams(() => {
-            logDebug('[WrapEtherBtn] Close modal on sentTransaction. IsModalVisible? ', {
-              'modalHook.isModalVisible': modalHook.isModalVisible,
-              'hook isModalVisible': isModalVisible,
-            })
-            // Hide modal if it's visible
-            // Unfortunatelly "modalHook.isModalVisible" doesn't have the right value, so we need to keep the state ourselves
-            if (isModalVisible) {
-              modalHook.hide()
-            }
+            if (isModalShownRef.current) toggleRef.current?.()
           })
 
           let wrapUnwrapPromise, successMessage: string, errorMessage: string
@@ -348,6 +328,11 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       />,
     ],
   })
+
+  // toggleModal recreated every time, keep ref to always use current in async code
+  toggleRef.current = toggleModal
+  // same for modalHook.isShown
+  isModalShownRef.current = modalHook.isShown
 
   return (
     <>
