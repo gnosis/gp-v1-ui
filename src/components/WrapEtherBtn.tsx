@@ -210,7 +210,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
   // Show available balance
   //  * For wrapping, we just show the value
-  //  * For unwrapping, we allow to clicl to unwrap all
+  //  * For unwrapping, we allow to click to unwrap all
   let availableBalanceComponent
   if (balance) {
     const amountFull = formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || '-'
@@ -270,6 +270,17 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
                     required: 'The amount is required',
                     min: 0,
                   })}
+                  onBlur={(e): void => {
+                    // react-hook-form does something onBlur that interferes with button clicks
+                    // at the same time modali buttons rerender at every opportunity
+                    // so click never arrives where we expect it to
+                    // at least that is my guess
+                    const { relatedTarget } = e
+                    // here be hacks
+                    if (relatedTarget instanceof HTMLButtonElement) {
+                      relatedTarget.click()
+                    }
+                  }}
                 />
               </InputBox>
             </div>
