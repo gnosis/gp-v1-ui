@@ -5,30 +5,6 @@ import useSafeState from './useSafeState'
 
 import { getPriceEstimation } from 'services'
 import { dexPriceEstimatorApi } from 'api'
-import useGlobalState from './useGlobalState'
-import { parseBigNumber } from 'utils'
-import { ONE_BIG_NUMBER, ONE_HUNDRED_BIG_NUMBER } from 'const'
-
-/**
- * @name checkSlippageAgainstPrice
- *
- * @param slippage - user set slippage as string
- * @param prePrice - pre-slippape adjusted price as BigNumber or null
- * @returns [BigNumber | null] - pre-price adjusted for slippage as BigNumber or null
- */
-function checkSlippageAgainstPrice(slippage: string, prePrice: BigNumber | null): BigNumber | null {
-  if (!prePrice) return null
-  const slippageAsBigNumber = parseBigNumber(slippage)
-  // if price slippage is not a BigNumber e.g 'abc' return prePrice
-  if (!slippageAsBigNumber) return prePrice
-
-  // slippageAsBigNumber here is defined and is indeed a valid number
-  // convert slippage into fraction: (1 - (0.5/100)) = (1 - 0.005) = 99.995
-  const slippageAsFraction = ONE_BIG_NUMBER.minus(slippageAsBigNumber.div(ONE_HUNDRED_BIG_NUMBER))
-  const postSlippagePrice = prePrice.times(slippageAsFraction)
-
-  return postSlippagePrice
-}
 
 interface Params {
   baseTokenId: number
@@ -84,7 +60,6 @@ interface SlippageParams {
 export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
   const [isPriceLoading, setIsPriceLoading] = useSafeState(true)
   const [priceEstimation, setPriceEstimation] = useSafeState<BigNumber | null>(null)
-  const [{ priceSlippage }] = useGlobalState()
   const { networkId, baseTokenId, baseTokenDecimals, quoteTokenId, quoteTokenDecimals, amount } = params
 
   useEffect(() => {
@@ -104,9 +79,7 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
           getPriceParams['amountInUnits'] = amount
         }
 
-        const preSlippagePrice = await dexPriceEstimatorApi.getPrice(getPriceParams)
-
-        const price = checkSlippageAgainstPrice(priceSlippage, preSlippagePrice)
+        const price = await dexPriceEstimatorApi.getPrice(getPriceParams)
 
         if (!cancelled) {
           setPriceEstimation(price)
@@ -131,7 +104,6 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
     baseTokenDecimals,
     baseTokenId,
     networkId,
-    priceSlippage,
     quoteTokenDecimals,
     quoteTokenId,
     setIsPriceLoading,
