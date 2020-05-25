@@ -9,7 +9,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { isTradeFilled } from 'utils'
 
 function classifyTrade(trade: Trade): string {
-  return isTradeFilled(trade) ? 'Filled' : 'Partial'
+  return isTradeFilled(trade) ? 'Full' : 'Partial'
 }
 
 const Trades: React.FC = () => {
