@@ -34,7 +34,7 @@ export class MultiTcrApi implements TcrApi {
 
     this.web3 = web3
 
-    const contractPrototype = new this.web3.eth.Contract(tcrAbi as AbiItem[]) as TcrContract
+    const contractPrototype = (new this.web3.eth.Contract(tcrAbi as AbiItem[]) as unknown) as TcrContract
 
     lists.forEach(list => {
       const contract = contractPrototype.clone()
