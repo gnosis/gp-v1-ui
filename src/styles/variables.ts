@@ -151,6 +151,7 @@ const variables = css`
     // BORDERS
     // ------------------------------
     --border-radius: 0.4375rem;
+    --border-radius-top: 0.6rem 0.6rem 0 0;
 
     // ------------------------------
     // BOX-SHADOW
