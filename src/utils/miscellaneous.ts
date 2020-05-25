@@ -1,6 +1,8 @@
+import BN from 'bn.js'
+
 import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, Trade } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
 import { ORDER_FILLED_FACTOR } from 'const'
 
@@ -72,10 +74,18 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
 }
 
-export function isOrderFilled(order: AuctionElement): boolean {
+function isAmountDifferenceGreaterThanNegligibleAmount(amount1: BN, amount2: BN): boolean {
   // consider an oder filled when less than `negligibleAmount` is left
-  const negligibleAmount = order.priceDenominator.divRound(ORDER_FILLED_FACTOR)
-  return !order.remainingAmount.gte(negligibleAmount)
+  const negligibleAmount = amount1.divRound(ORDER_FILLED_FACTOR)
+  return !amount2.gte(negligibleAmount)
+}
+
+export function isOrderFilled(order: AuctionElement): boolean {
+  return isAmountDifferenceGreaterThanNegligibleAmount(order.priceDenominator, order.remainingAmount)
+}
+
+export function isTradeFilled(trade: Trade): boolean {
+  return isAmountDifferenceGreaterThanNegligibleAmount(trade.sellAmount, trade.remainingAmount)
 }
 
 export const isOrderActive = (order: AuctionElement, now: Date): boolean =>

@@ -146,6 +146,7 @@ export interface Trade extends BaseTradeEvent {
   sellToken: TokenDetails
   limitPrice: BigNumber
   fillPrice: BigNumber
+  remainingAmount: BN
 }
 
 export interface GetOrdersPaginatedResult {
