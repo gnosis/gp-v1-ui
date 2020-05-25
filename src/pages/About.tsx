@@ -42,7 +42,7 @@ const About: React.FC = () => {
     <AboutWrapper>
       <h1>About {CONFIG.name}</h1>
       <p>
-        <strong>{CONFIG.name}</strong> it&apos;s an Open Source interface for{' '}
+        <strong>{CONFIG.name}</strong> is an Open Source interface for{' '}
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
         </a>
