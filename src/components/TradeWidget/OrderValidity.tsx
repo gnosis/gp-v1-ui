@@ -265,8 +265,8 @@ const OrderValidity: React.FC<Props> = ({
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
       // sanitize inputs as multiples of 5
-      const sanitizedFromValue = validFromInputValue ? makeMultipleOf(5, validFromInputValue).toString() : undefined
-      const sanitizedUntilValue = validUntilInputValue ? makeMultipleOf(5, validUntilInputValue).toString() : undefined
+      const sanitizedFromValue = makeMultipleOf(5, validFromInputValue).toString()
+      const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue).toString()
 
       batchedUpdates(() => {
         if (!sanitizedFromValue) setAsap(true)
@@ -355,9 +355,9 @@ const OrderValidity: React.FC<Props> = ({
     <Wrapper>
       <div>
         <div>
-          Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
+          Order starts: <b>{formatTimeInHours(validFrom!, 'ASAP')}</b>
           <HelpTooltip tooltip={OrderStartsTooltip} />
-          &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
+          &nbsp;- expires: <b>{formatTimeInHours(validUntil!, 'Never')}</b>
         </div>
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
       </div>
@@ -376,7 +376,7 @@ const OrderValidity: React.FC<Props> = ({
               disabled={isDisabled}
               required
               ref={(e): void => {
-                register(e)
+                register(e!)
                 validFromRef.current = e
               }}
               onFocus={(e): void => e.target.select()}
@@ -405,7 +405,7 @@ const OrderValidity: React.FC<Props> = ({
               disabled={isDisabled}
               required
               ref={(e): void => {
-                register(e)
+                register(e!)
                 validUntilRef.current = e
               }}
               onFocus={(e): void => e.target.select()}
