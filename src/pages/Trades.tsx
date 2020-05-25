@@ -15,6 +15,7 @@ const Trades: React.FC = () => {
       <CardTable $columns="repeat(6, 1fr)" $rowSeparation="0">
         <thead>
           <tr>
+            <th>Market</th>
             <th>Limit Price</th>
             <th>Fill Price</th>
             <th>Amount</th>
@@ -31,11 +32,10 @@ const Trades: React.FC = () => {
               {/* TODO: entries marked with NA are not yet available from the event.
                         Need to enrich event data first */}
               <td>
-                {formatPrice(trade.limitPrice)} {trade.sellToken.symbol}/{trade.buyToken.symbol}
+                {trade.sellToken.symbol}/{trade.buyToken.symbol}
               </td>
-              <td>
-                {formatPrice(trade.fillPrice)} {trade.sellToken.symbol}/{trade.buyToken.symbol}
-              </td>
+              <td>{formatPrice(trade.limitPrice)}</td>
+              <td>{formatPrice(trade.fillPrice)}</td>
               <td>
                 {formatAmount({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
                 {trade.sellToken.symbol}
