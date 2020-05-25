@@ -17,8 +17,6 @@ export function getTradesFactory(factoryParams: {
 }): (params: GetTradesParams) => Promise<Trade[]> {
   const { web3, exchangeApi, getTokens } = factoryParams
 
-  const nextFromBlock: { [networkId: number]: number } = {}
-
   async function getBlockTimePair(blockNumber: number): Promise<[number, number]> {
     return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp]
   }
@@ -29,14 +27,8 @@ export function getTradesFactory(factoryParams: {
 
   async function getTrades(params: GetTradesParams): Promise<Trade[]> {
     const { userAddress, networkId } = params
-    const fromBlock = params.fromBlock ?? nextFromBlock[params.networkId]
 
-    const [tradeEvents, currentBlock] = await Promise.all([
-      exchangeApi.getPastTrades({ ...params, fromBlock }),
-      web3.eth.getBlock('latest'),
-    ])
-    // set latest block to start from there next time, if no `fromBlock` is provided
-    nextFromBlock[networkId] = currentBlock.number
+    const tradeEvents = await exchangeApi.getPastTrades(params)
 
     // Minor optimization: return early when empty
     if (tradeEvents.length === 0) {
