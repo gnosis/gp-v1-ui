@@ -20,7 +20,7 @@ import useSafeState from 'hooks/useSafeState'
 
 import {
   safeTokenName,
-  formatAmount,
+  formatSmart,
   formatDateFromBatchId,
   batchIdToDate,
   isOrderFilled,
@@ -107,10 +107,10 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
   const filledAmount = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return formatAmount(filledAmount, sellToken.decimals) || '0'
+    return formatSmart(filledAmount, sellToken.decimals) || '0'
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
-  const totalAmount = useMemo(() => formatAmount(order.priceDenominator, sellToken.decimals) || '0', [
+  const totalAmount = useMemo(() => formatSmart(order.priceDenominator, sellToken.decimals) || '0', [
     order.priceDenominator,
     sellToken.decimals,
   ])
