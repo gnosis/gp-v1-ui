@@ -136,7 +136,6 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
     title: `${safeTokenName(baseToken)}-${safeTokenName(quoteToken)} Order book${networkDescription}`,
     message: (
       <ModalWrapper>
-        -
         <span>
           <TokenSelector
             tokens={tokenList}
