@@ -1,12 +1,21 @@
 import React from 'react'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck } from '@fortawesome/free-solid-svg-icons'
+
+import { formatPrice, formatAmount } from '@gnosis.pm/dex-js'
+
 import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
+import { EtherscanLink } from 'components/EtherscanLink'
+
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
-import { formatPrice, formatAmount } from '@gnosis.pm/dex-js'
-import { EtherscanLink } from 'components/EtherscanLink'
+
 import { Trade } from 'api/exchange/ExchangeApi'
+
 import { isTradeFilled } from 'utils'
+import { StatusCountdown } from 'components/StatusCountdown'
 
 function classifyTrade(trade: Trade): string {
   return isTradeFilled(trade) ? 'Full' : 'Partial'
@@ -15,10 +24,11 @@ function classifyTrade(trade: Trade): string {
 const Trades: React.FC = () => {
   const { networkId } = useWalletConnection()
   const trades = useTrades()
+  const now = new Date()
 
   return (
     <ContentPage>
-      <CardTable $columns="repeat(9, 1fr)" $rowSeparation="0">
+      <CardTable $columns="repeat(10, 1fr)" $rowSeparation="0">
         <thead>
           <tr>
             <th>Market</th>
@@ -30,14 +40,12 @@ const Trades: React.FC = () => {
             <th>Time</th>
             <th>BatchId | OrderId</th>
             <th>Tx</th>
-            {/* <th>Settled</th> */}
+            <th>Settled</th>
           </tr>
         </thead>
         <tbody>
           {trades.map((trade, index) => (
             <tr key={index} data-order-id={trade.orderId} data-trade-id={trade.id}>
-              {/* TODO: entries marked with NA are not yet available from the event.
-                        Need to enrich event data first */}
               <td>
                 {trade.sellToken.symbol}/{trade.buyToken.symbol}
               </td>
@@ -59,7 +67,9 @@ const Trades: React.FC = () => {
               <td>
                 <EtherscanLink type={'tx'} identifier={trade.txHash} networkId={networkId} />
               </td>
-              {/* <td>NA</td> */}
+              <td>
+                {trade.settlingDate > now ? <StatusCountdown timeoutDelta={60} /> : <FontAwesomeIcon icon={faCheck} />}
+              </td>
             </tr>
           ))}
         </tbody>
