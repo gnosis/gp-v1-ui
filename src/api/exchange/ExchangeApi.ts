@@ -206,7 +206,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     logDebug(
       `[ExchangeApiImpl] Fetched ${
         tradeEvents.length
-      } trades for address ${userAddress} on network ${networkId} from block ${fromBlock}${
+      } trades for address ${userAddress} on network ${networkId} from block ${fromBlock} ${
         toBlock ? `to block ${toBlock}` : ''
       }`,
     )
