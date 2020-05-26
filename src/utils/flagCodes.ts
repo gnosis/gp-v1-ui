@@ -1,17 +1,5 @@
 import { MEDIA_QUERY_NAMES } from './mediaQueries'
 
-// gasstation return example
-/*{
-  lastUpdate: '2020-03-03T11:23:53.500017Z',
-  lowest: '1000000001',
-  safeLow: '6000000001',
-  standard: '10000000001',
-  fast: '18800000001',
-  fastest: '1457792372351',
-} */
-// can in most cases safely override 9 last digits
-// even 10 digits if only using standard price
-
 export interface Flag<T extends string> {
   name: T
   values: string[] // value at 0-index is the default
