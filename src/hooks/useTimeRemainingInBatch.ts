@@ -1,15 +1,36 @@
 import useSafeState from './useSafeState'
-import { getSecondsRemainingInBatch } from 'utils'
+import { getTimeRemainingInBatch } from 'utils'
 import { useEffect, useRef } from 'react'
 import { BATCH_TIME } from 'const'
 
 export function useTimeRemainingInBatch(): number {
-  const [timeRemaining, setTimeRemaining] = useSafeState(getSecondsRemainingInBatch())
+  const [timeRemaining, setTimeRemaining] = useSafeState(getTimeRemainingInBatch())
 
   useEffect(() => {
-    const interval = setInterval(() => setTimeRemaining(getSecondsRemainingInBatch()), 1000)
+    let interval: null | NodeJS.Timeout = null
 
-    return (): void => clearInterval(interval)
+    function updateImmediatelyAndStartInterval(): void {
+      // update once
+      setTimeRemaining(getTimeRemainingInBatch())
+      // update every second from now on
+      interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
+    }
+
+    // timeout to start the timer exactly at second mark
+    const intervalStart = Date.now() % 1000
+
+    if (intervalStart === 0) {
+      // to avoid possible scheduling delays, execute right now if exactly at second mark
+      updateImmediatelyAndStartInterval()
+    } else {
+      // otherwise, schedule starting
+      interval = setTimeout(updateImmediatelyAndStartInterval, intervalStart)
+    }
+
+    return (): void => {
+      // `clearInterval` works for both interval AND timeouts
+      if (interval) clearInterval(interval)
+    }
   }, [setTimeRemaining])
 
   return timeRemaining
@@ -21,7 +42,7 @@ interface SecondsRemainingResult {
 }
 
 const checkIfTime = (seconds: number): SecondsRemainingResult => {
-  const secondsRemaining = getSecondsRemainingInBatch()
+  const secondsRemaining = getTimeRemainingInBatch()
   return {
     secondsRemaining,
     checkTime: secondsRemaining < seconds,
@@ -46,7 +67,7 @@ export function useCheckWhenTimeRemainingInBatch(
     }
 
     const currentCheck = checkIfTime(seconds)
-    let id: number
+    let id: NodeJS.Timeout
 
     if (currentCheck.checkTime) {
       callbackRef.current(currentCheck)
@@ -67,14 +88,15 @@ export function useCheckWhenTimeRemainingInBatch(
       callbackRef.current(currentCheck)
     }
 
-    id = window.setTimeout(() => {
+    id = setTimeout(() => {
       // now can go on interval
-      id = window.setInterval(checkAndReport, BATCH_TIME * 1000)
+      id = setInterval(checkAndReport, BATCH_TIME * 1000)
 
       checkAndReport()
     }, nextCheckInSeconds * 1000)
 
     return (): void => {
+      // clears both timeout and interval
       clearInterval(id)
     }
   }, [seconds])

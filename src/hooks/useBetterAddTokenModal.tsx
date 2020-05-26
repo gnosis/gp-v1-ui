@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react'
+import React, { useRef, useEffect, useMemo, useCallback } from 'react'
 import Modali, { useModali, ModalHook } from 'modali'
 import { fetchTokenData, FetchTokenResult } from 'services'
 import { Deferred, createDeferredPromise } from 'utils'
@@ -7,12 +7,11 @@ import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
 import { tokenListApi } from 'api'
 import { TokenFromExchange } from 'services/factories'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { useWalletConnection } from './useWalletConnection'
+import Spinner from 'components/Spinner'
 
 interface ExtraProps {
   focused: boolean
@@ -111,7 +110,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
         return (
           <NonTokenDisplay>
             <span>
-              <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+              <a href="https://docs.gnosis.io/protocol/docs/addtoken1/" rel="noopener noreferrer" target="_blank">
                 Register token
               </a>{' '}
               {tokenAddress} on Exchange first
@@ -134,7 +133,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
           />
           <a
             className="tokenText"
-            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            href="https://docs.gnosis.io/protocol/docs/addtoken1/"
             rel="noopener noreferrer"
             target="_blank"
           >
@@ -178,7 +177,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
   }
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin />
+const spinner = <Spinner style={{ marginRight: 7, alignSelf: 'center' }} />
 
 const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactElement => {
   // in fetching state -- show spinner
@@ -303,70 +302,73 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
     if (walletInfo.networkId) setNetworkId(walletInfo.networkId)
   }, [setNetworkId, walletInfo.networkId])
 
-  const addTokensToList = async (
-    params: TokensAddConfirmationProps | TokensAddConfirmationProps2,
-    defaultReason: FetchTokenResult['reason'] = TokenFromExchange.NOT_IN_TOKEN_LIST,
-  ): Promise<TokenDetails[]> => {
-    setNetworkId(params.networkId)
-    // start deferred promise to be resolved later
-    const deferred = createDeferredPromise<TokenDetails[]>()
-    result.current = deferred
+  const addTokensToList = useCallback(
+    async (
+      params: TokensAddConfirmationProps | TokensAddConfirmationProps2,
+      defaultReason: FetchTokenResult['reason'] = TokenFromExchange.NOT_IN_TOKEN_LIST,
+    ): Promise<TokenDetails[]> => {
+      setNetworkId(params.networkId)
+      // start deferred promise to be resolved later
+      const deferred = createDeferredPromise<TokenDetails[]>()
+      result.current = deferred
 
-    // if passed already known tokens
-    // show right away without fetching
-    if ('tokens' in params) {
-      if (params.tokens.length === 0) return []
+      // if passed already known tokens
+      // show right away without fetching
+      if ('tokens' in params) {
+        if (params.tokens.length === 0) return []
 
-      setTokens(params.tokens)
-      setFetchResults(
-        params.tokens.map(token => ({
-          token,
-          reason: defaultReason,
-          tokenAddress: token.address,
-        })),
-      )
-      toggleRef.current()
-    } else {
-      // if passed tokenAddresses only -- fetch
-      if (params.tokenAddresses.length === 0) return []
+        setTokens(params.tokens)
+        setFetchResults(
+          params.tokens.map(token => ({
+            token,
+            reason: defaultReason,
+            tokenAddress: token.address,
+          })),
+        )
+        toggleRef.current()
+      } else {
+        // if passed tokenAddresses only -- fetch
+        if (params.tokenAddresses.length === 0) return []
 
-      toggleRef.current()
-      // setTokenAddresses(params.tokenAddresses)
-      const fetcher = (tokenAddress: string): Promise<FetchTokenResult> =>
-        // networkId could have changed when between Default prov -> Rinkeby prov
-        // no problem on mainnet
-        fetchTokenData({ tokenAddress, networkId: networkRef.current || params.networkId })
-      let results = await Promise.all(params.tokenAddresses.map(fetcher))
+        toggleRef.current()
+        // setTokenAddresses(params.tokenAddresses)
+        const fetcher = (tokenAddress: string): Promise<FetchTokenResult> =>
+          // networkId could have changed when between Default prov -> Rinkeby prov
+          // no problem on mainnet
+          fetchTokenData({ tokenAddress, networkId: networkRef.current || params.networkId })
+        let results = await Promise.all(params.tokenAddresses.map(fetcher))
 
-      if (results.every(({ token, reason }) => !token && reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT)) {
-        // initial fetch can fail if we are in-between providers
-        // which happens when from URL -- default Prov -- Metamask switch happens on page load
-        results = await Promise.all(params.tokenAddresses.map(fetcher))
+        if (results.every(({ token, reason }) => !token && reason !== TokenFromExchange.NOT_REGISTERED_ON_CONTRACT)) {
+          // initial fetch can fail if we are in-between providers
+          // which happens when from URL -- default Prov -- Metamask switch happens on page load
+          results = await Promise.all(params.tokenAddresses.map(fetcher))
+        }
+
+        // only addable tokens, already registered on exchange
+        // but not in USER_LIST
+        // meaning they must have id
+        const tokens = results
+          .map(result => result.token)
+          .filter((token): token is TokenDetails => !!token && 'id' in token)
+
+        batchUpdates(() => {
+          setFetchResults(results)
+          setTokens(tokens)
+        })
       }
 
-      // only addable tokens, already registered on exchange
-      // but not in USER_LIST
-      // meaning they must have id
-      const tokens = results
-        .map(result => result.token)
-        .filter((token): token is TokenDetails => !!token && 'id' in token)
+      return deferred.promise.then(value => {
+        // close modal
+        if (isShownRef.current) toggleRef.current()
 
-      batchUpdates(() => {
-        setFetchResults(results)
-        setTokens(tokens)
+        // reset hook state
+        result.current = undefined
+
+        return value
       })
-    }
-
-    return deferred.promise.then(value => {
-      // close modal
-      if (isShownRef.current) toggleRef.current()
-
-      // reset hook state
-      result.current = undefined
-
-      return value
-    })
-  }
+    },
+    [setFetchResults, setNetworkId, setTokens],
+  )
 
   useEffect(() => {
     // isModalVisible is changed after a delay

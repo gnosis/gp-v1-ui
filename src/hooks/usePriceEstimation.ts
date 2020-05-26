@@ -16,6 +16,12 @@ interface Result {
   isPriceLoading: boolean
 }
 
+/*
+  PRICE ESTIMATION
+  *
+  BACKEND APPLIES A 0.1% SAFETY MARGIN ON ALL PRICES TO ACCOUNT FOR ROUNDING BY THE SOLVER
+*/
+
 export function usePriceEstimation(params: Params): Result {
   const { baseTokenId, quoteTokenId } = params
   const [isPriceLoading, setIsPriceLoading] = useSafeState(true)

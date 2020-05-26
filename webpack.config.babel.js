@@ -6,9 +6,10 @@ import PreloadWebpackPlugin from 'preload-webpack-plugin'
 import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
 import markdownIt from 'markdown-it'
 import linkAttributes from 'markdown-it-link-attributes'
+import path from 'path'
 
 import dotenv from 'dotenv'
-import path from 'path'
+import loadConfig from './src/loadConfig'
 
 // Setup env vars
 dotenv.config()
@@ -16,6 +17,8 @@ dotenv.config()
 const isProduction = process.env.NODE_ENV == 'production'
 
 const baseUrl = isProduction ? '' : '/'
+const config = loadConfig()
+const { name: appName } = config
 
 module.exports = ({ stats = false } = {}) => ({
   devtool: isProduction ? 'source-map' : 'eval-source-map',
@@ -108,13 +111,13 @@ module.exports = ({ stats = false } = {}) => ({
       'react-dom': '@hot-loader/react-dom',
       'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
     },
-    modules: ['src', 'node_modules'],
+    modules: ['custom', 'src', 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
   },
   plugins: [
     new HtmlWebPackPlugin({
-      template: './src/html/index.html',
-      title: 'Mesa',
+      template: config.templatePath,
+      title: appName,
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
@@ -130,13 +133,13 @@ module.exports = ({ stats = false } = {}) => ({
       },
     }),
     new FaviconsWebpackPlugin({
-      logo: './src/assets/img/logo.svg',
+      logo: config.logoPath,
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
-        appName: 'Mesa',
-        appDescription: 'Mesa',
-        developerName: 'Mesa',
+        appName: appName,
+        appDescription: appName,
+        developerName: appName,
         developerURL: null, // prevent retrieving from the nearest package.json
         background: '#dfe6ef',
         themeColor: '#476481',
@@ -155,6 +158,17 @@ module.exports = ({ stats = false } = {}) => ({
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
       BASE_URL: baseUrl,
+      // MOCK: Use mock or real API implementation
+      MOCK: 'false',
+      MOCK_WALLET: process.env.MOCK || 'false',
+      MOCK_TOKEN_LIST: process.env.MOCK || 'false',
+      MOCK_ERC20: process.env.MOCK || 'false',
+      MOCK_WETH: process.env.MOCK || 'false',
+      MOCK_DEPOSIT: process.env.MOCK || 'false',
+      MOCK_EXCHANGE: process.env.MOCK || 'false',
+      MOCK_WEB3: process.env.MOCK || 'false',
+      // AUTOCONNECT: only applies for mock implementation
+      AUTOCONNECT: 'true',
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance
@@ -162,18 +176,7 @@ module.exports = ({ stats = false } = {}) => ({
       VERSION: JSON.stringify(require('./package.json').version),
       DEX_JS_VERSION: JSON.stringify(require('@gnosis.pm/dex-js/package.json').version),
       CONTRACT_VERSION: JSON.stringify(require('@gnosis.pm/dex-contracts/package.json').version),
-
-      // MOCK: Use mock or real API implementation
-      'process.env.MOCK': JSON.stringify(process.env.MOCK || 'false'),
-      'process.env.MOCK_WALLET': JSON.stringify(process.env.MOCK_WALLET || process.env.MOCK || 'false'),
-      'process.env.MOCK_TOKEN_LIST': JSON.stringify(process.env.MOCK_TOKEN_LIST || process.env.MOCK || 'false'),
-      'process.env.MOCK_ERC20': JSON.stringify(process.env.MOCK_ERC20 || process.env.MOCK || 'false'),
-      'process.env.MOCK_DEPOSIT': JSON.stringify(process.env.MOCK_MOCK_DEPOSIT || process.env.MOCK || 'false'),
-      'process.env.MOCK_EXCHANGE': JSON.stringify(process.env.MOCK_EXCHANGE || process.env.MOCK || 'false'),
-      'process.env.MOCK_WEB3': JSON.stringify(process.env.MOCK_WEB3 || process.env.MOCK || 'false'),
-
-      // AUTOCONNECT: only applies for mock implementation
-      'process.env.AUTOCONNECT': JSON.stringify(process.env.AUTOCONNECT || 'true'),
+      CONFIG: JSON.stringify(config),
     }),
   ].filter(Boolean),
   optimization: {

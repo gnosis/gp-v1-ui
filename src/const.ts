@@ -9,11 +9,21 @@ export {
   FEE_PERCENTAGE,
   DEFAULT_DECIMALS,
   DEFAULT_PRECISION,
+  ZERO,
+  ONE,
+  TWO,
+  TEN,
+  ALLOWANCE_MAX_VALUE,
+  ALLOWANCE_FOR_ENABLED_TOKEN,
 } from '@gnosis.pm/dex-js'
-export { ZERO, ONE, TWO, TEN, ALLOWANCE_MAX_VALUE, ALLOWANCE_FOR_ENABLED_TOKEN } from '@gnosis.pm/dex-js'
+import { BATCH_TIME } from '@gnosis.pm/dex-js'
+
+export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
 
 export const ZERO_BIG_NUMBER = new BigNumber(0)
+export const ONE_BIG_NUMBER = new BigNumber(1)
 export const TEN_BIG_NUMBER = new BigNumber(10)
+export const ONE_HUNDRED_BIG_NUMBER = new BigNumber(100)
 
 // How much of the order needs to be matched to consider it filled
 // Will divide the total sell amount by this factor.
@@ -92,10 +102,38 @@ export const MEDIA = {
 }
 
 export const ELLIPSIS = '...'
-export const INFURA_ID = process.env.INFURA_ID || '607a7dfcb1ad4a0b83152e30ce20cfc5'
-export const ETH_NODE_URL = process.env.ETH_NODE_URL || `wss://mainnet.infura.io/ws/v3/${INFURA_ID}`
+
+// TODO: should this be on loadConfig?
+let infuraId
+if (process.env.INFURA_ID) {
+  infuraId = process.env.INFURA_ID
+} else if (CONFIG.defaultProviderConfig.type === 'infura') {
+  const { config } = CONFIG.defaultProviderConfig
+  infuraId = config.infuraId
+} else {
+  infuraId = ''
+}
+
+export const INFURA_ID = infuraId
+
+let ethNodeUrl
+if (process.env.ETH_NODE_URL) {
+  ethNodeUrl = process.env.ETH_NODE_URL
+} else if (CONFIG.defaultProviderConfig.type === 'infura') {
+  const { config } = CONFIG.defaultProviderConfig
+  ethNodeUrl = config.infuraEndpoint + config.infuraId
+} else if (CONFIG.defaultProviderConfig.type === 'url') {
+  const { config } = CONFIG.defaultProviderConfig
+  ethNodeUrl = config.ethNodeUrl
+} else {
+  throw new Error('Default provider URL is not set. Either provide ETH_NODE_URL env var or use the config.')
+}
+
+export const ETH_NODE_URL = ethNodeUrl
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
+
+export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
 
 export const GP_ORDER_TX_HASHES = {
   1: 'GP_ORDER_TX_HASHES_1',
@@ -108,3 +146,17 @@ export const INPUT_PRECISION_SIZE = 6
 export const VALID_UNTIL_DEFAULT = '2880'
 export const VALID_FROM_DEFAULT = '30'
 export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+export const ORDER_BOOK_HOPS_DEFAULT = 2
+export const ORDER_BOOK_HOPS_MAX = 2
+
+export const SLIPPAGE_MAP = new Map([
+  ['0.1', false],
+  ['0.5', true],
+  ['1', false],
+])
+export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
+// Delay disabling loading indicators, since in a normal workflow, when a transaction is mined, the spinner is stopped,
+// however, the new state, that flows top down once a bock is mined, can have a small delayed
+// This delay mitigates the strange effect of stopping the loading before the data is updated
+export const DISABLE_SPINNER_DELAY = 1000

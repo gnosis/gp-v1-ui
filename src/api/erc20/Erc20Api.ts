@@ -7,7 +7,19 @@ import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
 
+import ERC20_DETAILS from 'api/erc20/erc20Details.json'
+
 import Web3 from 'web3'
+
+export interface Erc20Props {
+  name: string
+  symbol: string
+  decimals: number
+}
+
+export interface Erc20Details {
+  [address: string]: Erc20Props
+}
 
 interface BaseParams {
   tokenAddress: string
@@ -66,7 +78,7 @@ export interface Erc20Api {
   transferFrom(params: TransferFromParams): Promise<Receipt>
 }
 
-export interface Params {
+export interface Erc20ApiDependencies {
   web3: Web3
   fetchGasPrice(): Promise<string | undefined>
 }
@@ -77,15 +89,21 @@ export interface Params {
 export class Erc20ApiImpl implements Erc20Api {
   private _contractPrototype: Erc20Contract
   private web3: Web3
+  private readonly localErc20Details: Erc20Details
 
   private static _contractsCache: { [network: number]: { [address: string]: Erc20Contract } } = {}
 
-  private fetchGasPrice: Params['fetchGasPrice']
+  private fetchGasPrice: Erc20ApiDependencies['fetchGasPrice']
 
-  public constructor(injectedDependencies: Params) {
+  public constructor(injectedDependencies: Erc20ApiDependencies) {
     Object.assign(this, injectedDependencies)
 
-    this._contractPrototype = new this.web3.eth.Contract(erc20Abi as AbiItem[]) as Erc20Contract
+    // Local overwrites for token details
+    // Usually that shouldn't be needed but some tokens do not abide by the standard
+    // and return symbol/name as bytes32 as opposed to string
+    this.localErc20Details = ERC20_DETAILS
+
+    this._contractPrototype = (new this.web3.eth.Contract(erc20Abi as AbiItem[]) as unknown) as Erc20Contract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,23 +121,38 @@ export class Erc20ApiImpl implements Erc20Api {
   }
 
   public async name({ tokenAddress, networkId }: NameParams): Promise<string> {
+    const name = this._getLocalErc20Property(tokenAddress, 'name')
+    if (name) {
+      return name
+    }
+
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    return await erc20.methods.name().call()
+    return erc20.methods.name().call()
   }
 
   public async symbol({ tokenAddress, networkId }: SymbolParams): Promise<string> {
+    const symbol = this._getLocalErc20Property(tokenAddress, 'symbol')
+    if (symbol) {
+      return symbol
+    }
+
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    return await erc20.methods.symbol().call()
+    return erc20.methods.symbol().call()
   }
 
   public async decimals({ tokenAddress, networkId }: DecimalsParams): Promise<number> {
+    const decimals = this._getLocalErc20Property(tokenAddress, 'decimals')
+    if (decimals) {
+      return decimals
+    }
+
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
-    const decimals = await erc20.methods.decimals().call()
+    const decimalsString = await erc20.methods.decimals().call()
 
-    return Number(decimals)
+    return Number(decimalsString)
   }
 
   public async totalSupply({ tokenAddress, networkId }: TotalSupplyParams): Promise<BN> {
@@ -228,6 +261,12 @@ export class Erc20ApiImpl implements Erc20Api {
     newERC20.options.address = address
 
     return (Erc20ApiImpl._contractsCache[networkId][address] = newERC20)
+  }
+
+  private _getLocalErc20Property<P extends keyof Erc20Props>(address: string, prop: P): Erc20Props[P] | undefined {
+    const erc20Details = this.localErc20Details[address]
+
+    return erc20Details ? erc20Details[prop] : undefined
   }
 }
 

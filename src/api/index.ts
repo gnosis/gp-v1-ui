@@ -3,10 +3,10 @@ import { WalletApiMock } from './wallet/WalletApiMock'
 import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
 import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
 import { TokenListApiMock } from './tokenList/TokenListApiMock'
-import { Erc20Api, Params as Erc20ApiDependencies } from './erc20/Erc20Api'
+import { Erc20Api, Erc20ApiDependencies } from './erc20/Erc20Api'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiProxy } from './erc20/Erc20ApiProxy'
-import { DepositApi, Params as DepositApiDependencies } from './deposit/DepositApi'
+import { DepositApi, DepositApiDependencies } from './deposit/DepositApi'
 import { DepositApiMock } from './deposit/DepositApiMock'
 import { DepositApiProxy } from './deposit/DepositApiProxy'
 import { ExchangeApi } from './exchange/ExchangeApi'
@@ -14,8 +14,12 @@ import { ExchangeApiMock } from './exchange/ExchangeApiMock'
 import { ExchangeApiProxy } from './exchange/ExchangeApiProxy'
 import { TheGraphApi } from './thegraph/TheGraphApi'
 import { TheGraphApiProxy } from './thegraph/TheGraphApiProxy'
+import { WethApi, WethApiImpl, WethApiDependencies } from './weth/WethApi'
+import { WethApiMock } from './weth/WethApiMock'
 import { DexPriceEstimatorApi } from './dexPriceEstimator/DexPriceEstimatorApi'
 import { DexPriceEstimatorApiProxy } from './dexPriceEstimator/DexPriceEstimatorApiProxy'
+import { TcrApi } from './tcr/TcrApi'
+import { MultiTcrApiProxy } from './tcr/MultiTcrApiProxy'
 import {
   tokenList,
   exchangeBalanceStates,
@@ -69,6 +73,18 @@ function createErc20Api(injectedDependencies: Erc20ApiDependencies): Erc20Api {
   return erc20Api
 }
 
+function createWethApi(injectedDependencies: WethApiDependencies): WethApi {
+  let wethApi
+  if (process.env.MOCK_WETH === 'true') {
+    wethApi = new WethApiMock()
+  } else {
+    wethApi = new WethApiImpl(injectedDependencies)
+  }
+  window['wethApi'] = wethApi // register for convenience
+
+  return wethApi
+}
+
 function createDepositApi(erc20Api: Erc20Api, injectedDependencies: DepositApiDependencies): DepositApi {
   let depositApi
   if (process.env.MOCK_DEPOSIT === 'true') {
@@ -112,26 +128,55 @@ function createTokenListApi(): TokenList {
 }
 
 function createTheGraphApi(): TheGraphApi {
-  const urls = {
-    [Network.Mainnet]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol',
-    [Network.Rinkeby]: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby',
+  const { type, config } = CONFIG.theGraphApi
+  let theGraphApi: TheGraphApi
+  switch (type) {
+    case 'the-graph':
+      theGraphApi = new TheGraphApiProxy(config)
+      break
+
+    default:
+      throw new Error('Unknown implementation for TheGraphApi: ' + type)
   }
 
-  const theGraphApi = new TheGraphApiProxy({ urls })
-
   window['theGraphApi'] = theGraphApi
-
   return theGraphApi
 }
 
 function createDexPriceEstimatorApi(): DexPriceEstimatorApi {
-  const networkIds = [Network.Mainnet, Network.Rinkeby]
+  const { type, config } = CONFIG.dexPriceEstimator
+  let dexPriceEstimatorApi: DexPriceEstimatorApi
+  switch (type) {
+    case 'dex-price-estimator':
+      dexPriceEstimatorApi = new DexPriceEstimatorApiProxy(config)
+      break
 
-  const dexPriceEstimatorApi = new DexPriceEstimatorApiProxy({ networkIds })
+    default:
+      throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)
+  }
 
   window['dexPriceEstimatorApi'] = dexPriceEstimatorApi
-
   return dexPriceEstimatorApi
+}
+
+function createTcrApi(web3: Web3): TcrApi | undefined {
+  const { type } = CONFIG.tcr
+  let tcrApi: TcrApi | undefined
+  switch (CONFIG.tcr.type) {
+    case 'none':
+      tcrApi = undefined
+      break
+    case 'multi-tcr':
+      const multiTcrApiConfig = CONFIG.tcr
+      tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
+      break
+
+    default:
+      throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)
+  }
+
+  window['tcrApi'] = tcrApi
+  return tcrApi
 }
 
 // Build APIs
@@ -144,8 +189,10 @@ const injectedDependencies = {
 }
 
 export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
+export const wethApi: WethApi = createWethApi(injectedDependencies)
 export const depositApi: DepositApi = createDepositApi(erc20Api, injectedDependencies)
 export const exchangeApi: ExchangeApi = createExchangeApi(erc20Api, injectedDependencies)
 export const tokenListApi: TokenList = createTokenListApi()
 export const theGraphApi: TheGraphApi = createTheGraphApi()
 export const dexPriceEstimatorApi: DexPriceEstimatorApi = createDexPriceEstimatorApi()
+export const tcrApi: TcrApi | undefined = createTcrApi(web3)

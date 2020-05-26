@@ -1,16 +1,22 @@
 import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress } from 'web3-utils'
-import { TokenImgWrapper } from './TokenImg'
-import { tokenListApi } from 'api'
 import styled from 'styled-components'
-import useSafeState from 'hooks/useSafeState'
-import { TokenDetails } from 'types'
-import { TokenFromExchange } from 'services/factories'
-import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
-import { safeFilledToken } from 'utils'
 import { toast } from 'toastify'
+
+// types, utils, services, api
+import { TokenDetails } from 'types'
+import { safeFilledToken } from 'utils'
+import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
 import { SimpleCache } from 'api/proxy/SimpleCache'
+import { TokenFromExchange } from 'services/factories'
+import { tokenListApi } from 'api'
+
+// components
+import { TokenImgWrapper } from 'components/TokenImg'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
 import { UseAddTokenModalResult } from 'hooks/useBetterAddTokenModal'
 
 const OptionItemWrapper = styled.div`
@@ -32,7 +38,7 @@ const OptionItemWrapper = styled.div`
     width: inherit;
     align-items: center;
     align-content: center;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
 
     .tokenName {
       display: flex;
@@ -130,14 +136,14 @@ const generateMessage = ({
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
       if (!token)
         return (
-          <a href="https://docs.gnosis.io/protocol/docs/addtoken5/" rel="noopener noreferrer" target="_blank">
+          <a href="https://docs.gnosis.io/protocol/docs/addtoken1/" rel="noopener noreferrer" target="_blank">
             Register token on Exchange first
           </a>
         )
       return (
         <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
           <ExtraOptionsMessage
-            href="https://docs.gnosis.io/protocol/docs/addtoken5/"
+            href="https://docs.gnosis.io/protocol/docs/addtoken1/"
             rel="noopener noreferrer"
             target="_blank"
           >
@@ -176,7 +182,7 @@ const generateMessage = ({
 
 // checks if token address is a valid address and not already in the list
 const checkIfAddableAddress = (tokenAddress: string, networkId: number): boolean =>
-  !tokenAddress || tokenListApi.hasToken({ tokenAddress, networkId }) || !isAddress(tokenAddress.toLowerCase())
+  !!tokenAddress && !tokenListApi.hasToken({ tokenAddress, networkId }) && isAddress(tokenAddress.toLowerCase())
 
 export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, networkId, addTokensToList }) => {
   const [isFetching, setIsFetching] = useSafeState(false)
@@ -191,7 +197,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
 
   useEffect(() => {
     // if truthy value, not already in the list and a valid address
-    if (checkIfAddableAddress(value, networkId)) return
+    if (!checkIfAddableAddress(value, networkId)) return
 
     // when cache is hit, token display is immediate
     const cacheKey = { tokenAddress: value, networkId }

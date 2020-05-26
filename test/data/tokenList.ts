@@ -1,5 +1,5 @@
 import { TokenDetails } from 'types'
-import { TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7 } from './basic'
+import { TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7, TOKEN_8 } from './basic'
 
 // Ether, Tether, TrueUSD, USD Coin, Paxos, Gemini, Dai
 const tokens: TokenDetails[] = [
@@ -97,6 +97,17 @@ const tokens: TokenDetails[] = [
     addressMainnet: '0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359',
     image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359/logo.png`,
     address: TOKEN_7,
+  },
+
+  // Fake token (FTK)
+  //  for testing token with problematic characters for the URL
+  {
+    id: 77,
+    name: 'Fake token',
+    symbol: 'FTK /21/10-DAI $99 & +|-',
+    decimals: 18,
+    addressMainnet: TOKEN_8,
+    address: TOKEN_8,
   },
 ]
 

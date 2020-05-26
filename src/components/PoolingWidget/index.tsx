@@ -1,32 +1,35 @@
 /* eslint-disable @typescript-eslint/ban-ts-ignore */
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
+import { Link } from 'react-router-dom'
+import { useForm, FormContext } from 'react-hook-form'
 import { toast } from 'toastify'
 import styled from 'styled-components'
-import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import joi from '@hapi/joi'
 
-import ProgressBar from './ProgressBar'
-import { StepDescription } from './StepDescriptors'
-import SubComponents from './SubComponents'
-import Widget from 'components/Layout/Widget'
-import LiquidityButtons from './LiquidityButtons'
-import { PoolingInterfaceWrapper } from './PoolingWidget.styled'
+// const, type, utils
+import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
+import { Receipt } from 'types'
+import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
+import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 
+// components
+import Widget from 'components/Layout/Widget'
+
+// PoolingWidget: subcomponents
+import ProgressBar from 'components/PoolingWidget/ProgressBar'
+import { StepDescription } from 'components/PoolingWidget/StepDescriptors'
+import SubComponents from 'components/PoolingWidget/SubComponents'
+import LiquidityButtons from 'components/PoolingWidget/LiquidityButtons'
+import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.styled'
+
+// Hooks and actions
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
 import useGlobalState from 'hooks/useGlobalState'
-import { useForm, FormContext } from 'react-hook-form'
-
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-
-import { Receipt } from 'types'
-
-import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
-import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { useTokenList } from 'hooks/useTokenList'
-import { Link } from 'react-router-dom'
+import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2

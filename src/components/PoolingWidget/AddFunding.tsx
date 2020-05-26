@@ -1,12 +1,18 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+
+import { Receipt } from 'types'
+
+// asset
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
+// componet
 import { EtherscanLink } from 'components/EtherscanLink'
-import { HighlightDiv } from './PoolingWidget.styled'
-import { AddFundingWrapper } from './AddFunding.styled'
-import { Receipt } from 'types'
+
+// PoolingWidget: subcomponent
+import { HighlightDiv } from 'components/PoolingWidget/PoolingWidget.styled'
+import { AddFundingWrapper } from 'components/PoolingWidget/AddFunding.styled'
 
 interface AddFundingProps {
   txIdentifier: string
@@ -24,7 +30,7 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
         </strong>
         <p>
           {txReceipt
-            ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions above.'
+            ? 'Your new liquidity has been successfully mined and submitted! Please carefully read the instructions below.'
             : ''}
         </p>
       </span>

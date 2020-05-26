@@ -1,14 +1,17 @@
+import { useCallback } from 'react'
 import { toast } from 'toastify'
+
+// assets
 import { assert } from '@gnosis.pm/dex-js'
-
-import useSafeState from 'hooks/useSafeState'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-
-import { exchangeApi } from 'api'
-
 import { logDebug } from 'utils'
 import { txOptionalParams } from 'utils/transaction'
-import { useCallback } from 'react'
+
+// api
+import { exchangeApi } from 'api'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 interface Result {
   deleteOrders: (orderIds: string[]) => Promise<boolean>

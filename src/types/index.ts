@@ -4,6 +4,7 @@ import { PendingFlux } from 'api/deposit/DepositApi'
 
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
+export type Unpromise<T> = T extends Promise<infer U> ? U : T
 
 export enum Network {
   Mainnet = 1,
@@ -34,6 +35,10 @@ export interface TokenBalanceDetails extends TokenDetails {
   claimable: boolean
   enabled: boolean
   totalExchangeBalance: BN
+}
+
+export interface WithTxOptionalParams {
+  txOptionalParams?: TxOptionalParams
 }
 
 export interface TxOptionalParams {

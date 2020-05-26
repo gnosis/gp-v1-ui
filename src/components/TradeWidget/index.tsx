@@ -1,28 +1,35 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
-
+import { useForm, FormContext } from 'react-hook-form'
+import { useParams } from 'react-router'
 import styled from 'styled-components'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
-import { SwitcherSVG } from 'assets/img/SVG'
-import arrow from 'assets/img/arrow.svg'
 import { FieldValues } from 'react-hook-form/dist/types'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { toast } from 'toastify'
-import BN from 'bn.js'
 import Modali from 'modali'
+import BN from 'bn.js'
 import { isAddress } from 'web3-utils'
 
-import TokenRow from './TokenRow'
-import OrderValidity from './OrderValidity'
+// assets
+import { SwitcherSVG } from 'assets/img/SVG'
+import arrow from 'assets/img/arrow.svg'
+
+// const, types
+import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
+import { TokenDetails, Network } from 'types'
+
+// components
 import Widget from 'components/Layout/Widget'
 import OrdersWidget from 'components/OrdersWidget'
 import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
-import FormMessage from './FormMessage'
 
-import { useForm, FormContext } from 'react-hook-form'
-import { useParams } from 'react-router'
+// TradeWidget: subcomponents
+import TokenRow from 'components/TradeWidget/TokenRow'
+import OrderValidity from 'components/TradeWidget/OrderValidity'
+import FormMessage from 'components/TradeWidget/FormMessage'
+
+// hooks and reducers
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -31,10 +38,7 @@ import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-
-import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
-
-import { TokenDetails } from 'types'
+import { Spinner } from 'components/Spinner'
 
 import {
   getToken,
@@ -57,6 +61,7 @@ import { tokenListApi } from 'api'
 
 import validationSchema from './validationSchema'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
+import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
@@ -149,7 +154,6 @@ const WrappedForm = styled.form`
 
     @media ${MEDIA.mediumUp} {
       max-height: 11rem;
-      overflow-y: auto;
     }
 
     > b {
@@ -425,6 +429,48 @@ const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networ
   return tokenAddresses
 }
 
+interface ChooseTokenInput {
+  tokens: TokenDetails[]
+  token: TokenDetails | null
+  tokenSymbolFromUrl?: string
+  defaultTokenSymbol: 'DAI' | 'USDC'
+}
+
+const chooseTokenWithFallback = ({
+  tokens,
+  token,
+  tokenSymbolFromUrl,
+  defaultTokenSymbol,
+}: ChooseTokenInput): TokenDetails => {
+  return (
+    token ||
+    (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())
+      ? getToken('address', tokenSymbolFromUrl, tokens)
+      : getToken('symbol', tokenSymbolFromUrl, tokens)) ||
+    (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
+  )
+}
+
+function buildUrl(params: {
+  sell: string
+  price: string
+  from: string
+  expires: string
+  sellToken: TokenDetails
+  buyToken: TokenDetails
+}): string {
+  const { sell, price, from, expires, sellToken, buyToken } = params
+
+  const searchQuery = buildSearchQuery({
+    sell,
+    price,
+    from,
+    expires,
+  })
+
+  return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -447,7 +493,9 @@ const TradeWidget: React.FC = () => {
       : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: sellTokenSymbol, buy: receiveTokenSymbol } = useParams()
+  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
+  const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
   const {
     sellAmount: sellParam,
     price: priceParam,
@@ -461,22 +509,57 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [sellToken, setSellToken] = useState(
-    () =>
-      trade.sellToken ||
-      (sellTokenSymbol && isAddress(sellTokenSymbol?.toLowerCase())
-        ? getToken('address', sellTokenSymbol, tokens)
-        : getToken('symbol', sellTokenSymbol, tokens)) ||
-      (getToken('symbol', 'DAI', tokens) as Required<TokenDetails>),
+  const [sellToken, setSellToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.sellToken,
+      tokens,
+      tokenSymbolFromUrl: sellTokenSymbol,
+      defaultTokenSymbol: 'DAI',
+    }),
   )
-  const [receiveToken, setReceiveToken] = useState(
-    () =>
-      trade.buyToken ||
-      (receiveTokenSymbol && isAddress(receiveTokenSymbol?.toLowerCase())
-        ? getToken('address', receiveTokenSymbol, tokens)
-        : getToken('symbol', receiveTokenSymbol, tokens)) ||
-      (getToken('symbol', 'USDC', tokens) as Required<TokenDetails>),
+  const [receiveToken, setReceiveToken] = useState(() =>
+    chooseTokenWithFallback({
+      token: trade.buyToken,
+      tokens,
+      tokenSymbolFromUrl: receiveTokenSymbol,
+      defaultTokenSymbol: 'USDC',
+    }),
   )
+
+  useEffect(() => {
+    //  when switching networks
+    // trade stays filled with last tokens
+    // which may not be available on the new network
+    if (trade.sellToken) {
+      // check if it should be different
+      const sellTokenOrFallback = chooseTokenWithFallback({
+        // don't consider token from trade from wrong network valid
+        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
+          ? trade.sellToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
+        tokenSymbolFromUrl: sellTokenSymbol, // from url params
+        defaultTokenSymbol: 'DAI', // default sellToken
+      })
+      setSellToken(sellTokenOrFallback)
+    }
+
+    if (trade.buyToken) {
+      const buyTokenOrFallback = chooseTokenWithFallback({
+        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
+          ? trade.buyToken
+          : null,
+        tokens: tokenListApi.getTokens(networkIdOrDefault),
+        tokenSymbolFromUrl: receiveTokenSymbol,
+        defaultTokenSymbol: 'USDC', // default buyToken
+      })
+      setReceiveToken(buyTokenOrFallback)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [networkIdOrDefault])
+  // don't need to depend on more than network as everything else updates together
+  // also avoids excessive setStates
+
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
 
@@ -564,13 +647,15 @@ const TradeWidget: React.FC = () => {
     setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
-  const searchQuery = buildSearchQuery({
+  const url = buildUrl({
     sell: sellValue,
     price: priceValue,
     from: validFromValue,
     expires: validUntilValue,
+    sellToken: sellToken,
+    buyToken: receiveToken,
   })
-  const url = `/trade/${sellToken.symbol}-${receiveToken.symbol}?${searchQuery}`
+  // Updates page URL with parameters from context
   useURLParams(url, true)
 
   // TESTING
@@ -824,7 +909,7 @@ const TradeWidget: React.FC = () => {
       const walletInfo = await connectWallet()
 
       // Then place the order if connection was successful
-      if (walletInfo && walletInfo.networkId && walletInfo.userAddress) {
+      if (walletInfo && walletInfo.networkId === Network.Mainnet && walletInfo.userAddress) {
         await _placeOrder({
           ...orderParams,
           networkId: walletInfo.networkId,
@@ -913,7 +998,7 @@ const TradeWidget: React.FC = () => {
             disabled={isSubmitting}
             tabIndex={1}
           >
-            {isSubmitting && <FontAwesomeIcon icon={faSpinner} size="lg" spin={isSubmitting} />}{' '}
+            {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Please select different tokens' : 'Submit limit order'}
           </SubmitButton>
         </WrappedForm>

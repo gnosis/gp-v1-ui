@@ -1,15 +1,19 @@
+import { useMemo } from 'react'
 import { toast } from 'toastify'
 import BN from 'bn.js'
 import { assert } from '@gnosis.pm/dex-js'
 
-import { depositApi, erc20Api } from 'api'
+// types, consts and utils
 import { TokenBalanceDetails } from 'types'
 import { ALLOWANCE_MAX_VALUE } from 'const'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-
-import { formatAmount, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
+import { formatSmart, formatAmountFull, logDebug, getToken, safeFilledToken } from 'utils'
 import { composeOptionalParams } from 'utils/transaction'
 
+// Api
+import { depositApi, erc20Api } from 'api'
+
+// Hooks and reducers
+import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
 import {
   TokenLocalState,
@@ -19,7 +23,6 @@ import {
   setHighlightAndWithdrawing,
   setEnabledAction,
 } from 'reducers-actions'
-import { useMemo } from 'react'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
 
@@ -100,7 +103,7 @@ export const useRowActions = (params: Params): Result => {
         })
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
-        toast.success(`Successfully deposited ${formatAmount(amount, decimals)} ${symbol}`)
+        toast.success(`Successfully deposited ${formatSmart(amount, decimals)} ${symbol}`)
       } catch (error) {
         console.error('DepositWidget:useRowActions] Error depositing', error)
         toast.error(`Error depositing: ${error.message}`)
@@ -137,7 +140,7 @@ export const useRowActions = (params: Params): Result => {
         })
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
 
-        toast.success(`Successfully requested withdraw of ${formatAmount(amount, decimals)} ${symbol}`)
+        toast.success(`Successfully requested withdraw of ${formatSmart(amount, decimals)} ${symbol}`)
       } catch (error) {
         console.error('DepositWidget:useRowActions] Error requesting withdraw', error)
         toast.error(`Error requesting withdraw: ${error.message}`)
@@ -173,7 +176,7 @@ export const useRowActions = (params: Params): Result => {
         })
 
         logDebug(`[DepositWidget:useRowActions] The transaction has been mined: ${receipt.transactionHash}`)
-        toast.success(`Withdraw of ${formatAmount(pendingWithdraw.amount, decimals)} ${symbol} completed`)
+        toast.success(`Withdraw of ${formatSmart(pendingWithdraw.amount, decimals)} ${symbol} completed`)
       } catch (error) {
         console.error('[DepositWidget:useRowActions] Error executing the withdraw request', error)
         toast.error(`Error executing the withdraw request: ${error.message}`)

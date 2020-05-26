@@ -1,22 +1,31 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
+
+// Assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
-import Form from './Form'
-import TokenImg from 'components/TokenImg'
-import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
-
-import useNoScroll from 'hooks/useNoScroll'
-
+// const, utils, types
 import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
-import { formatAmount, formatAmountFull } from 'utils'
+import { formatSmart, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
-import { TokenLocalState } from 'reducers-actions'
+
+// Components
+import TokenImg from 'components/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
+import { Spinner } from 'components/Spinner'
+
+// DepositWidget: subcomponents
+import Form from 'components/DepositWidget/Form'
+import { TokenRow, RowClaimButton, RowClaimSpan } from 'components/DepositWidget/Styled'
+
+// Hooks and reducers
+import useNoScroll from 'hooks/useNoScroll'
+import { TokenLocalState } from 'reducers-actions'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
+  ethBalance: BN | null
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
   onSubmitWithdraw: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
@@ -26,10 +35,11 @@ export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   innerHeight?: number
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+const spinner = <Spinner style={{ marginRight: 7 }} />
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
+    ethBalance,
     tokenBalances,
     onSubmitDeposit,
     onSubmitWithdraw,
@@ -92,7 +102,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           title={formatAmountFull({ amount: totalExchangeBalance, precision: decimals }) || ''}
         >
           {depositing && spinner}
-          {formatAmount(totalExchangeBalance, decimals)}
+          {formatSmart(totalExchangeBalance, decimals)}
         </td>
         <td
           data-label="Pending Withdrawals"
@@ -102,7 +112,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>
               <RowClaimButton className="success" onClick={onClaim} disabled={claiming}>
                 {(claiming || withdrawing) && spinner}
-                {formatAmount(pendingWithdraw.amount, decimals)}
+                {formatSmart(pendingWithdraw.amount, decimals)}
                 <RowClaimSpan className={claiming || withdrawing ? 'disabled' : 'success'}>Claim</RowClaimSpan>
               </RowClaimButton>
             </>
@@ -110,28 +120,29 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>
               {withdrawing && spinner}
               <FontAwesomeIcon icon={faClock} style={{ marginRight: 7 }} />
-              {formatAmount(pendingWithdraw.amount, decimals)}
+              {formatSmart(pendingWithdraw.amount, decimals)}
             </>
           ) : (
             <>{withdrawing && spinner}0</>
           )}
         </td>
-        <td data-label="Wallet" title={formatAmountFull({ amount: walletBalance, precision: decimals }) || ''}>
+        <td data-label="Wallet">
           {isWeth ? (
             <ul>
-              <li className="not-implemented">
-                0.1 ETH <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
+              <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
+                {ethBalance ? formatSmart(ethBalance, decimals) : '-'} ETH{' '}
+                <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
-              <li>
+              <li title={formatAmountFull({ amount: walletBalance, precision: decimals }) || undefined}>
                 {(claiming || depositing) && spinner}
-                {formatAmount(walletBalance, decimals) + ' '}
+                {formatSmart(walletBalance, decimals) + ' '}
                 WETH <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
               </li>
             </ul>
           ) : (
             <>
               {(claiming || depositing) && spinner}
-              {formatAmount(walletBalance, decimals)}
+              {formatSmart(walletBalance, decimals)}
             </>
           )}
         </td>
@@ -150,11 +161,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
                 {enabling ? (
                   <>
-                    <FontAwesomeIcon icon={faSpinner} spin />
-                    Enabling {symbol}
+                    <Spinner />
+                    Enabling
                   </>
                 ) : (
-                  <>Enable {symbol}</>
+                  <>Enable Deposit</>
                 )}
               </button>
             </>

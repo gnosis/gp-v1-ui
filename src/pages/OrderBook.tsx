@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, ChangeEvent } from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
 import OrderBookWidget from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
@@ -7,7 +7,9 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
-import { MEDIA } from 'const'
+import { Input } from 'components/Input'
+import { MEDIA, ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
+import InputBox from 'components/InputBox'
 
 const OrderBookPage = styled(ContentPage)`
   padding: 2.4rem 0rem;
@@ -55,6 +57,23 @@ const OrderBookWrapper = styled.div`
   > span:last-of-type > p {
     margin: 0 0 0 1rem;
   }
+
+  ${InputBox} {
+    padding: 0 0 0 3rem;
+
+    input {
+      padding: 0 1rem;
+    }
+
+    label {
+      margin: 0 1rem;
+      text-transform: capitalize;
+      color: var(--color-text-primary);
+      font-size: 1.5rem;
+      font-weight: bold;
+      line-height: 5rem;
+    }
+  }
 `
 
 const OrderBook: React.FC = () => {
@@ -62,6 +81,7 @@ const OrderBook: React.FC = () => {
   const tokenList = useTokenList(networkIdOrDefault)
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
+  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())
 
   const tokensLoaded = tokenList.length !== 0
   useEffect(() => {
@@ -90,9 +110,26 @@ const OrderBook: React.FC = () => {
         <span>
           <TokenSelector tokens={tokenList} selected={quoteToken} onChange={setQuoteToken} /> <p>Ask</p>
         </span>
+        <span>
+          <InputBox>
+            <label>Hops</label>
+            <Input
+              value={hops}
+              type="number"
+              min="0"
+              max={ORDER_BOOK_HOPS_MAX.toString()}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => {
+                const hopsValue = e.target.value
+                if (hopsValue && !isNaN(Number(hopsValue))) {
+                  setHops(hopsValue)
+                }
+              }}
+            />
+          </InputBox>
+        </span>
       </OrderBookWrapper>
 
-      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} />
+      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} hops={+hops} />
     </OrderBookPage>
   )
 }

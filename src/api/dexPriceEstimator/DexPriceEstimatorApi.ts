@@ -1,9 +1,10 @@
 import BigNumber from 'bignumber.js'
 import { assert, TEN_BIG_NUMBER, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
-import { Network } from 'types'
+import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
+  getOrderBookUrl(params: OrderBookParams): string
 }
 
 interface GetPriceParams {
@@ -12,6 +13,13 @@ interface GetPriceParams {
   quoteToken: Token
   amountInUnits?: BigNumber | string
   inWei?: boolean
+}
+
+interface OrderBookParams {
+  networkId: number
+  baseTokenId: number
+  quoteTokenId: number
+  hops?: number
 }
 
 interface Token {
@@ -33,32 +41,23 @@ interface GetPriceResponse {
   sellAmountInQuote: string
 }
 
-export interface Params {
-  networkIds: number[]
+export interface PriceEstimatorEndpoint {
+  networkId: number
+  url: string
 }
 
-function getDexPriceEstimatorUrl(networkId: number): string {
-  const basePath = 'api/v1/'
+export type DexPriceEstimatorParams = PriceEstimatorEndpoint[]
 
-  switch (networkId) {
-    case Network.Mainnet:
-      return `https://dex-price-estimator.gnosis.io/${basePath}`
-    case Network.Rinkeby:
-      return `https://dex-price-estimator.rinkeby.gnosis.io/${basePath}`
-    default:
-      throw new Error(`dex-price-estimator not available for network ${networkId}`)
-  }
+function getDexPriceEstimatorUrl(baseUlr: string): string {
+  return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
 }
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
-  private urlsByNetwork: { [networkId: number]: string }
+  private urlsByNetwork: { [networkId: number]: string } = {}
 
-  public constructor(params: Params) {
-    const { networkIds } = params
-
-    this.urlsByNetwork = {}
-    networkIds.forEach(networkId => {
-      this.urlsByNetwork[networkId] = getDexPriceEstimatorUrl(networkId)
+  public constructor(params: DexPriceEstimatorParams) {
+    params.forEach(endpoint => {
+      this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(endpoint.url)
     })
   }
 
@@ -95,6 +94,16 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
   }
 
+  public getOrderBookUrl(params: OrderBookParams): string {
+    const { networkId, baseTokenId, quoteTokenId, hops = ORDER_BOOK_HOPS_DEFAULT } = params
+    assert(hops >= 0, 'Hops should be positive')
+    assert(hops <= ORDER_BOOK_HOPS_MAX, 'Hops should be not be greater than ' + ORDER_BOOK_HOPS_MAX)
+
+    const baseUrl = this._getBaseUrl(networkId)
+
+    return `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+  }
+
   private parsePricesResponse(
     baseAmountInAtoms: string,
     baseDecimals: number,
@@ -109,8 +118,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   }
 
   private async query<T>(networkId: number, queryString: string): Promise<T | null> {
-    const baseUrl = this.urlsByNetwork[networkId]
-    assert(baseUrl, `Dex-price-estimator not available for network id ${networkId}`)
+    const baseUrl = this._getBaseUrl(networkId)
 
     const url = baseUrl + queryString
 
@@ -127,5 +135,12 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
 
     return JSON.parse(body)
+  }
+
+  private _getBaseUrl(networkId: number): string {
+    const baseUrl = this.urlsByNetwork[networkId]
+    assert(baseUrl, `Dex-price-estimator not available for network id ${networkId}`)
+
+    return baseUrl
   }
 }

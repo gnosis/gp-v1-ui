@@ -52,7 +52,7 @@ export interface PendingFlux {
   batchId: number
 }
 
-export interface Params {
+export interface DepositApiDependencies {
   web3: Web3
   fetchGasPrice(): Promise<string | undefined>
 }
@@ -60,14 +60,14 @@ export interface Params {
 export class DepositApiImpl implements DepositApi {
   protected _contractPrototype: BatchExchangeContract
   protected web3: Web3
-  protected static _contractsCache: { [network: number]: { [address: string]: BatchExchangeContract } } = {}
+  protected static _contractsCache: { [network: number]: BatchExchangeContract } = {}
 
-  protected fetchGasPrice: Params['fetchGasPrice']
+  protected fetchGasPrice: DepositApiDependencies['fetchGasPrice']
 
-  public constructor(injectedDependencies: Params) {
+  public constructor(injectedDependencies: DepositApiDependencies) {
     Object.assign(this, injectedDependencies)
 
-    this._contractPrototype = new this.web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
+    this._contractPrototype = (new this.web3.eth.Contract(batchExchangeAbi) as unknown) as BatchExchangeContract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,7 +146,7 @@ export class DepositApiImpl implements DepositApi {
       .deposit(tokenAddress, amount.toString())
       .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
 
-    if (txOptionalParams && txOptionalParams.onSentTransaction) {
+    if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
     }
 
@@ -194,33 +194,16 @@ export class DepositApiImpl implements DepositApi {
   /********************************    private methods   ********************************/
 
   protected async _getContract(networkId: number): Promise<BatchExchangeContract> {
-    return this._getContractForNetwork(networkId)
-  }
-
-  protected _getContractForNetwork(networkId: number): BatchExchangeContract {
     const address = this.getContractAddress(networkId)
-
     assert(address, `EpochTokenLocker was not deployed to network ${networkId}`)
 
-    return this._getContractAtAddress(networkId, address)
-  }
-
-  protected _getContractAtAddress(networkId: number, address: string): BatchExchangeContract {
-    let contract: BatchExchangeContract | undefined = undefined
-
-    if (DepositApiImpl._contractsCache[networkId]) {
-      contract = DepositApiImpl._contractsCache[networkId][address]
-    } else {
-      DepositApiImpl._contractsCache[networkId] = {}
+    let contract: BatchExchangeContract | undefined = DepositApiImpl._contractsCache[networkId]
+    if (!contract) {
+      contract = this._contractPrototype.clone()
+      contract.options.address = address
+      DepositApiImpl._contractsCache[networkId] = contract
     }
 
-    if (contract) {
-      return contract
-    }
-
-    const newContract = this._contractPrototype.clone()
-    newContract.options.address = address
-
-    return (DepositApiImpl._contractsCache[networkId][address] = newContract)
+    return contract
   }
 }
