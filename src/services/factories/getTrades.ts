@@ -28,7 +28,7 @@ export function getTradesFactory(factoryParams: {
   const { web3, exchangeApi, getTokens } = factoryParams
 
   async function getBlockTimePair(blockNumber: number): Promise<[number, number]> {
-    return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp]
+    return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp * 1000]
   }
 
   async function getOrderPair(userAddress: string, networkId: number, orderId: string): Promise<[string, Order]> {
@@ -71,7 +71,7 @@ export function getTradesFactory(factoryParams: {
     )
 
     const trades = tradeEvents.reduce<Trade[]>((acc, event) => {
-      const timestamp = (blockTimes.get(event.blockNumber) as number) * 1000
+      const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
       // TODO: this might be empty
       const buyToken = tokens.get(event.buyTokenId) as TokenDetails
