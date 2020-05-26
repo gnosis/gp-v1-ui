@@ -21,11 +21,14 @@ import {
   Subscriptions,
 } from '@gnosis.pm/dapp-ui'
 
-import { logDebug, toBN, gasPriceEncoder } from 'utils'
+import { logDebug, toBN, txDataEncoder } from 'utils'
 import { INFURA_ID } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
+import { composeProvider } from './composeProvider'
+import fetchGasPriceFactory from 'api/gasStation'
+import { earmarkTxData } from 'api/earmark'
 
 export interface WalletApi {
   isConnected(): boolean | Promise<boolean>
@@ -244,8 +247,13 @@ export class WalletApiImpl implements WalletApi {
 
     closeOpenWebSocketConnection(this._web3)
 
+    const fetchGasPrice = fetchGasPriceFactory(this)
+    const earmarkingFunction = async (data?: string): Promise<string> => earmarkTxData(data, await this.userPrintAsync)
+
+    const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTxData: earmarkingFunction })
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._web3.setProvider(provider as any)
+    this._web3.setProvider(composedProvider as any)
     logDebug('[WalletApiImpl] Connected')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -471,7 +479,7 @@ export class WalletApiImpl implements WalletApi {
       screenSize,
     }
 
-    const encoded = gasPriceEncoder(flagObject)
+    const encoded = txDataEncoder(flagObject)
 
     logDebug('Encoded object', flagObject)
     logDebug('User Wallet print', encoded)

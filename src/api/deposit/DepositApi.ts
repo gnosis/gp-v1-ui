@@ -54,15 +54,12 @@ export interface PendingFlux {
 
 export interface DepositApiDependencies {
   web3: Web3
-  fetchGasPrice(): Promise<string | undefined>
 }
 
 export class DepositApiImpl implements DepositApi {
   protected _contractPrototype: BatchExchangeContract
   protected web3: Web3
   protected static _contractsCache: { [network: number]: BatchExchangeContract } = {}
-
-  protected fetchGasPrice: DepositApiDependencies['fetchGasPrice']
 
   public constructor(injectedDependencies: DepositApiDependencies) {
     Object.assign(this, injectedDependencies)
@@ -142,9 +139,7 @@ export class DepositApiImpl implements DepositApi {
   }: DepositParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
-    const tx = contract.methods
-      .deposit(tokenAddress, amount.toString())
-      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -163,9 +158,7 @@ export class DepositApiImpl implements DepositApi {
   }: RequestWithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
-    const tx = contract.methods
-      .requestWithdraw(tokenAddress, amount.toString())
-      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -179,9 +172,7 @@ export class DepositApiImpl implements DepositApi {
 
   public async withdraw({ userAddress, tokenAddress, networkId, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods
-      .withdraw(userAddress, tokenAddress)
-      .send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
