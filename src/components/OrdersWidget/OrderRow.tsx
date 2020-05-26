@@ -30,7 +30,6 @@ import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from './OrderRow.styled'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
-import { tokenListApi } from 'api'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
@@ -317,16 +316,6 @@ interface Props {
 
 const onError = onErrorFactory('Failed to fetch token')
 
-interface AddTokenToList {
-  token: TokenDetails | null
-  networkId: number
-}
-const addTokenToListIfNotAlready = ({ token, networkId }: AddTokenToList): void => {
-  if (token && !tokenListApi.hasToken({ tokenAddress: token.address, networkId })) {
-    tokenListApi.addToken({ token, networkId })
-  }
-}
-
 const OrderRow: React.FC<Props> = props => {
   const {
     order,
@@ -349,17 +338,6 @@ const OrderRow: React.FC<Props> = props => {
     fetchToken(order.buyTokenId, order.id, networkId, setBuyToken, isPendingOrder).catch(onError)
     fetchToken(order.sellTokenId, order.id, networkId, setSellToken, isPendingOrder).catch(onError)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
-
-  useEffect(() => {
-    // if token somehow not in list
-    // as it was traded already we assume it to be a valid token
-    // and know to user
-    // and add it to USER_TOKEN_LIST automatically
-    addTokenToListIfNotAlready({ token: sellToken, networkId })
-  }, [networkId, sellToken])
-  useEffect(() => {
-    addTokenToListIfNotAlready({ token: buyToken, networkId })
-  }, [networkId, buyToken])
 
   const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
