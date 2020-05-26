@@ -33,6 +33,8 @@ export const ORDER_FILLED_FACTOR = new BN(10000) // 0.01%
 
 export const CONFIRMATION_BLOCKS = 4 // ~ 4*15s = 1m
 
+export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
+
 export const APP_NAME = 'fuse'
 
 export const ETHER_PNG =

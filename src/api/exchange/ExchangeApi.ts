@@ -143,6 +143,7 @@ export interface Trade extends BaseTradeEvent {
   hashKey: string // orderId + batchId, to find reverts
   // indexOnBatch: number // tracks trade position on batch, in case of reverts
   timestamp: number
+  settlingDate: Date
   buyToken: TokenDetails
   sellToken: TokenDetails
   limitPrice: BigNumber
