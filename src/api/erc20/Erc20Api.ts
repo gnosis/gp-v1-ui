@@ -80,7 +80,6 @@ export interface Erc20Api {
 
 export interface Erc20ApiDependencies {
   web3: Web3
-  fetchGasPrice(): Promise<string | undefined>
 }
 
 /**
@@ -92,8 +91,6 @@ export class Erc20ApiImpl implements Erc20Api {
   private readonly localErc20Details: Erc20Details
 
   private static _contractsCache: { [network: number]: { [address: string]: Erc20Contract } } = {}
-
-  private fetchGasPrice: Erc20ApiDependencies['fetchGasPrice']
 
   public constructor(injectedDependencies: Erc20ApiDependencies) {
     Object.assign(this, injectedDependencies)
@@ -186,7 +183,6 @@ export class Erc20ApiImpl implements Erc20Api {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
-      gasPrice: await this.fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -209,7 +205,6 @@ export class Erc20ApiImpl implements Erc20Api {
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: userAddress,
-      gasPrice: await this.fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -232,7 +227,6 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({
       from: fromAddress,
-      gasPrice: await this.fetchGasPrice(),
     })
 
     if (txOptionalParams?.onSentTransaction) {
