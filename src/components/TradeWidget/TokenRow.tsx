@@ -188,7 +188,7 @@ const TokenRow: React.FC<Props> = ({
         </i>
         <i>Sell amount exceeds your balance by</i>
         <strong>
-          {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
+          {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
         <Link to="/wallet" className="depositNow">
           + Deposit {selectedToken.symbol}
