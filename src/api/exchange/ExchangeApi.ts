@@ -130,9 +130,9 @@ export interface BaseTradeEvent {
   buyAmount: BN
   // block related
   txHash: string
-  txIndex: number
+  eventIndex: number
   blockNumber: number
-  id: string // txHash + | + txIndex
+  id: string // txHash | eventIndex
 }
 
 /**
@@ -260,7 +260,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const {
       returnValues: { orderId, sellToken: sellTokenId, buyToken: buyTokenId, executedSellAmount, executedBuyAmount },
       transactionHash: txHash,
-      transactionIndex: txIndex,
+      logIndex: eventIndex,
       blockNumber,
     } = event
 
@@ -271,9 +271,9 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       sellAmount: new BN(executedSellAmount),
       buyAmount: new BN(executedBuyAmount),
       txHash,
-      txIndex,
+      eventIndex,
       blockNumber,
-      id: `${txHash}|${txIndex}`,
+      id: `${txHash}|${eventIndex}`,
     }
 
     return trade
