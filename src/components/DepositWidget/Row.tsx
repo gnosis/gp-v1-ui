@@ -1,20 +1,28 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
+
+// Assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner, faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
+import { faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
-import Form from './Form'
-import TokenImg from 'components/TokenImg'
-import { TokenRow, RowClaimButton, RowClaimSpan } from './Styled'
-
-import useNoScroll from 'hooks/useNoScroll'
-
+// const, utils, types
 import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { formatAmount, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
-import { TokenLocalState } from 'reducers-actions'
+
+// Components
+import TokenImg from 'components/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
+import { Spinner } from 'components/Spinner'
+
+// DepositWidget: subcomponents
+import Form from 'components/DepositWidget/Form'
+import { TokenRow, RowClaimButton, RowClaimSpan } from 'components/DepositWidget/Styled'
+
+// Hooks and reducers
+import useNoScroll from 'hooks/useNoScroll'
+import { TokenLocalState } from 'reducers-actions'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   ethBalance: BN | null
@@ -27,7 +35,7 @@ export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   innerHeight?: number
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7 }} spin />
+const spinner = <Spinner style={{ marginRight: 7 }} />
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
@@ -153,7 +161,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
                 {enabling ? (
                   <>
-                    <FontAwesomeIcon icon={faSpinner} spin />
+                    <Spinner />
                     Enabling
                   </>
                 ) : (

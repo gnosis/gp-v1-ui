@@ -1,6 +1,6 @@
 import styled from 'styled-components'
-import { ProgressStepText } from './PoolingWidget.styled'
 import InputBox from 'components/InputBox'
+import { ProgressStepText } from 'components/PoolingWidget/PoolingWidget.styled'
 
 export const DefineSpreadWrapper = styled(InputBox)`
   flex-flow: column nowrap;

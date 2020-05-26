@@ -7,12 +7,11 @@ import TokenImg from '../components/TokenImg'
 import styled from 'styled-components'
 import { tokenListApi } from 'api'
 import { TokenFromExchange } from 'services/factories'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { useWalletConnection } from './useWalletConnection'
+import Spinner from 'components/Spinner'
 
 interface ExtraProps {
   focused: boolean
@@ -178,7 +177,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
   }
 }
 
-const spinner = <FontAwesomeIcon icon={faSpinner} style={{ marginRight: 7, alignSelf: 'center' }} spin />
+const spinner = <Spinner style={{ marginRight: 7, alignSelf: 'center' }} />
 
 const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): React.ReactElement => {
   // in fetching state -- show spinner

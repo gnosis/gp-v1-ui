@@ -40,9 +40,9 @@ const About: React.FC = () => {
   })
   return (
     <AboutWrapper>
-      <h1>About Mesa</h1>
+      <h1>About {CONFIG.name}</h1>
       <p>
-        Mesa it&apos;s an Open Source interface for{' '}
+        <strong>{CONFIG.name}</strong> is an Open Source interface for{' '}
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
         </a>
@@ -69,7 +69,7 @@ const About: React.FC = () => {
       <h2>Versions:</h2>
       <ul>
         <li>
-          Mesa:&nbsp;
+          {CONFIG.name}:&nbsp;
           <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
             v{VERSION}
           </a>{' '}
