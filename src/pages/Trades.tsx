@@ -28,7 +28,7 @@ const Trades: React.FC = () => {
 
   return (
     <ContentPage>
-      <CardTable $columns="repeat(10, 1fr)" $rowSeparation="0">
+      <CardTable $columns="repeat(9, 1fr)" $rowSeparation="0">
         <thead>
           <tr>
             <th>Market</th>
@@ -38,7 +38,6 @@ const Trades: React.FC = () => {
             <th>Received</th>
             <th>Type</th>
             <th>Time</th>
-            <th>BatchId | OrderId</th>
             <th>Tx</th>
             <th>Settled</th>
           </tr>
@@ -61,9 +60,6 @@ const Trades: React.FC = () => {
               </td>
               <td>{classifyTrade(trade)}</td>
               <td>{new Date(trade.timestamp).toISOString()}</td>
-              <td>
-                {trade.batchId} | {trade.orderId}
-              </td>
               <td>
                 <EtherscanLink type={'tx'} identifier={trade.txHash} networkId={networkId} />
               </td>
