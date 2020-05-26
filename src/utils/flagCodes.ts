@@ -19,7 +19,8 @@ export interface Flag<T extends string> {
 }
 
 // OUR specific flags
-const SENTINEL = '12'
+// lowercase hex value to be appended to tx.data
+const SENTINEL = 'dec0de'
 
 type DxFlagName = 'provider' | 'mobile' | 'browser' | 'screenSize'
 
