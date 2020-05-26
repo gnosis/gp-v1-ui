@@ -61,7 +61,7 @@ const Trades: React.FC = () => {
               <td>{classifyTrade(trade)}</td>
               <td>{new Date(trade.timestamp).toISOString()}</td>
               <td>
-                <EtherscanLink type={'tx'} identifier={trade.txHash} networkId={networkId} />
+                <EtherscanLink type={'event'} identifier={trade.txHash} networkId={networkId} />
               </td>
               <td>
                 {trade.settlingDate > now ? <StatusCountdown timeoutDelta={60} /> : <FontAwesomeIcon icon={faCheck} />}
