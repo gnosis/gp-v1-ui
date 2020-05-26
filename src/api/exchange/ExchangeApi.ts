@@ -140,7 +140,7 @@ export interface BaseTradeEvent {
  */
 export interface Trade extends BaseTradeEvent {
   batchId: number
-  hashKey: string // orderId + batchId, to find reverts
+  revertKey: string // batchId | orderId, to find reverts
   // indexOnBatch: number // tracks trade position on batch, in case of reverts
   timestamp: number
   settlingDate: Date
@@ -178,6 +178,12 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     super(injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
+  }
+
+  // TODO: Not very happy with this method. Can't be used inside the class because batchId is only known with block data
+  // TODO: Don't really know where to put it
+  public static buildTradeRevertKey(batchId: number, orderId: string): string {
+    return batchId + '|' + orderId
   }
 
   public async getPastTrades({

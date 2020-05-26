@@ -83,8 +83,8 @@ export function getTradesFactory(factoryParams: {
         ...event,
         batchId,
         timestamp,
-        hashKey: event.orderId + batchId,
         settlingDate: calculateSettlingDate(batchId),
+        revertKey: ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId),
         buyToken,
         sellToken,
         limitPrice: calculatePrice({
