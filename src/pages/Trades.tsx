@@ -44,7 +44,7 @@ const Trades: React.FC = () => {
         </thead>
         <tbody>
           {trades.map((trade, index) => (
-            <tr key={index} data-order-id={trade.orderId} data-trade-id={trade.id}>
+            <tr key={index} data-order-id={trade.orderId} data-batch-id={trade.batchId}>
               <td>
                 {trade.sellToken.symbol}/{trade.buyToken.symbol}
               </td>
