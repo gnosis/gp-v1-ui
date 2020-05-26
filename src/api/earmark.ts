@@ -20,5 +20,5 @@ export const earmarkGasPrice = (gasPrice: string, userPrint: string): string => 
   return markedGasPrice
 }
 
-// simple concatetaion, with '0x' for empty data to have `0x<userPrint>` at the least
+// simple concatenation, with '0x' for empty data to have `0x<userPrint>` at the least
 export const earmarkTxData = (data = '0x', userPrint: string): string => data + userPrint
