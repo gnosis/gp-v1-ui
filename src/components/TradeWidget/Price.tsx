@@ -77,7 +77,7 @@ export const PriceInputBox = styled.div`
 
   label > div {
     position: absolute;
-    width: 7rem;
+    width: 7.7rem;
     right: 1rem;
     top: 0;
     bottom: 0;
@@ -106,6 +106,9 @@ export const PriceInputBox = styled.div`
     }
     > small:nth-child(2) {
       max-width: 6%;
+      margin: 0 0.08rem;
+      font-size: 1.5rem;
+      font-weight: normal;
     }
   }
 
@@ -121,7 +124,7 @@ export const PriceInputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 8.5rem 0 1rem;
+    padding: 0 9rem 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {
