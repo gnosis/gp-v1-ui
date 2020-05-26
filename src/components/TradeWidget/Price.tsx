@@ -75,16 +75,19 @@ export const PriceInputBox = styled.div`
     }
   }
 
-  label > small {
+  label > div {
     position: absolute;
+    width: 7rem;
     right: 1rem;
     top: 0;
     bottom: 0;
     margin: auto;
     display: flex;
+    flex-flow: row nowrap;
     align-items: center;
+    justify-content: space-evenly;
     opacity: 0.75;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--color-text-primary);
     letter-spacing: -0.05rem;
     text-align: right;
@@ -93,6 +96,16 @@ export const PriceInputBox = styled.div`
     @media ${MEDIA.mobile} {
       font-size: 1rem;
       letter-spacing: 0.03rem;
+    }
+    > small:not(:nth-child(2)) {
+      font-size: inherit;
+      max-width: 47%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    > small:nth-child(2) {
+      max-width: 6%;
     }
   }
 
@@ -210,9 +223,11 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <small>
-            {sellToken.symbol}/{receiveToken.symbol}
-          </small>
+          <div>
+            <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <small>/</small>
+            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+          </div>
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
@@ -229,9 +244,11 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <small>
-            {receiveToken.symbol}/{sellToken.symbol}
-          </small>
+          <div>
+            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+            <small>/</small>
+            <small title={sellToken.symbol}>{sellToken.symbol}</small>
+          </div>
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
       </PriceInputBox>
