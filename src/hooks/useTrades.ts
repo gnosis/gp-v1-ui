@@ -8,6 +8,7 @@ import { appendTrades } from 'reducers-actions/trades'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
+import { CONFIRMATION_BLOCKS } from 'const'
 
 // TODO: (on global state) store trades to local storage
 // TODO: account for reverts
@@ -21,12 +22,16 @@ export function useTrades(): Trade[] {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
 
   useEffect(() => {
-    if (userAddress && networkId && blockNumber && (!lastCheckedBlock || lastCheckedBlock < blockNumber)) {
-      // TODO: right now checking for new trades on every block.
-      // TODO: for optimization, use a polling interval OR bloomfilter
-      getTrades({ userAddress, networkId, fromBlock: lastCheckedBlock }).then(newTrades =>
-        dispatch(appendTrades(newTrades, blockNumber)),
-      )
+    // Check only up to `latest - CONFIRMATION_BLOCKS` to reduce chance of re-orgs
+    const toBlock = blockNumber && blockNumber - CONFIRMATION_BLOCKS
+
+    if (userAddress && networkId && toBlock && (!lastCheckedBlock || lastCheckedBlock < toBlock)) {
+      getTrades({
+        userAddress,
+        networkId,
+        fromBlock: lastCheckedBlock,
+        toBlock,
+      }).then(newTrades => dispatch(appendTrades(newTrades, toBlock)))
     }
   }, [userAddress, networkId, blockNumber, lastCheckedBlock, dispatch])
 

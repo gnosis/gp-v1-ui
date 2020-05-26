@@ -8,6 +8,7 @@ interface GetTradesParams {
   networkId: number
   userAddress: string
   fromBlock?: number
+  toBlock?: number | 'latest' | 'pending'
 }
 
 export function getTradesFactory(factoryParams: {

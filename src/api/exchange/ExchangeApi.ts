@@ -39,6 +39,7 @@ export type HasTokenParams = GetTokenIdByAddressParams
 
 export interface PastEventsParams extends GetOrdersParams {
   fromBlock?: number
+  toBlock?: number | string
 }
 
 export interface SubscriptionParams extends GetOrdersParams {
@@ -182,6 +183,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     userAddress,
     networkId,
     fromBlock: _fromBlock,
+    toBlock: _toBlock,
   }: PastEventsParams): Promise<BaseTradeEvent[]> {
     const contract = await this._getContract(networkId)
 
@@ -191,12 +193,15 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // updating trades based on polling
     const fromBlock = _fromBlock ?? CONTRACT_DEPLOYMENT_BLOCK[networkId]
 
+    // Optionally fetch events until a given block.
+    // Defaults to 'latest'
+    const toBlock = _toBlock ?? 'latest'
+
     const tradeEvents = await contract.getPastEvents('Trade', {
       filter: { owner: userAddress },
       fromBlock,
+      toBlock,
     })
-
-    const toBlock = tradeEvents[tradeEvents.length - 1]?.blockNumber
 
     logDebug(
       `[ExchangeApiImpl] Fetched ${
