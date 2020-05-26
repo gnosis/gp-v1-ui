@@ -67,7 +67,7 @@ export class DepositApiImpl implements DepositApi {
   public constructor(injectedDependencies: DepositApiDependencies) {
     Object.assign(this, injectedDependencies)
 
-    this._contractPrototype = new this.web3.eth.Contract(batchExchangeAbi) as BatchExchangeContract
+    this._contractPrototype = (new this.web3.eth.Contract(batchExchangeAbi) as unknown) as BatchExchangeContract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

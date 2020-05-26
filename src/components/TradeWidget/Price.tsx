@@ -13,7 +13,7 @@ import { OrderBookBtn } from 'components/OrderBookBtn'
 
 // TradeWidget: subcomponents
 import { TradeFormData } from 'components/TradeWidget'
-import { FormInputError } from 'components/TradeWidget/FormMessage'
+import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 
 const Wrapper = styled.div`
@@ -25,6 +25,7 @@ const Wrapper = styled.div`
 
   > strong {
     display: flex;
+    align-items: center;
     text-transform: capitalize;
     color: var(--color-text-primary);
     width: 100%;
@@ -32,8 +33,16 @@ const Wrapper = styled.div`
     padding: 0;
     box-sizing: border-box;
     font-size: 1.5rem;
+
     @media ${MEDIA.mobile} {
       font-size: 1.3rem;
+    }
+
+    > ${FormMessage} {
+      width: min-content;
+      white-space: nowrap;
+      font-size: x-small;
+      margin: 0 0.5rem;
     }
 
     > button {
@@ -235,6 +244,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
       </PriceInputBox>
+      {/*  MAX SLIPPAGE CONTROL */}
     </Wrapper>
   )
 }

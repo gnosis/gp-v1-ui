@@ -21,6 +21,10 @@ export interface Actions<T, P> {
   payload: P
 }
 
+export type ActionCreator<T, P> = (payload: P) => Actions<T, P>
+
+export type ReducerCreator<S, A> = (state: S, action: A) => S
+
 export interface GlobalState {
   tokens: TokenLocalState
   pendingOrders: PendingOrdersState
