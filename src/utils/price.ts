@@ -1,7 +1,8 @@
 import BN from 'bn.js'
-import { assert, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
-import { TEN, UNLIMITED_ORDER_AMOUNT_BIGNUMBER } from 'const'
 import BigNumber from 'bignumber.js'
+import { assert, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
+import { parseBigNumber } from './format'
+import { TEN, UNLIMITED_ORDER_AMOUNT_BIGNUMBER, ONE_HUNDRED_BIG_NUMBER } from 'const'
 
 interface AdjustAmountParams {
   amount: BN
@@ -98,4 +99,25 @@ export function maxAmountsForSpread({
   }
 
   return { buyAmount: bigNumberToBN(buyAmount), sellAmount: bigNumberToBN(sellAmount) }
+}
+
+/**
+ * @name checkSlippageAgainstPrice
+ *
+ * @param slippage - user set slippage as string
+ * @param prePrice - pre-slippape adjusted price as BigNumber or null
+ * @returns [BigNumber | null] - pre-price adjusted for slippage as BigNumber or null
+ */
+export function checkSlippageAgainstPrice(slippage: string, prePrice: BigNumber | null): BigNumber | null {
+  if (!prePrice) return null
+  const slippageAsBigNumber = parseBigNumber(slippage)
+  // if price slippage is not a BigNumber e.g 'abc' return prePrice
+  if (!slippageAsBigNumber) return prePrice
+
+  // slippageAsBigNumber here is defined and is indeed a valid number
+  // convert slippage into fraction: (1 - (0.5/100)) = (1 - 0.005) = 99.995
+  const slippageAsFraction = ONE_BIG_NUMBER.minus(slippageAsBigNumber.div(ONE_HUNDRED_BIG_NUMBER))
+  const postSlippagePrice = prePrice.times(slippageAsFraction)
+
+  return postSlippagePrice
 }
