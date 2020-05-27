@@ -22,11 +22,12 @@ function classifyTrade(trade: Trade): string {
 interface TradeRowProps {
   trade: Trade
   networkId?: number
-  now: Date
 }
 
 export const TradeRow: React.FC<TradeRowProps> = params => {
-  const { trade, networkId, now } = params
+  const { trade, networkId } = params
+
+  const now = new Date()
 
   // Dima's trick to force component update
   const [, forceUpdate] = useSafeState({})

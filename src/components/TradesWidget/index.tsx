@@ -11,7 +11,6 @@ import { TradeRow } from 'components/TradesWidget/TradeRow'
 const Trades: React.FC = () => {
   const { networkId } = useWalletConnection()
   const trades = useTrades()
-  const now = new Date()
 
   return (
     <ContentPage>
@@ -31,7 +30,7 @@ const Trades: React.FC = () => {
         </thead>
         <tbody>
           {trades.map(trade => (
-            <TradeRow key={trade.id} trade={trade} networkId={networkId} now={now} />
+            <TradeRow key={trade.id} trade={trade} networkId={networkId} />
           ))}
         </tbody>
       </CardTable>
