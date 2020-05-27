@@ -28,7 +28,7 @@ const Trades: React.FC = () => {
 
   return (
     <ContentPage>
-      <CardTable $columns="repeat(9, 1fr)" $rowSeparation="0">
+      <CardTable $columns="1fr 1.2fr repeat(2, 0.8fr) 1.2fr 0.7fr 0.8fr 1fr 0.5fr" $rowSeparation="0">
         <thead>
           <tr>
             <th>Market</th>
