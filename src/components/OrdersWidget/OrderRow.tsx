@@ -26,12 +26,12 @@ import {
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
-  displayTokenSymbolOrLink,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
+import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props

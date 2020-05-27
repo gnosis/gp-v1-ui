@@ -14,8 +14,9 @@ import { useTrades } from 'hooks/useTrades'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
-import { isTradeFilled, displayTokenSymbolOrLink } from 'utils'
+import { isTradeFilled } from 'utils'
 import { StatusCountdown } from 'components/StatusCountdown'
+import { displayTokenSymbolOrLink } from 'utils/display'
 
 function classifyTrade(trade: Trade): string {
   return isTradeFilled(trade) ? 'Full' : 'Partial'
