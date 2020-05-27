@@ -59,7 +59,7 @@ const Trades: React.FC = () => {
                 {trade.buyToken.symbol}
               </td>
               <td>{classifyTrade(trade)}</td>
-              <td>{new Date(trade.timestamp).toISOString()}</td>
+              <td>{new Date(trade.timestamp).toLocaleString()}</td>
               <td>
                 <EtherscanLink type={'event'} identifier={trade.txHash} networkId={networkId} />
               </td>
