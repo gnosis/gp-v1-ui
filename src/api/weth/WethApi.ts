@@ -47,7 +47,7 @@ export class WethApiImpl implements WethApi {
 
   public constructor(injectedDependencies: WethApiDependencies) {
     Object.assign(this, injectedDependencies)
-    this._contractPrototype = new this.web3.eth.Contract(wethAbi) as WethContract
+    this._contractPrototype = (new this.web3.eth.Contract(wethAbi) as unknown) as WethContract
   }
 
   public async deposit(params: WrapUnwrapParams): Promise<Receipt> {
