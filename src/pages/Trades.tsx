@@ -3,7 +3,7 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons'
 
-import { formatPrice, formatAmount } from '@gnosis.pm/dex-js'
+import { formatPrice, formatSmart } from '@gnosis.pm/dex-js'
 
 import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
@@ -49,13 +49,13 @@ const Trades: React.FC = () => {
                 {trade.sellToken.symbol}/{trade.buyToken.symbol}
               </td>
               <td>
-                {formatAmount({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
+                {formatSmart({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
                 {trade.sellToken.symbol}
               </td>
               <td>{formatPrice(trade.limitPrice)}</td>
               <td>{formatPrice(trade.fillPrice)}</td>
               <td>
-                {formatAmount({ amount: trade.buyAmount, precision: trade.buyToken.decimals as number })}{' '}
+                {formatSmart({ amount: trade.buyAmount, precision: trade.buyToken.decimals as number })}{' '}
                 {trade.buyToken.symbol}
               </td>
               <td>{classifyTrade(trade)}</td>
