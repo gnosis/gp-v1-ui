@@ -29,6 +29,7 @@ import { useDebounce } from 'hooks/useDebounce'
 import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
 import { useEthBalances } from 'hooks/useEthBalance'
+import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
   amount: BN
