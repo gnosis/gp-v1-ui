@@ -20,13 +20,13 @@ import { StatusCountdown } from 'components/StatusCountdown'
 import useSafeState from 'hooks/useSafeState'
 
 import {
-  safeTokenName,
   formatSmart,
   formatDateFromBatchId,
   batchIdToDate,
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
+  displayTokenSymbolOrLink,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
@@ -57,14 +57,6 @@ const DeleteOrder: React.FC<Pick<
     />
   </td>
 )
-
-function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
-  const displayName = safeTokenName(token)
-  if (displayName.startsWith('0x')) {
-    return <EtherscanLink type="token" identifier={token.address} />
-  }
-  return displayName
-}
 
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
