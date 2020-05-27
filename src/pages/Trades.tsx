@@ -14,7 +14,7 @@ import { useTrades } from 'hooks/useTrades'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
-import { isTradeFilled } from 'utils'
+import { isTradeFilled, displayTokenSymbolOrLink } from 'utils'
 import { StatusCountdown } from 'components/StatusCountdown'
 
 function classifyTrade(trade: Trade): string {
@@ -43,20 +43,20 @@ const Trades: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {trades.map((trade, index) => (
-            <tr key={index} data-order-id={trade.orderId} data-batch-id={trade.batchId}>
+          {trades.map(trade => (
+            <tr key={trade.id} data-order-id={trade.orderId} data-batch-id={trade.batchId}>
               <td>
-                {trade.sellToken.symbol}/{trade.buyToken.symbol}
+                {displayTokenSymbolOrLink(trade.sellToken)}/{displayTokenSymbolOrLink(trade.buyToken)}
               </td>
               <td>
                 {formatSmart({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
-                {trade.sellToken.symbol}
+                {displayTokenSymbolOrLink(trade.sellToken)}
               </td>
               <td>{formatPrice(trade.limitPrice)}</td>
               <td>{formatPrice(trade.fillPrice)}</td>
               <td>
                 {formatSmart({ amount: trade.buyAmount, precision: trade.buyToken.decimals as number })}{' '}
-                {trade.buyToken.symbol}
+                {displayTokenSymbolOrLink(trade.buyToken)}
               </td>
               <td>{classifyTrade(trade)}</td>
               <td>{new Date(trade.timestamp).toLocaleString()}</td>
@@ -64,6 +64,7 @@ const Trades: React.FC = () => {
                 <EtherscanLink type={'event'} identifier={trade.txHash} networkId={networkId} />
               </td>
               <td>
+                {/* TODO: refresh component when countdown reaches 0 */}
                 {trade.settlingDate > now ? <StatusCountdown timeoutDelta={60} /> : <FontAwesomeIcon icon={faCheck} />}
               </td>
             </tr>
