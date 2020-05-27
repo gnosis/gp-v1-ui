@@ -1,21 +1,27 @@
 import React, { CSSProperties, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
-import { MEDIA } from 'const'
-
-import { formatAmount } from '@gnosis.pm/dex-js'
-import { isAddress } from 'web3-utils'
 import Modali from 'modali'
-
-import { TokenDetails, TokenBalanceDetails, Network } from 'types'
-import { TokenImgWrapper } from './TokenImg'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
-import { MenuList } from './TokenSelectorComponents'
+
+// assets
 import searchIcon from 'assets/img/search.svg'
-import { useWalletConnection } from 'hooks/useWalletConnection'
+
+// const, type, utils
+import { MEDIA } from 'const'
+import { TokenDetails, TokenBalanceDetails, Network } from 'types'
+import { isAddress } from 'web3-utils'
+import { formatSmart } from 'utils'
 import { tokenListApi } from 'api'
+
+// components
+import { TokenImgWrapper } from 'components/TokenImg'
+import { MenuList } from 'components/TokenSelectorComponents'
+import { SearchItem, OptionItem } from 'components/TokenOptionItem'
+
+// hooks
+import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
-import { SearchItem, OptionItem } from './TokenOptionItem'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 
 const Wrapper = styled.div`
@@ -140,7 +146,7 @@ function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.Rea
   return (
     <OptionItem name={name} symbol={symbol} image={image}>
       {'totalExchangeBalance' in token && (
-        <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, decimals)}</div>
+        <div className="tokenBalance">{formatSmart(token.totalExchangeBalance, decimals)}</div>
       )}
     </OptionItem>
   )

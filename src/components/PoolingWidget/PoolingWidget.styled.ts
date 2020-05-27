@@ -1,8 +1,11 @@
 import styled from 'styled-components'
+import { MEDIA } from 'const'
+
 import { PageWrapper } from 'components/Layout/PageWrapper'
+
+// assets
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
-import { MEDIA } from 'const'
 
 export const PoolingInterfaceWrapper = styled(PageWrapper)`
   display: flex;

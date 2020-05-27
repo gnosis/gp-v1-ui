@@ -1,12 +1,19 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Link } from 'react-router-dom'
-import ThemeToggler from 'components/ThemeToggler'
+
 import { MEDIA } from 'const'
 import { depositApi } from 'api'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-import { EtherscanLink } from 'components/EtherscanLink'
+
+// Assets
 import verified from 'assets/img/verified.svg'
+
+// Components
+import ThemeToggler from 'components/ThemeToggler'
+import { EtherscanLink } from 'components/EtherscanLink'
+
+// Hooks
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const Wrapper = styled.footer`
   position: relative;
@@ -120,6 +127,7 @@ const LinkWrapper = styled(EtherscanLink)`
 `
 
 const VerifiedText = 'View verified contract'
+const APP_NAME_ABOUT = CONFIG.name.length < 5 ? ' ' + CONFIG.name : ''
 
 const Footer: React.FC = () => {
   const { networkIdOrDefault: networkId } = useWalletConnection()
@@ -131,7 +139,7 @@ const Footer: React.FC = () => {
       <ThemeToggler />
       {/* LINKS */}
       <FooterLinks>
-        <Link to="/about">About Mesa</Link>
+        <Link to="/about">About{APP_NAME_ABOUT}</Link>
         <Link to="/faq">FAQ</Link>
       </FooterLinks>
       {/* VERSION */}

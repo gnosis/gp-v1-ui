@@ -1,16 +1,22 @@
 import React, { useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { isAddress } from 'web3-utils'
-import { TokenImgWrapper } from './TokenImg'
-import { tokenListApi } from 'api'
 import styled from 'styled-components'
-import useSafeState from 'hooks/useSafeState'
-import { TokenDetails } from 'types'
-import { TokenFromExchange } from 'services/factories'
-import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
-import { safeFilledToken } from 'utils'
 import { toast } from 'toastify'
+
+// types, utils, services, api
+import { TokenDetails } from 'types'
+import { safeFilledToken } from 'utils'
+import { fetchTokenData, FetchTokenResult, TokenAndNetwork } from 'services'
 import { SimpleCache } from 'api/proxy/SimpleCache'
+import { TokenFromExchange } from 'services/factories'
+import { tokenListApi } from 'api'
+
+// components
+import { TokenImgWrapper } from 'components/TokenImg'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
 import { UseAddTokenModalResult } from 'hooks/useBetterAddTokenModal'
 
 const OptionItemWrapper = styled.div`

@@ -1,5 +1,5 @@
 import { encoderFactory, decoderFactory, Flag } from 'utils'
-import { earmarkGasPrice, MIN_GAS_PRICE } from 'api/gasStation'
+import { earmarkGasPrice, MIN_GAS_PRICE, earmarkTxData } from 'api/earmark'
 
 describe('flagCodes', () => {
   const flagA: Flag<'flagA'> = {
@@ -224,7 +224,7 @@ describe('flagCodes', () => {
     })
   })
 
-  describe('earmark function', () => {
+  describe('earmark gasPrice function', () => {
     const gasPrice = '10000000001'
 
     it('marks gasPrice', () => {
@@ -281,5 +281,23 @@ describe('flagCodes', () => {
 
       expect(marked).toEqual(gasPrice)
     })
+  })
+})
+
+describe('earmart tx.data function', () => {
+  it('concatenates data and userPrint', () => {
+    const data = '0x26c3d394'
+    const print = 'SEN108'
+
+    const marked = earmarkTxData(data, print)
+
+    expect(marked).toEqual(data + print)
+  })
+  it('concatenates `0x` when falsy is empty and userPrint', () => {
+    const print = 'SEN108'
+
+    const marked = earmarkTxData(undefined, print)
+
+    expect(marked).toEqual('0x' + print)
   })
 })

@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
 
 export {
-  formatAmount,
+  formatSmart,
   formatAmountFull,
   adjustPrecision,
   parseAmount,

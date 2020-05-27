@@ -1,23 +1,26 @@
 import React, { useMemo, useEffect, useRef } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-
-import lowBalanceIcon from 'assets/img/lowBalance.svg'
-
-import { faSpinner, faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { toast } from 'toastify'
 
-import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
-
-// import Highlight from 'components/Highlight'
-import { EtherscanLink } from 'components/EtherscanLink'
-
-import { getTokenFromExchangeById } from 'services'
-import useSafeState from 'hooks/useSafeState'
+// types, utils and services
 import { TokenDetails } from 'types'
+import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
+import { getTokenFromExchangeById } from 'services'
+
+// assets
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import lowBalanceIcon from 'assets/img/lowBalance.svg'
+import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
+
+// components
+import { EtherscanLink } from 'components/EtherscanLink'
+import { Spinner } from 'components/Spinner'
+
+// hooks
+import useSafeState from 'hooks/useSafeState'
 
 import {
   safeTokenName,
-  formatAmount,
+  formatSmart,
   formatDateFromBatchId,
   batchIdToDate,
   isOrderFilled,
@@ -35,7 +38,7 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
   return (
     <>
-      <FontAwesomeIcon icon={faSpinner} size="sm" spin /> Pending...
+      <Spinner size="sm" /> Pending...
       <br />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
     </>
@@ -83,7 +86,6 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   return (
     <td data-label="Price">
       <div className="order-details">
-        {/* <Highlight color={pending ? 'grey' : ''} /> */}
         {price} {displayTokenSymbolOrLink(sellToken)}
         {'/'}
         {displayTokenSymbolOrLink(buyToken)}
@@ -105,10 +107,10 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
   const filledAmount = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return formatAmount(filledAmount, sellToken.decimals) || '0'
+    return formatSmart(filledAmount, sellToken.decimals) || '0'
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
-  const totalAmount = useMemo(() => formatAmount(order.priceDenominator, sellToken.decimals) || '0', [
+  const totalAmount = useMemo(() => formatSmart(order.priceDenominator, sellToken.decimals) || '0', [
     order.priceDenominator,
     sellToken.decimals,
   ])

@@ -1,22 +1,24 @@
 import React, { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
+
+// types, const and utils
+import { TokenDetails, TokenBalanceDetails } from 'types'
+import { ZERO, MEDIA } from 'const'
+import { formatSmart, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
+
+// components
 import TokenSelector from 'components/TokenSelector'
 import { InputBox } from 'components/InputBox'
-import { TokenDetails, TokenBalanceDetails } from 'types'
-import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
-import { ZERO } from 'const'
-
-import { TradeFormTokenId, TradeFormData } from './'
-
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
-import FormMessage, { FormInputError } from './FormMessage'
-import { useNumberInput } from './useNumberInput'
 import { Input } from 'components/Input'
-import { MEDIA, WETH_ADDRESS_MAINNET } from 'const'
-import { WrapEtherBtn } from 'components/WrapEtherBtn'
-import { Link } from 'react-router-dom'
+
+// TradeWidget: subcomponents
+import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
+import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 
 const Wrapper = styled.div`
   display: flex;
@@ -137,8 +139,8 @@ interface Props {
 
 const BalanceTooltip = (
   <HelpTooltipContainer>
-    This balance reflects the amount deposited in the Exchange Wallet on Mesa. Only orders with a balance will be
-    considered for matching.
+    This balance reflects the amount deposited in the Exchange Wallet on Gnosis Protocol. Only orders with a balance
+    will be considered for matching.
   </HelpTooltipContainer>
 )
 
@@ -186,7 +188,7 @@ const TokenRow: React.FC<Props> = ({
         </i>
         <i>Sell amount exceeds your balance by</i>
         <strong>
-          {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
+          {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
         <Link to="/wallet" className="depositNow">
           + Deposit {selectedToken.symbol}
@@ -223,7 +225,8 @@ const TokenRow: React.FC<Props> = ({
     [register],
   )
 
-  const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
+  // TODO: The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented
+  // const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
 
   return (
     <Wrapper>
@@ -231,24 +234,25 @@ const TokenRow: React.FC<Props> = ({
         <strong>{selectLabel}</strong>
         <span>
           {!readOnly && (
-            // TODO: Implement deposit in Trade widget
+            // TODO: Implement deposit in Trade widget. When ready, show also the Wrap Ether button
             //  https://github.com/gnosis/dex-react/issues/610
             <Link className="btn" to="/wallet">
               + Deposit
             </Link>
           )}
-          {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
+          {/* The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented  */}
+          {/* {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />} */}
           <span>
             Balance:
             {readOnly ? (
               <FormMessage className={balanceClassName}>
                 {' '}
-                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
               </FormMessage>
             ) : (
               <FormMessage className={balanceClassName}>
                 {' '}
-                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
                 {validateMaxAmount && (
                   <>
                     <TooltipWrapper tooltip="Fill maximum">

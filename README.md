@@ -10,15 +10,15 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
 
-# Mesa - a dapp for Gnosis Protocol
+# Gnosis Protocol Web
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-Mesa is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
+`Gnosis Protocol Web` is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
 
 Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximize liquidity.
 
-Mesa allows users to:
+`Gnosis Protocol Web` allows users to:
 
 - Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
 - See the balances for any token: available in their wallet and on the exchange
@@ -101,13 +101,16 @@ This app employs overrides from an alternative source (`custom/` directory) for 
 Override works for absolute paths that make use of baseUrl
 That is if there are two files:
 
-```js
-src/pages/About.tsx
-custom/pages/About.tsx
+- `src/pages/About.tsx`
+- `custom/pages/About.tsx`
 
+```js
 import About from 'pages/About'
 // will try resolving from custom/ first and failing that from src/
 ```
+
+> **NOTE**: If you are forking the project, you might want to delete the [custom/.gitignore](custom/.gitignore) file so you
+> can commit a config file and components inside the custom directory.
 
 ## Config
 
@@ -120,6 +123,9 @@ If you wish to replace any default config, create a file named `config` inside t
 Both JSON and YAML formats are supported.
 
 Simply replace any config found on [config-default](./config-default.yaml).
+
+> **NOTE**: If you are forking the project, you might want to delete the [custom/.gitignore](custom/.gitignore) file so you
+> can commit a config file and components inside the custom directory.
 
 Below we provide details for each config.
 

@@ -7,14 +7,14 @@ import { erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, logDebug } from 'utils'
+import { formatSmart, logDebug } from 'utils'
 import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
 import { useTokenList } from './useTokenList'
 
-interface UseTokenBalanceResult {
+interface UseBalanceResult {
   balances: TokenBalanceDetails[]
   tokens: TokenDetails[]
   error: boolean
@@ -109,29 +109,30 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   return balances.filter(Boolean) as TokenBalanceDetails[]
 }
 
-export const useTokenBalances = (): UseTokenBalanceResult => {
+export const useTokenBalances = (): UseBalanceResult => {
   const walletInfo = useWalletConnection()
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
   const tokens = useTokenList(walletInfo.networkId)
 
+  // Get token balances
   useEffect(() => {
-    // can return NULL (if no address or network)
-    walletInfo.isConnected &&
+    if (walletInfo.isConnected) {
       _getBalances(walletInfo, tokens)
         .then(balances => {
           logDebug(
             '[useTokenBalances] Wallet balances',
-            balances ? balances.map(b => formatAmount(b.walletBalance, b.decimals)) : null,
+            balances ? balances.map(b => formatSmart(b.walletBalance, b.decimals)) : null,
           )
           setBalances(balances)
           setError(false)
         })
         .catch(error => {
-          console.error('[useTokenBalances] Error loading balances', error)
+          console.error('[useTokenBalances] Error loading token balances', error)
           setError(true)
         })
+    }
   }, [setBalances, setError, walletInfo, tokens])
 
   return { balances, error, tokens }
