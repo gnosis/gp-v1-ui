@@ -25,7 +25,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   return !isTradeSettled(trade) ? null : (
     <tr key={trade.id} data-order-id={trade.orderId} data-batch-id={trade.batchId}>
       <td>
-        {displayTokenSymbolOrLink(trade.sellToken)}/{displayTokenSymbolOrLink(trade.buyToken)}
+        {displayTokenSymbolOrLink(trade.buyToken)}/{displayTokenSymbolOrLink(trade.sellToken)}
       </td>
       <td>
         {formatSmart({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
