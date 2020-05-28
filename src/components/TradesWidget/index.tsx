@@ -1,78 +1,127 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 
+import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
+
 import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
+import { FileDownloaderLink } from 'components/FileDownloaderLink'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
 
-import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
-
-import { formatPrice, formatSmart } from '@gnosis.pm/dex-js'
-
 import { Trade } from 'api/exchange/ExchangeApi'
 
-import { displayTokenSymbolOrLink } from 'utils/display'
-import { FileDownloaderLink } from 'components/FileDownloaderLink'
+import { toCsv } from 'utils/csv'
 
-const formatTradeAsCSV = (trade: Trade, now: Date): string => {
-  return [
-    displayTokenSymbolOrLink(trade.sellToken) + '/' + displayTokenSymbolOrLink(trade.buyToken),
-    formatSmart({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number }) +
-      ' ' +
-      displayTokenSymbolOrLink(trade.sellToken),
-    formatPrice(trade.limitPrice),
-    formatPrice(trade.fillPrice),
-    formatSmart({ amount: trade.buyAmount, precision: trade.buyToken.decimals as number }) +
-      ' ' +
-      displayTokenSymbolOrLink(trade.buyToken),
-    classifyTrade(trade),
-    new Date(trade.timestamp).toLocaleString(),
-    trade.txHash,
-    trade.settlingDate > now ? 'NOT SETTLED' : 'SETTLED',
-  ]
-    .map(value => {
-      // " is a string delimeter
-      // if already included in e.g. symbol
-      // must be replaced by double ""
-      value = value.replace(/"/g, '""')
+import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
+import { getNetworkFromId } from 'utils'
 
-      // if there's a field delimeter comma in e.g. symbol or date
-      // need to enclose whole string in quotes
-      if (value.includes(',')) value = `"${value}"`
-      return value
-    })
-    .join(',')
+const csvHeaders = [
+  'Market',
+  'BuyTokenSymbol',
+  'BuyTokenAddress',
+  'SellTokenSymbol',
+  'SellTokenAddress',
+  'Limit Price',
+  'Fill Price',
+  'Amount',
+  'Received',
+  'Type',
+  'Time',
+  'TransactionHash',
+  'EventLogIndex',
+  'Settled',
+  'OrderId',
+  'BatchId',
+]
+
+function symbolOrAddress(token: TokenDetails): string {
+  return token.symbol || token.address
 }
 
-const tableHeads = ['Market', 'Amount', 'Limit Price', 'Fill Price', 'Received', 'Type', 'Time', 'Tx', 'Settled']
-const tableHeader = tableHeads.join(',') + '\n'
+function csvTransformer(trade: Trade): string[] {
+  const {
+    buyToken,
+    sellToken,
+    limitPrice,
+    fillPrice,
+    sellAmount,
+    buyAmount,
+    timestamp,
+    txHash,
+    eventIndex,
+    settlingDate,
+    orderId,
+    batchId,
+  } = trade
+
+  return [
+    `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
+    buyToken.symbol || '',
+    buyToken.address,
+    sellToken.symbol || '',
+    sellToken.address,
+    formatPrice(limitPrice),
+    formatPrice(fillPrice),
+    formatAmount({
+      amount: sellAmount,
+      precision: sellToken.decimals as number,
+      decimals: sellToken.decimals,
+      thousandSeparator: false,
+      isLocaleAware: false,
+    }),
+    formatAmount({
+      amount: buyAmount,
+      precision: buyToken.decimals as number,
+      decimals: sellToken.decimals,
+      thousandSeparator: false,
+      isLocaleAware: false,
+    }),
+    classifyTrade(trade),
+    new Date(timestamp).toISOString(),
+    txHash,
+    eventIndex.toString(),
+    settlingDate > new Date() ? 'NOT SETTLED' : 'SETTLED',
+    orderId,
+    batchId.toString(),
+  ]
+}
 
 const Trades: React.FC = () => {
-  const { networkId } = useWalletConnection()
+  const { networkId, userAddress } = useWalletConnection()
   const trades = useTrades()
 
-  const csvString = useMemo(() => {
-    const now = new Date()
-    return tableHeader + trades.map(trade => formatTradeAsCSV(trade, now)).join('\n')
+  const generateCsv = useCallback(() => {
+    return toCsv({ headers: csvHeaders, data: trades, transformer: csvTransformer })
   }, [trades])
+
+  const filename = useMemo(
+    () => `trades_${getNetworkFromId(networkId as number).toLowerCase()}_${userAddress}_${new Date().getTime()}.csv`,
+    [networkId, userAddress],
+  )
 
   return (
     <ContentPage>
       {trades.length > 0 && (
-        <FileDownloaderLink data={csvString} options={{ type: 'text/csv;charset=utf-8;' }} filename="trades.csv">
+        <FileDownloaderLink data={generateCsv} options={{ type: 'text/csv;charset=utf-8;' }} filename={filename}>
           <FontAwesomeIcon icon={faFileCsv} size="2x" />
         </FileDownloaderLink>
       )}
       <CardTable $columns="1fr 1.2fr repeat(2, 0.8fr) 1.2fr 0.7fr 0.8fr 1fr 0.5fr" $rowSeparation="0">
         <thead>
           <tr>
-            {tableHeads.map(head => (
-              <th key={head}>{head}</th>
-            ))}
+            <th>Market</th>
+            <th>Amount</th>
+            <th>Limit Price</th>
+            <th>Fill Price</th>
+            <th>Received</th>
+            <th>Type</th>
+            <th>Time</th>
+            <th>Tx</th>
+            <th>Settled</th>
           </tr>
         </thead>
         <tbody>
