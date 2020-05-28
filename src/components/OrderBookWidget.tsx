@@ -111,7 +111,7 @@ interface PricePointDetails {
 
 function _toPricePoint(pricePoint: RawPricePoint, quoteTokenDecimals: number, baseTokenDecimals: number): PricePoint {
   return {
-    price: new BigNumber(pricePoint.price).dividedBy(TEN_BIG_NUMBER.pow(quoteTokenDecimals - baseTokenDecimals)),
+    price: new BigNumber(pricePoint.price).div(TEN_BIG_NUMBER.pow(quoteTokenDecimals - baseTokenDecimals)),
     volume: new BigNumber(pricePoint.volume).div(TEN_BIG_NUMBER.pow(baseTokenDecimals)),
   }
 }
