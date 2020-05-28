@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/dex-react",
-  "version": "0.11.1",
+  "version": "1.0.0-0",
   "description": "",
   "main": "src/index.js",
   "sideEffects": false,
@@ -29,7 +29,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "@fortawesome/react-fontawesome": "^0.1.8",
     "@gnosis.pm/dapp-ui": "^0.5.3",
-    "@gnosis.pm/dex-js": "0.3.0-RC.0",
+    "@gnosis.pm/dex-js": "^0.4.0",
     "@hapi/joi": "^17.1.1",
     "@hot-loader/react-dom": "^16.11.0",
     "@popperjs/core": "^2.0.6",
@@ -59,12 +59,12 @@
     "web3": "1.2.7"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.4",
+    "@babel/core": "^7.9.4",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@babel/plugin-transform-runtime": "^7.8.3",
-    "@babel/preset-env": "^7.8.4",
-    "@babel/preset-react": "^7.8.3",
+    "@babel/preset-env": "^7.9.4",
+    "@babel/preset-react": "^7.9.4",
     "@babel/register": "^7.8.3",
     "@fortawesome/fontawesome-common-types": "^0.2.26",
     "@types/bn.js": "^4.11.6",

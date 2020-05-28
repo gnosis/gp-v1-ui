@@ -2,7 +2,7 @@ import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig, InfuraProvi
 
 describe('Test config defaults', () => {
   it('name', () => {
-    expect(CONFIG.name).toEqual('Mesa - Gnosis Protocol DApp')
+    expect(CONFIG.name).toEqual('Gnosis Protocol Web')
   })
 
   it('logoPath', () => {

@@ -1,11 +1,39 @@
 import React, { useEffect, useRef } from 'react'
+import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
-import { TokenDetails, Network } from 'types'
+
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
-import { getNetworkFromId, safeTokenName } from '@gnosis.pm/dex-js'
+
 import { dexPriceEstimatorApi } from 'api'
+
+import { getNetworkFromId, safeTokenName, formatSmart, toBN } from 'utils'
+
+import { TEN_BIG_NUMBER } from 'const'
+
+import { TokenDetails, Network } from 'types'
+
+function checkPriceAndConvert(price: number): string {
+  // prices come in as type number so need to be converted
+  // some of the WEI values are so small we need to cast to Wei twice
+  const priceAsBigNumber = new BigNumber(price)
+  const calculatedPriceAsBnWei = toBN(
+    priceAsBigNumber
+      .times(TEN_BIG_NUMBER.pow(new BigNumber('18')))
+      // we don't want any decimals
+      // before passing into BN conversion
+      .decimalPlaces(0)
+      .toString(10),
+  )
+
+  return formatSmart({
+    amount: calculatedPriceAsBnWei,
+    precision: 18,
+    decimals: 6,
+    smallLimit: '0',
+  })
+}
 
 interface OrderBookProps {
   baseToken: TokenDetails
@@ -66,7 +94,7 @@ interface ProcessedItem {
   totalVolume: number
   askValueY: number | null
   bidValueY: number | null
-  price: number
+  price: string | number
 }
 
 /**
@@ -143,12 +171,13 @@ const draw = (
     const processed = processData(data.bids, baseToken, quoteToken, Offer.Bid).concat(
       processData(data.asks, baseToken, quoteToken, Offer.Ask),
     )
-    processed.sort((lhs, rhs) => lhs.price - rhs.price)
+    processed
+      // cast as number to sort...
+      .sort((lhs, rhs) => +lhs.price - +rhs.price)
+      // show as string
+      .map(processedItem => ({ ...processedItem, price: checkPriceAndConvert(processedItem.price as number) }))
     return processed
   })
-
-  // Set up precision for numbers
-  chart.numberFormatter.numberFormat = '#,###.##'
 
   // Colors
   const colors = {

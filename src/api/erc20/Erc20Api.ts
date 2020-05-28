@@ -7,7 +7,7 @@ import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'
 import { toBN } from 'utils'
 
-import ERC20_DETAILS from './erc20Details.json'
+import ERC20_DETAILS from 'api/erc20/erc20Details.json'
 
 import Web3 from 'web3'
 
@@ -100,7 +100,7 @@ export class Erc20ApiImpl implements Erc20Api {
     // and return symbol/name as bytes32 as opposed to string
     this.localErc20Details = ERC20_DETAILS
 
-    this._contractPrototype = new this.web3.eth.Contract(erc20Abi as AbiItem[]) as Erc20Contract
+    this._contractPrototype = (new this.web3.eth.Contract(erc20Abi as AbiItem[]) as unknown) as Erc20Contract
 
     // TODO remove later
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
