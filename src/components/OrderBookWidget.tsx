@@ -146,19 +146,20 @@ const processData = (
   const quoteTokenDecimals = quoteToken.decimals
   const baseTokenDecimals = baseToken.decimals
 
-  // Convert RawPricePoint into PricePoint:
-  //  Raw items use number (floats) and are given in "atoms"
-  //  Normalized items use decimals (BigNumber) and are given in natural units
-  let pricePoints: PricePoint[] = rawPricePoints.map(pricePoint =>
-    _toPricePoint(pricePoint, quoteTokenDecimals, baseTokenDecimals),
-  )
-
-  // Filter tiny orders
-  pricePoints = pricePoints.filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
-
   // Convert the price points that can be represented in the graph (PricePointDetails)
-  const { points } = pricePoints.reduce(
-    (acc, pricePoint, index) => {
+  const { points } = rawPricePoints.reduce(
+    (acc, rawPricePoint, index) => {
+      // Convert RawPricePoint into PricePoint:
+      //  Raw items use number (floats) and are given in "atoms"
+      //  Normalized items use decimals (BigNumber) and are given in natural units
+      const pricePoint = _toPricePoint(rawPricePoint, quoteTokenDecimals, baseTokenDecimals)
+
+      // Filter tiny orders
+      if (pricePoint.volume.lte(SMALL_VOLUME_THRESHOLD)) {
+        logDebug('[OrderBook] pricePoint discarded: ', pricePoint.price.toNumber(), pricePoint.volume.toNumber())
+        return acc
+      }
+
       const { price, volume } = pricePoint
       const totalVolume = acc.totalVolume.plus(volume)
 
@@ -213,7 +214,7 @@ const processData = (
 }
 
 function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetails, quoteToken: TokenDetails): void {
-  logDebug('Order Book: ' + baseToken.symbol + '-' + quoteToken.symbol)
+  logDebug('[OrderBook] Order Book: ' + baseToken.symbol + '-' + quoteToken.symbol)
   pricePoints.forEach(pricePoint => {
     const isBid = pricePoint.type === Offer.Bid
     logDebug(
