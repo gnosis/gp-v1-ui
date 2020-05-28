@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, AnchorHTMLAttributes } from 'react'
 
 interface FileSaverLinkProps {
-  data?: string
+  data?: string | (() => string)
   options?: BlobPropertyBag
   filename: string
 }
@@ -32,15 +32,16 @@ export const FileDownloaderLink: React.FC<FileSaverLinkProps & AnchorHTMLAttribu
       e.preventDefault()
       return
     }
+    const csvData = typeof data === 'string' ? data : data()
     // data didn't change, reusing already set ObjectURL
-    if (lastDataUsed.current === data) return
-    lastDataUsed.current = data
+    if (lastDataUsed.current === csvData) return
+    lastDataUsed.current = csvData
 
     // new data, need new ObjectURL
     // release old if was set previously
     if (lastObjectURL.current) URL.revokeObjectURL(lastObjectURL.current)
 
-    const blob = new Blob([data], options)
+    const blob = new Blob([csvData], options)
     e.currentTarget.href = lastObjectURL.current = URL.createObjectURL(blob)
   }
 
