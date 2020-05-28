@@ -20,27 +20,39 @@ interface TradeRowProps {
 
 export const TradeRow: React.FC<TradeRowProps> = params => {
   const { trade, networkId } = params
+  const {
+    buyToken,
+    sellToken,
+    sellAmount,
+    buyAmount,
+    limitPrice,
+    fillPrice,
+    orderId,
+    batchId,
+    timestamp,
+    txHash,
+  } = trade
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
-    <tr key={trade.id} data-order-id={trade.orderId} data-batch-id={trade.batchId}>
+    <tr data-order-id={orderId} data-batch-id={batchId}>
       <td>
-        {displayTokenSymbolOrLink(trade.buyToken)}/{displayTokenSymbolOrLink(trade.sellToken)}
+        {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td>
-        {formatSmart({ amount: trade.sellAmount, precision: trade.sellToken.decimals as number })}{' '}
-        {displayTokenSymbolOrLink(trade.sellToken)}
+        {formatSmart({ amount: sellAmount, precision: sellToken.decimals as number })}{' '}
+        {displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td>{formatPrice(trade.limitPrice)}</td>
-      <td>{formatPrice(trade.fillPrice)}</td>
+      <td>{formatPrice(limitPrice)}</td>
+      <td>{formatPrice(fillPrice)}</td>
       <td>
-        {formatSmart({ amount: trade.buyAmount, precision: trade.buyToken.decimals as number })}{' '}
-        {displayTokenSymbolOrLink(trade.buyToken)}
+        {formatSmart({ amount: buyAmount, precision: buyToken.decimals as number })}{' '}
+        {displayTokenSymbolOrLink(buyToken)}
       </td>
       <td>{classifyTrade(trade)}</td>
-      <td>{new Date(trade.timestamp).toLocaleString()}</td>
+      <td>{new Date(timestamp).toLocaleString()}</td>
       <td>
-        <EtherscanLink type={'event'} identifier={trade.txHash} networkId={networkId} />
+        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
       </td>
     </tr>
   )
