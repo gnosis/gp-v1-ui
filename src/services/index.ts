@@ -1,4 +1,4 @@
-import { tokenListApi, exchangeApi, erc20Api, web3, theGraphApi, tcrApi } from 'api'
+import { tokenListApi, exchangeApi, erc20Api, web3, theGraphApi, tcrApi, walletApi } from 'api'
 
 import {
   getTokenFromExchangeByAddressFactory,
@@ -10,6 +10,7 @@ import {
   getTokenFromErc20Factory,
   TokenFromExchange,
   TokenFromErc20,
+  addUnlistendTokensToUserTokenListByIdFactory,
 } from './factories'
 
 import { logDebug } from 'utils'
@@ -23,6 +24,7 @@ const apis = {
   web3,
   theGraphApi,
   tcrApi,
+  walletApi,
 }
 
 export const getTokenFromErc20 = getTokenFromErc20Factory(apis)
@@ -38,6 +40,10 @@ export const getPriceEstimation = getPriceEstimationFactory(apis)
 export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
 export const getTokens = getTokensFactory(apis, { getTokenFromErc20 })
+
+export const addUnlistendTokensToUserTokenListById = addUnlistendTokensToUserTokenListByIdFactory(apis, {
+  getTokenFromExchangeById,
+})
 
 export interface TokenAndNetwork {
   networkId: number
