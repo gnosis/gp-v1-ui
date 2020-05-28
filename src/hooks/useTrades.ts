@@ -4,7 +4,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 
 import { getTrades } from 'services'
 
-import { appendTrades } from 'reducers-actions/trades'
+import { appendTrades, updateLastCheckedBlock } from 'reducers-actions/trades'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
@@ -31,7 +31,9 @@ export function useTrades(): Trade[] {
         networkId,
         fromBlock: lastCheckedBlock,
         toBlock,
-      }).then(newTrades => dispatch(appendTrades(newTrades, toBlock)))
+      }).then(newTrades =>
+        dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock)),
+      )
     }
   }, [userAddress, networkId, blockNumber, lastCheckedBlock, dispatch])
 

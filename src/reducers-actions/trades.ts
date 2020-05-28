@@ -1,18 +1,24 @@
 import { Actions } from 'reducers-actions'
 import { Trade } from 'api/exchange/ExchangeApi'
 
-export type ActionTypes = 'APPEND_TRADES'
+export type ActionTypes = 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
 export interface TradesState {
   trades: Trade[]
   lastCheckedBlock?: number
 }
 
+type UpdateBlockActionType = Actions<ActionTypes, Required<Pick<TradesState, 'lastCheckedBlock'>>>
 type ReducerActionType = Actions<ActionTypes, TradesState>
 
 export const appendTrades = (trades: Trade[], lastCheckedBlock: number): ReducerActionType => ({
   type: 'APPEND_TRADES',
   payload: { trades, lastCheckedBlock },
+})
+
+export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockActionType => ({
+  type: 'UPDATE_BLOCK',
+  payload: { lastCheckedBlock },
 })
 
 // TODO: store to/load from localStorage
@@ -37,6 +43,9 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
       }, [])
 
       return { trades, lastCheckedBlock }
+    }
+    case 'UPDATE_BLOCK': {
+      return { ...state, ...action.payload }
     }
     default: {
       return state
