@@ -1,4 +1,5 @@
 import React from 'react'
+import styled from 'styled-components'
 
 import { formatPrice, formatSmart } from '@gnosis.pm/dex-js'
 
@@ -17,6 +18,18 @@ interface TradeRowProps {
   trade: Trade
   networkId?: number
 }
+
+const TypePill = styled.span<{
+  $bgColor?: string
+}>`
+  background-color: ${({ $bgColor = 'green' }): string => $bgColor};
+  color: white;
+  font-weight: bold;
+  border-radius: 1em;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 0.5em;
+`
 
 export const TradeRow: React.FC<TradeRowProps> = params => {
   const { trade, networkId } = params
@@ -49,7 +62,9 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatSmart({ amount: buyAmount, precision: buyToken.decimals as number })}{' '}
         {displayTokenSymbolOrLink(buyToken)}
       </td>
-      <td>{classifyTrade(trade)}</td>
+      <td>
+        <TypePill $bgColor={isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>{classifyTrade(trade)}</TypePill>
+      </td>
       <td>{new Date(timestamp).toLocaleString()}</td>
       <td>
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
