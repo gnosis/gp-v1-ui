@@ -1,9 +1,7 @@
 import { Actions } from 'reducers-actions'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from '@gnosis.pm/dex-js'
-import { TokenDetails } from 'types'
-import { tokenListApi, walletApi } from 'api'
-import { getTokenFromExchangeById } from 'services'
+import { addUnlistendTokensToUserTokenListById } from 'services'
 
 export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
@@ -135,23 +133,11 @@ export async function sideEffect(state: OrdersState, action: ReducerActionType):
     case 'OVERWRITE_ORDERS':
     case 'UPDATE_ORDERS':
     case 'APPEND_ORDERS':
-      const networkId = await walletApi.getNetworkId()
-      if (networkId) {
-        const newTokenIdsFromOrders = new Set<number>()
+      const newTokenIdsFromOrders = new Set<number>()
 
-        // orders can contain many duplicated tokenIds
-        state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
+      // orders can contain many duplicated tokenIds
+      state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
 
-        const tokensFromExchange = await Promise.all(
-          // calls are already cached, so we don't get duplicate calls later in components
-          Array.from(newTokenIdsFromOrders).map(tokenId => getTokenFromExchangeById({ tokenId, networkId })),
-        )
-
-        // only unlisted tokens get added inside
-        tokenListApi.addTokens({
-          tokens: tokensFromExchange.filter<TokenDetails>((token): token is TokenDetails => !!token),
-          networkId,
-        })
-      }
+      addUnlistendTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
   }
 }
