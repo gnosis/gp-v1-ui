@@ -29,7 +29,8 @@ export function useTrades(): Trade[] {
       getTrades({
         userAddress,
         networkId,
-        fromBlock: lastCheckedBlock,
+        // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
+        fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
         toBlock,
       }).then(newTrades =>
         dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock)),
