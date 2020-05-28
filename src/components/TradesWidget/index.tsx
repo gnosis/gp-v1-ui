@@ -17,7 +17,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { toCsv } from 'utils/csv'
 
 import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
-import { getNetworkFromId } from 'utils'
+import { getNetworkFromId, isTradeSettled } from 'utils'
 
 const csvHeaders = [
   'Market',
@@ -33,7 +33,6 @@ const csvHeaders = [
   'Time',
   'TransactionHash',
   'EventLogIndex',
-  'Settled',
   'OrderId',
   'BatchId',
 ]
@@ -53,7 +52,6 @@ function csvTransformer(trade: Trade): string[] {
     timestamp,
     txHash,
     eventIndex,
-    settlingDate,
     orderId,
     batchId,
   } = trade
@@ -84,7 +82,6 @@ function csvTransformer(trade: Trade): string[] {
     new Date(timestamp).toISOString(),
     txHash,
     eventIndex.toString(),
-    settlingDate > new Date() ? 'NOT SETTLED' : 'SETTLED',
     orderId,
     batchId.toString(),
   ]
@@ -94,9 +91,15 @@ const Trades: React.FC = () => {
   const { networkId, userAddress } = useWalletConnection()
   const trades = useTrades()
 
-  const generateCsv = useCallback(() => {
-    return toCsv({ headers: csvHeaders, data: trades, transformer: csvTransformer })
-  }, [trades])
+  const generateCsv = useCallback(
+    () =>
+      toCsv({
+        headers: csvHeaders,
+        data: trades.filter(isTradeSettled),
+        transformer: csvTransformer,
+      }),
+    [trades],
+  )
 
   const filename = useMemo(
     () => `trades_${getNetworkFromId(networkId as number).toLowerCase()}_${userAddress}_${new Date().getTime()}.csv`,
@@ -110,7 +113,7 @@ const Trades: React.FC = () => {
           <FontAwesomeIcon icon={faFileCsv} size="2x" />
         </FileDownloaderLink>
       )}
-      <CardTable $columns="1fr 1.2fr repeat(2, 0.8fr) 1.2fr 0.7fr 0.8fr 1fr 0.5fr" $rowSeparation="0">
+      <CardTable $columns="1fr 1.2fr repeat(2, 0.8fr) 1.2fr 0.7fr 0.8fr 1fr" $rowSeparation="0">
         <thead>
           <tr>
             <th>Market</th>
@@ -121,7 +124,6 @@ const Trades: React.FC = () => {
             <th>Type</th>
             <th>Time</th>
             <th>Tx</th>
-            <th>Settled</th>
           </tr>
         </thead>
         <tbody>

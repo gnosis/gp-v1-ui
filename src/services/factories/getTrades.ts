@@ -73,6 +73,9 @@ export function getTradesFactory(factoryParams: {
     const trades = tradeEvents.reduce<Trade[]>((acc, event) => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
+
+      const settlingDate = calculateSettlingDate(batchId)
+
       // TODO: this might be empty
       const buyToken = tokens.get(event.buyTokenId) as TokenDetails
       const sellToken = tokens.get(event.sellTokenId) as TokenDetails
@@ -83,7 +86,7 @@ export function getTradesFactory(factoryParams: {
         ...event,
         batchId,
         timestamp,
-        settlingDate: calculateSettlingDate(batchId),
+        settlingDate,
         revertKey: ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId),
         buyToken,
         sellToken,

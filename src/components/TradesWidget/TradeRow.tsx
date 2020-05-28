@@ -1,19 +1,13 @@
-import React, { useEffect, useRef } from 'react'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCheck } from '@fortawesome/free-solid-svg-icons'
+import React from 'react'
 
 import { formatPrice, formatSmart } from '@gnosis.pm/dex-js'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/EtherscanLink'
-import { StatusCountdown } from 'components/StatusCountdown'
 
-import { isTradeFilled } from 'utils'
+import { isTradeFilled, isTradeSettled } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
-
-import useSafeState from 'hooks/useSafeState'
 
 export function classifyTrade(trade: Trade): string {
   return isTradeFilled(trade) ? 'Full' : 'Partial'
@@ -27,31 +21,8 @@ interface TradeRowProps {
 export const TradeRow: React.FC<TradeRowProps> = params => {
   const { trade, networkId } = params
 
-  const now = new Date()
-
-  // Dima's trick to force component update
-  const [, forceUpdate] = useSafeState({})
-
-  const refreshTimeout = useRef<null | NodeJS.Timeout>(null)
-
-  // Refresh component when countdown reaches 0, if any
-  useEffect(() => {
-    function clear(): void {
-      if (refreshTimeout.current) clearTimeout(refreshTimeout.current)
-      refreshTimeout.current = null
-    }
-
-    clear()
-
-    if (trade.settlingDate > now) {
-      const timeout = trade.settlingDate.getTime() - now.getTime()
-      refreshTimeout.current = setTimeout(() => forceUpdate({}), timeout)
-    }
-
-    return clear
-  }, [forceUpdate, now, trade.settlingDate])
-
-  return (
+  // Do not display trades that are not settled
+  return !isTradeSettled(trade) ? null : (
     <tr key={trade.id} data-order-id={trade.orderId} data-batch-id={trade.batchId}>
       <td>
         {displayTokenSymbolOrLink(trade.sellToken)}/{displayTokenSymbolOrLink(trade.buyToken)}
@@ -71,7 +42,6 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td>
         <EtherscanLink type={'event'} identifier={trade.txHash} networkId={networkId} />
       </td>
-      <td>{trade.settlingDate > now ? <StatusCountdown timeoutDelta={60} /> : <FontAwesomeIcon icon={faCheck} />}</td>
     </tr>
   )
 }

@@ -88,6 +88,10 @@ export function isTradeFilled(trade: Trade): boolean {
   return isAmountDifferenceGreaterThanNegligibleAmount(trade.sellAmount, trade.remainingAmount)
 }
 
+export function isTradeSettled(trade: Trade): boolean {
+  return trade.settlingDate <= new Date()
+}
+
 export const isOrderActive = (order: AuctionElement, now: Date): boolean =>
   batchIdToDate(order.validUntil) >= now && !isOrderFilled(order)
 
