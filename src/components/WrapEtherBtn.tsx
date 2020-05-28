@@ -1,12 +1,13 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
 import Modali, { useModali } from 'modali'
 import BN from 'bn.js'
 
+import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
+
 // utils
 import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
-import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
 
 // components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
@@ -66,13 +67,7 @@ const ModalWrapper = styled(ModalBodyWrapper)`
       margin-bottom: 0.5rem;
       padding-left: -0.5;
       font-size: 1.3rem;
-      color: : var(--color-background-modali);
-    }
-
-    b {
-      
-      
-            
+      color: var(--color-background-modali);
     }
 
     a {
@@ -222,7 +217,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
   // Show available balance
   //  * For wrapping, we just show the value
-  //  * For unwrapping, we allow to clicl to unwrap all
+  //  * For unwrapping, we allow to click to unwrap all
   let availableBalanceComponent
   if (balance) {
     const amountFull = formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION }) || '-'
@@ -238,6 +233,9 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   } else {
     availableBalanceComponent = <span>...</span>
   }
+
+  const toggleRef = useRef<() => void>()
+  const isModalShownRef = useRef(false)
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -279,6 +277,17 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
                     required: 'The amount is required',
                     min: 0,
                   })}
+                  onBlur={(e): void => {
+                    // react-hook-form does something onBlur that interferes with button clicks
+                    // at the same time modali buttons rerender at every opportunity
+                    // so click never arrives where we expect it to
+                    // at least that is my guess
+                    const { relatedTarget } = e
+                    // here be hacks
+                    if (relatedTarget instanceof HTMLButtonElement) {
+                      relatedTarget.click()
+                    }
+                  }}
                 />
               </InputBox>
             </div>
@@ -309,7 +318,9 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           const wrapAmount = toWei(wrapAmountEther)
 
           // Hide modal once the transaction is sent
-          const txOptionalParams = composeOptionalParams(() => modalHook.hide())
+          const txOptionalParams = composeOptionalParams(() => {
+            if (isModalShownRef.current) toggleRef.current?.()
+          })
 
           let wrapUnwrapPromise, successMessage: string, errorMessage: string
           if (wrap) {
@@ -335,6 +346,11 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       />,
     ],
   })
+
+  // toggleModal recreated every time, keep ref to always use current in async code
+  toggleRef.current = toggleModal
+  // same for modalHook.isShown
+  isModalShownRef.current = modalHook.isShown
 
   return (
     <>
