@@ -15,7 +15,7 @@ import { displayTokenSymbolOrLink } from 'utils/display'
 
 import useSafeState from 'hooks/useSafeState'
 
-function classifyTrade(trade: Trade): string {
+export function classifyTrade(trade: Trade): string {
   return isTradeFilled(trade) ? 'Full' : 'Partial'
 }
 
