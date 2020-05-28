@@ -1,5 +1,8 @@
 import React, { useMemo } from 'react'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
+
 import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
 
@@ -59,7 +62,11 @@ const Trades: React.FC = () => {
 
   return (
     <ContentPage>
-      {trades.length > 0 && <FileDownloaderLink data={csvString} options={{ type: 'text/csv;charset=utf-8;' }} />}
+      {trades.length > 0 && (
+        <FileDownloaderLink data={csvString} options={{ type: 'text/csv;charset=utf-8;' }} filename="trades.csv">
+          <FontAwesomeIcon icon={faFileCsv} size="2x" />
+        </FileDownloaderLink>
+      )}
       <CardTable $columns="1fr 1.2fr repeat(2, 0.8fr) 1.2fr 0.7fr 0.8fr 1fr 0.5fr" $rowSeparation="0">
         <thead>
           <tr>

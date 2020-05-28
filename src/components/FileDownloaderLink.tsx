@@ -1,14 +1,17 @@
-import React, { useRef, useEffect } from 'react'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
+import React, { useRef, useEffect, AnchorHTMLAttributes } from 'react'
 
 interface FileSaverLinkProps {
   data?: string
   options?: BlobPropertyBag
+  filename: string
 }
 
-export const FileDownloaderLink: React.FC<FileSaverLinkProps> = ({ data, options }) => {
+export const FileDownloaderLink: React.FC<FileSaverLinkProps & AnchorHTMLAttributes<HTMLAnchorElement>> = ({
+  data,
+  options,
+  filename,
+  ...anchorProps
+}) => {
   const lastObjectURL = useRef('')
   const lastDataUsed = useRef('')
 
@@ -41,9 +44,5 @@ export const FileDownloaderLink: React.FC<FileSaverLinkProps> = ({ data, options
     e.currentTarget.href = lastObjectURL.current = URL.createObjectURL(blob)
   }
 
-  return (
-    <a href={lastObjectURL.current} download="trades.csv" onClick={handleClick}>
-      <FontAwesomeIcon icon={faFileCsv} size="2x" />
-    </a>
-  )
+  return <a href={lastObjectURL.current} download={filename} onClick={handleClick} {...anchorProps} />
 }
