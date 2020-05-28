@@ -84,7 +84,7 @@ export const PriceInputBox = styled.div`
     }
   }
 
-  label > div {
+  label > div:not(.radio-container) {
     position: absolute;
     width: 7.7rem;
     right: 1rem;
