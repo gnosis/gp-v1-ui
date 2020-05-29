@@ -28,9 +28,9 @@ const apis = {
 
 export const getTokenFromErc20 = getTokenFromErc20Factory(apis)
 
-export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory(apis, { getTokenFromErc20 })
+export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory({ ...apis, getTokenFromErc20 })
 
-export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis, { getTokenFromErc20 })
+export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory({ ...apis, getTokenFromErc20 })
 
 export const addTokenToExchangeContract = addTokenToExchangeFactory(apis)
 
@@ -38,7 +38,7 @@ export const getPriceEstimation = getPriceEstimationFactory(apis)
 
 export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
-export const getTokens = getTokensFactory(apis, { getTokenFromErc20 })
+export const getTokens = getTokensFactory({ ...apis, getTokenFromErc20 })
 
 export const getTrades = getTradesFactory({ ...apis, getTokens })
 

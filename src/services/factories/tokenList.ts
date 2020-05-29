@@ -7,20 +7,13 @@ import { logDebug, retry } from 'utils'
 
 import { TokenFromErc20Params, TokenFromErc20 } from './'
 
-interface Injects {
-  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
-}
-
-export function getTokensFactory(
-  factoryParams: {
-    tokenListApi: TokenList
-    exchangeApi: ExchangeApi
-    tcrApi?: TcrApi
-  },
-  injects: Injects,
-): (networkId: number) => TokenDetails[] {
-  const { tokenListApi, exchangeApi, tcrApi } = factoryParams
-  const { getTokenFromErc20 } = injects
+export function getTokensFactory(factoryParams: {
+  tokenListApi: TokenList
+  exchangeApi: ExchangeApi
+  tcrApi?: TcrApi
+  getTokenFromErc20: (params: TokenFromErc20Params) => Promise<TokenFromErc20>
+}): (networkId: number) => TokenDetails[] {
+  const { tokenListApi, exchangeApi, tcrApi, getTokenFromErc20 } = factoryParams
 
   // Set containing ids for networks which we successfully updated the tokens from the contract
   const areTokensUpdated = new Set<number>()
