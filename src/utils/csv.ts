@@ -26,9 +26,10 @@ export function toCsv<T>({ headers = [], data, transformer }: ToCsvParams<T>): s
           values = transformer(item)
 
           // Make sure the returned values match.
-          if (headers && values.length !== headers.length) {
-            throw new Error(`Values length (${values.length}) doesn't match headers length ${headers.length}`)
-          }
+          console.assert(
+            headers && values.length !== headers.length,
+            `Values length (${values.length}) doesn't match headers length ${headers.length}`,
+          )
         } catch (e) {
           logDebug(`[utils:toCsv] Not able to transform into csv: ${item}`, e)
           return acc
