@@ -1,5 +1,6 @@
 import BN from 'bn.js'
 import { Subscription } from 'web3-core-subscriptions'
+import { PastEventOptions } from 'web3-eth-contract'
 
 import { assert, BatchExchangeEvents, TokenDetails } from '@gnosis.pm/dex-js'
 
@@ -204,7 +205,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // Defaults to 'latest'
     const toBlock = _toBlock ?? 'latest'
 
-    const tradeEvents = await contract.getPastEvents('Trade', {
+    const tradeEvents = await this.safeGetEvents(options => contract.getPastEvents('Trade', options), {
       filter: { owner: userAddress },
       fromBlock,
       toBlock,
@@ -219,6 +220,51 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     )
 
     return tradeEvents.filter(event => !event['removed']).map(this.parseTradeEvent)
+  }
+
+  private async safeGetEvents<T>(
+    fn: (options: PastEventOptions) => Promise<T[]>,
+    options: PastEventOptions,
+  ): Promise<T[]> {
+    try {
+      return await fn(options)
+    } catch (e) {
+      // Error `-32005` means too many results in range.
+      // Let's split it up into 2 smaller requests
+      if (e.code === -32005) {
+        const { fromBlock: _fromBlock, toBlock: _toBlock } = options
+        logDebug(`[ExchangeApiImpl] Request range was too big [${_fromBlock} to ${_toBlock}]. Splitting up`)
+
+        const fromBlock =
+          _fromBlock === undefined
+            ? 0
+            : typeof _fromBlock === 'string'
+            ? (await this.web3.eth.getBlock(_fromBlock)).number
+            : _fromBlock
+
+        const toBlock =
+          _toBlock === undefined
+            ? await this.web3.eth.getBlockNumber()
+            : typeof _toBlock === 'string'
+            ? (await this.web3.eth.getBlock(_toBlock)).number
+            : _toBlock
+
+        // If we don't have numbers by now, something is not right, let it bubble up.
+        // Not gonna do this fully generic because we don't need it (yet, at least)
+        if (typeof fromBlock === 'number' && typeof toBlock === 'number') {
+          const currRange = toBlock - fromBlock
+
+          // if we are already querying for a single block and there are too many events, splitting the requests won't help
+          if (currRange > 1) {
+            const nextRange = Math.floor(Math.max(currRange / 2, 1))
+            const events = await this.safeGetEvents(fn, { ...options, toBlock: fromBlock + nextRange })
+            return events.concat(await this.safeGetEvents(fn, { ...options, fromBlock: fromBlock + nextRange + 1 }))
+          }
+        }
+      }
+      // Anything else: don't care, re-throw
+      throw e
+    }
   }
 
   public async subscribeToTradeEvent(params: SubscriptionParams): Promise<() => void> {
