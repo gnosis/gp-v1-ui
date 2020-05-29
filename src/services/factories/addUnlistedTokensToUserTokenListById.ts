@@ -1,7 +1,7 @@
 import { TokenList } from 'api/tokenList/TokenListApi'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { TokenDetails } from 'types'
-import { GetByIdParams } from './'
+import { GetByIdParams } from '.'
 
 interface FactoryParams {
   tokenListApi: TokenList
@@ -13,12 +13,12 @@ interface Injects {
 }
 
 /**
- * Factory of addUnlistendTokensToUserTokenListById
+ * Factory of addUnlistedTokensToUserTokenListById
  * Takes as input API instances
  * Returns async function to add unlisted tokens to USER_TOKEN_LIST by id
  * only adds token not alredy in the list
  */
-function addUnlistendTokensToUserTokenListByIdFactory(
+function addUnlistedTokensToUserTokenListByIdFactory(
   factoryParams: FactoryParams,
   { getTokenFromExchangeById }: Injects,
 ): (tokenIds: number[]) => Promise<void> {
@@ -41,4 +41,4 @@ function addUnlistendTokensToUserTokenListByIdFactory(
   }
 }
 
-export { addUnlistendTokensToUserTokenListByIdFactory }
+export { addUnlistedTokensToUserTokenListByIdFactory }

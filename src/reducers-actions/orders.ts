@@ -1,7 +1,7 @@
 import { Actions } from 'reducers-actions'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from '@gnosis.pm/dex-js'
-import { addUnlistendTokensToUserTokenListById } from 'services'
+import { addUnlistedTokensToUserTokenListById } from 'services'
 
 export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
@@ -138,6 +138,6 @@ export async function sideEffect(state: OrdersState, action: ReducerActionType):
       // orders can contain many duplicated tokenIds
       state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
 
-      addUnlistendTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
+      addUnlistedTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
   }
 }

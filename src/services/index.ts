@@ -11,7 +11,7 @@ import {
   TokenFromExchange,
   TokenFromErc20,
   getTradesFactory,
-  addUnlistendTokensToUserTokenListByIdFactory,
+  addUnlistedTokensToUserTokenListByIdFactory,
 } from './factories'
 
 import { logDebug } from 'utils'
@@ -44,7 +44,7 @@ export const getTokens = getTokensFactory({ ...apis, getTokenFromErc20 })
 
 export const getTrades = getTradesFactory({ ...apis, getTokens })
 
-export const addUnlistendTokensToUserTokenListById = addUnlistendTokensToUserTokenListByIdFactory(apis, {
+export const addUnlistedTokensToUserTokenListById = addUnlistedTokensToUserTokenListByIdFactory(apis, {
   getTokenFromExchangeById,
 })
 
