@@ -7,7 +7,7 @@ import { web3 } from 'api'
 
 import { getTrades } from 'services'
 
-import { appendTrades, updateLastCheckedBlock } from 'reducers-actions/trades'
+import { appendTrades, updateLastCheckedBlock, overwriteTrades } from 'reducers-actions/trades'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
@@ -29,6 +29,11 @@ export function useTrades(): Trade[] {
   const { userAddress, networkId } = useWalletConnection()
 
   const intervalId = useRef<null | NodeJS.Timeout>(null)
+
+  useEffect(() => {
+    // Resetting trades on network change
+    dispatch(overwriteTrades([], undefined))
+  }, [dispatch, networkId, userAddress])
 
   useEffect(() => {
     function updateTrades(): void {
