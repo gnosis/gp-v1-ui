@@ -54,7 +54,7 @@ const ModalWrapper = styled(ModalBodyWrapper)`
   }
 
   > span:first-of-type::after {
-    content: '⟶';
+    content: '/';
     margin: 0 1rem;
 
     @media ${MEDIA.mobile} {
@@ -137,7 +137,6 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
     message: (
       <ModalWrapper>
         <span>
-          <p>Bid</p>{' '}
           <TokenSelector
             tokens={tokenList}
             selected={baseToken}
@@ -165,8 +164,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
                 otherToken: baseToken,
               })
             }
-          />{' '}
-          <p>Ask</p>
+          />
         </span>
         <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
       </ModalWrapper>
