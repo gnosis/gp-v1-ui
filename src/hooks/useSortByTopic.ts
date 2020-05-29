@@ -20,7 +20,7 @@ function useSortByTopic<T, K extends string>(
   useMemo(() => {
     if (topic) {
       // make a copy as not to mutate
-      const dataCopy = Object.assign([], data)
+      const dataCopy = data.slice(0)
 
       const compareFn =
         // use custom compare fn
