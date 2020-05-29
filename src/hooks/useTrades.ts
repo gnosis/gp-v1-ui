@@ -31,21 +31,18 @@ export function useTrades(): Trade[] {
 
   useEffect(() => {
     function updateTrades(): void {
-      console.log(`Updating trades. Last checked block [${lastCheckedBlock}]`)
       if (userAddress && networkId) {
         // Don't want to update on every block
         // So instead, we get the latest block when the time comes
-        web3.eth.getBlock('latest').then(({ number: blockNumber }) => {
-          console.log(`Updating trades. Latest block [${blockNumber}]`)
-
+        web3.eth.getBlockNumber().then(toBlock => {
           getTrades({
             userAddress,
             networkId,
             // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
             fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
-            toBlock: blockNumber,
+            toBlock,
           }).then(newTrades =>
-            dispatch(newTrades.length > 0 ? appendTrades(newTrades, blockNumber) : updateLastCheckedBlock(blockNumber)),
+            dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock)),
           )
         })
       }
