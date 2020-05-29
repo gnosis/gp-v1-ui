@@ -44,7 +44,8 @@ export const getTokens = getTokensFactory({ ...apis, getTokenFromErc20 })
 
 export const getTrades = getTradesFactory({ ...apis, getTokens })
 
-export const addUnlistedTokensToUserTokenListById = addUnlistedTokensToUserTokenListByIdFactory(apis, {
+export const addUnlistedTokensToUserTokenListById = addUnlistedTokensToUserTokenListByIdFactory({
+  ...apis,
   getTokenFromExchangeById,
 })
 
