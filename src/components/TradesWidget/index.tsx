@@ -7,6 +7,7 @@ import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
 
 import { ContentPage } from 'components/Layout/PageWrapper'
 import { CardTable } from 'components/Layout/Card'
+import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -88,7 +89,7 @@ function csvTransformer(trade: Trade): string[] {
 }
 
 const Trades: React.FC = () => {
-  const { networkId, userAddress } = useWalletConnection()
+  const { networkId, userAddress, isConnected } = useWalletConnection()
   const trades = useTrades()
 
   const generateCsv = useCallback(
@@ -106,7 +107,9 @@ const Trades: React.FC = () => {
     [networkId, userAddress],
   )
 
-  return (
+  return !isConnected ? (
+    <ConnectWalletBanner />
+  ) : (
     <ContentPage>
       {trades.length > 0 && (
         <FileDownloaderLink data={generateCsv} options={{ type: 'text/csv;charset=utf-8;' }} filename={filename}>
