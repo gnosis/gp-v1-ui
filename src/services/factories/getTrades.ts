@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 import { addMinutes } from 'date-fns'
 
-import ExchangeApiImpl, { ExchangeApi, Trade, Order } from 'api/exchange/ExchangeApi'
+import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/exchange/ExchangeApi'
 import { getTokensFactory } from 'services/factories/tokenList'
 import { dateToBatchId, batchIdToDate } from 'utils'
 import { TokenDetails, calculatePrice } from '@gnosis.pm/dex-js'
@@ -12,6 +12,7 @@ interface GetTradesParams {
   userAddress: string
   fromBlock?: number
   toBlock?: number | 'latest' | 'pending'
+  orders: AuctionElement[]
 }
 
 // TODO: move to utils
@@ -36,7 +37,7 @@ export function getTradesFactory(factoryParams: {
   }
 
   async function getTrades(params: GetTradesParams): Promise<Trade[]> {
-    const { userAddress, networkId } = params
+    const { userAddress, networkId, orders: existingOrders } = params
 
     const tradeEvents = await exchangeApi.getPastTrades(params)
 
@@ -56,12 +57,23 @@ export function getTradesFactory(factoryParams: {
       tokenIdsSet.add(event.sellTokenId)
     })
 
-    // TODO: maybe combine both promise lists into 1?
-    const blockTimes = new Map<number, number>(await Promise.all(Array.from(blocksSet).map(getBlockTimePair)))
-    // TODO: we probably already have this info in global state and don't need to fetch from the contract again?
+    // Filter orders that we might already have
     const orders = new Map<string, Order>(
-      await Promise.all(Array.from(orderIdsSet).map(orderId => getOrderPair(userAddress, networkId, orderId))),
+      existingOrders
+        .filter(order => orderIdsSet.has(order.id))
+        .map(order => {
+          orderIdsSet.delete(order.id)
+          return [order.id, order]
+        }),
     )
+    // Fetch from contract the ones we don't have locally
+    const orderPairs = await Promise.all(
+      Array.from(orderIdsSet).map(orderId => getOrderPair(userAddress, networkId, orderId)),
+    )
+    orderPairs.forEach(pair => orders.set(...pair))
+
+    const blockTimes = new Map<number, number>(await Promise.all(Array.from(blocksSet).map(getBlockTimePair)))
+
     // TODO: list might not be up to date. Handle case where possibly tokens are not found
     // In that case, what to do? retry? get token from contract directly? use the `add to local list` functionality?
     const tokens = new Map(

@@ -22,6 +22,7 @@ export function useTrades(): Trade[] {
   const [
     {
       trades: { trades, lastCheckedBlock },
+      orders: { orders },
     },
     dispatch,
   ] = useGlobalState()
@@ -41,6 +42,7 @@ export function useTrades(): Trade[] {
             // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
             fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
             toBlock,
+            orders,
           }).then(newTrades =>
             dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock)),
           )
@@ -84,7 +86,7 @@ export function useTrades(): Trade[] {
     }
 
     return clear
-  }, [userAddress, networkId, lastCheckedBlock, dispatch, trades])
+  }, [userAddress, networkId, lastCheckedBlock, dispatch, trades, orders])
 
   // latest first
   return trades.slice(0).reverse()
