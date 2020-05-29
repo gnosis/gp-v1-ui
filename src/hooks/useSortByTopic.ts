@@ -1,28 +1,41 @@
 import { useMemo } from 'react'
 import useSafeState from './useSafeState'
 
-interface SortTopic {
-  topic: string
-  order: boolean
+interface SortTopic<K extends string> {
+  topic: K
+  asc: boolean
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function useSortByTopic<T>(
+function useSortByTopic<T, K extends string>(
   data: T[],
-  defaultTopic: string,
-): { sortTopic: SortTopic; setSortTopic: React.Dispatch<React.SetStateAction<SortTopic>> } {
+  defaultTopic: K,
+  compareFnFactory?: (topic: K, asc: boolean) => (lhs: T, rhs: T) => number,
+): { sortedData: T[]; sortTopic: SortTopic<K>; setSortTopic: React.Dispatch<React.SetStateAction<SortTopic<K>>> } {
   // true == 'asc' && false == 'dsc'
-  const [sortTopic, setSortTopic] = useSafeState<SortTopic>({ topic: defaultTopic, order: true })
+  const [sortTopic, setSortTopic] = useSafeState<SortTopic<K>>({ topic: defaultTopic, asc: true })
+  const [sortedData, setSortedData] = useSafeState<T[]>(data)
+
+  const { asc, topic } = sortTopic
 
   useMemo(() => {
-    if (sortTopic) {
-      data.sort((lhs, rhs) =>
-        sortTopic.order ? lhs[sortTopic.topic] - rhs[sortTopic.topic] : rhs[sortTopic.topic] - lhs[sortTopic.topic],
-      )
-    }
-  }, [data, sortTopic])
+    if (topic) {
+      // make a copy as not to mutate
+      const dataCopy = Object.assign([], data)
 
-  return { sortTopic, setSortTopic }
+      const compareFn =
+        // use custom compare fn
+        (compareFnFactory && compareFnFactory(topic, asc)) ||
+        // the default comparison function should assume numbers are being used
+        ((lhs: number, rhs: number): number => (asc ? lhs - rhs : rhs - lhs))
+
+      // Sort the data
+      dataCopy.sort(compareFn)
+
+      return setSortedData(dataCopy)
+    }
+  }, [compareFnFactory, data, asc, setSortedData, topic])
+
+  return { sortedData, sortTopic, setSortTopic }
 }
 
 export default useSortByTopic
