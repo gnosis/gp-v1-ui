@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 import { BATCH_TIME } from '@gnosis.pm/dex-js'
 
@@ -28,8 +28,6 @@ export function useTrades(): Trade[] {
   ] = useGlobalState()
   const { userAddress, networkId } = useWalletConnection()
 
-  const intervalId = useRef<null | NodeJS.Timeout>(null)
-
   useEffect(() => {
     // Resetting trades on network change
     dispatch(overwriteTrades([], undefined))
@@ -55,6 +53,8 @@ export function useTrades(): Trade[] {
       }
     }
 
+    let intervalId: null | NodeJS.Timeout = null
+
     // Don't bother starting the timeouts unless we are properly connected
     if (userAddress && networkId) {
       // Let's try to be a bit smarter, shall we?
@@ -69,23 +69,24 @@ export function useTrades(): Trade[] {
       const delay = getTimeRemainingInBatch() - 30
 
       // Update now to not leave the interface empty
-      if (trades.length === 0 || (delay >= 0 && delay < 10)) updateTrades()
+      if (trades.length === 0 || (delay >= 0 && delay < 10)) {
+        updateTrades()
+      }
 
       if (delay >= 0 && delay < 10) {
         // If time left in batch within this window, start the interval
-        intervalId.current = setInterval(updateTrades, BATCH_TIME_IN_MS)
+        intervalId = setInterval(updateTrades, BATCH_TIME_IN_MS)
       } else {
-        // Otherwise, set a timeout to, update, then set interval
-        intervalId.current = setTimeout(() => {
+        // Otherwise, set a timeout to update, then set interval
+        intervalId = setTimeout(() => {
           updateTrades()
-          intervalId.current = setInterval(updateTrades, BATCH_TIME_IN_MS)
+          intervalId = setInterval(updateTrades, BATCH_TIME_IN_MS)
         }, (delay < 0 ? delay + BATCH_TIME : delay) * 1000)
       }
     }
 
     return (): void => {
-      if (intervalId.current) clearInterval(intervalId.current)
-      intervalId.current = null
+      if (intervalId) clearInterval(intervalId)
     }
   }, [userAddress, networkId, lastCheckedBlock, dispatch, trades, orders])
 
