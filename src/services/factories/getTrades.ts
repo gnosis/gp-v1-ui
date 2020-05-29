@@ -1,10 +1,14 @@
 import Web3 from 'web3'
 import { addMinutes } from 'date-fns'
 
-import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/exchange/ExchangeApi'
-import { getTokensFactory } from 'services/factories/tokenList'
-import { dateToBatchId, batchIdToDate } from 'utils'
 import { TokenDetails, calculatePrice } from '@gnosis.pm/dex-js'
+
+import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/exchange/ExchangeApi'
+
+import { getTokensFactory } from 'services/factories/tokenList'
+import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
+
+import { dateToBatchId, batchIdToDate } from 'utils'
 import { BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
 interface GetTradesParams {
@@ -25,8 +29,9 @@ export function getTradesFactory(factoryParams: {
   web3: Web3
   exchangeApi: ExchangeApi
   getTokens: ReturnType<typeof getTokensFactory>
+  addUnlistedTokensToUserTokenListById: ReturnType<typeof addUnlistedTokensToUserTokenListByIdFactory>
 }): (params: GetTradesParams) => Promise<Trade[]> {
-  const { web3, exchangeApi, getTokens } = factoryParams
+  const { web3, exchangeApi, getTokens, addUnlistedTokensToUserTokenListById } = factoryParams
 
   async function getBlockTimePair(blockNumber: number): Promise<[number, number]> {
     return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp * 1000]
@@ -72,10 +77,13 @@ export function getTradesFactory(factoryParams: {
     )
     orderPairs.forEach(pair => orders.set(...pair))
 
+    // Fetch block info
     const blockTimes = new Map<number, number>(await Promise.all(Array.from(blocksSet).map(getBlockTimePair)))
 
-    // TODO: list might not be up to date. Handle case where possibly tokens are not found
-    // In that case, what to do? retry? get token from contract directly? use the `add to local list` functionality?
+    // Add whatever token might be missing. Will not try to add tokens already in the list.
+    await addUnlistedTokensToUserTokenListById(Array.from(tokenIdsSet))
+
+    // Get the tokens we need
     const tokens = new Map(
       getTokens(networkId)
         .filter(token => tokenIdsSet.has(token.id))
@@ -88,7 +96,6 @@ export function getTradesFactory(factoryParams: {
 
       const settlingDate = calculateSettlingDate(batchId)
 
-      // TODO: this might be empty
       const buyToken = tokens.get(event.buyTokenId) as TokenDetails
       const sellToken = tokens.get(event.sellTokenId) as TokenDetails
 

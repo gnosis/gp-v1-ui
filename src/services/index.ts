@@ -42,12 +42,12 @@ export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
 export const getTokens = getTokensFactory({ ...apis, getTokenFromErc20 })
 
-export const getTrades = getTradesFactory({ ...apis, getTokens })
-
 export const addUnlistedTokensToUserTokenListById = addUnlistedTokensToUserTokenListByIdFactory({
   ...apis,
   getTokenFromExchangeById,
 })
+
+export const getTrades = getTradesFactory({ ...apis, getTokens, addUnlistedTokensToUserTokenListById })
 
 export interface TokenAndNetwork {
   networkId: number
