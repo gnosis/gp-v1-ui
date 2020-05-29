@@ -7,7 +7,7 @@ interface FileSaverLinkProps {
 }
 
 export const FileDownloaderLink: React.FC<FileSaverLinkProps & AnchorHTMLAttributes<HTMLAnchorElement>> = ({
-  data,
+  data: _data,
   options,
   filename,
   ...anchorProps
@@ -26,22 +26,22 @@ export const FileDownloaderLink: React.FC<FileSaverLinkProps & AnchorHTMLAttribu
   // only create download onClick because
   // creating and retaining BLob and ObjectURL can be expensive on each render
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
+    const data = _data instanceof Function ? _data() : _data
     // no data
     if (!data) {
       // prevent invalid file download
       e.preventDefault()
       return
     }
-    const csvData = typeof data === 'string' ? data : data()
     // data didn't change, reusing already set ObjectURL
-    if (lastDataUsed.current === csvData) return
-    lastDataUsed.current = csvData
+    if (lastDataUsed.current === data) return
+    lastDataUsed.current = data
 
     // new data, need new ObjectURL
     // release old if was set previously
     if (lastObjectURL.current) URL.revokeObjectURL(lastObjectURL.current)
 
-    const blob = new Blob([csvData], options)
+    const blob = new Blob([data], options)
     e.currentTarget.href = lastObjectURL.current = URL.createObjectURL(blob)
   }
 
