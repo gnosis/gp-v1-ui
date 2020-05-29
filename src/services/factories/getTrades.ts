@@ -20,9 +20,9 @@ interface GetTradesParams {
 }
 
 // TODO: move to utils
-function calculateSettlingDate(batchId: number): Date {
+function calculateSettlingTimestamp(batchId: number): number {
   const batchStart = batchIdToDate(batchId)
-  return addMinutes(batchStart, BATCH_SUBMISSION_CLOSE_TIME)
+  return addMinutes(batchStart, BATCH_SUBMISSION_CLOSE_TIME).getTime()
 }
 
 export function getTradesFactory(factoryParams: {
@@ -94,8 +94,6 @@ export function getTradesFactory(factoryParams: {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
 
-      const settlingDate = calculateSettlingDate(batchId)
-
       const buyToken = tokens.get(event.buyTokenId) as TokenDetails
       const sellToken = tokens.get(event.sellTokenId) as TokenDetails
 
@@ -105,7 +103,7 @@ export function getTradesFactory(factoryParams: {
         ...event,
         batchId,
         timestamp,
-        settlingDate,
+        settlingTimestamp: calculateSettlingTimestamp(batchId),
         revertKey: ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId),
         buyToken,
         sellToken,

@@ -89,7 +89,7 @@ export function isTradeFilled(trade: Trade): boolean {
 }
 
 export function isTradeSettled(trade: Trade): boolean {
-  return trade.settlingDate <= new Date()
+  return trade.settlingTimestamp <= Date.now()
 }
 
 export const isOrderActive = (order: AuctionElement, now: Date): boolean =>
