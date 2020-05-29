@@ -160,3 +160,4 @@ export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
 // however, the new state, that flows top down once a bock is mined, can have a small delayed
 // This delay mitigates the strange effect of stopping the loading before the data is updated
 export const DISABLE_SPINNER_DELAY = 1000
+export const DEFAULT_ORDERS_SORTABLE_TOPIC = 'validUntil'

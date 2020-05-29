@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // Const and utils
 import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 import { isOrderActive, isPendingOrderActive } from 'utils'
+import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 
 // Hooks
 import { useOrders } from 'hooks/useOrders'
@@ -53,6 +54,8 @@ type FilteredOrdersState = {
   }
 }
 
+type TopicNames = 'validUntil'
+
 function emptyState(): FilteredOrdersState {
   return {
     active: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
@@ -78,6 +81,14 @@ function classifyOrders(
       state.active[ordersType].push(order)
     }
   })
+}
+
+const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionElement, rhs: AuctionElement): number => {
+  if (asc) {
+    return lhs[topic] - rhs[topic]
+  } else {
+    return rhs[topic] - lhs[topic]
+  }
 }
 
 const OrdersWidget: React.FC = () => {
@@ -142,7 +153,11 @@ const OrdersWidget: React.FC = () => {
   )
 
   // Sort validUntil
-  const { sortTopic, setSortTopic } = useSortByTopic<AuctionElement>(displayedOrders, 'validUntil')
+  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<AuctionElement, TopicNames>(
+    displayedOrders,
+    DEFAULT_ORDERS_SORTABLE_TOPIC,
+    compareFnFactory,
+  )
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
@@ -279,9 +294,9 @@ const OrdersWidget: React.FC = () => {
                       <th className="filled">Filled / Total</th>
                       <th
                         className="sortable"
-                        onClick={(): void => setSortTopic(prev => ({ ...prev, order: !prev.order }))}
+                        onClick={(): void => setSortTopic(prev => ({ ...prev, asc: !prev.asc }))}
                       >
-                        Expires <FontAwesomeIcon size="xs" icon={!sortTopic.order ? faChevronDown : faChevronUp} />
+                        Expires <FontAwesomeIcon size="xs" icon={!sortTopic.asc ? faChevronDown : faChevronUp} />
                       </th>
                       <th className="status">Status</th>
                     </tr>
@@ -299,7 +314,7 @@ const OrdersWidget: React.FC = () => {
                         transactionHash={order.txHash}
                       />
                     ))}
-                    {displayedOrders.map(order => (
+                    {sortedDisplayedOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}
