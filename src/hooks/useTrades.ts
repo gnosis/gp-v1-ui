@@ -55,13 +55,6 @@ export function useTrades(): Trade[] {
       }
     }
 
-    function clear(): void {
-      if (intervalId.current) clearInterval(intervalId.current)
-      intervalId.current = null
-    }
-
-    clear()
-
     // Don't bother starting the timeouts unless we are properly connected
     if (userAddress && networkId) {
       // Let's try to be a bit smarter, shall we?
@@ -90,7 +83,10 @@ export function useTrades(): Trade[] {
       }
     }
 
-    return clear
+    return (): void => {
+      if (intervalId.current) clearInterval(intervalId.current)
+      intervalId.current = null
+    }
   }, [userAddress, networkId, lastCheckedBlock, dispatch, trades, orders])
 
   // latest first
