@@ -1,58 +1,72 @@
 import { logDebug } from 'utils/miscellaneous'
 
-// TODO: can I make sure - using types - that headers length matches transformer return type length?
-// Alternatively, I could make headers be the keys of a second type parameter
-// which is the result of transformer, such as transformer<T, R>(item: T) => R[]
-interface ToCsvParams<T> {
-  headers?: string[]
+export interface CsvColumns {
+  [key: string]: string
+}
+
+export function escapeValue(value: string): string {
+  // " is a string delimeter
+  // if already included in e.g. symbol
+  // must be replaced by double ""
+  value = value.replace(/"/g, '""')
+
+  // if there's a field delimeter comma in e.g. symbol or date
+  // need to enclose whole string in quotes
+  if (value.includes(',')) value = `"${value}"`
+  return value
+}
+
+interface ToCsvParams<T, R extends CsvColumns> {
   data: T[]
-  transformer: (item: T) => string[]
+  transformer: (item: T) => R
 }
 
 /**
  * Util function that transforms given data and transformer function into a csv string,
  * taking care of escaping and error handling
  *
- * `headers` (optional). If present, length must match transformer return type length
  * `data` is a list of items to be converted to CSV by `transformer`
- * `transformer` is a function that receives the item and returns a list of strings
+ * `transformer` is a function that receives the item and returns an object
+ *
+ * Column order will be given by key order on returned object from transformer.
+ *
+ * When no data, empty string is returned
  */
-export function toCsv<T>({ headers = [], data, transformer }: ToCsvParams<T>): string {
-  return data
-    .reduce(
+export function toCsv<T, R extends CsvColumns>({ data, transformer }: ToCsvParams<T, R>): string {
+  if (data.length === 0) {
+    return ''
+  }
+
+  // Extract first item from list, to avoid redoing a potentially expensive operation twice
+  const [firstDataItem, ...remainingData] = data
+
+  // Extract headers from first item
+  const transformed = transformer(firstDataItem)
+  const headers = Object.keys(transformed).join(',')
+  // Since we already got it, use first row
+  const firstRow = Object.values(transformed)
+    .map(escapeValue)
+    .join(',')
+
+  return remainingData
+    .reduce<string[]>(
       (acc, item) => {
         let values
         try {
-          values = transformer(item)
-
-          // Make sure the returned values match.
-          console.assert(
-            headers && values.length !== headers.length,
-            `Values length (${values.length}) doesn't match headers length ${headers.length}`,
-          )
+          // Extract values from transformed data. We already have the keys.
+          values = Object.values(transformer(item))
         } catch (e) {
           logDebug(`[utils:toCsv] Not able to transform into csv: ${item}`, e)
           return acc
         }
-        const csvRow = values
-          .map(value => {
-            // " is a string delimeter
-            // if already included in e.g. symbol
-            // must be replaced by double ""
-            value = value.replace(/"/g, '""')
-
-            // if there's a field delimeter comma in e.g. symbol or date
-            // need to enclose whole string in quotes
-            if (value.includes(',')) value = `"${value}"`
-            return value
-          })
-          .join(',')
+        const csvRow = values.map(escapeValue).join(',')
 
         acc.push(csvRow)
 
         return acc
       },
-      [headers.join(',')],
+      // Start off with headers and first row
+      [headers, firstRow],
     )
     .join('\n')
 }

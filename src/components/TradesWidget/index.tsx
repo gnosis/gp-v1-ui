@@ -15,34 +15,16 @@ import { useTrades } from 'hooks/useTrades'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
-import { toCsv } from 'utils/csv'
+import { toCsv, CsvColumns } from 'utils/csv'
 
 import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
 import { getNetworkFromId, isTradeSettled } from 'utils'
-
-const csvHeaders = [
-  'Market',
-  'BuyTokenSymbol',
-  'BuyTokenAddress',
-  'SellTokenSymbol',
-  'SellTokenAddress',
-  'Limit Price',
-  'Fill Price',
-  'Amount',
-  'Received',
-  'Type',
-  'Time',
-  'TransactionHash',
-  'EventLogIndex',
-  'OrderId',
-  'BatchId',
-]
 
 function symbolOrAddress(token: TokenDetails): string {
   return token.symbol || token.address
 }
 
-function csvTransformer(trade: Trade): string[] {
+function csvTransformer(trade: Trade): CsvColumns {
   const {
     buyToken,
     sellToken,
@@ -57,35 +39,40 @@ function csvTransformer(trade: Trade): string[] {
     batchId,
   } = trade
 
-  return [
-    `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
-    buyToken.symbol || '',
-    buyToken.address,
-    sellToken.symbol || '',
-    sellToken.address,
-    formatPrice(limitPrice),
-    formatPrice(fillPrice),
-    formatAmount({
+  // The order of the keys defines csv column order,
+  // as well as names and whether to include it or not.
+  // We can optionally define an interface for that.
+  // I'm opting not to, to avoid duplication and the expectation of ordering,
+  // since it's ultimately defined here.
+  return {
+    Market: `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
+    BuyTokenSymbol: buyToken.symbol || '',
+    BuyTokenAddress: buyToken.address,
+    SellTokenSymbol: sellToken.symbol || '',
+    SellTokenAddress: sellToken.address,
+    LimitPrice: formatPrice({ price: limitPrice, decimals: 8 }),
+    FillPrice: formatPrice({ price: fillPrice, decimals: 8 }),
+    Amount: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
       decimals: sellToken.decimals,
       thousandSeparator: false,
       isLocaleAware: false,
     }),
-    formatAmount({
+    Received: formatAmount({
       amount: buyAmount,
       precision: buyToken.decimals as number,
       decimals: sellToken.decimals,
       thousandSeparator: false,
       isLocaleAware: false,
     }),
-    classifyTrade(trade),
-    new Date(timestamp).toISOString(),
-    txHash,
-    eventIndex.toString(),
-    orderId,
-    batchId.toString(),
-  ]
+    Type: classifyTrade(trade),
+    Time: new Date(timestamp).toISOString(),
+    TransactionHash: txHash,
+    EventLogIndex: eventIndex.toString(),
+    OrderId: orderId,
+    BatchId: batchId.toString(),
+  }
 }
 
 const Trades: React.FC = () => {
@@ -95,7 +82,6 @@ const Trades: React.FC = () => {
   const generateCsv = useCallback(
     () =>
       toCsv({
-        headers: csvHeaders,
         data: trades.filter(isTradeSettled),
         transformer: csvTransformer,
       }),
