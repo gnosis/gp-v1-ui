@@ -45,6 +45,7 @@ function csvTransformer(trade: Trade): CsvColumns {
   // I'm opting not to, to avoid duplication and the expectation of ordering,
   // since it's ultimately defined here.
   return {
+    Date: new Date(timestamp).toISOString(),
     Market: `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
     BuyTokenSymbol: buyToken.symbol || '',
     BuyTokenAddress: buyToken.address,
@@ -67,7 +68,6 @@ function csvTransformer(trade: Trade): CsvColumns {
       isLocaleAware: false,
     }),
     Type: classifyTrade(trade),
-    Time: new Date(timestamp).toISOString(),
     TransactionHash: txHash,
     EventLogIndex: eventIndex.toString(),
     OrderId: orderId,
@@ -102,16 +102,16 @@ const Trades: React.FC = () => {
           <FontAwesomeIcon icon={faFileCsv} size="2x" />
         </FileDownloaderLink>
       )}
-      <CardTable $columns="1fr 1.2fr repeat(2, 0.8fr) 1.2fr 0.7fr 0.8fr 1fr" $rowSeparation="0">
+      <CardTable $columns="1.2fr 1fr 1.2fr repeat(2, 0.7fr) 1.2fr 0.7fr 1fr" $rowSeparation="0">
         <thead>
           <tr>
+            <th>Date</th>
             <th>Market</th>
             <th>Amount</th>
             <th>Limit Price</th>
             <th>Fill Price</th>
             <th>Received</th>
             <th>Type</th>
-            <th>Time</th>
             <th>Tx</th>
           </tr>
         </thead>

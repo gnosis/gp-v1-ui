@@ -7,7 +7,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/EtherscanLink'
 
-import { isTradeFilled, isTradeSettled } from 'utils'
+import { isTradeFilled, isTradeSettled, formatDateFromBatchId } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
 export function classifyTrade(trade: Trade): string {
@@ -49,6 +49,9 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <tr data-order-id={orderId} data-batch-id={batchId}>
+      <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
+        {formatDateFromBatchId(batchId)}
+      </td>
       <td>
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
@@ -69,7 +72,6 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td>
         <TypePill $bgColor={isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>{classifyTrade(trade)}</TypePill>
       </td>
-      <td>{new Date(timestamp).toLocaleString()}</td>
       <td>
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
       </td>
