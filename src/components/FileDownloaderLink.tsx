@@ -26,7 +26,7 @@ export const FileDownloaderLink: React.FC<FileSaverLinkProps & AnchorHTMLAttribu
   // only create download onClick because
   // creating and retaining BLob and ObjectURL can be expensive on each render
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>): void => {
-    const data = _data instanceof Function ? _data() : _data
+    const data = typeof _data === 'function' ? _data() : _data
     // no data
     if (!data) {
       // prevent invalid file download
