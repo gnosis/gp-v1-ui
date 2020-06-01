@@ -34,11 +34,8 @@ export function getTradesFactory(factoryParams: {
   const { web3, exchangeApi, getTokens, addUnlistedTokensToUserTokenListById } = factoryParams
 
   async function getBlockTimePair(blockNumber: number): Promise<[number, number]> {
+    // js timestamp == unix timestamp * 1000
     return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp * 1000]
-  }
-
-  async function getOrderPair(userAddress: string, networkId: number, orderId: string): Promise<[string, Order]> {
-    return [orderId, await exchangeApi.getOrder({ userAddress, networkId, orderId })]
   }
 
   async function getTrades(params: GetTradesParams): Promise<Trade[]> {
@@ -62,24 +59,29 @@ export function getTradesFactory(factoryParams: {
       tokenIdsSet.add(event.sellTokenId)
     })
 
-    // Filter orders that we might already have
-    const orders = new Map<string, Order>(
-      existingOrders
-        .filter(order => orderIdsSet.has(order.id))
-        .map(order => {
-          orderIdsSet.delete(order.id)
-          return [order.id, order]
-        }),
-    )
-    // Fetch from contract the ones we don't have locally
-    const orderPairs = await Promise.all(
-      Array.from(orderIdsSet).map(orderId => getOrderPair(userAddress, networkId, orderId)),
-    )
-    orderPairs.forEach(pair => orders.set(...pair))
+    // ### ORDERS ###
+    const orders = new Map<string, Order>()
+    // Add all existing orders to map. No problem to have more than what we need since it'll be picked by id later.
+    existingOrders.forEach(order => orders.set(order.id, order))
 
-    // Fetch block info
+    // Fetch from contract the ones we don't have locally, and add it to the map
+    await Promise.all(
+      Array.from(orderIdsSet).map(async orderId => {
+        // We already have this order, ignore
+        if (orders.has(orderId)) {
+          return
+        }
+        // Fetch order from contract
+        const order = await exchangeApi.getOrder({ userAddress, networkId, orderId })
+        // Store in the orders map
+        orders.set(orderId, order)
+      }),
+    )
+
+    // ### BLOCKS ###
     const blockTimes = new Map<number, number>(await Promise.all(Array.from(blocksSet).map(getBlockTimePair)))
 
+    // ### TOKENS ###
     // Add whatever token might be missing. Will not try to add tokens already in the list.
     await addUnlistedTokensToUserTokenListById(Array.from(tokenIdsSet))
 
