@@ -8,7 +8,7 @@ import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
 
-import { dateToBatchId, batchIdToDate } from 'utils'
+import { dateToBatchId, batchIdToDate, isOrderDeleted, logDebug } from 'utils'
 import { BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
 interface GetTradesParams {
@@ -49,14 +49,20 @@ export function getTradesFactory(factoryParams: {
     }
 
     const blocksSet = new Set<number>()
-    const orderIdsSet = new Set<string>()
+    const orderIdsMap = new Map<string, { buyTokenId: number; sellTokenId: number; blockNumber: number }>()
     const tokenIdsSet = new Set<number>()
 
     tradeEvents.forEach(event => {
-      blocksSet.add(event.blockNumber)
-      orderIdsSet.add(event.orderId)
-      tokenIdsSet.add(event.buyTokenId)
-      tokenIdsSet.add(event.sellTokenId)
+      const { blockNumber, sellTokenId, buyTokenId, orderId } = event
+
+      blocksSet.add(blockNumber)
+      orderIdsMap.set(orderId, {
+        buyTokenId,
+        sellTokenId,
+        blockNumber,
+      })
+      tokenIdsSet.add(buyTokenId)
+      tokenIdsSet.add(sellTokenId)
     })
 
     // ### ORDERS ###
@@ -66,13 +72,33 @@ export function getTradesFactory(factoryParams: {
 
     // Fetch from contract the ones we don't have locally, and add it to the map
     await Promise.all(
-      Array.from(orderIdsSet).map(async orderId => {
+      Array.from(orderIdsMap.keys()).map(async orderId => {
         // We already have this order, ignore
         if (orders.has(orderId)) {
           return
         }
         // Fetch order from contract
-        const order = await exchangeApi.getOrder({ userAddress, networkId, orderId })
+        let order = await exchangeApi.getOrder({ userAddress, networkId, orderId })
+        // Load additional info
+        const orderInfo = orderIdsMap.get(orderId)
+
+        // In case order was deleted from the contract, try to get it from OrderPlacement events instead
+        if (isOrderDeleted(order) && orderInfo) {
+          const { buyTokenId, sellTokenId, blockNumber } = orderInfo
+          try {
+            order = await exchangeApi.getOrderFromOrderPlacementEvent({
+              userAddress,
+              networkId,
+              orderId,
+              // Parameters bellow not required, but help narrow down the search
+              buyTokenId,
+              sellTokenId,
+              toBlock: blockNumber,
+            })
+          } catch (e) {
+            logDebug(`[services:getTrades] Placement event not found for order ${orderId}`, e)
+          }
+        }
         // Store in the orders map
         orders.set(orderId, order)
       }),
@@ -88,6 +114,8 @@ export function getTradesFactory(factoryParams: {
     // Create tokens map. No need to do the extra hop to filter, since it'll be picked by id later
     const tokens = new Map(getTokens(networkId).map(token => [token.id, token]))
 
+    // ### TRADES ###
+    // Final step, put all together into Trade objects
     const trades = tradeEvents.reduce<Trade[]>((acc, event) => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
