@@ -97,11 +97,6 @@ const Trades: React.FC = () => {
     <ConnectWalletBanner />
   ) : (
     <ContentPage>
-      {trades.length > 0 && (
-        <FileDownloaderLink data={generateCsv} options={{ type: 'text/csv;charset=utf-8;' }} filename={filename}>
-          <FontAwesomeIcon icon={faFileCsv} size="2x" />
-        </FileDownloaderLink>
-      )}
       <CardTable $columns="1.2fr 1fr 1.2fr repeat(2, 0.7fr) 1.2fr 0.7fr 1fr" $rowSeparation="0">
         <thead>
           <tr>
@@ -112,7 +107,27 @@ const Trades: React.FC = () => {
             <th>Fill Price</th>
             <th>Received</th>
             <th>Type</th>
-            <th>Tx</th>
+            <th>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-around',
+                  alignItems: 'center',
+                }}
+              >
+                <span>Tx</span>
+
+                {trades.length > 0 && (
+                  <FileDownloaderLink
+                    data={generateCsv}
+                    options={{ type: 'text/csv;charset=utf-8;' }}
+                    filename={filename}
+                  >
+                    <FontAwesomeIcon icon={faFileCsv} size="2x" />
+                  </FileDownloaderLink>
+                )}
+              </div>
+            </th>
           </tr>
         </thead>
         <tbody>
