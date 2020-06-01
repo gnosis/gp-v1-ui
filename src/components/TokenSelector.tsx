@@ -11,7 +11,7 @@ import searchIcon from 'assets/img/search.svg'
 import { MEDIA } from 'const'
 import { TokenDetails, TokenBalanceDetails, Network } from 'types'
 import { isAddress } from 'web3-utils'
-import { formatAmount } from '@gnosis.pm/dex-js'
+import { formatSmart } from 'utils'
 import { tokenListApi } from 'api'
 
 // components
@@ -146,7 +146,7 @@ function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.Rea
   return (
     <OptionItem name={name} symbol={symbol} image={image}>
       {'totalExchangeBalance' in token && (
-        <div className="tokenBalance">{formatAmount(token.totalExchangeBalance, decimals)}</div>
+        <div className="tokenBalance">{formatSmart(token.totalExchangeBalance, decimals)}</div>
       )}
     </OptionItem>
   )

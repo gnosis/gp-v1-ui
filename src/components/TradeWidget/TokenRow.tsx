@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form'
 // types, const and utils
 import { TokenDetails, TokenBalanceDetails } from 'types'
 import { ZERO, MEDIA } from 'const'
-import { formatAmount, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
+import { formatSmart, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 
 // components
 import TokenSelector from 'components/TokenSelector'
@@ -139,8 +139,8 @@ interface Props {
 
 const BalanceTooltip = (
   <HelpTooltipContainer>
-    This balance reflects the amount deposited in the Exchange Wallet on Mesa. Only orders with a balance will be
-    considered for matching.
+    This balance reflects the amount deposited in the Exchange Wallet on Gnosis Protocol. Only orders with a balance
+    will be considered for matching.
   </HelpTooltipContainer>
 )
 
@@ -188,7 +188,7 @@ const TokenRow: React.FC<Props> = ({
         </i>
         <i>Sell amount exceeds your balance by</i>
         <strong>
-          {formatAmountFull({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
+          {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
         <Link to="/wallet" className="depositNow">
           + Deposit {selectedToken.symbol}
@@ -247,12 +247,12 @@ const TokenRow: React.FC<Props> = ({
             {readOnly ? (
               <FormMessage className={balanceClassName}>
                 {' '}
-                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
               </FormMessage>
             ) : (
               <FormMessage className={balanceClassName}>
                 {' '}
-                {balance ? formatAmount(balance.totalExchangeBalance, balance.decimals) : '0'}
+                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
                 {validateMaxAmount && (
                   <>
                     <TooltipWrapper tooltip="Fill maximum">

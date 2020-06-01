@@ -7,7 +7,7 @@ import { walletApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatAmount, logDebug } from 'utils'
+import { formatSmart, logDebug } from 'utils'
 
 interface UseEthBalanceResult {
   ethBalance: BN | null
@@ -25,7 +25,7 @@ export const useEthBalances = (): UseEthBalanceResult => {
       walletApi
         .getBalance()
         .then(etherBalance => {
-          logDebug('[useEthBalance] Wallet balance: %s ETH', formatAmount(etherBalance, DEFAULT_PRECISION))
+          logDebug('[useEthBalance] Wallet balance: %s ETH', formatSmart(etherBalance, DEFAULT_PRECISION))
           setEthBalance(etherBalance)
           setError(false)
         })

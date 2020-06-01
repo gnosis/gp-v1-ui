@@ -106,7 +106,7 @@ function getTokenFromExchangeByAddressFactory(
   }
 }
 
-interface GetByIdParams {
+export interface GetByIdParams {
   networkId: number
   tokenId: number
 }

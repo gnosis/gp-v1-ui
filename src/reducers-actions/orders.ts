@@ -1,6 +1,7 @@
 import { Actions } from 'reducers-actions'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 import { ZERO } from '@gnosis.pm/dex-js'
+import { addUnlistendTokensToUserTokenListById } from 'services'
 
 export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
@@ -124,5 +125,19 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
     }
     default:
       return state
+  }
+}
+
+export async function sideEffect(state: OrdersState, action: ReducerActionType): Promise<void> {
+  switch (action.type) {
+    case 'OVERWRITE_ORDERS':
+    case 'UPDATE_ORDERS':
+    case 'APPEND_ORDERS':
+      const newTokenIdsFromOrders = new Set<number>()
+
+      // orders can contain many duplicated tokenIds
+      state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
+
+      addUnlistendTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
   }
 }
