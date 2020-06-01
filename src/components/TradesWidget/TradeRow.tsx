@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatPrice, formatSmart } from '@gnosis.pm/dex-js'
+import { formatPrice, formatSmart, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
@@ -52,13 +52,17 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td>
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td>
+      <td data-label="Amount" title={formatAmountFull({ amount: sellAmount, precision: sellToken.decimals as number })}>
         {formatSmart({ amount: sellAmount, precision: sellToken.decimals as number })}{' '}
         {displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td>{formatPrice(limitPrice)}</td>
-      <td>{formatPrice(fillPrice)}</td>
-      <td>
+      <td data-label="Limit Price" title={formatPrice({ price: limitPrice, decimals: 8 })}>
+        {formatPrice(limitPrice)}
+      </td>
+      <td data-label="Fill Price" title={formatPrice({ price: fillPrice, decimals: 8 })}>
+        {formatPrice(fillPrice)}
+      </td>
+      <td data-label="Received" title={formatAmountFull({ amount: buyAmount, precision: buyToken.decimals as number })}>
         {formatSmart({ amount: buyAmount, precision: buyToken.decimals as number })}{' '}
         {displayTokenSymbolOrLink(buyToken)}
       </td>
