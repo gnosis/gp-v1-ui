@@ -83,12 +83,8 @@ export function getTradesFactory(factoryParams: {
     // Add whatever token might be missing. Will not try to add tokens already in the list.
     await addUnlistedTokensToUserTokenListById(Array.from(tokenIdsSet))
 
-    // Get the tokens we need
-    const tokens = new Map(
-      getTokens(networkId)
-        .filter(token => tokenIdsSet.has(token.id))
-        .map(token => [token.id, token]),
-    )
+    // Create tokens map. No need to do the extra hop to filter, since it'll be picked by id later
+    const tokens = new Map(getTokens(networkId).map(token => [token.id, token]))
 
     const trades = tradeEvents.reduce<Trade[]>((acc, event) => {
       const timestamp = blockTimes.get(event.blockNumber) as number
