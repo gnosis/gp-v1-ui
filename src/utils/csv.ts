@@ -1,8 +1,6 @@
 import { logDebug } from 'utils/miscellaneous'
 
-export interface CsvColumns {
-  [key: string]: string
-}
+export type CsvColumns = Record<string, string>
 
 export function escapeValue(value: string): string {
   // " is a string delimeter
