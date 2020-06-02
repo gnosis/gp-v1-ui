@@ -77,10 +77,10 @@ export function getTradesFactory(factoryParams: {
         if (orders.has(orderId)) {
           return
         }
-        // Fetch order from contract
-        let order = await exchangeApi.getOrder({ userAddress, networkId, orderId })
         // Load additional info
         const orderInfo = orderIdsMap.get(orderId)
+        // Fetch order from contract
+        let order = await exchangeApi.getOrder({ userAddress, networkId, orderId, blockNumber: orderInfo?.blockNumber })
 
         // In case order was deleted from the contract, try to get it from OrderPlacement events instead
         if (isOrderDeleted(order) && orderInfo) {

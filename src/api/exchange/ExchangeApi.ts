@@ -21,6 +21,7 @@ export interface GetOrdersParams extends BaseParams {
 
 export interface GetOrderParams extends GetOrdersParams {
   orderId: string
+  blockNumber?: number
 }
 
 export interface GetOrderFromOrderPlacementEventParams extends GetOrderParams {
@@ -339,11 +340,17 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     return trade
   }
 
-  public async getOrder({ userAddress, networkId, orderId }: GetOrderParams): Promise<Order> {
+  public async getOrder({ userAddress, networkId, orderId, blockNumber }: GetOrderParams): Promise<Order> {
     const contract = await this._getContract(networkId)
     logDebug(`[ExchangeApiImpl] Getting order ${orderId} for account ${userAddress}`)
 
-    const rawOrder = await contract.methods.orders(userAddress, orderId).call()
+    // TODO: Lol, need an eslint ignore to ignore a ts-ignore.
+    // TODO: Anyway, this is required because `blockNumber` option isn't typed.
+    // TODO: Dima might have an idea on how to manually fix that on `dex-js` side.
+    // TODO: In the mean time, the double layer ignore is required.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    //@ts-ignore
+    const rawOrder = await contract.methods.orders(userAddress, orderId).call({}, blockNumber)
 
     return decodeOrder(rawOrder)
   }
