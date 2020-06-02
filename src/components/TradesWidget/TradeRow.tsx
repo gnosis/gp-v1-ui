@@ -11,7 +11,7 @@ import { isTradeFilled, isTradeSettled, formatDateFromBatchId } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
 export function classifyTrade(trade: Trade): string {
-  return isTradeFilled(trade) ? 'Full' : 'Partial'
+  return !trade.remainingAmount ? 'Unknown' : isTradeFilled(trade) ? 'Full' : 'Partial'
 }
 
 interface TradeRowProps {
@@ -59,8 +59,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatSmart({ amount: sellAmount, precision: sellToken.decimals as number })}{' '}
         {displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td data-label="Limit Price" title={formatPrice({ price: limitPrice, decimals: 8 })}>
-        {formatPrice(limitPrice)}
+      <td data-label="Limit Price" title={limitPrice && formatPrice({ price: limitPrice, decimals: 8 })}>
+        {limitPrice ? formatPrice(limitPrice) : 'N/A'}
       </td>
       <td data-label="Fill Price" title={formatPrice({ price: fillPrice, decimals: 8 })}>
         {formatPrice(fillPrice)}
@@ -70,7 +70,9 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {displayTokenSymbolOrLink(buyToken)}
       </td>
       <td>
-        <TypePill $bgColor={isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>{classifyTrade(trade)}</TypePill>
+        <TypePill $bgColor={!trade.remainingAmount ? 'grey' : isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>
+          {classifyTrade(trade)}
+        </TypePill>
       </td>
       <td>
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />

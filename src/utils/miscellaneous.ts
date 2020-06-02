@@ -104,7 +104,9 @@ export function isOrderFilled(order: AuctionElement): boolean {
 }
 
 export function isTradeFilled(trade: Trade): boolean {
-  return isAmountDifferenceGreaterThanNegligibleAmount(trade.sellAmount, trade.remainingAmount)
+  return (
+    !!trade.remainingAmount && isAmountDifferenceGreaterThanNegligibleAmount(trade.sellAmount, trade.remainingAmount)
+  )
 }
 
 export function isTradeSettled(trade: Trade): boolean {

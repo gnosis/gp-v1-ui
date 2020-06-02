@@ -7,7 +7,7 @@ import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
 
-import { dateToBatchId, calculateSettlingTimestamp } from 'utils'
+import { dateToBatchId, calculateSettlingTimestamp, logDebug } from 'utils'
 
 interface GetTradesParams {
   networkId: number
@@ -70,17 +70,21 @@ export function getTradesFactory(factoryParams: {
         const blockNumber = orderIdToBlockNumberMap.get(orderId)
 
         // Fetch order from contract
-        const order = await exchangeApi.getOrder({
-          userAddress,
-          networkId,
-          orderId,
-          // blockNumber is used to fetch the order at the same block where the Trade event was emitted
-          // thus avoiding empty orders in case it was deleted later
-          blockNumber,
-        })
+        try {
+          const order = await exchangeApi.getOrder({
+            userAddress,
+            networkId,
+            orderId,
+            // blockNumber is used to fetch the order at the same block where the Trade event was emitted
+            // thus avoiding empty orders in case it was deleted later
+            blockNumber,
+          })
 
-        // Store in the orders map
-        orders.set(orderId, order)
+          // Store in the orders map
+          orders.set(orderId, order)
+        } catch (e) {
+          logDebug(`[services:getTrades] failed to fetch order ${orderId}: ${e.message}`)
+        }
       }),
     )
 
@@ -103,7 +107,8 @@ export function getTradesFactory(factoryParams: {
       const buyToken = tokens.get(event.buyTokenId) as TokenDetails
       const sellToken = tokens.get(event.sellTokenId) as TokenDetails
 
-      const order = orders.get(event.orderId) as Order
+      // Maybe we couldn't find the order /shrug
+      const order = orders.get(event.orderId)
 
       const trade: Trade = {
         ...event,
@@ -113,15 +118,17 @@ export function getTradesFactory(factoryParams: {
         revertKey: ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId),
         buyToken,
         sellToken,
-        limitPrice: calculatePrice({
-          numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
-          denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
-        }),
+        limitPrice:
+          order &&
+          calculatePrice({
+            numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
+            denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
+          }),
         fillPrice: calculatePrice({
           numerator: { amount: event.buyAmount, decimals: buyToken.decimals },
           denominator: { amount: event.sellAmount, decimals: sellToken.decimals },
         }),
-        remainingAmount: order.priceDenominator.sub(event.sellAmount),
+        remainingAmount: order && order.priceDenominator.sub(event.sellAmount),
       }
       acc.push(trade)
 

@@ -141,9 +141,9 @@ export interface Trade extends BaseTradeEvent {
   settlingTimestamp: number
   buyToken: TokenDetails
   sellToken: TokenDetails
-  limitPrice: BigNumber
+  limitPrice?: BigNumber
   fillPrice: BigNumber
-  remainingAmount: BN
+  remainingAmount?: BN
 }
 
 export interface GetOrdersPaginatedResult {
