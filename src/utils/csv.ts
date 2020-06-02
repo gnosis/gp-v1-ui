@@ -49,19 +49,19 @@ export function toCsv<T, R extends CsvColumns>({ data, transformer }: ToCsvParam
   return remainingData
     .reduce<string[]>(
       (acc, item) => {
-        let values
         try {
           // Extract values from transformed data. We already have the keys.
-          values = Object.values(transformer(item))
+          const values = Object.values(transformer(item))
+          // Build csv row, escaping each value as needed
+          const csvRow = values.map(escapeValue).join(',')
+
+          acc.push(csvRow)
+
+          return acc
         } catch (e) {
           logDebug(`[utils:toCsv] Not able to transform into csv: ${item}`, e)
           return acc
         }
-        const csvRow = values.map(escapeValue).join(',')
-
-        acc.push(csvRow)
-
-        return acc
       },
       // Start off with headers and first row
       [headers, firstRow],
