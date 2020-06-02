@@ -2,6 +2,7 @@ import React, { useCallback, useMemo } from 'react'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
+import styled from 'styled-components'
 
 import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
 
@@ -19,6 +20,12 @@ import { toCsv, CsvColumns } from 'utils/csv'
 
 import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
 import { getNetworkFromId, isTradeSettled } from 'utils'
+
+const CsvButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+`
 
 function symbolOrAddress(token: TokenDetails): string {
   return token.symbol || token.address
@@ -110,13 +117,7 @@ const Trades: React.FC = () => {
             <th>Received</th>
             <th>Type</th>
             <th>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-around',
-                  alignItems: 'center',
-                }}
-              >
+              <CsvButtonContainer>
                 <span>Tx</span>
 
                 {trades.length > 0 && (
@@ -124,7 +125,7 @@ const Trades: React.FC = () => {
                     <FontAwesomeIcon icon={faFileCsv} size="2x" />
                   </FileDownloaderLink>
                 )}
-              </div>
+              </CsvButtonContainer>
             </th>
           </tr>
         </thead>
