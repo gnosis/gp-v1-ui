@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-import { addMinutes } from 'date-fns'
 
 import { TokenDetails, calculatePrice } from '@gnosis.pm/dex-js'
 
@@ -8,8 +7,7 @@ import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
 
-import { dateToBatchId, batchIdToDate } from 'utils'
-import { BATCH_SUBMISSION_CLOSE_TIME } from 'const'
+import { dateToBatchId, calculateSettlingTimestamp } from 'utils'
 
 interface GetTradesParams {
   networkId: number
@@ -17,12 +15,6 @@ interface GetTradesParams {
   fromBlock?: number
   toBlock?: number | 'latest' | 'pending'
   orders: AuctionElement[]
-}
-
-// TODO: move to utils
-function calculateSettlingTimestamp(batchId: number): number {
-  const batchStart = batchIdToDate(batchId)
-  return addMinutes(batchStart, BATCH_SUBMISSION_CLOSE_TIME).getTime()
 }
 
 export function getTradesFactory(factoryParams: {
