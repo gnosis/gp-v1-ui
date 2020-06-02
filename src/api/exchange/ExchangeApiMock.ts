@@ -66,14 +66,6 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     return []
   }
 
-  public async subscribeToTradeEvent(): Promise<() => void> {
-    return this.unsubscribeToTradeEvent
-  }
-
-  public unsubscribeToTradeEvent(): void {
-    return
-  }
-
   public async getOrder({ userAddress, orderId }: GetOrderParams): Promise<Order> {
     this._initOrders(userAddress)
 

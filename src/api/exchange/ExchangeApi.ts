@@ -1,5 +1,4 @@
 import BN from 'bn.js'
-import { Subscription } from 'web3-core-subscriptions'
 import { PastEventOptions } from 'web3-eth-contract'
 
 import { assert, BatchExchangeEvents, TokenDetails } from '@gnosis.pm/dex-js'
@@ -42,10 +41,6 @@ export type HasTokenParams = GetTokenIdByAddressParams
 export interface PastEventsParams extends GetOrdersParams {
   fromBlock?: number
   toBlock?: number | string
-}
-
-export interface SubscriptionParams extends GetOrdersParams {
-  callback: (trade: BaseTradeEvent) => void
 }
 
 export interface AddTokenParams extends BaseParams, WithTxOptionalParams {
@@ -95,8 +90,6 @@ export interface ExchangeApi extends DepositApi {
 
   // event related
   getPastTrades(params: PastEventsParams): Promise<BaseTradeEvent[]>
-  subscribeToTradeEvent(params: SubscriptionParams): Promise<() => void>
-  unsubscribeToTradeEvent(): void
 
   addToken(params: AddTokenParams): Promise<Receipt>
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
@@ -165,17 +158,11 @@ const CONTRACT_DEPLOYMENT_BLOCK = {
 }
 
 type TradeEvent = BatchExchangeEvents['Trade']
-type TradeSubscription = Subscription<TradeEvent>
 
-interface Subscriptions {
-  trade: { [networkId: number]: TradeSubscription }
-}
 /**
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  private subscriptions: Subscriptions = { trade: {} }
-
   public constructor(injectedDependencies: DepositApiDependencies) {
     super(injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -266,48 +253,6 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       // Anything else: don't care, re-throw
       throw e
     }
-  }
-
-  public async subscribeToTradeEvent(params: SubscriptionParams): Promise<() => void> {
-    const { userAddress, networkId, callback } = params
-
-    // Remove any active subscription
-    this.unsubscribeToTradeEvent()
-
-    logDebug(`[ExchangeApiImpl] subscribing to trade events for address ${userAddress} and networkId ${networkId}`)
-
-    const subscription = await this.getTradeSubscription(params)
-
-    subscription
-      .on('data', event => callback(this.parseTradeEvent(event)))
-      .on('error', error => {
-        console.error(
-          `[ExchangeApiImpl] Failed to receive Trade event for address ${userAddress} on network ${networkId}: ${error}`,
-        )
-      })
-
-    return (): void => this.unsubscribeToTradeEvent()
-  }
-
-  public unsubscribeToTradeEvent(): void {
-    Object.keys(this.subscriptions.trade).forEach(networkId => {
-      logDebug(`[ExchangeApiImpl] Unsubscribing trade events for network ${networkId}`)
-      this.subscriptions.trade[networkId].unsubscribe()
-    })
-  }
-
-  private async getTradeSubscription(params: PastEventsParams): Promise<TradeSubscription> {
-    const { userAddress, networkId } = params
-
-    const contract = await this._getContract(networkId)
-
-    if (!this.subscriptions.trade[networkId]) {
-      this.subscriptions.trade[networkId] = contract.events.Trade({
-        filter: { owner: userAddress },
-      })
-    }
-
-    return this.subscriptions.trade[networkId]
   }
 
   private parseTradeEvent(event: TradeEvent): BaseTradeEvent {
