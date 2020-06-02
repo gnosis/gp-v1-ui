@@ -75,6 +75,8 @@ function csvTransformer(trade: Trade): CsvColumns {
   }
 }
 
+const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
+
 const Trades: React.FC = () => {
   const { networkId, userAddress, isConnected } = useWalletConnection()
   const trades = useTrades()
@@ -118,11 +120,7 @@ const Trades: React.FC = () => {
                 <span>Tx</span>
 
                 {trades.length > 0 && (
-                  <FileDownloaderLink
-                    data={generateCsv}
-                    options={{ type: 'text/csv;charset=utf-8;' }}
-                    filename={filename}
-                  >
+                  <FileDownloaderLink data={generateCsv} options={CSV_FILE_OPTIONS} filename={filename}>
                     <FontAwesomeIcon icon={faFileCsv} size="2x" />
                   </FileDownloaderLink>
                 )}
