@@ -24,12 +24,6 @@ export interface GetOrderParams extends GetOrdersParams {
   blockNumber?: number
 }
 
-export interface GetOrderFromOrderPlacementEventParams extends GetOrderParams {
-  buyTokenId?: number | string
-  sellTokenId?: number | string
-  toBlock?: number
-}
-
 export interface GetOrdersPaginatedParams extends GetOrdersParams {
   offset: number
   pageSize?: number
@@ -92,7 +86,6 @@ export interface ExchangeApi extends DepositApi {
   getFeeDenominator(networkId: number): Promise<number>
 
   getOrder(params: GetOrderParams): Promise<Order>
-  getOrderFromOrderPlacementEvent(params: GetOrderFromOrderPlacementEventParams): Promise<Order>
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
   getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
 
@@ -353,50 +346,6 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const rawOrder = await contract.methods.orders(userAddress, orderId).call({}, blockNumber)
 
     return decodeOrder(rawOrder)
-  }
-
-  public async getOrderFromOrderPlacementEvent({
-    userAddress,
-    networkId,
-    orderId,
-    buyTokenId: buyToken = '',
-    sellTokenId: sellToken = '',
-    toBlock,
-  }: GetOrderFromOrderPlacementEventParams): Promise<Order> {
-    const contract = await this._getContract(networkId)
-
-    const orderPlacementEvents = await this.safeGetEvents(
-      options => contract.getPastEvents('OrderPlacement', options),
-      {
-        // Indexed values: https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L97
-        filter: { owner: userAddress, sellToken, buyToken },
-        // Have to search since contract creation
-        fromBlock: CONTRACT_DEPLOYMENT_BLOCK[networkId],
-        // Limit search to Trade event emit block
-        toBlock,
-      },
-    )
-
-    // This list might be big, but there's no way around it at the moment
-    const orderPlacementEvent = orderPlacementEvents.find(event => event.returnValues.index === orderId)
-
-    // Should exist and be unique
-    assert(
-      orderPlacementEvent,
-      `No order was placed on network ${networkId} for address ${userAddress} and id ${orderId}`,
-    )
-
-    const values = orderPlacementEvent.returnValues
-
-    return {
-      buyTokenId: +values.buyToken,
-      sellTokenId: +values.sellToken,
-      validFrom: +values.validFrom,
-      validUntil: +values.validUntil,
-      priceNumerator: new BN(values.priceNumerator),
-      priceDenominator: new BN(values.priceDenominator),
-      remainingAmount: new BN('NaN'), // not available on OrderPlacement
-    }
   }
 
   public async getOrders({ userAddress, networkId }: GetOrdersParams): Promise<AuctionElement[]> {
