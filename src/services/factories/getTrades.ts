@@ -8,7 +8,7 @@ import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
 
-import { dateToBatchId, batchIdToDate, isOrderDeleted, logDebug } from 'utils'
+import { dateToBatchId, batchIdToDate } from 'utils'
 import { BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
 interface GetTradesParams {
@@ -70,6 +70,7 @@ export function getTradesFactory(factoryParams: {
     await Promise.all(
       Array.from(orderIdToBlockNumberMap.keys()).map(async orderId => {
         // We already have this order, ignore
+        // Keep in mind the global state filters out deleted orders
         if (orders.has(orderId)) {
           return
         }
