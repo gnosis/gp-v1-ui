@@ -49,18 +49,14 @@ export function getTradesFactory(factoryParams: {
     }
 
     const blocksSet = new Set<number>()
-    const orderIdsMap = new Map<string, { buyTokenId: number; sellTokenId: number; blockNumber: number }>()
+    const orderIdToBlockNumberMap = new Map<string, number>()
     const tokenIdsSet = new Set<number>()
 
     tradeEvents.forEach(event => {
       const { blockNumber, sellTokenId, buyTokenId, orderId } = event
 
       blocksSet.add(blockNumber)
-      orderIdsMap.set(orderId, {
-        buyTokenId,
-        sellTokenId,
-        blockNumber,
-      })
+      orderIdToBlockNumberMap.set(orderId, blockNumber)
       tokenIdsSet.add(buyTokenId)
       tokenIdsSet.add(sellTokenId)
     })
@@ -72,33 +68,24 @@ export function getTradesFactory(factoryParams: {
 
     // Fetch from contract the ones we don't have locally, and add it to the map
     await Promise.all(
-      Array.from(orderIdsMap.keys()).map(async orderId => {
+      Array.from(orderIdToBlockNumberMap.keys()).map(async orderId => {
         // We already have this order, ignore
         if (orders.has(orderId)) {
           return
         }
-        // Load additional info
-        const orderInfo = orderIdsMap.get(orderId)
-        // Fetch order from contract
-        let order = await exchangeApi.getOrder({ userAddress, networkId, orderId, blockNumber: orderInfo?.blockNumber })
 
-        // In case order was deleted from the contract, try to get it from OrderPlacement events instead
-        if (isOrderDeleted(order) && orderInfo) {
-          const { buyTokenId, sellTokenId, blockNumber } = orderInfo
-          try {
-            order = await exchangeApi.getOrderFromOrderPlacementEvent({
-              userAddress,
-              networkId,
-              orderId,
-              // Parameters bellow not required, but help narrow down the search
-              buyTokenId,
-              sellTokenId,
-              toBlock: blockNumber,
-            })
-          } catch (e) {
-            logDebug(`[services:getTrades] Placement event not found for order ${orderId}`, e)
-          }
-        }
+        const blockNumber = orderIdToBlockNumberMap.get(orderId)
+
+        // Fetch order from contract
+        const order = await exchangeApi.getOrder({
+          userAddress,
+          networkId,
+          orderId,
+          // blockNumber is used to fetch the order at the same block where the Trade event was emitted
+          // thus avoiding empty orders in case it was deleted later
+          blockNumber,
+        })
+
         // Store in the orders map
         orders.set(orderId, order)
       }),
