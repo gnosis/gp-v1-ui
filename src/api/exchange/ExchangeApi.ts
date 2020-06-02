@@ -169,11 +169,15 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     ;(window as any).exchange = this._contractPrototype
   }
 
+  /** STATIC methods **/
+
   // TODO: Not very happy with this method. Can't be used inside the class because batchId is only known with block data
   // TODO: Don't really know where to put it
   public static buildTradeRevertKey(batchId: number, orderId: string): string {
     return batchId + '|' + orderId
   }
+
+  /** PUBLIC methods **/
 
   public async getPastTrades({
     userAddress,
@@ -208,74 +212,6 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     )
 
     return tradeEvents.filter(event => !event['removed']).map(this.parseTradeEvent)
-  }
-
-  private async safeGetEvents<T>(
-    fn: (options: PastEventOptions) => Promise<T[]>,
-    options: PastEventOptions,
-  ): Promise<T[]> {
-    try {
-      return await fn(options)
-    } catch (e) {
-      // Error `-32005` means too many results in range.
-      // Let's split it up into 2 smaller requests
-      if (e.code === -32005) {
-        const { fromBlock: _fromBlock, toBlock: _toBlock } = options
-        logDebug(`[ExchangeApiImpl] Request range was too big [${_fromBlock} to ${_toBlock}]. Splitting up`)
-
-        const fromBlock =
-          _fromBlock === undefined
-            ? 0
-            : typeof _fromBlock === 'string'
-            ? (await this.web3.eth.getBlock(_fromBlock)).number
-            : _fromBlock
-
-        const toBlock =
-          _toBlock === undefined
-            ? await this.web3.eth.getBlockNumber()
-            : typeof _toBlock === 'string'
-            ? (await this.web3.eth.getBlock(_toBlock)).number
-            : _toBlock
-
-        // If we don't have numbers by now, something is not right, let it bubble up.
-        // Not gonna do this fully generic because we don't need it (yet, at least)
-        if (typeof fromBlock === 'number' && typeof toBlock === 'number') {
-          const currRange = toBlock - fromBlock
-
-          // if we are already querying for a single block and there are too many events, splitting the requests won't help
-          if (currRange > 1) {
-            const nextRange = Math.floor(Math.max(currRange / 2, 1))
-            const events = await this.safeGetEvents(fn, { ...options, toBlock: fromBlock + nextRange })
-            return events.concat(await this.safeGetEvents(fn, { ...options, fromBlock: fromBlock + nextRange + 1 }))
-          }
-        }
-      }
-      // Anything else: don't care, re-throw
-      throw e
-    }
-  }
-
-  private parseTradeEvent(event: TradeEvent): BaseTradeEvent {
-    const {
-      returnValues: { orderId, sellToken: sellTokenId, buyToken: buyTokenId, executedSellAmount, executedBuyAmount },
-      transactionHash: txHash,
-      logIndex: eventIndex,
-      blockNumber,
-    } = event
-
-    const trade: BaseTradeEvent = {
-      orderId,
-      sellTokenId: +sellTokenId,
-      buyTokenId: +buyTokenId,
-      sellAmount: new BN(executedSellAmount),
-      buyAmount: new BN(executedBuyAmount),
-      txHash,
-      eventIndex,
-      blockNumber,
-      id: `${txHash}|${eventIndex}`,
-    }
-
-    return trade
   }
 
   public async getOrder({ userAddress, networkId, orderId, blockNumber }: GetOrderParams): Promise<Order> {
@@ -476,6 +412,76 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     logDebug(`[ExchangeApiImpl] Cancelled Orders ${orderIds}`)
 
     return tx
+  }
+
+  /** PRIVATE methods **/
+
+  private async safeGetEvents<T>(
+    fn: (options: PastEventOptions) => Promise<T[]>,
+    options: PastEventOptions,
+  ): Promise<T[]> {
+    try {
+      return await fn(options)
+    } catch (e) {
+      // Error `-32005` means too many results in range.
+      // Let's split it up into 2 smaller requests
+      if (e.code === -32005) {
+        const { fromBlock: _fromBlock, toBlock: _toBlock } = options
+        logDebug(`[ExchangeApiImpl] Request range was too big [${_fromBlock} to ${_toBlock}]. Splitting up`)
+
+        const fromBlock =
+          _fromBlock === undefined
+            ? 0
+            : typeof _fromBlock === 'string'
+            ? (await this.web3.eth.getBlock(_fromBlock)).number
+            : _fromBlock
+
+        const toBlock =
+          _toBlock === undefined
+            ? await this.web3.eth.getBlockNumber()
+            : typeof _toBlock === 'string'
+            ? (await this.web3.eth.getBlock(_toBlock)).number
+            : _toBlock
+
+        // If we don't have numbers by now, something is not right, let it bubble up.
+        // Not gonna do this fully generic because we don't need it (yet, at least)
+        if (typeof fromBlock === 'number' && typeof toBlock === 'number') {
+          const currRange = toBlock - fromBlock
+
+          // if we are already querying for a single block and there are too many events, splitting the requests won't help
+          if (currRange > 1) {
+            const nextRange = Math.floor(Math.max(currRange / 2, 1))
+            const events = await this.safeGetEvents(fn, { ...options, toBlock: fromBlock + nextRange })
+            return events.concat(await this.safeGetEvents(fn, { ...options, fromBlock: fromBlock + nextRange + 1 }))
+          }
+        }
+      }
+      // Anything else: don't care, re-throw
+      throw e
+    }
+  }
+
+  private parseTradeEvent(event: TradeEvent): BaseTradeEvent {
+    const {
+      returnValues: { orderId, sellToken: sellTokenId, buyToken: buyTokenId, executedSellAmount, executedBuyAmount },
+      transactionHash: txHash,
+      logIndex: eventIndex,
+      blockNumber,
+    } = event
+
+    const trade: BaseTradeEvent = {
+      orderId,
+      sellTokenId: +sellTokenId,
+      buyTokenId: +buyTokenId,
+      sellAmount: new BN(executedSellAmount),
+      buyAmount: new BN(executedBuyAmount),
+      txHash,
+      eventIndex,
+      blockNumber,
+      id: `${txHash}|${eventIndex}`,
+    }
+
+    return trade
   }
 }
 
