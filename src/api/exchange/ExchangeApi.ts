@@ -151,10 +151,13 @@ export interface GetOrdersPaginatedResult {
   nextIndex?: number
 }
 
-// TODO: move to const/config
-const CONTRACT_DEPLOYMENT_BLOCK = {
-  1: 9340147,
-  4: 5844678,
+export interface ContractDeploymentBlock {
+  networkId: number
+  blockNumber: number
+}
+
+export interface ExchangeApiParams extends DepositApiDependencies {
+  contractsDeploymentBlocks: ContractDeploymentBlock[]
 }
 
 type TradeEvent = BatchExchangeEvents['Trade']
@@ -163,10 +166,20 @@ type TradeEvent = BatchExchangeEvents['Trade']
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  public constructor(injectedDependencies: DepositApiDependencies) {
+  private contractDeploymentBlock: Record<number, number>
+
+  public constructor(injectedDependencies: ExchangeApiParams) {
     super(injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
+
+    this.contractDeploymentBlock = injectedDependencies.contractsDeploymentBlocks.reduce(
+      (acc, { networkId, blockNumber }) => {
+        acc[networkId] = blockNumber
+        return acc
+      },
+      {},
+    )
   }
 
   /** STATIC methods **/
@@ -191,7 +204,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // Could be used to fetch from 0 (although, why?) OR
     // pagination of sorts OR
     // updating trades based on polling
-    const fromBlock = _fromBlock ?? CONTRACT_DEPLOYMENT_BLOCK[networkId]
+    const fromBlock = _fromBlock ?? this.contractDeploymentBlock[networkId]
 
     // Optionally fetch events until a given block.
     // Defaults to 'latest'

@@ -106,7 +106,10 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
       ordersByUser: exchangeOrders,
     })
   } else {
-    exchangeApi = new ExchangeApiProxy(injectedDependencies)
+    exchangeApi = new ExchangeApiProxy({
+      ...injectedDependencies,
+      contractsDeploymentBlocks: CONFIG.exchangeContractConfig.config,
+    })
   }
   window['exchangeApi'] = exchangeApi
   return exchangeApi
