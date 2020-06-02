@@ -6,10 +6,12 @@ interface SortTopic<K extends string> {
   asc: boolean
 }
 
+type CustomSortComparator<T, K> = (topic: K, asc: boolean) => (lhs: T, rhs: T) => number
+
 function useSortByTopic<T, K extends string>(
   data: T[],
   defaultTopic: K,
-  compareFnFactory?: (topic: K, asc: boolean) => (lhs: T, rhs: T) => number,
+  compareFnFactory: CustomSortComparator<T, K>,
 ): { sortedData: T[]; sortTopic: SortTopic<K>; setSortTopic: React.Dispatch<React.SetStateAction<SortTopic<K>>> } {
   // true == 'asc' && false == 'dsc'
   const [sortTopic, setSortTopic] = useSafeState<SortTopic<K>>({ topic: defaultTopic, asc: true })
@@ -22,11 +24,7 @@ function useSortByTopic<T, K extends string>(
       // make a copy as not to mutate
       const dataCopy = data.slice(0)
 
-      const compareFn =
-        // use custom compare fn
-        (compareFnFactory && compareFnFactory(topic, asc)) ||
-        // the default comparison function should assume numbers are being used
-        ((lhs: number, rhs: number): number => (asc ? lhs - rhs : rhs - lhs))
+      const compareFn = compareFnFactory(topic, asc)
 
       // Sort the data
       dataCopy.sort(compareFn)
