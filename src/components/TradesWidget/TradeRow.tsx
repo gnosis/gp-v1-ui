@@ -78,7 +78,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   return !isTradeSettled(trade) ? null : (
     <tr data-order-id={orderId} data-batch-id={batchId}>
       <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
-        {formatDateFromBatchId(batchId)}
+        {formatDateFromBatchId(batchId, { strict: true })}
       </td>
       <td>
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
