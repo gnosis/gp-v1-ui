@@ -14,25 +14,24 @@ import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
 import { Spinner } from 'components/Spinner'
+import { StatusCountdown } from 'components/StatusCountdown'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
 
 import {
-  safeTokenName,
   formatSmart,
   formatDateFromBatchId,
   batchIdToDate,
   isOrderFilled,
   dateToBatchId,
-  formatSeconds,
   getTimeRemainingInBatch,
 } from 'utils'
 import { onErrorFactory } from 'utils/onError'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
 
-import { OrderRowWrapper } from './OrderRow.styled'
-import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
+import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
+import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
@@ -58,14 +57,6 @@ const DeleteOrder: React.FC<Pick<
     />
   </td>
 )
-
-function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
-  const displayName = safeTokenName(token)
-  if (displayName.startsWith('0x')) {
-    return <EtherscanLink type="token" identifier={token.address} />
-  }
-  return displayName
-}
 
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
@@ -141,20 +132,6 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = (
   }, [isPendingOrder, order.validUntil])
 
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
-}
-
-const StatusCountdown: React.FC<{ timeoutDelta?: number }> = ({ timeoutDelta }) => {
-  // If it's rendered, it means it should display the countdown
-  const timeRemainingInBatch = useTimeRemainingInBatch()
-
-  // `timeoutDelta` use case is for a countdown that's shorter than batch duration
-  // instead of counting all the way down to (currently 5min) batch time, we count instead to
-  // batchTime - timeoutDelta.
-  // When this countdown is over but there's still time left in the batch, return 0 for safety.
-  // Up to parent component to stop rendering at that time
-  const timeRemaining = timeoutDelta ? Math.max(0, timeRemainingInBatch - timeoutDelta) : timeRemainingInBatch
-
-  return <>{formatSeconds(timeRemaining)}</>
 }
 
 const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({

@@ -10,7 +10,8 @@ import {
   getTokenFromErc20Factory,
   TokenFromExchange,
   TokenFromErc20,
-  addUnlistendTokensToUserTokenListByIdFactory,
+  getTradesFactory,
+  addUnlistedTokensToUserTokenListByIdFactory,
 } from './factories'
 
 import { logDebug } from 'utils'
@@ -29,9 +30,9 @@ const apis = {
 
 export const getTokenFromErc20 = getTokenFromErc20Factory(apis)
 
-export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory(apis, { getTokenFromErc20 })
+export const getTokenFromExchangeByAddress = getTokenFromExchangeByAddressFactory({ ...apis, getTokenFromErc20 })
 
-export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory(apis, { getTokenFromErc20 })
+export const getTokenFromExchangeById = getTokenFromExchangeByIdFactory({ ...apis, getTokenFromErc20 })
 
 export const addTokenToExchangeContract = addTokenToExchangeFactory(apis)
 
@@ -39,11 +40,14 @@ export const getPriceEstimation = getPriceEstimationFactory(apis)
 
 export const subscribeToTokenList = subscribeToTokenListFactory(apis)
 
-export const getTokens = getTokensFactory(apis, { getTokenFromErc20 })
+export const getTokens = getTokensFactory({ ...apis, getTokenFromErc20 })
 
-export const addUnlistendTokensToUserTokenListById = addUnlistendTokensToUserTokenListByIdFactory(apis, {
+export const addUnlistedTokensToUserTokenListById = addUnlistedTokensToUserTokenListByIdFactory({
+  ...apis,
   getTokenFromExchangeById,
 })
+
+export const getTrades = getTradesFactory({ ...apis, getTokens, addUnlistedTokensToUserTokenListById })
 
 export interface TokenAndNetwork {
   networkId: number
