@@ -7,7 +7,7 @@ import { DepositApiImpl, DepositApi, DepositApiDependencies } from 'api/deposit/
 import { Receipt, WithTxOptionalParams } from 'types'
 import { logDebug } from 'utils'
 import { decodeAuctionElements, decodeOrder } from './utils/decodeAuctionElements'
-import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
+import { DEFAULT_ORDERS_PAGE_SIZE, LIMIT_EXCEEDED_ERROR_CODE } from 'const'
 import BigNumber from 'bignumber.js'
 
 interface BaseParams {
@@ -487,9 +487,9 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     try {
       return await fn(options)
     } catch (e) {
-      // Error `-32005` means too many results in range.
+      // Error `Limit exceeded` thrown when there are too many results (over 1000) in search range.
       // Let's split it up into 2 smaller requests
-      if (e.code === -32005) {
+      if (e.code === LIMIT_EXCEEDED_ERROR_CODE) {
         const { fromBlock: _fromBlock, toBlock: _toBlock } = options
         logDebug(`[ExchangeApiImpl] Request range was too big [${_fromBlock} to ${_toBlock}]. Splitting up`)
 
