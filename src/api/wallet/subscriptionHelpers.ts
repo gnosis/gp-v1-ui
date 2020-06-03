@@ -33,7 +33,7 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
   callback,
 }: SubscribeParams<T>): Promise<() => void> => {
   return new Promise<Subscription<Event2Data[T]>>((resolve, reject) => {
-    // callback normally used as complition of on('error') and on('data') together
+    // callback normally used as completion of on('error') and on('data') together
     // but needed here because not all providers will call on('error')
     const detectValidSubCb = (e: Error): void => {
       if (e) {
