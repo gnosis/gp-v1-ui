@@ -515,8 +515,12 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
           // if we are already querying for a single block and there are too many events, splitting the requests won't help
           if (currRange > 1) {
             const nextRange = Math.floor(Math.max(currRange / 2, 1))
-            const events = await this.safeGetEvents(fn, { ...options, toBlock: fromBlock + nextRange })
-            return events.concat(await this.safeGetEvents(fn, { ...options, fromBlock: fromBlock + nextRange + 1 }))
+            // Query both parts in parallel
+            const [lowerRange, upperRange] = await Promise.all([
+              this.safeGetEvents(fn, { ...options, toBlock: fromBlock + nextRange }),
+              this.safeGetEvents(fn, { ...options, fromBlock: fromBlock + nextRange + 1 }),
+            ])
+            return lowerRange.concat(upperRange)
           }
         }
       }
