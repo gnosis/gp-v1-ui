@@ -3,23 +3,11 @@ import BN from 'bn.js'
 import assert from 'assert'
 import { getDefaultProvider } from '..'
 
-import Web3Connect from 'web3connect'
+import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile } from 'web3modal'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
-
-import {
-  getProvider,
-  getProviderState,
-  createSubscriptions,
-  Provider,
-  WalletConnectInits,
-  isWalletConnectProvider,
-  isMetamaskSubscriptions,
-  isWalletConnectSubscriptions,
-  isMetamaskProvider,
-  Subscriptions,
-} from '@gnosis.pm/dapp-ui'
+import { HttpProvider, WebsocketProvider } from 'web3-core'
 
 import { logDebug, toBN, txDataEncoder } from 'utils'
 import { INFURA_ID } from 'const'
@@ -30,14 +18,104 @@ import { composeProvider } from './composeProvider'
 import fetchGasPriceFactory from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
 
+// EIP1193 interfaces
+interface ProviderConnectInfo {
+  chainId: string
+  [key: string]: unknown
+}
+
+interface ProviderRpcError extends Error {
+  message: string
+  code: number
+  data?: unknown
+}
+
+interface ProviderMessage {
+  type: string
+  data: unknown
+}
+
+interface SpecificEvents<T extends HttpProvider | WebsocketProvider> {
+  on?(event: 'connect', listener: (connectInfo: ProviderConnectInfo) => void): T
+  on?(event: 'disconnect', listener: (error: ProviderRpcError) => void): T
+  on?(event: 'chainChanged', listener: (chainId: string) => void): T
+  on?(event: 'accountsChanged', listener: (accounts: string[]) => void): T
+  on?(event: 'message', listener: (message: ProviderMessage) => void): T
+  on?(event: string, listener: (...params: unknown[]) => void): T
+  once?(event: 'connect', listener: (connectInfo: ProviderConnectInfo) => void): T
+  once?(event: 'disconnect', listener: (error: ProviderRpcError) => void): T
+  once?(event: 'chainChanged', listener: (chainId: string) => void): T
+  once?(event: 'accountsChanged', listener: (accounts: string[]) => void): T
+  once?(event: 'message', listener: (message: ProviderMessage) => void): T
+  once?(event: string, listener: (...params: unknown[]) => void): T
+  off?(event: 'connect', listener: (connectInfo: ProviderConnectInfo) => void): T
+  off?(event: 'disconnect', listener: (error: ProviderRpcError) => void): T
+  off?(event: 'chainChanged', listener: (chainId: string) => void): T
+  off?(event: 'accountsChanged', listener: (accounts: string[]) => void): T
+  off?(event: 'message', listener: (message: ProviderMessage) => void): T
+  off?(event: string, listener: (...params: unknown[]) => void): T
+}
+
+type HttpProviderX = SpecificEvents<HttpProvider> & HttpProvider
+type WebsocketProviderX = SpecificEvents<WebsocketProvider> &
+  WebsocketProvider & {
+    on?(event: 'close', listener: () => void): WebsocketProviderX
+    once?(event: 'close', listener: () => void): WebsocketProviderX
+    off?(event: 'close', listener: () => void): WebsocketProviderX
+  }
+
+type Provider = HttpProviderX | WebsocketProviderX | MetamaskProvider | WalletConnectProvider
+
+interface MetamaskProvider extends HttpProviderX {
+  autoRefreshOnNetworkChange: boolean
+}
+interface WalletConnectProvider extends HttpProviderX {
+  close(): Promise<void>
+}
+
+const isMetamaskProvider = (provider: Provider | null): provider is MetamaskProvider => {
+  if (!provider) return false
+
+  const info = getProviderInfo(provider)
+  return info.name === 'MetaMask'
+}
+const isWalletConnectProvider = (provider: Provider | null): provider is WalletConnectProvider => {
+  if (!provider) return false
+
+  const info = getProviderInfo(provider)
+  return info.name === 'WalletConnect'
+}
+
+interface ProviderState {
+  accounts: string[]
+  chainId: number
+  isConnected: boolean
+}
+
+const getProviderState = async (web3: Web3): Promise<ProviderState | null> => {
+  if (!web3.currentProvider) return null
+  try {
+    const [accounts, chainId] = await Promise.all([web3.eth.getAccounts(), web3.eth.getChainId()])
+
+    return {
+      accounts,
+      chainId,
+      isConnected: accounts.length > 0 && !!chainId,
+    }
+  } catch (error) {
+    console.error('[WalletApiImpl] Error getting ProviderState', error)
+    return null
+  }
+}
+
 export interface WalletApi {
-  isConnected(): boolean | Promise<boolean>
+  isConnected(): Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
   disconnect(): Promise<void>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
-  getWalletInfo(): WalletInfo | Promise<WalletInfo>
+  getWalletInfo(): Promise<WalletInfo>
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo
@@ -52,7 +130,7 @@ export interface WalletInfo {
   blockNumber?: number
 }
 
-export type ProviderInfo = Omit<ReturnType<typeof Web3Connect.getProviderInfo>, 'package'>
+export type ProviderInfo = IProviderInfo
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -71,16 +149,58 @@ interface BlockchainUpdatePrompt {
 
 type BlockchainUpdatePromptCallback = (callback: (changedChainData: BlockchainUpdatePrompt) => void) => Command
 
+interface Subscriptions {
+  onAccountsChanged(callback: (accounts: string[]) => void, once?: boolean): () => void
+  // should be enough to rely on onChainChanged only, bet let it stay commented out
+  // onNetworkChanged(callback: (networkId: string) => void, once?: boolean): () => void;
+  onChainChanged(callback: (chainId: string | number) => void, once?: boolean): () => void
+}
+
+function createSubscriptions(provider: null): null
+function createSubscriptions(provider: Provider): Subscriptions | null
+function createSubscriptions(provider: Provider | null): null | Subscriptions {
+  if (!provider || !('on' in provider)) return null
+
+  const onAccountsChanged = (callback: (accounts: string[]) => void, once?: boolean): (() => void) => {
+    if (once) {
+      provider.once?.('accountsChanged', callback)
+    } else {
+      provider.on?.('accountsChanged', callback)
+    }
+
+    return (): void => {
+      provider.off?.('accountsChanged', callback)
+    }
+  }
+  const onChainChanged = (callback: (chainId: string | number) => void, once?: boolean): (() => void) => {
+    if (once) {
+      provider.once?.('chainChanged', callback)
+    } else {
+      provider.on?.('chainChanged', callback)
+    }
+
+    return (): void => {
+      provider.off?.('chainChanged', callback)
+    }
+  }
+
+  return {
+    onAccountsChanged,
+    // onNetworkChanged,
+    onChainChanged,
+  }
+}
+
 // provides subscription to blockhain updates for account/network/block
-const subscribeToBlockchainUpdate = ({
+const subscribeToBlockchainUpdate = async ({
   provider,
   subscriptions,
   web3,
 }: {
   provider: Provider
-  subscriptions?: Subscriptions
+  subscriptions: Subscriptions | null
   web3: Web3
-}): BlockchainUpdatePromptCallback => {
+}): Promise<BlockchainUpdatePromptCallback> => {
   const subs = subscriptions || createSubscriptions(provider)
 
   const blockUpdate = (cb: (blockHeader: BlockHeader) => void): Command => {
@@ -94,7 +214,7 @@ const subscribeToBlockchainUpdate = ({
 
   let blockchainPrompt: BlockchainUpdatePrompt
 
-  const providerState = getProviderState(provider)
+  const providerState = await getProviderState(web3)
 
   if (providerState) {
     const {
@@ -104,7 +224,7 @@ const subscribeToBlockchainUpdate = ({
 
     blockchainPrompt = {
       account,
-      chainId: +chainId,
+      chainId,
       blockHeader: null,
     }
   } else {
@@ -131,22 +251,17 @@ const subscribeToBlockchainUpdate = ({
     return subscriptionHOC
   }
 
-  let networkUpdate: (callback: (chainId: number) => void) => Command
-
-  if (isMetamaskSubscriptions(subs)) networkUpdate = (cb): Command => subs.onNetworkChanged(networkId => cb(+networkId))
-  if (isWalletConnectSubscriptions(subs)) networkUpdate = subs.onChainChanged
-
-  const accountsUpdate = subs.onAccountsChanged
+  const { onChainChanged: networkUpdate, onAccountsChanged: accountsUpdate } = subs
 
   const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
     const unsubNetwork = networkUpdate(chainId => {
-      blockchainPrompt = { ...blockchainPrompt, chainId }
       logDebug('[WalletApiImpl] chainId changed:', chainId)
+      blockchainPrompt = { ...blockchainPrompt, chainId: +chainId }
       callback(blockchainPrompt)
     })
     const unsubAccounts = accountsUpdate(([account]) => {
-      blockchainPrompt = { ...blockchainPrompt, account }
       logDebug('[WalletApiImpl] accounts changed:', account)
+      blockchainPrompt = { ...blockchainPrompt, account }
       callback(blockchainPrompt)
     })
 
@@ -171,6 +286,8 @@ const subscribeToBlockchainUpdate = ({
 }
 
 // const AUTOCONNECT = process.env.AUTOCONNECT === 'true'
+
+type WalletConnectInits = IProviderOptions['walletconnect']
 
 const wcOptions: Omit<WalletConnectInits, 'package'> = {
   options: {
@@ -206,9 +323,7 @@ export class WalletApiImpl implements WalletApi {
   public userPrintAsync: Promise<string> = Promise.resolve('')
   public blockchainState: BlockchainUpdatePrompt
 
-  private _unsubscribe: Command = () => {
-    // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
-  }
+  private _unsubscribe: Command
 
   public constructor(web3: Web3) {
     this._listeners = []
@@ -223,21 +338,34 @@ export class WalletApiImpl implements WalletApi {
     })
   }
 
-  public isConnected(): boolean | Promise<boolean> {
+  public isConnected(): Promise<boolean> {
     return this._connected
   }
 
   public async connect(givenProvider?: Provider): Promise<boolean> {
-    const options: WalletConnectInits = {
-      ...wcOptions,
-      package: (
-        await import(
-          /* webpackChunkName: "@walletconnect"*/
-          '@walletconnect/web3-provider'
-        )
-      ).default,
+    let provider: Provider
+
+    if (givenProvider) {
+      provider = givenProvider
+    } else {
+      const WCoptions: WalletConnectInits = {
+        ...wcOptions,
+        package: (
+          await import(
+            /* webpackChunkName: "@walletconnect"*/
+            '@walletconnect/web3-provider'
+          )
+        ).default,
+      }
+
+      const web3Modal = new Web3Modal({
+        providerOptions: {
+          walletconnect: WCoptions,
+        },
+      })
+
+      provider = await web3Modal.connect()
     }
-    const provider = givenProvider || (await getProvider(options))
 
     if (!provider) return false
 
@@ -253,13 +381,13 @@ export class WalletApiImpl implements WalletApi {
     const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTxData: earmarkingFunction })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this._web3.setProvider(composedProvider as any)
+    this._web3.setProvider(composedProvider)
     logDebug('[WalletApiImpl] Connected')
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).web3c = this._web3
 
-    const providerState = getProviderState(provider)
+    const providerState = await getProviderState(this._web3)
 
     if (providerState) {
       const {
@@ -278,22 +406,54 @@ export class WalletApiImpl implements WalletApi {
 
     const subscriptions = createSubscriptions(provider)
 
-    const unsubscribeUpdates = subscribeToBlockchainUpdate({ subscriptions, provider, web3: this._web3 })(
-      this._notifyListeners.bind(this),
-    )
+    const blockchainPromtSubscription = await subscribeToBlockchainUpdate({ subscriptions, provider, web3: this._web3 })
+
+    const unsubscribeUpdates = blockchainPromtSubscription(this._notifyListeners.bind(this))
 
     let unsubscribeDisconnect: Command = () => {
       // Empty comment to indicate this is on purpose: https://github.com/eslint/eslint/commit/c1c4f4d
     }
-    if (isWalletConnectSubscriptions(subscriptions)) {
-      unsubscribeDisconnect = subscriptions.onStop(this.disconnect.bind(this))
-    } else if (isMetamaskSubscriptions(subscriptions)) {
-      unsubscribeDisconnect = subscriptions.onAccountsChanged(accounts => {
+
+    if (isWalletConnectProvider(provider)) {
+      const handleDisconnect = this.disconnect.bind(this)
+      // WalletConnect provider has 'close' event
+      // but fires it NEVER
+      provider.on?.('close', handleDisconnect)
+      provider.on?.('close', (...params) => {
+        logDebug('[WalletApiImpl] WC closed', ...params)
+      })
+      // also has 'stop' event
+      // inherited from web3-provider-engine
+      // fires it only in versions <=beta.61
+      provider.on?.('stop', handleDisconnect)
+      provider.on?.('stop', v => {
+        logDebug('[WalletApiImpl] WC stopped', v)
+      })
+
+      unsubscribeDisconnect = (): void => {
+        provider.off?.('close', handleDisconnect)
+        provider.off?.('stop', handleDisconnect)
+      }
+    } else {
+      const handleEmptyAccounts = (accounts: string[]): void => {
         if (accounts.length > 0) return
         // accounts  = [] when user locks Metamask
-
+        logDebug('[WalletApiImpl] accountsChanged empty accounts')
         this.disconnect()
-      })
+      }
+      provider.on?.('accountsChanged', handleEmptyAccounts)
+
+      const handleDisconnect = (error: ProviderRpcError): void => {
+        logDebug('[WalletApiImpl] disconnect provider disconnected', error)
+        this.disconnect()
+      }
+      // providers should support 'disconnect' event
+      provider.on?.('disconnect', handleDisconnect)
+
+      unsubscribeDisconnect = (): void => {
+        provider.off?.('accountsChanged', handleEmptyAccounts)
+        provider.off?.('disconnect', handleDisconnect)
+      }
     }
 
     this._unsubscribe = (): void => {
@@ -307,9 +467,15 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public async disconnect(): Promise<void> {
+    // don't trigger all logic if already disconnected
+    if (!this._provider) return
+
     this._unsubscribe()
 
-    if (isWalletConnectProvider(this._provider) && (await this._connected)) await this._provider.close()
+    if (this._provider) {
+      if ('close' in this._provider) this._provider.close()
+      else if ('disconnect' in this._provider) this._provider.disconnect(1000, 'Closing provider connection')
+    }
 
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
@@ -363,15 +529,13 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public getProviderInfo(): ProviderInfo {
-    return Web3Connect.getProviderInfo(this._provider)
+    return getProviderInfo(this._provider)
   }
 
-  public getWalletInfo(): WalletInfo | Promise<WalletInfo> {
-    const providerState = getProviderState(this._provider)
+  public async getWalletInfo(): Promise<WalletInfo> {
+    const providerState = await getProviderState(this._web3)
 
-    if (!providerState) return this._getAsyncWalletInfo()
-
-    const { isConnected = false, accounts = [], chainId = 0 } = providerState
+    const { isConnected = false, accounts = [], chainId = 0 } = providerState || {}
     return {
       isConnected,
       userAddress: accounts[0],
@@ -380,25 +544,6 @@ export class WalletApiImpl implements WalletApi {
   }
 
   /* ****************      Private Functions      **************** */
-
-  private async _getAsyncWalletInfo(): Promise<WalletInfo> {
-    try {
-      const [[userAddress], networkId] = await Promise.all([this._web3.eth.getAccounts(), this._web3.eth.net.getId()])
-
-      return {
-        userAddress,
-        networkId,
-        isConnected: !!userAddress && !!networkId,
-      }
-    } catch (error) {
-      console.error('[WalletApiImpl] Error asynchronously getting WalletInfo', error)
-      return {
-        userAddress: '',
-        networkId: 0,
-        isConnected: false,
-      }
-    }
-  }
 
   private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
     let chainIdChanged = false
@@ -409,7 +554,7 @@ export class WalletApiImpl implements WalletApi {
 
     await Promise.resolve()
 
-    const walletInfo = await (this.getWalletInfo() || this._getAsyncWalletInfo())
+    const walletInfo = await this.getWalletInfo()
     const wInfoExtended = { ...walletInfo, blockNumber: blockchainUpdate?.blockHeader?.number }
 
     if (
@@ -430,30 +575,18 @@ export class WalletApiImpl implements WalletApi {
     this._listeners.forEach(listener => listener(wInfoExtended))
   }
 
-  private get _connected(): boolean | Promise<boolean> {
-    const providerState = getProviderState(this._provider)
-
-    if (providerState) return providerState.isConnected
-
-    return this._getAsyncWalletInfo().then(walletInfo => walletInfo.isConnected)
+  private get _connected(): Promise<boolean> {
+    return this.getWalletInfo().then(walletInfo => walletInfo?.isConnected || false)
   }
-  private get _user(): string | Promise<string> {
-    const providerState = getProviderState(this._provider)
-
-    if (providerState) return providerState.accounts[0]
-
-    return this._getAsyncWalletInfo().then(walletInfo => walletInfo.userAddress || '')
+  private get _user(): Promise<string> {
+    return this.getWalletInfo().then(walletInfo => walletInfo.userAddress || '')
   }
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
     return Promise.resolve(this._user).then(user => this._web3.eth.getBalance(user))
   }
-  private get _networkId(): Network | Promise<Network> {
-    const providerState = getProviderState(this._provider)
-
-    if (providerState) return providerState.chainId || 0
-
-    return this._getAsyncWalletInfo().then(walletInfo => walletInfo.networkId || 0)
+  private get _networkId(): Promise<Network> {
+    return this.getWalletInfo().then(walletInfo => walletInfo.networkId || 0)
   }
 
   // new userPrint is generated when provider or screen size changes
@@ -461,7 +594,7 @@ export class WalletApiImpl implements WalletApi {
   private async _generateAsyncUserPrint(): Promise<string> {
     const { name: providerName } = this.getProviderInfo()
 
-    const mobile = Web3Connect.isMobile() ? 'mobile' : 'desktop'
+    const mobile = isMobile() ? 'mobile' : 'desktop'
 
     const screenSize = getMatchingScreenSize()
 
