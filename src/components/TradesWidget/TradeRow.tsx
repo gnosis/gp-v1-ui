@@ -23,12 +23,15 @@ const TypePill = styled.span<{
   $bgColor?: string
 }>`
   background-color: ${({ $bgColor = 'green' }): string => $bgColor};
+  display: inline-block;
+  font-size: 0.9rem;
+  padding: 0.2rem 0.8rem;
+  min-width: 5.3em;
   color: white;
   font-weight: bold;
   border-radius: 1em;
   text-align: center;
   text-transform: uppercase;
-  padding: 0.5em;
 `
 
 export const TradeRow: React.FC<TradeRowProps> = params => {
