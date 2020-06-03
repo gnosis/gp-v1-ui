@@ -48,8 +48,6 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
         web3.eth.subscribe(event as any, detectValidSubCb)) as Subscription<Event2Data[T]>
 
     sub
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
       .on('connected', id => {
         // called with subscription id
         // if subscribtion was created successfully
