@@ -153,6 +153,8 @@ export function getTradesFactory(factoryParams: {
           denominator: { amount: event.sellAmount, decimals: sellToken.decimals },
         }),
         remainingAmount: order && order.priceDenominator.sub(event.sellAmount),
+        orderBuyAmount: order && order.priceNumerator,
+        orderSellAmount: order && order.priceDenominator,
       }
       acc.push(trade)
 

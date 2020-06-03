@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
-import { formatPrice, formatSmart, formatAmountFull } from '@gnosis.pm/dex-js'
+import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION, isOrderUnlimited } from '@gnosis.pm/dex-js'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
@@ -47,7 +47,32 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
     batchId,
     timestamp,
     txHash,
+    remainingAmount,
+    orderBuyAmount,
+    orderSellAmount,
   } = trade
+  const buyTokenDecimals = buyToken.decimals || DEFAULT_PRECISION
+  const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
+
+  const typeColumnTitle = useMemo(() => {
+    if (!orderSellAmount) {
+      return ''
+    }
+    if (orderBuyAmount && isOrderUnlimited(orderSellAmount, orderBuyAmount)) {
+      return 'Unlimited order'
+    }
+
+    const tradeAmount = formatAmountFull({
+      amount: sellAmount,
+      precision: sellTokenDecimals,
+    })
+    const orderAmount = formatAmountFull({
+      amount: orderSellAmount,
+      precision: sellTokenDecimals,
+    })
+
+    return `${tradeAmount} matched out of ${orderAmount}`
+  }, [orderBuyAmount, orderSellAmount, sellAmount, sellTokenDecimals])
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
@@ -58,9 +83,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td>
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td data-label="Amount" title={formatAmountFull({ amount: sellAmount, precision: sellToken.decimals as number })}>
-        {formatSmart({ amount: sellAmount, precision: sellToken.decimals as number })}{' '}
-        {displayTokenSymbolOrLink(sellToken)}
+      <td data-label="Amount" title={formatAmountFull({ amount: sellAmount, precision: sellTokenDecimals })}>
+        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {displayTokenSymbolOrLink(sellToken)}
       </td>
       <td data-label="Limit Price" title={limitPrice && formatPrice({ price: limitPrice, decimals: 8 })}>
         {limitPrice ? formatPrice(limitPrice) : 'N/A'}
@@ -68,12 +92,11 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Fill Price" title={formatPrice({ price: fillPrice, decimals: 8 })}>
         {formatPrice(fillPrice)}
       </td>
-      <td data-label="Received" title={formatAmountFull({ amount: buyAmount, precision: buyToken.decimals as number })}>
-        {formatSmart({ amount: buyAmount, precision: buyToken.decimals as number })}{' '}
-        {displayTokenSymbolOrLink(buyToken)}
+      <td data-label="Received" title={formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}>
+        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
-      <td>
-        <TypePill $bgColor={!trade.remainingAmount ? 'grey' : isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>
+      <td data-label="Type" title={typeColumnTitle}>
+        <TypePill $bgColor={!remainingAmount ? 'grey' : isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>
           {classifyTrade(trade)}
         </TypePill>
       </td>
