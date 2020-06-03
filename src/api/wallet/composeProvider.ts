@@ -6,12 +6,11 @@ import RpcEngine, {
   JsonRpcError,
 } from 'json-rpc-engine'
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
-import { Provider } from '@gnosis.pm/dapp-ui'
-import { WebsocketProvider, TransactionConfig } from 'web3-core'
+import { HttpProvider, WebsocketProvider, TransactionConfig } from 'web3-core'
 import { numberToHex } from 'web3-utils'
 
 // custom providerAsMiddleware
-function providerAsMiddleware(provider: Provider | WebsocketProvider): JsonRpcMiddleware {
+function providerAsMiddleware(provider: HttpProvider | WebsocketProvider): JsonRpcMiddleware {
   // MMask provider uses sendAsync
   // WS provider doesn't have sendAsync
   const sendFName = 'sendAsync' in provider ? 'sendAsync' : 'send'
@@ -49,10 +48,10 @@ interface ExtraMiddlewareHandlers {
   earmarkTxData(data?: string): Promise<string>
 }
 
-export const composeProvider = (
-  provider: Provider,
+export const composeProvider = <T extends HttpProvider | WebsocketProvider>(
+  provider: T,
   { fetchGasPrice, earmarkTxData }: ExtraMiddlewareHandlers,
-): Provider => {
+): T => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
 
@@ -97,7 +96,7 @@ export const composeProvider = (
 
   engine.push(walletMiddleware)
 
-  const composedProvider: Provider = providerFromEngine(engine)
+  const composedProvider: T = providerFromEngine(engine)
 
   const providerProxy = new Proxy(composedProvider, {
     get: function(target, prop, receiver): unknown {
