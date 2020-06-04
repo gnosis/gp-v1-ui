@@ -3,6 +3,13 @@ import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { logDebug } from 'utils'
 
+declare module '@walletconnect/types' {
+  // eslint-disable-next-line @typescript-eslint/interface-name-prefix
+  export interface IConnector {
+    on: (event: string, listener: (...params: unknown[]) => void) => void
+  }
+}
+
 const getWCIfConnected = async (): Promise<unknown> => {
   const { default: WalletConnectProvider } = await import(
     /* webpackChunkName: "@walletconnect"*/
