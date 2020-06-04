@@ -112,8 +112,14 @@ const Trades: React.FC = () => {
             <th>Date</th>
             <th>Market</th>
             <th>Amount</th>
-            <th>Limit Price</th>
-            <th>Fill Price</th>
+            <th>
+              Limit <br />
+              Price
+            </th>
+            <th>
+              Fill <br />
+              Price
+            </th>
             <th>Received</th>
             <th>Type</th>
             <th>
