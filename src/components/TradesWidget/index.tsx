@@ -106,12 +106,11 @@ const Trades: React.FC = () => {
     <ConnectWalletBanner />
   ) : (
     <ContentPage>
-      <CardTable $columns="1.2fr 1fr 1.2fr repeat(2, 0.7fr) 1.2fr 0.7fr 1fr" $rowSeparation="0">
+      <CardTable $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.7fr 1fr" $rowSeparation="0">
         <thead>
           <tr>
             <th>Date</th>
             <th>Market</th>
-            <th>Amount</th>
             <th>
               Limit <br />
               Price
@@ -120,6 +119,7 @@ const Trades: React.FC = () => {
               Fill <br />
               Price
             </th>
+            <th>Amount</th>
             <th>Received</th>
             <th>Type</th>
             <th>
