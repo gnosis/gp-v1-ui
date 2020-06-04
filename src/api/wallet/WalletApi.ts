@@ -116,7 +116,7 @@ export interface WalletApi {
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
   getWalletInfo(): Promise<WalletInfo>
-  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void, trigger?: boolean): Command
+  addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo
   blockchainState: BlockchainUpdatePrompt
@@ -502,7 +502,7 @@ export class WalletApiImpl implements WalletApi {
     return this._networkId
   }
 
-  public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
+  public addOnChangeWalletInfo(callback: OnChangeWalletInfo): Command {
     // cancell possible promise if any
     let promiseIsStale = false
     const cancellableCallback: OnChangeWalletInfo = newWalletInfo => {
@@ -510,16 +510,13 @@ export class WalletApiImpl implements WalletApi {
       callback(newWalletInfo)
     }
     this._listeners.push(cancellableCallback)
-    const walletInfo = this.getWalletInfo()
-    // if walletInfo can only be gotten asynchronously
+    // since walletInfo can only be gotten asynchronously
     // trigger callback as soon as it becomes available
     // unless there's been a newer WalletInfo since promise initialization
-    if (trigger || isPromise(walletInfo)) {
-      Promise.resolve(walletInfo).then(newWalletInfo => {
-        if (promiseIsStale) return
-        callback(newWalletInfo)
-      })
-    }
+    this.getWalletInfo().then(newWalletInfo => {
+      if (promiseIsStale) return
+      callback(newWalletInfo)
+    })
 
     return (): void => this.removeOnChangeWalletInfo(callback)
   }

@@ -71,11 +71,9 @@ export class WalletApiMock implements WalletApi {
     return this._networkId
   }
 
-  public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
+  public addOnChangeWalletInfo(callback: OnChangeWalletInfo): Command {
     this._listeners.push(callback)
-    if (trigger) {
-      this.getWalletInfo().then(walletInfo => callback(walletInfo))
-    }
+    this.getWalletInfo().then(walletInfo => callback(walletInfo))
 
     return (): void => this.removeOnChangeWalletInfo(callback)
   }
