@@ -57,3 +57,12 @@ defaultProviderConfig:
   # type: 'url'
   # config:
   #   ethNodeUrl: <local eth node>
+
+# Exchange contract config
+exchangeContractConfig:
+  type: 'contractBlock' # choices: contractBlock
+  config:
+    - networkId: 1
+      blockNumber: 9340147
+    - networkId: 4
+      blockNumber: 5844678

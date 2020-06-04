@@ -12,6 +12,7 @@ import {
   sideEffect as OrdersSideEffect,
 } from './orders'
 import { reducer as TradeReducer, TradeState, INITIAL_TRADE_STATE as trade } from './trade'
+import { reducer as TradesReducer, TradesState, INITIAL_TRADES_STATE as trades } from './trades'
 import {
   reducer as LocalTokensReducer,
   LocalTokensState,
@@ -35,6 +36,7 @@ export interface GlobalState {
   pendingOrders: PendingOrdersState
   orders: OrdersState
   trade: TradeState
+  trades: TradesState
   localTokens: LocalTokensState
 }
 
@@ -51,6 +53,7 @@ export const INITIAL_STATE = (): GlobalState => {
     pendingOrders,
     orders,
     trade,
+    trades,
     localTokens,
   }
 }
@@ -86,5 +89,6 @@ export const rootReducer = combineReducers({
   pendingOrders: PendingOrderReducer,
   orders: addSideEffect(OrdersReducer, OrdersSideEffect),
   trade: TradeReducer,
+  trades: TradesReducer,
   localTokens: addSideEffect(LocalTokensReducer, LocalTokensSideEffect),
 })

@@ -1,6 +1,7 @@
 import { TheGraphApiImplParams } from 'api/thegraph/TheGraphApi'
 import { MultiTcrApiParams } from 'api/tcr/MultiTcrApi'
 import { DexPriceEstimatorParams } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
+import { ContractDeploymentBlock } from 'api/exchange/ExchangeApi'
 
 export interface MultiTcrConfig {
   type: 'multi-tcr'
@@ -31,6 +32,11 @@ export interface UrlProviderConfig {
   config: { ethNodeUrl: string }
 }
 
+export interface ExchangeContractConfig {
+  type: 'contractBlock'
+  config: ContractDeploymentBlock[]
+}
+
 export interface Config {
   name: string
   logoPath: string
@@ -39,4 +45,5 @@ export interface Config {
   dexPriceEstimator: DexPriceEstimatorConfig
   theGraphApi: TheGraphApiConfig
   defaultProviderConfig: InfuraProviderConfig | UrlProviderConfig
+  exchangeContractConfig: ExchangeContractConfig
 }

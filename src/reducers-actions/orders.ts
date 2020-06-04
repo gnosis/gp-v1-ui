@@ -1,7 +1,7 @@
 import { Actions } from 'reducers-actions'
 import { AuctionElement } from 'api/exchange/ExchangeApi'
-import { ZERO } from '@gnosis.pm/dex-js'
-import { addUnlistendTokensToUserTokenListById } from 'services'
+import { addUnlistedTokensToUserTokenListById } from 'services'
+import { isOrderDeleted } from 'utils'
 
 export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
@@ -35,24 +35,6 @@ export const updateOffset = (offset: number): UpdateOffsetActionType => ({
 })
 
 export const INITIAL_ORDERS_STATE = { orders: [], offset: 0 }
-
-/**
- * When orders are `deleted` from the contract, they are still returned, but with all fields set to zero.
- * We will not display such orders.
- *
- * This function checks whether the order has been zeroed out.
- * @param order The order object to check
- */
-function isOrderDeleted(order: AuctionElement): boolean {
-  return (
-    order.buyTokenId === 0 &&
-    order.sellTokenId === 0 &&
-    order.priceDenominator.eq(ZERO) &&
-    order.priceNumerator.eq(ZERO) &&
-    order.validFrom === 0 &&
-    order.validUntil === 0
-  )
-}
 
 export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
@@ -138,6 +120,6 @@ export async function sideEffect(state: OrdersState, action: ReducerActionType):
       // orders can contain many duplicated tokenIds
       state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
 
-      addUnlistendTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
+      addUnlistedTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
   }
 }
