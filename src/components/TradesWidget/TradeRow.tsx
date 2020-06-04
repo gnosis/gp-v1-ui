@@ -10,8 +10,18 @@ import { EtherscanLink } from 'components/EtherscanLink'
 import { isTradeFilled, isTradeSettled, formatDateFromBatchId } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
-export function classifyTrade(trade: Trade): string {
-  return !trade.remainingAmount ? 'Unknown' : isTradeFilled(trade) ? 'Full' : 'Partial'
+type TradeType = 'full' | 'partial' | 'liquidity' | 'unknown'
+
+export function classifyTrade(trade: Trade): TradeType {
+  const { remainingAmount, orderBuyAmount, orderSellAmount } = trade
+
+  if (!remainingAmount) {
+    return 'unknown'
+  }
+  if (orderBuyAmount && orderSellAmount && isOrderUnlimited(orderBuyAmount, orderSellAmount)) {
+    return 'liquidity'
+  }
+  return isTradeFilled(trade) ? 'full' : 'partial'
 }
 
 interface TradeRowProps {
@@ -26,7 +36,7 @@ const TypePill = styled.span<{
   display: inline-block;
   font-size: 0.9rem;
   padding: 0.2rem 0.8rem;
-  min-width: 5.3em;
+  min-width: 6.5em;
   color: white;
   font-weight: bold;
   border-radius: 1em;
@@ -47,32 +57,50 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
     batchId,
     timestamp,
     txHash,
-    remainingAmount,
-    orderBuyAmount,
     orderSellAmount,
   } = trade
   const buyTokenDecimals = buyToken.decimals || DEFAULT_PRECISION
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
 
-  const typeColumnTitle = useMemo(() => {
-    if (!orderSellAmount) {
-      return ''
-    }
-    if (orderBuyAmount && isOrderUnlimited(orderSellAmount, orderBuyAmount)) {
-      return 'Unlimited order'
+  const tradeType = useMemo(() => classifyTrade(trade), [trade])
+
+  const [typeColumnTitle, tradeTypePillColor] = useMemo(() => {
+    let title = ''
+    let color = 'grey'
+
+    let tradeAmount, orderAmount
+    if (orderSellAmount) {
+      tradeAmount = formatAmountFull({
+        amount: sellAmount,
+        precision: sellTokenDecimals,
+      })
+      orderAmount = formatAmountFull({
+        amount: orderSellAmount,
+        precision: sellTokenDecimals,
+      })
     }
 
-    const tradeAmount = formatAmountFull({
-      amount: sellAmount,
-      precision: sellTokenDecimals,
-    })
-    const orderAmount = formatAmountFull({
-      amount: orderSellAmount,
-      precision: sellTokenDecimals,
-    })
-
-    return `${tradeAmount} matched out of ${orderAmount}`
-  }, [orderBuyAmount, orderSellAmount, sellAmount, sellTokenDecimals])
+    switch (tradeType) {
+      case 'full':
+        title = `${tradeAmount} matched out of ${orderAmount}`
+        color = 'darkgreen'
+        break
+      case 'partial': {
+        title = `${tradeAmount} matched out of ${orderAmount}`
+        color = 'darkorange'
+        break
+      }
+      case 'liquidity':
+        color = 'blueviolet'
+        break
+      case 'unknown':
+        color = 'grey'
+        break
+      default:
+        title = ''
+    }
+    return [title, color]
+  }, [orderSellAmount, sellAmount, sellTokenDecimals, tradeType])
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
@@ -96,9 +124,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
-        <TypePill $bgColor={!remainingAmount ? 'grey' : isTradeFilled(trade) ? 'darkgreen' : 'darkorange'}>
-          {classifyTrade(trade)}
-        </TypePill>
+        <TypePill $bgColor={tradeTypePillColor}>{tradeType}</TypePill>
       </td>
       <td>
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
