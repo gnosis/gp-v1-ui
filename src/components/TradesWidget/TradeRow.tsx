@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
+import BigNumber from 'bignumber.js'
 
 import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION, isOrderUnlimited } from '@gnosis.pm/dex-js'
 
@@ -9,6 +10,7 @@ import { EtherscanLink } from 'components/EtherscanLink'
 
 import { isTradeFilled, isTradeSettled, formatDateFromBatchId } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
+import { ONE_HUNDRED_BIG_NUMBER } from 'const'
 
 type TradeType = 'full' | 'partial' | 'liquidity' | 'unknown'
 
@@ -56,6 +58,28 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
+// TODO: move to dex-js
+/**
+ * Formats percentage values with 2 decimals of precision.
+ * Adds `%` at the end
+ * Adds `<` at start when smaller than 0.01
+ * Adds `>` at start when greater than 99.99
+ *
+ * @param percentage Raw percentage value. E.g.: 50% == 0.5
+ */
+function formatPercentage(percentage: BigNumber): string {
+  const displayPercentage = percentage.times(ONE_HUNDRED_BIG_NUMBER)
+  let result = ''
+  if (!displayPercentage.gte('0.01')) {
+    result = '<0.01'
+  } else if (displayPercentage.gt('99.99')) {
+    result = '>99.99'
+  } else {
+    result = displayPercentage.decimalPlaces(2, BigNumber.ROUND_FLOOR).toString(10)
+  }
+  return result + '%'
+}
+
 export const TradeRow: React.FC<TradeRowProps> = params => {
   const { trade, networkId } = params
   const {
@@ -81,15 +105,14 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       case 'full':
       case 'partial': {
         if (orderSellAmount) {
-          const tradeAmount = formatAmountFull({
-            amount: sellAmount,
-            precision: sellTokenDecimals,
-          })
-          const orderAmount = formatAmountFull({
+          const fillPercentage = formatPercentage(
+            new BigNumber(sellAmount.toString()).dividedBy(new BigNumber(orderSellAmount.toString())),
+          )
+          const orderAmount = formatSmart({
             amount: orderSellAmount,
             precision: sellTokenDecimals,
           })
-          return `${tradeAmount} matched out of ${orderAmount}`
+          return `${fillPercentage} matched out of ${orderAmount} ${displayTokenSymbolOrLink(sellToken)}`
         }
       }
       case 'liquidity':
@@ -97,7 +120,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       default:
         return ''
     }
-  }, [orderSellAmount, sellAmount, sellTokenDecimals, tradeType])
+  }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, tradeType])
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
