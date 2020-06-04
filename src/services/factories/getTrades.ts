@@ -30,6 +30,48 @@ export function getTradesFactory(factoryParams: {
     return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp * 1000]
   }
 
+  async function _getTrades(
+    events: BaseTradeEvent[],
+    blockTimes: Map<number, number>,
+    orders: Map<string, Order>,
+    tokens: Map<number, TokenDetails>,
+  ): Promise<Trade[]> {
+    return events.map(event => {
+      const timestamp = blockTimes.get(event.blockNumber) as number
+      const batchId = dateToBatchId(timestamp)
+      const revertKey = ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId)
+
+      const buyToken = tokens.get(event.buyTokenId) as TokenDetails
+      const sellToken = tokens.get(event.sellTokenId) as TokenDetails
+
+      // Maybe we couldn't find the order /shrug
+      const order = orders.get(event.orderId)
+
+      return {
+        ...event,
+        batchId,
+        timestamp,
+        revertKey,
+        settlingTimestamp: calculateSettlingTimestamp(batchId),
+        buyToken,
+        sellToken,
+        limitPrice:
+          order &&
+          calculatePrice({
+            numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
+            denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
+          }),
+        fillPrice: calculatePrice({
+          numerator: { amount: event.buyAmount, decimals: buyToken.decimals },
+          denominator: { amount: event.sellAmount, decimals: sellToken.decimals },
+        }),
+        remainingAmount: order && order.priceDenominator.sub(event.sellAmount),
+        orderBuyAmount: order && order.priceNumerator,
+        orderSellAmount: order && order.priceDenominator,
+      }
+    })
+  }
+
   async function getTrades(params: GetTradesParams): Promise<Trade[]> {
     const { userAddress, networkId, orders: existingOrders } = params
 
@@ -124,42 +166,7 @@ export function getTradesFactory(factoryParams: {
 
     // ### TRADES ###
     // Final step, put all together into Trade objects
-    const trades = tradeEvents.reduce<Trade[]>((acc, event) => {
-      const timestamp = blockTimes.get(event.blockNumber) as number
-      const batchId = dateToBatchId(timestamp)
-
-      const buyToken = tokens.get(event.buyTokenId) as TokenDetails
-      const sellToken = tokens.get(event.sellTokenId) as TokenDetails
-
-      // Maybe we couldn't find the order /shrug
-      const order = orders.get(event.orderId)
-
-      const trade: Trade = {
-        ...event,
-        batchId,
-        timestamp,
-        settlingTimestamp: calculateSettlingTimestamp(batchId),
-        revertKey: ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId),
-        buyToken,
-        sellToken,
-        limitPrice:
-          order &&
-          calculatePrice({
-            numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
-            denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
-          }),
-        fillPrice: calculatePrice({
-          numerator: { amount: event.buyAmount, decimals: buyToken.decimals },
-          denominator: { amount: event.sellAmount, decimals: sellToken.decimals },
-        }),
-        remainingAmount: order && order.priceDenominator.sub(event.sellAmount),
-        orderBuyAmount: order && order.priceNumerator,
-        orderSellAmount: order && order.priceDenominator,
-      }
-      acc.push(trade)
-
-      return acc
-    }, [])
+    const trades = await _getTrades(tradeEvents, blockTimes, orders, tokens)
 
     return trades
   }
