@@ -110,6 +110,9 @@ module.exports = ({ stats = false } = {}) => ({
     alias: {
       'react-dom': '@hot-loader/react-dom',
       'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
+      // hack to unequivocally resolve @walletconnect/* dependencies from 'node_modules/@walletconnect'
+      // otherwise, for example @walletconnect/client installs its own @walletconnect/core@1.0.0-next.0
+      '@walletconnect': path.resolve(__dirname, 'node_modules/@walletconnect'),
     },
     modules: ['custom', 'src', 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
