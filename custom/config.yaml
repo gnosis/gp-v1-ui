@@ -1,0 +1,59 @@
+#######################################################################################
+##                                  DEFAULT CONFIG                                   ##
+#######################################################################################
+# - Defines the default configuration
+# - **WARNING**: Do not modify this file
+#   - For custom config create a new file "custom/config.yaml"
+#   - You can override in the custom file any config that is defined here
+#   - For redefining components, or for more information, follow the instructions in ./README.md
+
+name: Mesa.eth
+
+logoPath: './src/assets/img/logo.svg'
+
+templatePath: './src/html/index.html'
+
+# Whitelisted tokens from Gnosis Contract retrieved from a smart contract
+tcr:
+  type: 'multi-tcr' # choices: multi-tcr | none
+  config:
+    lists:
+      - networkId: 1
+        listId: 1
+        contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0'
+
+      - networkId: 4
+        contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b'
+
+# Price estimation/orderbook graph
+dexPriceEstimator:
+  type: 'dex-price-estimator' # choices: dex-price-estimator
+  config:
+    - networkId: 1
+      url: https://dex-price-estimator.gnosis.io
+
+    - networkId: 4
+      url: https://dex-price-estimator.rinkeby.gnosis.io
+
+# Subgraph abstraction, used for getting the last price
+theGraphApi:
+  type: 'the-graph' # choices: the-graph
+  config:
+    - networkId: 1
+      url: https://api.thegraph.com/subgraphs/name/gnosis/protocol
+
+    - networkId: 4
+      url: https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby
+
+# Eth node config
+defaultProviderConfig:
+  type: 'infura' # Choices: infura | url
+  config:
+    # It'll be appended to `infuraEndpoint`
+    infuraId: 607a7dfcb1ad4a0b83152e30ce20cfc5
+    infuraEndpoint: wss://mainnet.infura.io/ws/v3/
+  #
+  # Example for type `url`
+  # type: 'url'
+  # config:
+  #   ethNodeUrl: <local eth node>
