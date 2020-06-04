@@ -30,9 +30,21 @@ interface TradeRowProps {
 }
 
 const TypePill = styled.span<{
-  $bgColor?: string
+  tradeType: TradeType
 }>`
-  background-color: ${({ $bgColor = 'green' }): string => $bgColor};
+  background-color: ${({ tradeType }): string => {
+    switch (tradeType) {
+      case 'full':
+        return 'darkgreen'
+      case 'partial':
+        return 'darkorange'
+      case 'liquidity':
+        return 'blueviolet'
+      case 'unknown':
+      default:
+        return 'grey'
+    }
+  }};
   display: inline-block;
   font-size: 0.9rem;
   padding: 0.2rem 0.8rem;
@@ -64,42 +76,27 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
 
   const tradeType = useMemo(() => classifyTrade(trade), [trade])
 
-  const [typeColumnTitle, tradeTypePillColor] = useMemo(() => {
-    let title = ''
-    let color = 'grey'
-
-    let tradeAmount, orderAmount
-    if (orderSellAmount) {
-      tradeAmount = formatAmountFull({
-        amount: sellAmount,
-        precision: sellTokenDecimals,
-      })
-      orderAmount = formatAmountFull({
-        amount: orderSellAmount,
-        precision: sellTokenDecimals,
-      })
-    }
-
+  const typeColumnTitle = useMemo(() => {
     switch (tradeType) {
       case 'full':
-        title = `${tradeAmount} matched out of ${orderAmount}`
-        color = 'darkgreen'
-        break
       case 'partial': {
-        title = `${tradeAmount} matched out of ${orderAmount}`
-        color = 'darkorange'
-        break
+        if (orderSellAmount) {
+          const tradeAmount = formatAmountFull({
+            amount: sellAmount,
+            precision: sellTokenDecimals,
+          })
+          const orderAmount = formatAmountFull({
+            amount: orderSellAmount,
+            precision: sellTokenDecimals,
+          })
+          return `${tradeAmount} matched out of ${orderAmount}`
+        }
       }
       case 'liquidity':
-        color = 'blueviolet'
-        break
       case 'unknown':
-        color = 'grey'
-        break
       default:
-        title = ''
+        return ''
     }
-    return [title, color]
   }, [orderSellAmount, sellAmount, sellTokenDecimals, tradeType])
 
   // Do not display trades that are not settled
@@ -124,7 +121,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
-        <TypePill $bgColor={tradeTypePillColor}>{tradeType}</TypePill>
+        <TypePill tradeType={tradeType}>{tradeType}</TypePill>
       </td>
       <td>
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
