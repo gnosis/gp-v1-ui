@@ -291,7 +291,6 @@ type WalletConnectInits = IProviderOptions['walletconnect']
 
 const wcOptions: Omit<WalletConnectInits, 'package'> = {
   options: {
-    // TODO get infuraId from .env
     infuraId: INFURA_ID,
   },
 }
