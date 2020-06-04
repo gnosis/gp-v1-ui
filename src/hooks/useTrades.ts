@@ -47,7 +47,7 @@ export function useTrades(): Trade[] {
           toBlock,
           orders,
         }
-        const newTrades = await getTrades(params)
+        const [newTrades, reverts] = await getTrades(params)
         dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock))
       }
     }

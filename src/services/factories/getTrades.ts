@@ -2,7 +2,14 @@ import Web3 from 'web3'
 
 import { TokenDetails, calculatePrice } from '@gnosis.pm/dex-js'
 
-import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/exchange/ExchangeApi'
+import ExchangeApiImpl, {
+  ExchangeApi,
+  Trade,
+  TradeReversion,
+  Order,
+  AuctionElement,
+  BaseTradeEvent,
+} from 'api/exchange/ExchangeApi'
 
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
@@ -22,7 +29,7 @@ export function getTradesFactory(factoryParams: {
   exchangeApi: ExchangeApi
   getTokens: ReturnType<typeof getTokensFactory>
   addUnlistedTokensToUserTokenListById: ReturnType<typeof addUnlistedTokensToUserTokenListByIdFactory>
-}): (params: GetTradesParams) => Promise<Trade[]> {
+}): (params: GetTradesParams) => Promise<[Trade[], TradeReversion[]]> {
   const { web3, exchangeApi, getTokens, addUnlistedTokensToUserTokenListById } = factoryParams
 
   async function getBlockTimePair(blockNumber: number): Promise<[number, number]> {
@@ -30,7 +37,20 @@ export function getTradesFactory(factoryParams: {
     return [blockNumber, +(await web3.eth.getBlock(blockNumber)).timestamp * 1000]
   }
 
-  async function _getTrades(
+  async function assembleTradeReversions(
+    events: BaseTradeEvent[],
+    blockTimes: Map<number, number>,
+  ): Promise<TradeReversion[]> {
+    return events.map(event => {
+      const timestamp = blockTimes.get(event.blockNumber) as number
+      const batchId = dateToBatchId(timestamp)
+      const revertKey = ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId)
+
+      return { ...event, timestamp, batchId, revertKey }
+    })
+  }
+
+  async function assembleTrades(
     events: BaseTradeEvent[],
     blockTimes: Map<number, number>,
     orders: Map<string, Order>,
@@ -72,14 +92,14 @@ export function getTradesFactory(factoryParams: {
     })
   }
 
-  async function getTrades(params: GetTradesParams): Promise<Trade[]> {
+  async function getTradesAndTradeReversions(params: GetTradesParams): Promise<[Trade[], TradeReversion[]]> {
     const { userAddress, networkId, orders: existingOrders } = params
 
     const tradeEvents = await exchangeApi.getPastTrades(params)
 
     // Minor optimization: return early when empty
     if (tradeEvents.length === 0) {
-      return []
+      return [[], []]
     }
 
     const blocksSet = new Set<number>()
@@ -97,6 +117,15 @@ export function getTradesFactory(factoryParams: {
       })
       tokenIdsSet.add(buyTokenId)
       tokenIdsSet.add(sellTokenId)
+    })
+
+    // TODO: should fetch in parallel with trade events and risk being discarded,
+    // or not and delay a bit the execution but possibly saving resources?
+    const tradeReversionEvents = await exchangeApi.getPastTradeReversions(params)
+    // Go over trade reversion blocks as well
+    // Only add blocks though, no need to check orders nor tokens
+    tradeReversionEvents.forEach(event => {
+      blocksSet.add(event.blockNumber)
     })
 
     // ### ORDERS ###
@@ -164,12 +193,13 @@ export function getTradesFactory(factoryParams: {
     // Create tokens map. No need to do the extra hop to filter, since it'll be picked by id later
     const tokens = new Map(getTokens(networkId).map(token => [token.id, token]))
 
-    // ### TRADES ###
-    // Final step, put all together into Trade objects
-    const trades = await _getTrades(tradeEvents, blockTimes, orders, tokens)
-
-    return trades
+    // ### TRADES and TRADE REVERSIONS ###
+    // Final step, put all together
+    return await Promise.all([
+      assembleTrades(tradeEvents, blockTimes, orders, tokens),
+      assembleTradeReversions(tradeReversionEvents, blockTimes),
+    ])
   }
 
-  return getTrades
+  return getTradesAndTradeReversions
 }
