@@ -1,28 +1,24 @@
 import { TokenList } from 'api/tokenList/TokenListApi'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { TokenDetails } from 'types'
-import { GetByIdParams } from './'
+import { GetByIdParams } from '.'
 
 interface FactoryParams {
   tokenListApi: TokenList
   walletApi: WalletApi
-}
-
-interface Injects {
   getTokenFromExchangeById(params: GetByIdParams): Promise<TokenDetails | null>
 }
 
 /**
- * Factory of addUnlistendTokensToUserTokenListById
+ * Factory of addUnlistedTokensToUserTokenListById
  * Takes as input API instances
  * Returns async function to add unlisted tokens to USER_TOKEN_LIST by id
- * only adds token not alredy in the list
+ * only adds token not already in the list
  */
-function addUnlistendTokensToUserTokenListByIdFactory(
+function addUnlistedTokensToUserTokenListByIdFactory(
   factoryParams: FactoryParams,
-  { getTokenFromExchangeById }: Injects,
 ): (tokenIds: number[]) => Promise<void> {
-  const { tokenListApi, walletApi } = factoryParams
+  const { tokenListApi, walletApi, getTokenFromExchangeById } = factoryParams
 
   return async (tokenIds: number[]): Promise<void> => {
     const networkId = await walletApi.getNetworkId()
@@ -41,4 +37,4 @@ function addUnlistendTokensToUserTokenListByIdFactory(
   }
 }
 
-export { addUnlistendTokensToUserTokenListByIdFactory }
+export { addUnlistedTokensToUserTokenListByIdFactory }

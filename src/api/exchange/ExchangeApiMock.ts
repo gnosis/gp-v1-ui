@@ -21,6 +21,9 @@ import {
   GetOrdersPaginatedParams,
   GetOrdersPaginatedResult,
   HasTokenParams,
+  BaseTradeEvent,
+  GetOrderParams,
+  GetOrderFromOrderPlacementEventParams,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { wait } from 'utils'
@@ -58,6 +61,25 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     }, {})
     this.maxTokens = maxTokens
     this.orders = ordersByUser
+  }
+
+  public async getPastTrades(): Promise<BaseTradeEvent[]> {
+    return []
+  }
+
+  public async getOrder({ userAddress, orderId }: GetOrderParams): Promise<Order> {
+    this._initOrders(userAddress)
+
+    return this.orders[userAddress][orderId]
+  }
+
+  public async getOrderFromOrderPlacementEvent({
+    userAddress,
+    orderId,
+  }: GetOrderFromOrderPlacementEventParams): Promise<Order> {
+    this._initOrders(userAddress)
+
+    return this.orders[userAddress][orderId]
   }
 
   public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {

@@ -254,3 +254,23 @@ Where:
 - `ethNodeUrl` is the url to an Ethereum node.
 
 **Note**: Both values can be provided as environment variables. Respectively, `INFURA_ID` and `ETH_NODE_URL`.
+
+### exchangeContractConfig
+
+Exchange contract config. Used for narrowing down event queries.
+
+**Config format:**
+
+```yaml
+exchangeContractConfig:
+  type: 'contractBlock'
+  config:
+    - networkId: number
+      blockNumber: number
+```
+
+Where:
+
+- `type` can only be `contractBlock`.
+- `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
+- `blockNumber` is the block where contract was deployed to given network

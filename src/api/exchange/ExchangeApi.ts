@@ -1,12 +1,14 @@
 import BN from 'bn.js'
+import { PastEventOptions } from 'web3-eth-contract'
 
-import { assert } from '@gnosis.pm/dex-js'
+import { assert, BatchExchangeEvents, TokenDetails } from '@gnosis.pm/dex-js'
 
 import { DepositApiImpl, DepositApi, DepositApiDependencies } from 'api/deposit/DepositApi'
 import { Receipt, WithTxOptionalParams } from 'types'
 import { logDebug } from 'utils'
-import { decodeAuctionElements } from './utils/decodeAuctionElements'
+import { decodeAuctionElements, decodeOrder } from './utils/decodeAuctionElements'
 import { DEFAULT_ORDERS_PAGE_SIZE } from 'const'
+import BigNumber from 'bignumber.js'
 
 interface BaseParams {
   networkId: number
@@ -14,6 +16,17 @@ interface BaseParams {
 
 export interface GetOrdersParams extends BaseParams {
   userAddress: string
+}
+
+export interface GetOrderParams extends GetOrdersParams {
+  orderId: string
+  blockNumber?: number
+}
+
+export interface GetOrderFromOrderPlacementEventParams extends GetOrderParams {
+  buyTokenId?: number | string
+  sellTokenId?: number | string
+  toBlock?: number
 }
 
 export interface GetOrdersPaginatedParams extends GetOrdersParams {
@@ -30,6 +43,11 @@ export interface GetTokenIdByAddressParams extends BaseParams {
 }
 
 export type HasTokenParams = GetTokenIdByAddressParams
+
+export interface PastEventsParams extends GetOrdersParams {
+  fromBlock?: number
+  toBlock?: number | string
+}
 
 export interface AddTokenParams extends BaseParams, WithTxOptionalParams {
   userAddress: string
@@ -68,12 +86,17 @@ export interface ExchangeApi extends DepositApi {
   getNumTokens(networkId: number): Promise<number>
   getFeeDenominator(networkId: number): Promise<number>
 
+  getOrder(params: GetOrderParams): Promise<Order>
+  getOrderFromOrderPlacementEvent(params: GetOrderFromOrderPlacementEventParams): Promise<Order>
   getOrders(params: GetOrdersParams): Promise<AuctionElement[]>
   getOrdersPaginated(params: GetOrdersPaginatedParams): Promise<GetOrdersPaginatedResult>
 
   getTokenAddressById(params: GetTokenAddressByIdParams): Promise<string> // tokenAddressToIdMap
   getTokenIdByAddress(params: GetTokenIdByAddressParams): Promise<number>
   hasToken(params: HasTokenParams): Promise<boolean>
+
+  // event related
+  getPastTrades(params: PastEventsParams): Promise<BaseTradeEvent[]>
 
   addToken(params: AddTokenParams): Promise<Receipt>
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
@@ -97,19 +120,177 @@ export interface Order {
   remainingAmount: BN
 }
 
+/**
+ * BaseTradeEvent uses only info available on the emitted Trade event
+ */
+export interface BaseTradeEvent {
+  // order related
+  orderId: string
+  sellTokenId: number
+  buyTokenId: number
+  sellAmount: BN
+  buyAmount: BN
+  // block related
+  txHash: string
+  eventIndex: number
+  blockNumber: number
+  id: string // txHash | eventIndex
+}
+
+/**
+ * Trade enriches BaseTradeEvent with block, order and token data
+ */
+export interface Trade extends BaseTradeEvent {
+  batchId: number
+  revertKey: string // batchId | orderId, to find reverts
+  // indexOnBatch: number // tracks trade position on batch, in case of reverts
+  timestamp: number
+  settlingTimestamp: number
+  buyToken: TokenDetails
+  sellToken: TokenDetails
+  limitPrice?: BigNumber
+  fillPrice: BigNumber
+  remainingAmount?: BN
+}
+
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
   nextIndex?: number
 }
 
+export interface ContractDeploymentBlock {
+  networkId: number
+  blockNumber: number
+}
+
+export interface ExchangeApiParams extends DepositApiDependencies {
+  contractsDeploymentBlocks: ContractDeploymentBlock[]
+}
+
+type TradeEvent = BatchExchangeEvents['Trade']
+
 /**
  * Basic implementation of Stable Coin Converter API
  */
 export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
-  public constructor(injectedDependencies: DepositApiDependencies) {
+  private contractDeploymentBlock: Record<number, number>
+
+  public constructor(injectedDependencies: ExchangeApiParams) {
     super(injectedDependencies)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(window as any).exchange = this._contractPrototype
+
+    this.contractDeploymentBlock = injectedDependencies.contractsDeploymentBlocks.reduce(
+      (acc, { networkId, blockNumber }) => {
+        acc[networkId] = blockNumber
+        return acc
+      },
+      {},
+    )
+  }
+
+  /** STATIC methods **/
+
+  // TODO: Not very happy with this method. Can't be used inside the class because batchId is only known with block data
+  // TODO: Don't really know where to put it
+  public static buildTradeRevertKey(batchId: number, orderId: string): string {
+    return batchId + '|' + orderId
+  }
+
+  /** PUBLIC methods **/
+
+  public async getPastTrades({
+    userAddress,
+    networkId,
+    fromBlock: _fromBlock,
+    toBlock: _toBlock,
+  }: PastEventsParams): Promise<BaseTradeEvent[]> {
+    const contract = await this._getContract(networkId)
+
+    // Optionally fetch events from a given block.
+    // Could be used to fetch from 0 (although, why?) OR
+    // pagination of sorts OR
+    // updating trades based on polling
+    const fromBlock = _fromBlock ?? this.contractDeploymentBlock[networkId]
+
+    // Optionally fetch events until a given block.
+    // Defaults to 'latest'
+    const toBlock = _toBlock ?? 'latest'
+
+    const tradeEvents = await this.safeGetEvents(options => contract.getPastEvents('Trade', options), {
+      filter: { owner: userAddress },
+      fromBlock,
+      toBlock,
+    })
+
+    logDebug(
+      `[ExchangeApiImpl] Fetched ${
+        tradeEvents.length
+      } trades for address ${userAddress} on network ${networkId} from block ${fromBlock} ${
+        toBlock ? `to block ${toBlock}` : ''
+      }`,
+    )
+
+    return tradeEvents.filter(event => !event['removed']).map(this.parseTradeEvent)
+  }
+
+  public async getOrder({ userAddress, networkId, orderId, blockNumber }: GetOrderParams): Promise<Order> {
+    const contract = await this._getContract(networkId)
+    logDebug(`[ExchangeApiImpl] Getting order ${orderId} for account ${userAddress}`)
+
+    // TODO: Lol, need an eslint ignore to ignore a ts-ignore.
+    // TODO: Anyway, this is required because `blockNumber` option isn't typed.
+    // TODO: Dima might have an idea on how to manually fix that on `dex-js` side.
+    // TODO: In the mean time, the double layer ignore is required.
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    //@ts-ignore
+    const rawOrder = await contract.methods.orders(userAddress, orderId).call({}, blockNumber)
+
+    return decodeOrder(rawOrder)
+  }
+
+  public async getOrderFromOrderPlacementEvent({
+    userAddress,
+    networkId,
+    orderId,
+    buyTokenId: buyToken = '',
+    sellTokenId: sellToken = '',
+    toBlock,
+  }: GetOrderFromOrderPlacementEventParams): Promise<Order> {
+    const contract = await this._getContract(networkId)
+
+    const orderPlacementEvents = await this.safeGetEvents(
+      options => contract.getPastEvents('OrderPlacement', options),
+      {
+        // Indexed values: https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L97
+        filter: { owner: userAddress, sellToken, buyToken },
+        // Have to search since contract creation
+        fromBlock: this.contractDeploymentBlock[networkId],
+        // Limit search to Trade event emit block
+        toBlock,
+      },
+    )
+
+    // This list might be big, but there's no way around it at the moment
+    const orderPlacementEvent = orderPlacementEvents.find(event => event.returnValues.index === orderId)
+
+    // Should exist and be unique
+    assert(
+      orderPlacementEvent,
+      `No order was placed on network ${networkId} for address ${userAddress} and id ${orderId}`,
+    )
+
+    const values = orderPlacementEvent.returnValues
+
+    return {
+      buyTokenId: +values.buyToken,
+      sellTokenId: +values.sellToken,
+      validFrom: +values.validFrom,
+      validUntil: +values.validUntil,
+      priceNumerator: new BN(values.priceNumerator),
+      priceDenominator: new BN(values.priceDenominator),
+      remainingAmount: new BN('NaN'), // not available on OrderPlacement
+    }
   }
 
   public async getOrders({ userAddress, networkId }: GetOrdersParams): Promise<AuctionElement[]> {
@@ -295,6 +476,76 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     logDebug(`[ExchangeApiImpl] Cancelled Orders ${orderIds}`)
 
     return tx
+  }
+
+  /** PRIVATE methods **/
+
+  private async safeGetEvents<T>(
+    fn: (options: PastEventOptions) => Promise<T[]>,
+    options: PastEventOptions,
+  ): Promise<T[]> {
+    try {
+      return await fn(options)
+    } catch (e) {
+      // Error `-32005` means too many results in range.
+      // Let's split it up into 2 smaller requests
+      if (e.code === -32005) {
+        const { fromBlock: _fromBlock, toBlock: _toBlock } = options
+        logDebug(`[ExchangeApiImpl] Request range was too big [${_fromBlock} to ${_toBlock}]. Splitting up`)
+
+        const fromBlock =
+          _fromBlock === undefined
+            ? 0
+            : typeof _fromBlock === 'string'
+            ? (await this.web3.eth.getBlock(_fromBlock)).number
+            : _fromBlock
+
+        const toBlock =
+          _toBlock === undefined
+            ? await this.web3.eth.getBlockNumber()
+            : typeof _toBlock === 'string'
+            ? (await this.web3.eth.getBlock(_toBlock)).number
+            : _toBlock
+
+        // If we don't have numbers by now, something is not right, let it bubble up.
+        // Not gonna do this fully generic because we don't need it (yet, at least)
+        if (typeof fromBlock === 'number' && typeof toBlock === 'number') {
+          const currRange = toBlock - fromBlock
+
+          // if we are already querying for a single block and there are too many events, splitting the requests won't help
+          if (currRange > 1) {
+            const nextRange = Math.floor(Math.max(currRange / 2, 1))
+            const events = await this.safeGetEvents(fn, { ...options, toBlock: fromBlock + nextRange })
+            return events.concat(await this.safeGetEvents(fn, { ...options, fromBlock: fromBlock + nextRange + 1 }))
+          }
+        }
+      }
+      // Anything else: don't care, re-throw
+      throw e
+    }
+  }
+
+  private parseTradeEvent(event: TradeEvent): BaseTradeEvent {
+    const {
+      returnValues: { orderId, sellToken: sellTokenId, buyToken: buyTokenId, executedSellAmount, executedBuyAmount },
+      transactionHash: txHash,
+      logIndex: eventIndex,
+      blockNumber,
+    } = event
+
+    const trade: BaseTradeEvent = {
+      orderId,
+      sellTokenId: +sellTokenId,
+      buyTokenId: +buyTokenId,
+      sellAmount: new BN(executedSellAmount),
+      buyAmount: new BN(executedBuyAmount),
+      txHash,
+      eventIndex,
+      blockNumber,
+      id: `${txHash}|${eventIndex}`,
+    }
+
+    return trade
   }
 }
 

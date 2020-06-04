@@ -1,8 +1,11 @@
+import BN from 'bn.js'
+
 import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, Trade, Order } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
 import { ORDER_FILLED_FACTOR } from 'const'
+import { ZERO } from '@gnosis.pm/dex-js'
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -72,10 +75,42 @@ export function getImageUrl(tokenAddress?: string): string | undefined {
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
 }
 
-export function isOrderFilled(order: AuctionElement): boolean {
+function isAmountDifferenceGreaterThanNegligibleAmount(amount1: BN, amount2: BN): boolean {
   // consider an oder filled when less than `negligibleAmount` is left
-  const negligibleAmount = order.priceDenominator.divRound(ORDER_FILLED_FACTOR)
-  return !order.remainingAmount.gte(negligibleAmount)
+  const negligibleAmount = amount1.divRound(ORDER_FILLED_FACTOR)
+  return !amount2.gte(negligibleAmount)
+}
+
+/**
+ * When orders are `deleted` from the contract, they are still returned, but with all fields set to zero.
+ * We will not display such orders.
+ *
+ * This function checks whether the order has been zeroed out.
+ * @param order The order object to check
+ */
+export function isOrderDeleted(order: Order): boolean {
+  return (
+    order.buyTokenId === 0 &&
+    order.sellTokenId === 0 &&
+    order.priceDenominator.eq(ZERO) &&
+    order.priceNumerator.eq(ZERO) &&
+    order.validFrom === 0 &&
+    order.validUntil === 0
+  )
+}
+
+export function isOrderFilled(order: AuctionElement): boolean {
+  return isAmountDifferenceGreaterThanNegligibleAmount(order.priceDenominator, order.remainingAmount)
+}
+
+export function isTradeFilled(trade: Trade): boolean {
+  return (
+    !!trade.remainingAmount && isAmountDifferenceGreaterThanNegligibleAmount(trade.sellAmount, trade.remainingAmount)
+  )
+}
+
+export function isTradeSettled(trade: Trade): boolean {
+  return trade.settlingTimestamp <= Date.now()
 }
 
 export const isOrderActive = (order: AuctionElement, now: Date): boolean =>
