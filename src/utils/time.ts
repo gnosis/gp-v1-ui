@@ -1,4 +1,4 @@
-import { formatDistanceToNow, addMinutes } from 'date-fns'
+import { formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
 
 import { BATCH_TIME, BATCH_TIME_IN_MS, BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
@@ -30,9 +30,10 @@ export function batchIdToDate(batchId: number): Date {
   return new Date(timestamp)
 }
 
-export function formatDateFromBatchId(batchId: number): string {
+export function formatDateFromBatchId(batchId: number, options?: { strict?: boolean; addSuffix?: boolean }): string {
+  const { strict = false, addSuffix = true } = options || {}
   const date = batchIdToDate(batchId)
-  return formatDistanceToNow(date, { addSuffix: true })
+  return strict ? formatDistanceStrict(date, new Date(), { addSuffix }) : formatDistanceToNow(date, { addSuffix })
 }
 
 /**
