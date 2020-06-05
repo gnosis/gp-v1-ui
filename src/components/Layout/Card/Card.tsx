@@ -112,11 +112,9 @@ export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>
 export const CardTable = styled.table<{
   $bgColor?: string
 
-  $headerGap?: string
   $columns?: string
   $rows?: string
   $gap?: string
-  $cellSeparation?: string
   $rowSeparation?: string
 
   $align?: string
@@ -126,7 +124,6 @@ export const CardTable = styled.table<{
 }>`
   display: grid;
   flex: 1;
-  // grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
 
   .checked {
@@ -150,8 +147,6 @@ export const CardTable = styled.table<{
       position: relative;
       display: grid;
       grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
-      // grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
-      // grid-template-columns: 3.2rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem);
       // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       // grid-gap
@@ -182,7 +177,6 @@ export const CardTable = styled.table<{
       // Separation between CELLS
       > th,
       > td {
-        // margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
         text-overflow: ellipsis;
         overflow: hidden;
         text-align: left;
@@ -208,6 +202,14 @@ export const CardTable = styled.table<{
         line-height: 1;
         font-size: 1.1rem;
         padding: 1.3rem 0;
+
+        &.sortable {
+          cursor: pointer;
+        }
+
+        > svg {
+          margin: 0 0 0.04rem 0.2rem;
+        }
       }
       
       > th.filled {
