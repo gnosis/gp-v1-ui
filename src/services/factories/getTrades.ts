@@ -29,7 +29,7 @@ interface GetTradesAndTradeReversionReturn {
   reverts: TradeReversion[]
 }
 
-export function getTradesFactory(factoryParams: {
+export function getTradesAndTradeReversionsFactory(factoryParams: {
   web3: Web3
   exchangeApi: ExchangeApi
   getTokens: ReturnType<typeof getTokensFactory>

@@ -5,7 +5,7 @@ import { BATCH_TIME } from '@gnosis.pm/dex-js'
 import { Trade } from 'api/exchange/ExchangeApi'
 import { web3 } from 'api'
 
-import { getTrades } from 'services'
+import { getTradesAndTradeReversions } from 'services'
 
 import { appendTrades, updateLastCheckedBlock, overwriteTrades } from 'reducers-actions/trades'
 
@@ -47,7 +47,7 @@ export function useTrades(): Trade[] {
           toBlock,
           orders,
         }
-        const { trades: newTrades, reverts } = await getTrades(params)
+        const { trades: newTrades, reverts } = await getTradesAndTradeReversions(params)
         dispatch(
           newTrades.length > 0 || reverts.length > 0
             ? appendTrades(newTrades, reverts, toBlock)
