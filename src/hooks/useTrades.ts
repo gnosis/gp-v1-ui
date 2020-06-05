@@ -30,7 +30,7 @@ export function useTrades(): Trade[] {
 
   useEffect(() => {
     // Resetting trades on network change
-    dispatch(overwriteTrades([], undefined))
+    dispatch(overwriteTrades([], [], undefined))
   }, [dispatch, networkId, userAddress])
 
   useEffect(() => {
@@ -47,8 +47,12 @@ export function useTrades(): Trade[] {
           toBlock,
           orders,
         }
-        const [newTrades, reverts] = await getTrades(params)
-        dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock))
+        const { trades: newTrades, reverts } = await getTrades(params)
+        dispatch(
+          newTrades.length > 0 || reverts.length > 0
+            ? appendTrades(newTrades, reverts, toBlock)
+            : updateLastCheckedBlock(toBlock),
+        )
       }
     }
 
