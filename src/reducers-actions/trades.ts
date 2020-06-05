@@ -99,14 +99,16 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trad
       if (remainingTrades < 1) {
         // Case 2 and 3, all trades reverted
         tradesByRevertKey.delete(revertKey)
-        logDebug(`All ${trades.length} trade(s) reverted by ${reverts.length} revert(s). Key:${revertKey}`)
+        logDebug(`[reducers:trade][${revertKey}] All ${trades.length} trade(s) reverted by ${reverts.length} revert(s)`)
       } else {
         // Case 1. One or more trades left, pick from the end
         const filteredTrades = trades.slice(trades.length - remainingTrades)
         tradesByRevertKey.set(revertKey, filteredTrades)
-        logDebug(`Reverted ${reverts.length} trade(s), ${filteredTrades.length} left. Key:${revertKey}`)
+        logDebug(`[reducers:trade][${revertKey}] Reverted ${reverts.length} trade(s), ${filteredTrades.length} left`)
       }
     }
+    // TODO: this effectively makes the reverts global state to always be empty.
+    //    Should we care? Is there a use case where a revert will happen before a trade?
     // Reverts have been "used", remove them
     revertsByRevertKey.delete(revertKey)
   })
@@ -126,6 +128,7 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
     }
     case 'OVERWRITE_TRADES': {
       const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
+
       const [trades, reverts] = applyRevertsToTrades(newTrades, newReverts)
 
       return { trades, reverts, lastCheckedBlock }
