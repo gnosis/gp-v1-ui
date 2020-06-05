@@ -1,10 +1,11 @@
 import { Actions } from 'reducers-actions'
-import { Trade } from 'api/exchange/ExchangeApi'
+import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/ExchangeApi'
 
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
 export interface TradesState {
   trades: Trade[]
+  reverts: TradeReversion[]
   lastCheckedBlock?: number
 }
 
@@ -13,14 +14,22 @@ type AppendTradesActionType = Actions<'APPEND_TRADES', Required<TradesState>>
 type UpdateBlockActionType = Actions<'UPDATE_BLOCK', Required<Pick<TradesState, 'lastCheckedBlock'>>>
 type ReducerActionType = Actions<ActionTypes, TradesState>
 
-export const overwriteTrades = (trades: Trade[], lastCheckedBlock?: number): OverwriteTradesActionType => ({
+export const overwriteTrades = (
+  trades: Trade[],
+  reverts: TradeReversion[],
+  lastCheckedBlock?: number,
+): OverwriteTradesActionType => ({
   type: 'OVERWRITE_TRADES',
-  payload: { trades, lastCheckedBlock },
+  payload: { trades, reverts, lastCheckedBlock },
 })
 
-export const appendTrades = (trades: Trade[], lastCheckedBlock: number): AppendTradesActionType => ({
+export const appendTrades = (
+  trades: Trade[],
+  reverts: TradeReversion[],
+  lastCheckedBlock: number,
+): AppendTradesActionType => ({
   type: 'APPEND_TRADES',
-  payload: { trades, lastCheckedBlock },
+  payload: { trades, reverts, lastCheckedBlock },
 })
 
 export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockActionType => ({
@@ -29,7 +38,7 @@ export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockAct
 })
 
 // TODO: store to/load from localStorage
-export const INITIAL_TRADES_STATE = { trades: [] }
+export const INITIAL_TRADES_STATE = { trades: [], reverts: [] }
 
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
   switch (action.type) {
