@@ -125,7 +125,10 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
       return { trades, reverts, lastCheckedBlock }
     }
     case 'OVERWRITE_TRADES': {
-      return { ...action.payload }
+      const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
+      const [trades, reverts] = applyRevertsToTrades(newTrades, newReverts)
+
+      return { trades, reverts, lastCheckedBlock }
     }
     case 'UPDATE_BLOCK': {
       return { ...state, ...action.payload }
