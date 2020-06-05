@@ -277,8 +277,8 @@ const OrdersWidget: React.FC = () => {
             {ordersCount > 0 ? (
               <div className="ordersContainer">
                 <CardTable
-                  // $columns="minmax(2rem, min-content) minmax(13.625rem, 1fr) repeat(2, minmax(6.2rem, 0.6fr)) minmax(5.5rem, 1fr)"
-                  $columns="3.2rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem)"
+                  $columns="3.2rem repeat(2, 1fr) repeat(2, minmax(5.2rem, 0.6fr))"
+                  $gap="0 0.6rem"
                   $rowSeparation="0"
                 >
                   <thead>
