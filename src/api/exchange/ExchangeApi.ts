@@ -138,9 +138,8 @@ export interface BaseTradeEvent {
   id: string // txHash | eventIndex
 }
 
-interface AdditionalEventDetails extends BaseTradeEvent {
+export interface EventWithBlockInfo extends BaseTradeEvent {
   revertKey: string // batchId | orderId, to find reverts
-  // indexOnBatch: number // tracks trade position on batch, in case of reverts
   batchId: number
   timestamp: number
 }
@@ -148,7 +147,7 @@ interface AdditionalEventDetails extends BaseTradeEvent {
 /**
  * Trade enriches BaseTradeEvent with block, order and token data
  */
-export interface Trade extends AdditionalEventDetails {
+export interface Trade extends EventWithBlockInfo {
   settlingTimestamp: number
   buyToken: TokenDetails
   sellToken: TokenDetails
@@ -159,7 +158,7 @@ export interface Trade extends AdditionalEventDetails {
   orderSellAmount?: BN
 }
 
-export type TradeReversion = AdditionalEventDetails
+export type TradeReversion = EventWithBlockInfo
 
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
