@@ -16,7 +16,7 @@ import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/
 
 import { dateToBatchId, calculateSettlingTimestamp, logDebug, isOrderDeleted } from 'utils'
 
-interface GetTradesParams {
+interface GetTradesAndTradeReversionParams {
   networkId: number
   userAddress: string
   fromBlock?: number
@@ -24,12 +24,17 @@ interface GetTradesParams {
   orders: AuctionElement[]
 }
 
+interface GetTradesAndTradeReversionReturn {
+  trades: Trade[]
+  reverts: TradeReversion[]
+}
+
 export function getTradesFactory(factoryParams: {
   web3: Web3
   exchangeApi: ExchangeApi
   getTokens: ReturnType<typeof getTokensFactory>
   addUnlistedTokensToUserTokenListById: ReturnType<typeof addUnlistedTokensToUserTokenListByIdFactory>
-}): (params: GetTradesParams) => Promise<[Trade[], TradeReversion[]]> {
+}): (params: GetTradesAndTradeReversionParams) => Promise<GetTradesAndTradeReversionReturn> {
   const { web3, exchangeApi, getTokens, addUnlistedTokensToUserTokenListById } = factoryParams
 
   async function getBlockTimePair(blockNumber: number): Promise<[number, number]> {
@@ -41,7 +46,7 @@ export function getTradesFactory(factoryParams: {
     events: BaseTradeEvent[],
     blockTimes: Map<number, number>,
   ): Promise<TradeReversion[]> {
-    return events.map(event => {
+    return events.map<TradeReversion>(event => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
       const revertKey = ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId)
@@ -56,7 +61,7 @@ export function getTradesFactory(factoryParams: {
     orders: Map<string, Order>,
     tokens: Map<number, TokenDetails>,
   ): Promise<Trade[]> {
-    return events.map(event => {
+    return events.map<Trade>(event => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
       const revertKey = ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId)
@@ -92,14 +97,19 @@ export function getTradesFactory(factoryParams: {
     })
   }
 
-  async function getTradesAndTradeReversions(params: GetTradesParams): Promise<[Trade[], TradeReversion[]]> {
+  async function getTradesAndTradeReversions(
+    params: GetTradesAndTradeReversionParams,
+  ): Promise<GetTradesAndTradeReversionReturn> {
     const { userAddress, networkId, orders: existingOrders } = params
 
-    const tradeEvents = await exchangeApi.getPastTrades(params)
+    const [tradeEvents, tradeReversionEvents] = await Promise.all([
+      exchangeApi.getPastTrades(params),
+      exchangeApi.getPastTradeReversions(params),
+    ])
 
-    // Minor optimization: return early when empty
-    if (tradeEvents.length === 0) {
-      return [[], []]
+    // Minor optimization: return early when both are empty
+    if (tradeEvents.length === 0 && tradeReversionEvents.length === 0) {
+      return { trades: [], reverts: [] }
     }
 
     const blocksSet = new Set<number>()
@@ -119,9 +129,6 @@ export function getTradesFactory(factoryParams: {
       tokenIdsSet.add(sellTokenId)
     })
 
-    // TODO: should fetch in parallel with trade events and risk being discarded,
-    // or not and delay a bit the execution but possibly saving resources?
-    const tradeReversionEvents = await exchangeApi.getPastTradeReversions(params)
     // Go over trade reversion blocks as well
     // Only add blocks though, no need to check orders nor tokens
     tradeReversionEvents.forEach(event => {
@@ -195,10 +202,13 @@ export function getTradesFactory(factoryParams: {
 
     // ### TRADES and TRADE REVERSIONS ###
     // Final step, put all together
-    return await Promise.all([
+    const [trades, reverts] = await Promise.all([
       assembleTrades(tradeEvents, blockTimes, orders, tokens),
       assembleTradeReversions(tradeReversionEvents, blockTimes),
     ])
+
+    //TODO: Can't figure out why, but TS doesn't accept `trades` is of type `Trade[]`
+    return { trades: trades as Trade[], reverts }
   }
 
   return getTradesAndTradeReversions
