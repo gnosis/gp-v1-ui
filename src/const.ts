@@ -163,3 +163,6 @@ export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
 // This delay mitigates the strange effect of stopping the loading before the data is updated
 export const DISABLE_SPINNER_DELAY = 1000
 export const DEFAULT_ORDERS_SORTABLE_TOPIC = 'validUntil'
+/** ERROR CODES **/
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1474.md
+export const LIMIT_EXCEEDED_ERROR_CODE = -32005
