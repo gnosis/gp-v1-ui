@@ -137,58 +137,61 @@ export function getTradesFactory(factoryParams: {
 
     // ### ORDERS ###
     const orders = new Map<string, Order>()
-    // Add all existing orders to map. No problem to have more than what we need since it'll be picked by id later.
-    existingOrders.forEach(order => orders.set(order.id, order))
+    // Only if there are trade events
+    if (tradeEvents.length > 0) {
+      // Add all existing orders to map. No problem to have more than what we need since it'll be picked by id later.
+      existingOrders.forEach(order => orders.set(order.id, order))
 
-    // Fetch from contract the ones we don't have locally, and add it to the map
-    await Promise.all(
-      Array.from(orderIdsMap.keys()).map(async orderId => {
-        // We already have this order, ignore
-        // Keep in mind the global state filters out deleted orders
-        if (orders.has(orderId)) {
-          return
-        }
+      // Fetch from contract the ones we don't have locally, and add it to the map
+      await Promise.all(
+        Array.from(orderIdsMap.keys()).map(async orderId => {
+          // We already have this order, ignore
+          // Keep in mind the global state filters out deleted orders
+          if (orders.has(orderId)) {
+            return
+          }
 
-        let order: Order | undefined
+          let order: Order | undefined
 
-        // Fetch order from contract
-        try {
-          order = await exchangeApi.getOrder({
-            userAddress,
-            networkId,
-            orderId,
-          })
-
-          // Store in the orders map
-        } catch (e) {
-          logDebug(`[services:getTrades] failed to fetch order ${orderId}: ${e.message}`)
-        }
-
-        // Load additional info
-        const orderInfo = orderIdsMap.get(orderId)
-
-        // In case order was deleted from the contract, or failed to fetch it
-        // try to get it from OrderPlacement events instead
-        if (orderInfo && (!order || isOrderDeleted(order))) {
-          const { buyTokenId, sellTokenId, blockNumber } = orderInfo
+          // Fetch order from contract
           try {
-            order = await exchangeApi.getOrderFromOrderPlacementEvent({
+            order = await exchangeApi.getOrder({
               userAddress,
               networkId,
               orderId,
-              // Parameters bellow not required, but help narrow down the search
-              buyTokenId,
-              sellTokenId,
-              toBlock: blockNumber,
             })
+
+            // Store in the orders map
           } catch (e) {
-            logDebug(`[services:getTrades] Placement event not found for order ${orderId}`, e)
+            logDebug(`[services:getTrades] failed to fetch order ${orderId}: ${e.message}`)
           }
-        }
-        // Store in the orders map, if found
-        order && orders.set(orderId, order)
-      }),
-    )
+
+          // Load additional info
+          const orderInfo = orderIdsMap.get(orderId)
+
+          // In case order was deleted from the contract, or failed to fetch it
+          // try to get it from OrderPlacement events instead
+          if (orderInfo && (!order || isOrderDeleted(order))) {
+            const { buyTokenId, sellTokenId, blockNumber } = orderInfo
+            try {
+              order = await exchangeApi.getOrderFromOrderPlacementEvent({
+                userAddress,
+                networkId,
+                orderId,
+                // Parameters bellow not required, but help narrow down the search
+                buyTokenId,
+                sellTokenId,
+                toBlock: blockNumber,
+              })
+            } catch (e) {
+              logDebug(`[services:getTrades] Placement event not found for order ${orderId}`, e)
+            }
+          }
+          // Store in the orders map, if found
+          order && orders.set(orderId, order)
+        }),
+      )
+    }
 
     // ### BLOCKS ###
     const blockTimes = new Map<number, number>(await Promise.all(Array.from(blocksSet).map(getBlockTimePair)))
