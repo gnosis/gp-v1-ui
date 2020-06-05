@@ -68,56 +68,59 @@ function flattenGroup<T extends EventWithBlockInfo>(map: Map<string, T[]>): T[] 
   }, [])
 }
 
+function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trade[], TradeReversion[]] {
+  const tradesByRevertKey = new Map<string, Trade[]>()
+  const revertsByRevertKey = new Map<string, TradeReversion[]>()
+
+  // Group trades by revertKey
+  groupByRevertKey(trades, tradesByRevertKey)
+  groupByRevertKey(reverts, revertsByRevertKey)
+
+  // Assumptions:
+  // 1. There can be more than one trade per batch for a given order (even if there are no reverts)
+  //    This case is not likely given our current solvers, but it's not forbidden by the contract
+  // 2. There will never be more reverts than trades for a given batch/order pair
+  // 3. Every revert matches 1 trade
+  // 4. Reverts match Trades by order or appearance (first Revert matches first Trade and so on)
+
+  Array.from(revertsByRevertKey.keys()).forEach(revertKey => {
+    const reverts = revertsByRevertKey.get(revertKey) as TradeReversion[]
+    const trades = tradesByRevertKey.get(revertKey)
+
+    // Given the assumptions above, the possibilities are:
+    // 1. # trades > # reverts
+    // 2. # trades == # reverts
+    // Not possible:
+    // 3. # trades < # reverts
+    // 4. There are reverts but there are no trades for given revertKey <- should NOT ever happen
+    // 5. There are trades but no reverts <- wouldn't be in this loop in that case
+    if (trades) {
+      const remainingTrades = trades.length - reverts.length
+      if (remainingTrades < 1) {
+        // Case 2 and 3, all trades reverted
+        tradesByRevertKey.delete(revertKey)
+        logDebug(`All ${trades.length} trade(s) reverted by ${reverts.length} revert(s). Key:${revertKey}`)
+      } else {
+        // Case 1. One or more trades left, pick from the end
+        const filteredTrades = trades.slice(trades.length - remainingTrades)
+        tradesByRevertKey.set(revertKey, filteredTrades)
+        logDebug(`Reverted ${reverts.length} trade(s), ${filteredTrades.length} left. Key:${revertKey}`)
+      }
+    }
+    // Reverts have been "used", remove them
+    revertsByRevertKey.delete(revertKey)
+  })
+
+  return [flattenGroup(tradesByRevertKey), flattenGroup(revertsByRevertKey)]
+}
+
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
   switch (action.type) {
     case 'APPEND_TRADES': {
       const { trades: currTrades, reverts: currReverts } = state
       const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
 
-      const tradesByRevertKey = new Map<string, Trade[]>()
-      const revertsByRevertKey = new Map<string, TradeReversion[]>()
-
-      // Group trades by revertKey
-      groupByRevertKey(currTrades.concat(newTrades), tradesByRevertKey)
-      groupByRevertKey(currReverts.concat(newReverts), revertsByRevertKey)
-
-      // Assumptions:
-      // 1. There can be more than one trade per batch for a given order (even if there are no reverts)
-      //    This case is not likely given our current solvers, but it's not forbidden by the contract
-      // 2. There will never be more reverts than trades for a given batch/order pair
-      // 3. Every revert matches 1 trade
-      // 4. Reverts match Trades by order or appearance (first Revert matches first Trade and so on)
-
-      Array.from(revertsByRevertKey.keys()).forEach(revertKey => {
-        const reverts = revertsByRevertKey.get(revertKey) as TradeReversion[]
-        const trades = tradesByRevertKey.get(revertKey)
-
-        // Given the assumptions above, the possibilities are:
-        // 1. # trades > # reverts
-        // 2. # trades == # reverts
-        // Not possible:
-        // 3. # trades < # reverts
-        // 4. There are reverts but there are no trades for given revertKey <- should NOT ever happen
-        // 5. There are trades but no reverts <- wouldn't be in this loop in that case
-        if (trades) {
-          const remainingTrades = trades.length - reverts.length
-          if (remainingTrades < 1) {
-            // Case 2 and 3, all trades reverted
-            tradesByRevertKey.delete(revertKey)
-            logDebug(`All ${trades.length} trade(s) reverted by ${reverts.length} revert(s). Key:${revertKey}`)
-          } else {
-            // Case 1. One or more trades left, pick from the end
-            const filteredTrades = trades.slice(trades.length - remainingTrades)
-            tradesByRevertKey.set(revertKey, filteredTrades)
-            logDebug(`Reverted ${reverts.length} trade(s), ${filteredTrades.length} left. Key:${revertKey}`)
-          }
-        }
-        // Reverts have been "used", remove them
-        revertsByRevertKey.delete(revertKey)
-      })
-
-      const trades = flattenGroup(tradesByRevertKey)
-      const reverts = flattenGroup(revertsByRevertKey)
+      const [trades, reverts] = applyRevertsToTrades(currTrades.concat(newTrades), currReverts.concat(newReverts))
 
       return { trades, reverts, lastCheckedBlock }
     }
