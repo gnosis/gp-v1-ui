@@ -7,7 +7,6 @@ import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile }
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
-import { HttpProvider, WebsocketProvider } from 'web3-core'
 
 import { logDebug, toBN, txDataEncoder } from 'utils'
 import { INFURA_ID } from 'const'
@@ -17,74 +16,7 @@ import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQ
 import { composeProvider } from './composeProvider'
 import fetchGasPriceFactory from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
-
-// EIP1193 interfaces
-interface ProviderConnectInfo {
-  chainId: string
-  [key: string]: unknown
-}
-
-interface ProviderRpcError extends Error {
-  message: string
-  code: number
-  data?: unknown
-}
-
-interface ProviderMessage {
-  type: string
-  data: unknown
-}
-
-interface SpecificEvents<T extends HttpProvider | WebsocketProvider> {
-  on?(event: 'connect', listener: (connectInfo: ProviderConnectInfo) => void): T
-  on?(event: 'disconnect', listener: (error: ProviderRpcError) => void): T
-  on?(event: 'chainChanged', listener: (chainId: string) => void): T
-  on?(event: 'accountsChanged', listener: (accounts: string[]) => void): T
-  on?(event: 'message', listener: (message: ProviderMessage) => void): T
-  on?(event: string, listener: (...params: unknown[]) => void): T
-  once?(event: 'connect', listener: (connectInfo: ProviderConnectInfo) => void): T
-  once?(event: 'disconnect', listener: (error: ProviderRpcError) => void): T
-  once?(event: 'chainChanged', listener: (chainId: string) => void): T
-  once?(event: 'accountsChanged', listener: (accounts: string[]) => void): T
-  once?(event: 'message', listener: (message: ProviderMessage) => void): T
-  once?(event: string, listener: (...params: unknown[]) => void): T
-  off?(event: 'connect', listener: (connectInfo: ProviderConnectInfo) => void): T
-  off?(event: 'disconnect', listener: (error: ProviderRpcError) => void): T
-  off?(event: 'chainChanged', listener: (chainId: string) => void): T
-  off?(event: 'accountsChanged', listener: (accounts: string[]) => void): T
-  off?(event: 'message', listener: (message: ProviderMessage) => void): T
-  off?(event: string, listener: (...params: unknown[]) => void): T
-}
-
-type HttpProviderX = SpecificEvents<HttpProvider> & HttpProvider
-type WebsocketProviderX = SpecificEvents<WebsocketProvider> &
-  WebsocketProvider & {
-    on?(event: 'close', listener: () => void): WebsocketProviderX
-    once?(event: 'close', listener: () => void): WebsocketProviderX
-    off?(event: 'close', listener: () => void): WebsocketProviderX
-  }
-
-type Provider = HttpProviderX | WebsocketProviderX | MetamaskProvider | WalletConnectProvider
-
-interface MetamaskProvider extends HttpProviderX {
-  autoRefreshOnNetworkChange: boolean
-}
-interface WalletConnectProvider extends HttpProviderX {
-  close(): Promise<void>
-}
-
-const isMetamaskProvider = (provider: Provider | null): provider is MetamaskProvider => {
-  if (!provider) return false
-
-  const info = getProviderInfo(provider)
-  return info.name === 'MetaMask'
-}
-const isWalletConnectProvider = (provider: Provider | null): provider is WalletConnectProvider => {
-  if (!provider) return false
-
-  const info = getProviderInfo(provider)
-  return info.name === 'WalletConnect'
-}
+import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
 
 interface ProviderState {
   accounts: string[]
