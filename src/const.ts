@@ -31,6 +31,8 @@ export const ONE_HUNDRED_BIG_NUMBER = new BigNumber(100)
 // ∴ when the amount is < 5 the order will be considered filled.
 export const ORDER_FILLED_FACTOR = new BN(10000) // 0.01%
 
+export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
+
 export const APP_NAME = 'fuse'
 
 export const ETHER_PNG =
@@ -160,3 +162,7 @@ export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
 // however, the new state, that flows top down once a bock is mined, can have a small delayed
 // This delay mitigates the strange effect of stopping the loading before the data is updated
 export const DISABLE_SPINNER_DELAY = 1000
+export const DEFAULT_ORDERS_SORTABLE_TOPIC = 'validUntil'
+/** ERROR CODES **/
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1474.md
+export const LIMIT_EXCEEDED_ERROR_CODE = -32005
