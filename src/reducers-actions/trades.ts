@@ -1,6 +1,6 @@
 import { Actions } from 'reducers-actions'
 import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/ExchangeApi'
-import { logDebug } from 'utils'
+import { logDebug, flattenMapOfLists } from 'utils'
 
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
@@ -58,13 +58,6 @@ function groupByRevertKey<T extends EventWithBlockInfo>(list: T[]): Map<string, 
   })
 
   return map
-}
-
-function flattenGroup<T extends EventWithBlockInfo>(map: Map<string, T[]>): T[] {
-  return Array.from(map.keys()).reduce<T[]>((acc, key) => {
-    const list = map.get(key) as T[]
-    return acc.concat(list)
-  }, [])
 }
 
 function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): number {
@@ -131,7 +124,7 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trad
     revertsByRevertKey.delete(revertKey)
   })
 
-  return [flattenGroup(tradesByRevertKey), flattenGroup(revertsByRevertKey)]
+  return [flattenMapOfLists(tradesByRevertKey), flattenMapOfLists(revertsByRevertKey)]
 }
 
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {

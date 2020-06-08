@@ -164,3 +164,7 @@ export async function retry<T extends () => any>(fn: T, options?: RetryOptions):
     }
   }
 }
+
+export function flattenMapOfLists<K, T>(map: Map<K, T[]>): T[] {
+  return Array.from(map.values()).reduce<T[]>((acc, list) => acc.concat(list), [])
+}
