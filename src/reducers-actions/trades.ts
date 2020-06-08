@@ -6,14 +6,17 @@ export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
 export interface TradesState {
   trades: Trade[]
-  reverts: TradeReversion[]
   lastCheckedBlock?: number
 }
 
-type OverwriteTradesActionType = Actions<'OVERWRITE_TRADES', TradesState>
-type AppendTradesActionType = Actions<'APPEND_TRADES', Required<TradesState>>
+interface WithReverts {
+  reverts: TradeReversion[]
+}
+
+type OverwriteTradesActionType = Actions<'OVERWRITE_TRADES', TradesState & WithReverts>
+type AppendTradesActionType = Actions<'APPEND_TRADES', Required<TradesState> & WithReverts>
 type UpdateBlockActionType = Actions<'UPDATE_BLOCK', Required<Pick<TradesState, 'lastCheckedBlock'>>>
-type ReducerActionType = Actions<ActionTypes, TradesState>
+type ReducerActionType = Actions<ActionTypes, TradesState & WithReverts>
 
 export const overwriteTrades = (
   trades: Trade[],
@@ -126,20 +129,19 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): Trade
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
   switch (action.type) {
     case 'APPEND_TRADES': {
-      const { trades: currTrades, reverts: currReverts } = state
-      const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
+      const { trades: currTrades } = state
+      const { trades: newTrades, reverts, lastCheckedBlock } = action.payload
 
-      const trades = applyRevertsToTrades(currTrades.concat(newTrades), currReverts.concat(newReverts))
+      const trades = applyRevertsToTrades(currTrades.concat(newTrades), reverts)
 
-      // TODO: is there a point in storing reverts? Don't think so. Remove it
-      return { trades, reverts: [], lastCheckedBlock }
+      return { trades, lastCheckedBlock }
     }
     case 'OVERWRITE_TRADES': {
-      const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
+      const { trades: newTrades, reverts, lastCheckedBlock } = action.payload
 
-      const trades = applyRevertsToTrades(newTrades, newReverts)
+      const trades = applyRevertsToTrades(newTrades, reverts)
 
-      return { trades, reverts: [], lastCheckedBlock }
+      return { trades, lastCheckedBlock }
     }
     case 'UPDATE_BLOCK': {
       return { ...state, ...action.payload }
