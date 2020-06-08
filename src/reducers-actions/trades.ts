@@ -46,14 +46,11 @@ function groupByRevertKey<T extends EventWithBlockInfo>(list: T[]): Map<string, 
 
   list.forEach(item => {
     if (map.has(item.revertKey)) {
-      // Do I have to pop it out?
       const subList = map.get(item.revertKey) as T[]
 
       // Do not insert duplicates
       if (!subList.find(({ id }) => item.id === id)) {
         subList.push(item)
-        // Do I have to put it back in?
-        map.set(item.revertKey, subList)
       }
     } else {
       map.set(item.revertKey, [item])
