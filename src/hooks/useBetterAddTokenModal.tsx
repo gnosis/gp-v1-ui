@@ -50,21 +50,30 @@ export const ModalBodyWrapper = styled(FocusedDiv)`
 const TokenDisplay = styled.div`
   display: grid;
 
-  align-items: center;
-  grid-template-columns: auto minmax(12rem, auto) 2rem 1fr;
-  grid-template-rows: auto auto;
+  align-items: flex-start;
   grid-template-areas:
-    'image symbol . text-1'
-    'image name . text-2';
+    'image symbol text-1'
+    'image name text-2';
+
+  grid-gap: 0 1.7rem;
+  margin: auto;
+  padding: 0 1.7rem;
 
   .tokenImage {
     grid-area: image;
     height: 5em;
     width: 5em;
+    margin: 0;
+  }
+
+  .tokenName,
+  .tokenSymbol {
+    word-break: break-word;
   }
 
   .tokenSymbol {
     grid-area: symbol;
+    align-self: flex-end;
   }
 
   .tokenName {
@@ -74,10 +83,12 @@ const TokenDisplay = styled.div`
   .tokenText {
     &:first-of-type {
       grid-area: text-1;
+      align-self: flex-end;
     }
 
     &:last-of-type {
       grid-area: text-2;
+      align-self: flex-start;
     }
   }
 `
