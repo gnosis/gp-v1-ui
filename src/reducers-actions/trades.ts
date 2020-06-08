@@ -68,7 +68,7 @@ function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): nu
   return a.eventIndex - b.eventIndex
 }
 
-function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trade[], TradeReversion[]] {
+function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): Trade[] {
   // Group trades by revertKey
   const tradesByRevertKey = groupByRevertKey(trades)
   const revertsByRevertKey = groupByRevertKey(reverts)
@@ -118,13 +118,9 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trad
         console.error(`There are reverts not matched to trades`)
       }
     }
-    // TODO: this effectively makes the reverts global state to always be empty.
-    //    Should we care? Is there a use case where a revert will happen before a trade?
-    // Reverts have been "used", remove them
-    revertsByRevertKey.delete(revertKey)
   })
 
-  return [flattenMapOfLists(tradesByRevertKey), flattenMapOfLists(revertsByRevertKey)]
+  return flattenMapOfLists(tradesByRevertKey)
 }
 
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
@@ -133,16 +129,17 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
       const { trades: currTrades, reverts: currReverts } = state
       const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
 
-      const [trades, reverts] = applyRevertsToTrades(currTrades.concat(newTrades), currReverts.concat(newReverts))
+      const trades = applyRevertsToTrades(currTrades.concat(newTrades), currReverts.concat(newReverts))
 
-      return { trades, reverts, lastCheckedBlock }
+      // TODO: is there a point in storing reverts? Don't think so. Remove it
+      return { trades, reverts: [], lastCheckedBlock }
     }
     case 'OVERWRITE_TRADES': {
       const { trades: newTrades, reverts: newReverts, lastCheckedBlock } = action.payload
 
-      const [trades, reverts] = applyRevertsToTrades(newTrades, newReverts)
+      const trades = applyRevertsToTrades(newTrades, newReverts)
 
-      return { trades, reverts, lastCheckedBlock }
+      return { trades, reverts: [], lastCheckedBlock }
     }
     case 'UPDATE_BLOCK': {
       return { ...state, ...action.payload }
