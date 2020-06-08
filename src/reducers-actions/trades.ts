@@ -94,24 +94,38 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trad
     const reverts = (revertsByRevertKey.get(revertKey) as TradeReversion[]).sort(sortByTimeAndPosition)
     const trades = tradesByRevertKey.get(revertKey)?.sort(sortByTimeAndPosition)
 
-    // Given the assumptions above, the possibilities are:
-    // 1. # trades > # reverts
-    // 2. # trades == # reverts
-    // Not possible:
-    // 3. # trades < # reverts
-    // 4. There are reverts but there are no trades for given revertKey <- should NOT ever happen
-    // 5. There are trades but no reverts <- wouldn't be in this loop in that case
     if (trades) {
-      const remainingTrades = trades.length - reverts.length
-      if (remainingTrades < 1) {
-        // Case 2 and 3, all trades reverted
-        tradesByRevertKey.delete(revertKey)
-        logDebug(`[reducers:trade][${revertKey}] All ${trades.length} trade(s) reverted by ${reverts.length} revert(s)`)
-      } else {
-        // Case 1. One or more trades left, pick from the end
-        const filteredTrades = trades.slice(trades.length - remainingTrades)
-        tradesByRevertKey.set(revertKey, filteredTrades)
-        logDebug(`[reducers:trade][${revertKey}] Reverted ${reverts.length} trade(s), ${filteredTrades.length} left`)
+      let tradesIndex = 0
+      let revertsIndex = 0
+      // Iterate over both trades and reverts while there are any
+      while (tradesIndex < trades.length && revertsIndex < reverts.length) {
+        if (!trades[tradesIndex].revertId) {
+          // Trade was not reverted. Now it is.
+          // Update trade, move both indices forward
+          trades[tradesIndex].revertId = reverts[revertsIndex].id
+          trades[tradesIndex].revertTimestamp = reverts[revertsIndex].timestamp
+          logDebug(
+            `[reducers:trade][${revertKey}] Trade ${trades[tradesIndex].id} matched to Revert ${reverts[revertsIndex].id}`,
+          )
+          tradesIndex++
+          revertsIndex++
+        } else if (trades[tradesIndex].revertId === reverts[revertsIndex].id) {
+          // Trade was already reverted by this Revert
+          // Move both indices forward
+          logDebug(
+            `[reducers:trade][${revertKey}] Trade ${trades[tradesIndex].id} was already matched to Revert ${reverts[revertsIndex].id}`,
+          )
+          tradesIndex++
+          revertsIndex++
+        } else {
+          // Trade was already reverted, not by this Revert
+          // Move on to next Trade, keep same Revert
+          tradesIndex++
+        }
+      }
+      // Shouldn't happen, here for debugging
+      if (tradesIndex === trades.length && revertsIndex < reverts.length) {
+        console.error(`There are reverts not matched to trades`)
       }
     }
     // TODO: this effectively makes the reverts global state to always be empty.
