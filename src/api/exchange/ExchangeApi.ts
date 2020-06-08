@@ -148,6 +148,8 @@ export interface EventWithBlockInfo extends BaseTradeEvent {
  * Trade enriches BaseTradeEvent with block, order and token data
  */
 export interface Trade extends EventWithBlockInfo {
+  revertTimestamp?: number
+  revertId?: string
   settlingTimestamp: number
   buyToken: TokenDetails
   sellToken: TokenDetails
