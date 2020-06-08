@@ -41,7 +41,9 @@ export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockAct
 // TODO: store to/load from localStorage
 export const INITIAL_TRADES_STATE = { trades: [], reverts: [] }
 
-function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], map: Map<string, T[]>): void {
+function groupByRevertKey<T extends EventWithBlockInfo>(list: T[]): Map<string, T[]> {
+  const map = new Map<string, T[]>()
+
   list.forEach(item => {
     if (map.has(item.revertKey)) {
       // Do I have to pop it out?
@@ -57,6 +59,8 @@ function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], map: Map<stri
       map.set(item.revertKey, [item])
     }
   })
+
+  return map
 }
 
 function flattenGroup<T extends EventWithBlockInfo>(map: Map<string, T[]>): T[] {
@@ -75,12 +79,9 @@ function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): nu
 }
 
 function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trade[], TradeReversion[]] {
-  const tradesByRevertKey = new Map<string, Trade[]>()
-  const revertsByRevertKey = new Map<string, TradeReversion[]>()
-
   // Group trades by revertKey
-  groupByRevertKey(trades, tradesByRevertKey)
-  groupByRevertKey(reverts, revertsByRevertKey)
+  const tradesByRevertKey = groupByRevertKey(trades)
+  const revertsByRevertKey = groupByRevertKey(reverts)
 
   // Assumptions:
   // 1. There can be more than one trade per batch for a given order (even if there are no reverts)
