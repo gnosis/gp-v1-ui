@@ -50,8 +50,6 @@ function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], map: Map<stri
       // Do not insert duplicates
       if (!subList.find(({ id }) => item.id === id)) {
         subList.push(item)
-        // Should I sort on insert?
-        subList.sort((a, b) => a.timestamp - b.timestamp)
         // Do I have to put it back in?
         map.set(item.revertKey, subList)
       }
@@ -66,6 +64,14 @@ function flattenGroup<T extends EventWithBlockInfo>(map: Map<string, T[]>): T[] 
     const list = map.get(key) as T[]
     return acc.concat(list)
   }, [])
+}
+
+function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): number {
+  if (a.timestamp < b.timestamp) return -1
+  if (a.timestamp > b.timestamp) return 1
+  // if timestamps are equal, means both happened on the same block
+  // in that case, check the event index
+  return a.eventIndex - b.eventIndex
 }
 
 function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trade[], TradeReversion[]] {
@@ -84,8 +90,8 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): [Trad
   // 4. Reverts match Trades by order or appearance (first Revert matches first Trade and so on)
 
   Array.from(revertsByRevertKey.keys()).forEach(revertKey => {
-    const reverts = revertsByRevertKey.get(revertKey) as TradeReversion[]
-    const trades = tradesByRevertKey.get(revertKey)
+    const reverts = (revertsByRevertKey.get(revertKey) as TradeReversion[]).sort(sortByTimeAndPosition)
+    const trades = tradesByRevertKey.get(revertKey)?.sort(sortByTimeAndPosition)
 
     // Given the assumptions above, the possibilities are:
     // 1. # trades > # reverts
