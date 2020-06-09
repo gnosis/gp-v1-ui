@@ -2,14 +2,7 @@ import Web3 from 'web3'
 
 import { TokenDetails, calculatePrice } from '@gnosis.pm/dex-js'
 
-import ExchangeApiImpl, {
-  ExchangeApi,
-  Trade,
-  TradeReversion,
-  Order,
-  AuctionElement,
-  BaseTradeEvent,
-} from 'api/exchange/ExchangeApi'
+import { ExchangeApi, Trade, TradeReversion, Order, AuctionElement, BaseTradeEvent } from 'api/exchange/ExchangeApi'
 
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
@@ -49,9 +42,8 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     return events.map<TradeReversion>(event => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
-      const revertKey = ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId)
 
-      return { ...event, timestamp, batchId, revertKey }
+      return { ...event, timestamp, batchId }
     })
   }
 
@@ -64,7 +56,6 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     return events.map<Trade>(event => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
-      const revertKey = ExchangeApiImpl.buildTradeRevertKey(batchId, event.orderId)
 
       const buyToken = tokens.get(event.buyTokenId) as TokenDetails
       const sellToken = tokens.get(event.sellTokenId) as TokenDetails
@@ -76,7 +67,6 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
         ...event,
         batchId,
         timestamp,
-        revertKey,
         settlingTimestamp: calculateSettlingTimestamp(batchId),
         buyToken,
         sellToken,

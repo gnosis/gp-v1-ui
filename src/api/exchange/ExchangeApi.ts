@@ -139,7 +139,6 @@ export interface BaseTradeEvent {
 }
 
 export interface EventWithBlockInfo extends BaseTradeEvent {
-  revertKey: string // batchId | orderId, to find reverts
   batchId: number
   timestamp: number
 }
@@ -196,14 +195,6 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       },
       {},
     )
-  }
-
-  /** STATIC methods **/
-
-  // TODO: Not very happy with this method. Can't be used inside the class because batchId is only known with block data
-  // TODO: Don't really know where to put it
-  public static buildTradeRevertKey(batchId: number, orderId: string): string {
-    return batchId + '|' + orderId
   }
 
   /** PUBLIC methods **/

@@ -45,19 +45,25 @@ export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockAct
 // TODO: store to/load from localStorage
 export const INITIAL_TRADES_STATE = { trades: [], pendingTrades: new Map<string, Trade[]>() }
 
+function buildTradeRevertKey(batchId: number, orderId: string): string {
+  return batchId + '|' + orderId
+}
+
 function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, T[]>): Map<string, T[]> {
   const map = initial || new Map<string, T[]>()
 
   list.forEach(item => {
-    if (map.has(item.revertKey)) {
-      const subList = map.get(item.revertKey) as T[]
+    const revertKey = buildTradeRevertKey(item.batchId, item.orderId)
+
+    if (map.has(revertKey)) {
+      const subList = map.get(revertKey) as T[]
 
       // Do not insert duplicates
       if (!subList.find(({ id }) => item.id === id)) {
         subList.push(item)
       }
     } else {
-      map.set(item.revertKey, [item])
+      map.set(revertKey, [item])
     }
   })
 
