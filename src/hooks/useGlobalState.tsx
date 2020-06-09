@@ -1,10 +1,6 @@
-import React, { useContext, useCallback, useReducer, useRef, useMemo } from 'react'
+import React, { useContext, useReducer } from 'react'
 import { GlobalState } from 'reducers-actions'
 import { AnyAction } from 'combine-reducers'
-
-import useDeepCompareRef from './useDeepCompareRef'
-
-import enhanceDispatchWithMiddleware from 'middlewares'
 
 const GlobalStateContext = React.createContext({})
 
@@ -15,27 +11,9 @@ export function withGlobalContext<P>(
 ): (props: P) => JSX.Element {
   return function WrappedComponentWithGlobalState(props: P): JSX.Element {
     const [state, dispatch] = useReducer(reducer, initialStateFunc())
-    // hold a reference to state here
-    const stateRef = useRef(state)
-    // deep check there are no majour changes
-    // between updates
-    const deepState = useDeepCompareRef(state)
-    // set new ref current value if no deep changes
-    useMemo(() => {
-      stateRef.current = deepState as GlobalState
-    }, [deepState])
-
-    // apply middlewares and pass a state getting fn via ref and NO DEPS
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const enhancedDispatch = useCallback(
-      enhanceDispatchWithMiddleware(() => stateRef.current, dispatch),
-      [],
-    )
-
-    process.env.NODE_ENV === 'development' && (window['eDispatch'] = enhancedDispatch)
 
     return (
-      <GlobalStateContext.Provider value={[deepState, enhancedDispatch]}>
+      <GlobalStateContext.Provider value={[state, dispatch]}>
         <WrappedComponent {...props} />
       </GlobalStateContext.Provider>
     )
