@@ -1,11 +1,9 @@
-import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-ui'
 import { delay } from 'utils'
 import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
-import Web3 from 'web3'
 import { logDebug } from 'utils'
 
-const getWCIfConnected = async (): Promise<WCProvider | null> => {
+const getWCIfConnected = async (): Promise<unknown> => {
   const { default: WalletConnectProvider } = await import(
     /* webpackChunkName: "@walletconnect"*/
     '@walletconnect/web3-provider'
@@ -49,16 +47,9 @@ const getWCIfConnected = async (): Promise<WCProvider | null> => {
   return provider
 }
 
-declare global {
-  interface Window {
-    ethereum?: Provider & { enable(): Promise<string[]> }
-    web3?: Web3 & { currentProvider: Provider }
-  }
-}
-
 // from web3connect/providers/connectors/injected.ts
-const connectToInjected = async (): Promise<Provider> => {
-  let provider: Provider
+const connectToInjected = async (): Promise<unknown> => {
+  let provider
   if (window.ethereum) {
     provider = window.ethereum
     try {
@@ -66,7 +57,7 @@ const connectToInjected = async (): Promise<Provider> => {
     } catch (error) {
       throw new Error('User Rejected')
     }
-  } else if (window.web3) {
+  } else if (window.web3 && window.web3.currentProvider && typeof window.web3.currentProvider === 'object') {
     provider = window.web3.currentProvider
   } else {
     throw new Error('No Web3 Provider found')
@@ -74,7 +65,8 @@ const connectToInjected = async (): Promise<Provider> => {
   return provider
 }
 
-export const getLastProvider = async (): Promise<Provider | null> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getLastProvider = async (): Promise<any> => {
   const lastProviderName = localStorage.getItem(STORAGE_KEY_LAST_PROVIDER)
 
   try {
@@ -83,12 +75,12 @@ export const getLastProvider = async (): Promise<Provider | null> => {
     // but account for possibly stale session
     if (lastProviderName === 'WalletConnect') return getWCIfConnected()
 
-    const { default: Web3Connect } = await import(
-      /* webpackChunkName: "@web3connect"*/
-      'web3connect'
+    const { getInjectedProviderName } = await import(
+      /* webpackChunkName: "web3modal"*/
+      'web3modal'
     )
 
-    const injectedProviderName = Web3Connect.getInjectedProviderName()
+    const injectedProviderName = getInjectedProviderName()
     // last provider is the current injected provider
     // and it's still injected
     if (injectedProviderName && injectedProviderName === lastProviderName) {

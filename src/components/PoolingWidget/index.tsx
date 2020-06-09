@@ -290,7 +290,7 @@ const PoolingInterface: React.FC = () => {
             <ContentWrapper>
               <StepDescription step={step} />
               {/* Main Components here */}
-              <SubComponents step={step} {...restProps} />
+              <SubComponents {...restProps} />
             </ContentWrapper>
 
             <LiquidityMessage>
