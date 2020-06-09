@@ -104,6 +104,11 @@ export interface ExchangeApi extends DepositApi {
   cancelOrders(params: CancelOrdersParams): Promise<Receipt>
 }
 
+export interface DetailedAuctionElement extends AuctionElement {
+  buyToken: TokenDetails | null
+  sellToken: TokenDetails | null
+}
+
 export interface AuctionElement extends Order {
   user: string
   sellTokenBalance: BN
