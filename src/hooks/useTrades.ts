@@ -85,8 +85,8 @@ export function useTrades(): Trade[] {
       // Thus, we check for new trades a few seconds after the 4min mark
       const delay = getTimeRemainingInBatch() - 30
 
-      // Update now to not leave the interface empty
-      if (trades.length === 0 || (delay >= 0 && delay < 10)) {
+      // Update now if this is the first time for this address/network OR within the range to start now
+      if (!lastCheckedBlock || (delay >= 0 && delay < 10)) {
         updateTrades()
       }
 
@@ -106,7 +106,7 @@ export function useTrades(): Trade[] {
       cancelled = true
       if (intervalId) clearInterval(intervalId)
     }
-  }, [userAddress, networkId, lastCheckedBlock, dispatch, trades, orders])
+  }, [userAddress, networkId, lastCheckedBlock, dispatch, orders])
 
   // latest first
   return trades.slice(0).reverse()
