@@ -1,11 +1,12 @@
 import { Actions } from 'reducers-actions'
 import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/ExchangeApi'
-import { logDebug, flattenMapOfLists } from 'utils'
+import { logDebug, flattenMapOfLists, dateToBatchId } from 'utils'
 
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
 export interface TradesState {
   trades: Trade[]
+  pendingTrades: Map<string, Trade[]>
   lastCheckedBlock?: number
 }
 
@@ -13,8 +14,8 @@ interface WithReverts {
   reverts: TradeReversion[]
 }
 
-type OverwriteTradesActionType = Actions<'OVERWRITE_TRADES', TradesState & WithReverts>
-type AppendTradesActionType = Actions<'APPEND_TRADES', Required<TradesState> & WithReverts>
+type OverwriteTradesActionType = Actions<'OVERWRITE_TRADES', Omit<TradesState, 'pendingTrades'> & WithReverts>
+type AppendTradesActionType = Actions<'APPEND_TRADES', Required<Omit<TradesState, 'pendingTrades'>> & WithReverts>
 type UpdateBlockActionType = Actions<'UPDATE_BLOCK', Required<Pick<TradesState, 'lastCheckedBlock'>>>
 type ReducerActionType = Actions<ActionTypes, TradesState & WithReverts>
 
@@ -42,10 +43,10 @@ export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockAct
 })
 
 // TODO: store to/load from localStorage
-export const INITIAL_TRADES_STATE = { trades: [], reverts: [] }
+export const INITIAL_TRADES_STATE = { trades: [], pendingTrades: new Map<string, Trade[]>() }
 
-function groupByRevertKey<T extends EventWithBlockInfo>(list: T[]): Map<string, T[]> {
-  const map = new Map<string, T[]>()
+function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, T[]>): Map<string, T[]> {
+  const map = initial || new Map<string, T[]>()
 
   list.forEach(item => {
     if (map.has(item.revertKey)) {
@@ -71,9 +72,35 @@ function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): nu
   return a.eventIndex - b.eventIndex
 }
 
-function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): Trade[] {
+function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, Trade[]> {
+  // Now that we matched the reverts with trades we currently have, we filter the trades
+  // that might have reverts still coming in.
+
+  // To be on the very safe side, let's assume pending anything in the last two batches
+  const currentBatchId = dateToBatchId()
+
+  // Filter out trades in that range (curr ... curr -2).
+  // The `revertKey` is composed by batchId|orderId, so this regex looks for the batchIds in the keys
+  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\|`)
+
+  return new Map<string, Trade[]>(
+    // Iterate over trade groups by key. Reduces it to a list of tuples.
+    Array.from(tradesByRevertKey.keys()).reduce<[string, Trade[]][]>((acc, key) => {
+      if (batchesRegex.test(key)) {
+        acc.push([key, tradesByRevertKey.get(key) as Trade[]])
+      }
+      return acc
+    }, []),
+  )
+}
+
+function applyRevertsToTrades(
+  trades: Trade[],
+  reverts: TradeReversion[],
+  pendingTrades?: Map<string, Trade[]>,
+): [Trade[], Map<string, Trade[]>] {
   // Group trades by revertKey
-  const tradesByRevertKey = groupByRevertKey(trades)
+  const tradesByRevertKey = groupByRevertKey(trades, pendingTrades)
   const revertsByRevertKey = groupByRevertKey(reverts)
 
   // Assumptions:
@@ -123,25 +150,25 @@ function applyRevertsToTrades(trades: Trade[], reverts: TradeReversion[]): Trade
     }
   })
 
-  return flattenMapOfLists(tradesByRevertKey)
+  return [flattenMapOfLists(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
 }
 
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
   switch (action.type) {
     case 'APPEND_TRADES': {
-      const { trades: currTrades } = state
+      const { trades: currTrades, pendingTrades: currPendingTrades } = state
       const { trades: newTrades, reverts, lastCheckedBlock } = action.payload
 
-      const trades = applyRevertsToTrades(currTrades.concat(newTrades), reverts)
+      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts, currPendingTrades)
 
-      return { trades, lastCheckedBlock }
+      return { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades }
     }
     case 'OVERWRITE_TRADES': {
       const { trades: newTrades, reverts, lastCheckedBlock } = action.payload
 
-      const trades = applyRevertsToTrades(newTrades, reverts)
+      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts)
 
-      return { trades, lastCheckedBlock }
+      return { trades, lastCheckedBlock, pendingTrades }
     }
     case 'UPDATE_BLOCK': {
       return { ...state, ...action.payload }
