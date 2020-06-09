@@ -76,7 +76,7 @@ export const OrdersForm = styled.div`
   }
 
   .infoContainer {
-    margin: 1rem auto 0;
+    margin: 0 auto;
     display: flex;
     flex-flow: row nowrap;
     width: 100%;

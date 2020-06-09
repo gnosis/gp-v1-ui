@@ -29,6 +29,7 @@ import { CardTable } from 'components/Layout/Card'
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
+import SearchFilter from 'components/SearchFilter'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
@@ -264,6 +265,10 @@ const OrdersWidget: React.FC = () => {
                   isActive={selectedTab === 'closed'}
                   count={filteredOrders.closed.orders.length + filteredOrders.closed.pendingOrders.length}
                   onClick={setSelectedTabFactory('closed')}
+                />
+                <SearchFilter
+                  focusBgColor="var(--color-background-CTA)"
+                  focusFontColor="var(--color-background-pageWrapper)"
                 />
               </div>
             </div>
