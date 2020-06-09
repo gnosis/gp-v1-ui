@@ -17,7 +17,6 @@ import { BATCH_TIME_IN_MS } from 'const'
 import { getTimeRemainingInBatch } from 'utils'
 
 // TODO: (on global state) store trades to local storage
-// TODO: account for reverts
 export function useTrades(): Trade[] {
   const [
     {
@@ -34,6 +33,9 @@ export function useTrades(): Trade[] {
   }, [dispatch, networkId, userAddress])
 
   useEffect(() => {
+    // Flow control. Cancel query/state update on unmount
+    let cancelled = false
+
     async function updateTrades(): Promise<void> {
       if (userAddress && networkId) {
         // Don't want to update on every block
@@ -47,7 +49,19 @@ export function useTrades(): Trade[] {
           toBlock,
           orders,
         }
+
+        // Check before expensive operation
+        if (cancelled) {
+          return
+        }
+
         const { trades: newTrades, reverts } = await getTradesAndTradeReversions(params)
+
+        // Check before updating state
+        if (cancelled) {
+          return
+        }
+
         dispatch(
           newTrades.length > 0 || reverts.length > 0
             ? appendTrades(newTrades, reverts, toBlock)
@@ -89,6 +103,7 @@ export function useTrades(): Trade[] {
     }
 
     return (): void => {
+      cancelled = true
       if (intervalId) clearInterval(intervalId)
     }
   }, [userAddress, networkId, lastCheckedBlock, dispatch, trades, orders])
