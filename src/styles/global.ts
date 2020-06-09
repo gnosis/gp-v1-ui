@@ -959,7 +959,6 @@ const GlobalStyles = createGlobalStyle`
   #walletconnect-qrcode-modal {
     .walletconnect-modal__headerLogo {
       max-width: 24rem;
-      height: auto;
       margin: 2.4rem auto;
     }
     
