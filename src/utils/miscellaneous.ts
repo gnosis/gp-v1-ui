@@ -1,4 +1,3 @@
-import isEqual from 'lodash/isEqual'
 import BN from 'bn.js'
 
 import { TokenDetails, Unpromise } from 'types'
@@ -7,8 +6,6 @@ import { AuctionElement, Trade, Order } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
 import { ORDER_FILLED_FACTOR } from 'const'
 import { ZERO } from '@gnosis.pm/dex-js'
-
-export const isDeepEqual: typeof isEqual = isEqual
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -138,20 +135,6 @@ export function setStorageItem(key: string, data: unknown): void {
   return localStorage.setItem(key, formattedData)
 }
 
-// Used e.g inside middleware composition in useGlobalState
-export function compose(...funcs: Function[]): Function {
-  if (funcs.length === 0) {
-    // infer the argument type so it is usable in inference down the line
-    return function thing<T>(arg: T): T {
-      return arg
-    }
-  }
-
-  if (funcs.length === 1) {
-    return funcs[0]
-  }
-  return funcs.reduce((a, b) => (...args: unknown[]): Function => a(b(...args)))
-}
 interface RetryOptions {
   retriesLeft?: number
   interval?: number
