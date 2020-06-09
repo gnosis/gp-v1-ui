@@ -1,6 +1,6 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
-import { toBN } from 'utils'
+import { toBN, setStorageItem } from 'utils'
 import { STORAGE_PENDING_ORDER_KEY } from 'const'
 
 export type ActionTypes = 'SAVE_PENDING_ORDERS' | 'REMOVE_PENDING_ORDERS'
@@ -90,6 +90,16 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
 
       return newState
     }
+    default:
+      return state
+  }
+}
+
+export const sideEffect = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
+  switch (action.type) {
+    case 'SAVE_PENDING_ORDERS':
+    case 'REMOVE_PENDING_ORDERS':
+      setStorageItem(STORAGE_PENDING_ORDER_KEY, state)
     default:
       return state
   }
