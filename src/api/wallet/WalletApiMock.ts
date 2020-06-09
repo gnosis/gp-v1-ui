@@ -33,7 +33,7 @@ export class WalletApiMock implements WalletApi {
     this._listeners = []
   }
 
-  public isConnected(): boolean {
+  public async isConnected(): Promise<boolean> {
     return this._connected
   }
 
@@ -71,11 +71,9 @@ export class WalletApiMock implements WalletApi {
     return this._networkId
   }
 
-  public addOnChangeWalletInfo(callback: OnChangeWalletInfo, trigger?: boolean): Command {
+  public addOnChangeWalletInfo(callback: OnChangeWalletInfo): Command {
     this._listeners.push(callback)
-    if (trigger) {
-      callback(this.getWalletInfo())
-    }
+    this.getWalletInfo().then(walletInfo => callback(walletInfo))
 
     return (): void => this.removeOnChangeWalletInfo(callback)
   }
@@ -91,7 +89,6 @@ export class WalletApiMock implements WalletApi {
       type: 'mock',
       logo: '',
       check: '',
-      styled: {},
     }
   }
 
@@ -108,7 +105,7 @@ export class WalletApiMock implements WalletApi {
     this._notifyListeners()
   }
 
-  public getWalletInfo(): WalletInfo {
+  public async getWalletInfo(): Promise<WalletInfo> {
     return {
       isConnected: this._connected,
       userAddress: this._connected ? this._user : undefined,
@@ -118,8 +115,8 @@ export class WalletApiMock implements WalletApi {
 
   /* ****************      Private Functions      **************** */
 
-  private _notifyListeners(): void {
-    const walletInfo: WalletInfo = this.getWalletInfo()
+  private async _notifyListeners(): Promise<void> {
+    const walletInfo: WalletInfo = await this.getWalletInfo()
     this._listeners.forEach(listener => listener(walletInfo))
   }
 }

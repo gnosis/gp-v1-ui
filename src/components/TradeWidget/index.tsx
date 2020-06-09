@@ -347,22 +347,20 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   }
 `
 
-export const enum TradeFormTokenId {
-  sellToken = 'sellToken',
-  receiveToken = 'receiveToken',
-  validFrom = 'validFrom',
-  validUntil = 'validUntil',
-  price = 'price',
-  priceInverse = 'priceInverse',
-}
+export type TradeFormTokenId = keyof TradeFormData
 
-export type TradeFormData = {
-  [K in keyof typeof TradeFormTokenId]: string
+export interface TradeFormData {
+  sellToken: string
+  receiveToken: string
+  validFrom?: string
+  validUntil?: string
+  price: string
+  priceInverse: string
 }
 
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
-export const DEFAULT_FORM_STATE = {
+export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
@@ -476,12 +474,12 @@ const TradeWidget: React.FC = () => {
   const { connectWallet } = useConnectWallet()
   const [{ trade }, dispatch] = useGlobalState()
 
-  const sellInputId = TradeFormTokenId.sellToken
-  const receiveInputId = TradeFormTokenId.receiveToken
-  const priceInputId = TradeFormTokenId.price
-  const priceInverseInputId = TradeFormTokenId.priceInverse
-  const validFromId = TradeFormTokenId.validFrom
-  const validUntilId = TradeFormTokenId.validUntil
+  const sellInputId: TradeFormTokenId = 'sellToken'
+  const receiveInputId: TradeFormTokenId = 'receiveToken'
+  const priceInputId: TradeFormTokenId = 'price'
+  const priceInverseInputId: TradeFormTokenId = 'priceInverse'
+  const validFromId: TradeFormTokenId = 'validFrom'
+  const validUntilId: TradeFormTokenId = 'validUntil'
   const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
@@ -508,6 +506,15 @@ const TradeWidget: React.FC = () => {
   const defaultSellAmount = trade.sellAmount || sellParam
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
+
+  const defaultFormValues: TradeFormData = {
+    [sellInputId]: defaultSellAmount,
+    [receiveInputId]: '',
+    [validFromId]: defaultValidFrom,
+    [validUntilId]: defaultValidUntil,
+    [priceInputId]: defaultPrice,
+    [priceInverseInputId]: invertPriceFromString(defaultPrice),
+  }
 
   const [sellToken, setSellToken] = useState(() =>
     chooseTokenWithFallback({
@@ -567,14 +574,7 @@ const TradeWidget: React.FC = () => {
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
-    defaultValues: {
-      [sellInputId]: defaultSellAmount,
-      [receiveInputId]: '',
-      [validFromId]: defaultValidFrom,
-      [validUntilId]: defaultValidUntil,
-      [priceInputId]: defaultPrice,
-      [priceInverseInputId]: invertPriceFromString(defaultPrice),
-    },
+    defaultValues: defaultFormValues,
     validationResolver,
   })
   const { handleSubmit, reset, watch, setValue } = methods
@@ -650,8 +650,8 @@ const TradeWidget: React.FC = () => {
   const url = buildUrl({
     sell: sellValue,
     price: priceValue,
-    from: validFromValue,
-    expires: validUntilValue,
+    from: validFromValue || '',
+    expires: validUntilValue || '',
     sellToken: sellToken,
     buyToken: receiveToken,
   })
