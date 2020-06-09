@@ -13,6 +13,7 @@ interface FactoryParams {
   exchangeApi: ExchangeApi
   erc20Api: Erc20Api
   web3: Web3
+  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
 }
 
 interface GetByAddressParams {
@@ -32,10 +33,6 @@ export interface TokenFromExchangeResult {
   reason: TokenFromExchange
 }
 
-interface Injects {
-  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
-}
-
 /**
  * Factory of getTokenFromExchangeByAddress
  * Takes as input API instances
@@ -43,9 +40,8 @@ interface Injects {
  */
 function getTokenFromExchangeByAddressFactory(
   factoryParams: FactoryParams,
-  { getTokenFromErc20 }: Injects,
 ): (params: GetByAddressParams) => Promise<TokenFromExchangeResult> {
-  const { tokenListApi, exchangeApi } = factoryParams
+  const { tokenListApi, exchangeApi, getTokenFromErc20 } = factoryParams
 
   return async ({ networkId, tokenAddress }: GetByAddressParams): Promise<TokenFromExchangeResult> => {
     const tokens = tokenListApi.getTokens(networkId)
@@ -106,7 +102,7 @@ function getTokenFromExchangeByAddressFactory(
   }
 }
 
-interface GetByIdParams {
+export interface GetByIdParams {
   networkId: number
   tokenId: number
 }
@@ -118,9 +114,8 @@ interface GetByIdParams {
  */
 function getTokenFromExchangeByIdFactory(
   factoryParams: FactoryParams,
-  { getTokenFromErc20 }: Injects,
 ): (params: GetByIdParams) => Promise<TokenDetails | null> {
-  const { tokenListApi, exchangeApi } = factoryParams
+  const { tokenListApi, exchangeApi, getTokenFromErc20 } = factoryParams
 
   return async ({ tokenId, networkId }: GetByIdParams): Promise<TokenDetails | null> => {
     const tokens = tokenListApi.getTokens(networkId)

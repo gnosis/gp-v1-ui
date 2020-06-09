@@ -84,7 +84,7 @@ export const PriceInputBox = styled.div`
     }
   }
 
-  label > div {
+  label > div:not(.radio-container) {
     position: absolute;
     width: 7.7rem;
     right: 1rem;
@@ -220,7 +220,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
   return (
     <Wrapper>
       <strong>
-        Limit Price <OrderBookBtn baseToken={sellToken} quoteToken={receiveToken} />
+        Limit Price <OrderBookBtn baseToken={receiveToken} quoteToken={sellToken} />
       </strong>
       <PriceInputBox>
         <label>

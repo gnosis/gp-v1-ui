@@ -22,10 +22,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
 
   .order-details {
     white-space: normal;
-    word-break: break-all;
-
-    .order-details-subgrid {
-    }
+    word-break: break-word;
   }
 
   .sub-columns {

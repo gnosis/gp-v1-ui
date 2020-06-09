@@ -1,4 +1,10 @@
-import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig, InfuraProviderConfig } from 'types/config'
+import {
+  MultiTcrConfig,
+  DexPriceEstimatorConfig,
+  TheGraphApiConfig,
+  InfuraProviderConfig,
+  ExchangeContractConfig,
+} from 'types/config'
 
 describe('Test config defaults', () => {
   it('name', () => {
@@ -78,5 +84,16 @@ describe('Test config defaults', () => {
     }
 
     expect(CONFIG.defaultProviderConfig).toEqual(expected)
+  })
+
+  it('exchangeContractConfig', () => {
+    const expected: ExchangeContractConfig = {
+      type: 'contractBlock',
+      config: [
+        { networkId: 1, blockNumber: 9340147 },
+        { networkId: 4, blockNumber: 5844678 },
+      ],
+    }
+    expect(CONFIG.exchangeContractConfig).toEqual(expected)
   })
 })
