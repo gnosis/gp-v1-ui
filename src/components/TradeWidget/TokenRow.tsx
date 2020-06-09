@@ -129,7 +129,7 @@ interface Props {
   balance: TokenBalanceDetails
   selectLabel: string
   onSelectChange: (selected: TokenDetails) => void
-  inputId: TradeFormTokenId
+  inputId: Extract<TradeFormTokenId, 'sellToken' | 'receiveToken'>
   isDisabled: boolean
   validateMaxAmount?: true
   tabIndex: number

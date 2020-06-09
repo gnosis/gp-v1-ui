@@ -286,7 +286,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   const { networkId } = useWalletConnection()
 
   const onSelectChange = useCallback(
-    (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (selected: { token: TokenDetails }, { action }: ActionMeta<any>): void => {
       // When an option is chosen, give control back to react-select
       setIsFocused(false)
 

@@ -21,6 +21,9 @@ function addUnlistedTokensToUserTokenListByIdFactory(
   const { tokenListApi, walletApi, getTokenFromExchangeById } = factoryParams
 
   return async (tokenIds: number[]): Promise<void> => {
+    // opt out early
+    if (tokenIds.length === 0 || !(await walletApi.isConnected())) return
+
     const networkId = await walletApi.getNetworkId()
     if (networkId) {
       const tokensFromExchange = await Promise.all(
