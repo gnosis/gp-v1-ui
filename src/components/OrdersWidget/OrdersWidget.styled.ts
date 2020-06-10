@@ -76,20 +76,6 @@ export const OrdersForm = styled.div`
     }
   }
 
-  && {
-    ${FormMessage} {
-      color: initial;
-      font-size: x-small;
-      margin: 0;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: max-content;
-      padding: 0.1rem 1.6rem 0.1rem 0.5rem;
-      border-radius: 0 1.6rem 0rem 0rem;
-    }
-  }
-
   .infoContainer {
     margin: 0 auto;
     display: flex;

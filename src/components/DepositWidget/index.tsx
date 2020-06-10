@@ -290,9 +290,15 @@ export const BalanceTools = styled.div`
       }
 
       &:focus {
+        color: var(--color-text-active);
+      }
+
+      &:focus,
+      &:focus ~ ${FormMessage} {
         border-bottom: 0.2rem solid var(--color-text-active);
         border-color: var(--color-text-active);
-        color: var(--color-text-active);
+
+        transition: all 0.2s ease-in-out;
       }
 
       &.error {
