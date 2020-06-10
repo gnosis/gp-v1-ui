@@ -87,15 +87,15 @@ function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, 
   // The `revertKey` is composed by batchId|orderId, so this regex looks for the batchIds in the keys
   const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\|`)
 
-  return new Map<string, Trade[]>(
-    // Iterate over trade groups by key. Reduces it to a list of tuples.
-    Array.from(tradesByRevertKey.keys()).reduce<[string, Trade[]][]>((acc, key) => {
-      if (batchesRegex.test(key)) {
-        acc.push([key, tradesByRevertKey.get(key) as Trade[]])
-      }
-      return acc
-    }, []),
-  )
+  const pending = new Map<string, Trade[]>()
+
+  tradesByRevertKey.forEach((trades, key) => {
+    if (batchesRegex.test(key)) {
+      pending.set(key, trades)
+    }
+  })
+
+  return pending
 }
 
 function applyRevertsToTrades(
@@ -114,8 +114,8 @@ function applyRevertsToTrades(
   // 3. Every revert matches 1 trade
   // 4. Reverts match Trades by order or appearance (first Revert matches first Trade and so on)
 
-  Array.from(revertsByRevertKey.keys()).forEach(revertKey => {
-    const reverts = (revertsByRevertKey.get(revertKey) as TradeReversion[]).sort(sortByTimeAndPosition)
+  revertsByRevertKey.forEach((reverts, revertKey) => {
+    reverts.sort(sortByTimeAndPosition)
     const trades = tradesByRevertKey.get(revertKey)?.sort(sortByTimeAndPosition)
 
     if (trades) {
