@@ -31,8 +31,7 @@ function useDataFilter<T>({
   const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, searchDebounceTime)
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
-  const handleToggleFilter = (e: React.ChangeEvent<HTMLInputElement>): void =>
-    setShowFilter(state => e?.target?.checked || !state)
+  const handleToggleFilter = (): void => setShowFilter(state => !state)
   const clearFilters = (): void => {
     setSearch('')
     setDebouncedSearch('')
