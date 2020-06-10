@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback } from 'react'
 import Modali from 'modali'
 import styled from 'styled-components'
 import BN from 'bn.js'
@@ -9,7 +9,7 @@ import searchIcon from 'assets/img/search.svg'
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
-import { TokenBalanceDetails } from 'types'
+import { TokenBalanceDetails, TokenDetails } from 'types'
 
 // Components
 import { CardTable } from 'components/Layout/Card'
@@ -25,10 +25,10 @@ import { useDepositModals } from 'components/DepositWidget/useDepositModals'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import useSafeState from 'hooks/useSafeState'
 import useWindowSizes from 'hooks/useWindowSizes'
-import { useDebounce } from 'hooks/useDebounce'
 import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
 import { useEthBalances } from 'hooks/useEthBalance'
+import useDataFilter from 'hooks/useDataFilter'
 import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
@@ -335,6 +335,39 @@ interface BalanceDisplayProps extends TokenLocalState {
   ): Promise<void>
 }
 
+const customFilterFnFactory = (customStopCheck: (...any: unknown[]) => boolean) => (searchTxt: string) => ({
+  symbol,
+  name,
+  address,
+}: TokenBalanceDetails): boolean => {
+  if (
+    customStopCheck &&
+    customStopCheck({
+      symbol,
+      name,
+      address,
+    })
+  ) {
+    return false
+  }
+
+  if (searchTxt === '') return true
+
+  return (
+    symbol?.toLowerCase().includes(searchTxt) ||
+    name?.toLowerCase().includes(searchTxt) ||
+    address.toLowerCase().includes(searchTxt)
+  )
+}
+
+const customHideZeroFilterFn = ({
+  totalExchangeBalance,
+  pendingWithdraw,
+  walletBalance,
+}: TokenBalanceDetails): boolean => {
+  return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
+}
+
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   ethBalance,
   balances,
@@ -352,48 +385,24 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 }) => {
   const windowSpecs = useWindowSizes()
 
-  const [search, setSearch] = useState('')
-  const [hideZeroBalances, setHideZeroBalances] = useState(false)
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
-
-  const handleHideZeroBalances = (e: React.ChangeEvent<HTMLInputElement>): void => setHideZeroBalances(e.target.checked)
-
-  const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
-
-  const clearFilters = (): void => {
-    setSearch('')
-    setDebouncedSearch('')
-    setHideZeroBalances(false)
-  }
-
   const [{ localTokens }] = useGlobalState()
 
-  const filteredBalances = useMemo(() => {
-    if ((!debouncedSearch && localTokens.disabled.size === 0) || !balances || balances.length === 0) return balances
+  const { filteredData: filteredBalances, search, handleSearch } = useDataFilter({
+    data: balances,
+    filterFnFactory: customFilterFnFactory((params: TokenDetails) => localTokens.disabled.has(params.address)),
+    customStopCheck: () => localTokens.disabled.size === 0,
+  })
 
-    const searchTxt = debouncedSearch.trim().toLowerCase()
-
-    return balances.filter(({ symbol, name, address }) => {
-      if (localTokens.disabled.has(address)) return false
-
-      if (searchTxt === '') return true
-
-      return (
-        symbol?.toLowerCase().includes(searchTxt) ||
-        name?.toLowerCase().includes(searchTxt) ||
-        address.toLowerCase().includes(searchTxt)
-      )
-    })
-  }, [debouncedSearch, balances, localTokens.disabled])
-
-  const displayedBalances = useMemo(() => {
-    if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
-
-    return filteredBalances.filter(({ totalExchangeBalance, pendingWithdraw, walletBalance }) => {
-      return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
-    })
-  }, [hideZeroBalances, filteredBalances])
+  const {
+    filteredData: displayedBalances,
+    showFilter: hideZeroBalances,
+    handleToggleFilter: handleHideZeroBalances,
+    clearFilters,
+  } = useDataFilter({
+    data: filteredBalances,
+    filterFnFactory: () => customHideZeroFilterFn,
+    isSearchFilter: false,
+  })
 
   const { modalProps, toggleModal } = useManageTokens()
 
