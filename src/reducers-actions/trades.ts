@@ -151,9 +151,9 @@ function applyRevertsToTrades(
           tradesIndex++
         }
       }
-      // Shouldn't happen, here for debugging
+      // Shouldn't happen, but...
       if (tradesIndex === trades.length && revertsIndex < reverts.length) {
-        console.error(`There are reverts not matched to trades`)
+        throw new Error(`There are ${reverts.length - revertsIndex} reverts not matched to trades`)
       }
     }
   })
