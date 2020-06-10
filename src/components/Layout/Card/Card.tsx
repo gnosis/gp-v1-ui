@@ -116,6 +116,7 @@ export const CardTable = styled.table<{
   $rows?: string
   $gap?: string
   $rowSeparation?: string
+  $padding?: string
 
   $align?: string
   $justify?: string
@@ -160,6 +161,8 @@ export const CardTable = styled.table<{
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
       text-align: center;
       transition: all 0.2s ease-in-out;
+
+      padding: ${({ $padding = '0' }): string => `${$padding}`};
 
       &:hover {
         background: var(--color-background-row-hover);
