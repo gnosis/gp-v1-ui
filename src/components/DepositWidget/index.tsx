@@ -253,7 +253,7 @@ export const BalanceTools = styled.div`
     }
 
     > ${FormMessage} {
-      color: initial;
+      color: var(--color-text-primary);
       font-size: x-small;
       margin: 0;
       position: absolute;
