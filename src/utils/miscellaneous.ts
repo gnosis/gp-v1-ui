@@ -113,6 +113,10 @@ export function isTradeSettled(trade: Trade): boolean {
   return trade.settlingTimestamp <= Date.now()
 }
 
+export function isTradeReverted(trade: Trade): boolean {
+  return !!trade.revertId
+}
+
 export const isOrderActive = (order: AuctionElement, now: Date): boolean =>
   batchIdToDate(order.validUntil) >= now && !isOrderFilled(order)
 
