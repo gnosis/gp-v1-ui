@@ -19,20 +19,18 @@ type AppendTradesActionType = Actions<'APPEND_TRADES', Required<Omit<TradesState
 type UpdateBlockActionType = Actions<'UPDATE_BLOCK', Required<Pick<TradesState, 'lastCheckedBlock'>>>
 type ReducerActionType = Actions<ActionTypes, TradesState & WithReverts>
 
-export const overwriteTrades = (
-  trades: Trade[],
-  reverts: TradeReversion[],
-  lastCheckedBlock?: number,
-): OverwriteTradesActionType => ({
+interface Params {
+  trades: Trade[]
+  reverts: TradeReversion[]
+  lastCheckedBlock?: number
+}
+
+export const overwriteTrades = ({ trades, reverts, lastCheckedBlock }: Params): OverwriteTradesActionType => ({
   type: 'OVERWRITE_TRADES',
   payload: { trades, reverts, lastCheckedBlock },
 })
 
-export const appendTrades = (
-  trades: Trade[],
-  reverts: TradeReversion[],
-  lastCheckedBlock: number,
-): AppendTradesActionType => ({
+export const appendTrades = ({ trades, reverts, lastCheckedBlock }: Required<Params>): AppendTradesActionType => ({
   type: 'APPEND_TRADES',
   payload: { trades, reverts, lastCheckedBlock },
 })

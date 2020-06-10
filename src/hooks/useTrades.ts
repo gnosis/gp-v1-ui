@@ -29,7 +29,7 @@ export function useTrades(): Trade[] {
 
   useEffect(() => {
     // Resetting trades on network change
-    dispatch(overwriteTrades([], [], undefined))
+    dispatch(overwriteTrades({ trades: [], reverts: [], lastCheckedBlock: undefined }))
   }, [dispatch, networkId, userAddress])
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export function useTrades(): Trade[] {
 
         dispatch(
           newTrades.length > 0 || reverts.length > 0
-            ? appendTrades(newTrades, reverts, toBlock)
+            ? appendTrades({ trades: newTrades, reverts, lastCheckedBlock: toBlock })
             : updateLastCheckedBlock(toBlock),
         )
       }
