@@ -98,17 +98,17 @@ const OrdersWidget: React.FC = () => {
   const { networkId, isConnected } = useWalletConnection()
 
   // allOrders and markedForDeletion, split by tab
-  const [filteredOrders, setFilteredOrders] = useSafeState<FilteredOrdersState>(emptyState())
+  const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState())
   const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
 
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
     () => ({
-      displayedOrders: filteredOrders[selectedTab].orders,
-      displayedPendingOrders: filteredOrders[selectedTab].pendingOrders,
-      markedForDeletion: filteredOrders[selectedTab].markedForDeletion,
+      displayedOrders: classifiedOrders[selectedTab].orders,
+      displayedPendingOrders: classifiedOrders[selectedTab].pendingOrders,
+      markedForDeletion: classifiedOrders[selectedTab].markedForDeletion,
     }),
-    [filteredOrders, selectedTab],
+    [classifiedOrders, selectedTab],
   )
 
   const setSelectedTabFactory = useCallback(
@@ -123,22 +123,22 @@ const OrdersWidget: React.FC = () => {
     [setSelectedTab],
   )
 
-  // Update filteredOrders state whenever there's a change to allOrders
+  // Update classifiedOrders state whenever there's a change to allOrders
   // splitting orders into respective tabs
   useEffect(() => {
-    const filteredOrders = emptyState()
+    const classifiedOrders = emptyState()
 
-    classifyOrders(allOrders, filteredOrders, 'orders')
-    classifyOrders(allPendingOrders, filteredOrders, 'pendingOrders')
+    classifyOrders(allOrders, classifiedOrders, 'orders')
+    classifyOrders(allPendingOrders, classifiedOrders, 'pendingOrders')
 
-    setFilteredOrders(curr => {
+    setClassifiedOrders(curr => {
       // copy markedForDeletion
-      Object.keys(filteredOrders).forEach(
-        type => (filteredOrders[type].markedForDeletion = curr[type].markedForDeletion),
+      Object.keys(classifiedOrders).forEach(
+        type => (classifiedOrders[type].markedForDeletion = curr[type].markedForDeletion),
       )
-      return filteredOrders
+      return classifiedOrders
     })
-  }, [allOrders, allPendingOrders, setFilteredOrders])
+  }, [allOrders, allPendingOrders, setClassifiedOrders])
 
   const ordersCount = displayedOrders.length + displayedPendingOrders.length
 
@@ -161,7 +161,7 @@ const OrdersWidget: React.FC = () => {
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
-      setFilteredOrders(curr => {
+      setClassifiedOrders(curr => {
         const state = emptyState()
 
         // copy full state
@@ -176,24 +176,24 @@ const OrdersWidget: React.FC = () => {
 
         return state
       }),
-    [setFilteredOrders],
+    [setClassifiedOrders],
   )
 
   const toggleSelectAll = useCallback(
     ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) =>
-      setFilteredOrders(curr => {
+      setClassifiedOrders(curr => {
         const state = emptyState()
 
         // copy full state
         Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
 
         state[selectedTab].markedForDeletion = checked
-          ? new Set(filteredOrders[selectedTab].orders.map(order => order.id))
+          ? new Set(classifiedOrders[selectedTab].orders.map(order => order.id))
           : new Set()
 
         return state
       }),
-    [filteredOrders, selectedTab, setFilteredOrders],
+    [classifiedOrders, selectedTab, setClassifiedOrders],
   )
 
   const { deleteOrders, deleting } = useDeleteOrders()
@@ -208,7 +208,7 @@ const OrdersWidget: React.FC = () => {
         unstable_batchedUpdates(() => {
           // reset selections
 
-          setFilteredOrders(curr => {
+          setClassifiedOrders(curr => {
             const state = emptyState()
 
             // copy full state
@@ -228,7 +228,7 @@ const OrdersWidget: React.FC = () => {
         })
       }
     },
-    [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setFilteredOrders],
+    [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
   return (
@@ -250,19 +250,19 @@ const OrdersWidget: React.FC = () => {
                 <ShowOrdersButton
                   type="active"
                   isActive={selectedTab === 'active'}
-                  count={filteredOrders.active.orders.length + filteredOrders.active.pendingOrders.length}
+                  count={classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length}
                   onClick={setSelectedTabFactory('active')}
                 />
                 <ShowOrdersButton
                   type="liquidity"
                   isActive={selectedTab === 'liquidity'}
-                  count={filteredOrders.liquidity.orders.length + filteredOrders.liquidity.pendingOrders.length}
+                  count={classifiedOrders.liquidity.orders.length + classifiedOrders.liquidity.pendingOrders.length}
                   onClick={setSelectedTabFactory('liquidity')}
                 />
                 <ShowOrdersButton
                   type="closed"
                   isActive={selectedTab === 'closed'}
-                  count={filteredOrders.closed.orders.length + filteredOrders.closed.pendingOrders.length}
+                  count={classifiedOrders.closed.orders.length + classifiedOrders.closed.pendingOrders.length}
                   onClick={setSelectedTabFactory('closed')}
                 />
               </div>
