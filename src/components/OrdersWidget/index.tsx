@@ -257,6 +257,10 @@ const OrdersWidget: React.FC = () => {
                   // onChange={handleSearch}
                 />
               </label>
+              <label className="balances-hideZero">
+                <input type="checkbox" /* checked={hideZeroBalances} onChange={handleHideZeroBalances} */ />
+                <b>Hide untouched orders</b>
+              </label>
             </BalanceTools>
             <div className="infoContainer">
               <div className="countContainer">

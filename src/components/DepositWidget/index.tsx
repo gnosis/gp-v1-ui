@@ -193,7 +193,7 @@ export const BalanceTools = styled.div`
   padding: 0;
   box-sizing: border-box;
   align-items: center;
-  order: 1;
+  order: 0;
 
   > .balances-manageTokens {
     font-size: 1.4rem;
