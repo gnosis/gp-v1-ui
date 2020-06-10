@@ -195,13 +195,12 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
 
     // ### TRADES and TRADE REVERSIONS ###
     // Final step, put all together
-    const [trades, reverts] = await Promise.all([
+    const [trades, reverts] = await Promise.all<Trade[], TradeReversion[]>([
       assembleTrades(tradeEvents, blockTimes, orders, tokens),
       assembleTradeReversions(tradeReversionEvents, blockTimes),
     ])
 
-    //TODO: Can't figure out why, but TS doesn't accept `trades` is of type `Trade[]`
-    return { trades: trades as Trade[], reverts }
+    return { trades, reverts }
   }
 
   return getTradesAndTradeReversions
