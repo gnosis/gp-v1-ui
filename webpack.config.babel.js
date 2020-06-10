@@ -188,6 +188,7 @@ module.exports = ({ stats = false } = {}) => ({
     }),
   ].filter(Boolean),
   optimization: {
+    moduleIds: 'hashed',
     splitChunks: {
       chunks: 'all',
       minSize: 20000,
