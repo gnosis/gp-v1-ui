@@ -14,12 +14,12 @@ import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 // Hooks
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
-import usePendingOrders from 'hooks/usePendingOrders'
+import usePendingOrders, { DetailedPendingOrder } from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSortByTopic from 'hooks/useSortByTopic'
 
 // Api
-import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
@@ -29,6 +29,7 @@ import { CardTable } from 'components/Layout/Card'
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
+import { BalanceTools } from 'components/DepositWidget'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
@@ -48,8 +49,8 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, cou
 type FilteredOrdersStateKeys = OrderTabs
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
-    orders: AuctionElement[]
-    pendingOrders: AuctionElement[]
+    orders: DetailedAuctionElement[]
+    pendingOrders: DetailedPendingOrder[]
     markedForDeletion: Set<string>
   }
 }
@@ -65,7 +66,7 @@ function emptyState(): FilteredOrdersState {
 }
 
 function classifyOrders(
-  orders: AuctionElement[],
+  orders: DetailedAuctionElement[],
   state: FilteredOrdersState,
   ordersType: 'orders' | 'pendingOrders',
 ): void {
@@ -83,7 +84,10 @@ function classifyOrders(
   })
 }
 
-const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionElement, rhs: AuctionElement): number => {
+const compareFnFactory = (topic: TopicNames, asc: boolean) => (
+  lhs: DetailedAuctionElement,
+  rhs: DetailedAuctionElement,
+): number => {
   if (asc) {
     return lhs[topic] - rhs[topic]
   } else {
@@ -153,11 +157,10 @@ const OrdersWidget: React.FC = () => {
   )
 
   // Sort validUntil
-  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<AuctionElement, TopicNames>(
-    displayedOrders,
-    DEFAULT_ORDERS_SORTABLE_TOPIC,
-    compareFnFactory,
-  )
+  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<
+    DetailedAuctionElement,
+    TopicNames
+  >(displayedOrders, DEFAULT_ORDERS_SORTABLE_TOPIC, compareFnFactory)
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
@@ -245,6 +248,16 @@ const OrdersWidget: React.FC = () => {
       {!noOrders && networkId && (
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
+            <BalanceTools>
+              <label className="balances-searchTokens">
+                <input
+                  placeholder="Search token by Name, Symbol or Address"
+                  type="text"
+                  // value={search}
+                  // onChange={handleSearch}
+                />
+              </label>
+            </BalanceTools>
             <div className="infoContainer">
               <div className="countContainer">
                 <ShowOrdersButton
@@ -303,7 +316,7 @@ const OrdersWidget: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedPendingOrders.map((order: PendingTxObj) => (
+                    {displayedPendingOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}
