@@ -185,7 +185,7 @@ const BalancesWidget = styled(Widget)`
   }
 `
 
-const BalanceTools = styled.div`
+export const BalanceTools = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
