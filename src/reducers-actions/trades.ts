@@ -49,17 +49,21 @@ function buildTradeRevertKey(batchId: number, orderId: string): string {
 
 function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, T[]>): Map<string, T[]> {
   const map = initial || new Map<string, T[]>()
+  const seenIds = new Set<string>()
 
   list.forEach(item => {
+    // Avoid duplicate entries
+    if (seenIds.has(item.id)) {
+      return
+    }
+    seenIds.add(item.id)
+
     const revertKey = buildTradeRevertKey(item.batchId, item.orderId)
 
     if (map.has(revertKey)) {
       const subList = map.get(revertKey) as T[]
 
-      // Do not insert duplicates
-      if (!subList.find(({ id }) => item.id === id)) {
-        subList.push(item)
-      }
+      subList.push(item)
     } else {
       map.set(revertKey, [item])
     }
