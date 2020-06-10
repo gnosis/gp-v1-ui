@@ -17,6 +17,7 @@ import { LocalTokensState } from 'reducers-actions/localTokens'
 import { CardTable } from 'components/Layout/Card'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
+import FormMessage from 'components/TradeWidget/FormMessage'
 
 // DepositWidget: subcomponents
 import { Row } from 'components/DepositWidget/Row'
@@ -251,6 +252,18 @@ export const BalanceTools = styled.div`
       margin: 0 0 2.4rem;
     }
 
+    > ${FormMessage} {
+      color: initial;
+      font-size: x-small;
+      margin: 0;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: max-content;
+      padding: 0.1rem 1.6rem 0.1rem 0.5rem;
+      border-radius: 0 1.6rem 0rem 0rem;
+    }
+
     > input {
       margin: 0;
       width: 35rem;
@@ -422,6 +435,9 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             value={search}
             onChange={handleSearch}
           />
+          {hideZeroBalances && displayedBalances?.length > 0 && (
+            <FormMessage className="warning">Filter: Showing {displayedBalances?.length} tokens</FormMessage>
+          )}
         </label>
         <label className="balances-hideZero">
           <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />

@@ -22,6 +22,7 @@ import useSortByTopic from 'hooks/useSortByTopic'
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 // Components
+import FormMessage from 'components/TradeWidget/FormMessage'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { CardTable } from 'components/Layout/Card'
 
@@ -30,6 +31,7 @@ import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 import { BalanceTools } from 'components/DepositWidget'
+import useDataFilter from 'hooks/useDataFilter'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
@@ -234,6 +236,56 @@ const OrdersWidget: React.FC = () => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
+  const customFilterFnFactory = useCallback(
+    (customStopCheck?: (...any: unknown[]) => boolean) => (searchTxt: string) => ({
+      buyToken,
+      sellToken,
+    }: DetailedAuctionElement): boolean => {
+      if (
+        customStopCheck &&
+        customStopCheck({
+          buyToken,
+          sellToken,
+        })
+      ) {
+        return false
+      }
+
+      if (searchTxt === '') return true
+
+      return Boolean(
+        buyToken?.symbol?.toLowerCase().includes(searchTxt) ||
+          buyToken?.name?.toLowerCase().includes(searchTxt) ||
+          buyToken?.address.toLowerCase().includes(searchTxt) ||
+          sellToken?.symbol?.toLowerCase().includes(searchTxt) ||
+          sellToken?.name?.toLowerCase().includes(searchTxt) ||
+          sellToken?.address.toLowerCase().includes(searchTxt),
+      )
+    },
+    [],
+  )
+
+  const customHideZeroFilterFn = useCallback(params => {
+    console.debug(params)
+    return true
+  }, [])
+
+  const { filteredData, search, handleSearch } = useDataFilter({
+    data: sortedDisplayedOrders,
+    filterFnFactory: customFilterFnFactory(),
+  })
+
+  const {
+    filteredData: filteredAndSortedOrders,
+    showFilter: hideUntouchedOrders,
+    handleToggleFilter: handleHideUntouchedOrders,
+    // clearFilters,
+  } = useDataFilter({
+    data: filteredData,
+    filterFnFactory: () => customHideZeroFilterFn,
+    isSearchFilter: false,
+  })
+
   return (
     <OrdersWrapper>
       {!isConnected ? (
@@ -253,12 +305,17 @@ const OrdersWidget: React.FC = () => {
                 <input
                   placeholder="Search token by Name, Symbol or Address"
                   type="text"
-                  // value={search}
-                  // onChange={handleSearch}
+                  value={search}
+                  onChange={handleSearch}
                 />
+                {search && (
+                  <FormMessage className="warning">
+                    Filter: Showing {displayedPendingOrders.length + filteredAndSortedOrders.length} orders
+                  </FormMessage>
+                )}
               </label>
               <label className="balances-hideZero">
-                <input type="checkbox" /* checked={hideZeroBalances} onChange={handleHideZeroBalances} */ />
+                <input type="checkbox" checked={hideUntouchedOrders} onChange={handleHideUntouchedOrders} />
                 <b>Hide untouched orders</b>
               </label>
             </BalanceTools>
@@ -332,7 +389,7 @@ const OrdersWidget: React.FC = () => {
                         transactionHash={order.txHash}
                       />
                     ))}
-                    {sortedDisplayedOrders.map(order => (
+                    {filteredAndSortedOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}

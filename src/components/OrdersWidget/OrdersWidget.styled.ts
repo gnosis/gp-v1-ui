@@ -1,5 +1,6 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
+import FormMessage from 'components/TradeWidget/FormMessage'
 
 export const OrdersWrapper = styled.div`
   width: 100%;
@@ -75,8 +76,22 @@ export const OrdersForm = styled.div`
     }
   }
 
+  && {
+    ${FormMessage} {
+      color: initial;
+      font-size: x-small;
+      margin: 0;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: max-content;
+      padding: 0.1rem 1.6rem 0.1rem 0.5rem;
+      border-radius: 0 1.6rem 0rem 0rem;
+    }
+  }
+
   .infoContainer {
-    margin: 1rem auto 0;
+    margin: 0 auto;
     display: flex;
     flex-flow: row nowrap;
     width: 100%;
