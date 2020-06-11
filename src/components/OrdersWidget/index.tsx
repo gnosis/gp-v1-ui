@@ -239,21 +239,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
-  const customFilterFnFactory = useCallback(
-    (customStopCheck?: (...any: unknown[]) => boolean) => (searchTxt: string) => ({
-      buyToken,
-      sellToken,
-    }: DetailedAuctionElement): boolean => {
-      if (
-        customStopCheck &&
-        customStopCheck({
-          buyToken,
-          sellToken,
-        })
-      ) {
-        return false
-      }
-
+  const filterOrdersFn = useCallback(
+    (searchTxt: string) => ({ buyToken, sellToken }: DetailedAuctionElement): boolean => {
       if (searchTxt === '') return true
 
       return Boolean(
@@ -268,25 +255,9 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     [],
   )
 
-  const customHideZeroFilterFn = useCallback(params => {
-    console.debug(params)
-    return true
-  }, [])
-
-  const { filteredData, search, handleSearch } = useDataFilter({
+  const { filteredData: filteredAndSortedOrders, search, handleSearch } = useDataFilter({
     data: sortedDisplayedOrders,
-    filterFnFactory: customFilterFnFactory(),
-  })
-
-  const {
-    filteredData: filteredAndSortedOrders,
-    showFilter: hideUntouchedOrders,
-    handleToggleFilter: handleHideUntouchedOrders,
-    // clearFilters,
-  } = useDataFilter({
-    data: filteredData,
-    filterFnFactory: () => customHideZeroFilterFn,
-    isSearchFilter: false,
+    filterFnFactory: filterOrdersFn,
   })
 
   return (
@@ -326,11 +297,12 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
               showFilter={!!search}
               dataLength={displayedPendingOrders.length + filteredAndSortedOrders.length}
             >
-              {/* implement later when better data concerning order state and can be saved to global state */}
-              <label className="not-implemented balances-hideZero">
+              {/* implement later when better data concerning order state and can be saved to global state 
+              <label className="balances-hideZero">
                 <input type="checkbox" checked={hideUntouchedOrders} onChange={handleHideUntouchedOrders} />
                 <b>Hide untouched orders</b>
               </label>
+              */}
             </FilterTools>
             <div className="infoContainer">
               <div className="countContainer">
