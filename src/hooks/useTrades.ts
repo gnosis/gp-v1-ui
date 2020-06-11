@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { BATCH_TIME } from '@gnosis.pm/dex-js'
 
@@ -7,7 +7,7 @@ import { web3 } from 'api'
 
 import { getTradesAndTradeReversions } from 'services'
 
-import { appendTrades, updateLastCheckedBlock, overwriteTrades } from 'reducers-actions/trades'
+import { appendTrades, updateLastCheckedBlock } from 'reducers-actions/trades'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
@@ -16,21 +16,20 @@ import { BATCH_TIME_IN_MS } from 'const'
 
 import { getTimeRemainingInBatch } from 'utils'
 
-// TODO: (on global state) store trades to local storage
 export function useTrades(): Trade[] {
   const [
     {
-      trades: { trades, lastCheckedBlock },
+      trades: globalStateTrades,
       orders: { orders },
     },
     dispatch,
   ] = useGlobalState()
   const { userAddress, networkId } = useWalletConnection()
 
-  useEffect(() => {
-    // Resetting trades on network change
-    dispatch(overwriteTrades({ trades: [], reverts: [], lastCheckedBlock: undefined }))
-  }, [dispatch, networkId, userAddress])
+  const { lastCheckedBlock, trades } = useMemo(
+    () => (networkId ? globalStateTrades[networkId] : { lastCheckedBlock: undefined, trades: [] }),
+    [globalStateTrades, networkId],
+  )
 
   useEffect(() => {
     // Flow control. Cancel query/state update on unmount
@@ -64,8 +63,8 @@ export function useTrades(): Trade[] {
 
         dispatch(
           newTrades.length > 0 || reverts.length > 0
-            ? appendTrades({ trades: newTrades, reverts, lastCheckedBlock: toBlock })
-            : updateLastCheckedBlock(toBlock),
+            ? appendTrades({ trades: newTrades, reverts, lastCheckedBlock: toBlock, networkId })
+            : updateLastCheckedBlock(toBlock, networkId),
         )
       }
     }
