@@ -142,6 +142,8 @@ export const GP_ORDER_TX_HASHES = {
   4: 'GP_ORDER_TX_HASHES_4',
 }
 
+export const TRADES_LOCAL_STORAGE_KEY = 'TRADES_PER_NETWORK'
+
 const LIQUIDITY_TOKEN_LIST_VALUES = process.env.LIQUIDITY_TOKEN_LIST || 'USDT,TUSD,USDC,PAX,GUSD,DAI,sUSD'
 export const LIQUIDITY_TOKEN_LIST = new Set(LIQUIDITY_TOKEN_LIST_VALUES.split(',').map(symbol => symbol.trim()))
 export const INPUT_PRECISION_SIZE = 6

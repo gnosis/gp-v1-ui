@@ -1,6 +1,13 @@
-import { Actions } from 'reducers-actions'
+import BigNumber from 'bignumber.js'
+
 import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/ExchangeApi'
-import { logDebug, flattenMapOfLists, dateToBatchId } from 'utils'
+
+import { Actions } from 'reducers-actions'
+
+import { logDebug, flattenMapOfLists, dateToBatchId, toBN } from 'utils'
+import { TRADES_LOCAL_STORAGE_KEY } from 'const'
+
+// ******** TYPES/INTERFACES
 
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
@@ -19,6 +26,8 @@ interface WithReverts {
 interface WithNetworkId {
   networkId: number
 }
+
+// ******** ACTION TYPES
 
 type OverwriteTradesActionType = Actions<
   'OVERWRITE_TRADES',
@@ -40,6 +49,8 @@ interface Params extends WithNetworkId {
   lastCheckedBlock?: number
 }
 
+// ******** REDUCER FUNCTIONS
+
 export const overwriteTrades = (params: Params): OverwriteTradesActionType => ({
   type: 'OVERWRITE_TRADES',
   payload: params,
@@ -55,13 +66,11 @@ export const updateLastCheckedBlock = (lastCheckedBlock: number, networkId: numb
   payload: { lastCheckedBlock, networkId },
 })
 
-const INITIAL_TRADES_STATE_SINGLE_NETWORK = { trades: [], pendingTrades: new Map<string, Trade[]>() }
-
-export const INITIAL_TRADES_STATE = { 1: INITIAL_TRADES_STATE_SINGLE_NETWORK, 4: INITIAL_TRADES_STATE_SINGLE_NETWORK }
-
 function buildTradeRevertKey(batchId: number, orderId: string): string {
   return batchId + '|' + orderId
 }
+
+// ******** HELPERS
 
 function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, T[]>): Map<string, T[]> {
   const map = initial || new Map<string, T[]>()
@@ -177,6 +186,8 @@ function applyRevertsToTrades(
   return [flattenMapOfLists(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
 }
 
+// ******** REDUCER
+
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
   switch (action.type) {
     case 'APPEND_TRADES': {
@@ -204,3 +215,68 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
     }
   }
 }
+
+// TODO: use the one from David once his changes are merged https://github.com/gnosis/dex-react/pull/1091
+function setStorageItem(key: string, data: unknown): void {
+  // localStorage API accepts only strings
+  // TODO: consider switching to localForage API (accepts all types)
+  const formattedData = JSON.stringify(data)
+  return localStorage.setItem(key, formattedData)
+}
+
+// ******** SIDE EFFECT
+
+export async function sideEffect(state: TradesState, action: ReducerActionType): Promise<void> {
+  switch (action.type) {
+    case 'APPEND_TRADES':
+    case 'OVERWRITE_TRADES':
+    case 'UPDATE_BLOCK':
+      setStorageItem(TRADES_LOCAL_STORAGE_KEY, state)
+  }
+}
+
+// ******** INITIAL STATE / LOCAL STORAGE
+
+const INITIAL_TRADES_STATE_SINGLE_NETWORK = { trades: [], pendingTrades: new Map<string, Trade[]>() }
+
+/**
+ * Custom json parser for BN and BigNumber values.
+ * Since there's no context on what is BN/BigNumber,
+ * we have to keep track of keys and parse accordingly
+ */
+function reviver(key: string, value: unknown): unknown {
+  if (value && typeof value === 'string') {
+    switch (key) {
+      case 'limitPrice':
+      case 'fillPrice':
+        return new BigNumber(value)
+      case 'buyAmount':
+      case 'sellAmount':
+      case 'orderBuyAmount':
+      case 'orderSellAmount':
+      case 'remainingAmount':
+        return toBN(value)
+      default:
+        return value
+    }
+  }
+  return value
+}
+
+function loadInitialState(): TradesState {
+  let state = { 1: INITIAL_TRADES_STATE_SINGLE_NETWORK, 4: INITIAL_TRADES_STATE_SINGLE_NETWORK }
+
+  const localStorageOrders = localStorage.getItem(TRADES_LOCAL_STORAGE_KEY)
+
+  if (localStorageOrders) {
+    try {
+      state = JSON.parse(localStorageOrders, reviver)
+    } catch (e) {
+      logDebug(`[reducer:trades] Failed to load localStorage`, e.msg)
+    }
+  }
+
+  return state
+}
+
+export const initialState = loadInitialState()
