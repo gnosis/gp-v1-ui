@@ -3,21 +3,18 @@ import Modali from 'modali'
 import styled from 'styled-components'
 import BN from 'bn.js'
 
-// Assets
-import searchIcon from 'assets/img/search.svg'
-
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
-import { TokenLocalState } from 'reducers-actions'
 import { LocalTokensState } from 'reducers-actions/localTokens'
+import { TokenLocalState } from 'reducers-actions'
 
 // Components
 import { CardTable } from 'components/Layout/Card'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
-import FormMessage from 'components/TradeWidget/FormMessage'
+import FilterTools from 'components/FilterTools'
 
 // DepositWidget: subcomponents
 import { Row } from 'components/DepositWidget/Row'
@@ -184,19 +181,8 @@ const BalancesWidget = styled(Widget)`
       }
     }
   }
-`
-
-export const BalanceTools = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  align-items: center;
-  order: 0;
-
-  > .balances-manageTokens {
+  // button
+  .balances-manageTokens {
     font-size: 1.4rem;
     color: var(--color-text-active);
     letter-spacing: 0;
@@ -218,7 +204,8 @@ export const BalanceTools = styled.div`
     }
   }
 
-  > .balances-hideZero {
+  // label + radio input
+  .balances-hideZero {
     display: flex;
     flex-flow: row nowrap;
     font-size: 1.4rem;
@@ -235,83 +222,6 @@ export const BalanceTools = styled.div`
     > b {
       font-weight: inherit;
       margin: 0 0 0 0.5rem;
-    }
-  }
-
-  > .balances-searchTokens {
-    display: flex;
-    width: auto;
-    max-width: 100%;
-    position: relative;
-    height: 5.6rem;
-    margin: 1.6rem;
-
-    @media ${MEDIA.mobile} {
-      width: 100%;
-      height: 4.6rem;
-      margin: 0 0 2.4rem;
-    }
-
-    > ${FormMessage} {
-      color: var(--color-text-primary);
-      font-size: x-small;
-      margin: 0;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: max-content;
-      padding: 0.1rem 1.6rem 0.1rem 0.5rem;
-      border-radius: 0 1.6rem 0rem 0rem;
-    }
-
-    > input {
-      margin: 0;
-      width: 35rem;
-      max-width: 100%;
-      background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
-      border-radius: 0.6rem 0.6rem 0 0;
-      border: 0;
-      font-size: 1.4rem;
-      line-height: 1;
-      box-sizing: border-box;
-      border-bottom: 0.2rem solid transparent;
-      font-weight: var(--font-weight-normal);
-      padding: 0 1.6rem 0 4.8rem;
-      outline: 0;
-
-      @media ${MEDIA.mobile} {
-        font-size: 1.3rem;
-        width: 100%;
-      }
-
-      &::placeholder {
-        font-size: inherit;
-        color: inherit;
-      }
-
-      &:focus {
-        color: var(--color-text-active);
-      }
-
-      &:focus,
-      &:focus ~ ${FormMessage} {
-        border-bottom: 0.2rem solid var(--color-text-active);
-        border-color: var(--color-text-active);
-
-        transition: all 0.2s ease-in-out;
-      }
-
-      &.error {
-        border-color: var(--color-error);
-      }
-
-      &.warning {
-        border-color: orange;
-      }
-
-      &:disabled {
-        box-shadow: none;
-      }
     }
   }
 `
@@ -433,18 +343,12 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 
   return (
     <BalancesWidget>
-      <BalanceTools>
-        <label className="balances-searchTokens">
-          <input
-            placeholder="Search token by Name, Symbol or Address"
-            type="text"
-            value={search}
-            onChange={handleSearch}
-          />
-          {hideZeroBalances && displayedBalances?.length > 0 && (
-            <FormMessage className="warning">Filter: Showing {displayedBalances?.length} tokens</FormMessage>
-          )}
-        </label>
+      <FilterTools
+        searchValue={search}
+        handleSearch={handleSearch}
+        showFilter={hideZeroBalances && displayedBalances?.length > 0}
+        dataLength={displayedBalances.length}
+      >
         <label className="balances-hideZero">
           <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
           <b>Hide zero balances</b>
@@ -452,7 +356,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
         <button type="button" className="balances-manageTokens" onClick={toggleModal}>
           Manage Tokens
         </button>
-      </BalanceTools>
+      </FilterTools>
       {error ? (
         <ErrorMsg title="oops..." message="Something happened while loading the balances" />
       ) : (
