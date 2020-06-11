@@ -1,6 +1,5 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
-import FormMessage from 'components/TradeWidget/FormMessage'
 
 export const OrdersWrapper = styled.div`
   width: 100%;
@@ -25,6 +24,17 @@ export const OrdersWrapper = styled.div`
     min-width: initial;
     min-height: 25rem;
     width: 100%;
+  }
+
+  > h5 {
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.6rem 0 1rem;
+    font-weight: var(--font-weight-bold);
+    font-size: 1.6rem;
+    color: var(--color-text-primary);
+    letter-spacing: 0.03rem;
+    text-align: center;
   }
 
   > div {
