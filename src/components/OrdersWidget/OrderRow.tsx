@@ -315,7 +315,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
+      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : ''} $open={openCard}>
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}
