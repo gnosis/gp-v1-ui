@@ -17,21 +17,20 @@ import useSafeState from 'hooks/useSafeState'
 import usePendingOrders, { DetailedPendingOrder } from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSortByTopic from 'hooks/useSortByTopic'
+import useDataFilter from 'hooks/useDataFilter'
 
 // Api
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 // Components
-import FormMessage from 'components/TradeWidget/FormMessage'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { CardTable } from 'components/Layout/Card'
+import FilterTools from 'components/FilterTools'
 
 // OrderWidget
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
-import { BalanceTools } from 'components/DepositWidget'
-import useDataFilter from 'hooks/useDataFilter'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
@@ -97,7 +96,11 @@ const compareFnFactory = (topic: TopicNames, asc: boolean) => (
   }
 }
 
-const OrdersWidget: React.FC = () => {
+interface Props {
+  isWidget?: boolean
+}
+
+const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const { orders: allOrders, forceOrdersRefresh } = useOrders()
   const allPendingOrders = usePendingOrders()
   // this page is behind login wall so networkId should always be set
@@ -300,25 +303,35 @@ const OrdersWidget: React.FC = () => {
       {!noOrders && networkId && (
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
-            <BalanceTools>
-              <label className="balances-searchTokens">
-                <input
-                  placeholder="Search token by Name, Symbol or Address"
-                  type="text"
-                  value={search}
-                  onChange={handleSearch}
-                />
-                {search && (
-                  <FormMessage className="warning">
-                    Filter: Showing {displayedPendingOrders.length + filteredAndSortedOrders.length} orders
-                  </FormMessage>
-                )}
-              </label>
-              <label className="balances-hideZero">
+            <FilterTools
+              customStyles={
+                isWidget &&
+                `
+                #filterLabel {
+                  bottom: -1.2rem;
+                }
+
+                .balances-searchTokens { 
+                    height: 3.6rem; 
+                    margin: 0.8rem; 
+                    width: 100%; 
+                    
+                    > input { 
+                      width: 100%; 
+                    } 
+                }`
+              }
+              searchValue={search}
+              handleSearch={handleSearch}
+              showFilter={!!search}
+              dataLength={displayedPendingOrders.length + filteredAndSortedOrders.length}
+            >
+              {/* implement later when better data concerning order state and can be saved to global state */}
+              <label className="not-implemented balances-hideZero">
                 <input type="checkbox" checked={hideUntouchedOrders} onChange={handleHideUntouchedOrders} />
                 <b>Hide untouched orders</b>
               </label>
-            </BalanceTools>
+            </FilterTools>
             <div className="infoContainer">
               <div className="countContainer">
                 <ShowOrdersButton
