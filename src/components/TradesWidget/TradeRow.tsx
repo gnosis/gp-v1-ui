@@ -128,7 +128,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
         {formatDateFromBatchId(batchId, { strict: true })}
       </td>
-      <td>
+      <td data-label="Trade">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td data-label="Limit Price" title={limitPrice && formatPrice({ price: limitPrice, decimals: 8 })}>
@@ -146,7 +146,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={tradeType}>{tradeType}</TypePill>
       </td>
-      <td>
+      <td data-label="View on Etherscan">
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
       </td>
     </tr>
