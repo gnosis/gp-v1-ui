@@ -32,6 +32,9 @@ import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
+// Types/misc
+import { TokenDetails } from 'types'
+
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
 interface ShowOrdersButtonProps {
@@ -83,6 +86,25 @@ function classifyOrders(
       state.active[ordersType].push(order)
     }
   })
+}
+
+function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
+  if (!token) return false
+  return (
+    token?.symbol?.toLowerCase().includes(searchText) ||
+    token?.name?.toLowerCase().includes(searchText) ||
+    token?.address.toLowerCase().includes(searchText)
+  )
+}
+
+const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean => {
+  if (searchTxt === '') return true
+
+  return (
+    !!id.includes(searchTxt) ||
+    checkTokenAgainstSearch(buyToken as TokenDetails, searchTxt) ||
+    checkTokenAgainstSearch(sellToken as TokenDetails, searchTxt)
+  )
 }
 
 const compareFnFactory = (topic: TopicNames, asc: boolean) => (
@@ -237,22 +259,6 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
       }
     },
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
-  )
-
-  const filterOrdersFn = useCallback(
-    (searchTxt: string) => ({ buyToken, sellToken }: DetailedAuctionElement): boolean => {
-      if (searchTxt === '') return true
-
-      return Boolean(
-        buyToken?.symbol?.toLowerCase().includes(searchTxt) ||
-          buyToken?.name?.toLowerCase().includes(searchTxt) ||
-          buyToken?.address.toLowerCase().includes(searchTxt) ||
-          sellToken?.symbol?.toLowerCase().includes(searchTxt) ||
-          sellToken?.name?.toLowerCase().includes(searchTxt) ||
-          sellToken?.address.toLowerCase().includes(searchTxt),
-      )
-    },
-    [],
   )
 
   const { filteredData: filteredAndSortedOrders, search, handleSearch } = useDataFilter({
