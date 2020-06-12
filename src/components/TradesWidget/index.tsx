@@ -104,7 +104,7 @@ const Trades: React.FC = () => {
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
-    <CardWidgetWrapper $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.9fr 1fr">
+    <CardWidgetWrapper $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.9fr 1.23fr">
       <CardTable $rowSeparation="0" $gap="0 0.6rem" $padding="0.5em 0">
         <thead>
           <tr>
