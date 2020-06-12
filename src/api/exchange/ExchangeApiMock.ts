@@ -234,6 +234,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       user: userAddress,
       sellTokenBalance: new BN('1500000000000000000000').add(ONE),
       id: index.toString(),
+      isUnlimited: false,
     }
   }
 }

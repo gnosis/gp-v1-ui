@@ -114,6 +114,7 @@ export interface AuctionElement extends Order {
   user: string
   sellTokenBalance: BN
   id: string // string because we might need natural ids
+  isUnlimited: boolean
 }
 
 export interface Order {

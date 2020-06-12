@@ -108,6 +108,7 @@ describe('Decode orders', () => {
         priceNumerator: priceNumerator.toString(),
         priceDenominator: priceDenominator.toString(),
         remainingAmount: remainingAmount.toString(),
+        isUnlimited: false,
       },
     ])
   })
@@ -163,6 +164,7 @@ describe('Decode orders', () => {
         priceNumerator: '0',
         priceDenominator: '0',
         remainingAmount: '0',
+        isUnlimited: false,
       },
       {
         user: '0x' + user.toString(16).padStart(40, '0'),
@@ -175,6 +177,7 @@ describe('Decode orders', () => {
         priceNumerator: '0',
         priceDenominator: '0',
         remainingAmount: '0',
+        isUnlimited: false,
       },
     ])
   })

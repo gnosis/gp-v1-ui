@@ -743,6 +743,7 @@ const TradeWidget: React.FC = () => {
         validFrom: validFromWithBatchID,
         validUntil: validUntilWithBatchID,
         txHash,
+        isUnlimited: false,
       }
 
       return dispatch(savePendingOrdersAction({ orders: [pendingOrder], networkId, userAddress }))
