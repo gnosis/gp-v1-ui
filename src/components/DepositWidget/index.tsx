@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import Modali from 'modali'
 import styled from 'styled-components'
 import BN from 'bn.js'
@@ -9,7 +9,9 @@ import searchIcon from 'assets/img/search.svg'
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
-import { TokenBalanceDetails, TokenDetails } from 'types'
+import { TokenBalanceDetails } from 'types'
+import { TokenLocalState } from 'reducers-actions'
+import { LocalTokensState } from 'reducers-actions/localTokens'
 
 // Components
 import { CardTable } from 'components/Layout/Card'
@@ -29,7 +31,6 @@ import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
 import { useEthBalances } from 'hooks/useEthBalance'
 import useDataFilter from 'hooks/useDataFilter'
-import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
   amount: BN
@@ -335,21 +336,12 @@ interface BalanceDisplayProps extends TokenLocalState {
   ): Promise<void>
 }
 
-const customFilterFnFactory = (customStopCheck: (...any: unknown[]) => boolean) => (searchTxt: string) => ({
+const customFilterFnFactory = (localTokens: LocalTokensState) => (searchTxt: string) => ({
   symbol,
   name,
   address,
 }: TokenBalanceDetails): boolean => {
-  if (
-    customStopCheck &&
-    customStopCheck({
-      symbol,
-      name,
-      address,
-    })
-  ) {
-    return false
-  }
+  if (localTokens.disabled.has(address)) return false
 
   if (searchTxt === '') return true
 
@@ -387,22 +379,36 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 
   const [{ localTokens }] = useGlobalState()
 
-  const { filteredData: filteredBalances, search, handleSearch } = useDataFilter({
-    data: balances,
-    filterFnFactory: customFilterFnFactory((params: TokenDetails) => localTokens.disabled.has(params.address)),
-    customStopCheck: () => localTokens.disabled.size === 0,
-  })
+  const memoizedSearchFilterParams = useMemo(
+    () => ({
+      data: balances,
+      filterFnFactory: customFilterFnFactory(localTokens),
+      userConditionalCheck: ({ debouncedSearch }: { debouncedSearch: string }): boolean =>
+        !debouncedSearch && localTokens.disabled.size === 0,
+    }),
+    [balances, localTokens],
+  )
+
+  const {
+    filteredData: filteredBalances,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter(memoizedSearchFilterParams)
+
+  const memoizedZeroFilterParams = useMemo(
+    () => ({
+      data: filteredBalances,
+      isSearchFilter: false,
+      filterFnFactory: (): typeof customHideZeroFilterFn => customHideZeroFilterFn,
+    }),
+    [filteredBalances],
+  )
 
   const {
     filteredData: displayedBalances,
     showFilter: hideZeroBalances,
-    handleToggleFilter: handleHideZeroBalances,
-    clearFilters,
-  } = useDataFilter({
-    data: filteredBalances,
-    filterFnFactory: () => customHideZeroFilterFn,
-    isSearchFilter: false,
-  })
+    handlers: { handleToggleFilter: handleHideZeroBalances, clearFilters },
+  } = useDataFilter(memoizedZeroFilterParams)
 
   const { modalProps, toggleModal } = useManageTokens()
 
