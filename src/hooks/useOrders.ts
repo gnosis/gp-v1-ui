@@ -60,11 +60,18 @@ export function useOrders(): Result {
           offset,
         })
 
-        const ordersPromises = ordersPreTokenDetails.map(async order => ({
-          ...order,
-          sellToken: await getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
-          buyToken: await getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
-        }))
+        const ordersPromises = ordersPreTokenDetails.map(async order => {
+          const [sellToken, buyToken] = await Promise.all([
+            getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
+            getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
+          ])
+          return {
+            ...order,
+            sellToken,
+            buyToken,
+          }
+        })
+
         // check cancelled bool from parent scope
         if (cancelled) return
 

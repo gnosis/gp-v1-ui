@@ -20,11 +20,18 @@ function usePendingOrders(): DetailedPendingOrder[] {
     async function getDetailedPendingOrders(): Promise<void> {
       if (userAddress && networkId) {
         const pendingOrdersByNetwork = pendingOrdersGlobal[networkId][userAddress] || []
-        const ordersPromises = pendingOrdersByNetwork.map(async order => ({
-          ...order,
-          sellToken: await getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
-          buyToken: await getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
-        }))
+
+        const ordersPromises = pendingOrdersByNetwork.map(async order => {
+          const [sellToken, buyToken] = await Promise.all([
+            getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
+            getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
+          ])
+          return {
+            ...order,
+            sellToken,
+            buyToken,
+          }
+        })
 
         const orders: DetailedPendingOrder[] = await Promise.all(ordersPromises)
         setPendingOrders(orders)
