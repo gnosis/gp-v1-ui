@@ -376,6 +376,12 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                   count={classifiedOrders.closed.orders.length + classifiedOrders.closed.pendingOrders.length}
                   onClick={setSelectedTabFactory('closed')}
                 />
+                <ShowOrdersButton
+                  type="fills"
+                  isActive={selectedTab === 'fills'}
+                  count={trades.length}
+                  onClick={setSelectedTabFactory('fills')}
+                />
               </div>
             </div>
             {/* DELETE ORDERS ROW */}
