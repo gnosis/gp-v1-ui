@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUndo } from '@fortawesome/free-solid-svg-icons'
 
 import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION, isOrderUnlimited } from '@gnosis.pm/dex-js'
 
@@ -130,7 +128,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
         {formatDateFromBatchId(batchId, { strict: true })}
       </td>
-      <td>
+      <td data-label="Trade">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td data-label="Limit Price" title={limitPrice && formatPrice({ price: limitPrice, decimals: 8 })}>
@@ -148,20 +146,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={tradeType}>{tradeType}</TypePill>
       </td>
-      <td>
-        {/* TODO: remove icon and filter out reverted trades */}
-        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />{' '}
-        {trade.revertId && (
-          <FontAwesomeIcon
-            icon={faUndo}
-            data-trade-id={trade.id}
-            data-revert-id={trade.revertId}
-            data-revert-timestamp={trade.revertTimestamp}
-            data-sell-token-id={trade.sellTokenId}
-            data-buy-token-id={trade.buyTokenId}
-            data-order-id={trade.orderId}
-          />
-        )}
+      <td data-label="View on Etherscan">
+        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
       </td>
     </tr>
   )
