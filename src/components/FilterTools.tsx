@@ -103,6 +103,7 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 
 interface Props {
   customStyles?: string | false
+  className?: string
   dataLength: number
   resultName?: string
   searchValue: string
@@ -112,6 +113,7 @@ interface Props {
 
 const FilterTools: React.FC<Props> = ({
   children,
+  className,
   customStyles,
   dataLength,
   resultName = 'results',
@@ -119,7 +121,7 @@ const FilterTools: React.FC<Props> = ({
   showFilter,
   handleSearch,
 }) => (
-  <BalanceTools $css={customStyles}>
+  <BalanceTools className={className} $css={customStyles}>
     <label className="balances-searchTokens">
       <input
         placeholder="Search token by Name, Symbol or Address"

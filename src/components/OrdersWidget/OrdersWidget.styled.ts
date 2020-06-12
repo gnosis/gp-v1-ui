@@ -86,6 +86,22 @@ export const OrdersForm = styled.div`
     }
   }
 
+  .widgetFilterTools {
+    #filterLabel {
+      bottom: -1.2rem;
+    }
+
+    .balances-searchTokens {
+      height: 3.6rem;
+      margin: 0.8rem;
+      width: 100%;
+
+      > input {
+        width: 100%;
+      }
+    }
+  }
+
   .infoContainer {
     margin: 0 auto;
     display: flex;

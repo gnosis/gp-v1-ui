@@ -285,24 +285,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
+              className={isWidget ? 'widgetFilterTools' : ''}
               resultName="orders"
-              customStyles={
-                isWidget &&
-                `
-                #filterLabel {
-                  bottom: -1.2rem;
-                }
-
-                .balances-searchTokens { 
-                    height: 3.6rem; 
-                    margin: 0.8rem; 
-                    width: 100%; 
-                    
-                    > input { 
-                      width: 100%; 
-                    } 
-                }`
-              }
               searchValue={search}
               handleSearch={handleSearch}
               showFilter={!!search}
