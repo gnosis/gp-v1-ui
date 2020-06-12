@@ -261,7 +261,11 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
-  const { filteredData: filteredAndSortedOrders, search, handleSearch } = useDataFilter({
+  const {
+    filteredData: filteredAndSortedOrders,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter({
     data: sortedDisplayedOrders,
     filterFnFactory: filterOrdersFn,
   })
