@@ -1,9 +1,10 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
 import { toBN, setStorageItem } from 'utils'
-import { STORAGE_PENDING_ORDER_KEY } from 'const'
 
-export type ActionTypes = 'SAVE_PENDING_ORDERS' | 'REMOVE_PENDING_ORDERS'
+const STORAGE_PENDING_ORDER_KEY = 'STORAGE_PENDING_ORDER_TX_HASHES'
+
+export type ActionTypes = 'SAVE_PENDING_ORDERS' | 'REPLACE_PENDING_ORDERS'
 
 type SavePendingOrdersActionType = Actions<
   ActionTypes,
@@ -44,7 +45,7 @@ export const removePendingOrdersAction = (payload: {
   userAddress: string
   orders: PendingTxObj[]
 }): RemovePendingOrdersActionType => ({
-  type: 'REMOVE_PENDING_ORDERS',
+  type: 'REPLACE_PENDING_ORDERS',
   payload,
 })
 
@@ -83,7 +84,7 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
 
       return newState
     }
-    case 'REMOVE_PENDING_ORDERS': {
+    case 'REPLACE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
 
       const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: orders } }
@@ -98,7 +99,7 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
 export const sideEffect = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
   switch (action.type) {
     case 'SAVE_PENDING_ORDERS':
-    case 'REMOVE_PENDING_ORDERS':
+    case 'REPLACE_PENDING_ORDERS':
       setStorageItem(STORAGE_PENDING_ORDER_KEY, state)
     default:
       return state

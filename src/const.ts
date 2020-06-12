@@ -151,7 +151,7 @@ export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
-export const STORAGE_PENDING_ORDER_KEY = 'STORAGE_PENDING_ORDER_TX_HASHES'
+
 export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 // for stable reference
 // to avoid updates on setState([])
