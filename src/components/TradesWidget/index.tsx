@@ -83,9 +83,14 @@ function csvTransformer(trade: Trade): CsvColumns {
 
 const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
 
-const Trades: React.FC = () => {
-  const { networkId, userAddress, isConnected } = useWalletConnection()
-  const trades = useTrades()
+interface InnerTradesWidgetProps {
+  trades: Trade[]
+}
+
+export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
+  const { trades } = props
+
+  const { networkId, userAddress } = useWalletConnection()
 
   const filteredTrades = useMemo(() => trades.filter(trade => isTradeSettled(trade) && !isTradeReverted(trade)), [
     trades,
@@ -105,47 +110,61 @@ const Trades: React.FC = () => {
     [networkId, userAddress],
   )
 
+  return (
+    <CardTable
+      $rowSeparation="0"
+      $gap="0 0.6rem"
+      $padding="0.5em 0"
+      $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.9fr 1.23fr"
+    >
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Market</th>
+          <th>
+            Limit <br />
+            Price
+          </th>
+          <th>
+            Fill <br />
+            Price
+          </th>
+          <th>Amount</th>
+          <th>Received</th>
+          <th>Type</th>
+          <th>
+            <CsvButtonContainer>
+              <span>Tx</span>
+
+              {trades.length > 0 && (
+                <FileDownloaderLink data={generateCsv} options={CSV_FILE_OPTIONS} filename={filename}>
+                  <FontAwesomeIcon icon={faFileCsv} size="2x" />
+                </FileDownloaderLink>
+              )}
+            </CsvButtonContainer>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredTrades.map(trade => (
+          <TradeRow key={trade.id} trade={trade} networkId={networkId} />
+        ))}
+      </tbody>
+    </CardTable>
+  )
+}
+
+export const TradesWidget: React.FC = () => {
+  const { isConnected } = useWalletConnection()
+  const trades = useTrades()
+
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
-    <CardWidgetWrapper $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.9fr 1.23fr">
-      <CardTable $rowSeparation="0" $gap="0 0.6rem" $padding="0.5em 0">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Market</th>
-            <th>
-              Limit <br />
-              Price
-            </th>
-            <th>
-              Fill <br />
-              Price
-            </th>
-            <th>Amount</th>
-            <th>Received</th>
-            <th>Type</th>
-            <th>
-              <CsvButtonContainer>
-                <span>Tx</span>
-
-                {trades.length > 0 && (
-                  <FileDownloaderLink data={generateCsv} options={CSV_FILE_OPTIONS} filename={filename}>
-                    <FontAwesomeIcon icon={faFileCsv} size="2x" />
-                  </FileDownloaderLink>
-                )}
-              </CsvButtonContainer>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTrades.map(trade => (
-            <TradeRow key={trade.id} trade={trade} networkId={networkId} />
-          ))}
-        </tbody>
-      </CardTable>
+    <CardWidgetWrapper>
+      <InnerTradesWidget trades={trades} />
     </CardWidgetWrapper>
   )
 }
 
-export default Trades
+export default TradesWidget
