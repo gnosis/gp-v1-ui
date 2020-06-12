@@ -346,7 +346,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
       <FilterTools
         searchValue={search}
         handleSearch={handleSearch}
-        showFilter={hideZeroBalances && displayedBalances?.length > 0}
+        showFilter={(!!search || hideZeroBalances) && displayedBalances?.length > 0}
         dataLength={displayedBalances.length}
       >
         <label className="balances-hideZero">
