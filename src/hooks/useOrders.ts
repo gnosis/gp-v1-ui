@@ -1,16 +1,18 @@
 import { useEffect, useCallback, useRef } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 
-import useGlobalState from './useGlobalState'
+// API + Reducer/Actions
+import { exchangeApi } from 'api'
 import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/orders'
-
-import { useWalletConnection } from './useWalletConnection'
+// Hooks
 import useSafeState from './useSafeState'
-import { exchangeApi, web3 } from 'api'
-import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
+import useGlobalState from './useGlobalState'
+import usePendingOrders from './usePendingOrders'
+import { useWalletConnection } from './useWalletConnection'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
-import { removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { REFRESH_WHEN_SECONDS_LEFT, EMPTY_ARRAY } from 'const'
+// Constants/Types
+import { REFRESH_WHEN_SECONDS_LEFT } from 'const'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
 interface Result {
   orders: AuctionElement[]
@@ -24,66 +26,12 @@ export function useOrders(): Result {
   const [
     {
       orders: { orders, offset },
-      pendingOrders,
     },
     dispatch,
   ] = useGlobalState()
 
-  // Handle Pending Orders
-  // pending orders are saved in global app state as well as local storage
-  // users can refresh page after creating orders and see them after reload thanks for local storage
-  // uses this effect hook to:
-  //   1. listen to block updates and filter recently mined transactions based on their hash
-  //   2. remove any orders that may have been re-sent at a higher gas price
-  const currentPendingOrders = (userAddress && networkId && pendingOrders[networkId]?.[userAddress]) || EMPTY_ARRAY
-  useEffect(() => {
-    // Don't fire if there are no pending orders...
-    if (userAddress && networkId && currentPendingOrders.length > 0) {
-      const managePendingOrders = async (): Promise<void> => {
-        const latestBlock = await web3.eth.getBlock(blockNumber || 'latest')
-
-        // Set from block transaction array for easy lookup
-        const transactionsSet = new Set(latestBlock.transactions)
-
-        // check CURRENT pending orders txHash against the new block's
-        // mined transaction list - return orders still pending
-        let blockTransactionsFilteredPendingOrders = currentPendingOrders.filter(
-          ({ txHash }: { txHash: string }) => !transactionsSet.has(txHash),
-        )
-
-        // if some orders are still pending
-        if (blockTransactionsFilteredPendingOrders.length !== 0) {
-          // can return Transaction receipt as Pending/Mined OR null
-          // Pending TransactionReceipt will not have blockNumber/Hash or transactionIndex
-          // Mined TransactionRceipt WILL have the above props filled
-          // null indicates dropped tx
-          const transactionStatusArray = await Promise.all(
-            blockTransactionsFilteredPendingOrders.map(order => web3.eth.getTransaction(order.txHash)),
-          )
-
-          // Remove orders that are NULL and/or orders that have a blockNumber (indicating mined status)
-          // e.g [null, { blockNumber: 19082137, ... }, ...]
-          blockTransactionsFilteredPendingOrders = blockTransactionsFilteredPendingOrders.filter(
-            (_, index) => !!transactionStatusArray[index] && !transactionStatusArray[index].blockNumber,
-          )
-        }
-
-        // Dispatch if a pending transaction was mined
-        if (blockTransactionsFilteredPendingOrders.length !== currentPendingOrders.length) {
-          // Remove from global
-          dispatch(
-            removePendingOrdersAction({
-              networkId,
-              userAddress,
-              orders: blockTransactionsFilteredPendingOrders,
-            }),
-          )
-        }
-      }
-
-      managePendingOrders()
-    }
-  }, [currentPendingOrders, blockNumber, networkId, userAddress, dispatch])
+  // Pending Orders
+  const pendingOrders = usePendingOrders()
 
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
@@ -176,7 +124,7 @@ export function useOrders(): Result {
 
   return {
     orders,
-    pendingOrders: currentPendingOrders,
+    pendingOrders,
     isLoading,
     forceOrdersRefresh,
   }
