@@ -344,6 +344,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   return (
     <BalancesWidget>
       <FilterTools
+        resultName="tokens"
         searchValue={search}
         handleSearch={handleSearch}
         showFilter={(!!search || hideZeroBalances) && displayedBalances?.length > 0}

@@ -285,6 +285,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
+              resultName="orders"
               customStyles={
                 isWidget &&
                 `

@@ -104,6 +104,7 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 interface Props {
   customStyles?: string | false
   dataLength: number
+  resultName?: string
   searchValue: string
   showFilter: boolean
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
@@ -113,6 +114,7 @@ const FilterTools: React.FC<Props> = ({
   children,
   customStyles,
   dataLength,
+  resultName = 'results',
   searchValue,
   showFilter,
   handleSearch,
@@ -125,7 +127,11 @@ const FilterTools: React.FC<Props> = ({
         value={searchValue}
         onChange={handleSearch}
       />
-      {showFilter && <FormMessage id="filterLabel">Filter: Showing {dataLength} tokens</FormMessage>}
+      {showFilter && (
+        <FormMessage id="filterLabel">
+          Filter: Showing {dataLength} {dataLength === 1 ? 'result' : resultName}
+        </FormMessage>
+      )}
     </label>
     <>{children}</>
   </BalanceTools>
