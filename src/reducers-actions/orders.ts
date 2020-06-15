@@ -1,12 +1,12 @@
 import { Actions } from 'reducers-actions'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 import { addUnlistedTokensToUserTokenListById } from 'services'
 import { isOrderDeleted } from 'utils'
 
 export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
 export interface OrdersState {
-  orders: AuctionElement[]
+  orders: DetailedAuctionElement[]
   offset: number
 }
 
@@ -14,17 +14,17 @@ type UpdateOrdersActionType = Actions<ActionTypes, Pick<OrdersState, 'orders'>>
 type UpdateOffsetActionType = Actions<ActionTypes, Pick<OrdersState, 'offset'>>
 type ReducerActionType = Actions<ActionTypes, OrdersState>
 
-export const overwriteOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+export const overwriteOrders = (orders: DetailedAuctionElement[]): UpdateOrdersActionType => ({
   type: 'OVERWRITE_ORDERS',
   payload: { orders },
 })
 
-export const appendOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+export const appendOrders = (orders: DetailedAuctionElement[]): UpdateOrdersActionType => ({
   type: 'APPEND_ORDERS',
   payload: { orders },
 })
 
-export const updateOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+export const updateOrders = (orders: DetailedAuctionElement[]): UpdateOrdersActionType => ({
   type: 'UPDATE_ORDERS',
   payload: { orders },
 })
@@ -67,7 +67,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       // First we process reversedNewOrders, then currentOrders.
       // Thanks to processedOrderIds newOrders override currentOrders with same id
-      const updatedOrders = reversedNewOrders.concat(currentOrders).reduce<AuctionElement[]>((acc, order) => {
+      const updatedOrders = reversedNewOrders.concat(currentOrders).reduce<DetailedAuctionElement[]>((acc, order) => {
         // already included a potentially updated order
         // or the order was deleted
         if (processedOrderIds.has(order.id)) {

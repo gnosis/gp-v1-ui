@@ -1003,7 +1003,7 @@ const TradeWidget: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget />
+          <OrdersWidget isWidget />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}

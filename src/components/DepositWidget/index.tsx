@@ -1,20 +1,20 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import Modali from 'modali'
 import styled from 'styled-components'
 import BN from 'bn.js'
-
-// Assets
-import searchIcon from 'assets/img/search.svg'
 
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
+import { LocalTokensState } from 'reducers-actions/localTokens'
+import { TokenLocalState } from 'reducers-actions'
 
 // Components
 import { CardTable } from 'components/Layout/Card'
 import ErrorMsg from 'components/ErrorMsg'
 import Widget from 'components/Layout/Widget'
+import FilterTools from 'components/FilterTools'
 
 // DepositWidget: subcomponents
 import { Row } from 'components/DepositWidget/Row'
@@ -25,11 +25,10 @@ import { useDepositModals } from 'components/DepositWidget/useDepositModals'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import useSafeState from 'hooks/useSafeState'
 import useWindowSizes from 'hooks/useWindowSizes'
-import { useDebounce } from 'hooks/useDebounce'
 import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
 import { useEthBalances } from 'hooks/useEthBalance'
-import { TokenLocalState } from 'reducers-actions'
+import useDataFilter from 'hooks/useDataFilter'
 
 interface WithdrawState {
   amount: BN
@@ -182,19 +181,8 @@ const BalancesWidget = styled(Widget)`
       }
     }
   }
-`
-
-const BalanceTools = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  align-items: center;
-  order: 1;
-
-  > .balances-manageTokens {
+  // button
+  .balances-manageTokens {
     font-size: 1.4rem;
     color: var(--color-text-active);
     letter-spacing: 0;
@@ -216,7 +204,8 @@ const BalanceTools = styled.div`
     }
   }
 
-  > .balances-hideZero {
+  // label + radio input
+  .balances-hideZero {
     display: flex;
     flex-flow: row nowrap;
     font-size: 1.4rem;
@@ -233,65 +222,6 @@ const BalanceTools = styled.div`
     > b {
       font-weight: inherit;
       margin: 0 0 0 0.5rem;
-    }
-  }
-
-  > .balances-searchTokens {
-    display: flex;
-    width: auto;
-    max-width: 100%;
-    position: relative;
-    height: 5.6rem;
-    margin: 1.6rem;
-
-    @media ${MEDIA.mobile} {
-      width: 100%;
-      height: 4.6rem;
-      margin: 0 0 2.4rem;
-    }
-
-    > input {
-      margin: 0;
-      width: 35rem;
-      max-width: 100%;
-      background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
-      border-radius: 0.6rem 0.6rem 0 0;
-      border: 0;
-      font-size: 1.4rem;
-      line-height: 1;
-      box-sizing: border-box;
-      border-bottom: 0.2rem solid transparent;
-      font-weight: var(--font-weight-normal);
-      padding: 0 1.6rem 0 4.8rem;
-      outline: 0;
-
-      @media ${MEDIA.mobile} {
-        font-size: 1.3rem;
-        width: 100%;
-      }
-
-      &::placeholder {
-        font-size: inherit;
-        color: inherit;
-      }
-
-      &:focus {
-        border-bottom: 0.2rem solid var(--color-text-active);
-        border-color: var(--color-text-active);
-        color: var(--color-text-active);
-      }
-
-      &.error {
-        border-color: var(--color-error);
-      }
-
-      &.warning {
-        border-color: orange;
-      }
-
-      &:disabled {
-        box-shadow: none;
-      }
     }
   }
 `
@@ -335,6 +265,30 @@ interface BalanceDisplayProps extends TokenLocalState {
   ): Promise<void>
 }
 
+const customFilterFnFactory = (localTokens: LocalTokensState) => (searchTxt: string) => ({
+  symbol,
+  name,
+  address,
+}: TokenBalanceDetails): boolean => {
+  if (localTokens.disabled.has(address)) return false
+
+  if (searchTxt === '') return true
+
+  return (
+    symbol?.toLowerCase().includes(searchTxt) ||
+    name?.toLowerCase().includes(searchTxt) ||
+    address.toLowerCase().includes(searchTxt)
+  )
+}
+
+const customHideZeroFilterFn = ({
+  totalExchangeBalance,
+  pendingWithdraw,
+  walletBalance,
+}: TokenBalanceDetails): boolean => {
+  return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
+}
+
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   ethBalance,
   balances,
@@ -352,62 +306,50 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 }) => {
   const windowSpecs = useWindowSizes()
 
-  const [search, setSearch] = useState('')
-  const [hideZeroBalances, setHideZeroBalances] = useState(false)
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
-
-  const handleHideZeroBalances = (e: React.ChangeEvent<HTMLInputElement>): void => setHideZeroBalances(e.target.checked)
-
-  const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
-
-  const clearFilters = (): void => {
-    setSearch('')
-    setDebouncedSearch('')
-    setHideZeroBalances(false)
-  }
-
   const [{ localTokens }] = useGlobalState()
 
-  const filteredBalances = useMemo(() => {
-    if ((!debouncedSearch && localTokens.disabled.size === 0) || !balances || balances.length === 0) return balances
+  const memoizedSearchFilterParams = useMemo(
+    () => ({
+      data: balances,
+      filterFnFactory: customFilterFnFactory(localTokens),
+      userConditionalCheck: ({ debouncedSearch }: { debouncedSearch: string }): boolean =>
+        !debouncedSearch && localTokens.disabled.size === 0,
+    }),
+    [balances, localTokens],
+  )
 
-    const searchTxt = debouncedSearch.trim().toLowerCase()
+  const {
+    filteredData: filteredBalances,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter(memoizedSearchFilterParams)
 
-    return balances.filter(({ symbol, name, address }) => {
-      if (localTokens.disabled.has(address)) return false
+  const memoizedZeroFilterParams = useMemo(
+    () => ({
+      data: filteredBalances,
+      isSearchFilter: false,
+      filterFnFactory: (): typeof customHideZeroFilterFn => customHideZeroFilterFn,
+    }),
+    [filteredBalances],
+  )
 
-      if (searchTxt === '') return true
-
-      return (
-        symbol?.toLowerCase().includes(searchTxt) ||
-        name?.toLowerCase().includes(searchTxt) ||
-        address.toLowerCase().includes(searchTxt)
-      )
-    })
-  }, [debouncedSearch, balances, localTokens.disabled])
-
-  const displayedBalances = useMemo(() => {
-    if (!hideZeroBalances || !filteredBalances || filteredBalances.length === 0) return filteredBalances
-
-    return filteredBalances.filter(({ totalExchangeBalance, pendingWithdraw, walletBalance }) => {
-      return !totalExchangeBalance.isZero() || !pendingWithdraw.amount.isZero() || !walletBalance.isZero()
-    })
-  }, [hideZeroBalances, filteredBalances])
+  const {
+    filteredData: displayedBalances,
+    showFilter: hideZeroBalances,
+    handlers: { handleToggleFilter: handleHideZeroBalances, clearFilters },
+  } = useDataFilter(memoizedZeroFilterParams)
 
   const { modalProps, toggleModal } = useManageTokens()
 
   return (
     <BalancesWidget>
-      <BalanceTools>
-        <label className="balances-searchTokens">
-          <input
-            placeholder="Search token by Name, Symbol or Address"
-            type="text"
-            value={search}
-            onChange={handleSearch}
-          />
-        </label>
+      <FilterTools
+        resultName="tokens"
+        searchValue={search}
+        handleSearch={handleSearch}
+        showFilter={(!!search || hideZeroBalances) && displayedBalances?.length > 0}
+        dataLength={displayedBalances.length}
+      >
         <label className="balances-hideZero">
           <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
           <b>Hide zero balances</b>
@@ -415,7 +357,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
         <button type="button" className="balances-manageTokens" onClick={toggleModal}>
           Manage Tokens
         </button>
-      </BalanceTools>
+      </FilterTools>
       {error ? (
         <ErrorMsg title="oops..." message="Something happened while loading the balances" />
       ) : (

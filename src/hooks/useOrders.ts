@@ -3,20 +3,22 @@ import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 
 // API + Reducer/Actions
 import { exchangeApi } from 'api'
+import { getTokenFromExchangeById } from 'services'
 import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/orders'
 // Hooks
 import useSafeState from './useSafeState'
 import useGlobalState from './useGlobalState'
-import usePendingOrders from './usePendingOrders'
 import { useWalletConnection } from './useWalletConnection'
+import usePendingOrders, { DetailedPendingOrder } from './usePendingOrders'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
+
 // Constants/Types
 import { REFRESH_WHEN_SECONDS_LEFT } from 'const'
-import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 interface Result {
-  orders: AuctionElement[]
-  pendingOrders: PendingTxObj[]
+  orders: DetailedAuctionElement[]
+  pendingOrders: DetailedPendingOrder[]
   forceOrdersRefresh: () => void
   isLoading: boolean
 }
@@ -57,11 +59,28 @@ export function useOrders(): Result {
 
       // contract call
       try {
-        const { orders, nextIndex } = await exchangeApi.getOrdersPaginated({ userAddress, networkId, offset })
+        const { orders: ordersPreTokenDetails, nextIndex } = await exchangeApi.getOrdersPaginated({
+          userAddress,
+          networkId,
+          offset,
+        })
+
+        const ordersPromises = ordersPreTokenDetails.map(async order => {
+          const [sellToken, buyToken] = await Promise.all([
+            getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
+            getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
+          ])
+          return {
+            ...order,
+            sellToken,
+            buyToken,
+          }
+        })
 
         // check cancelled bool from parent scope
         if (cancelled) return
 
+        const orders: DetailedAuctionElement[] = await Promise.all(ordersPromises)
         // ensures we don't have multiple reruns for each update
         // i.e. offset change -> render
         //      isLoading change -> another render

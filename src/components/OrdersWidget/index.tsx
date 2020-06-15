@@ -14,20 +14,26 @@ import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 // Hooks
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
-import { useWalletConnection } from 'hooks/useWalletConnection'
+import useDataFilter from 'hooks/useDataFilter'
 import useSortByTopic from 'hooks/useSortByTopic'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 // Api
-import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { CardTable } from 'components/Layout/Card'
+import FilterTools from 'components/FilterTools'
 
 // OrderWidget
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
+
+// Types/misc
+import { DetailedPendingOrder } from 'hooks/usePendingOrders'
+import { TokenDetails } from 'types'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
@@ -47,8 +53,8 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, cou
 type FilteredOrdersStateKeys = OrderTabs
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
-    orders: AuctionElement[]
-    pendingOrders: AuctionElement[]
+    orders: DetailedAuctionElement[]
+    pendingOrders: DetailedPendingOrder[]
     markedForDeletion: Set<string>
   }
 }
@@ -64,7 +70,7 @@ function emptyState(): FilteredOrdersState {
 }
 
 function classifyOrders(
-  orders: AuctionElement[],
+  orders: DetailedAuctionElement[],
   state: FilteredOrdersState,
   ordersType: 'orders' | 'pendingOrders',
 ): void {
@@ -82,7 +88,29 @@ function classifyOrders(
   })
 }
 
-const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionElement, rhs: AuctionElement): number => {
+function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
+  if (!token) return false
+  return (
+    token?.symbol?.toLowerCase().includes(searchText) ||
+    token?.name?.toLowerCase().includes(searchText) ||
+    token?.address.toLowerCase().includes(searchText)
+  )
+}
+
+const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean | null => {
+  if (searchTxt === '') return null
+
+  return (
+    !!id.includes(searchTxt) ||
+    checkTokenAgainstSearch(buyToken, searchTxt) ||
+    checkTokenAgainstSearch(sellToken, searchTxt)
+  )
+}
+
+const compareFnFactory = (topic: TopicNames, asc: boolean) => (
+  lhs: DetailedAuctionElement,
+  rhs: DetailedAuctionElement,
+): number => {
   if (asc) {
     return lhs[topic] - rhs[topic]
   } else {
@@ -90,23 +118,27 @@ const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionEleme
   }
 }
 
-const OrdersWidget: React.FC = () => {
+interface Props {
+  isWidget?: boolean
+}
+
+const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
+  const { orders: allOrders, pendingOrders: allPendingOrders, forceOrdersRefresh } = useOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
-  const { orders: allOrders, forceOrdersRefresh, pendingOrders: allPendingOrders } = useOrders()
 
   // allOrders and markedForDeletion, split by tab
-  const [filteredOrders, setFilteredOrders] = useSafeState<FilteredOrdersState>(emptyState())
+  const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState())
   const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
 
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
     () => ({
-      displayedOrders: filteredOrders[selectedTab].orders,
-      displayedPendingOrders: filteredOrders[selectedTab].pendingOrders,
-      markedForDeletion: filteredOrders[selectedTab].markedForDeletion,
+      displayedOrders: classifiedOrders[selectedTab].orders,
+      displayedPendingOrders: classifiedOrders[selectedTab].pendingOrders,
+      markedForDeletion: classifiedOrders[selectedTab].markedForDeletion,
     }),
-    [filteredOrders, selectedTab],
+    [classifiedOrders, selectedTab],
   )
 
   const setSelectedTabFactory = useCallback(
@@ -121,22 +153,22 @@ const OrdersWidget: React.FC = () => {
     [setSelectedTab],
   )
 
-  // Update filteredOrders state whenever there's a change to allOrders
+  // Update classifiedOrders state whenever there's a change to allOrders
   // splitting orders into respective tabs
   useEffect(() => {
-    const filteredOrders = emptyState()
+    const classifiedOrders = emptyState()
 
-    classifyOrders(allOrders, filteredOrders, 'orders')
-    classifyOrders(allPendingOrders, filteredOrders, 'pendingOrders')
+    classifyOrders(allOrders, classifiedOrders, 'orders')
+    classifyOrders(allPendingOrders, classifiedOrders, 'pendingOrders')
 
-    setFilteredOrders(curr => {
+    setClassifiedOrders(curr => {
       // copy markedForDeletion
-      Object.keys(filteredOrders).forEach(
-        type => (filteredOrders[type].markedForDeletion = curr[type].markedForDeletion),
+      Object.keys(classifiedOrders).forEach(
+        type => (classifiedOrders[type].markedForDeletion = curr[type].markedForDeletion),
       )
-      return filteredOrders
+      return classifiedOrders
     })
-  }, [allOrders, allPendingOrders, setFilteredOrders])
+  }, [allOrders, allPendingOrders, setClassifiedOrders])
 
   const ordersCount = displayedOrders.length + displayedPendingOrders.length
 
@@ -151,15 +183,14 @@ const OrdersWidget: React.FC = () => {
   )
 
   // Sort validUntil
-  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<AuctionElement, TopicNames>(
-    displayedOrders,
-    DEFAULT_ORDERS_SORTABLE_TOPIC,
-    compareFnFactory,
-  )
+  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<
+    DetailedAuctionElement,
+    TopicNames
+  >(displayedOrders, DEFAULT_ORDERS_SORTABLE_TOPIC, compareFnFactory)
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
-      setFilteredOrders(curr => {
+      setClassifiedOrders(curr => {
         const state = emptyState()
 
         // copy full state
@@ -174,24 +205,24 @@ const OrdersWidget: React.FC = () => {
 
         return state
       }),
-    [setFilteredOrders],
+    [setClassifiedOrders],
   )
 
   const toggleSelectAll = useCallback(
     ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) =>
-      setFilteredOrders(curr => {
+      setClassifiedOrders(curr => {
         const state = emptyState()
 
         // copy full state
         Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
 
         state[selectedTab].markedForDeletion = checked
-          ? new Set(filteredOrders[selectedTab].orders.map(order => order.id))
+          ? new Set(classifiedOrders[selectedTab].orders.map(order => order.id))
           : new Set()
 
         return state
       }),
-    [filteredOrders, selectedTab, setFilteredOrders],
+    [classifiedOrders, selectedTab, setClassifiedOrders],
   )
 
   const { deleteOrders, deleting } = useDeleteOrders()
@@ -206,7 +237,7 @@ const OrdersWidget: React.FC = () => {
         unstable_batchedUpdates(() => {
           // reset selections
 
-          setFilteredOrders(curr => {
+          setClassifiedOrders(curr => {
             const state = emptyState()
 
             // copy full state
@@ -226,8 +257,17 @@ const OrdersWidget: React.FC = () => {
         })
       }
     },
-    [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setFilteredOrders],
+    [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
+
+  const {
+    filteredData: filteredAndSortedOrders,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter({
+    data: sortedDisplayedOrders,
+    filterFnFactory: filterOrdersFn,
+  })
 
   return (
     <OrdersWrapper>
@@ -243,24 +283,39 @@ const OrdersWidget: React.FC = () => {
       {!noOrders && networkId && (
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
+            <FilterTools
+              className={isWidget ? 'widgetFilterTools' : ''}
+              resultName="orders"
+              searchValue={search}
+              handleSearch={handleSearch}
+              showFilter={!!search}
+              dataLength={displayedPendingOrders.length + filteredAndSortedOrders.length}
+            >
+              {/* implement later when better data concerning order state and can be saved to global state 
+              <label className="balances-hideZero">
+                <input type="checkbox" checked={hideUntouchedOrders} onChange={handleHideUntouchedOrders} />
+                <b>Hide untouched orders</b>
+              </label>
+              */}
+            </FilterTools>
             <div className="infoContainer">
               <div className="countContainer">
                 <ShowOrdersButton
                   type="active"
                   isActive={selectedTab === 'active'}
-                  count={filteredOrders.active.orders.length + filteredOrders.active.pendingOrders.length}
+                  count={classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length}
                   onClick={setSelectedTabFactory('active')}
                 />
                 <ShowOrdersButton
                   type="liquidity"
                   isActive={selectedTab === 'liquidity'}
-                  count={filteredOrders.liquidity.orders.length + filteredOrders.liquidity.pendingOrders.length}
+                  count={classifiedOrders.liquidity.orders.length + classifiedOrders.liquidity.pendingOrders.length}
                   onClick={setSelectedTabFactory('liquidity')}
                 />
                 <ShowOrdersButton
                   type="closed"
                   isActive={selectedTab === 'closed'}
-                  count={filteredOrders.closed.orders.length + filteredOrders.closed.pendingOrders.length}
+                  count={classifiedOrders.closed.orders.length + classifiedOrders.closed.pendingOrders.length}
                   onClick={setSelectedTabFactory('closed')}
                 />
               </div>
@@ -301,7 +356,7 @@ const OrdersWidget: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedPendingOrders.map((order: PendingTxObj) => (
+                    {displayedPendingOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}
@@ -313,7 +368,7 @@ const OrdersWidget: React.FC = () => {
                         transactionHash={order.txHash}
                       />
                     ))}
-                    {sortedDisplayedOrders.map(order => (
+                    {filteredAndSortedOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}

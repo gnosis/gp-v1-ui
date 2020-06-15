@@ -1,20 +1,51 @@
 import { useEffect, useMemo } from 'react'
-// Hooks
-import useGlobalState from './useGlobalState'
-import { useWalletConnection } from './useWalletConnection'
 // API
 import { web3 } from 'api'
+// Hooks
+import useGlobalState from './useGlobalState'
+import useSafeState from './useSafeState'
+import { useWalletConnection } from './useWalletConnection'
 // Reducers/Actions
 import { removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 // Constants/Types/Misc.
 import { EMPTY_ARRAY } from 'const'
-import { PendingTxObj } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement, AuctionElement } from 'api/exchange/ExchangeApi'
+import { getTokenFromExchangeById } from 'services'
 
-type Result = PendingTxObj[]
+async function getDetailedPendingOrders({
+  orders,
+  networkId,
+  setFn,
+}: {
+  orders: AuctionElement[]
+  networkId: number
+  setFn: React.Dispatch<React.SetStateAction<DetailedPendingOrder[]>>
+}): Promise<void> {
+  const ordersPromises = orders.map(async order => {
+    const [sellToken, buyToken] = await Promise.all([
+      getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
+      getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
+    ])
+    return {
+      ...order,
+      sellToken,
+      buyToken,
+    }
+  })
 
-const usePendingOrders = (): Result => {
-  const { userAddress, networkId, blockNumber } = useWalletConnection()
+  const detailedOrders: DetailedPendingOrder[] = await Promise.all(ordersPromises)
+  return setFn(detailedOrders)
+}
+
+export interface DetailedPendingOrder extends DetailedAuctionElement {
+  txHash?: string
+}
+
+function usePendingOrders(): DetailedPendingOrder[] {
+  const { blockNumber, userAddress, networkId } = useWalletConnection()
+
   const [{ pendingOrders }, dispatch] = useGlobalState()
+  const [detailedPendingOrders, setDetailedPendingOrders] = useSafeState<DetailedPendingOrder[]>([])
 
   // Handle Pending Orders
   // pending orders are saved in global app state as well as local storage
@@ -26,6 +57,7 @@ const usePendingOrders = (): Result => {
     () => (userAddress && networkId && pendingOrders[networkId]?.[userAddress]) || EMPTY_ARRAY,
     [networkId, pendingOrders, userAddress],
   )
+
   useEffect(() => {
     // Don't fire if there are no pending orders...
     if (userAddress && networkId && currentPendingOrders.length > 0) {
@@ -75,7 +107,14 @@ const usePendingOrders = (): Result => {
     }
   }, [currentPendingOrders, blockNumber, networkId, userAddress, dispatch])
 
-  return currentPendingOrders
+  // get detailed pending order details
+  useEffect(() => {
+    if (networkId) {
+      getDetailedPendingOrders({ orders: currentPendingOrders, networkId, setFn: setDetailedPendingOrders })
+    }
+  }, [currentPendingOrders, networkId, setDetailedPendingOrders])
+
+  return detailedPendingOrders
 }
 
 export default usePendingOrders

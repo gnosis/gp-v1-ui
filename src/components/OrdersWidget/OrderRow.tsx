@@ -4,7 +4,6 @@ import { toast } from 'toastify'
 // types, utils and services
 import { TokenDetails } from 'types'
 import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
-import { getTokenFromExchangeById } from 'services'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -27,8 +26,8 @@ import {
   dateToBatchId,
   getTimeRemainingInBatch,
 } from 'utils'
-import { onErrorFactory } from 'utils/onError'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
@@ -247,24 +246,19 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   )
 }
 
-async function fetchToken(
-  tokenId: number,
+function fetchToken(
   orderId: string,
-  networkId: number,
+  token: TokenDetails | null,
   setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
   isPendingOrder?: boolean,
-): Promise<void> {
-  const token = await getTokenFromExchangeById({ tokenId, networkId })
-
+): void {
   // It is unlikely the token ID coming form the order won't exist
   // Still, if that ever happens, store null and keep this order hidden
   setFn(token)
 
   // Also, inform the user this token failed and the order is hidden.
   if (!token && !isPendingOrder) {
-    toast.warn(
-      `Token id ${tokenId} used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`,
-    )
+    toast.warn(`Token used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`)
   }
 }
 
@@ -282,7 +276,7 @@ const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ han
 }
 
 interface Props {
-  order: AuctionElement
+  order: DetailedAuctionElement
   isOverBalance: boolean
   networkId: number
   pending?: boolean
@@ -292,8 +286,6 @@ interface Props {
   disabled: boolean
   isPendingOrder?: boolean
 }
-
-const onError = onErrorFactory('Failed to fetch token')
 
 const OrderRow: React.FC<Props> = props => {
   const {
@@ -314,8 +306,8 @@ const OrderRow: React.FC<Props> = props => {
   const [openCard, setOpenCard] = useSafeState(true)
 
   useEffect(() => {
-    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken, isPendingOrder).catch(onError)
-    fetchToken(order.sellTokenId, order.id, networkId, setSellToken, isPendingOrder).catch(onError)
+    fetchToken(order.id, order.buyToken as TokenDetails, setBuyToken, isPendingOrder)
+    fetchToken(order.id, order.sellToken as TokenDetails, setSellToken, isPendingOrder)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
   const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
@@ -323,7 +315,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
+      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : ''} $open={openCard}>
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}
