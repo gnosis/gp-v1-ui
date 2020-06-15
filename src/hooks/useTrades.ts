@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import { BATCH_TIME } from '@gnosis.pm/dex-js'
 
