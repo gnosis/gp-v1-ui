@@ -97,8 +97,8 @@ function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string)
   )
 }
 
-const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean => {
-  if (searchTxt === '') return true
+const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean | null => {
+  if (searchTxt === '') return null
 
   return (
     !!id.includes(searchTxt) ||

@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react'
 import { useDebounce } from './useDebounce'
 
+type FilterFnFactory<T> = (searchTxt: string) => (params: T, index: number, array: T[]) => boolean | null
+
 interface InternalState<T> {
   debouncedSearch?: string
   showFilter?: boolean
@@ -23,7 +25,7 @@ export interface HookParams<T> {
   searchDebounceTime?: number
   isSearchFilter?: boolean
   userConditionalCheck?: (internalState?: InternalState<T>) => boolean
-  filterFnFactory: (searchTxt: string) => (params: T, index: number, array: T[]) => boolean
+  filterFnFactory: FilterFnFactory<T>
 }
 
 function useDataFilter<T>({
@@ -63,6 +65,9 @@ function useDataFilter<T>({
 
     const searchTxt = debouncedSearch.trim().toLowerCase()
     const customFilterFn = filterFnFactory(searchTxt)
+
+    // check null return from customFilterFn to opt out
+    if (!customFilterFn) return data
 
     return data.filter(customFilterFn)
   }, [debouncedSearch, data, isSearchFilter, showFilter, userConditionalCheck, filterFnFactory])
