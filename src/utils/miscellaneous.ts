@@ -132,6 +132,12 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
   }
 }
 
+export function setStorageItem(key: string, data: unknown): void {
+  // localStorage API accepts only strings
+  const formattedData = JSON.stringify(data)
+  return localStorage.setItem(key, formattedData)
+}
+
 interface RetryOptions {
   retriesLeft?: number
   interval?: number

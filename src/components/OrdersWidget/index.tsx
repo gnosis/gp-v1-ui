@@ -14,7 +14,6 @@ import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 // Hooks
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
-import usePendingOrders from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSortByTopic from 'hooks/useSortByTopic'
 
@@ -92,10 +91,9 @@ const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionEleme
 }
 
 const OrdersWidget: React.FC = () => {
-  const { orders: allOrders, forceOrdersRefresh } = useOrders()
-  const allPendingOrders = usePendingOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
+  const { orders: allOrders, forceOrdersRefresh, pendingOrders: allPendingOrders } = useOrders()
 
   // allOrders and markedForDeletion, split by tab
   const [filteredOrders, setFilteredOrders] = useSafeState<FilteredOrdersState>(emptyState())

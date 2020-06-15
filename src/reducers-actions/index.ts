@@ -4,6 +4,7 @@ import {
   reducer as PendingOrderReducer,
   PendingOrdersState,
   PendingOrdersInitialState as pendingOrders,
+  sideEffect as PendingOrdersSideEffect,
 } from './pendingOrders'
 import {
   reducer as OrdersReducer,
@@ -86,7 +87,7 @@ const addSideEffect = <S, A extends Action = AnyAction>(
  */
 export const rootReducer = combineReducers({
   tokens: TokenRowReducer,
-  pendingOrders: PendingOrderReducer,
+  pendingOrders: addSideEffect(PendingOrderReducer, PendingOrdersSideEffect),
   orders: addSideEffect(OrdersReducer, OrdersSideEffect),
   trade: TradeReducer,
   trades: addSideEffect(TradesReducer, TradesSideEffect),

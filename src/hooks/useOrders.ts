@@ -1,24 +1,25 @@
 import { useEffect, useCallback, useRef } from 'react'
-// eslint-disable-next-line @typescript-eslint/camelcase
-import { unstable_batchedUpdates } from 'react-dom'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 
-import useGlobalState from './useGlobalState'
-import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/orders'
-
-import { useWalletConnection } from './useWalletConnection'
-import useSafeState from './useSafeState'
+// API + Reducer/Actions
 import { exchangeApi } from 'api'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/orders'
+// Hooks
+import useSafeState from './useSafeState'
+import useGlobalState from './useGlobalState'
+import usePendingOrders from './usePendingOrders'
+import { useWalletConnection } from './useWalletConnection'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
+// Constants/Types
+import { REFRESH_WHEN_SECONDS_LEFT } from 'const'
+import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
 
 interface Result {
   orders: AuctionElement[]
+  pendingOrders: PendingTxObj[]
   forceOrdersRefresh: () => void
   isLoading: boolean
 }
-
-const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
-// solutions submitted at this point
 
 export function useOrders(): Result {
   const { userAddress, networkId, blockNumber } = useWalletConnection()
@@ -28,6 +29,9 @@ export function useOrders(): Result {
     },
     dispatch,
   ] = useGlobalState()
+
+  // Pending Orders
+  const pendingOrders = usePendingOrders()
 
   // can only start loading when connection is ready. Keep it `false` until then
   const [isLoading, setIsLoading] = useSafeState<boolean>(false)
@@ -61,7 +65,7 @@ export function useOrders(): Result {
         // ensures we don't have multiple reruns for each update
         // i.e. offset change -> render
         //      isLoading change -> another render
-        unstable_batchedUpdates(() => {
+        batchedUpdates(() => {
           if (orders.length > 0) {
             // update
             dispatch(updateOrders(orders))
@@ -118,5 +122,10 @@ export function useOrders(): Result {
     dispatch(overwriteOrders([]))
   }, [userAddress, networkId, forceOrdersRefresh, dispatch])
 
-  return { orders, isLoading, forceOrdersRefresh }
+  return {
+    orders,
+    pendingOrders,
+    isLoading,
+    forceOrdersRefresh,
+  }
 }

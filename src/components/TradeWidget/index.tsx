@@ -23,6 +23,7 @@ import OrdersWidget from 'components/OrdersWidget'
 import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
+import { Spinner } from 'components/Spinner'
 
 // TradeWidget: subcomponents
 import TokenRow from 'components/TradeWidget/TokenRow'
@@ -37,8 +38,7 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { Spinner } from 'components/Spinner'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import {
   getToken,
@@ -732,7 +732,7 @@ const TradeWidget: React.FC = () => {
       toast.info(<TxNotification txHash={txHash} />)
 
       const pendingOrder: PendingTxObj = {
-        id: Date.now() + '', // Uses a temporal unique id
+        id: String(Date.now()), // Uses a temporal unique id
         buyTokenId,
         sellTokenId,
         priceNumerator,
@@ -745,7 +745,7 @@ const TradeWidget: React.FC = () => {
         txHash,
       }
 
-      return dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
+      return dispatch(savePendingOrdersAction({ orders: [pendingOrder], networkId, userAddress }))
     },
     [dispatch, reset, setIsSubmitting],
   )
@@ -774,7 +774,6 @@ const TradeWidget: React.FC = () => {
         userAddress,
       } = params
 
-      let pendingTxHash: string | undefined = undefined
       // block form
       setIsSubmitting(true)
 
@@ -786,11 +785,9 @@ const TradeWidget: React.FC = () => {
       const isASAP = validFrom === 0
       const isNever = validUntil === 0
 
-      let success: boolean
       // ASAP ORDER
       if (isASAP) {
-        // ; for destructure reassign format
-        ;({ success } = await placeOrder({
+        return placeOrder({
           networkId,
           userAddress,
           buyAmount,
@@ -800,7 +797,6 @@ const TradeWidget: React.FC = () => {
           validUntil,
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
               return savePendingTransactionsAndResetForm(
                 txHash,
                 {
@@ -824,10 +820,9 @@ const TradeWidget: React.FC = () => {
               )
             },
           },
-        }))
+        })
       } else {
-        // ; for destructure reassign format
-        ;({ success } = await placeMultipleOrders({
+        return placeMultipleOrders({
           networkId,
           userAddress,
           orders: [
@@ -842,7 +837,6 @@ const TradeWidget: React.FC = () => {
           ],
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
               return savePendingTransactionsAndResetForm(
                 txHash,
                 {
@@ -865,14 +859,10 @@ const TradeWidget: React.FC = () => {
               )
             },
           },
-        }))
-      }
-      if (success && pendingTxHash) {
-        // remove pending tx
-        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+        })
       }
     },
-    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
+    [placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
   )
 
   async function onSubmit(data: FieldValues): Promise<void> {

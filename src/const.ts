@@ -134,13 +134,11 @@ if (process.env.ETH_NODE_URL) {
 export const ETH_NODE_URL = ethNodeUrl
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
-
-export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
-
-export const GP_ORDER_TX_HASHES = {
-  1: 'GP_ORDER_TX_HASHES_1',
-  4: 'GP_ORDER_TX_HASHES_4',
+export const STORAGE_PENDING_ORDER_TX_HASHES = {
+  1: 'STORAGE_PENDING_ORDER_TX_HASHES_1',
+  4: 'STORAGE_PENDING_ORDER_TX_HASHES_4',
 }
+export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
 
 export const TRADES_LOCAL_STORAGE_KEY = 'TRADES_PER_NETWORK'
 
@@ -153,6 +151,11 @@ export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
+
+export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
+// for stable reference
+// to avoid updates on setState([])
+export const EMPTY_ARRAY = []
 
 export const SLIPPAGE_MAP = new Map([
   ['0.1', false],
