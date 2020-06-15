@@ -89,6 +89,7 @@ export const OrdersForm = styled.div`
   .widgetFilterTools {
     #filterLabel {
       bottom: -1.2rem;
+      border-radius: 0 0 1.6rem 0rem;
     }
 
     .balances-searchTokens {
