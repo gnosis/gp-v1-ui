@@ -26,10 +26,7 @@ export function useTrades(): Trade[] {
   ] = useGlobalState()
   const { userAddress, networkId } = useWalletConnection()
 
-  const { lastCheckedBlock, trades } = useMemo(
-    () => (networkId ? globalStateTrades[networkId] : { lastCheckedBlock: undefined, trades: [] }),
-    [globalStateTrades, networkId],
-  )
+  const { lastCheckedBlock = undefined, trades = [] } = networkId ? globalStateTrades[networkId] : {}
 
   useEffect(() => {
     // Flow control. Cancel query/state update on unmount
