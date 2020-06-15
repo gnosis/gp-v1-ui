@@ -33,7 +33,7 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
   callback,
 }: SubscribeParams<T>): Promise<() => void> => {
   return new Promise<Subscription<Event2Data[T]>>((resolve, reject) => {
-    // callback normally used as complition of on('error') and on('data') together
+    // callback normally used as completion of on('error') and on('data') together
     // but needed here because not all providers will call on('error')
     const detectValidSubCb = (e: Error): void => {
       if (e) {
@@ -48,8 +48,6 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
         web3.eth.subscribe(event as any, detectValidSubCb)) as Subscription<Event2Data[T]>
 
     sub
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
       .on('connected', id => {
         // called with subscription id
         // if subscribtion was created successfully

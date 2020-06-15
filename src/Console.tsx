@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Hook, Unhook, Console, Message, Decode } from 'console-feed'
 import styled from 'styled-components'
-import Web3Connect from 'web3connect'
+import { isMobile } from 'web3modal'
 
 const ConsoleWrapper = styled.div`
   position: fixed;
@@ -138,7 +138,7 @@ const ConsoleFrame: React.FC = () => {
 }
 
 const MobileConsole: React.FC = () => {
-  if (!Web3Connect.isMobile()) return null
+  if (!isMobile()) return null
 
   return <ConsoleFrame />
 }

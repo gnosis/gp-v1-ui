@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUndo } from '@fortawesome/free-solid-svg-icons'
 
 import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION, isOrderUnlimited } from '@gnosis.pm/dex-js'
 
@@ -147,7 +149,19 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         <TypePill tradeType={tradeType}>{tradeType}</TypePill>
       </td>
       <td>
-        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
+        {/* TODO: remove icon and filter out reverted trades */}
+        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />{' '}
+        {trade.revertId && (
+          <FontAwesomeIcon
+            icon={faUndo}
+            data-trade-id={trade.id}
+            data-revert-id={trade.revertId}
+            data-revert-timestamp={trade.revertTimestamp}
+            data-sell-token-id={trade.sellTokenId}
+            data-buy-token-id={trade.buyTokenId}
+            data-order-id={trade.orderId}
+          />
+        )}
       </td>
     </tr>
   )
