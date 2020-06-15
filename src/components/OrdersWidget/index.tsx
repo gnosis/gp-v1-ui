@@ -102,8 +102,8 @@ const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: Deta
 
   return (
     !!id.includes(searchTxt) ||
-    checkTokenAgainstSearch(buyToken as TokenDetails, searchTxt) ||
-    checkTokenAgainstSearch(sellToken as TokenDetails, searchTxt)
+    checkTokenAgainstSearch(buyToken, searchTxt) ||
+    checkTokenAgainstSearch(sellToken, searchTxt)
   )
 }
 
