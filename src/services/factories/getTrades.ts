@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 
-import { TokenDetails, calculatePrice } from '@gnosis.pm/dex-js'
+import { calculatePrice } from '@gnosis.pm/dex-js'
+import { TokenDetails } from 'types'
 
 import ExchangeApiImpl, { ExchangeApi, Trade, Order, AuctionElement } from 'api/exchange/ExchangeApi'
 

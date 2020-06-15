@@ -26,6 +26,17 @@ export const OrdersWrapper = styled.div`
     width: 100%;
   }
 
+  > h5 {
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.6rem 0 1rem;
+    font-weight: var(--font-weight-bold);
+    font-size: 1.6rem;
+    color: var(--color-text-primary);
+    letter-spacing: 0.03rem;
+    text-align: center;
+  }
+
   > div {
     width: 100%;
     position: relative;
@@ -75,8 +86,25 @@ export const OrdersForm = styled.div`
     }
   }
 
+  .widgetFilterTools {
+    #filterLabel {
+      bottom: -1.2rem;
+      border-radius: 0 0 1.6rem 0rem;
+    }
+
+    .balances-searchTokens {
+      height: 3.6rem;
+      margin: 0.8rem;
+      width: 100%;
+
+      > input {
+        width: 100%;
+      }
+    }
+  }
+
   .infoContainer {
-    margin: 1rem auto 0;
+    margin: 0 auto;
     display: flex;
     flex-flow: row nowrap;
     width: 100%;

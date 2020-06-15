@@ -14,21 +14,26 @@ import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 // Hooks
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
-import usePendingOrders from 'hooks/usePendingOrders'
+import usePendingOrders, { DetailedPendingOrder } from 'hooks/usePendingOrders'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSortByTopic from 'hooks/useSortByTopic'
+import useDataFilter from 'hooks/useDataFilter'
 
 // Api
-import { AuctionElement, PendingTxObj } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { CardTable } from 'components/Layout/Card'
+import FilterTools from 'components/FilterTools'
 
 // OrderWidget
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
+
+// Types/misc
+import { TokenDetails } from 'types'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
 
@@ -48,8 +53,8 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, cou
 type FilteredOrdersStateKeys = OrderTabs
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
-    orders: AuctionElement[]
-    pendingOrders: AuctionElement[]
+    orders: DetailedAuctionElement[]
+    pendingOrders: DetailedPendingOrder[]
     markedForDeletion: Set<string>
   }
 }
@@ -65,7 +70,7 @@ function emptyState(): FilteredOrdersState {
 }
 
 function classifyOrders(
-  orders: AuctionElement[],
+  orders: DetailedAuctionElement[],
   state: FilteredOrdersState,
   ordersType: 'orders' | 'pendingOrders',
 ): void {
@@ -83,7 +88,29 @@ function classifyOrders(
   })
 }
 
-const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionElement, rhs: AuctionElement): number => {
+function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
+  if (!token) return false
+  return (
+    token?.symbol?.toLowerCase().includes(searchText) ||
+    token?.name?.toLowerCase().includes(searchText) ||
+    token?.address.toLowerCase().includes(searchText)
+  )
+}
+
+const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean | null => {
+  if (searchTxt === '') return null
+
+  return (
+    !!id.includes(searchTxt) ||
+    checkTokenAgainstSearch(buyToken, searchTxt) ||
+    checkTokenAgainstSearch(sellToken, searchTxt)
+  )
+}
+
+const compareFnFactory = (topic: TopicNames, asc: boolean) => (
+  lhs: DetailedAuctionElement,
+  rhs: DetailedAuctionElement,
+): number => {
   if (asc) {
     return lhs[topic] - rhs[topic]
   } else {
@@ -91,7 +118,11 @@ const compareFnFactory = (topic: TopicNames, asc: boolean) => (lhs: AuctionEleme
   }
 }
 
-const OrdersWidget: React.FC = () => {
+interface Props {
+  isWidget?: boolean
+}
+
+const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const { orders: allOrders, forceOrdersRefresh } = useOrders()
   const allPendingOrders = usePendingOrders()
   // this page is behind login wall so networkId should always be set
@@ -153,11 +184,10 @@ const OrdersWidget: React.FC = () => {
   )
 
   // Sort validUntil
-  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<AuctionElement, TopicNames>(
-    displayedOrders,
-    DEFAULT_ORDERS_SORTABLE_TOPIC,
-    compareFnFactory,
-  )
+  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<
+    DetailedAuctionElement,
+    TopicNames
+  >(displayedOrders, DEFAULT_ORDERS_SORTABLE_TOPIC, compareFnFactory)
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
@@ -231,6 +261,15 @@ const OrdersWidget: React.FC = () => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
+  const {
+    filteredData: filteredAndSortedOrders,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter({
+    data: sortedDisplayedOrders,
+    filterFnFactory: filterOrdersFn,
+  })
+
   return (
     <OrdersWrapper>
       {!isConnected ? (
@@ -245,6 +284,21 @@ const OrdersWidget: React.FC = () => {
       {!noOrders && networkId && (
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
+            <FilterTools
+              className={isWidget ? 'widgetFilterTools' : ''}
+              resultName="orders"
+              searchValue={search}
+              handleSearch={handleSearch}
+              showFilter={!!search}
+              dataLength={displayedPendingOrders.length + filteredAndSortedOrders.length}
+            >
+              {/* implement later when better data concerning order state and can be saved to global state 
+              <label className="balances-hideZero">
+                <input type="checkbox" checked={hideUntouchedOrders} onChange={handleHideUntouchedOrders} />
+                <b>Hide untouched orders</b>
+              </label>
+              */}
+            </FilterTools>
             <div className="infoContainer">
               <div className="countContainer">
                 <ShowOrdersButton
@@ -303,7 +357,7 @@ const OrdersWidget: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedPendingOrders.map((order: PendingTxObj) => (
+                    {displayedPendingOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}
@@ -315,7 +369,7 @@ const OrdersWidget: React.FC = () => {
                         transactionHash={order.txHash}
                       />
                     ))}
-                    {sortedDisplayedOrders.map(order => (
+                    {filteredAndSortedOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}

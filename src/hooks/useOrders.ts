@@ -8,11 +8,12 @@ import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/or
 import { useWalletConnection } from './useWalletConnection'
 import useSafeState from './useSafeState'
 import { exchangeApi } from 'api'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
+import { getTokenFromExchangeById } from 'services'
 
 interface Result {
-  orders: AuctionElement[]
+  orders: DetailedAuctionElement[]
   forceOrdersRefresh: () => void
   isLoading: boolean
 }
@@ -53,11 +54,28 @@ export function useOrders(): Result {
 
       // contract call
       try {
-        const { orders, nextIndex } = await exchangeApi.getOrdersPaginated({ userAddress, networkId, offset })
+        const { orders: ordersPreTokenDetails, nextIndex } = await exchangeApi.getOrdersPaginated({
+          userAddress,
+          networkId,
+          offset,
+        })
+
+        const ordersPromises = ordersPreTokenDetails.map(async order => {
+          const [sellToken, buyToken] = await Promise.all([
+            getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
+            getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
+          ])
+          return {
+            ...order,
+            sellToken,
+            buyToken,
+          }
+        })
 
         // check cancelled bool from parent scope
         if (cancelled) return
 
+        const orders: DetailedAuctionElement[] = await Promise.all(ordersPromises)
         // ensures we don't have multiple reruns for each update
         // i.e. offset change -> render
         //      isLoading change -> another render
