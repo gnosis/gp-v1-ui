@@ -19,7 +19,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { toCsv, CsvColumns } from 'utils/csv'
 
 import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
-import { getNetworkFromId, isTradeSettled } from 'utils'
+import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
 const CsvButtonContainer = styled.div`
   display: flex;
@@ -88,13 +88,17 @@ const Trades: React.FC = () => {
   const { networkId, userAddress, isConnected } = useWalletConnection()
   const trades = useTrades()
 
+  const filteredTrades = useMemo(() => trades.filter(trade => isTradeSettled(trade) && !isTradeReverted(trade)), [
+    trades,
+  ])
+
   const generateCsv = useCallback(
     () =>
       toCsv({
-        data: trades.filter(isTradeSettled),
+        data: filteredTrades,
         transformer: csvTransformer,
       }),
-    [trades],
+    [filteredTrades],
   )
 
   const filename = useMemo(
@@ -136,7 +140,7 @@ const Trades: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {trades.map(trade => (
+          {filteredTrades.map(trade => (
             <TradeRow key={trade.id} trade={trade} networkId={networkId} />
           ))}
         </tbody>
