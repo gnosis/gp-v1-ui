@@ -210,10 +210,10 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
     <td className="status">
       {pending ? (
         pending
-      ) : isExpiredOrder ? (
-        'Expired'
       ) : isFilled ? (
         'Filled'
+      ) : isExpiredOrder ? (
+        'Expired'
       ) : isActiveNextBatch ? (
         <>
           {`Active in next batch: `} <StatusCountdown />

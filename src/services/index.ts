@@ -10,7 +10,7 @@ import {
   getTokenFromErc20Factory,
   TokenFromExchange,
   TokenFromErc20,
-  getTradesFactory,
+  getTradesAndTradeReversionsFactory,
   addUnlistedTokensToUserTokenListByIdFactory,
 } from './factories'
 
@@ -47,7 +47,11 @@ export const addUnlistedTokensToUserTokenListById = addUnlistedTokensToUserToken
   getTokenFromExchangeById,
 })
 
-export const getTrades = getTradesFactory({ ...apis, getTokens, addUnlistedTokensToUserTokenListById })
+export const getTradesAndTradeReversions = getTradesAndTradeReversionsFactory({
+  ...apis,
+  getTokens,
+  addUnlistedTokensToUserTokenListById,
+})
 
 export interface TokenAndNetwork {
   networkId: number

@@ -14,10 +14,9 @@ import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 // Hooks
 import { useOrders } from 'hooks/useOrders'
 import useSafeState from 'hooks/useSafeState'
-import usePendingOrders, { DetailedPendingOrder } from 'hooks/usePendingOrders'
-import { useWalletConnection } from 'hooks/useWalletConnection'
-import useSortByTopic from 'hooks/useSortByTopic'
 import useDataFilter from 'hooks/useDataFilter'
+import useSortByTopic from 'hooks/useSortByTopic'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 // Api
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
@@ -33,6 +32,7 @@ import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
 // Types/misc
+import { DetailedPendingOrder } from 'hooks/usePendingOrders'
 import { TokenDetails } from 'types'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed'
@@ -123,8 +123,7 @@ interface Props {
 }
 
 const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
-  const { orders: allOrders, forceOrdersRefresh } = useOrders()
-  const allPendingOrders = usePendingOrders()
+  const { orders: allOrders, pendingOrders: allPendingOrders, forceOrdersRefresh } = useOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
 

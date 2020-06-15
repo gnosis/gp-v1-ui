@@ -24,8 +24,8 @@ module.exports = ({ stats = false } = {}) => ({
   devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
-    chunkFilename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
-    filename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
+    chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
+    filename: isProduction ? '[name].[contenthash].js' : '[name].js',
     publicPath: baseUrl,
   },
   module: {
@@ -188,6 +188,7 @@ module.exports = ({ stats = false } = {}) => ({
     }),
   ].filter(Boolean),
   optimization: {
+    moduleIds: 'hashed',
     splitChunks: {
       chunks: 'all',
       minSize: 20000,

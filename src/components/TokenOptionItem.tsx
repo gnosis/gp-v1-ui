@@ -45,6 +45,10 @@ const OptionItemWrapper = styled.div`
       flex-direction: column;
       margin-left: 1rem;
     }
+    > button {
+      border-radius: 3rem;
+      padding: 0.6rem 1rem;
+    }
   }
 
   > div > div {

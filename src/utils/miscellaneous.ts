@@ -113,6 +113,10 @@ export function isTradeSettled(trade: Trade): boolean {
   return trade.settlingTimestamp <= Date.now()
 }
 
+export function isTradeReverted(trade: Trade): boolean {
+  return !!trade.revertId
+}
+
 export const isOrderActive = (order: AuctionElement, now: Date): boolean =>
   batchIdToDate(order.validUntil) >= now && !isOrderFilled(order)
 
@@ -126,6 +130,12 @@ export async function silentPromise<T>(promise: Promise<T>, customMessage?: stri
     logDebug(customMessage || 'Failed to fetch promise', e.message)
     return
   }
+}
+
+export function setStorageItem(key: string, data: unknown): void {
+  // localStorage API accepts only strings
+  const formattedData = JSON.stringify(data)
+  return localStorage.setItem(key, formattedData)
 }
 
 interface RetryOptions {
@@ -163,4 +173,8 @@ export async function retry<T extends () => any>(fn: T, options?: RetryOptions):
       throw new Error(`Max retries reached`)
     }
   }
+}
+
+export function flattenMapOfLists<K, T>(map: Map<K, T[]>): T[] {
+  return Array.from(map.values()).reduce<T[]>((acc, list) => acc.concat(list), [])
 }

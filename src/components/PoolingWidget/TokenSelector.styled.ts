@@ -4,7 +4,6 @@ import { MEDIA } from 'const'
 export const TokenSelectorWrapper = styled.div`
   width: 50%;
   width: calc(50% - 1.5rem);
-  padding: 0 0 5rem 0;
   box-sizing: border-box;
   height: 33.6rem;
   overflow-y: auto;
