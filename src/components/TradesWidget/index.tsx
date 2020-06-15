@@ -115,19 +115,16 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
       $rowSeparation="0"
       $gap="0 0.6rem"
       $padding="0.5em 0"
-      $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.9fr 1.23fr"
+      $columns="1.2fr 1fr 0.9fr repeat(2, 1.2fr) 0.9fr 1.23fr"
     >
       <thead>
         <tr>
           <th>Date</th>
           <th>Market</th>
-          <th>
-            Limit <br />
-            Price
-          </th>
-          <th>
-            Fill <br />
-            Price
+          <th className="filled">
+            Limit Price
+            <br />
+            Fill Price
           </th>
           <th>Amount</th>
           <th>Received</th>

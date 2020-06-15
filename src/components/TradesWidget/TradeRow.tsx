@@ -131,10 +131,14 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Trade">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td data-label="Limit Price" title={limitPrice && formatPrice({ price: limitPrice, decimals: 8 })}>
-        {limitPrice ? formatPrice(limitPrice) : 'N/A'}
-      </td>
-      <td data-label="Fill Price" title={formatPrice({ price: fillPrice, decimals: 8 })}>
+      <td
+        data-label="Limit Price / Fill Price"
+        title={`${limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice({
+          price: fillPrice,
+          decimals: 8,
+        })}`}
+      >
+        {limitPrice ? formatPrice(limitPrice) : 'N/A'} <br />
         {formatPrice(fillPrice)}
       </td>
       <td data-label="Amount" title={formatAmountFull({ amount: sellAmount, precision: sellTokenDecimals })}>
