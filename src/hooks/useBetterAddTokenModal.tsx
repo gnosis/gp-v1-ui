@@ -45,19 +45,25 @@ export const ModalBodyWrapper = styled(FocusedDiv)`
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: auto;
+  width: 75%;
 `
 
 const TokenDisplay = styled.div`
   display: grid;
 
   align-items: flex-start;
+  grid-template-columns: 7rem 0.7fr 1fr;
   grid-template-areas:
     'image symbol text-1'
     'image name text-2';
 
   grid-gap: 0 1.7rem;
+  width: 100%;
   margin: auto;
   padding: 0 1.7rem;
+
+  text-align: center;
 
   .tokenImage {
     grid-area: image;
