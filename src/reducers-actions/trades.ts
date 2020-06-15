@@ -1,10 +1,19 @@
-import { Actions } from 'reducers-actions'
+import BigNumber from 'bignumber.js'
+
 import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/ExchangeApi'
-import { logDebug, flattenMapOfLists, dateToBatchId } from 'utils'
+
+import { Actions } from 'reducers-actions'
+
+import { logDebug, flattenMapOfLists, dateToBatchId, toBN } from 'utils'
+import { TRADES_LOCAL_STORAGE_KEY } from 'const'
+
+// ******** TYPES/INTERFACES
 
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
-export interface TradesState {
+export type TradesState = Record<number, TradesStateSingleNetwork>
+
+interface TradesStateSingleNetwork {
   trades: Trade[]
   pendingTrades: Map<string, Trade[]>
   lastCheckedBlock?: number
@@ -14,38 +23,54 @@ interface WithReverts {
   reverts: TradeReversion[]
 }
 
-type OverwriteTradesActionType = Actions<'OVERWRITE_TRADES', Omit<TradesState, 'pendingTrades'> & WithReverts>
-type AppendTradesActionType = Actions<'APPEND_TRADES', Required<Omit<TradesState, 'pendingTrades'>> & WithReverts>
-type UpdateBlockActionType = Actions<'UPDATE_BLOCK', Required<Pick<TradesState, 'lastCheckedBlock'>>>
-type ReducerActionType = Actions<ActionTypes, TradesState & WithReverts>
+interface WithNetworkId {
+  networkId: number
+}
 
-interface Params {
+// ******** ACTION TYPES
+
+type OverwriteTradesActionType = Actions<
+  'OVERWRITE_TRADES',
+  Omit<TradesStateSingleNetwork, 'pendingTrades'> & WithReverts & WithNetworkId
+>
+type AppendTradesActionType = Actions<
+  'APPEND_TRADES',
+  Required<Omit<TradesStateSingleNetwork, 'pendingTrades'>> & WithReverts & WithNetworkId
+>
+type UpdateBlockActionType = Actions<
+  'UPDATE_BLOCK',
+  Required<Pick<TradesStateSingleNetwork, 'lastCheckedBlock'>> & WithNetworkId
+>
+type ReducerActionType = Actions<ActionTypes, TradesStateSingleNetwork & WithReverts & WithNetworkId>
+
+interface Params extends WithNetworkId {
   trades: Trade[]
   reverts: TradeReversion[]
   lastCheckedBlock?: number
 }
 
-export const overwriteTrades = ({ trades, reverts, lastCheckedBlock }: Params): OverwriteTradesActionType => ({
+// ******** REDUCER FUNCTIONS
+
+export const overwriteTrades = (params: Params): OverwriteTradesActionType => ({
   type: 'OVERWRITE_TRADES',
-  payload: { trades, reverts, lastCheckedBlock },
+  payload: params,
 })
 
-export const appendTrades = ({ trades, reverts, lastCheckedBlock }: Required<Params>): AppendTradesActionType => ({
+export const appendTrades = (params: Required<Params>): AppendTradesActionType => ({
   type: 'APPEND_TRADES',
-  payload: { trades, reverts, lastCheckedBlock },
+  payload: params,
 })
 
-export const updateLastCheckedBlock = (lastCheckedBlock: number): UpdateBlockActionType => ({
+export const updateLastCheckedBlock = (lastCheckedBlock: number, networkId: number): UpdateBlockActionType => ({
   type: 'UPDATE_BLOCK',
-  payload: { lastCheckedBlock },
+  payload: { lastCheckedBlock, networkId },
 })
-
-// TODO: store to/load from localStorage
-export const INITIAL_TRADES_STATE = { trades: [], pendingTrades: new Map<string, Trade[]>() }
 
 function buildTradeRevertKey(batchId: number, orderId: string): string {
   return batchId + '|' + orderId
 }
+
+// ******** HELPERS
 
 function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, T[]>): Map<string, T[]> {
   const map = initial || new Map<string, T[]>()
@@ -161,28 +186,97 @@ function applyRevertsToTrades(
   return [flattenMapOfLists(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
 }
 
+// ******** REDUCER
+
 export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
   switch (action.type) {
     case 'APPEND_TRADES': {
-      const { trades: currTrades, pendingTrades: currPendingTrades } = state
-      const { trades: newTrades, reverts, lastCheckedBlock } = action.payload
+      const { trades: newTrades, reverts, lastCheckedBlock, networkId } = action.payload
+      const { trades: currTrades, pendingTrades: currPendingTrades } = state[networkId]
 
       const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts, currPendingTrades)
 
-      return { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades }
+      return { ...state, [networkId]: { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades } }
     }
     case 'OVERWRITE_TRADES': {
-      const { trades: newTrades, reverts, lastCheckedBlock } = action.payload
+      const { trades: newTrades, reverts, lastCheckedBlock, networkId } = action.payload
 
       const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts)
 
-      return { trades, lastCheckedBlock, pendingTrades }
+      return { ...state, [networkId]: { trades, lastCheckedBlock, pendingTrades } }
     }
     case 'UPDATE_BLOCK': {
-      return { ...state, ...action.payload }
+      const { networkId, lastCheckedBlock } = action.payload
+
+      return { ...state, [networkId]: { ...state[networkId], lastCheckedBlock } }
     }
     default: {
       return state
     }
   }
 }
+
+// TODO: use the one from David once his changes are merged https://github.com/gnosis/dex-react/pull/1091
+function setStorageItem(key: string, data: unknown): void {
+  // localStorage API accepts only strings
+  // TODO: consider switching to localForage API (accepts all types)
+  const formattedData = JSON.stringify(data)
+  return localStorage.setItem(key, formattedData)
+}
+
+// ******** SIDE EFFECT
+
+export async function sideEffect(state: TradesState, action: ReducerActionType): Promise<void> {
+  switch (action.type) {
+    case 'APPEND_TRADES':
+    case 'OVERWRITE_TRADES':
+    case 'UPDATE_BLOCK':
+      setStorageItem(TRADES_LOCAL_STORAGE_KEY, state)
+  }
+}
+
+// ******** INITIAL STATE / LOCAL STORAGE
+
+const INITIAL_TRADES_STATE_SINGLE_NETWORK = { trades: [], pendingTrades: new Map<string, Trade[]>() }
+
+/**
+ * Custom json parser for BN and BigNumber values.
+ * Since there's no context on what is BN/BigNumber,
+ * we have to keep track of keys and parse accordingly
+ */
+function reviver(key: string, value: unknown): unknown {
+  if (value && typeof value === 'string') {
+    switch (key) {
+      case 'limitPrice':
+      case 'fillPrice':
+        return new BigNumber(value)
+      case 'buyAmount':
+      case 'sellAmount':
+      case 'orderBuyAmount':
+      case 'orderSellAmount':
+      case 'remainingAmount':
+        return toBN(value)
+      default:
+        return value
+    }
+  }
+  return value
+}
+
+function loadInitialState(): TradesState {
+  let state = { 1: INITIAL_TRADES_STATE_SINGLE_NETWORK, 4: INITIAL_TRADES_STATE_SINGLE_NETWORK }
+
+  const localStorageOrders = localStorage.getItem(TRADES_LOCAL_STORAGE_KEY)
+
+  if (localStorageOrders) {
+    try {
+      state = JSON.parse(localStorageOrders, reviver)
+    } catch (e) {
+      logDebug(`[reducer:trades] Failed to load localStorage`, e.msg)
+    }
+  }
+
+  return state
+}
+
+export const initialState = loadInitialState()
