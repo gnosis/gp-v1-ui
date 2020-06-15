@@ -4,7 +4,7 @@ import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/Exchange
 
 import { Actions } from 'reducers-actions'
 
-import { logDebug, flattenMapOfLists, dateToBatchId, toBN } from 'utils'
+import { logDebug, flattenMapOfLists, dateToBatchId, toBN, setStorageItem } from 'utils'
 import { TRADES_LOCAL_STORAGE_KEY } from 'const'
 
 // ******** TYPES/INTERFACES
@@ -273,14 +273,6 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
       return state
     }
   }
-}
-
-// TODO: use the one from David once his changes are merged https://github.com/gnosis/dex-react/pull/1091
-function setStorageItem(key: string, data: unknown): void {
-  // localStorage API accepts only strings
-  // TODO: consider switching to localForage API (accepts all types)
-  const formattedData = JSON.stringify(data)
-  return localStorage.setItem(key, formattedData)
 }
 
 // ******** SIDE EFFECT
