@@ -5,7 +5,7 @@ import { BATCH_TIME } from '@gnosis.pm/dex-js'
 import { Trade } from 'api/exchange/ExchangeApi'
 import { web3 } from 'api'
 
-import { getTrades } from 'services'
+import { getTradesAndTradeReversions } from 'services'
 
 import { appendTrades, updateLastCheckedBlock, overwriteTrades } from 'reducers-actions/trades'
 
@@ -17,7 +17,6 @@ import { BATCH_TIME_IN_MS } from 'const'
 import { getTimeRemainingInBatch } from 'utils'
 
 // TODO: (on global state) store trades to local storage
-// TODO: account for reverts
 export function useTrades(): Trade[] {
   const [
     {
@@ -30,26 +29,44 @@ export function useTrades(): Trade[] {
 
   useEffect(() => {
     // Resetting trades on network change
-    dispatch(overwriteTrades([], undefined))
+    dispatch(overwriteTrades({ trades: [], reverts: [], lastCheckedBlock: undefined }))
   }, [dispatch, networkId, userAddress])
 
   useEffect(() => {
-    function updateTrades(): void {
+    // Flow control. Cancel query/state update on unmount
+    let cancelled = false
+
+    async function updateTrades(): Promise<void> {
       if (userAddress && networkId) {
         // Don't want to update on every block
         // So instead, we get the latest block when the time comes
-        web3.eth.getBlockNumber().then(toBlock => {
-          getTrades({
-            userAddress,
-            networkId,
-            // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
-            fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
-            toBlock,
-            orders,
-          }).then(newTrades =>
-            dispatch(newTrades.length > 0 ? appendTrades(newTrades, toBlock) : updateLastCheckedBlock(toBlock)),
-          )
-        })
+        const toBlock = await web3.eth.getBlockNumber()
+        const params = {
+          userAddress,
+          networkId,
+          // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
+          fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
+          toBlock,
+          orders,
+        }
+
+        // Check before expensive operation
+        if (cancelled) {
+          return
+        }
+
+        const { trades: newTrades, reverts } = await getTradesAndTradeReversions(params)
+
+        // Check before updating state
+        if (cancelled) {
+          return
+        }
+
+        dispatch(
+          newTrades.length > 0 || reverts.length > 0
+            ? appendTrades({ trades: newTrades, reverts, lastCheckedBlock: toBlock })
+            : updateLastCheckedBlock(toBlock),
+        )
       }
     }
 
@@ -68,8 +85,8 @@ export function useTrades(): Trade[] {
       // Thus, we check for new trades a few seconds after the 4min mark
       const delay = getTimeRemainingInBatch() - 30
 
-      // Update now to not leave the interface empty
-      if (trades.length === 0 || (delay >= 0 && delay < 10)) {
+      // Update now if this is the first time for this address/network OR within the range to start now
+      if (!lastCheckedBlock || (delay >= 0 && delay < 10)) {
         updateTrades()
       }
 
@@ -86,9 +103,10 @@ export function useTrades(): Trade[] {
     }
 
     return (): void => {
+      cancelled = true
       if (intervalId) clearInterval(intervalId)
     }
-  }, [userAddress, networkId, lastCheckedBlock, dispatch, trades, orders])
+  }, [userAddress, networkId, lastCheckedBlock, dispatch, orders])
 
   // latest first
   return trades.slice(0).reverse()

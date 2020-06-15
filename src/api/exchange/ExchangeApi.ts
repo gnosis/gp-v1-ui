@@ -97,6 +97,7 @@ export interface ExchangeApi extends DepositApi {
 
   // event related
   getPastTrades(params: PastEventsParams): Promise<BaseTradeEvent[]>
+  getPastTradeReversions(params: PastEventsParams): Promise<BaseTradeEvent[]>
 
   addToken(params: AddTokenParams): Promise<Receipt>
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
@@ -137,14 +138,17 @@ export interface BaseTradeEvent {
   id: string // txHash | eventIndex
 }
 
+export interface EventWithBlockInfo extends BaseTradeEvent {
+  batchId: number
+  timestamp: number
+}
+
 /**
  * Trade enriches BaseTradeEvent with block, order and token data
  */
-export interface Trade extends BaseTradeEvent {
-  batchId: number
-  revertKey: string // batchId | orderId, to find reverts
-  // indexOnBatch: number // tracks trade position on batch, in case of reverts
-  timestamp: number
+export interface Trade extends EventWithBlockInfo {
+  revertTimestamp?: number
+  revertId?: string
   settlingTimestamp: number
   buyToken: TokenDetails
   sellToken: TokenDetails
@@ -154,6 +158,8 @@ export interface Trade extends BaseTradeEvent {
   orderBuyAmount?: BN
   orderSellAmount?: BN
 }
+
+export type TradeReversion = EventWithBlockInfo
 
 export interface GetOrdersPaginatedResult {
   orders: AuctionElement[]
@@ -191,49 +197,14 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     )
   }
 
-  /** STATIC methods **/
-
-  // TODO: Not very happy with this method. Can't be used inside the class because batchId is only known with block data
-  // TODO: Don't really know where to put it
-  public static buildTradeRevertKey(batchId: number, orderId: string): string {
-    return batchId + '|' + orderId
-  }
-
   /** PUBLIC methods **/
 
-  public async getPastTrades({
-    userAddress,
-    networkId,
-    fromBlock: _fromBlock,
-    toBlock: _toBlock,
-  }: PastEventsParams): Promise<BaseTradeEvent[]> {
-    const contract = await this._getContract(networkId)
+  public async getPastTrades(params: PastEventsParams): Promise<BaseTradeEvent[]> {
+    return this.getPastTradeEvents(params, 'Trade')
+  }
 
-    // Optionally fetch events from a given block.
-    // Could be used to fetch from 0 (although, why?) OR
-    // pagination of sorts OR
-    // updating trades based on polling
-    const fromBlock = _fromBlock ?? this.contractDeploymentBlock[networkId]
-
-    // Optionally fetch events until a given block.
-    // Defaults to 'latest'
-    const toBlock = _toBlock ?? 'latest'
-
-    const tradeEvents = await this.safeGetEvents(options => contract.getPastEvents('Trade', options), {
-      filter: { owner: userAddress },
-      fromBlock,
-      toBlock,
-    })
-
-    logDebug(
-      `[ExchangeApiImpl] Fetched ${
-        tradeEvents.length
-      } trades for address ${userAddress} on network ${networkId} from block ${fromBlock} ${
-        toBlock ? `to block ${toBlock}` : ''
-      }`,
-    )
-
-    return tradeEvents.filter(event => !event['removed']).map(this.parseTradeEvent)
+  public async getPastTradeReversions(params: PastEventsParams): Promise<BaseTradeEvent[]> {
+    return this.getPastTradeEvents(params, 'TradeReversion')
   }
 
   public async getOrder({ userAddress, networkId, orderId, blockNumber }: GetOrderParams): Promise<Order> {
@@ -481,6 +452,45 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }
 
   /** PRIVATE methods **/
+
+  /**
+   * Semi-generic method for fetching past events.
+   * Right now only generic for Trade related events.
+   * Can be generalized further if needed.
+   */
+  private async getPastTradeEvents(
+    params: PastEventsParams,
+    eventType: keyof BatchExchangeEvents,
+  ): Promise<BaseTradeEvent[]> {
+    const { userAddress, networkId, fromBlock: _fromBlock, toBlock: _toBlock } = params
+    const contract = await this._getContract(networkId)
+
+    // Optionally fetch events from a given block.
+    // Could be used to fetch from 0 (although, why?) OR
+    // pagination of sorts OR
+    // updating trades based on polling
+    const fromBlock = _fromBlock ?? this.contractDeploymentBlock[networkId]
+
+    // Optionally fetch events until a given block.
+    // Defaults to 'latest'
+    const toBlock = _toBlock ?? 'latest'
+
+    const events = await this.safeGetEvents(options => contract.getPastEvents(eventType, options), {
+      filter: { owner: userAddress },
+      fromBlock,
+      toBlock,
+    })
+
+    logDebug(
+      `[ExchangeApiImpl] Fetched ${
+        events.length
+      } ${eventType}(s) for address ${userAddress} on network ${networkId} from block ${fromBlock} ${
+        toBlock ? `to block ${toBlock}` : ''
+      }`,
+    )
+
+    return events.filter(event => !event['removed']).map(this.parseTradeEvent)
+  }
 
   private async safeGetEvents<T>(
     fn: (options: PastEventOptions) => Promise<T[]>,
