@@ -67,14 +67,14 @@ function csvTransformer(trade: Trade): CsvColumns {
     SellTokenAddress: sellToken.address,
     LimitPrice: limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
     FillPrice: formatPrice({ price: fillPrice, decimals: 8 }),
-    Amount: formatAmount({
+    Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
       decimals: sellToken.decimals,
       thousandSeparator: false,
       isLocaleAware: false,
     }),
-    Received: formatAmount({
+    Bought: formatAmount({
       amount: buyAmount,
       precision: buyToken.decimals as number,
       decimals: sellToken.decimals,
@@ -137,8 +137,8 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
           </th>
           <th>
             <SplitHeaderTitle>
-              <span>Amount /</span>
-              <span>Received</span>
+              <span>Sold /</span>
+              <span>Bought</span>
             </SplitHeaderTitle>
           </th>
           <th>Type</th>
