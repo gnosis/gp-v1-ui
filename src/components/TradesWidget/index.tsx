@@ -26,6 +26,14 @@ const CsvButtonContainer = styled.div`
   align-items: center;
 `
 
+const SplitHeaderTitle = styled.div`
+  display: flex;
+  flex-flow: column;
+  > span {
+    margin: 0.25rem 0;
+  }
+`
+
 function symbolOrAddress(token: TokenDetails): string {
   return token.symbol || token.address
 }
@@ -116,15 +124,17 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
         <tr>
           <th>Date</th>
           <th>Market</th>
-          <th className="filled">
-            Limit Price
-            <br />
-            Fill Price
+          <th>
+            <SplitHeaderTitle>
+              <span>Limit Price /</span>
+              <span>Fill Price</span>
+            </SplitHeaderTitle>
           </th>
           <th>
-            Amount
-            <br />
-            Received
+            <SplitHeaderTitle>
+              <span>Amount /</span>
+              <span>Received</span>
+            </SplitHeaderTitle>
           </th>
           <th>Type</th>
           <th>
