@@ -1,10 +1,10 @@
 import BN from 'bn.js'
 import { PastEventOptions } from 'web3-eth-contract'
 
-import { assert, BatchExchangeEvents, TokenDetails } from '@gnosis.pm/dex-js'
+import { assert, BatchExchangeEvents } from '@gnosis.pm/dex-js'
 
 import { DepositApiImpl, DepositApi, DepositApiDependencies } from 'api/deposit/DepositApi'
-import { Receipt, WithTxOptionalParams } from 'types'
+import { Receipt, TokenDetails, WithTxOptionalParams } from 'types'
 import { logDebug } from 'utils'
 import { decodeAuctionElements, decodeOrder } from './utils/decodeAuctionElements'
 import { DEFAULT_ORDERS_PAGE_SIZE, LIMIT_EXCEEDED_ERROR_CODE } from 'const'
@@ -103,6 +103,11 @@ export interface ExchangeApi extends DepositApi {
   placeOrder(params: PlaceOrderParams): Promise<Receipt>
   placeValidFromOrders(params: PlaceValidFromOrdersParams): Promise<Receipt>
   cancelOrders(params: CancelOrdersParams): Promise<Receipt>
+}
+
+export interface DetailedAuctionElement extends AuctionElement {
+  buyToken: TokenDetails | null
+  sellToken: TokenDetails | null
 }
 
 export interface AuctionElement extends Order {

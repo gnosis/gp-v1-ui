@@ -2,7 +2,6 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { useForm, FormContext } from 'react-hook-form'
 import { toast } from 'toastify'
 import styled from 'styled-components'
 import joi from '@hapi/joi'
@@ -27,9 +26,11 @@ import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
+import { useForm, FormContext } from 'react-hook-form'
 import useGlobalState from 'hooks/useGlobalState'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
+
 import { useTokenList } from 'hooks/useTokenList'
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -181,7 +182,6 @@ const PoolingInterface: React.FC = () => {
   const sendTransaction = useCallback(async () => {
     if (!networkId || !userAddress) return
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-    let pendingTxHash: string | undefined
     try {
       setIsSubmitting(true)
       setTxReceipt(undefined)
@@ -192,29 +192,29 @@ const PoolingInterface: React.FC = () => {
         orders,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
-            pendingTxHash = txHash
-
             setTxHash(txHash)
 
-            batchedUpdates(() => {
-              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-                const pendingOrder = {
-                  txHash,
-                  id: 'PENDING ORDER',
+            const batchedOrders = orders.map(
+              ({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }, index) => {
+                return {
+                  id: `${Date.now()}_${index}`,
                   buyTokenId,
                   sellTokenId,
                   priceNumerator: buyAmount,
                   priceDenominator: sellAmount,
                   user: userAddress,
-                  remainingAmount: ZERO,
+                  remainingAmount: sellAmount,
                   sellTokenBalance: ZERO,
                   validFrom: 0,
                   validUntil: 0,
+                  txHash,
                 }
+              },
+            )
 
-                setIsSubmitting(false)
-                dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
-              })
+            batchedUpdates(() => {
+              setIsSubmitting(false)
+              dispatch(savePendingOrdersAction({ orders: batchedOrders, networkId, userAddress }))
             })
           },
         },
@@ -227,8 +227,6 @@ const PoolingInterface: React.FC = () => {
 
       // Error handle
       setTxError(e)
-    } finally {
-      pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
     }
   }, [
     dispatch,
