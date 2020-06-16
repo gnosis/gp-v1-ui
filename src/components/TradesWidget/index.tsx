@@ -119,7 +119,12 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
   )
 
   return (
-    <CardTable $rowSeparation="0" $gap="0 0.6rem" $padding="0.5em 0" $columns="1.2fr 1fr 0.9fr 1.2fr 0.9fr 1.23fr">
+    <CardTable
+      $rowSeparation="0"
+      $gap="0 0.6rem"
+      $padding="0.5em 0 0.5em 1em"
+      $columns="1.2fr 1fr 0.9fr 1.2fr 0.9fr 1.23fr"
+    >
       <thead>
         <tr>
           <th>Date</th>
