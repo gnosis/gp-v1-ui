@@ -322,6 +322,12 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                   onClick={setSelectedTabFactory('active')}
                 />
                 <ShowOrdersButton
+                  type="fills"
+                  isActive={selectedTab === 'fills'}
+                  count={trades.length}
+                  onClick={setSelectedTabFactory('fills')}
+                />
+                <ShowOrdersButton
                   type="liquidity"
                   isActive={selectedTab === 'liquidity'}
                   count={classifiedOrders.liquidity.orders.length + classifiedOrders.liquidity.pendingOrders.length}
@@ -332,12 +338,6 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                   isActive={selectedTab === 'closed'}
                   count={classifiedOrders.closed.orders.length + classifiedOrders.closed.pendingOrders.length}
                   onClick={setSelectedTabFactory('closed')}
-                />
-                <ShowOrdersButton
-                  type="fills"
-                  isActive={selectedTab === 'fills'}
-                  count={trades.length}
-                  onClick={setSelectedTabFactory('fills')}
                 />
               </div>
             </div>
