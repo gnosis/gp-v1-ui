@@ -217,7 +217,7 @@ const SubmitButton = styled.button`
   }
 `
 
-const OrdersPanel = styled.div`
+export const OrdersPanel = styled.div`
   overflow: hidden;
   display: flex;
   flex-flow: column wrap;
@@ -314,7 +314,7 @@ const OrdersPanel = styled.div`
   }
 `
 
-const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
+export const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   width: 1.6rem;
   height: 100%;
   border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
@@ -1003,7 +1003,7 @@ const TradeWidget: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget isWidget />
+          <OrdersWidget isWidget displayOnly={'regular'} />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}

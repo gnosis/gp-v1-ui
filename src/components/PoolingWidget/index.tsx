@@ -31,6 +31,7 @@ import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { useTokenList } from 'hooks/useTokenList'
+import OrdersWidget from 'pages/Orders'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -319,6 +320,19 @@ const PoolingInterface: React.FC = () => {
           </form>
         </FormContext>
       </PoolingInterfaceWrapper>
+      {/* <OrdersPanel> */}
+      {/* Toggle panel visibility (arrow) */}
+      {/* <OrdersToggler
+          type="button"
+          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          $isOpen={ordersVisible}
+        /> */}
+      {/* Actual orders content */}
+      <div>
+        <h5>Your liquidity orders</h5>
+        <OrdersWidget isWidget displayOnly={'liquidity'} />
+      </div>
+      {/* </OrdersPanel> */}
     </Widget>
   )
 }
