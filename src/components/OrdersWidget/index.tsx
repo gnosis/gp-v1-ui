@@ -7,7 +7,6 @@ import { faTrashAlt, faChevronDown, faChevronUp } from '@fortawesome/free-solid-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Const and utils
-import { isOrderUnlimited } from '@gnosis.pm/dex-js'
 import { isOrderActive, isPendingOrderActive } from 'utils'
 import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 
@@ -80,7 +79,7 @@ function classifyOrders(
   orders.forEach(order => {
     if (!isOrderActiveFn(order, now)) {
       state.closed[ordersType].push(order)
-    } else if (isOrderUnlimited(order.priceDenominator, order.priceNumerator)) {
+    } else if (order.isUnlimited) {
       state.liquidity[ordersType].push(order)
     } else {
       state.active[ordersType].push(order)

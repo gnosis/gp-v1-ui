@@ -3,7 +3,7 @@ import { toast } from 'toastify'
 
 // types, utils and services
 import { TokenDetails } from 'types'
-import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
+import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -90,10 +90,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
 
 interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
-  isUnlimited: boolean
 }
 
-const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
+const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
   const filledAmount = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
@@ -107,7 +106,7 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
 
   return (
     <td data-label="Unfilled Amount">
-      {isUnlimited ? (
+      {order.isUnlimited ? (
         <span>no limit</span>
       ) : (
         <>
@@ -147,11 +146,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   const isScheduled = batchIdToDate(order.validFrom) > now
   const isActiveNextBatch = batchId === order.validFrom
   const isFirstActiveBatch = batchId === order.validFrom + 1 && msRemainingInBatch > 60 * 1000 // up until minute 4
-
-  const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
-    order.priceDenominator,
-    order.priceNumerator,
-  ])
+  const isUnlimited = order.isUnlimited
   const isActive = useMemo(() => order.remainingAmount.eq(order.priceDenominator), [
     order.priceDenominator,
     order.remainingAmount,
@@ -310,8 +305,6 @@ const OrderRow: React.FC<Props> = props => {
     fetchToken(order.id, order.sellToken as TokenDetails, setSellToken, isPendingOrder)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
-  const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
-
   return (
     sellToken &&
     buyToken && (
@@ -323,7 +316,7 @@ const OrderRow: React.FC<Props> = props => {
           disabled={disabled || isPendingOrder || pending}
         />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
         <Status
           order={order}
