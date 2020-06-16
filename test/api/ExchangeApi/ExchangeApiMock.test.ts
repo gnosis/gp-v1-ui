@@ -25,6 +25,7 @@ const baseOrder = {
   priceNumerator: ONE,
   priceDenominator: ZERO,
   remainingAmount: ONE,
+  isUnlimited: false,
 }
 
 beforeAll(() => {
@@ -186,6 +187,7 @@ describe('placeOrder', () => {
     priceNumerator: ONE,
     priceDenominator: ONE,
     remainingAmount: ONE,
+    isUnlimited: false,
   }
 
   const params = {
@@ -277,6 +279,7 @@ describe('placeValidFromOrders', () => {
         user: params.userAddress,
         id: (index + 1).toString(),
         sellTokenBalance: new BN('1500000000000000000000').add(ONE),
+        isUnlimited: false,
       })
     })
   })
