@@ -7,7 +7,7 @@ import { web3 } from 'api'
 
 import { getTradesAndTradeReversions } from 'services'
 
-import { appendTrades, updateLastCheckedBlock } from 'reducers-actions/trades'
+import { appendTrades, updateLastCheckedBlock, buildAccountKey } from 'reducers-actions/trades'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useGlobalState from 'hooks/useGlobalState'
@@ -26,7 +26,10 @@ export function useTrades(): Trade[] {
   ] = useGlobalState()
   const { userAddress, networkId } = useWalletConnection()
 
-  const { lastCheckedBlock = undefined, trades = [] } = networkId ? globalStateTrades[networkId] : {}
+  const accountKey = networkId && userAddress && buildAccountKey({ networkId, userAddress })
+
+  const { lastCheckedBlock = undefined, trades = [] } =
+    accountKey && globalStateTrades[accountKey] ? globalStateTrades[accountKey] : {}
 
   useEffect(() => {
     // Flow control. Cancel query/state update on unmount
@@ -60,8 +63,8 @@ export function useTrades(): Trade[] {
 
         dispatch(
           newTrades.length > 0 || reverts.length > 0
-            ? appendTrades({ trades: newTrades, reverts, lastCheckedBlock: toBlock, networkId })
-            : updateLastCheckedBlock(toBlock, networkId),
+            ? appendTrades({ lastCheckedBlock: toBlock, networkId, userAddress, trades: newTrades, reverts })
+            : updateLastCheckedBlock({ lastCheckedBlock: toBlock, networkId, userAddress }),
         )
       }
     }
