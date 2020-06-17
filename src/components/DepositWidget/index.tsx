@@ -37,17 +37,30 @@ interface WithdrawState {
 }
 
 const BalancesWidget = styled(CardWidgetWrapper)`
-  ${CardTable} > tbody > tr:not([class^="Card__CardRowDrawer"]) > td {
-    &[data-label='Token'] {
-      font-family: var(--font-default);
-      letter-spacing: 0;
-      line-height: 1.2;
-      flex-flow: row nowrap;
+  ${CardTable} {
+    > thead,
+    > tbody {
+      > tr:not([class^='Card__CardRowDrawer']) {
+        > td,
+        > th {
+          justify-content: flex-end;
+          text-align: right;
+        }
+      }
     }
 
-    &[data-label='Token'] > div > b {
-      display: block;
-      color: var(--color-text-primary);
+    > tbody > tr:not([class^='Card__CardRowDrawer']) > td {
+      &[data-label='Token'] {
+        font-family: var(--font-default);
+        letter-spacing: 0;
+        line-height: 1.2;
+        flex-flow: row nowrap;
+      }
+
+      &[data-label='Token'] > div > b {
+        display: block;
+        color: var(--color-text-primary);
+      }
     }
   }
   // button
