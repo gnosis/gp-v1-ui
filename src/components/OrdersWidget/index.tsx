@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // Const and utils
 import { isOrderActive, isPendingOrderActive } from 'utils'
 import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
+import { filterOrdersFn } from 'utils/filter'
 
 // Hooks
 import { useOrders } from 'hooks/useOrders'
@@ -19,7 +20,7 @@ import useSortByTopic from 'hooks/useSortByTopic'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 // Api
-import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement, DetailedPendingOrder } from 'api/exchange/ExchangeApi'
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
@@ -31,10 +32,6 @@ import FilterTools from 'components/FilterTools'
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
-
-// Types/misc
-import { DetailedPendingOrder } from 'hooks/usePendingOrders'
-import { TokenDetails } from 'types'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
 
@@ -87,25 +84,6 @@ function classifyOrders(
       state.active[ordersType].push(order)
     }
   })
-}
-
-function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
-  if (!token) return false
-  return (
-    token?.symbol?.toLowerCase().includes(searchText) ||
-    token?.name?.toLowerCase().includes(searchText) ||
-    token?.address.toLowerCase().includes(searchText)
-  )
-}
-
-const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean | null => {
-  if (searchTxt === '') return null
-
-  return (
-    !!id.includes(searchTxt) ||
-    checkTokenAgainstSearch(buyToken, searchTxt) ||
-    checkTokenAgainstSearch(sellToken, searchTxt)
-  )
 }
 
 const compareFnFactory = (topic: TopicNames, asc: boolean) => (
@@ -277,7 +255,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     filteredData: filteredAndSortedOrders,
     search,
     handlers: { handleSearch },
-  } = useDataFilter({
+  } = useDataFilter<DetailedAuctionElement>({
     data: sortedDisplayedOrders,
     filterFnFactory: filterOrdersFn,
   })

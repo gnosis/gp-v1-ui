@@ -9,7 +9,7 @@ import { useWalletConnection } from './useWalletConnection'
 import { removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 // Constants/Types/Misc.
 import { EMPTY_ARRAY } from 'const'
-import { DetailedAuctionElement, AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, DetailedPendingOrder } from 'api/exchange/ExchangeApi'
 import { getTokenFromExchangeById } from 'services'
 
 async function getDetailedPendingOrders({
@@ -35,10 +35,6 @@ async function getDetailedPendingOrders({
 
   const detailedOrders: DetailedPendingOrder[] = await Promise.all(ordersPromises)
   return setFn(detailedOrders)
-}
-
-export interface DetailedPendingOrder extends DetailedAuctionElement {
-  txHash?: string
 }
 
 function usePendingOrders(): DetailedPendingOrder[] {
