@@ -402,6 +402,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         &:first-of-type {
           text-align: left;
           justify-content: flex-start;
+          padding-left: 2rem;
         }
       }
     }
