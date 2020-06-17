@@ -16,8 +16,6 @@ export function computeMarketProp({
 }: {
   sellToken: TokenDetails
   buyToken: TokenDetails
-}): string | null {
-  if (!sellToken || !buyToken) return null
-
+}): string {
   return `${safeTokenName(sellToken).toLowerCase()}-${safeTokenName(buyToken).toLowerCase()}`
 }
