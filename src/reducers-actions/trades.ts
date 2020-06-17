@@ -4,7 +4,7 @@ import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/Exchange
 
 import { Actions } from 'reducers-actions'
 
-import { logDebug, flattenMapOfLists, dateToBatchId, toBN, setStorageItem } from 'utils'
+import { logDebug, dateToBatchId, toBN, setStorageItem, flattenMapOfSets } from 'utils'
 import { TRADES_LOCAL_STORAGE_KEY } from 'const'
 
 // ******** TYPES/INTERFACES
@@ -15,7 +15,7 @@ export type TradesState = Record<string, TradesStatePerAccount>
 
 interface TradesStatePerAccount {
   trades: Trade[]
-  pendingTrades: Map<string, Trade[]>
+  pendingTrades: [string, Trade[]][]
   lastCheckedBlock?: number
 }
 
@@ -79,8 +79,8 @@ function buildTradeRevertKey(batchId: number, orderId: string): string {
 
 // ******** HELPERS
 
-function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, T[]>): Map<string, T[]> {
-  const map = initial || new Map<string, T[]>()
+function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, Set<T>>): Map<string, Set<T>> {
+  const map = initial || new Map<string, Set<T>>()
   const seenIds = new Set<string>()
 
   list.forEach(item => {
@@ -93,11 +93,14 @@ function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map
     const revertKey = buildTradeRevertKey(item.batchId, item.orderId)
 
     if (map.has(revertKey)) {
-      const subList = map.get(revertKey) as T[]
+      const tradesSet = map.get(revertKey) as Set<T>
 
-      subList.push(item)
+      tradesSet.add(item)
     } else {
-      map.set(revertKey, [item])
+      map.set(
+        revertKey,
+        new Set<T>([item]),
+      )
     }
   })
 
@@ -112,7 +115,7 @@ function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): nu
   return a.eventIndex - b.eventIndex
 }
 
-function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, Trade[]> {
+function getPendingTrades(tradesByRevertKey: Map<string, Set<Trade>>): [string, Trade[]][] {
   // Now that we matched the reverts with trades we currently have, we filter the trades
   // that might have reverts still coming in.
 
@@ -121,13 +124,13 @@ function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, 
 
   // Filter out trades in that range (curr ... curr -2).
   // The `revertKey` is composed by batchId|orderId, so this regex looks for the batchIds in the keys
-  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\|`)
+  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\\\|`)
 
-  const pending = new Map<string, Trade[]>()
+  const pending: [string, Trade[]][] = []
 
   tradesByRevertKey.forEach((trades, key) => {
     if (batchesRegex.test(key)) {
-      pending.set(key, trades)
+      pending.push([key, Array.from(trades)])
     }
   })
 
@@ -137,10 +140,14 @@ function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, 
 function applyRevertsToTrades(
   trades: Trade[],
   reverts: TradeReversion[],
-  pendingTrades?: Map<string, Trade[]>,
-): [Trade[], Map<string, Trade[]>] {
+  pendingTrades?: [string, Trade[]][],
+): [Trade[], [string, Trade[]][]] {
+  // Not trivial to serialize to/from JSON a Map of Sets, so we instead rebuild it here on start
+  const initialTrades = new Map<string, Set<Trade>>()
+  pendingTrades?.forEach(([key, value]) => initialTrades.set(key, new Set(value)))
+
   // Group trades by revertKey
-  const tradesByRevertKey = groupByRevertKey(trades, pendingTrades)
+  const tradesByRevertKey = groupByRevertKey(trades, initialTrades)
   const revertsByRevertKey = groupByRevertKey(reverts)
 
   // Assumptions:
@@ -150,11 +157,13 @@ function applyRevertsToTrades(
   // 3. Every revert matches 1 trade
   // 4. Reverts match Trades by order or appearance (first Revert matches first Trade and so on)
 
-  revertsByRevertKey.forEach((reverts, revertKey) => {
-    reverts.sort(sortByTimeAndPosition)
-    const trades = tradesByRevertKey.get(revertKey)?.sort(sortByTimeAndPosition)
+  revertsByRevertKey.forEach((revertsSet, revertKey) => {
+    const reverts = Array.from(revertsSet).sort(sortByTimeAndPosition)
+    const tradesSet = tradesByRevertKey.get(revertKey)
 
-    if (trades) {
+    if (tradesSet) {
+      const trades = Array.from(tradesSet).sort(sortByTimeAndPosition)
+
       let tradesIndex = 0
       let revertsIndex = 0
       // Iterate over both trades and reverts while there are any
@@ -190,7 +199,7 @@ function applyRevertsToTrades(
     }
   })
 
-  return [flattenMapOfLists(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
+  return [flattenMapOfSets(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
 }
 
 // ******** INITIAL STATE / LOCAL STORAGE
