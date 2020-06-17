@@ -6,18 +6,21 @@ import styled from 'styled-components'
 
 import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
 
+import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
+import { TradeRow } from 'components/TradesWidget/TradeRow'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
+import useDataFilter from 'hooks/useDataFilter'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
+import { filterOrdersFn } from 'utils/filter'
 
-import { TradeRow } from 'components/TradesWidget/TradeRow'
 import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
 const CsvButtonContainer = styled.div`
@@ -170,11 +173,28 @@ export const TradesWidget: React.FC = () => {
   const { isConnected } = useWalletConnection()
   const trades = useTrades()
 
+  const {
+    filteredData,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter<Trade>({
+    data: trades,
+    filterFnFactory: filterOrdersFn,
+  })
+
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
     <CardWidgetWrapper>
-      <InnerTradesWidget trades={trades} />
+      <FilterTools
+        className="widgetFilterTools"
+        resultName="trades"
+        searchValue={search}
+        handleSearch={handleSearch}
+        showFilter={!!search}
+        dataLength={filteredData.length}
+      />
+      <InnerTradesWidget trades={filteredData} />
     </CardWidgetWrapper>
   )
 }
