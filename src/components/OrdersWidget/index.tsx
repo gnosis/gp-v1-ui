@@ -181,11 +181,47 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     [displayedOrders],
   )
 
-  // Sort validUntil
-  const { sortedData: sortedDisplayedOrders, sortTopic, setSortTopic } = useSortByTopic<
-    DetailedAuctionElement,
-    TopicNames
-  >(displayedOrders, DEFAULT_ORDERS_SORTABLE_TOPIC, compareFnFactory)
+  // =========================================
+  // SORTING + FILTERING
+  // =========================================
+  const { sortedData: sortedOrders, sortTopic, setSortTopic } = useSortByTopic<DetailedAuctionElement, TopicNames>(
+    displayedOrders,
+    DEFAULT_ORDERS_SORTABLE_TOPIC,
+    compareFnFactory,
+  )
+
+  // Why 2 useDataFilter instead of concatenating pending + current?
+  // I find the approach of using 2 hooks, 1 for each data set of orders (current, pending)
+  // to be clearer than potentially using 1 data set concatenated + split to display
+  // FILTER CURRENT ORDERS
+  const {
+    filteredData: filteredAndSortedOrders,
+    search,
+    handlers: { handleSearch: handleSearchingOrders },
+  } = useDataFilter({
+    data: sortedOrders,
+    filterFnFactory: filterOrdersFn,
+  })
+
+  // FILTER PENDING ORDERS
+  const {
+    filteredData: filteredAndSortedPendingOrders,
+    handlers: { handleSearch: handleSearchingPendingOrders },
+  } = useDataFilter<DetailedPendingOrder>({
+    data: displayedPendingOrders,
+    filterFnFactory: filterOrdersFn,
+  })
+
+  const handleBothOrderTypeSearch = useCallback(
+    (e): void => {
+      handleSearchingOrders(e)
+      handleSearchingPendingOrders(e)
+    },
+    [handleSearchingOrders, handleSearchingPendingOrders],
+  )
+
+  // =========================================
+  // =========================================
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
@@ -259,15 +295,6 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
-  const {
-    filteredData: filteredAndSortedOrders,
-    search,
-    handlers: { handleSearch },
-  } = useDataFilter({
-    data: sortedDisplayedOrders,
-    filterFnFactory: filterOrdersFn,
-  })
-
   return (
     <OrdersWrapper>
       {!isConnected ? (
@@ -286,9 +313,9 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
               className={isWidget ? 'widgetFilterTools' : ''}
               resultName="orders"
               searchValue={search}
-              handleSearch={handleSearch}
+              handleSearch={handleBothOrderTypeSearch}
               showFilter={!!search}
-              dataLength={displayedPendingOrders.length + filteredAndSortedOrders.length}
+              dataLength={filteredAndSortedPendingOrders.length + filteredAndSortedOrders.length}
             >
               {/* implement later when better data concerning order state and can be saved to global state 
               <label className="balances-hideZero">
@@ -355,7 +382,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedPendingOrders.map(order => (
+                    {filteredAndSortedPendingOrders.map(order => (
                       <OrderRow
                         key={order.id}
                         order={order}
