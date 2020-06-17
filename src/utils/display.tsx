@@ -9,3 +9,15 @@ export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode |
   }
   return displayName
 }
+
+export function computeMarketProp({
+  sellToken,
+  buyToken,
+}: {
+  sellToken: TokenDetails
+  buyToken: TokenDetails
+}): string | null {
+  if (!sellToken || !buyToken) return null
+
+  return `${safeTokenName(sellToken).toLowerCase()}-${safeTokenName(buyToken).toLowerCase()}`
+}
