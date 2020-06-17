@@ -259,21 +259,24 @@ export const CardTable = styled.table<{
 export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
   display: flex;
   flex-flow: column nowrap;
+  justify-content: flex-start;
+
   width: auto;
+  margin: 0 auto;
   padding: 0 0 2.4rem;
+  min-height: 54rem;
   min-width: 85rem;
   max-width: 140rem;
+
   background: var(--color-background-pageWrapper);
   box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
     rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
     rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
     rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+
   border-radius: 0.6rem;
-  margin: 0 auto;
-  min-height: 54rem;
   font-size: 1.6rem;
   line-height: 1;
-  justify-content: flex-start;
 
   @media ${MEDIA.tablet} {
     min-width: 100vw;
@@ -312,7 +315,6 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         font-size: 1.1rem;
         color: var(--color-text-primary);
         letter-spacing: 0;
-        padding: 0.8rem;
         text-transform: uppercase;
       }
     }
@@ -334,7 +336,6 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         display: flex;
         flex-flow: row wrap;
         align-items: center;
-        padding: 0 0.5rem;
         word-break: break-all;
         white-space: normal;
 
@@ -390,6 +391,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         &:first-of-type {
           text-align: left;
           justify-content: flex-start;
+          padding-left: 2rem;
         }
       }
     }
