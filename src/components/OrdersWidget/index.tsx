@@ -349,7 +349,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
             </div>
             {selectedTab === 'fills' ? (
               <div className="ordersContainer">
-                <InnerTradesWidget trades={trades} />
+                <InnerTradesWidget isTab trades={trades} />
               </div>
             ) : ordersCount > 0 ? (
               <div className="ordersContainer">

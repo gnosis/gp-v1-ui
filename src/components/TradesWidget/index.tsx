@@ -94,10 +94,11 @@ const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
 
 interface InnerTradesWidgetProps {
   trades: Trade[]
+  isTab?: boolean
 }
 
 export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
-  const { trades } = props
+  const { isTab, trades } = props
 
   const { networkId, userAddress } = useWalletConnection()
 
@@ -120,7 +121,12 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
   )
 
   return (
-    <CardTable $rowSeparation="0" $gap="0 0.6rem" $padding="0 0 0 1.5em" $columns="1fr 0.8fr 0.9fr 1.2fr 6.5rem 1.23fr">
+    <CardTable
+      $rowSeparation="0"
+      $gap="0 0.6rem"
+      $padding="0 0 0 2rem"
+      $columns={`1fr 0.8fr 0.9fr 1.2fr 6.5rem ${isTab ? '1.23fr' : '0.74fr'}`}
+    >
       <thead>
         <tr>
           <th>Date</th>
