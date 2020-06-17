@@ -18,7 +18,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
 
-import { TradeRow, classifyTrade } from 'components/TradesWidget/TradeRow'
+import { TradeRow } from 'components/TradesWidget/TradeRow'
 import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
 const CsvButtonContainer = styled.div`
@@ -74,7 +74,7 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
-    Type: classifyTrade(trade),
+    Type: trade.type || '',
     TransactionHash: txHash,
     EventLogIndex: eventIndex.toString(),
     OrderId: orderId,

@@ -8,7 +8,7 @@ import { ExchangeApi, Trade, TradeReversion, Order, AuctionElement, BaseTradeEve
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
 
-import { dateToBatchId, calculateSettlingTimestamp, logDebug, isOrderDeleted } from 'utils'
+import { dateToBatchId, calculateSettlingTimestamp, logDebug, isOrderDeleted, classifyTrade } from 'utils'
 
 interface GetTradesAndTradeReversionParams {
   networkId: number
@@ -64,7 +64,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
       // Maybe we couldn't find the order /shrug
       const order = orders.get(event.orderId)
 
-      return {
+      const trade: Trade = {
         ...event,
         batchId,
         timestamp,
@@ -85,6 +85,10 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
         orderBuyAmount: order && order.priceNumerator,
         orderSellAmount: order && order.priceDenominator,
       }
+
+      trade.type = classifyTrade(trade)
+
+      return trade
     })
   }
 

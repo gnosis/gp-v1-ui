@@ -114,6 +114,7 @@ export interface AuctionElement extends Order {
   user: string
   sellTokenBalance: BN
   id: string // string because we might need natural ids
+  isUnlimited: boolean
 }
 
 export interface Order {
@@ -148,6 +149,8 @@ export interface EventWithBlockInfo extends BaseTradeEvent {
   timestamp: number
 }
 
+export type TradeType = 'full' | 'partial' | 'liquidity' | 'unknown'
+
 /**
  * Trade enriches BaseTradeEvent with block, order and token data
  */
@@ -157,6 +160,7 @@ export interface Trade extends EventWithBlockInfo {
   settlingTimestamp: number
   buyToken: TokenDetails
   sellToken: TokenDetails
+  type?: TradeType
   limitPrice?: BigNumber
   fillPrice: BigNumber
   remainingAmount?: BN

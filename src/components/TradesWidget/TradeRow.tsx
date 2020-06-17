@@ -4,29 +4,15 @@ import BigNumber from 'bignumber.js'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUndo } from '@fortawesome/free-solid-svg-icons'
 
-import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION, isOrderUnlimited } from '@gnosis.pm/dex-js'
+import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
-import { Trade } from 'api/exchange/ExchangeApi'
+import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/EtherscanLink'
 
-import { isTradeFilled, isTradeSettled, formatDateFromBatchId } from 'utils'
+import { isTradeSettled, formatDateFromBatchId } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { ONE_HUNDRED_BIG_NUMBER } from 'const'
-
-type TradeType = 'full' | 'partial' | 'liquidity' | 'unknown'
-
-export function classifyTrade(trade: Trade): TradeType {
-  const { remainingAmount, orderBuyAmount, orderSellAmount } = trade
-
-  if (!remainingAmount) {
-    return 'unknown'
-  }
-  if (orderBuyAmount && orderSellAmount && isOrderUnlimited(orderBuyAmount, orderSellAmount)) {
-    return 'liquidity'
-  }
-  return isTradeFilled(trade) ? 'full' : 'partial'
-}
 
 interface TradeRowProps {
   trade: Trade
@@ -34,7 +20,7 @@ interface TradeRowProps {
 }
 
 const TypePill = styled.span<{
-  tradeType: TradeType
+  tradeType?: TradeType
 }>`
   background-color: ${({ tradeType }): string => {
     switch (tradeType) {
@@ -96,14 +82,13 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
     timestamp,
     txHash,
     orderSellAmount,
+    type,
   } = trade
   const buyTokenDecimals = buyToken.decimals || DEFAULT_PRECISION
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
 
-  const tradeType = useMemo(() => classifyTrade(trade), [trade])
-
   const typeColumnTitle = useMemo(() => {
-    switch (tradeType) {
+    switch (type) {
       case 'full':
       case 'partial': {
         if (orderSellAmount) {
@@ -122,7 +107,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       default:
         return ''
     }
-  }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, tradeType])
+  }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
@@ -146,7 +131,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
-        <TypePill tradeType={tradeType}>{tradeType}</TypePill>
+        <TypePill tradeType={type}>{type}</TypePill>
       </td>
       <td>
         {/* TODO: remove icon and filter out reverted trades */}

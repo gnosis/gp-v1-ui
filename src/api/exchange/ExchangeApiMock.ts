@@ -1,5 +1,7 @@
 import BN from 'bn.js'
 
+import { isOrderUnlimited } from '@gnosis.pm/dex-js'
+
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
@@ -234,6 +236,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       user: userAddress,
       sellTokenBalance: new BN('1500000000000000000000').add(ONE),
       id: index.toString(),
+      isUnlimited: isOrderUnlimited(order.priceNumerator, order.priceDenominator),
     }
   }
 }

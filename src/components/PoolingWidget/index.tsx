@@ -208,6 +208,7 @@ const PoolingInterface: React.FC = () => {
                   validFrom: 0,
                   validUntil: 0,
                   txHash,
+                  isUnlimited: true,
                 }
               },
             )

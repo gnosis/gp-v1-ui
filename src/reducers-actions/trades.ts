@@ -4,16 +4,16 @@ import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/Exchange
 
 import { Actions } from 'reducers-actions'
 
-import { logDebug, flattenMapOfLists, dateToBatchId, toBN } from 'utils'
+import { logDebug, flattenMapOfLists, dateToBatchId, toBN, setStorageItem } from 'utils'
 import { TRADES_LOCAL_STORAGE_KEY } from 'const'
 
 // ******** TYPES/INTERFACES
 
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
-export type TradesState = Record<number, TradesStateSingleNetwork>
+export type TradesState = Record<string, TradesStatePerAccount>
 
-interface TradesStateSingleNetwork {
+interface TradesStatePerAccount {
   trades: Trade[]
   pendingTrades: Map<string, Trade[]>
   lastCheckedBlock?: number
@@ -23,27 +23,28 @@ interface WithReverts {
   reverts: TradeReversion[]
 }
 
-interface WithNetworkId {
+interface WithAccountInfo {
   networkId: number
+  userAddress: string
 }
 
 // ******** ACTION TYPES
 
 type OverwriteTradesActionType = Actions<
   'OVERWRITE_TRADES',
-  Omit<TradesStateSingleNetwork, 'pendingTrades'> & WithReverts & WithNetworkId
+  Omit<TradesStatePerAccount, 'pendingTrades'> & WithReverts & WithAccountInfo
 >
 type AppendTradesActionType = Actions<
   'APPEND_TRADES',
-  Required<Omit<TradesStateSingleNetwork, 'pendingTrades'>> & WithReverts & WithNetworkId
+  Required<Omit<TradesStatePerAccount, 'pendingTrades'>> & WithReverts & WithAccountInfo
 >
 type UpdateBlockActionType = Actions<
   'UPDATE_BLOCK',
-  Required<Pick<TradesStateSingleNetwork, 'lastCheckedBlock'>> & WithNetworkId
+  Required<Pick<TradesStatePerAccount, 'lastCheckedBlock'>> & WithAccountInfo
 >
-type ReducerActionType = Actions<ActionTypes, TradesStateSingleNetwork & WithReverts & WithNetworkId>
+type ReducerActionType = Actions<ActionTypes, TradesStatePerAccount & WithReverts & WithAccountInfo>
 
-interface Params extends WithNetworkId {
+interface Params extends WithAccountInfo {
   trades: Trade[]
   reverts: TradeReversion[]
   lastCheckedBlock?: number
@@ -61,10 +62,16 @@ export const appendTrades = (params: Required<Params>): AppendTradesActionType =
   payload: params,
 })
 
-export const updateLastCheckedBlock = (lastCheckedBlock: number, networkId: number): UpdateBlockActionType => ({
+export const updateLastCheckedBlock = (
+  params: Required<Pick<Params, 'lastCheckedBlock'>> & WithAccountInfo,
+): UpdateBlockActionType => ({
   type: 'UPDATE_BLOCK',
-  payload: { lastCheckedBlock, networkId },
+  payload: params,
 })
+
+export function buildAccountKey({ networkId, userAddress }: WithAccountInfo): string {
+  return networkId + '|' + userAddress
+}
 
 function buildTradeRevertKey(batchId: number, orderId: string): string {
   return batchId + '|' + orderId
@@ -186,55 +193,6 @@ function applyRevertsToTrades(
   return [flattenMapOfLists(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
 }
 
-// ******** REDUCER
-
-export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
-  switch (action.type) {
-    case 'APPEND_TRADES': {
-      const { trades: newTrades, reverts, lastCheckedBlock, networkId } = action.payload
-      const { trades: currTrades, pendingTrades: currPendingTrades } = state[networkId]
-
-      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts, currPendingTrades)
-
-      return { ...state, [networkId]: { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades } }
-    }
-    case 'OVERWRITE_TRADES': {
-      const { trades: newTrades, reverts, lastCheckedBlock, networkId } = action.payload
-
-      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts)
-
-      return { ...state, [networkId]: { trades, lastCheckedBlock, pendingTrades } }
-    }
-    case 'UPDATE_BLOCK': {
-      const { networkId, lastCheckedBlock } = action.payload
-
-      return { ...state, [networkId]: { ...state[networkId], lastCheckedBlock } }
-    }
-    default: {
-      return state
-    }
-  }
-}
-
-// TODO: use the one from David once his changes are merged https://github.com/gnosis/dex-react/pull/1091
-function setStorageItem(key: string, data: unknown): void {
-  // localStorage API accepts only strings
-  // TODO: consider switching to localForage API (accepts all types)
-  const formattedData = JSON.stringify(data)
-  return localStorage.setItem(key, formattedData)
-}
-
-// ******** SIDE EFFECT
-
-export async function sideEffect(state: TradesState, action: ReducerActionType): Promise<void> {
-  switch (action.type) {
-    case 'APPEND_TRADES':
-    case 'OVERWRITE_TRADES':
-    case 'UPDATE_BLOCK':
-      setStorageItem(TRADES_LOCAL_STORAGE_KEY, state)
-  }
-}
-
 // ******** INITIAL STATE / LOCAL STORAGE
 
 const INITIAL_TRADES_STATE_SINGLE_NETWORK = { trades: [], pendingTrades: new Map<string, Trade[]>() }
@@ -264,7 +222,7 @@ function reviver(key: string, value: unknown): unknown {
 }
 
 function loadInitialState(): TradesState {
-  let state = { 1: INITIAL_TRADES_STATE_SINGLE_NETWORK, 4: INITIAL_TRADES_STATE_SINGLE_NETWORK }
+  let state = {}
 
   const localStorageOrders = localStorage.getItem(TRADES_LOCAL_STORAGE_KEY)
 
@@ -280,3 +238,50 @@ function loadInitialState(): TradesState {
 }
 
 export const initialState = loadInitialState()
+
+// ******** REDUCER
+
+export const reducer = (state: TradesState, action: ReducerActionType): TradesState => {
+  switch (action.type) {
+    case 'APPEND_TRADES': {
+      const { trades: newTrades, reverts, lastCheckedBlock, networkId, userAddress } = action.payload
+
+      const accountKey = buildAccountKey({ networkId, userAddress })
+
+      const { trades: currTrades, pendingTrades: currPendingTrades } =
+        state[accountKey] || INITIAL_TRADES_STATE_SINGLE_NETWORK
+
+      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts, currPendingTrades)
+
+      return { ...state, [accountKey]: { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades } }
+    }
+    case 'OVERWRITE_TRADES': {
+      const { trades: newTrades, reverts, lastCheckedBlock, networkId, userAddress } = action.payload
+
+      const accountKey = buildAccountKey({ networkId, userAddress })
+
+      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts)
+
+      return { ...state, [accountKey]: { trades, lastCheckedBlock, pendingTrades } }
+    }
+    case 'UPDATE_BLOCK': {
+      const { networkId, lastCheckedBlock } = action.payload
+
+      return { ...state, [networkId]: { ...state[networkId], lastCheckedBlock } }
+    }
+    default: {
+      return state
+    }
+  }
+}
+
+// ******** SIDE EFFECT
+
+export async function sideEffect(state: TradesState, action: ReducerActionType): Promise<void> {
+  switch (action.type) {
+    case 'APPEND_TRADES':
+    case 'OVERWRITE_TRADES':
+    case 'UPDATE_BLOCK':
+      setStorageItem(TRADES_LOCAL_STORAGE_KEY, state)
+  }
+}
