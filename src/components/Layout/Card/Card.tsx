@@ -192,13 +192,7 @@ export const CardTable = styled.table<{
         text-align: left;
       }
     }
-  }
-  
-  .lowBalance {
-    color: #B27800;
-    display: block;
-    > img {margin: 0 0 0 .25rem;}
-  }
+  }  
   
   // Table Header
   > thead {
@@ -246,6 +240,23 @@ export const CardTable = styled.table<{
       > td {
         &.cardOpener {
           display: none;
+        }
+
+        // td.status
+        &.status {
+          flex-flow: column;
+          align-items: flex-start;
+
+          > .lowBalance {
+            color: #B27800;
+            display: flex;
+            margin: 0.2rem 0;
+            font-size: smaller;
+        
+            > img {
+              margin: 0 0 0.2rem 0.45rem;
+            }
+          }
         }
       }
 
