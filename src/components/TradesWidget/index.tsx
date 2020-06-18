@@ -19,7 +19,7 @@ import useDataFilter from 'hooks/useDataFilter'
 import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
-import { filterOrdersFn } from 'utils/filter'
+import { filterTradesFn } from 'utils/filter'
 
 import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
@@ -179,7 +179,7 @@ export const TradesWidget: React.FC = () => {
     handlers: { handleSearch },
   } = useDataFilter<Trade>({
     data: trades,
-    filterFnFactory: filterOrdersFn,
+    filterFnFactory: filterTradesFn,
   })
 
   return !isConnected ? (
