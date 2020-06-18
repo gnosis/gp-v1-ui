@@ -15,8 +15,6 @@ import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 // Constants/Types
 import { REFRESH_WHEN_SECONDS_LEFT } from 'const'
 import { DetailedAuctionElement, DetailedPendingOrder } from 'api/exchange/ExchangeApi'
-// Utils
-import { computeMarketProp } from 'utils/display'
 
 interface Result {
   orders: DetailedAuctionElement[]
@@ -83,16 +81,7 @@ export function useOrders(): Result {
         // check cancelled bool from parent scope
         if (cancelled) return
 
-        const orders: DetailedAuctionElement[] = (await Promise.all(ordersPromises)).map(order => {
-          if (!order.sellToken || !order.buyToken) return order
-
-          const market = computeMarketProp({ sellToken: order.sellToken, buyToken: order.buyToken })
-
-          return {
-            ...order,
-            market,
-          }
-        })
+        const orders: DetailedAuctionElement[] = await Promise.all(ordersPromises)
         // ensures we don't have multiple reruns for each update
         // i.e. offset change -> render
         //      isLoading change -> another render
