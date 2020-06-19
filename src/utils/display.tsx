@@ -12,7 +12,7 @@ export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode |
 
 /**
  * computeMarketProp
- * @description returns array of potentially accepted market names by:: SELLTOKEN <SEPARATOR> BUYTOKEN
+ * @description returns array of potentially accepted market names by:: BUYTOKEN <SEPARATOR> SELLTOKEN
  * @param { sellToken, buyToken, acceptedSeparators: string[] }
  */
 export function computeMarketProp({
@@ -26,13 +26,15 @@ export function computeMarketProp({
   acceptedSeparators?: string[]
   inverseMarket?: boolean
 }): string[] {
-  const sellTokenFormatted = safeTokenName(sellToken).toLowerCase()
   const buyTokenFormatted = safeTokenName(buyToken).toLowerCase()
+  const sellTokenFormatted = safeTokenName(sellToken).toLowerCase()
 
-  const marketList = acceptedSeparators.map(sep => `${sellTokenFormatted}${sep}${buyTokenFormatted}`)
+  // BUYTOKEN/SELLTOKEN
+  const marketList = acceptedSeparators.map(sep => `${buyTokenFormatted}${sep}${sellTokenFormatted}`)
 
   if (inverseMarket) {
-    const inverseMarketList = acceptedSeparators.map(sep => `${buyTokenFormatted}${sep}${sellTokenFormatted}`)
+    // SELLTOKEN/BUYTOKEN
+    const inverseMarketList = acceptedSeparators.map(sep => `${sellTokenFormatted}${sep}${buyTokenFormatted}`)
     return marketList.concat(inverseMarketList)
   }
 
