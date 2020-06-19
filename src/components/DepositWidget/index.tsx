@@ -40,7 +40,7 @@ const BalancesWidget = styled(CardWidgetWrapper)`
   ${CardTable} {
     > thead,
     > tbody {
-      > tr:not([class^='Card__CardRowDrawer']) {
+      > tr:not(.cardRowDrawer) {
         > td,
         > th {
           justify-content: flex-end;
@@ -49,7 +49,7 @@ const BalancesWidget = styled(CardWidgetWrapper)`
       }
     }
 
-    > tbody > tr:not([class^='Card__CardRowDrawer']) > td {
+    > tbody > tr:not(.cardRowDrawer) > td {
       &[data-label='Token'] {
         font-family: var(--font-default);
         letter-spacing: 0;

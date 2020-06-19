@@ -102,7 +102,7 @@ export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>
   ref,
 ) {
   return (
-    <CardRowDrawer ref={ref}>
+    <CardRowDrawer className=".cardRowDrawer" ref={ref}>
       <td>
         <CardDrawerCloser onClick={closeDrawer}>&times;</CardDrawerCloser>
         {children}
@@ -146,7 +146,7 @@ export const CardTable = styled.table<{
   }
 
   > thead, tbody {
-    > tr:not(${CardRowDrawer}) {
+    > tr:not(.cardRowDrawer) {
       position: relative;
       display: grid;
       grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
@@ -235,7 +235,7 @@ export const CardTable = styled.table<{
   }
   
   tbody {
-    > tr:not(${CardRowDrawer}) {
+    > tr:not(.cardRowDrawer) {
 
       > td {
         &.cardOpener {
@@ -322,7 +322,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         display: none;
       }
 
-      > tr:not([class^='Card__CardRowDrawer']) > th {
+      > tr:not(.cardRowDrawer) > th {
         font-size: 1.1rem;
         color: var(--color-text-primary);
         letter-spacing: 0;
@@ -343,7 +343,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         width: 100%;
       }
 
-      > tr:not([class^='Card__CardRowDrawer']) > td {
+      > tr:not(.cardRowDrawer) > td {
         display: flex;
         flex-flow: row wrap;
         align-items: center;
@@ -381,8 +381,8 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     /////////////////////
     // ALL TABLE ROWS
     /////////////////////
-    > thead > tr:not([class^='Card__CardRowDrawer']),
-    > tbody > tr:not([class^='Card__CardRowDrawer']) {
+    > thead > tr:not(.cardRowDrawer),
+    > tbody > tr:not(.cardRowDrawer) {
       ${({ $columns }): string => ($columns ? `grid-template-columns: ${$columns}` : '')};
       text-align: left;
       padding: 0.8rem;
@@ -402,7 +402,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         &:first-of-type {
           text-align: left;
           justify-content: flex-start;
-          padding-left: 2rem;
+          padding: 0 0.8rem;
         }
       }
     }
