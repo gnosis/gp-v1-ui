@@ -9,12 +9,12 @@ import { overwriteOrders, updateOffset, updateOrders } from 'reducers-actions/or
 import useSafeState from './useSafeState'
 import useGlobalState from './useGlobalState'
 import { useWalletConnection } from './useWalletConnection'
-import usePendingOrders, { DetailedPendingOrder } from './usePendingOrders'
+import usePendingOrders from './usePendingOrders'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
 
 // Constants/Types
 import { REFRESH_WHEN_SECONDS_LEFT } from 'const'
-import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement, DetailedPendingOrder } from 'api/exchange/ExchangeApi'
 
 interface Result {
   orders: DetailedAuctionElement[]
@@ -70,6 +70,7 @@ export function useOrders(): Result {
             getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
             getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
           ])
+
           return {
             ...order,
             sellToken,

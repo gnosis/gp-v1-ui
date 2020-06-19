@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // Const and utils
 import { isOrderActive, isPendingOrderActive } from 'utils'
 import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
+import { filterTradesFn, filterOrdersFn } from 'utils/filter'
 
 // Hooks
 import { useOrders } from 'hooks/useOrders'
@@ -19,7 +20,7 @@ import useSortByTopic from 'hooks/useSortByTopic'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 // Api
-import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchange/ExchangeApi'
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
@@ -31,10 +32,6 @@ import FilterTools from 'components/FilterTools'
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
-
-// Types/misc
-import { DetailedPendingOrder } from 'hooks/usePendingOrders'
-import { TokenDetails } from 'types'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
 
@@ -87,25 +84,6 @@ function classifyOrders(
       state.active[ordersType].push(order)
     }
   })
-}
-
-function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
-  if (!token) return false
-  return (
-    token?.symbol?.toLowerCase().includes(searchText) ||
-    token?.name?.toLowerCase().includes(searchText) ||
-    token?.address.toLowerCase().includes(searchText)
-  )
-}
-
-const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean | null => {
-  if (searchTxt === '') return null
-
-  return (
-    !!id.includes(searchTxt) ||
-    checkTokenAgainstSearch(buyToken, searchTxt) ||
-    checkTokenAgainstSearch(sellToken, searchTxt)
-  )
 }
 
 const compareFnFactory = (topic: TopicNames, asc: boolean) => (
@@ -277,10 +255,42 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     filteredData: filteredAndSortedOrders,
     search,
     handlers: { handleSearch },
-  } = useDataFilter({
+  } = useDataFilter<DetailedAuctionElement>({
     data: sortedDisplayedOrders,
     filterFnFactory: filterOrdersFn,
   })
+
+  const {
+    filteredData: filteredTrades,
+    search: tradesSearch,
+    handlers: { handleSearch: handleTradesSearch },
+  } = useDataFilter<Trade>({
+    data: trades,
+    filterFnFactory: filterTradesFn,
+  })
+
+  const { handleTabSpecificSearch, tabSpecficSearch, tabSpecificResultName, tabSpecificDataLength } = useMemo(
+    () => ({
+      handleTabSpecificSearch: (e: React.ChangeEvent<HTMLInputElement>): void =>
+        selectedTab === 'fills' ? handleTradesSearch(e) : handleSearch(e),
+      tabSpecficSearch: selectedTab === 'fills' ? tradesSearch : search,
+      tabSpecificResultName: selectedTab === 'fills' ? 'trades' : 'orders',
+      tabSpecificDataLength:
+        selectedTab === 'fills'
+          ? filteredTrades.length
+          : displayedPendingOrders.length + filteredAndSortedOrders.length,
+    }),
+    [
+      selectedTab,
+      displayedPendingOrders.length,
+      filteredAndSortedOrders.length,
+      filteredTrades.length,
+      search,
+      tradesSearch,
+      handleSearch,
+      handleTradesSearch,
+    ],
+  )
 
   return (
     <OrdersWrapper>
@@ -299,11 +309,11 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
               className={isWidget ? 'widgetFilterTools' : ''}
-              resultName="orders"
-              searchValue={search}
-              handleSearch={handleSearch}
-              showFilter={!!search}
-              dataLength={displayedPendingOrders.length + filteredAndSortedOrders.length}
+              resultName={tabSpecificResultName}
+              searchValue={tabSpecficSearch}
+              handleSearch={handleTabSpecificSearch}
+              showFilter={!!tabSpecficSearch}
+              dataLength={tabSpecificDataLength}
             >
               {/* implement later when better data concerning order state and can be saved to global state 
               <label className="balances-hideZero">
@@ -312,6 +322,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
               </label>
               */}
             </FilterTools>
+            {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
             <div className="infoContainer">
               <div className="countContainer">
                 <ShowOrdersButton
@@ -340,6 +351,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                 />
               </div>
             </div>
+            {/* DELETE ORDERS ROW */}
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
               <b>↴</b>
               <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
@@ -347,11 +359,13 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                 {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
               </ButtonWithIcon>
             </div>
+            {/* FILLS AKA TRADES */}
             {selectedTab === 'fills' ? (
               <div className="ordersContainer">
-                <InnerTradesWidget isTab trades={trades} />
+                <InnerTradesWidget isTab trades={filteredTrades} />
               </div>
             ) : ordersCount > 0 ? (
+              // ACTIVE / LIQUIDITY / CLOSED ORDERS
               <div className="ordersContainer">
                 <CardTable
                   $columns="3.2rem repeat(2, 1fr) repeat(2, minmax(5.2rem, 0.6fr))"
