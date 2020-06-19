@@ -105,16 +105,11 @@ export interface ExchangeApi extends DepositApi {
   cancelOrders(params: CancelOrdersParams): Promise<Receipt>
 }
 
-// Where market = 'WETH-TUSD'
-export interface Market {
-  market?: string
-}
-
-export interface DetailedPendingOrder extends DetailedAuctionElement, Market {
+export interface DetailedPendingOrder extends DetailedAuctionElement {
   txHash?: string
 }
 
-export interface DetailedAuctionElement extends AuctionElement, Market {
+export interface DetailedAuctionElement extends AuctionElement {
   buyToken: TokenDetails | null
   sellToken: TokenDetails | null
 }
@@ -163,7 +158,7 @@ export type TradeType = 'full' | 'partial' | 'liquidity' | 'unknown'
 /**
  * Trade enriches BaseTradeEvent with block, order and token data
  */
-export interface Trade extends EventWithBlockInfo, Market {
+export interface Trade extends EventWithBlockInfo {
   revertTimestamp?: number
   revertId?: string
   settlingTimestamp: number

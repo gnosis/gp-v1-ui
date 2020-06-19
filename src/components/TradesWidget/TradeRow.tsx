@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
 
-import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
@@ -84,6 +84,10 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   } = trade
   const buyTokenDecimals = buyToken.decimals || DEFAULT_PRECISION
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
+  // Calculate the inverse price - just make sure Limit Price is defined and isn't ZERO
+  // don't want none of that divide by zero and destroy the world stuff
+  const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
+  const invertedFillPrice = invertPrice(fillPrice)
 
   const typeColumnTitle = useMemo(() => {
     switch (type) {
@@ -118,14 +122,16 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       </td>
       <td
         data-label="Limit Price / Fill Price"
-        title={`${limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice({
-          price: fillPrice,
-          decimals: 8,
-        })}`}
+        title={`${invertedLimitPrice ? formatPrice({ price: invertedLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice(
+          {
+            price: invertedFillPrice,
+            decimals: 8,
+          },
+        )}`}
       >
-        {limitPrice ? formatPrice(limitPrice) : 'N/A'}
+        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'}
         <br />
-        {formatPrice(fillPrice)}
+        {formatPrice(invertedFillPrice)}
       </td>
       <td
         data-label="Amount / Received"

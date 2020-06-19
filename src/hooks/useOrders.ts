@@ -70,6 +70,7 @@ export function useOrders(): Result {
             getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
             getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
           ])
+
           return {
             ...order,
             sellToken,

@@ -15,7 +15,6 @@ import useGlobalState from 'hooks/useGlobalState'
 import { BATCH_TIME_IN_MS } from 'const'
 
 import { getTimeRemainingInBatch } from 'utils'
-import { computeMarketProp } from 'utils/display'
 
 export function useTrades(): Trade[] {
   const [
@@ -62,20 +61,9 @@ export function useTrades(): Trade[] {
           return
         }
 
-        // concat derived prop "market" onto Trade e.g ETH-DAI
-        const tradesWithMarkets = newTrades.map(trade => {
-          const market = computeMarketProp({ sellToken: trade.sellToken, buyToken: trade.buyToken })
-          if (!market) return trade
-
-          return {
-            ...trade,
-            market,
-          }
-        })
-
         dispatch(
-          tradesWithMarkets.length > 0 || reverts.length > 0
-            ? appendTrades({ lastCheckedBlock: toBlock, networkId, userAddress, trades: tradesWithMarkets, reverts })
+          newTrades.length > 0 || reverts.length > 0
+            ? appendTrades({ lastCheckedBlock: toBlock, networkId, userAddress, trades: newTrades, reverts })
             : updateLastCheckedBlock({ lastCheckedBlock: toBlock, networkId, userAddress }),
         )
       }
