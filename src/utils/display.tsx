@@ -18,7 +18,7 @@ export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode |
 export function computeMarketProp({
   sellToken,
   buyToken,
-  acceptedSeparators = ['-', '/', ' '],
+  acceptedSeparators = ['-', '/', ''],
   inverseMarket = false,
 }: {
   sellToken: TokenDetails
