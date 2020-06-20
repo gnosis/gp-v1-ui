@@ -33,9 +33,6 @@ const CsvButtonContainer = styled.div`
 const SplitHeaderTitle = styled.div`
   display: flex;
   flex-flow: column;
-  > span {
-    margin: 0.25rem 0;
-  }
 `
 
 function symbolOrAddress(token: TokenDetails): string {

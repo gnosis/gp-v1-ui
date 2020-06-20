@@ -203,7 +203,7 @@ export const CardTable = styled.table<{
 
       > th {
         color: inherit;
-        line-height: 0.6;
+        line-height: 1.2;
         font-size: 1.1rem;
         height: 4rem;
 
@@ -385,7 +385,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     > tbody > tr:not(.cardRowDrawer) {
       ${({ $columns }): string => ($columns ? `grid-template-columns: ${$columns}` : '')};
       text-align: left;
-      padding: 0.8rem;
+      padding: 0.8rem 1.6rem;
       margin: 0;
       justify-content: flex-end;
 
@@ -402,7 +402,6 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         &:first-of-type {
           text-align: left;
           justify-content: flex-start;
-          padding: 0 0.8rem;
         }
       }
     }

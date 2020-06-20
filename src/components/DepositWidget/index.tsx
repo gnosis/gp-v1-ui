@@ -57,9 +57,13 @@ const BalancesWidget = styled(CardWidgetWrapper)`
         flex-flow: row nowrap;
       }
 
-      &[data-label='Token'] > div > b {
-        display: block;
-        color: var(--color-text-primary);
+      &[data-label='Token'] > div {
+        word-break: break-word;
+
+        > b {
+          display: block;
+          color: var(--color-text-primary);
+        }
       }
     }
   }
@@ -224,7 +228,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const { modalProps, toggleModal } = useManageTokens()
 
   return (
-    <BalancesWidget $columns="repeat(auto-fit, minmax(5rem, 1fr));">
+    <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
       <FilterTools
         resultName="tokens"
         searchValue={search}
@@ -243,7 +247,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
       {error ? (
         <ErrorMsg title="oops..." message="Something happened while loading the balances" />
       ) : (
-        <CardTable className="balancesOverview">
+        <CardTable className="balancesOverview" $gap="0 1rem">
           <thead>
             <tr>
               <th>Token</th>
