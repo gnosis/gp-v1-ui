@@ -102,7 +102,7 @@ export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>
   ref,
 ) {
   return (
-    <CardRowDrawer className=".cardRowDrawer" ref={ref}>
+    <CardRowDrawer className="cardRowDrawer" ref={ref}>
       <td>
         <CardDrawerCloser onClick={closeDrawer}>&times;</CardDrawerCloser>
         {children}
