@@ -368,8 +368,9 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
               // ACTIVE / LIQUIDITY / CLOSED ORDERS
               <div className="ordersContainer">
                 <CardTable
-                  $columns="3.2rem repeat(2, 1fr) repeat(2, minmax(5.2rem, 0.6fr))"
+                  $columns="3.2rem repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(7.2rem, 0.3fr)"
                   $gap="0 0.6rem"
+                  $padding="0 0.8rem"
                   $rowSeparation="0"
                 >
                   <thead>
