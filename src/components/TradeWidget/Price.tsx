@@ -213,7 +213,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     precision: DEFAULT_PRECISION,
   })
   const { onKeyPress: onKeyPressPriceInverse, removeExcessZeros: removeExcessZerosPriceInverse } = useNumberInput({
-    inputId: priceInputId,
+    inputId: priceInverseInputId,
     precision: DEFAULT_PRECISION,
   })
 
