@@ -40,11 +40,11 @@ describe('Test config defaults', () => {
       config: [
         {
           networkId: 1,
-          url: 'https://dex-price-estimator.gnosis.io',
+          url: 'https://price-estimate-mainnet.dev.gnosisdev.com',
         },
         {
           networkId: 4,
-          url: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          url: 'https://price-estimate-rinkeby.dev.gnosisdev.com',
         },
       ],
     }
