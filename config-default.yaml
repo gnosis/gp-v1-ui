@@ -57,3 +57,7 @@ defaultProviderConfig:
   # type: 'url'
   # config:
   #   ethNodeUrl: <local eth node>
+
+# Wallet Connect
+walletConnect:
+  bridge: 'wss://safe-walletconnect.gnosis.io/'
