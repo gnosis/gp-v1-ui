@@ -257,9 +257,9 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             tabIndex={tabIndex}
           />
           <div>
-            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
-            <small>per</small>
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <small>per</small>
+            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
           </div>
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
