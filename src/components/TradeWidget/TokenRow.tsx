@@ -1,5 +1,4 @@
-import React, { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useMemo, useState } from 'react'
 import BN from 'bn.js'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
@@ -11,6 +10,7 @@ import { formatSmart, formatAmountFull, parseAmount, validInputPattern, validate
 
 // components
 import TokenSelector from 'components/TokenSelector'
+import Form from 'components/DepositWidget/Form'
 import { InputBox } from 'components/InputBox'
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { Input } from 'components/Input'
@@ -19,6 +19,10 @@ import { Spinner } from 'components/Spinner'
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { faPlus } from '@fortawesome/free-solid-svg-icons'
+
+// Hooks
+import useNoScroll from 'hooks/useNoScroll'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 import { useRowActions } from 'components/DepositWidget/useRowActions'
 
@@ -28,71 +32,76 @@ const Wrapper = styled.div`
   align-items: flex-start;
   flex-flow: column wrap;
 
-  > div:first-of-type {
-    width: 100%;
-    display: flex;
-    flex-flow: row nowrap;
-    margin: 0 0 1rem;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  > div {
+    &:first-of-type {
+      width: 100%;
+      display: flex;
+      flex-flow: row nowrap;
+      margin: 0 0 1rem;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-  > div > strong {
-    margin: 0 auto 0 0;
-    text-transform: capitalize;
-    color: var(--color-text-primary);
-    display: flex;
-    align-items: center;
-    font-size: 1.5rem;
+    > strong {
+      margin: 0 auto 0 0;
+      text-transform: capitalize;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      font-size: 1.5rem;
 
-    @media ${MEDIA.mobile} {
+      @media ${MEDIA.mobile} {
+        font-size: 1.3rem;
+      }
+    }
+
+    > div {
+      display: flex;
+      flex-flow: row nowrap;
       font-size: 1.3rem;
+      color: var(--color-text-active);
+      letter-spacing: -0.03rem;
+      text-align: right;
+
+      > span {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+        justify-items: center;
+        color: var(--color-text-secondary);
+
+        > ${FormMessage} {
+          margin: 0 0 0 0.25rem;
+          padding: 0.5rem;
+        }
+      }
+
+      > button {
+        background: 0;
+        font-weight: var(--font-weight-normal);
+        color: var(--color-text-active);
+        font-size: inherit;
+        margin: 0;
+        padding: 0;
+        text-decoration: underline;
+
+        &::after {
+          content: '-';
+          margin: 0 0.5rem;
+          display: inline-block;
+          color: var(--color-text-secondary);
+          text-decoration: none;
+        }
+      }
     }
   }
 
-  > div > span {
-    display: flex;
-    flex-flow: row nowrap;
-    font-size: 1.3rem;
-    color: var(--color-text-active);
-    letter-spacing: -0.03rem;
-    text-align: right;
-  }
-
-  > div > span > span > ${FormMessage} {
-    margin: 0 0 0 0.25rem;
-  }
-
-  > div > span > button {
-    background: 0;
-    font-weight: var(--font-weight-normal);
-    color: var(--color-text-active);
-    font-size: inherit;
-    margin: 0;
-    padding: 0;
-    text-decoration: underline;
-
-    &::after {
-      content: '-';
-      margin: 0 0.5rem;
-      display: inline-block;
-      color: var(--color-text-secondary);
-      text-decoration: none;
-    }
-  }
-
-  > div > span > span {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    justify-items: center;
-    color: var(--color-text-secondary);
-  }
-
-  a.btn {
+  div.btn {
     margin: 0 1rem;
     display: flex;
     align-items: center;
+    text-decoration: underline;
+    cursor: pointer;
   }
 `
 
@@ -170,6 +179,15 @@ const TokenRow: React.FC<Props> = ({
     precision: selectedToken.decimals,
   })
 
+  const [visibleForm, showForm] = useState<'deposit' | void>()
+
+  // Checks innerWidth
+  const showResponsive = !!innerWidth && innerWidth < MEDIA.MOBILE_LARGE_PX
+  useNoScroll(!!visibleForm && showResponsive)
+
+  const isDepositFormVisible = visibleForm == 'deposit'
+  // const isWeth = balance.addressMainnet === WETH_ADDRESS_MAINNET
+
   let overMax = ZERO
   if (balance && validateMaxAmount) {
     const max = balance.totalExchangeBalance
@@ -192,9 +210,9 @@ const TokenRow: React.FC<Props> = ({
         <strong>
           {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
-        <Link to="/wallet" className="depositNow">
+        <div className="btn" onClick={(): void => showForm('deposit')}>
           + Deposit {selectedToken.symbol}
-        </Link>
+        </div>
         {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
@@ -227,7 +245,7 @@ const TokenRow: React.FC<Props> = ({
     [register],
   )
 
-  const { enableToken, enabled, enabling } = useRowActions({ balances: [balance] })
+  const { depositToken, enableToken, enabled, enabling } = useRowActions({ balances: [balance] })
   const showEnableToken = !enabled.has(balance.address) && !balance.enabled && !readOnly
   // TODO: The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented
   // const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
@@ -236,13 +254,31 @@ const TokenRow: React.FC<Props> = ({
     <Wrapper>
       <div>
         <strong>{selectLabel}</strong>
-        <span>
+        <div>
           {!readOnly && (
-            // TODO: Implement deposit in Trade widget. When ready, show also the Wrap Ether button
-            //  https://github.com/gnosis/dex-react/issues/610
-            <Link className="btn" to="/wallet">
-              + Deposit
-            </Link>
+            <>
+              <div className="btn" onClick={(): void => showForm('deposit')}>
+                + Deposit
+              </div>
+              {isDepositFormVisible && (
+                <Form
+                  title={
+                    <span>
+                      Deposit <strong>{balance.symbol}</strong> into the Exchange Wallet
+                    </span>
+                  }
+                  totalAmountLabel="wallet balance"
+                  totalAmount={balance.walletBalance}
+                  inputLabel="Deposit amount"
+                  tokenBalances={balance}
+                  submitBtnLabel="Deposit"
+                  submitBtnIcon={faPlus}
+                  onSubmit={(balanceAmt): Promise<void> => depositToken(balanceAmt, balance.address)}
+                  onClose={(): void => showForm()}
+                  responsive={showResponsive}
+                />
+              )}
+            </>
           )}
           {/* The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented  */}
           {/* {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />} */}
@@ -270,7 +306,7 @@ const TokenRow: React.FC<Props> = ({
             &nbsp;
             <HelpTooltip tooltip={BalanceTooltip} />
           </span>
-        </span>
+        </div>
       </div>
       <InputBox>
         <Input
