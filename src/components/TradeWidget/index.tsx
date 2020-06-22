@@ -636,8 +636,7 @@ const TradeWidget: React.FC = () => {
         setValue(priceInputId, newPrice)
         setValue(priceInverseInputId, invertPriceFromString(newPrice))
 
-        // now that we don't register priceValue, we don't have it inside FormContext
-        setValue(receiveInputId, calculateReceiveAmount(invertPriceFromString(priceInverseValue), sellValue))
+        setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -645,7 +644,7 @@ const TradeWidget: React.FC = () => {
 
   // Update receive amount
   useEffect(() => {
-    setValue(receiveInputId, calculateReceiveAmount(invertPriceFromString(priceInverseValue), sellValue))
+    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
   }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
 
   const url = buildUrl({
