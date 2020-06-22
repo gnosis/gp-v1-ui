@@ -194,12 +194,12 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     [setValue],
   )
 
-  const onChangePrice = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>): void => {
-      updateInversePrice(priceInverseInputId, e)
-    },
-    [updateInversePrice, priceInverseInputId],
-  )
+  // const onChangePrice = useCallback(
+  //   (e: React.ChangeEvent<HTMLInputElement>): void => {
+  //     updateInversePrice(priceInverseInputId, e)
+  //   },
+  //   [updateInversePrice, priceInverseInputId],
+  // )
 
   const onChangePriceInverse = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
@@ -208,10 +208,10 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     [updateInversePrice, priceInputId],
   )
 
-  const { onKeyPress: onKeyPressPrice, removeExcessZeros: removeExcessZerosPrice } = useNumberInput({
-    inputId: priceInputId,
-    precision: DEFAULT_PRECISION,
-  })
+  // const { onKeyPress: onKeyPressPrice, removeExcessZeros: removeExcessZerosPrice } = useNumberInput({
+  //   inputId: priceInputId,
+  //   precision: DEFAULT_PRECISION,
+  // })
   const { onKeyPress: onKeyPressPriceInverse, removeExcessZeros: removeExcessZerosPriceInverse } = useNumberInput({
     inputId: priceInverseInputId,
     precision: DEFAULT_PRECISION,
@@ -222,7 +222,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
       <strong>
         Limit Price <OrderBookBtn baseToken={receiveToken} quoteToken={sellToken} />
       </strong>
-      <PriceInputBox>
+      {/* <PriceInputBox>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -242,7 +242,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
           </div>
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
-      </PriceInputBox>
+      </PriceInputBox> */}
       <PriceInputBox>
         <label>
           <input
