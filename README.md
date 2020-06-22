@@ -255,7 +255,7 @@ Where:
 
 **Note**: Both values can be provided as environment variables. Respectively, `INFURA_ID` and `ETH_NODE_URL`.
 
-### wallet connect
+### Wallet connect
 
 Config for wallet connect. Allows to set a different bridge.
 
