@@ -62,8 +62,7 @@ export const PriceInputBox = styled.div`
   display: flex;
   flex-flow: column nowrap;
   margin: 0;
-  width: 50%;
-  width: calc(50% - 0.8rem);
+  width: 100%;
   position: relative;
   outline: 0;
 
@@ -86,7 +85,8 @@ export const PriceInputBox = styled.div`
 
   label > div:not(.radio-container) {
     position: absolute;
-    width: 7.7rem;
+    min-width: 7.7rem;
+    max-width: 10rem;
     right: 1rem;
     top: 0;
     bottom: 0;
@@ -114,10 +114,10 @@ export const PriceInputBox = styled.div`
       white-space: nowrap;
     }
     > small:nth-child(2) {
-      max-width: 6%;
-      margin: 0 0.08rem;
-      font-size: 1.5rem;
-      font-weight: normal;
+      max-width: 10%;
+      min-width: min-content;
+      margin: 0 0.3rem;
+      font-size: 1rem;
     }
   }
 
@@ -133,7 +133,7 @@ export const PriceInputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 9rem 0 1rem;
+    padding: 0 11.1rem 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {
