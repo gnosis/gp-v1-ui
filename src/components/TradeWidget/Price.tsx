@@ -258,7 +258,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
           />
           <div>
             <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
-            <small>/</small>
+            <small>per</small>
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
           </div>
         </label>
