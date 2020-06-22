@@ -14,11 +14,13 @@ import TokenSelector from 'components/TokenSelector'
 import { InputBox } from 'components/InputBox'
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { Input } from 'components/Input'
+import { Spinner } from 'components/Spinner'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
+import { useRowActions } from 'components/DepositWidget/useRowActions'
 
 const Wrapper = styled.div`
   display: flex;
@@ -225,6 +227,8 @@ const TokenRow: React.FC<Props> = ({
     [register],
   )
 
+  const { enableToken, enabled, enabling } = useRowActions({ balances: [balance] })
+  const showEnableToken = !enabled.has(balance.address) && !balance.enabled && !readOnly
   // TODO: The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented
   // const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
 
@@ -288,9 +292,13 @@ const TokenRow: React.FC<Props> = ({
 
         {/* Using TokenBoxWrapper to use a single parent for the ENABLE button and TokenSelector */}
         <TokenBoxWrapper>
-          {/* TODO: Implement enable token in Trade widget */}
-          {/*   https://github.com/gnosis/dex-react/issues/611 */}
-          {!readOnly && <TokenEnable className="not-implemented">Enable</TokenEnable>}
+          {enabling.has(balance.address) ? (
+            <TokenEnable>
+              <Spinner style={{ marginRight: '1rem' }} /> Enabling
+            </TokenEnable>
+          ) : showEnableToken ? (
+            <TokenEnable onClick={(): Promise<void> => enableToken(selectedToken.address)}>Enable</TokenEnable>
+          ) : null}
           <TokenSelector
             label={selectLabel}
             isDisabled={isDisabled}
