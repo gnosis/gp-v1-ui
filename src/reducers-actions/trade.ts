@@ -26,6 +26,7 @@ export const INITIAL_TRADE_STATE: TradeState = {
   sellToken: null,
   buyToken: null,
   validFrom: null,
+  // Do not expire (never)
   validUntil: null,
 }
 
