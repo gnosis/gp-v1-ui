@@ -369,7 +369,7 @@ export const DEFAULT_FORM_STATE = {
   // ASAP
   validFrom: undefined,
   // Do not expire (never)
-  validUntil: null,
+  validUntil: undefined,
 }
 
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
