@@ -88,9 +88,10 @@ const Trades: React.FC = () => {
   const { networkId, userAddress, isConnected } = useWalletConnection()
   const trades = useTrades()
 
-  const filteredTrades = useMemo(() => trades.filter(trade => isTradeSettled(trade) && !isTradeReverted(trade)), [
-    trades,
-  ])
+  const filteredTrades = useMemo(
+    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
+    [trades],
+  )
 
   const generateCsv = useCallback(
     () =>
