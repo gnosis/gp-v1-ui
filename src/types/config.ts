@@ -37,6 +37,10 @@ export interface ExchangeContractConfig {
   config: ContractDeploymentBlock[]
 }
 
+export interface WalletConnectConfig {
+  bridge: string
+}
+
 export interface Config {
   name: string
   logoPath: string
@@ -46,4 +50,5 @@ export interface Config {
   theGraphApi: TheGraphApiConfig
   defaultProviderConfig: InfuraProviderConfig | UrlProviderConfig
   exchangeContractConfig: ExchangeContractConfig
+  walletConnect: WalletConnectConfig
 }

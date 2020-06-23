@@ -26,7 +26,8 @@ export const INITIAL_TRADE_STATE: TradeState = {
   sellToken: null,
   buyToken: null,
   validFrom: null,
-  validUntil: '2880',
+  // Do not expire (never)
+  validUntil: null,
 }
 
 export function reducer(state: TradeState, action: ReducerActionType): TradeState {
