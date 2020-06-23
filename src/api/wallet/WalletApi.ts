@@ -22,7 +22,7 @@ import {
 } from '@gnosis.pm/dapp-ui'
 
 import { logDebug, toBN, gasPriceEncoder } from 'utils'
-import { INFURA_ID } from 'const'
+import { INFURA_ID, WALLET_CONNECT_BRIDGE } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
@@ -173,6 +173,7 @@ const wcOptions: Omit<WalletConnectInits, 'package'> = {
   options: {
     // TODO get infuraId from .env
     infuraId: INFURA_ID,
+    bridge: WALLET_CONNECT_BRIDGE,
   },
 }
 
