@@ -1,6 +1,6 @@
 import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-ui'
 import { delay } from 'utils'
-import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
+import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER, WALLET_CONNECT_BRIDGE } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import Web3 from 'web3'
 import { logDebug } from 'utils'
@@ -12,6 +12,7 @@ const getWCIfConnected = async (): Promise<WCProvider | null> => {
   )
   const provider = new WalletConnectProvider({
     infuraId: INFURA_ID,
+    bridge: WALLET_CONNECT_BRIDGE,
   })
 
   if (!provider.wc.connected) return null
