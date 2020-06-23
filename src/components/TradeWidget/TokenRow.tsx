@@ -145,6 +145,7 @@ interface Props {
   validateMaxAmount?: true
   tabIndex: number
   readOnly: boolean
+  userConnected?: boolean
   autoFocus?: boolean
 }
 
@@ -166,6 +167,7 @@ const TokenRow: React.FC<Props> = ({
   validateMaxAmount,
   tabIndex,
   readOnly = false,
+  userConnected = true,
   autoFocus,
 }) => {
   const isEditable = isDisabled || readOnly
@@ -186,7 +188,6 @@ const TokenRow: React.FC<Props> = ({
   useNoScroll(!!visibleForm && showResponsive)
 
   const isDepositFormVisible = visibleForm == 'deposit'
-  // const isWeth = balance.addressMainnet === WETH_ADDRESS_MAINNET
 
   let overMax = ZERO
   if (balance && validateMaxAmount) {
@@ -210,9 +211,11 @@ const TokenRow: React.FC<Props> = ({
         <strong>
           {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
-        <div className="btn" onClick={(): void => showForm('deposit')}>
-          + Deposit {selectedToken.symbol}
-        </div>
+        {!readOnly && userConnected && (
+          <div className="btn" onClick={(): void => showForm('deposit')}>
+            + Deposit {selectedToken.symbol}
+          </div>
+        )}
         {/* This creates a standing order. <a href="#">Read more</a>. */}
       </FormMessage>
     )
@@ -246,16 +249,14 @@ const TokenRow: React.FC<Props> = ({
   )
 
   const { depositToken, enableToken, enabled, enabling } = useRowActions({ balances: [balance] })
-  const showEnableToken = !enabled.has(balance.address) && !balance.enabled && !readOnly
-  // TODO: The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented
-  // const isWeth = selectedToken.addressMainnet === WETH_ADDRESS_MAINNET
+  const showEnableToken = !readOnly && userConnected && !enabled.has(balance.address) && !balance.enabled
 
   return (
     <Wrapper>
       <div>
         <strong>{selectLabel}</strong>
         <div>
-          {!readOnly && (
+          {!readOnly && userConnected && (
             <>
               <div className="btn" onClick={(): void => showForm('deposit')}>
                 + Deposit
