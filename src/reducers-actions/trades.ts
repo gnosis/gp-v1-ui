@@ -4,7 +4,7 @@ import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/Exchange
 
 import { Actions } from 'reducers-actions'
 
-import { logDebug, dateToBatchId, toBN, setStorageItem, flattenMapOfSets } from 'utils'
+import { logDebug, dateToBatchId, toBN, setStorageItem, flattenMapOfLists } from 'utils'
 import { TRADES_LOCAL_STORAGE_KEY } from 'const'
 
 // ******** TYPES/INTERFACES
@@ -12,11 +12,18 @@ import { TRADES_LOCAL_STORAGE_KEY } from 'const'
 export type ActionTypes = 'OVERWRITE_TRADES' | 'APPEND_TRADES' | 'UPDATE_BLOCK'
 
 export type TradesState = Record<string, TradesStatePerAccount>
+export type SerializableTradesState = Record<string, SerializableTradesStatePerAccount>
 
 interface TradesStatePerAccount {
   trades: Trade[]
-  pendingTrades: [string, Trade[]][]
+  tradeIds: Set<string>
+  pendingTrades: Map<string, Trade[]>
   lastCheckedBlock?: number
+}
+
+interface SerializableTradesStatePerAccount extends Omit<TradesStatePerAccount, 'tradeIds' | 'pendingTrades'> {
+  tradeIds: string[]
+  pendingTrades: [string, Trade[]][]
 }
 
 interface WithReverts {
@@ -32,11 +39,11 @@ interface WithAccountInfo {
 
 type OverwriteTradesActionType = Actions<
   'OVERWRITE_TRADES',
-  Omit<TradesStatePerAccount, 'pendingTrades'> & WithReverts & WithAccountInfo
+  Pick<TradesStatePerAccount, 'trades' | 'lastCheckedBlock'> & WithReverts & WithAccountInfo
 >
 type AppendTradesActionType = Actions<
   'APPEND_TRADES',
-  Required<Omit<TradesStatePerAccount, 'pendingTrades'>> & WithReverts & WithAccountInfo
+  Required<Pick<TradesStatePerAccount, 'trades' | 'lastCheckedBlock'>> & WithReverts & WithAccountInfo
 >
 type UpdateBlockActionType = Actions<
   'UPDATE_BLOCK',
@@ -79,32 +86,34 @@ function buildTradeRevertKey(batchId: number, orderId: string): string {
 
 // ******** HELPERS
 
-function groupByRevertKey<T extends EventWithBlockInfo>(list: T[], initial?: Map<string, Set<T>>): Map<string, Set<T>> {
-  const map = initial || new Map<string, Set<T>>()
-  const seenIds = new Set<string>()
+function groupByRevertKey<T extends EventWithBlockInfo>(
+  list: T[],
+  initial?: Map<string, T[]>,
+  seenTradeIds?: Set<string>,
+): { group: Map<string, T[]>; seenIds: Set<string> } {
+  const group = initial || new Map<string, T[]>()
+  const seenIds = seenTradeIds || new Set<string>()
+  const newIds = new Set<string>()
 
   list.forEach(item => {
     // Avoid duplicate entries
-    if (seenIds.has(item.id)) {
+    if (seenIds.has(item.id) || newIds.has(item.id)) {
       return
     }
-    seenIds.add(item.id)
+    newIds.add(item.id)
 
     const revertKey = buildTradeRevertKey(item.batchId, item.orderId)
 
-    if (map.has(revertKey)) {
-      const tradesSet = map.get(revertKey) as Set<T>
+    if (group.has(revertKey)) {
+      const tradesList = group.get(revertKey) as T[]
 
-      tradesSet.add(item)
+      tradesList.push(item)
     } else {
-      map.set(
-        revertKey,
-        new Set<T>([item]),
-      )
+      group.set(revertKey, [item])
     }
   })
 
-  return map
+  return { group, seenIds: newIds }
 }
 
 function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): number {
@@ -115,7 +124,7 @@ function sortByTimeAndPosition(a: EventWithBlockInfo, b: EventWithBlockInfo): nu
   return a.eventIndex - b.eventIndex
 }
 
-function getPendingTrades(tradesByRevertKey: Map<string, Set<Trade>>): [string, Trade[]][] {
+function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, Trade[]> {
   // Now that we matched the reverts with trades we currently have, we filter the trades
   // that might have reverts still coming in.
 
@@ -126,11 +135,11 @@ function getPendingTrades(tradesByRevertKey: Map<string, Set<Trade>>): [string, 
   // The `revertKey` is composed by batchId|orderId, so this regex looks for the batchIds in the keys
   const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\\\|`)
 
-  const pending: [string, Trade[]][] = []
+  const pending = new Map<string, Trade[]>()
 
   tradesByRevertKey.forEach((trades, key) => {
     if (batchesRegex.test(key)) {
-      pending.push([key, Array.from(trades)])
+      pending.set(key, trades)
     }
   })
 
@@ -140,15 +149,12 @@ function getPendingTrades(tradesByRevertKey: Map<string, Set<Trade>>): [string, 
 function applyRevertsToTrades(
   trades: Trade[],
   reverts: TradeReversion[],
-  pendingTrades?: [string, Trade[]][],
-): [Trade[], [string, Trade[]][]] {
-  // Not trivial to serialize to/from JSON a Map of Sets, so we instead rebuild it here on start
-  const initialTrades = new Map<string, Set<Trade>>()
-  pendingTrades?.forEach(([key, value]) => initialTrades.set(key, new Set(value)))
-
+  pendingTrades?: Map<string, Trade[]>,
+  seenIds?: Set<string>,
+): { trades: Trade[]; pendingTrades: Map<string, Trade[]>; seenIds: Set<string> } {
   // Group trades by revertKey
-  const tradesByRevertKey = groupByRevertKey(trades, initialTrades)
-  const revertsByRevertKey = groupByRevertKey(reverts)
+  const { group: tradesByRevertKey, seenIds: newTradeIds } = groupByRevertKey(trades, pendingTrades, seenIds)
+  const { group: revertsByRevertKey } = groupByRevertKey(reverts)
 
   // Assumptions:
   // 1. There can be more than one trade per batch for a given order (even if there are no reverts)
@@ -157,13 +163,11 @@ function applyRevertsToTrades(
   // 3. Every revert matches 1 trade
   // 4. Reverts match Trades by order or appearance (first Revert matches first Trade and so on)
 
-  revertsByRevertKey.forEach((revertsSet, revertKey) => {
-    const reverts = Array.from(revertsSet).sort(sortByTimeAndPosition)
-    const tradesSet = tradesByRevertKey.get(revertKey)
+  revertsByRevertKey.forEach((revertsList, revertKey) => {
+    const reverts = revertsList.sort(sortByTimeAndPosition)
+    const trades = tradesByRevertKey.get(revertKey)?.sort(sortByTimeAndPosition)
 
-    if (tradesSet) {
-      const trades = Array.from(tradesSet).sort(sortByTimeAndPosition)
-
+    if (trades) {
       let tradesIndex = 0
       let revertsIndex = 0
       // Iterate over both trades and reverts while there are any
@@ -199,12 +203,28 @@ function applyRevertsToTrades(
     }
   })
 
-  return [flattenMapOfSets(tradesByRevertKey), getPendingTrades(tradesByRevertKey)]
+  // Transform groups into a single list
+  const newTrades = flattenMapOfLists(tradesByRevertKey)
+    // Remove old trades that were used only to help matching possible reverts to new trades
+    .filter(trade => trade && newTradeIds.has(trade.id))
+
+  // Merge existing and new set of ids
+  seenIds?.forEach(id => id && newTradeIds.add(id))
+
+  return {
+    trades: newTrades,
+    pendingTrades: getPendingTrades(tradesByRevertKey),
+    seenIds: newTradeIds,
+  }
 }
 
 // ******** INITIAL STATE / LOCAL STORAGE
 
-const INITIAL_TRADES_STATE_SINGLE_NETWORK = { trades: [], pendingTrades: new Map<string, Trade[]>() }
+const INITIAL_TRADES_STATE_SINGLE_ACCOUNT = {
+  trades: [],
+  pendingTrades: new Map<string, Trade[]>(),
+  tradeIds: new Set<string>(),
+}
 
 /**
  * Custom json parser for BN and BigNumber values.
@@ -230,6 +250,34 @@ function reviver(key: string, value: unknown): unknown {
   return value
 }
 
+function serialize(state: TradesState): SerializableTradesState {
+  const serialized = {}
+
+  Object.keys(state).forEach(accountKey => {
+    serialized[accountKey] = { ...state[accountKey], tradeIds: [], pendingTrades: [] }
+    state[accountKey].tradeIds?.forEach(id => serialized[accountKey].tradeIds.push(id))
+    state[accountKey].pendingTrades?.forEach((value, key) => serialized[accountKey].pendingTrades.push([key, value]))
+  })
+
+  return serialized
+}
+
+function deserialize(state: SerializableTradesState): TradesState {
+  const parsedState = {}
+
+  Object.keys(state).forEach(accountKey => {
+    parsedState[accountKey] = {
+      ...state[accountKey],
+      tradeIds: new Set<string>(),
+      pendingTrades: new Map<string, Trade[]>(),
+    }
+    state[accountKey].tradeIds?.forEach(id => parsedState[accountKey].tradeIds.add(id))
+    state[accountKey].pendingTrades?.forEach(tuple => parsedState[accountKey].pendingTrades.set(...tuple))
+  })
+
+  return parsedState
+}
+
 function loadInitialState(): TradesState {
   let state = {}
 
@@ -237,7 +285,7 @@ function loadInitialState(): TradesState {
 
   if (localStorageOrders) {
     try {
-      state = JSON.parse(localStorageOrders, reviver)
+      state = deserialize(JSON.parse(localStorageOrders, reviver))
     } catch (e) {
       logDebug(`[reducer:trades] Failed to load localStorage`, e.msg)
     }
@@ -257,21 +305,25 @@ export const reducer = (state: TradesState, action: ReducerActionType): TradesSt
 
       const accountKey = buildAccountKey({ networkId, userAddress })
 
-      const { trades: currTrades, pendingTrades: currPendingTrades } =
-        state[accountKey] || INITIAL_TRADES_STATE_SINGLE_NETWORK
+      const { trades: currTrades, pendingTrades: currPendingTrades, tradeIds } =
+        state[accountKey] || INITIAL_TRADES_STATE_SINGLE_ACCOUNT
 
-      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts, currPendingTrades)
+      const { trades, pendingTrades, seenIds } = applyRevertsToTrades(newTrades, reverts, currPendingTrades, tradeIds)
 
-      return { ...state, [accountKey]: { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades } }
+      return {
+        ...state,
+        [accountKey]: { trades: currTrades.concat(trades), lastCheckedBlock, pendingTrades, tradeIds: seenIds },
+      }
     }
     case 'OVERWRITE_TRADES': {
       const { trades: newTrades, reverts, lastCheckedBlock, networkId, userAddress } = action.payload
 
       const accountKey = buildAccountKey({ networkId, userAddress })
+      const tradeIds = new Set<string>()
 
-      const [trades, pendingTrades] = applyRevertsToTrades(newTrades, reverts)
+      const { trades, pendingTrades, seenIds } = applyRevertsToTrades(newTrades, reverts, undefined, tradeIds)
 
-      return { ...state, [accountKey]: { trades, lastCheckedBlock, pendingTrades } }
+      return { ...state, [accountKey]: { trades, lastCheckedBlock, pendingTrades, tradeIds: seenIds } }
     }
     case 'UPDATE_BLOCK': {
       const { networkId, lastCheckedBlock } = action.payload
@@ -291,6 +343,6 @@ export async function sideEffect(state: TradesState, action: ReducerActionType):
     case 'APPEND_TRADES':
     case 'OVERWRITE_TRADES':
     case 'UPDATE_BLOCK':
-      setStorageItem(TRADES_LOCAL_STORAGE_KEY, state)
+      setStorageItem(TRADES_LOCAL_STORAGE_KEY, serialize(state))
   }
 }
