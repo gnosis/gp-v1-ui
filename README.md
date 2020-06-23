@@ -226,7 +226,7 @@ Where:
 
 Endpoint for default Ethereum network provider.
 
-Used when a wallet is not connected and for read operations when connected thru Wallet Connect.
+Used when a wallet is not connected and for read operations when connected through Wallet Connect.
 
 **Config format:**
 
@@ -265,3 +265,5 @@ Config for wallet connect. Allows to set a different bridge.
 walletConnect:
   bridge: 'wss://safe-walletconnect.gnosis.io/'
 ```
+
+Alternatively you can set the bridge by declaring the env var `WALLET_CONNECT_BRIDGE` that would take precedence over the config.
