@@ -211,6 +211,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
 const OrderValidityBox = styled(PriceInputBox)`
   flex-flow: column nowrap;
+  width: calc(50% - 0.8rem);
 
   strong {
     margin-bottom: 1rem;
