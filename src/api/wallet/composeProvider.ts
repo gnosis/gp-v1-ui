@@ -111,14 +111,15 @@ export const composeProvider = <T extends Provider>(
     // read-only of course
     // account will update on the next eth_accounts call
     // normally on new block in a few seconds
+
+    let substituteAccount = ''
+
     engine.push(
       createConditionalMiddleware(
         req => req.method === 'eth_accounts',
         (_req, res) => {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          if ((window as any).__acc) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            res.result = [(window as any).__acc]
+          if (substituteAccount) {
+            res.result = [substituteAccount]
             return true
           }
 
@@ -126,6 +127,10 @@ export const composeProvider = <T extends Provider>(
         },
       ),
     )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).loginAs = (address: string): void => {
+      substituteAccount = address
+    }
   }
 
   engine.push(
