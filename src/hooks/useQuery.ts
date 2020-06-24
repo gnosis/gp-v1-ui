@@ -13,7 +13,7 @@ export function useQuery(): { sellAmount: string; price: string; validFrom?: str
       sellAmount: sanitizeInput(query.get('sell')),
       price: sanitizeInput(query.get('price')),
       validFrom: Number(query.get('from')) ? sanitizeNegativeAndMakeMultipleOf(query.get('from')) : undefined,
-      validUntil: sanitizeNegativeAndMakeMultipleOf(query.get('expires'), DEFAULT_FORM_STATE.validUntil),
+      validUntil: sanitizeNegativeAndMakeMultipleOf(query.get('expires'), DEFAULT_FORM_STATE.validUntil ?? ''),
     }
   }, [search])
 }
