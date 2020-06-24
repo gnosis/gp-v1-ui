@@ -1,5 +1,5 @@
 import { delay } from 'utils'
-import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER } from 'const'
+import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER, WALLET_CONNECT_BRIDGE } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { logDebug } from 'utils'
 
@@ -10,6 +10,7 @@ const getWCIfConnected = async (): Promise<unknown> => {
   )
   const provider = new WalletConnectProvider({
     infuraId: INFURA_ID,
+    bridge: WALLET_CONNECT_BRIDGE,
   })
 
   if (!provider.wc.connected) return null

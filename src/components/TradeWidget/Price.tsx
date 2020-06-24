@@ -93,8 +93,6 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
 
   label > div:not(.radio-container) {
     position: absolute;
-    min-width: 7.7rem;
-    max-width: 10rem;
     right: 1rem;
     top: 0;
     bottom: 0;
@@ -116,14 +114,12 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
     }
     > small:not(:nth-child(2)) {
       font-size: inherit;
-      max-width: 47%;
+      max-width: 6ch;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
     }
     > small:nth-child(2) {
-      max-width: 10%;
-      min-width: min-content;
       margin: 0 0.3rem;
       font-size: 1rem;
     }
@@ -141,7 +137,7 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 11.1rem 0 1rem;
+    padding: 0 15ch 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {
