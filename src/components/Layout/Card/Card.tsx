@@ -132,6 +132,10 @@ export const CardTable = styled.table<{
   .checked {
     margin: 0;
     outline: 0;
+
+    > input[type="checkbox"] {
+      margin: 0;
+    }
   }
   
   > thead {
@@ -145,7 +149,7 @@ export const CardTable = styled.table<{
     font-weight: var(--font-weight-bold);
   }
 
-  > thead, tbody {
+  > thead, > tbody {
     > tr:not(.cardRowDrawer) {
       position: relative;
       display: grid;
@@ -195,16 +199,15 @@ export const CardTable = styled.table<{
   }  
   
   // Table Header
-  > thead {
+  thead {
     // No styling for table header
-    > tr {
+    tr {
       background-color: transparent;
       box-shadow: none;
 
-      > th {
+      th {
         color: inherit;
         line-height: 1.2;
-        font-size: 1.1rem;
         height: 4rem;
 
         &.sortable {
@@ -214,30 +217,26 @@ export const CardTable = styled.table<{
         > svg {
           margin: 0 0 0.04rem 0.2rem;
         }
-      }
-      
-      > th.filled {
-      }
+      } 
     }
   }
-
-  // Table Body
+  
   tbody {
     flex: 1;
     display: flex;
     flex-flow: nowrap column;
+    
     font-size: 1.1rem;
     font-family: var(--font-mono);
     font-weight: var(--font-weight-regular);
     color: var(--color-text-primary);
+    
     letter-spacing: -0.085rem;
     line-height: 1.2;
-  }
-  
-  tbody {
-    > tr:not(.cardRowDrawer) {
 
-      > td {
+    tr:not(.cardRowDrawer) {
+
+      td {
         &.cardOpener {
           display: none;
         }
@@ -272,9 +271,9 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
   flex-flow: column nowrap;
   justify-content: flex-start;
 
-  width: auto;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 0 2.4rem;
+  padding: 0 0 2rem;
 
   border-radius: 0.6rem;
   font-size: 1.6rem;
@@ -306,13 +305,12 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     /////////////////////
     // TABLE HEADERS
     /////////////////////
-    > thead {
+    thead {
       @media ${MEDIA.mobile} {
         display: none;
       }
 
-      > tr:not(.cardRowDrawer) > th {
-        font-size: 1.1rem;
+      tr:not(.cardRowDrawer) > th {
         color: var(--color-text-primary);
         letter-spacing: 0;
       }
@@ -321,8 +319,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     /////////////////////
     // TABLE BODY
     /////////////////////
-    > tbody {
-      font-size: 1.3rem;
+    tbody {
       line-height: 1;
 
       @media ${MEDIA.mobile} {
@@ -331,36 +328,43 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         width: 100%;
       }
 
-      > tr:not(.cardRowDrawer) > td {
-        display: flex;
-        flex-flow: row wrap;
-        align-items: center;
-        word-break: break-word;
-        white-space: normal;
-
-        @media ${MEDIA.mobile} {
-          width: 100%;
-          border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
-          padding: 1rem 0.5rem;
-          flex-flow: row nowrap;
-
-          &:last-of-type {
-            border: 0;
-          }
+      tr:not(.cardRowDrawer) {
+        &:last-child {
+          border-bottom: 0.1rem solid rgba(159, 180, 201, 0.5);
+          border-radius: var(--border-radius);
         }
 
-        &::before {
+        td {
+          display: flex;
+          flex-flow: row wrap;
+          align-items: center;
+          word-break: break-word;
+          white-space: normal;
+
           @media ${MEDIA.mobile} {
-            content: attr(data-label);
-            margin-right: auto;
-            font-weight: var(--font-weight-bold);
-            text-transform: uppercase;
-            font-size: 1rem;
-            font-family: var(--font-default);
-            letter-spacing: 0;
-            white-space: nowrap;
-            padding: 0 0.5rem 0 0;
-            color: var(--color-text-primary);
+            width: 100%;
+            border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+            padding: 1rem 0.5rem;
+            flex-flow: row nowrap;
+
+            &:last-of-type {
+              border: 0;
+            }
+          }
+
+          &::before {
+            @media ${MEDIA.mobile} {
+              content: attr(data-label);
+              margin-right: auto;
+              font-weight: var(--font-weight-bold);
+              text-transform: uppercase;
+              font-size: 1rem;
+              font-family: var(--font-default);
+              letter-spacing: 0;
+              white-space: nowrap;
+              padding: 0 0.5rem 0 0;
+              color: var(--color-text-primary);
+            }
           }
         }
       }
@@ -369,13 +373,12 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     /////////////////////
     // ALL TABLE ROWS
     /////////////////////
-    > thead > tr:not(.cardRowDrawer),
-    > tbody > tr:not(.cardRowDrawer) {
+    tr:not(.cardRowDrawer) {
       ${({ $columns }): string => ($columns ? `grid-template-columns: ${$columns}` : '')};
       text-align: left;
-      padding: 0.8rem 1.6rem;
       margin: 0;
       justify-content: flex-end;
+      padding: 0.8rem 1.6rem;
 
       @media ${MEDIA.mobile} {
         padding: 1.6rem 0.8rem;

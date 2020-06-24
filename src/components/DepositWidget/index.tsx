@@ -39,10 +39,13 @@ interface WithdrawState {
 const BalancesWidget = styled(CardWidgetWrapper)`
   background: var(--color-background-pageWrapper);
 
-  ${CardTable} {
+  > ${CardTable} {
     > thead,
     > tbody {
+      font-size: 1.3rem;
+
       > tr:not(.cardRowDrawer) {
+        padding: 0.8rem 1.6rem;
         > td,
         > th {
           justify-content: flex-end;
@@ -70,16 +73,9 @@ const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  .balances-hideZero,
-  .balances-manageTokens {
-    white-space: nowrap;
-  }
-
   // button
   .balances-manageTokens {
-    font-size: 1.4rem;
     color: var(--color-text-active);
-    letter-spacing: 0;
     text-align: right;
     font-weight: var(--font-weight-normal);
     appearance: none;
@@ -102,20 +98,25 @@ const BalancesWidget = styled(CardWidgetWrapper)`
   .balances-hideZero {
     display: flex;
     flex-flow: row nowrap;
-    font-size: 1.4rem;
     color: var(--color-text-primary);
-    letter-spacing: 0;
     font-weight: var(--font-weight-regular);
     margin: 0 2rem;
     cursor: pointer;
 
-    @media ${MEDIA.mobile} {
-      margin: 0 1.6rem 1.6rem;
-    }
-
     > b {
       font-weight: inherit;
       margin: 0 0 0 0.5rem;
+    }
+  }
+
+  .balances-hideZero,
+  .balances-manageTokens {
+    white-space: nowrap;
+    font-size: 1.4rem;
+    letter-spacing: 0;
+
+    @media ${MEDIA.mobile} {
+      margin: 0 1.6rem 1.6rem;
     }
   }
 `

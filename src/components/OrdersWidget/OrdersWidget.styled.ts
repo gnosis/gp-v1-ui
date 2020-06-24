@@ -2,10 +2,6 @@ import styled from 'styled-components'
 import { MEDIA } from 'const'
 import { CardWidgetWrapper } from 'components/Layout/Card'
 
-export const OrdersWidgetCardWrapper = styled(CardWidgetWrapper)`
-  width: 100%;
-`
-
 export const OrdersWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -60,6 +56,37 @@ export const OrdersWrapper = styled.div`
     text-align: center;
     line-height: 1.4;
   }
+
+  ${CardWidgetWrapper} {
+    > table {
+      > thead,
+      > tbody {
+        font-size: 1.3rem;
+      }
+
+      > tbody {
+        > tr.orderRowWrapper {
+          > td.cardOpener {
+            display: none;
+          }
+
+          @media ${MEDIA.mobile} {
+            display: flex;
+
+            > td.checked {
+              order: 5;
+              border: none;
+
+              > input[type='checkbox'] {
+                margin: 0;
+                margin-left: auto;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 `
 
 export const ButtonWithIcon = styled.button`
@@ -101,14 +128,20 @@ export const OrdersForm = styled.div`
     > label.checked {
       display: none;
       justify-content: center;
-      margin: 0 1rem;
+      margin: auto 1rem;
       white-space: nowrap;
 
       > small {
         margin-right: 1rem;
       }
+    }
 
-      @media ${MEDIA.mobile} {
+    @media ${MEDIA.mobile} {
+      > .balances-searchTokens {
+        margin: 0.8rem;
+      }
+
+      > label.checked {
         display: flex;
       }
     }
@@ -193,30 +226,6 @@ export const OrdersForm = styled.div`
     padding: 0 0 5rem;
     box-sizing: border-box;
     overflow-y: auto;
-
-    ${OrdersWidgetCardWrapper} {
-      > table > tbody {
-        > tr.orderRowWrapper {
-          > td.cardOpener {
-            display: none;
-          }
-
-          @media ${MEDIA.mobile} {
-            display: flex;
-
-            > td.checked {
-              order: 5;
-              border: none;
-
-              > input[type='checkbox'] {
-                margin: 0;
-                margin-left: auto;
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   .checked {

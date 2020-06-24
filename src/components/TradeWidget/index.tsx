@@ -253,6 +253,25 @@ const OrdersPanel = styled.div`
     min-height: initial;
     min-width: initial;
     max-width: initial;
+
+    // Search Filter
+    .widgetFilterTools {
+      > .balances-searchTokens {
+        height: 3.6rem;
+        margin: 0.8rem;
+      }
+    }
+
+    .widgetCardWrapper {
+      thead,
+      tbody {
+        font-size: 1.1rem;
+
+        > tr {
+          padding: 0 1.4rem;
+        }
+      }
+    }
   }
 
   > div {

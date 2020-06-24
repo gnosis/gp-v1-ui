@@ -24,19 +24,14 @@ import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchang
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
-import { CardTable } from 'components/Layout/Card'
+import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { InnerTradesWidget } from 'components/TradesWidget'
 import FilterTools from 'components/FilterTools'
 
 // OrderWidget
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
-import {
-  OrdersWrapper,
-  ButtonWithIcon,
-  OrdersForm,
-  OrdersWidgetCardWrapper,
-} from 'components/OrdersWidget/OrdersWidget.styled'
+import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
 
@@ -395,18 +390,17 @@ const OrdersWidget: React.FC = () => {
             {/* FILLS AKA TRADES */}
             {selectedTab === 'fills' ? (
               <div className="ordersContainer">
-                <OrdersWidgetCardWrapper>
+                <CardWidgetWrapper className="widgetCardWrapper">
                   <InnerTradesWidget isTab trades={filteredTrades} />
-                </OrdersWidgetCardWrapper>
+                </CardWidgetWrapper>
               </div>
             ) : ordersCount > 0 ? (
               // ACTIVE / LIQUIDITY / CLOSED ORDERS
               <div className="ordersContainer">
-                <OrdersWidgetCardWrapper>
+                <CardWidgetWrapper className="widgetCardWrapper">
                   <CardTable
                     $columns="3.2rem repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(7.2rem, 0.3fr)"
                     $gap="0 0.6rem"
-                    $padding="0 0.8rem"
                     $rowSeparation="0"
                   >
                     <thead>
@@ -457,7 +451,7 @@ const OrdersWidget: React.FC = () => {
                       ))}
                     </tbody>
                   </CardTable>
-                </OrdersWidgetCardWrapper>
+                </CardWidgetWrapper>
               </div>
             ) : (
               <div className="noOrders">

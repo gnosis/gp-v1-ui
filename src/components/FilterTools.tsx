@@ -39,8 +39,8 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
     margin: 1.2rem;
 
     @media ${MEDIA.mobile} {
-      height: 3.6rem;
-      margin: 0.8rem;
+      height: 4.6rem;
+      margin: 0 0 1.6rem 0;
 
       > input {
         flex: 1 1 50%;
