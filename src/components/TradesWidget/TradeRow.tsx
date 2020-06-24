@@ -1,10 +1,8 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUndo } from '@fortawesome/free-solid-svg-icons'
 
-import { formatPrice, formatSmart, formatAmountFull, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
@@ -86,6 +84,10 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   } = trade
   const buyTokenDecimals = buyToken.decimals || DEFAULT_PRECISION
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
+  // Calculate the inverse price - just make sure Limit Price is defined and isn't ZERO
+  // don't want none of that divide by zero and destroy the world stuff
+  const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
+  const invertedFillPrice = invertPrice(fillPrice)
 
   const typeColumnTitle = useMemo(() => {
     switch (type) {
@@ -115,38 +117,38 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
         {formatDateFromBatchId(batchId, { strict: true })}
       </td>
-      <td>
+      <td data-label="Trade">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
-      <td data-label="Limit Price" title={limitPrice && formatPrice({ price: limitPrice, decimals: 8 })}>
-        {limitPrice ? formatPrice(limitPrice) : 'N/A'}
+      <td
+        data-label="Limit Price / Fill Price"
+        title={`${invertedLimitPrice ? formatPrice({ price: invertedLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice(
+          {
+            price: invertedFillPrice,
+            decimals: 8,
+          },
+        )}`}
+      >
+        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'}
+        <br />
+        {formatPrice(invertedFillPrice)}
       </td>
-      <td data-label="Fill Price" title={formatPrice({ price: fillPrice, decimals: 8 })}>
-        {formatPrice(fillPrice)}
-      </td>
-      <td data-label="Amount" title={formatAmountFull({ amount: sellAmount, precision: sellTokenDecimals })}>
+      <td
+        data-label="Amount / Received"
+        title={`${formatAmountFull({
+          amount: sellAmount,
+          precision: sellTokenDecimals,
+        })} / ${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
+      >
         {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {displayTokenSymbolOrLink(sellToken)}
-      </td>
-      <td data-label="Received" title={formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}>
+        <br />
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
       </td>
-      <td>
-        {/* TODO: remove icon and filter out reverted trades */}
-        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />{' '}
-        {trade.revertId && (
-          <FontAwesomeIcon
-            icon={faUndo}
-            data-trade-id={trade.id}
-            data-revert-id={trade.revertId}
-            data-revert-timestamp={trade.revertTimestamp}
-            data-sell-token-id={trade.sellTokenId}
-            data-buy-token-id={trade.buyTokenId}
-            data-order-id={trade.orderId}
-          />
-        )}
+      <td data-label="View on Etherscan">
+        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
       </td>
     </tr>
   )

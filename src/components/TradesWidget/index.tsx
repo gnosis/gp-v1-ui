@@ -6,25 +6,33 @@ import styled from 'styled-components'
 
 import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
 
-import { ContentPage } from 'components/Layout/PageWrapper'
-import { CardTable } from 'components/Layout/Card'
+import FilterTools from 'components/FilterTools'
+import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
+import { TradeRow } from 'components/TradesWidget/TradeRow'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
+import useDataFilter from 'hooks/useDataFilter'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
+import { filterTradesFn } from 'utils/filter'
 
-import { TradeRow } from 'components/TradesWidget/TradeRow'
 import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
 const CsvButtonContainer = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
+  width: 100%;
+`
+
+const SplitHeaderTitle = styled.div`
+  display: flex;
+  flex-flow: column;
 `
 
 function symbolOrAddress(token: TokenDetails): string {
@@ -60,14 +68,14 @@ function csvTransformer(trade: Trade): CsvColumns {
     SellTokenAddress: sellToken.address,
     LimitPrice: limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
     FillPrice: formatPrice({ price: fillPrice, decimals: 8 }),
-    Amount: formatAmount({
+    Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
       decimals: sellToken.decimals,
       thousandSeparator: false,
       isLocaleAware: false,
     }),
-    Received: formatAmount({
+    Bought: formatAmount({
       amount: buyAmount,
       precision: buyToken.decimals as number,
       decimals: sellToken.decimals,
@@ -84,9 +92,15 @@ function csvTransformer(trade: Trade): CsvColumns {
 
 const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
 
-const Trades: React.FC = () => {
-  const { networkId, userAddress, isConnected } = useWalletConnection()
-  const trades = useTrades()
+interface InnerTradesWidgetProps {
+  trades: Trade[]
+  isTab?: boolean
+}
+
+export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
+  const { isTab, trades } = props
+
+  const { networkId, userAddress } = useWalletConnection()
 
   const filteredTrades = useMemo(
     () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
@@ -107,47 +121,80 @@ const Trades: React.FC = () => {
     [networkId, userAddress],
   )
 
-  return !isConnected ? (
-    <ConnectWalletBanner />
-  ) : (
-    <ContentPage>
-      <CardTable $columns="1.2fr 1fr repeat(2, 0.7fr) repeat(2, 1.2fr) 0.9fr 1fr" $rowSeparation="0">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Market</th>
-            <th>
-              Limit <br />
-              Price
-            </th>
-            <th>
-              Fill <br />
-              Price
-            </th>
-            <th>Amount</th>
-            <th>Received</th>
-            <th>Type</th>
-            <th>
-              <CsvButtonContainer>
-                <span>Tx</span>
+  return (
+    <CardTable
+      $rowSeparation="0"
+      $gap="0 0.6rem"
+      $padding="0 0 0 2rem"
+      $columns={`1fr 0.8fr 0.9fr 1.2fr 6.5rem ${isTab ? '1.23fr' : '0.74fr'}`}
+    >
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Market</th>
+          <th>
+            <SplitHeaderTitle>
+              <span>Limit Price /</span>
+              <span>Fill Price</span>
+            </SplitHeaderTitle>
+          </th>
+          <th>
+            <SplitHeaderTitle>
+              <span>Sold /</span>
+              <span>Bought</span>
+            </SplitHeaderTitle>
+          </th>
+          <th>Type</th>
+          <th>
+            <CsvButtonContainer>
+              <span>Tx</span>
 
-                {trades.length > 0 && (
-                  <FileDownloaderLink data={generateCsv} options={CSV_FILE_OPTIONS} filename={filename}>
-                    <FontAwesomeIcon icon={faFileCsv} size="2x" />
-                  </FileDownloaderLink>
-                )}
-              </CsvButtonContainer>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredTrades.map(trade => (
-            <TradeRow key={trade.id} trade={trade} networkId={networkId} />
-          ))}
-        </tbody>
-      </CardTable>
-    </ContentPage>
+              {trades.length > 0 && (
+                <FileDownloaderLink data={generateCsv} options={CSV_FILE_OPTIONS} filename={filename}>
+                  <FontAwesomeIcon icon={faFileCsv} size="2x" />
+                </FileDownloaderLink>
+              )}
+            </CsvButtonContainer>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredTrades.map(trade => (
+          <TradeRow key={trade.id} trade={trade} networkId={networkId} />
+        ))}
+      </tbody>
+    </CardTable>
   )
 }
 
-export default Trades
+export const TradesWidget: React.FC = () => {
+  const { isConnected } = useWalletConnection()
+  const trades = useTrades()
+
+  const {
+    filteredData,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter<Trade>({
+    data: trades,
+    filterFnFactory: filterTradesFn,
+  })
+
+  return !isConnected ? (
+    <ConnectWalletBanner />
+  ) : (
+    <CardWidgetWrapper>
+      <FilterTools
+        className="widgetFilterTools"
+        resultName="trades"
+        searchValue={search}
+        handleSearch={handleSearch}
+        showFilter={!!search}
+        dataLength={filteredData.length}
+      />
+      <InnerTradesWidget trades={filteredData} />
+    </CardWidgetWrapper>
+  )
+}
+
+export default TradesWidget
