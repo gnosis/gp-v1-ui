@@ -6,32 +6,33 @@ import styled from 'styled-components'
 
 import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
 
+import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
+import { TradeRow } from 'components/TradesWidget/TradeRow'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
+import useDataFilter from 'hooks/useDataFilter'
 
 import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
+import { filterTradesFn } from 'utils/filter'
 
-import { TradeRow } from 'components/TradesWidget/TradeRow'
 import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
 const CsvButtonContainer = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
+  width: 100%;
 `
 
 const SplitHeaderTitle = styled.div`
   display: flex;
   flex-flow: column;
-  > span {
-    margin: 0.25rem 0;
-  }
 `
 
 function symbolOrAddress(token: TokenDetails): string {
@@ -93,10 +94,11 @@ const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
 
 interface InnerTradesWidgetProps {
   trades: Trade[]
+  isTab?: boolean
 }
 
 export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
-  const { trades } = props
+  const { isTab, trades } = props
 
   const { networkId, userAddress } = useWalletConnection()
 
@@ -122,8 +124,8 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $padding="0.5em 0 0.5em 1em"
-      $columns="1.2fr 1fr 0.9fr 1.2fr 0.9fr 1.23fr"
+      $padding="0 0 0 2rem"
+      $columns={`1fr 0.8fr 0.9fr 1.2fr 6.5rem ${isTab ? '1.23fr' : '0.74fr'}`}
     >
       <thead>
         <tr>
@@ -168,11 +170,28 @@ export const TradesWidget: React.FC = () => {
   const { isConnected } = useWalletConnection()
   const trades = useTrades()
 
+  const {
+    filteredData,
+    search,
+    handlers: { handleSearch },
+  } = useDataFilter<Trade>({
+    data: trades,
+    filterFnFactory: filterTradesFn,
+  })
+
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
     <CardWidgetWrapper>
-      <InnerTradesWidget trades={trades} />
+      <FilterTools
+        className="widgetFilterTools"
+        resultName="trades"
+        searchValue={search}
+        handleSearch={handleSearch}
+        showFilter={!!search}
+        dataLength={filteredData.length}
+      />
+      <InnerTradesWidget trades={filteredData} />
     </CardWidgetWrapper>
   )
 }

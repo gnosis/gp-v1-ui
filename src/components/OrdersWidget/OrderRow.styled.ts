@@ -2,7 +2,6 @@ import styled from 'styled-components'
 
 export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
   color: ${({ $color = '' }): string => $color};
-  min-height: 4rem;
 
   &.pending {
     background: rgba(33, 141, 255, 0.1);

@@ -37,17 +37,34 @@ interface WithdrawState {
 }
 
 const BalancesWidget = styled(CardWidgetWrapper)`
-  ${CardTable} > tbody > tr:not([class^="Card__CardRowDrawer"]) > td {
-    &[data-label='Token'] {
-      font-family: var(--font-default);
-      letter-spacing: 0;
-      line-height: 1.2;
-      flex-flow: row nowrap;
+  ${CardTable} {
+    > thead,
+    > tbody {
+      > tr:not(.cardRowDrawer) {
+        > td,
+        > th {
+          justify-content: flex-end;
+          text-align: right;
+        }
+      }
     }
 
-    &[data-label='Token'] > div > b {
-      display: block;
-      color: var(--color-text-primary);
+    > tbody > tr:not(.cardRowDrawer) > td {
+      &[data-label='Token'] {
+        font-family: var(--font-default);
+        letter-spacing: 0;
+        line-height: 1.2;
+        flex-flow: row nowrap;
+      }
+
+      &[data-label='Token'] > div {
+        word-break: break-word;
+
+        > b {
+          display: block;
+          color: var(--color-text-primary);
+        }
+      }
     }
   }
   // button
@@ -211,7 +228,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const { modalProps, toggleModal } = useManageTokens()
 
   return (
-    <BalancesWidget $columns="repeat(auto-fit, minmax(5rem, 1fr));">
+    <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
       <FilterTools
         resultName="tokens"
         searchValue={search}
@@ -230,7 +247,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
       {error ? (
         <ErrorMsg title="oops..." message="Something happened while loading the balances" />
       ) : (
-        <CardTable className="balancesOverview">
+        <CardTable className="balancesOverview" $gap="0 1rem">
           <thead>
             <tr>
               <th>Token</th>
