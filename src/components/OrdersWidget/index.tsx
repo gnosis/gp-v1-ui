@@ -99,7 +99,7 @@ interface Props {
   displayOnly?: 'liquidity' | 'regular'
 }
 
-function filterOrders(
+function filterOrdersByDisplayType(
   orders: DetailedAuctionElement[],
   displayOnly?: 'liquidity' | 'regular',
 ): DetailedAuctionElement[] {
@@ -107,7 +107,7 @@ function filterOrders(
     ? orders
     : orders.filter(
         order =>
-          (displayOnly === 'liquidity' && order.isUnlimited) || (displayOnly === 'liquidity' && !order.isUnlimited),
+          (displayOnly === 'liquidity' && order.isUnlimited) || (displayOnly === 'regular' && !order.isUnlimited),
       )
 }
 
@@ -162,8 +162,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false, displayOnly }) => {
   useEffect(() => {
     const classifiedOrders = emptyState()
 
-    classifyOrders(filterOrders(allOrders), classifiedOrders, 'orders')
-    classifyOrders(filterOrders(allPendingOrders), classifiedOrders, 'pendingOrders')
+    classifyOrders(filterOrdersByDisplayType(allOrders, displayOnly), classifiedOrders, 'orders')
+    classifyOrders(filterOrdersByDisplayType(allPendingOrders, displayOnly), classifiedOrders, 'pendingOrders')
 
     setClassifiedOrders(curr => {
       // copy markedForDeletion
@@ -172,7 +172,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false, displayOnly }) => {
       )
       return classifiedOrders
     })
-  }, [allOrders, allPendingOrders, setClassifiedOrders])
+  }, [allOrders, allPendingOrders, displayOnly, setClassifiedOrders])
 
   const ordersCount = displayedOrders.length + displayedPendingOrders.length
 
