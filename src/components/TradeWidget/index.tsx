@@ -67,7 +67,6 @@ const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  max-width: 160rem;
   height: 63rem;
   width: auto;
   flex-flow: row nowrap;
@@ -223,7 +222,7 @@ const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
   flex: 1;
-  min-width: 48rem;
+  min-width: 50vw;
   max-width: 100%;
   background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
   border-radius: 0 0.6rem 0.6rem 0;
@@ -366,8 +365,8 @@ export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   price: '0',
   // ASAP
   validFrom: undefined,
-  // 2 days
-  validUntil: '2880',
+  // Do not expire (never)
+  validUntil: undefined,
 }
 
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {

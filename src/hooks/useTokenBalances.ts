@@ -7,8 +7,7 @@ import { erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatSmart, logDebug } from 'utils'
-import { ALLOWANCE_FOR_ENABLED_TOKEN } from 'const'
+import { formatSmart, logDebug, isTokenEnabled } from 'utils'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
@@ -60,7 +59,7 @@ async function fetchBalancesForToken(
     pendingWithdraw,
     claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBatchId,
     walletBalance,
-    enabled: allowance.gt(ALLOWANCE_FOR_ENABLED_TOKEN),
+    enabled: isTokenEnabled(allowance, token),
   }
 }
 

@@ -9,7 +9,7 @@ import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
 
 import { logDebug, toBN, txDataEncoder } from 'utils'
-import { INFURA_ID } from 'const'
+import { INFURA_ID, WALLET_CONNECT_BRIDGE } from 'const'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
@@ -224,6 +224,7 @@ type WalletConnectInits = IProviderOptions['walletconnect']
 const wcOptions: Omit<WalletConnectInits, 'package'> = {
   options: {
     infuraId: INFURA_ID,
+    bridge: WALLET_CONNECT_BRIDGE,
   },
 }
 

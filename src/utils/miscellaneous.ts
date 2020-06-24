@@ -4,8 +4,8 @@ import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement, Trade, Order } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
-import { ORDER_FILLED_FACTOR } from 'const'
-import { ZERO } from '@gnosis.pm/dex-js'
+import { ORDER_FILLED_FACTOR, MINIMUM_ALLOWANCE_DECIMALS } from 'const'
+import { TEN, ZERO } from '@gnosis.pm/dex-js'
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
   if (val === undefined || val === null) {
@@ -73,6 +73,11 @@ export const delay = <T>(ms = 100, result?: T): Promise<T> => new Promise(resolv
 export function getImageUrl(tokenAddress?: string): string | undefined {
   if (!tokenAddress) return undefined
   return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${tokenAddress}/logo.png`
+}
+
+export function isTokenEnabled(allowance: BN, { decimals = 18 }: TokenDetails): boolean {
+  const allowanceValue = TEN.pow(new BN(decimals + MINIMUM_ALLOWANCE_DECIMALS))
+  return allowance.gte(allowanceValue)
 }
 
 function isAmountDifferenceGreaterThanNegligibleAmount(amount1: BN, amount2: BN): boolean {
@@ -177,4 +182,8 @@ export async function retry<T extends () => any>(fn: T, options?: RetryOptions):
 
 export function flattenMapOfLists<K, T>(map: Map<K, T[]>): T[] {
   return Array.from(map.values()).reduce<T[]>((acc, list) => acc.concat(list), [])
+}
+
+export function flattenMapOfSets<K, T>(map: Map<K, Set<T>>): T[] {
+  return Array.from(map.values()).reduce<T[]>((acc, set) => acc.concat(Array.from(set)), [])
 }

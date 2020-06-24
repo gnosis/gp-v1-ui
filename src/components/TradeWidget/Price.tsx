@@ -1,7 +1,10 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faRetweet } from '@fortawesome/free-solid-svg-icons'
 
 // types, utils
 import { TokenDetails } from 'types'
@@ -58,18 +61,22 @@ const Wrapper = styled.div`
   }
 `
 
-export const PriceInputBox = styled.div`
-  display: flex;
+export const PriceInputBox = styled.div<{ hidden?: boolean }>`
+  display: ${(props): string => (props.hidden ? 'none' : 'flex')};
   flex-flow: column nowrap;
   margin: 0;
-  width: 50%;
-  width: calc(50% - 0.8rem);
+  width: 100%;
   position: relative;
   outline: 0;
 
   @media ${MEDIA.mobile} {
     width: 100%;
     margin: 0 0 1.6rem;
+  }
+
+  .swap-icon {
+    padding: 0.7em 0.3em;
+    cursor: pointer;
   }
 
   label {
@@ -86,7 +93,6 @@ export const PriceInputBox = styled.div`
 
   label > div:not(.radio-container) {
     position: absolute;
-    width: 7.7rem;
     right: 1rem;
     top: 0;
     bottom: 0;
@@ -108,16 +114,14 @@ export const PriceInputBox = styled.div`
     }
     > small:not(:nth-child(2)) {
       font-size: inherit;
-      max-width: 47%;
+      max-width: 6ch;
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
     }
     > small:nth-child(2) {
-      max-width: 6%;
-      margin: 0 0.08rem;
-      font-size: 1.5rem;
-      font-weight: normal;
+      margin: 0 0.3rem;
+      font-size: 1rem;
     }
   }
 
@@ -133,7 +137,7 @@ export const PriceInputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 9rem 0 1rem;
+    padding: 0 15ch 0 1rem;
     outline: 0;
 
     @media ${MEDIA.mobile} {
@@ -181,6 +185,12 @@ export function invertPriceFromString(priceValue: string): string {
 const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
+
+  const swapPrices = (): void => {
+    setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
+  }
+
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
   const isError = errorPrice || errorPriceInverse
@@ -213,7 +223,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
     precision: DEFAULT_PRECISION,
   })
   const { onKeyPress: onKeyPressPriceInverse, removeExcessZeros: removeExcessZerosPriceInverse } = useNumberInput({
-    inputId: priceInputId,
+    inputId: priceInverseInputId,
     precision: DEFAULT_PRECISION,
   })
 
@@ -222,7 +232,8 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
       <strong>
         Limit Price <OrderBookBtn baseToken={receiveToken} quoteToken={sellToken} />
       </strong>
-      <PriceInputBox>
+      {/* using display: none to hide to avoid hook-form reregister */}
+      <PriceInputBox hidden={priceShown !== 'DIRECT'}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -236,14 +247,17 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             tabIndex={tabIndex}
           />
           <div>
-            <small title={sellToken.symbol}>{sellToken.symbol}</small>
-            <small>/</small>
             <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+            <small>per</small>
+            <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <span className="swap-icon" onClick={swapPrices}>
+              <FontAwesomeIcon icon={faRetweet} />
+            </span>
           </div>
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox>
+      <PriceInputBox hidden={priceShown !== 'INVERSE'}>
         <label>
           <input
             name={priceInverseInputId}
@@ -257,9 +271,12 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             tabIndex={tabIndex}
           />
           <div>
-            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
-            <small>/</small>
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <small>per</small>
+            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+            <span className="swap-icon" onClick={swapPrices}>
+              <FontAwesomeIcon icon={faRetweet} />
+            </span>
           </div>
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />

@@ -102,9 +102,10 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
 
   const { networkId, userAddress } = useWalletConnection()
 
-  const filteredTrades = useMemo(() => trades.filter(trade => isTradeSettled(trade) && !isTradeReverted(trade)), [
-    trades,
-  ])
+  const filteredTrades = useMemo(
+    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
+    [trades],
+  )
 
   const generateCsv = useCallback(
     () =>

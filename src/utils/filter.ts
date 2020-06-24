@@ -11,11 +11,11 @@ export function checkTokenAgainstSearch(token: TokenDetails | null, searchText: 
   )
 }
 
-const filterTradesAndOrdersFnFactory = (includeInverseMarket?: boolean) => (searchTxt: string) => ({
-  id,
-  buyToken,
-  sellToken,
-}: Trade | DetailedAuctionElement): boolean | null => {
+const filterTradesAndOrdersFnFactory = <
+  T extends { id: string; buyToken: TokenDetails | null; sellToken: TokenDetails | null }
+>(
+  includeInverseMarket?: boolean,
+) => (searchTxt: string) => ({ id, buyToken, sellToken }: T): boolean | null => {
   if (searchTxt === '') return null
 
   const market =
@@ -29,5 +29,5 @@ const filterTradesAndOrdersFnFactory = (includeInverseMarket?: boolean) => (sear
   )
 }
 
-export const filterOrdersFn = filterTradesAndOrdersFnFactory(true)
-export const filterTradesFn = filterTradesAndOrdersFnFactory()
+export const filterOrdersFn = filterTradesAndOrdersFnFactory<DetailedAuctionElement>(true)
+export const filterTradesFn = filterTradesAndOrdersFnFactory<Trade>()
