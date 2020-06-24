@@ -1,5 +1,10 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
+import { CardWidgetWrapper } from 'components/Layout/Card'
+
+export const OrdersWidgetCardWrapper = styled(CardWidgetWrapper)`
+  width: 100%;
+`
 
 export const OrdersWrapper = styled.div`
   width: 100%;
@@ -9,10 +14,7 @@ export const OrdersWrapper = styled.div`
 
   /* In use when accessed as a dedicated page and not part of OrdersPanel */
   background: var(--color-background-pageWrapper);
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
   min-height: 54rem;
   min-width: 85rem;
@@ -96,13 +98,18 @@ export const OrdersForm = styled.div`
       border-radius: 0 0 1.6rem 0rem;
     }
 
-    .balances-searchTokens {
-      height: 3.6rem;
-      margin: 0.8rem;
-      width: 100%;
+    > label.checked {
+      display: none;
+      justify-content: center;
+      margin: 0 1rem;
+      white-space: nowrap;
 
-      > input {
-        width: 100%;
+      > small {
+        margin-right: 1rem;
+      }
+
+      @media ${MEDIA.mobile} {
+        display: flex;
       }
     }
   }
@@ -113,7 +120,6 @@ export const OrdersForm = styled.div`
     flex-flow: row nowrap;
     width: 100%;
     justify-content: center;
-    min-height: 6.4rem;
     border-bottom: 0.1rem solid var(--color-text-secondary);
     align-items: center;
 
@@ -123,8 +129,8 @@ export const OrdersForm = styled.div`
 
     .countContainer {
       display: flex;
+      flex-flow: row wrap;
       width: 100%;
-      height: 100%;
       margin: 0 0 -0.1rem;
       align-items: center;
 
@@ -140,6 +146,7 @@ export const OrdersForm = styled.div`
         outline: 0;
         text-transform: uppercase;
         display: flex;
+        flex: 1 1 10.1rem;
         width: 100%;
         justify-content: center;
         transition: border 0.2s ease-in-out;
@@ -186,6 +193,30 @@ export const OrdersForm = styled.div`
     padding: 0 0 5rem;
     box-sizing: border-box;
     overflow-y: auto;
+
+    ${OrdersWidgetCardWrapper} {
+      > table > tbody {
+        > tr.orderRowWrapper {
+          > td.cardOpener {
+            display: none;
+          }
+
+          @media ${MEDIA.mobile} {
+            display: flex;
+
+            > td.checked {
+              order: 5;
+              border: none;
+
+              > input[type='checkbox'] {
+                margin: 0;
+                margin-left: auto;
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   .checked {
