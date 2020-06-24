@@ -31,7 +31,7 @@
     "@fortawesome/free-regular-svg-icons": "^5.12.0",
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "@fortawesome/react-fontawesome": "^0.1.8",
-    "@gnosis.pm/dex-js": "^0.4.0",
+    "@gnosis.pm/dex-js": "^0.4.1",
     "@hapi/joi": "^17.1.1",
     "@hot-loader/react-dom": "^16.11.0",
     "@popperjs/core": "^2.0.6",
