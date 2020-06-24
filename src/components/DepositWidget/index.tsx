@@ -37,6 +37,8 @@ interface WithdrawState {
 }
 
 const BalancesWidget = styled(CardWidgetWrapper)`
+  background: var(--color-background-pageWrapper);
+
   ${CardTable} {
     > thead,
     > tbody {
@@ -67,6 +69,12 @@ const BalancesWidget = styled(CardWidgetWrapper)`
       }
     }
   }
+
+  .balances-hideZero,
+  .balances-manageTokens {
+    white-space: nowrap;
+  }
+
   // button
   .balances-manageTokens {
     font-size: 1.4rem;
@@ -98,7 +106,7 @@ const BalancesWidget = styled(CardWidgetWrapper)`
     color: var(--color-text-primary);
     letter-spacing: 0;
     font-weight: var(--font-weight-regular);
-    margin: 0 2rem 0 auto;
+    margin: 0 2rem;
     cursor: pointer;
 
     @media ${MEDIA.mobile} {

@@ -275,15 +275,6 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
   width: auto;
   margin: 0 auto;
   padding: 0 0 2.4rem;
-  min-height: 54rem;
-  min-width: 85rem;
-  max-width: 140rem;
-
-  background: var(--color-background-pageWrapper);
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
 
   border-radius: 0.6rem;
   font-size: 1.6rem;
@@ -300,6 +291,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     max-width: 100%;
     min-width: initial;
     width: 100%;
+    box-shadow: none;
 
     > div {
       flex-flow: row wrap;
@@ -315,9 +307,6 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     // TABLE HEADERS
     /////////////////////
     > thead {
-      background: var(--color-background);
-      border-radius: 0.6rem;
-
       @media ${MEDIA.mobile} {
         display: none;
       }
@@ -326,7 +315,6 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         font-size: 1.1rem;
         color: var(--color-text-primary);
         letter-spacing: 0;
-        text-transform: uppercase;
       }
     }
 
@@ -347,7 +335,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
         display: flex;
         flex-flow: row wrap;
         align-items: center;
-        word-break: break-all;
+        word-break: break-word;
         white-space: normal;
 
         @media ${MEDIA.mobile} {

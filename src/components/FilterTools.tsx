@@ -32,16 +32,14 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 
   // label + search input
   > .balances-searchTokens {
-    display: flex;
-    width: auto;
-    max-width: 100%;
     position: relative;
-    height: 5.6rem;
-    margin: 1.6rem;
+    display: flex;
+    width: 100%;
+    height: 3.6rem;
+    margin: 0.8rem;
 
     > input {
       margin: 0;
-      width: 35rem;
       max-width: 100%;
       background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;

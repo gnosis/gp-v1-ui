@@ -47,7 +47,7 @@ const DeleteOrder: React.FC<Pick<
   Props,
   'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
 >> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
-  <td data-label="Actions" className="checked">
+  <td data-label="Cancel Order" className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
@@ -202,7 +202,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
-    <td className="status">
+    <td className="status" data-label="Status">
       {pending ? (
         pending
       ) : isFilled ? (
@@ -308,7 +308,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : ''} $open={openCard}>
+      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : 'orderRowWrapper'} $open={openCard}>
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}

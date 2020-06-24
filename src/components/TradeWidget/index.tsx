@@ -1000,7 +1000,7 @@ const TradeWidget: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget isWidget />
+          <OrdersWidget />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}
