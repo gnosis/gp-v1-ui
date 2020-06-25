@@ -1,11 +1,47 @@
 import React from 'react'
-import { useForm, FormContextValues, ErrorMessage, ValidationResolver } from 'react-hook-form'
+import { useForm, FormContextValues, ValidationResolver, ErrorMessage, FieldErrors } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 import styled from 'styled-components'
 import { MEDIA } from 'const'
 
+import Joi from '@hapi/joi'
+
+const BridgeSchema = Joi.string()
+  .empty('')
+  .optional()
+  .uri({ scheme: ['http', 'https'] })
+const RPCSchema = BridgeSchema
+const InfuraIdSchema = Joi.string()
+  .empty('')
+  .optional()
+  .length(32)
+
+const WCSettingsSchema = Joi.object({
+  bridge: BridgeSchema.message('Bridge must be a valid URL'),
+  infuraId: InfuraIdSchema.message('Must be a valid id'),
+  rpc: RPCSchema.message('RPC must be a valid URL'),
+}).oxor('infuraId', 'rpc')
+// const WCSettingsSchema = Joi.alternatives().try(
+//   Joi.object({
+//     bridge: BridgeSchema.message('Bridge must be a valid URL'),
+//     infuraId: InfuraIdSchema,
+//     rpc: '',
+//   }),
+//   Joi.object({
+//     bridge: BridgeSchema.message('Bridge must be a valid URL'),
+//     infuraId: '',
+//     rpc: RPCSchema.message('RPC must be a valid URL'),
+//   }),
+//   Joi.object({
+//     bridge: BridgeSchema.message('Bridge must be a valid URL'),
+//     infuraId: '',
+//     rpc: '',
+//   }),
+// )
+
 interface WCSettingsProps {
   register: FormContextValues['register']
+  errors: FieldErrors<SettingsFormData>
 }
 
 const OuterFormSection = styled.div`
@@ -55,6 +91,10 @@ const FormField = styled.label`
     /* min-width: 32ch; */
     font-size: 1em;
     font-weight: normal;
+
+    ::placeholder {
+      opacity: 0.2;
+    }
   }
 `
 
@@ -90,7 +130,7 @@ const SettingsButton = styled.button`
   letter-spacing: 0.03rem;
 `
 
-export const WCSettings: React.FC<WCSettingsProps> = ({ register }) => {
+export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
   return (
     <div>
       <Disclaimer>
@@ -105,6 +145,7 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register }) => {
             <FormField>
               <span>IfuraId</span>
               <input type="text" name="walletconnect.infuraId" ref={register} />
+              <WCError errors={errors} name="infuraId" />
             </FormField>
           </InnerFormSection>
           <OrSeparator>
@@ -113,7 +154,8 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register }) => {
           <InnerFormSection>
             <FormField>
               <span>RPC URL</span>
-              <input type="text" name="walletconnect.rpc" ref={register} />
+              <input type="text" name="walletconnect.rpc" ref={register} placeholder="https://mainnet.path_to_node" />
+              <WCError errors={errors} name="rpc" />
             </FormField>
           </InnerFormSection>
         </AlternativesSection>
@@ -121,11 +163,36 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register }) => {
         <InnerFormSection>
           <FormField>
             <span>Bridge URL</span>
-            <input type="text" name="walletconnect.bridge" ref={register} />
+            <input
+              type="text"
+              name="walletconnect.bridge"
+              ref={register}
+              placeholder="https://bridge.walletconnect.org"
+            />
+            <WCError errors={errors} name="bridge" />
           </FormField>
         </InnerFormSection>
       </OuterFormSection>
     </div>
+  )
+}
+
+const ErrorWrapper = styled.p`
+  color: var(--color-error);
+  margin: 0;
+  padding: 0.5em;
+`
+
+interface WCErrorsProps {
+  errors: FieldErrors<SettingsFormData>
+  name: string
+}
+
+const WCError: React.FC<WCErrorsProps> = ({ errors, name }) => {
+  return (
+    <ErrorWrapper>
+      <ErrorMessage errors={errors} name={'walletconnect.' + name} />
+    </ErrorWrapper>
   )
 }
 
@@ -144,28 +211,49 @@ interface SettingsFormData {
   walletconnect: WCSettingsData
 }
 
-// const resolver: ValidationResolver<SettingsFormData> = (data, validationContext) => {
-// const { error, value: values } = validationSchema.validate(data, {
-//   abortEarly: false,
-// })
-// const error = false
-// return {
-//   values: error ? {} : values,
-//   errors: error
-//     ? error.details.reduce((previous, currentError) => {
-//         return {
-//           ...previous,
-//           [currentError.path[0]]: currentError,
-//         }
-//       }, {})
-//     : {},
-// }
+const resolver: ValidationResolver<SettingsFormData> = (data, validationContext) => {
+  console.log('validationContext', validationContext)
+  const { walletconnect } = data
+  console.log('walletconnect', walletconnect)
+  const result = WCSettingsSchema.validate(walletconnect, {
+    abortEarly: false,
+  })
+  const { value: values, error } = result
+  console.log('result', result)
+  console.log('values', values)
+  console.log('error', error)
+
+  let errors = {}
+  if (error) {
+    errors = {
+      walletconnect: error.details.reduce((previous, currentError) => {
+        return {
+          ...previous,
+          [currentError.path[0]]: currentError,
+        }
+      }, {}),
+    }
+  }
+
+  return {
+    values: error ? {} : values,
+    errors,
+  }
+}
+
+interface ErrorMessageProps {
+  error: string
+}
+
+// const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
+//   return <p>{error}</p>
 // }
 
 export const Settings: React.FC = () => {
   const { register, handleSubmit, watch, errors, control, getValues } = useForm<SettingsFormData>({
-    // validationResolver: resolver,
+    validationResolver: resolver,
   })
+  console.log('errors', errors)
   console.log('getValues', getValues({ nest: true }))
 
   const onSubmit = (data: SettingsFormData): void => {
@@ -175,8 +263,7 @@ export const Settings: React.FC = () => {
   return (
     <div style={{ width: '100%' }}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        <WCSettings register={register} />
-        <ErrorMessage errors={errors} name="walletconnect" />
+        <WCSettings register={register} errors={errors} />
         <div>
           <SettingsButton type="submit">Apply Settings</SettingsButton>
         </div>
