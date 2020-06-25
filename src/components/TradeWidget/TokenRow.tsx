@@ -199,6 +199,11 @@ const TokenRow: React.FC<Props> = ({
   const balanceClassName = !error && sellAmountOverMax ? 'warning' : 'success'
   const inputClassName = error ? 'error' : sellAmountOverMax ? 'warning' : ''
 
+  const { depositToken, enableToken, enabled, enabling } = useRowActions({ balances: [balance] })
+  const tokenDisabled = !enabled.has(balance.address) && !balance.enabled
+  const editableAndConnected = !readOnly && userConnected
+  const showEnableToken = editableAndConnected && tokenDisabled
+
   const errorOrWarning = error?.message ? (
     <FormInputError errorMessage={error.message as string} />
   ) : (
@@ -211,7 +216,7 @@ const TokenRow: React.FC<Props> = ({
         <strong>
           {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
         </strong>
-        {!readOnly && userConnected && (
+        {editableAndConnected && !tokenDisabled && (
           <div className="btn" onClick={(): void => showForm('deposit')}>
             + Deposit {selectedToken.symbol}
           </div>
@@ -248,15 +253,12 @@ const TokenRow: React.FC<Props> = ({
     [register],
   )
 
-  const { depositToken, enableToken, enabled, enabling } = useRowActions({ balances: [balance] })
-  const showEnableToken = !readOnly && userConnected && !enabled.has(balance.address) && !balance.enabled
-
   return (
     <Wrapper>
       <div>
         <strong>{selectLabel}</strong>
         <div>
-          {!readOnly && userConnected && (
+          {editableAndConnected && !tokenDisabled && (
             <>
               <div className="btn" onClick={(): void => showForm('deposit')}>
                 + Deposit
