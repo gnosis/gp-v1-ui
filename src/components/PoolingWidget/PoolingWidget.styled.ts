@@ -2,10 +2,15 @@ import styled from 'styled-components'
 import { MEDIA } from 'const'
 
 import { PageWrapper } from 'components/Layout/PageWrapper'
+import Widget from 'components/Layout/Widget'
 
 // assets
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
+
+export const PoolingWidgetWrapper = styled(Widget)`
+  flex-flow: row nowrap;
+`
 
 export const PoolingInterfaceWrapper = styled(PageWrapper)`
   display: flex;

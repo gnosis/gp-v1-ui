@@ -13,14 +13,14 @@ import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 
 // components
-import Widget from 'components/Layout/Widget'
+import { OrdersPanel, OrdersToggler } from 'components/TradeWidget'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
 import { StepDescription } from 'components/PoolingWidget/StepDescriptors'
 import SubComponents from 'components/PoolingWidget/SubComponents'
 import LiquidityButtons from 'components/PoolingWidget/LiquidityButtons'
-import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.styled'
+import { PoolingInterfaceWrapper, PoolingWidgetWrapper } from 'components/PoolingWidget/PoolingWidget.styled'
 
 // Hooks and actions
 import useSafeState from 'hooks/useSafeState'
@@ -144,6 +144,8 @@ const PoolingInterface: React.FC = () => {
   const [txHash, setTxHash] = useSafeState('')
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
+
+  const [ordersVisible, setOrdersVisible] = useSafeState(true)
 
   const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
@@ -282,7 +284,7 @@ const PoolingInterface: React.FC = () => {
     ],
   )
   return (
-    <Widget>
+    <PoolingWidgetWrapper className={ordersVisible ? '' : 'expanded'}>
       <PoolingInterfaceWrapper $width="100%">
         <FormContext {...methods}>
           <form onSubmit={handleSubmit(sendTransaction)} noValidate>
@@ -320,20 +322,20 @@ const PoolingInterface: React.FC = () => {
           </form>
         </FormContext>
       </PoolingInterfaceWrapper>
-      {/* <OrdersPanel> */}
-      {/* Toggle panel visibility (arrow) */}
-      {/* <OrdersToggler
+      <OrdersPanel>
+        {/* Toggle panel visibility (arrow) */}
+        <OrdersToggler
           type="button"
           onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
           $isOpen={ordersVisible}
-        /> */}
-      {/* Actual orders content */}
-      <div>
-        <h5>Your liquidity orders</h5>
-        <OrdersWidget isWidget displayOnly={'liquidity'} />
-      </div>
-      {/* </OrdersPanel> */}
-    </Widget>
+        />
+        {/* Actual orders content */}
+        <div>
+          <h5>Your liquidity orders</h5>
+          <OrdersWidget isWidget displayOnly={'liquidity'} />
+        </div>
+      </OrdersPanel>
+    </PoolingWidgetWrapper>
   )
 }
 
