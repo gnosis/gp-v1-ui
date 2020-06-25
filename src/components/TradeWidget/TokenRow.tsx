@@ -5,7 +5,7 @@ import { useFormContext } from 'react-hook-form'
 
 // types, const and utils
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { ZERO, MEDIA } from 'const'
+import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
 import { formatSmart, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
 
 // components
@@ -15,6 +15,7 @@ import { InputBox } from 'components/InputBox'
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { Input } from 'components/Input'
 import { Spinner } from 'components/Spinner'
+import { WrapEtherBtn } from 'components/WrapEtherBtn'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
@@ -204,6 +205,8 @@ const TokenRow: React.FC<Props> = ({
   const editableAndConnected = !readOnly && userConnected
   const showEnableToken = editableAndConnected && tokenDisabled
 
+  const isWeth = balance.addressMainnet === WETH_ADDRESS_MAINNET
+
   const errorOrWarning = error?.message ? (
     <FormInputError errorMessage={error.message as string} />
   ) : (
@@ -283,8 +286,7 @@ const TokenRow: React.FC<Props> = ({
               )}
             </>
           )}
-          {/* The Wrap Ether button doesn't make sense until https://github.com/gnosis/dex-react/issues/610 is implemented  */}
-          {/* {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />} */}
+          {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
             {readOnly ? (
