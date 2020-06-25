@@ -19,6 +19,10 @@ export const OrdersWrapper = styled.div`
   max-width: 140rem;
   /* ====================================================================== */
 
+  @media ${MEDIA.tabletSmall} {
+    min-width: ${MEDIA.smallScreen};
+  }
+
   @media ${MEDIA.mobile} {
     max-width: 100%;
     min-width: initial;

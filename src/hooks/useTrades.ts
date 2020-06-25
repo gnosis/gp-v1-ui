@@ -37,35 +37,39 @@ export function useTrades(): Trade[] {
 
     async function updateTrades(): Promise<void> {
       if (userAddress && networkId) {
-        // Don't want to update on every block
-        // So instead, we get the latest block when the time comes
-        const toBlock = await web3.eth.getBlockNumber()
-        const params = {
-          userAddress,
-          networkId,
-          // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
-          fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
-          toBlock,
-          orders,
+        try {
+          // Don't want to update on every block
+          // So instead, we get the latest block when the time comes
+          const toBlock = await web3.eth.getBlockNumber()
+          const params = {
+            userAddress,
+            networkId,
+            // fromBlock is inclusive. If set, add 1 to avoid duplicates, otherwise return undefined
+            fromBlock: !lastCheckedBlock ? lastCheckedBlock : lastCheckedBlock + 1,
+            toBlock,
+            orders,
+          }
+
+          // Check before expensive operation
+          if (cancelled) {
+            return
+          }
+
+          const { trades: newTrades, reverts } = await getTradesAndTradeReversions(params)
+
+          // Check before updating state
+          if (cancelled) {
+            return
+          }
+
+          dispatch(
+            newTrades.length > 0 || reverts.length > 0
+              ? appendTrades({ lastCheckedBlock: toBlock, networkId, userAddress, trades: newTrades, reverts })
+              : updateLastCheckedBlock({ lastCheckedBlock: toBlock, networkId, userAddress }),
+          )
+        } catch (e) {
+          console.error(`Failed to update trades`, e)
         }
-
-        // Check before expensive operation
-        if (cancelled) {
-          return
-        }
-
-        const { trades: newTrades, reverts } = await getTradesAndTradeReversions(params)
-
-        // Check before updating state
-        if (cancelled) {
-          return
-        }
-
-        dispatch(
-          newTrades.length > 0 || reverts.length > 0
-            ? appendTrades({ lastCheckedBlock: toBlock, networkId, userAddress, trades: newTrades, reverts })
-            : updateLastCheckedBlock({ lastCheckedBlock: toBlock, networkId, userAddress }),
-        )
       }
     }
 
