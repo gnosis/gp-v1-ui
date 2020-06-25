@@ -5,12 +5,20 @@ import BigNumber from 'bignumber.js'
 import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
+import useSafeState from 'hooks/useSafeState'
 
 import { EtherscanLink } from 'components/EtherscanLink'
+import { ResponsiveRowSizeToggler, FoldableRowWrapper } from 'components/Layout/Card'
 
 import { isTradeSettled, formatDateFromBatchId } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { ONE_HUNDRED_BIG_NUMBER } from 'const'
+
+const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
+  &&&&& {
+    ${(props): string | false => !props.$open && "td[data-label='Type'] { border: none; }"}
+  }
+`
 
 interface TradeRowProps {
   trade: Trade
@@ -67,6 +75,8 @@ function formatPercentage(percentage: BigNumber): string {
 }
 
 export const TradeRow: React.FC<TradeRowProps> = params => {
+  const [openCard, setOpenCard] = useSafeState(false)
+
   const { trade, networkId } = params
   const {
     buyToken,
@@ -113,11 +123,11 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
-    <tr data-order-id={orderId} data-batch-id={batchId}>
-      <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
+    <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId} $open={openCard}>
+      <td data-label="Date" className="showReponsive" title={new Date(timestamp).toLocaleString()}>
         {formatDateFromBatchId(batchId, { strict: true })}
       </td>
-      <td data-label="Trade">
+      <td data-label="Trade" className="showReponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td
@@ -144,12 +154,13 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         <br />
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
-      <td data-label="Type" title={typeColumnTitle}>
+      <td data-label="Type" className="showReponsive" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
       </td>
       <td data-label="View on Etherscan">
         <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
       </td>
-    </tr>
+      <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
+    </TradeRowFoldableWrapper>
   )
 }

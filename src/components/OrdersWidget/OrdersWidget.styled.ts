@@ -38,7 +38,7 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
       > tbody {
         > tr.orderRowWrapper {
           > td.cardOpener {
-            display: none;
+            // display: none;
           }
 
           @media ${MEDIA.mobile} {

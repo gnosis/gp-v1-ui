@@ -3,6 +3,8 @@ import styled from 'styled-components'
 
 import Widget from '../Widget'
 import { MEDIA } from 'const'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 const CardRowDrawer = styled.tr`
   display: flex;
@@ -110,6 +112,74 @@ export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>
     </CardRowDrawer>
   )
 })
+
+interface ResponsiveRowSizeTogglerProps {
+  handleOpen: () => void
+  openStatus: boolean
+}
+
+const ResponsiveRowWrapper = styled.tr`
+  &&&&&& {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    order: 999;
+    padding: 0.8rem 0 0 0;
+    text-align: center;
+    cursor: pointer;
+  }
+`
+
+export const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
+  return (
+    <ResponsiveRowWrapper className="cardOpener" onClick={handleOpen}>
+      <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
+    </ResponsiveRowWrapper>
+  )
+}
+
+export const FoldableRowWrapper = styled.tr<{ $open?: boolean; $openCSS?: string }>`
+  // Handling card opening/closing logic
+  &&&&& {
+    .cardOpener {
+      display: none;
+    }
+
+    td.responsiveRow {
+      display: none;
+    }
+
+    td[data-label='Market'] {
+      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+    }
+
+    @media ${MEDIA.mobile} {
+      .cardOpener {
+        display: flex;
+      }
+
+      td.responsiveRow {
+        display: flex;
+      }
+
+      td:not(.responsiveRow):not(.cardOpener):not(.showReponsive) {
+        overflow: hidden;
+        transition: all 0.4s ease-in-out;
+      }
+
+      ${({ $open = true }): string | false =>
+        !$open &&
+        `
+        td:not(.responsiveRow):not(.cardOpener):not(.showReponsive) {
+          height: 0;
+          padding: 0;
+          border: none;
+        }
+      `}
+    }
+  }
+`
 
 export const CardTable = styled.table<{
   $bgColor?: string
@@ -237,10 +307,6 @@ export const CardTable = styled.table<{
     tr:not(.cardRowDrawer) {
 
       td {
-        &.cardOpener {
-          display: none;
-        }
-
         // td.status
         &.status {
           flex-flow: column;

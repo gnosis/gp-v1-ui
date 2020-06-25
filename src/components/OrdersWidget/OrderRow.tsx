@@ -6,14 +6,13 @@ import { TokenDetails } from 'types'
 import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // assets
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import lowBalanceIcon from 'assets/img/lowBalance.svg'
-import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
 import { Spinner } from 'components/Spinner'
 import { StatusCountdown } from 'components/StatusCountdown'
+import { ResponsiveRowSizeToggler } from 'components/Layout/Card'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
@@ -29,7 +28,7 @@ import {
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
-import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
+import { OrderRowWrapper, ResponsiveTitleRow } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
@@ -74,7 +73,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])
 
   return (
-    <td data-label="Price">
+    <td data-label="Price" className="showReponsive">
       <div className="order-details">
         {price} {displayTokenSymbolOrLink(sellToken)}
         {'/'}
@@ -257,19 +256,6 @@ function fetchToken(
   }
 }
 
-interface ResponsiveRowSizeTogglerProps {
-  handleOpen: () => void
-  openStatus: boolean
-}
-
-const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
-  return (
-    <td className="cardOpener" onClick={handleOpen}>
-      <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
-    </td>
-  )
-}
-
 interface Props {
   order: DetailedAuctionElement
   isOverBalance: boolean
@@ -298,7 +284,7 @@ const OrderRow: React.FC<Props> = props => {
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
-  const [openCard, setOpenCard] = useSafeState(true)
+  const [openCard, setOpenCard] = useSafeState(false)
 
   useEffect(() => {
     fetchToken(order.id, order.buyToken as TokenDetails, setBuyToken, isPendingOrder)
@@ -325,6 +311,11 @@ const OrderRow: React.FC<Props> = props => {
           transactionHash={transactionHash}
         />
         <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
+        <ResponsiveTitleRow className="responsiveRow" data-label="Market">
+          <div>
+            {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
+          </div>
+        </ResponsiveTitleRow>
       </OrderRowWrapper>
     )
   )

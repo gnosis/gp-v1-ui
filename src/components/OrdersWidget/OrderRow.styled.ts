@@ -1,6 +1,7 @@
 import styled from 'styled-components'
+import { FoldableRowWrapper } from 'components/Layout/Card'
 
-export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
+export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
   color: ${({ $color = '' }): string => $color};
 
   &.pending {
@@ -44,5 +45,20 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
       top: 100%;
       position: absolute;
     }
+  }
+
+  &&&&& {
+    ${(props): string | false => !props.$open && "td[data-label='Price'] { border: none; }"}
+  }
+`
+
+export const ResponsiveTitleRow = styled.td`
+  // force first
+  order: -1;
+
+  > div:first-of-type {
+    display: flex;
+    justify-content: center;
+    align-items: items;
   }
 `
