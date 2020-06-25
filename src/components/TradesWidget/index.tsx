@@ -10,7 +10,7 @@ import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
-import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
+import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 import { TradeRow } from 'components/TradesWidget/TradeRow'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -126,7 +126,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $columns={`1fr 0.8fr 0.94fr 1.2fr 6.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
+      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
     >
       <thead>
         <tr>
@@ -183,7 +183,7 @@ export const TradesWidget: React.FC = () => {
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
-    <OrdersWrapper>
+    <StandaloneCardWrapper>
       <CardWidgetWrapper>
         <FilterTools
           className="widgetFilterTools"
@@ -195,7 +195,7 @@ export const TradesWidget: React.FC = () => {
         />
         <InnerTradesWidget trades={filteredData} />
       </CardWidgetWrapper>
-    </OrdersWrapper>
+    </StandaloneCardWrapper>
   )
 }
 

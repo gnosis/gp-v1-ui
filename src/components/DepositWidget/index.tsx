@@ -9,9 +9,10 @@ import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 
 // Components
-import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import ErrorMsg from 'components/ErrorMsg'
 import FilterTools from 'components/FilterTools'
+import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
+import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 
 // DepositWidget: subcomponents
 import { Row } from 'components/DepositWidget/Row'
@@ -237,76 +238,78 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const { modalProps, toggleModal } = useManageTokens()
 
   return (
-    <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
-      <FilterTools
-        resultName="tokens"
-        searchValue={search}
-        handleSearch={handleSearch}
-        showFilter={(!!search || hideZeroBalances) && displayedBalances?.length > 0}
-        dataLength={displayedBalances.length}
-      >
-        <label className="balances-hideZero">
-          <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
-          <b>Hide zero balances</b>
-        </label>
-        <button type="button" className="balances-manageTokens" onClick={toggleModal}>
-          Manage Tokens
-        </button>
-      </FilterTools>
-      {error ? (
-        <ErrorMsg title="oops..." message="Something happened while loading the balances" />
-      ) : (
-        <CardTable className="balancesOverview" $gap="0 1rem">
-          <thead>
-            <tr>
-              <th>Token</th>
-              <th>Exchange Balance</th>
-              <th>Pending Withdrawals</th>
-              <th>Wallet Balance</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {displayedBalances && displayedBalances.length > 0
-              ? displayedBalances.map(tokenBalances => (
-                  <Row
-                    key={tokenBalances.address}
-                    ethBalance={ethBalance}
-                    tokenBalances={tokenBalances}
-                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
-                      depositToken(balance, tokenBalances.address, onTxHash)
-                    }
-                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
-                      return requestWithdrawConfirmation(
-                        balance,
-                        tokenBalances.address,
-                        tokenBalances.claimable,
-                        onTxHash,
-                      )
-                    }}
-                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
-                    claiming={claiming.has(tokenBalances.address)}
-                    withdrawing={withdrawing.has(tokenBalances.address)}
-                    depositing={depositing.has(tokenBalances.address)}
-                    highlighted={highlighted.has(tokenBalances.address)}
-                    enabling={enabling.has(tokenBalances.address)}
-                    enabled={enabled.has(tokenBalances.address)}
-                    {...windowSpecs}
-                  />
-                ))
-              : (search || hideZeroBalances) && (
-                  <NoTokensMessage>
-                    <td>
-                      No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
-                    </td>
-                  </NoTokensMessage>
-                )}
-          </tbody>
-        </CardTable>
-      )}
-      <Modali.Modal {...modalProps} />
-    </BalancesWidget>
+    <StandaloneCardWrapper>
+      <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
+        <FilterTools
+          resultName="tokens"
+          searchValue={search}
+          handleSearch={handleSearch}
+          showFilter={(!!search || hideZeroBalances) && displayedBalances?.length > 0}
+          dataLength={displayedBalances.length}
+        >
+          <label className="balances-hideZero">
+            <input type="checkbox" checked={hideZeroBalances} onChange={handleHideZeroBalances} />
+            <b>Hide zero balances</b>
+          </label>
+          <button type="button" className="balances-manageTokens" onClick={toggleModal}>
+            Manage Tokens
+          </button>
+        </FilterTools>
+        {error ? (
+          <ErrorMsg title="oops..." message="Something happened while loading the balances" />
+        ) : (
+          <CardTable className="balancesOverview" $gap="0 1rem">
+            <thead>
+              <tr>
+                <th>Token</th>
+                <th>Exchange Balance</th>
+                <th>Pending Withdrawals</th>
+                <th>Wallet Balance</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayedBalances && displayedBalances.length > 0
+                ? displayedBalances.map(tokenBalances => (
+                    <Row
+                      key={tokenBalances.address}
+                      ethBalance={ethBalance}
+                      tokenBalances={tokenBalances}
+                      onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                      onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                        depositToken(balance, tokenBalances.address, onTxHash)
+                      }
+                      onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                        return requestWithdrawConfirmation(
+                          balance,
+                          tokenBalances.address,
+                          tokenBalances.claimable,
+                          onTxHash,
+                        )
+                      }}
+                      onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                      claiming={claiming.has(tokenBalances.address)}
+                      withdrawing={withdrawing.has(tokenBalances.address)}
+                      depositing={depositing.has(tokenBalances.address)}
+                      highlighted={highlighted.has(tokenBalances.address)}
+                      enabling={enabling.has(tokenBalances.address)}
+                      enabled={enabled.has(tokenBalances.address)}
+                      {...windowSpecs}
+                    />
+                  ))
+                : (search || hideZeroBalances) && (
+                    <NoTokensMessage>
+                      <td>
+                        No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                      </td>
+                    </NoTokensMessage>
+                  )}
+            </tbody>
+          </CardTable>
+        )}
+        <Modali.Modal {...modalProps} />
+      </BalancesWidget>
+    </StandaloneCardWrapper>
   )
 }
 

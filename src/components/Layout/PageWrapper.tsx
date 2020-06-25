@@ -1,16 +1,8 @@
 import styled from 'styled-components'
+import { CardWidgetWrapper } from './Card'
+import { MEDIA } from 'const'
 
-export const PageWrapper = styled.div<{ $bgColor?: string; $boxShadow?: string; $width?: string }>`
-  /* background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor}; */
-  /* border-radius: var(--border-radius); */
-  /* box-shadow: ${({ $boxShadow = 'var(--box-shadow)' }): string => $boxShadow}; */
-  /* margin: auto; */
-  /* padding: 0; */
-  /* width: ${({ $width = '95vw' }): string => $width}; */
-  /* width: 100%; */
-`
-
-export const ContentPage = styled(PageWrapper)`
+export const ContentPage = styled.div`
   display: flex;
   flex-flow: row wrap;
   padding: 2.4rem 2.4rem 8rem;
@@ -48,5 +40,41 @@ export const ContentPage = styled(PageWrapper)`
     display: block;
     margin: 0;
     width: 100%;
+  }
+`
+
+export const StandaloneCardWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-flow: column wrap;
+  position: relative;
+
+  /* In use when accessed as a dedicated page and not part of OrdersPanel */
+  background: var(--color-background-pageWrapper);
+  box-shadow: var(--box-shadow-wrapper);
+  border-radius: 0.6rem;
+  min-height: 54rem;
+  min-width: 85rem;
+  max-width: 140rem;
+  /* ====================================================================== */
+
+  @media ${MEDIA.tablet} {
+    max-width: 100%;
+    min-width: initial;
+  }
+
+  @media ${MEDIA.mobile} {
+    max-width: 100%;
+    min-width: initial;
+    min-height: 25rem;
+  }
+  // Pages in standalone mode use bigger fonts
+  ${CardWidgetWrapper} {
+    > table {
+      > thead,
+      > tbody {
+        font-size: 1.3rem;
+      }
+    }
   }
 `
