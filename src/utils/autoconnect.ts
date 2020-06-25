@@ -12,18 +12,9 @@ const getWCIfConnected = async (): Promise<unknown> => {
     infuraId: INFURA_ID,
     bridge: WALLET_CONNECT_BRIDGE,
   })
-
   if (!provider.wc.connected) return null
 
   try {
-    await new Promise((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      provider.wc.on('transport_open', (error: Error, event: any) => {
-        if (error) reject(error)
-        else resolve(event)
-      })
-    })
-
     await Promise.race([
       // some time for connection to settle
       delay(250),
