@@ -10,6 +10,7 @@ import GlobalStyles from 'styles/global'
 
 // Main layout
 import Layout from 'components/Layout'
+import { Settings } from 'pages/Settings'
 
 // Pages
 const About = React.lazy(() =>
@@ -104,6 +105,7 @@ const App: React.FC = () => (
             <Route path="/book" exact component={OrderBook} />
             <Route path="/connect-wallet" exact component={ConnectWallet} />
             <Route path="/trades" exact component={Trades} />
+            <Route path="/settings" exact component={Settings} />
             <Redirect from="/" to="/trade/DAI-USDC?sell=0&price=0" />
             <Route component={NotFound} />
           </Switch>
