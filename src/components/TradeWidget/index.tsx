@@ -23,6 +23,7 @@ import OrdersWidget from 'components/OrdersWidget'
 import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
+import { Spinner } from 'components/Spinner'
 
 // TradeWidget: subcomponents
 import TokenRow from 'components/TradeWidget/TokenRow'
@@ -37,8 +38,7 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { Spinner } from 'components/Spinner'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import {
   getToken,
@@ -67,7 +67,6 @@ const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  max-width: 160rem;
   height: 63rem;
   width: auto;
   flex-flow: row nowrap;
@@ -223,7 +222,7 @@ const OrdersPanel = styled.div`
   display: flex;
   flex-flow: column wrap;
   flex: 1;
-  min-width: 48rem;
+  min-width: 50vw;
   max-width: 100%;
   background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
   border-radius: 0 0.6rem 0.6rem 0;
@@ -347,22 +346,20 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   }
 `
 
-export const enum TradeFormTokenId {
-  sellToken = 'sellToken',
-  receiveToken = 'receiveToken',
-  validFrom = 'validFrom',
-  validUntil = 'validUntil',
-  price = 'price',
-  priceInverse = 'priceInverse',
-}
+export type TradeFormTokenId = keyof TradeFormData
 
-export type TradeFormData = {
-  [K in keyof typeof TradeFormTokenId]: string
+export interface TradeFormData {
+  sellToken: string
+  receiveToken: string
+  validFrom?: string
+  validUntil?: string
+  price: string
+  priceInverse: string
 }
 
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
-export const DEFAULT_FORM_STATE = {
+export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
@@ -476,12 +473,12 @@ const TradeWidget: React.FC = () => {
   const { connectWallet } = useConnectWallet()
   const [{ trade }, dispatch] = useGlobalState()
 
-  const sellInputId = TradeFormTokenId.sellToken
-  const receiveInputId = TradeFormTokenId.receiveToken
-  const priceInputId = TradeFormTokenId.price
-  const priceInverseInputId = TradeFormTokenId.priceInverse
-  const validFromId = TradeFormTokenId.validFrom
-  const validUntilId = TradeFormTokenId.validUntil
+  const sellInputId: TradeFormTokenId = 'sellToken'
+  const receiveInputId: TradeFormTokenId = 'receiveToken'
+  const priceInputId: TradeFormTokenId = 'price'
+  const priceInverseInputId: TradeFormTokenId = 'priceInverse'
+  const validFromId: TradeFormTokenId = 'validFrom'
+  const validUntilId: TradeFormTokenId = 'validUntil'
   const { balances, tokens: tokenList } = useTokenBalances()
 
   // If user is connected, use balances, otherwise get the default list
@@ -508,6 +505,15 @@ const TradeWidget: React.FC = () => {
   const defaultSellAmount = trade.sellAmount || sellParam
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
+
+  const defaultFormValues: TradeFormData = {
+    [sellInputId]: defaultSellAmount,
+    [receiveInputId]: '',
+    [validFromId]: defaultValidFrom,
+    [validUntilId]: defaultValidUntil,
+    [priceInputId]: defaultPrice,
+    [priceInverseInputId]: invertPriceFromString(defaultPrice),
+  }
 
   const [sellToken, setSellToken] = useState(() =>
     chooseTokenWithFallback({
@@ -567,14 +573,7 @@ const TradeWidget: React.FC = () => {
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
-    defaultValues: {
-      [sellInputId]: defaultSellAmount,
-      [receiveInputId]: '',
-      [validFromId]: defaultValidFrom,
-      [validUntilId]: defaultValidUntil,
-      [priceInputId]: defaultPrice,
-      [priceInverseInputId]: invertPriceFromString(defaultPrice),
-    },
+    defaultValues: defaultFormValues,
     validationResolver,
   })
   const { handleSubmit, reset, watch, setValue } = methods
@@ -650,8 +649,8 @@ const TradeWidget: React.FC = () => {
   const url = buildUrl({
     sell: sellValue,
     price: priceValue,
-    from: validFromValue,
-    expires: validUntilValue,
+    from: validFromValue || '',
+    expires: validUntilValue || '',
     sellToken: sellToken,
     buyToken: receiveToken,
   })
@@ -732,7 +731,7 @@ const TradeWidget: React.FC = () => {
       toast.info(<TxNotification txHash={txHash} />)
 
       const pendingOrder: PendingTxObj = {
-        id: Date.now() + '', // Uses a temporal unique id
+        id: String(Date.now()), // Uses a temporal unique id
         buyTokenId,
         sellTokenId,
         priceNumerator,
@@ -743,9 +742,10 @@ const TradeWidget: React.FC = () => {
         validFrom: validFromWithBatchID,
         validUntil: validUntilWithBatchID,
         txHash,
+        isUnlimited: false,
       }
 
-      return dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
+      return dispatch(savePendingOrdersAction({ orders: [pendingOrder], networkId, userAddress }))
     },
     [dispatch, reset, setIsSubmitting],
   )
@@ -774,7 +774,6 @@ const TradeWidget: React.FC = () => {
         userAddress,
       } = params
 
-      let pendingTxHash: string | undefined = undefined
       // block form
       setIsSubmitting(true)
 
@@ -786,11 +785,9 @@ const TradeWidget: React.FC = () => {
       const isASAP = validFrom === 0
       const isNever = validUntil === 0
 
-      let success: boolean
       // ASAP ORDER
       if (isASAP) {
-        // ; for destructure reassign format
-        ;({ success } = await placeOrder({
+        return placeOrder({
           networkId,
           userAddress,
           buyAmount,
@@ -800,7 +797,6 @@ const TradeWidget: React.FC = () => {
           validUntil,
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
               return savePendingTransactionsAndResetForm(
                 txHash,
                 {
@@ -824,10 +820,9 @@ const TradeWidget: React.FC = () => {
               )
             },
           },
-        }))
+        })
       } else {
-        // ; for destructure reassign format
-        ;({ success } = await placeMultipleOrders({
+        return placeMultipleOrders({
           networkId,
           userAddress,
           orders: [
@@ -842,7 +837,6 @@ const TradeWidget: React.FC = () => {
           ],
           txOptionalParams: {
             onSentTransaction: (txHash: string): void => {
-              pendingTxHash = txHash
               return savePendingTransactionsAndResetForm(
                 txHash,
                 {
@@ -865,14 +859,10 @@ const TradeWidget: React.FC = () => {
               )
             },
           },
-        }))
-      }
-      if (success && pendingTxHash) {
-        // remove pending tx
-        dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
+        })
       }
     },
-    [dispatch, placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
+    [placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
   )
 
   async function onSubmit(data: FieldValues): Promise<void> {
@@ -1013,7 +1003,7 @@ const TradeWidget: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget />
+          <OrdersWidget isWidget />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}

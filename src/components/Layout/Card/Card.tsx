@@ -1,5 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+
+import Widget from '../Widget'
 import { MEDIA } from 'const'
 
 const CardRowDrawer = styled.tr`
@@ -100,7 +102,7 @@ export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>
   ref,
 ) {
   return (
-    <CardRowDrawer ref={ref}>
+    <CardRowDrawer className="cardRowDrawer" ref={ref}>
       <td>
         <CardDrawerCloser onClick={closeDrawer}>&times;</CardDrawerCloser>
         {children}
@@ -112,12 +114,11 @@ export const CardDrawer = React.forwardRef<HTMLTableRowElement, CardDrawerProps>
 export const CardTable = styled.table<{
   $bgColor?: string
 
-  $headerGap?: string
   $columns?: string
   $rows?: string
   $gap?: string
-  $cellSeparation?: string
   $rowSeparation?: string
+  $padding?: string
 
   $align?: string
   $justify?: string
@@ -126,7 +127,6 @@ export const CardTable = styled.table<{
 }>`
   display: grid;
   flex: 1;
-  // grid-gap: ${({ $headerGap = '0.3rem' }): string => $headerGap};
   width: 100%;
 
   .checked {
@@ -146,12 +146,10 @@ export const CardTable = styled.table<{
   }
 
   > thead, tbody {
-    > tr:not(${CardRowDrawer}) {
+    > tr:not(.cardRowDrawer) {
       position: relative;
       display: grid;
-      // grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
-      // grid-template-columns: minmax(2rem,.4fr) minmax(7rem,16rem) minmax(4rem,11rem) minmax(5rem, 7.5rem) minmax(3rem,9rem);
-      grid-template-columns: 3.2rem 1fr 1fr minmax(3rem,8rem) minmax(5rem,9rem);
+      grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
       // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       // grid-gap
@@ -161,10 +159,14 @@ export const CardTable = styled.table<{
       border-bottom: .1rem solid rgba(159,180,201,0.50);
       border-radius: 0;
 
+      min-height: 4rem;
+
       // How much separation between ROWS
       margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
       text-align: center;
       transition: all 0.2s ease-in-out;
+
+      padding: ${({ $padding = '0' }): string => `${$padding}`};
 
       &:hover {
         background: var(--color-background-row-hover);
@@ -182,19 +184,15 @@ export const CardTable = styled.table<{
       // Separation between CELLS
       > th,
       > td {
-        // margin: ${({ $cellSeparation = '0 .5rem' }): string => $cellSeparation};
+        display: flex;
+        align-items: center;
+
         text-overflow: ellipsis;
         overflow: hidden;
         text-align: left;
       }
     }
-  }
-  
-  .lowBalance {
-    color: #B27800;
-    display: block;
-    > img {margin: 0 0 0 .25rem;}
-  }
+  }  
   
   // Table Header
   > thead {
@@ -205,9 +203,17 @@ export const CardTable = styled.table<{
 
       > th {
         color: inherit;
-        line-height: 1;
+        line-height: 1.2;
         font-size: 1.1rem;
-        padding: 1.3rem 0;
+        height: 4rem;
+
+        &.sortable {
+          cursor: pointer;
+        }
+
+        > svg {
+          margin: 0 0 0.04rem 0.2rem;
+        }
       }
       
       > th.filled {
@@ -229,11 +235,28 @@ export const CardTable = styled.table<{
   }
   
   tbody {
-    > tr:not(${CardRowDrawer}) {
+    > tr:not(.cardRowDrawer) {
 
       > td {
         &.cardOpener {
           display: none;
+        }
+
+        // td.status
+        &.status {
+          flex-flow: column;
+          align-items: flex-start;
+
+          > .lowBalance {
+            color: #B27800;
+            display: flex;
+            margin: 0.2rem 0;
+            font-size: smaller;
+        
+            > img {
+              margin: 0 0 0.2rem 0.45rem;
+            }
+          }
         }
       }
 
@@ -242,4 +265,145 @@ export const CardTable = styled.table<{
 
   // Top level custom CSS
   ${({ $webCSS }): string | undefined => $webCSS}
+`
+
+export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+
+  width: auto;
+  margin: 0 auto;
+  padding: 0 0 2.4rem;
+  min-height: 54rem;
+  min-width: 85rem;
+  max-width: 140rem;
+
+  background: var(--color-background-pageWrapper);
+  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
+    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
+    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
+    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+
+  border-radius: 0.6rem;
+  font-size: 1.6rem;
+  line-height: 1;
+
+  @media ${MEDIA.tablet} {
+    min-width: 100vw;
+    min-width: calc(100vw - 4.8rem);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  @media ${MEDIA.mobile} {
+    max-width: 100%;
+    min-width: initial;
+    width: 100%;
+
+    > div {
+      flex-flow: row wrap;
+    }
+  }
+
+  ${CardTable} {
+    display: flex;
+    flex-flow: column nowrap;
+    width: auto;
+
+    /////////////////////
+    // TABLE HEADERS
+    /////////////////////
+    > thead {
+      background: var(--color-background);
+      border-radius: 0.6rem;
+
+      @media ${MEDIA.mobile} {
+        display: none;
+      }
+
+      > tr:not(.cardRowDrawer) > th {
+        font-size: 1.1rem;
+        color: var(--color-text-primary);
+        letter-spacing: 0;
+        text-transform: uppercase;
+      }
+    }
+
+    /////////////////////
+    // TABLE BODY
+    /////////////////////
+    > tbody {
+      font-size: 1.3rem;
+      line-height: 1;
+
+      @media ${MEDIA.mobile} {
+        display: flex;
+        flex-flow: column wrap;
+        width: 100%;
+      }
+
+      > tr:not(.cardRowDrawer) > td {
+        display: flex;
+        flex-flow: row wrap;
+        align-items: center;
+        word-break: break-all;
+        white-space: normal;
+
+        @media ${MEDIA.mobile} {
+          width: 100%;
+          border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+          padding: 1rem 0.5rem;
+          flex-flow: row nowrap;
+
+          &:last-of-type {
+            border: 0;
+          }
+        }
+
+        &::before {
+          @media ${MEDIA.mobile} {
+            content: attr(data-label);
+            margin-right: auto;
+            font-weight: var(--font-weight-bold);
+            text-transform: uppercase;
+            font-size: 1rem;
+            font-family: var(--font-default);
+            letter-spacing: 0;
+            white-space: nowrap;
+            padding: 0 0.5rem 0 0;
+            color: var(--color-text-primary);
+          }
+        }
+      }
+    }
+
+    /////////////////////
+    // ALL TABLE ROWS
+    /////////////////////
+    > thead > tr:not(.cardRowDrawer),
+    > tbody > tr:not(.cardRowDrawer) {
+      ${({ $columns }): string => ($columns ? `grid-template-columns: ${$columns}` : '')};
+      text-align: left;
+      padding: 0.8rem 1.6rem;
+      margin: 0;
+      justify-content: flex-end;
+
+      @media ${MEDIA.mobile} {
+        padding: 1.6rem 0.8rem;
+        display: table;
+        flex-flow: column wrap;
+        width: 100%;
+        border-bottom: 0.2rem solid rgba(159, 180, 201, 0.5);
+      }
+
+      > td,
+      > th {
+        &:first-of-type {
+          text-align: left;
+          justify-content: flex-start;
+        }
+      }
+    }
+  }
 `

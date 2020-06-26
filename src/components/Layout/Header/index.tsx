@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 // utils, const
-import { formatSeconds } from 'utils'
+import { formatSeconds, dateToBatchId } from 'utils'
 import { MEDIA } from 'const'
 
 // Components
@@ -41,12 +41,17 @@ const TopWrapper = styled.div`
 
 const CountDownStyled = styled.div`
   display: flex;
-  order: 2;
+  flex-flow: column;
+  order 2;
+
+ > div {
+  display: flex;
   font-family: var(--font-mono);
   font-size: 1.2rem;
   color: var(--color-text-primary);
   width: 16rem;
   letter-spacing: 0;
+  margin: 0.5rem 0;
 
   @media ${MEDIA.mobile} {
     flex-flow: row wrap;
@@ -57,13 +62,19 @@ const CountDownStyled = styled.div`
   > strong {
     color: var(--color-text-active);
   }
+ }
 `
 
 const BatchCountDown: React.FC = () => {
   const timeRemainingInBatch = useTimeRemainingInBatch()
   return (
     <CountDownStyled>
-      Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
+      <div>
+        Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
+      </div>
+      <div>
+        Current batch: <strong>{dateToBatchId()}</strong>
+      </div>
     </CountDownStyled>
   )
 }

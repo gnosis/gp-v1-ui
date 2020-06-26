@@ -149,10 +149,12 @@ declare module 'console-feed' {
   export function Decode(data: any): Message
 }
 
-declare module '@walletconnect/web3-provider'
+declare module '@walletconnect/web3-provider/*' // allows to import '@walletconnect/web3-provider/dist/umd/index.min.js'
 declare module '*.otf'
 declare module '*.woff'
 declare module '*.woff2'
 declare module '*.md' {
   export const react: React.FC
 }
+
+declare module 'eth-json-rpc-middleware/*'

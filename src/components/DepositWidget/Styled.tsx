@@ -40,7 +40,7 @@ export const TokenRow = styled.tr`
     border-radius: 2.4rem;
     height: 2.4rem;
     width: 2.4rem;
-    margin: 0 0 0 1rem;
+    margin-left: 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;

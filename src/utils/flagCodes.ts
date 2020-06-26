@@ -1,17 +1,5 @@
 import { MEDIA_QUERY_NAMES } from './mediaQueries'
 
-// gasstation return example
-/*{
-  lastUpdate: '2020-03-03T11:23:53.500017Z',
-  lowest: '1000000001',
-  safeLow: '6000000001',
-  standard: '10000000001',
-  fast: '18800000001',
-  fastest: '1457792372351',
-} */
-// can in most cases safely override 9 last digits
-// even 10 digits if only using standard price
-
 export interface Flag<T extends string> {
   name: T
   values: string[] // value at 0-index is the default
@@ -19,7 +7,8 @@ export interface Flag<T extends string> {
 }
 
 // OUR specific flags
-const SENTINEL = '12'
+// lowercase hex value to be appended to tx.data
+const SENTINEL = 'dec0de'
 
 type DxFlagName = 'provider' | 'mobile' | 'browser' | 'screenSize'
 
@@ -206,6 +195,13 @@ export const decoderFactory = <T extends string>({
 
 // OUR encoder and decoder
 
-export const gasPriceEncoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
+export const txDataEncoder = encoderFactory({ sentinel: SENTINEL, flags: FLAGS })
 
-export const gasPriceDecoder = decoderFactory({ sentinel: SENTINEL, flags: FLAGS, prefix: '\\d+', postfix: '$' })
+// not used in FE
+// export const txDataDecoder = decoderFactory({
+//   sentinel: SENTINEL,
+//   flags: FLAGS,
+//   // tx data is a hex string
+//   prefix: '0x[\\da-fA-F]*',
+//   postfix: '$',
+// })

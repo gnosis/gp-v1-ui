@@ -23,7 +23,6 @@ export interface WethApi {
 
 export interface WethApiDependencies {
   web3: Web3
-  fetchGasPrice(): Promise<string | undefined>
 }
 
 function getWethAddressByNetwork(networkId: number): string {
@@ -45,7 +44,6 @@ export class WethApiImpl implements WethApi {
   protected _contractPrototype: WethContract
   protected static _contractsCache: { [network: number]: { [address: string]: WethContract } } = {}
   private web3: Web3
-  private fetchGasPrice: WethApiDependencies['fetchGasPrice']
 
   public constructor(injectedDependencies: WethApiDependencies) {
     Object.assign(this, injectedDependencies)
@@ -56,9 +54,7 @@ export class WethApiImpl implements WethApi {
     const { networkId, amount, userAddress, txOptionalParams } = params
     const contract = await this._getContract(networkId)
 
-    const tx = contract.methods
-      .deposit()
-      .send({ from: userAddress, value: amount, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.deposit().send({ from: userAddress, value: amount })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
@@ -73,7 +69,7 @@ export class WethApiImpl implements WethApi {
     const { networkId, amount, userAddress, txOptionalParams } = params
     const contract = await this._getContract(networkId)
 
-    const tx = contract.methods.withdraw(amount).send({ from: userAddress, gasPrice: await this.fetchGasPrice() })
+    const tx = contract.methods.withdraw(amount).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)

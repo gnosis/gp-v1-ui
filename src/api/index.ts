@@ -32,7 +32,6 @@ import {
 } from '../../test/data'
 import Web3 from 'web3'
 import { ETH_NODE_URL } from 'const'
-import fetchGasPriceFactory from './gasStation'
 
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
@@ -107,7 +106,10 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
       ordersByUser: exchangeOrders,
     })
   } else {
-    exchangeApi = new ExchangeApiProxy(injectedDependencies)
+    exchangeApi = new ExchangeApiProxy({
+      ...injectedDependencies,
+      contractsDeploymentBlocks: CONFIG.exchangeContractConfig.config,
+    })
   }
   window['exchangeApi'] = exchangeApi
   return exchangeApi
@@ -183,10 +185,7 @@ function createTcrApi(web3: Web3): TcrApi | undefined {
 export const web3: Web3 = createWeb3Api()
 export const walletApi: WalletApi = createWalletApi(web3)
 
-const injectedDependencies = {
-  web3,
-  fetchGasPrice: fetchGasPriceFactory(walletApi),
-}
+const injectedDependencies = { web3 }
 
 export const erc20Api: Erc20Api = createErc20Api(injectedDependencies)
 export const wethApi: WethApi = createWethApi(injectedDependencies)

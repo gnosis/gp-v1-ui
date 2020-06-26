@@ -1,6 +1,6 @@
-import { formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
 
-import { BATCH_TIME, BATCH_TIME_IN_MS } from 'const'
+import { BATCH_TIME, BATCH_TIME_IN_MS, BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
 /**
  * Epoch in seconds
@@ -19,8 +19,8 @@ export function getEpoch(): number {
  * @param date? Optional Date object to calculate the batchId from.
  *  Defaults to Date.now()
  */
-export function dateToBatchId(date?: Date): number {
-  const timestamp = date ? date.getTime() : Date.now()
+export function dateToBatchId(date?: Date | string | number): number {
+  const timestamp = !date ? Date.now() : typeof date === 'string' || typeof date === 'number' ? +date : date.getTime()
   const timestampInSeconds = Math.floor(timestamp / 1000)
   return Math.floor(timestampInSeconds / BATCH_TIME)
 }
@@ -30,9 +30,20 @@ export function batchIdToDate(batchId: number): Date {
   return new Date(timestamp)
 }
 
-export function formatDateFromBatchId(batchId: number): string {
+export function formatDateFromBatchId(batchId: number, options?: { strict?: boolean; addSuffix?: boolean }): string {
+  const { strict = false, addSuffix = true } = options || {}
   const date = batchIdToDate(batchId)
-  return formatDistanceToNow(date, { addSuffix: true })
+  return strict ? formatDistanceStrict(date, new Date(), { addSuffix }) : formatDistanceToNow(date, { addSuffix })
+}
+
+/**
+ * Calculates the time when given batch is settled == no longer accepting solutions
+ *
+ * @param batchId Id of batch we want to get the settling date for
+ */
+export function calculateSettlingTimestamp(batchId: number): number {
+  const batchStart = batchIdToDate(batchId)
+  return addMinutes(batchStart, BATCH_SUBMISSION_CLOSE_TIME).getTime()
 }
 
 /**

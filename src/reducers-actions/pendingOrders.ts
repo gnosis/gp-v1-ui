@@ -1,15 +1,15 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
+import { toBN, setStorageItem } from 'utils'
 
-export const enum ActionTypes {
-  SAVE_PENDING_ORDERS = 'SAVE_PENDING_ORDERS',
-  REMOVE_PENDING_ORDERS = 'REMOVE_PENDING_ORDERS',
-}
+const STORAGE_PENDING_ORDER_KEY = 'STORAGE_PENDING_ORDER_TX_HASHES'
+
+export type ActionTypes = 'SAVE_PENDING_ORDERS' | 'REPLACE_PENDING_ORDERS'
 
 type SavePendingOrdersActionType = Actions<
   ActionTypes,
   {
-    orders: PendingTxObj
+    orders: PendingTxObj[]
     networkId: number
   }
 >
@@ -17,36 +17,35 @@ type SavePendingOrdersActionType = Actions<
 type RemovePendingOrdersActionType = Actions<
   ActionTypes,
   {
+    orders: PendingTxObj[]
     networkId: number
-    pendingTxHash: string
   }
 >
 
 type ReducerType = Actions<
   ActionTypes,
   {
-    orders: PendingTxObj
+    orders: PendingTxObj[]
     networkId: number
-    pendingTxHash: string
     userAddress: string
   }
 >
 
 export const savePendingOrdersAction = (payload: {
-  orders: PendingTxObj
+  orders: PendingTxObj[]
   networkId: number
   userAddress: string
 }): SavePendingOrdersActionType => ({
-  type: ActionTypes.SAVE_PENDING_ORDERS,
+  type: 'SAVE_PENDING_ORDERS',
   payload,
 })
 
 export const removePendingOrdersAction = (payload: {
   networkId: number
-  pendingTxHash: string
   userAddress: string
+  orders: PendingTxObj[]
 }): RemovePendingOrdersActionType => ({
-  type: ActionTypes.REMOVE_PENDING_ORDERS,
+  type: 'REPLACE_PENDING_ORDERS',
   payload,
 })
 
@@ -74,13 +73,9 @@ export const EMPTY_PENDING_ORDERS_STATE = {
   4: {},
 }
 
-export const PendingOrdersInitialState: PendingOrdersState = localStorage.getItem('GP_ORDER_TX_HASHES')
-  ? JSON.parse(localStorage.getItem('GP_ORDER_TX_HASHES') as string)
-  : EMPTY_PENDING_ORDERS_STATE
-
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
   switch (action.type) {
-    case ActionTypes.SAVE_PENDING_ORDERS: {
+    case 'SAVE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
 
       const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
@@ -89,14 +84,10 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
 
       return newState
     }
-    case ActionTypes.REMOVE_PENDING_ORDERS: {
-      const { networkId, pendingTxHash, userAddress } = action.payload
+    case 'REPLACE_PENDING_ORDERS': {
+      const { networkId, orders, userAddress } = action.payload
 
-      const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
-      const newPendingTxArray = userPendingOrdersArr.filter(
-        ({ txHash }: { txHash: string }) => txHash !== pendingTxHash,
-      )
-      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
+      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: orders } }
 
       return newState
     }
@@ -104,3 +95,49 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
       return state
   }
 }
+
+export const sideEffect = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
+  switch (action.type) {
+    case 'SAVE_PENDING_ORDERS':
+    case 'REPLACE_PENDING_ORDERS':
+      setStorageItem(STORAGE_PENDING_ORDER_KEY, state)
+    default:
+      return state
+  }
+}
+
+function parsePendingOrders(ordersToParse: PendingTxObj[]): PendingTxObj[] {
+  if (ordersToParse && ordersToParse.length > 0) {
+    // JSON BN objects need to be re-cast back to BN via toBN
+    return ordersToParse.map(({ priceNumerator, priceDenominator, remainingAmount, sellTokenBalance, ...rest }) => ({
+      ...rest,
+      priceNumerator: toBN(priceNumerator.toString()),
+      priceDenominator: toBN(priceDenominator.toString()),
+      remainingAmount: toBN(remainingAmount.toString()),
+      sellTokenBalance: toBN(sellTokenBalance.toString()),
+    }))
+  }
+
+  return []
+}
+
+function grabAndParseLocalStorageOrders(localPendingOrders: PendingOrdersState): PendingOrdersState {
+  // [1, 4].reduce(...)
+  const castLocalState = Object.keys(localPendingOrders).reduce((acc, key) => {
+    const ordersByAddr = localPendingOrders[key]
+
+    acc[key] = Object.keys(ordersByAddr).reduce((acc2, address) => {
+      const innerPendingOrders = ordersByAddr[address]
+      acc2[address] = parsePendingOrders(innerPendingOrders)
+
+      return acc2
+    }, {})
+
+    return acc
+  }, {})
+  return castLocalState
+}
+
+export const PendingOrdersInitialState: PendingOrdersState = localStorage.getItem(STORAGE_PENDING_ORDER_KEY)
+  ? grabAndParseLocalStorageOrders(JSON.parse(localStorage.getItem(STORAGE_PENDING_ORDER_KEY) as string))
+  : EMPTY_PENDING_ORDERS_STATE

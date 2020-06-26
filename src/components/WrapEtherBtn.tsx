@@ -354,14 +354,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
   return (
     <>
-      <TooltipWrapper
-        as="button"
-        type="button"
-        className={className}
-        style={{ minWidth: '7em' }}
-        onClick={toggleModal}
-        tooltip={tooltipText}
-      >
+      <TooltipWrapper as="button" type="button" className={className} onClick={toggleModal} tooltip={tooltipText}>
         {loading && <FontAwesomeIcon icon={faSpinner} spin />} {label || title}
       </TooltipWrapper>
       <Modali.Modal {...modalHook} />

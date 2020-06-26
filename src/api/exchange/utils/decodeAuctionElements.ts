@@ -1,5 +1,7 @@
 import BN from 'bn.js'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
+import { AuctionElement, Order } from 'api/exchange/ExchangeApi'
+import { BatchExchangeContract, isOrderUnlimited } from '@gnosis.pm/dex-js'
+import { NonPayableTransactionObject } from '@gnosis.pm/dex-js/build-esm/contracts/gen/types'
 
 const ADDRESS_WIDTH = 20 * 2
 const UINT256_WIDTH = 32 * 2
@@ -33,10 +35,13 @@ export function decodeAuctionElements(bytes: string, startingIndex?: number): Au
       sellTokenId,
       validFrom,
       validUntil,
-      priceNumerator,
-      priceDenominator,
+      priceNumeratorStr,
+      priceDenominatorStr,
       remainingAmount,
     ] = order
+
+    const priceNumerator = new BN(priceNumeratorStr, 16)
+    const priceDenominator = new BN(priceDenominatorStr, 16)
 
     result.push({
       user: '0x' + user,
@@ -46,10 +51,29 @@ export function decodeAuctionElements(bytes: string, startingIndex?: number): Au
       sellTokenId: parseInt(sellTokenId, 16),
       validFrom: parseInt(validFrom, 16),
       validUntil: parseInt(validUntil, 16),
-      priceNumerator: new BN(priceNumerator, 16),
-      priceDenominator: new BN(priceDenominator, 16),
+      priceNumerator,
+      priceDenominator,
       remainingAmount: new BN(remainingAmount, 16),
+      isUnlimited: isOrderUnlimited(priceNumerator, priceDenominator),
     })
   }
   return result
+}
+
+export function decodeOrder(
+  rawOrder: ReturnType<BatchExchangeContract['methods']['orders']> extends NonPayableTransactionObject<infer T>
+    ? T
+    : never,
+): Order {
+  const priceDenominator = new BN(rawOrder.priceDenominator)
+
+  return {
+    buyTokenId: +rawOrder.buyToken,
+    sellTokenId: +rawOrder.sellToken,
+    validFrom: +rawOrder.validFrom,
+    validUntil: +rawOrder.validUntil,
+    priceNumerator: new BN(rawOrder.priceNumerator),
+    priceDenominator,
+    remainingAmount: priceDenominator.sub(new BN(rawOrder.usedAmount)),
+  }
 }

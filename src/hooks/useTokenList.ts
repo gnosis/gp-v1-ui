@@ -2,14 +2,11 @@ import { useEffect } from 'react'
 import { TokenDetails } from 'types'
 import useSafeState from './useSafeState'
 import { getTokens, subscribeToTokenList } from 'services'
-
-// for stable reference
-// to avoid updates on setState([])
-const emptyArray: TokenDetails[] = []
+import { EMPTY_ARRAY } from 'const'
 
 export const useTokenList = (networkId?: number): TokenDetails[] => {
   // sync get tokenList
-  const tokens = networkId === undefined ? emptyArray : getTokens(networkId)
+  const tokens = networkId === undefined ? EMPTY_ARRAY : getTokens(networkId)
 
   // force update with a new value each time
   const [, forceUpdate] = useSafeState({})
