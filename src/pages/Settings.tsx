@@ -226,7 +226,6 @@ const WCresolver = (
   })
 
   const { value: values, error } = result
-  console.log('WCresolver::result', result)
 
   return {
     name: 'walletconnect',
@@ -299,33 +298,11 @@ const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
 
 const resolver: ValidationResolver<SettingsFormData> = data => {
   const { walletconnect } = data
-  console.log('walletconnect', walletconnect)
 
   const result = WCresolver(walletconnect)
-  const { values: walletconnectValues, errors: walletconnectErrors } = result
-  console.log('result', result)
-  console.log('walletconnectValues', walletconnectValues)
-  console.log('walletconnectErrors', walletconnectErrors)
 
   // potentially allow for Setting sections other than WalletConnect
   const { values, errors } = composeValuesErrors(result)
-
-  // const values: SettingsFormData | {} = walletconnectErrors
-  //   ? {}
-  //   : walletconnectValues
-  //   ? {
-  //       walletconnect: walletconnectValues,
-  //     }
-  //   : {}
-
-  // const errors = walletconnectErrors
-  //   ? {
-  //       walletconnect: walletconnectErrors,
-  //     }
-  //   : {}
-
-  console.log('FINAL::values', values)
-  console.log('FINAL::errors', errors)
 
   return {
     values: errors ? {} : values || {},
@@ -345,21 +322,16 @@ export const Settings: React.FC = () => {
   // to not touch localStorage on every render
   const [defaultValues] = useState(getDefaultSettings)
 
-  const { register, handleSubmit, errors, control, getValues } = useForm<SettingsFormData>({
+  const { register, handleSubmit, errors, control } = useForm<SettingsFormData>({
     validationResolver: resolver,
     defaultValues,
   })
-  console.log('errors', errors)
-  console.log('getValues', getValues({ nest: true }))
 
   const onSubmit = async (data: SettingsFormData): Promise<void> => {
-    console.log('WC_FORM::data', data)
-
     if (data.walletconnect) {
       if (!setCustomWCOptions(data.walletconnect)) return
 
-      const reconnected = await walletApi.reconnectWC()
-      console.log('reconnected', reconnected)
+      await walletApi.reconnectWC()
     }
   }
 

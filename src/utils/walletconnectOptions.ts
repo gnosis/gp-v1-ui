@@ -27,7 +27,6 @@ export const getWCOptionsFromStorage = (): WCOptions => {
   if (!storedOptions) return {}
 
   const { infuraId, bridge, rpc }: WCOptions = JSON.parse(storedOptions)
-  console.log('JSON.parse(storedOptions)', JSON.parse(storedOptions))
   return {
     infuraId,
     bridge,
