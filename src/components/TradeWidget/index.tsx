@@ -933,7 +933,7 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
-      {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
+      {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
@@ -949,6 +949,7 @@ const TradeWidget: React.FC = () => {
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
+            userConnected={!!(userAddress && networkId)}
           />
           <IconWrapper onClick={swapTokens}>
             <SwitcherSVG />
