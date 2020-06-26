@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useForm, FormContextValues, ValidationResolver, ErrorMessage, FieldErrors } from 'react-hook-form'
 import { DevTool } from '@hookform/devtools'
 import styled from 'styled-components'
@@ -6,6 +6,7 @@ import { MEDIA } from 'const'
 
 import Joi from '@hapi/joi'
 import { walletApi } from 'api'
+import { setCustomWCOptions, getWCOptionsFromStorage } from 'utils'
 
 const BridgeSchema = Joi.string()
   .empty('')
@@ -184,14 +185,11 @@ const WCError: React.FC<WCErrorsProps> = ({ errors, name }) => {
   )
 }
 
-type WCSettingsData = (
-  | {
-      infuraId: string
-    }
-  | {
-      rpc: string
-    }
-) & {
+interface WCSettingsData {
+  infuraId?: string
+
+  rpc?: string
+
   bridge?: string
 }
 
@@ -319,30 +317,21 @@ const resolver: ValidationResolver<SettingsFormData> = data => {
   }
 }
 
-interface WCOptions {
-  infuraId?: string
-  bridge?: string
-  rpc?: string
-}
-
-const setCustomWalletConnectOptions = (options: WCOptions): str => {
-  const optionsStr = JSON.stringify(options)
-  const oldStr = localStorage.getItem('CustomWCOptions')
-
-  // no change,no need to reconnect
-  if (optionsStr === oldStr) return false
-
-  localStorage.setItem('CustomWCOptions', optionsStr)
-  return true
-}
-
 const SettingsWrapper = styled.div`
   width: 100%;
 `
 
+const getDefaultSettings = (): SettingsFormData => ({
+  walletconnect: getWCOptionsFromStorage() as WCSettingsData,
+})
+
 export const Settings: React.FC = () => {
+  // to not touch localStorage on every render
+  const [defaultValues] = useState(getDefaultSettings)
+
   const { register, handleSubmit, errors, control, getValues } = useForm<SettingsFormData>({
     validationResolver: resolver,
+    defaultValues,
   })
   console.log('errors', errors)
   console.log('getValues', getValues({ nest: true }))
@@ -351,7 +340,7 @@ export const Settings: React.FC = () => {
     console.log('WC_FORM::data', data)
 
     if (data.walletconnect) {
-      if (!setCustomWalletConnectOptions(data.walletconnect)) return
+      if (!setCustomWCOptions(data.walletconnect)) return
 
       const reconnected = await walletApi.reconnectWC()
       console.log('reconnected', reconnected)
