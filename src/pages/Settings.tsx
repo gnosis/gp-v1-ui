@@ -6,22 +6,30 @@ import { MEDIA } from 'const'
 
 import Joi from '@hapi/joi'
 import { walletApi } from 'api'
-import { setCustomWCOptions, getWCOptionsFromStorage } from 'utils'
+import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
 
-const BridgeSchema = Joi.string()
+const URLSchema = Joi.string()
   .empty('')
   .optional()
   .uri({ scheme: ['http', 'https'] })
-const RPCSchema = BridgeSchema
+const BridgeSchema = URLSchema.message('Bridge must be a valid URL')
+const RPCSchema = URLSchema.message('RPC must be a valid URL')
 const InfuraIdSchema = Joi.string()
   .empty('')
   .optional()
   .length(32)
+  .message('Must be a valid id')
 
 const WCSettingsSchema = Joi.object({
-  bridge: BridgeSchema.message('Bridge must be a valid URL'),
-  infuraId: InfuraIdSchema.message('Must be a valid id'),
-  rpc: RPCSchema.message('RPC must be a valid URL'),
+  bridge: BridgeSchema,
+  infuraId: InfuraIdSchema,
+  rpc: Joi.object({
+    mainnet: RPCSchema,
+    rinkeby: RPCSchema,
+  }).empty({
+    mainnet: '',
+    rinkeby: '',
+  }),
 })
   .oxor('infuraId', 'rpc')
   .messages({ 'object.oxor': 'InfuraId and RPC are mutually exclusive' })
@@ -154,7 +162,18 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
           <InnerFormSection>
             <FormField>
               <span>RPC URL</span>
-              <input type="text" name="walletconnect.rpc" ref={register} placeholder="https://mainnet.path_to_node" />
+              <input
+                type="text"
+                name="walletconnect.rpc.mainnet"
+                ref={register}
+                placeholder="MAINNET: https://mainnet.node_url"
+              />
+              <input
+                type="text"
+                name="walletconnect.rpc.rinkeby"
+                ref={register}
+                placeholder="RINKEBY: https://rinkeby.node_url"
+              />
             </FormField>
             <WCError errors={errors} name="rpc" />
           </InnerFormSection>
@@ -190,24 +209,16 @@ const WCError: React.FC<WCErrorsProps> = ({ errors, name }) => {
   )
 }
 
-interface WCSettingsData {
-  infuraId?: string
-
-  rpc?: string
-
-  bridge?: string
-}
-
 interface SettingsFormData {
-  walletconnect: WCSettingsData
+  walletconnect: WCOptions
 }
 
 // validates only walletconnect slice of form data
 const WCresolver = (
-  data: WCSettingsData,
+  data: WCOptions,
 ): {
-  values: WCSettingsData | null
-  errors: FieldErrors<WCSettingsData> | null
+  values: WCOptions | null
+  errors: FieldErrors<WCOptions> | null
   name: 'walletconnect'
 } => {
   const result = WCSettingsSchema.validate(data, {
@@ -327,7 +338,7 @@ const SettingsWrapper = styled.div`
 `
 
 const getDefaultSettings = (): SettingsFormData => ({
-  walletconnect: getWCOptionsFromStorage() as WCSettingsData,
+  walletconnect: getWCOptionsFromStorage(),
 })
 
 export const Settings: React.FC = () => {

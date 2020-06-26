@@ -1,10 +1,14 @@
 import { INFURA_ID, WALLET_CONNECT_BRIDGE, STORAGE_KEY_CUSTOM_WC_OPTIONS } from 'const'
-import { IWalletConnectProviderOptions } from '@walletconnect/types'
+import { IWalletConnectProviderOptions, IRPCMap } from '@walletconnect/types'
+import { Network } from 'types'
 
-interface WCOptions {
+export interface WCOptions {
   infuraId?: string
   bridge?: string
-  rpc?: string
+  rpc?: {
+    mainnet?: string
+    rinkeby?: string
+  }
 }
 
 export const setCustomWCOptions = (options: WCOptions): boolean => {
@@ -18,11 +22,11 @@ export const setCustomWCOptions = (options: WCOptions): boolean => {
   return true
 }
 
-export const getWCOptionsFromStorage = (): IWalletConnectProviderOptions => {
+export const getWCOptionsFromStorage = (): WCOptions => {
   const storedOptions = localStorage.getItem(STORAGE_KEY_CUSTOM_WC_OPTIONS)
   if (!storedOptions) return {}
 
-  const { infuraId, bridge, rpc }: IWalletConnectProviderOptions = JSON.parse(storedOptions)
+  const { infuraId, bridge, rpc }: WCOptions = JSON.parse(storedOptions)
   console.log('JSON.parse(storedOptions)', JSON.parse(storedOptions))
   return {
     infuraId,
@@ -31,10 +35,23 @@ export const getWCOptionsFromStorage = (): IWalletConnectProviderOptions => {
   }
 }
 
+const mapStoredRpc = (rpc?: WCOptions['rpc']): IRPCMap | undefined => {
+  if (!rpc) return
+
+  const { mainnet, rinkeby } = rpc
+
+  const rpcMap = {}
+  if (mainnet) rpcMap[Network.Mainnet] = mainnet
+  if (rinkeby) rpcMap[Network.Rinkeby] = rinkeby
+
+  return rpcMap
+}
+
 export const generateWCOptions = (): IWalletConnectProviderOptions => {
-  const { infuraId, bridge } = getWCOptionsFromStorage()
+  const { infuraId, bridge, rpc } = getWCOptionsFromStorage()
   return {
     infuraId: infuraId || INFURA_ID,
     bridge: bridge || WALLET_CONNECT_BRIDGE,
+    rpc: mapStoredRpc(rpc),
   }
 }
