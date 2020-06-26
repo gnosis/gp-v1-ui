@@ -7,6 +7,7 @@ import { MEDIA } from 'const'
 import Joi from '@hapi/joi'
 import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
+import { useHistory } from 'react-router'
 
 const URLSchema = Joi.string()
   .empty('')
@@ -327,11 +328,14 @@ export const Settings: React.FC = () => {
     defaultValues,
   })
 
+  const history = useHistory()
+
   const onSubmit = async (data: SettingsFormData): Promise<void> => {
     if (data.walletconnect) {
       if (!setCustomWCOptions(data.walletconnect)) return
 
-      await walletApi.reconnectWC()
+      const reconnected = await walletApi.reconnectWC()
+      if (reconnected) history.push('/')
     }
   }
 
