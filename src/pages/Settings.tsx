@@ -107,12 +107,12 @@ const Disclaimer = styled.div`
   }
 `
 
-const SettingsButton = styled.button`
+const SettingsButtonSubmit = styled.button`
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  background: #c2d1ff;
+  background: #355df1;
   font-size: 1.4rem;
-  color: var(--color-text-active);
+  color: var(--color-text-CTA);
   -webkit-letter-spacing: 0;
   -moz-letter-spacing: 0;
   -ms-letter-spacing: 0;
@@ -123,6 +123,11 @@ const SettingsButton = styled.button`
   outline: 0;
   height: 3.6rem;
   letter-spacing: 0.03rem;
+`
+
+const SettingsButtonReset = styled(SettingsButtonSubmit)`
+  background: #c7cbda;
+  color: var(--color-text-active);
 `
 
 export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
@@ -352,7 +357,8 @@ export const Settings: React.FC = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <WCSettings register={register} errors={errors} />
         <div>
-          <SettingsButton type="submit">Apply Settings</SettingsButton>
+          <SettingsButtonReset type="reset">Reset</SettingsButtonReset>
+          <SettingsButtonSubmit type="submit">Apply Settings</SettingsButtonSubmit>
         </div>
       </form>
       <DevTool control={control} />
