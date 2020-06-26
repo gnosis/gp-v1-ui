@@ -5,6 +5,7 @@ import styled from 'styled-components'
 import { MEDIA } from 'const'
 
 import Joi from '@hapi/joi'
+import { walletApi } from 'api'
 
 const BridgeSchema = Joi.string()
   .empty('')
@@ -20,24 +21,9 @@ const WCSettingsSchema = Joi.object({
   bridge: BridgeSchema.message('Bridge must be a valid URL'),
   infuraId: InfuraIdSchema.message('Must be a valid id'),
   rpc: RPCSchema.message('RPC must be a valid URL'),
-}).oxor('infuraId', 'rpc')
-// const WCSettingsSchema = Joi.alternatives().try(
-//   Joi.object({
-//     bridge: BridgeSchema.message('Bridge must be a valid URL'),
-//     infuraId: InfuraIdSchema,
-//     rpc: '',
-//   }),
-//   Joi.object({
-//     bridge: BridgeSchema.message('Bridge must be a valid URL'),
-//     infuraId: '',
-//     rpc: RPCSchema.message('RPC must be a valid URL'),
-//   }),
-//   Joi.object({
-//     bridge: BridgeSchema.message('Bridge must be a valid URL'),
-//     infuraId: '',
-//     rpc: '',
-//   }),
-// )
+})
+  .oxor('infuraId', 'rpc')
+  .messages({ 'object.oxor': 'InfuraId and RPC are mutually exclusive' })
 
 interface WCSettingsProps {
   register: FormContextValues['register']
@@ -48,7 +34,6 @@ const OuterFormSection = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 1.5em;
-  /* min-width: 80vw; */
 
   > div {
     margin: 0.5em;
@@ -58,10 +43,7 @@ const OuterFormSection = styled.div`
 const AlternativesSection = styled.div`
   display: grid;
   outline: dotted;
-  /* flex-wrap: wrap; */
   grid-template-columns: 1fr auto 1fr;
-  /* grid-template-rows: 1fr auto 1fr; */
-  /* grid-template-areas: 'field or field' 'field or field'; */
 
   @media ${MEDIA.mobile} {
     grid-template-rows: 1fr auto 1fr;
@@ -75,11 +57,23 @@ const OrSeparator = styled.div`
   font-size: 0.8em;
 `
 
+const ErrorWrapper = styled.p`
+  color: var(--color-error);
+  margin: 0;
+  padding: 0.5em;
+  font-size: 0.7em;
+`
+
 const InnerFormSection = styled.div`
   padding: 0.5em;
   background-color: aquamarine;
-  /* flex: 1 0 0; */
-  /* grid-area: field; */
+  position: relative;
+  padding-bottom: 1em;
+
+  ${ErrorWrapper} {
+    position: absolute;
+    bottom: 0;
+  }
 `
 
 const FormField = styled.label`
@@ -145,8 +139,8 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
             <FormField>
               <span>IfuraId</span>
               <input type="text" name="walletconnect.infuraId" ref={register} />
-              <WCError errors={errors} name="infuraId" />
             </FormField>
+            <WCError errors={errors} name="infuraId" />
           </InnerFormSection>
           <OrSeparator>
             <span>OR</span>
@@ -155,8 +149,8 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
             <FormField>
               <span>RPC URL</span>
               <input type="text" name="walletconnect.rpc" ref={register} placeholder="https://mainnet.path_to_node" />
-              <WCError errors={errors} name="rpc" />
             </FormField>
+            <WCError errors={errors} name="rpc" />
           </InnerFormSection>
         </AlternativesSection>
 
@@ -169,19 +163,13 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
               ref={register}
               placeholder="https://bridge.walletconnect.org"
             />
-            <WCError errors={errors} name="bridge" />
           </FormField>
+          <WCError errors={errors} name="bridge" />
         </InnerFormSection>
       </OuterFormSection>
     </div>
   )
 }
-
-const ErrorWrapper = styled.p`
-  color: var(--color-error);
-  margin: 0;
-  padding: 0.5em;
-`
 
 interface WCErrorsProps {
   errors: FieldErrors<SettingsFormData>
@@ -211,57 +199,167 @@ interface SettingsFormData {
   walletconnect: WCSettingsData
 }
 
-const resolver: ValidationResolver<SettingsFormData> = (data, validationContext) => {
-  console.log('validationContext', validationContext)
-  const { walletconnect } = data
-  console.log('walletconnect', walletconnect)
-  const result = WCSettingsSchema.validate(walletconnect, {
+// validates only walletconnect slice of form data
+const WCresolver = (
+  data: WCSettingsData,
+): {
+  values: WCSettingsData | null
+  errors: FieldErrors<WCSettingsData> | null
+  name: 'walletconnect'
+} => {
+  const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
-  const { value: values, error } = result
-  console.log('result', result)
-  console.log('values', values)
-  console.log('error', error)
 
-  let errors = {}
-  if (error) {
-    errors = {
-      walletconnect: error.details.reduce((previous, currentError) => {
-        return {
-          ...previous,
-          [currentError.path[0]]: currentError,
-        }
-      }, {}),
-    }
-  }
+  const { value: values, error } = result
+  console.log('WCresolver::result', result)
 
   return {
-    values: error ? {} : values,
+    name: 'walletconnect',
+    values: error ? null : values,
+    errors: error
+      ? error.details.reduce((previous, currentError) => {
+          if (currentError.path.length === 0 && currentError.type === 'object.oxor') {
+            return {
+              ...previous,
+              infuraId: currentError,
+              rpc: currentError,
+            }
+          }
+          return {
+            ...previous,
+            [currentError.path[0]]: currentError,
+          }
+        }, {})
+      : null,
+  }
+}
+
+const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
+  ...obj: { errors: null | FieldErrors<T[K]>; values: null | T[K]; name: K }[]
+): {
+  values: T | null
+  errors: FieldErrors<T> | null
+} => {
+  const { errors, values } = obj.reduce<{
+    errors: null | FieldErrors<T>
+    values: null | T
+  }>(
+    (acc, elem) => {
+      // accumulate errors
+      // or leave as null
+      if (elem.errors) {
+        if (!acc.errors) acc.errors = {}
+
+        acc.errors = {
+          ...acc.errors,
+          [elem.name]: elem.errors,
+        }
+      }
+
+      // accumulate values
+      // or make null if there are errors
+      if (acc.errors) {
+        acc.values = null
+        return acc
+      }
+
+      if (!elem.values) return acc
+
+      if (!acc.values) acc.values = {} as T
+      acc.values = {
+        ...acc.values,
+        [elem.name]: elem.values,
+      }
+
+      return acc
+    },
+    { errors: null, values: null },
+  )
+
+  return {
+    values: errors ? null : values,
     errors,
   }
 }
 
-interface ErrorMessageProps {
-  error: string
+const resolver: ValidationResolver<SettingsFormData> = data => {
+  const { walletconnect } = data
+  console.log('walletconnect', walletconnect)
+
+  const result = WCresolver(walletconnect)
+  const { values: walletconnectValues, errors: walletconnectErrors } = result
+  console.log('result', result)
+  console.log('walletconnectValues', walletconnectValues)
+  console.log('walletconnectErrors', walletconnectErrors)
+
+  // potentially allow for Setting sections other than WalletConnect
+  const { values, errors } = composeValuesErrors(result)
+
+  // const values: SettingsFormData | {} = walletconnectErrors
+  //   ? {}
+  //   : walletconnectValues
+  //   ? {
+  //       walletconnect: walletconnectValues,
+  //     }
+  //   : {}
+
+  // const errors = walletconnectErrors
+  //   ? {
+  //       walletconnect: walletconnectErrors,
+  //     }
+  //   : {}
+
+  console.log('FINAL::values', values)
+  console.log('FINAL::errors', errors)
+
+  return {
+    values: errors ? {} : values || {},
+    errors: errors || {},
+  }
 }
 
-// const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
-//   return <p>{error}</p>
-// }
+interface WCOptions {
+  infuraId?: string
+  bridge?: string
+  rpc?: string
+}
+
+const setCustomWalletConnectOptions = (options: WCOptions): str => {
+  const optionsStr = JSON.stringify(options)
+  const oldStr = localStorage.getItem('CustomWCOptions')
+
+  // no change,no need to reconnect
+  if (optionsStr === oldStr) return false
+
+  localStorage.setItem('CustomWCOptions', optionsStr)
+  return true
+}
+
+const SettingsWrapper = styled.div`
+  width: 100%;
+`
 
 export const Settings: React.FC = () => {
-  const { register, handleSubmit, watch, errors, control, getValues } = useForm<SettingsFormData>({
+  const { register, handleSubmit, errors, control, getValues } = useForm<SettingsFormData>({
     validationResolver: resolver,
   })
   console.log('errors', errors)
   console.log('getValues', getValues({ nest: true }))
 
-  const onSubmit = (data: SettingsFormData): void => {
+  const onSubmit = async (data: SettingsFormData): Promise<void> => {
     console.log('WC_FORM::data', data)
+
+    if (data.walletconnect) {
+      if (!setCustomWalletConnectOptions(data.walletconnect)) return
+
+      const reconnected = await walletApi.reconnectWC()
+      console.log('reconnected', reconnected)
+    }
   }
 
   return (
-    <div style={{ width: '100%' }}>
+    <SettingsWrapper>
       <form onSubmit={handleSubmit(onSubmit)}>
         <WCSettings register={register} errors={errors} />
         <div>
@@ -269,6 +367,6 @@ export const Settings: React.FC = () => {
         </div>
       </form>
       <DevTool control={control} />
-    </div>
+    </SettingsWrapper>
   )
 }
