@@ -214,8 +214,18 @@ interface SettingsFormData {
   walletconnect: WCOptions
 }
 
+interface ResolverResult<T extends SettingsFormData, K extends keyof T = keyof T> {
+  values: T[K] | null
+  errors: FieldErrors<T[K]> | null
+  name: K
+}
+
+interface Resolver<T extends SettingsFormData, K extends keyof T = keyof T> {
+  (data: T[K]): ResolverResult<T>
+}
+
 // validates only walletconnect slice of form data
-const WCresolver = (
+const WCresolver: Resolver<SettingsFormData, 'walletconnect'> = (
   data: WCOptions,
 ): {
   values: WCOptions | null
@@ -250,12 +260,12 @@ const WCresolver = (
 }
 
 const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
-  ...obj: { errors: null | FieldErrors<T[K]>; values: null | T[K]; name: K }[]
+  resolvedResults: { errors: null | FieldErrors<T[K]>; values: null | T[K]; name: K }[],
 ): {
   values: T | null
   errors: FieldErrors<T> | null
 } => {
-  const { errors, values } = obj.reduce<{
+  const { errors, values } = resolvedResults.reduce<{
     errors: null | FieldErrors<T>
     values: null | T
   }>(
@@ -297,13 +307,24 @@ const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
   }
 }
 
-const resolver: ValidationResolver<SettingsFormData> = data => {
-  const { walletconnect } = data
+const composeResolvers = (resolvers: { [K in keyof SettingsFormData]: Resolver<SettingsFormData, K> }) => {
+  return (data: SettingsFormData): ResolverResult<SettingsFormData>[] => {
+    return Object.keys(data).map((key: keyof SettingsFormData) => {
+      const resolver = resolvers[key]
+      return resolver(data[key])
+    })
+  }
+}
 
-  const result = WCresolver(walletconnect)
+const mainResolver = composeResolvers({
+  walletconnect: WCresolver,
+})
+
+const resolver: ValidationResolver<SettingsFormData> = data => {
+  const results = mainResolver(data)
 
   // potentially allow for Setting sections other than WalletConnect
-  const { values, errors } = composeValuesErrors(result)
+  const { values, errors } = composeValuesErrors(results)
 
   return {
     values: errors ? {} : values || {},
