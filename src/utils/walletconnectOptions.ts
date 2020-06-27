@@ -26,12 +26,7 @@ export const getWCOptionsFromStorage = (): WCOptions => {
   const storedOptions = localStorage.getItem(STORAGE_KEY_CUSTOM_WC_OPTIONS)
   if (!storedOptions) return {}
 
-  const { infuraId, bridge, rpc }: WCOptions = JSON.parse(storedOptions)
-  return {
-    infuraId,
-    bridge,
-    rpc,
-  }
+  return JSON.parse(storedOptions)
 }
 
 const mapStoredRpc = (rpc?: WCOptions['rpc']): IRPCMap | undefined => {
