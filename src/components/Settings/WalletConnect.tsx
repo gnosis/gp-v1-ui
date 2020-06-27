@@ -157,7 +157,7 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
     <div>
       <Disclaimer>
         <p>
-          Here you can set InfuraId or RPC URl that willbe used for connecting WalletConnect provider to mainnet. It is
+          Here you can set InfuraId or RPC URl that will be used for connecting WalletConnect provider to mainnet. It is
           also possible to set WalletConnect bridge URL to use instead of the default one
         </p>
       </Disclaimer>
