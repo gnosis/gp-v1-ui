@@ -32,6 +32,7 @@ export const ONE_HUNDRED_BIG_NUMBER = new BigNumber(100)
 export const ORDER_FILLED_FACTOR = new BN(10000) // 0.01%
 
 export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
+
 export const MINIMUM_ALLOWANCE_DECIMALS = 12
 
 export const APP_NAME = 'fuse'
