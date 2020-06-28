@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
 import { sanitizeInput, sanitizeNegativeAndMakeMultipleOf } from 'utils'
-// import { DEFAULT_FORM_STATE } from 'components/TradeWidget'
 
 export function useQuery(): { sellAmount: string; price: string; validFrom?: string; validUntil?: string } {
   const { search } = useLocation()
