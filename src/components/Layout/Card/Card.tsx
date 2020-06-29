@@ -118,7 +118,7 @@ interface ResponsiveRowSizeTogglerProps {
   openStatus: boolean
 }
 
-const ResponsiveRowWrapper = styled.tr`
+const ResponsiveRowWrapper = styled.td`
   &&&&&& {
     display: flex;
     justify-content: center;
