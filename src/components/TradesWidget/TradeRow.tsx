@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
+import { formatDistanceStrict } from 'date-fns'
 
 import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
@@ -10,7 +11,7 @@ import useSafeState from 'hooks/useSafeState'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { ResponsiveRowSizeToggler, FoldableRowWrapper } from 'components/Layout/Card'
 
-import { isTradeSettled, formatDateFromBatchId } from 'utils'
+import { isTradeSettled } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { ONE_HUNDRED_BIG_NUMBER } from 'const'
 
@@ -99,6 +100,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
   const invertedFillPrice = invertPrice(fillPrice)
 
+  const date = new Date(timestamp)
+
   const typeColumnTitle = useMemo(() => {
     switch (type) {
       case 'full':
@@ -124,8 +127,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId} $open={openCard}>
-      <td data-label="Date" className="showReponsive" title={new Date(timestamp).toLocaleString()}>
-        {formatDateFromBatchId(batchId, { strict: true })}
+      <td data-label="Date" className="showReponsive" title={date.toLocaleString()}>
+        {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
       <td data-label="Market" className="showReponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
