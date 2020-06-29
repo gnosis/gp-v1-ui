@@ -240,14 +240,19 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
         // copy full state
         Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
 
+        // filteredOrders are selectedTab specific,
+        // so it's ok to use them directly
+        // without classifiedOrders[selectedTab]
         state[selectedTab].markedForDeletion = checked
-          ? new Set(classifiedOrders[selectedTab].orders.map(order => order.id))
+          ? new Set(filteredAndSortedOrders.concat(filteredAndSortedPendingOrders).map(order => order.id))
           : new Set()
+        // on deselect, better deselect all filtered and unfiltered
+        // to avoid cancelling not shown orders
 
         return state
       })
     },
-    [classifiedOrders, selectedTab, setClassifiedOrders],
+    [filteredAndSortedOrders, filteredAndSortedPendingOrders, selectedTab, setClassifiedOrders],
   )
 
   const { deleteOrders, deleting } = useDeleteOrders()
