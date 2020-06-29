@@ -9,6 +9,8 @@ import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
 import { numberToHex } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
+import { logDebug, logInfo } from 'utils'
+import { web3 } from 'api'
 
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
@@ -151,8 +153,33 @@ export const composeProvider = <T extends Provider>(
     ),
   )
 
-  const walletMiddleware = providerAsMiddleware(provider)
+  engine.push(
+    createConditionalMiddleware<TransactionConfig[]>(
+      req => req.method === 'eth_sendTransaction',
+      async req => {
+        const txConfig = req.params?.[0]
+        // no parameters, which shouldn't happen
+        if (!txConfig) return false
 
+        if (!txConfig.gas) {
+          const gasLimit = await web3.eth.estimateGas(txConfig)
+          // const gasLimit = '100000000'
+          logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
+          txConfig.gas = gasLimit
+        } else {
+          logDebug('[composeProvider] Gas Limit: ' + txConfig.gas)
+        }
+
+        logInfo('[composeProvider] Send transaction: ', JSON.stringify(txConfig, null, 2))
+
+        // don't mark as handled
+        // pass modified tx on
+        return false
+      },
+    ),
+  )
+
+  const walletMiddleware = providerAsMiddleware(provider)
   engine.push(walletMiddleware)
 
   const composedProvider: T = providerFromEngine(engine)
