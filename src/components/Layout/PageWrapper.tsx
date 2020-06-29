@@ -60,7 +60,7 @@ export const StandaloneCardWrapper = styled.div`
 
   @media ${MEDIA.tablet} {
     max-width: 100%;
-    min-width: initial;
+    min-width: 73.7rem;
   }
 
   @media ${MEDIA.mobile} {
