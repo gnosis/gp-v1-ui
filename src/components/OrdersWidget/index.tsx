@@ -212,10 +212,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
       if (selectedTab === 'fills') return
 
       setClassifiedOrders(curr => {
-        const state = emptyState()
-
         // copy full state
-        Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
+        const state = { ...curr }
 
         // copy markedForDeletion set
         const newSet = new Set(curr[selectedTab].markedForDeletion)
@@ -235,10 +233,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
       if (selectedTab === 'fills') return
 
       setClassifiedOrders(curr => {
-        const state = emptyState()
-
         // copy full state
-        Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
+        const state = { ...curr }
 
         // filteredOrders are selectedTab specific,
         // so it's ok to use them directly
@@ -270,10 +266,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
           // reset selections
 
           setClassifiedOrders(curr => {
-            const state = emptyState()
-
             // copy full state
-            Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
+            const state = { ...curr }
 
             // remove checked orders
             state[selectedTab].orders = curr[selectedTab].orders.filter(
