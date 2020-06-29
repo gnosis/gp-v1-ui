@@ -68,7 +68,7 @@ const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
       }
 
       // accumulate values
-      // or make null if there are errors
+      // or set to null if there are errors
       if (acc.errors) {
         acc.values = null
         return acc
@@ -139,9 +139,13 @@ export const Settings: React.FC = () => {
 
   const onSubmit = async (data: SettingsFormData): Promise<void> => {
     if (data.walletconnect) {
+      // if options didn't change, exit early
       if (!setCustomWCOptions(data.walletconnect)) return
 
+      // connect with new options
+      // with Web3Modal prompt and everything
       const reconnected = await walletApi.reconnectWC()
+      // if successful, redirect to home
       if (reconnected) history.push('/')
     }
   }

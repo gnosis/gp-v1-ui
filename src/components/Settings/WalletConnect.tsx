@@ -32,7 +32,6 @@ const WCSettingsSchema = Joi.object({
 })
   .oxor('infuraId', 'rpc')
   .messages({ 'object.oxor': 'InfuraId and RPC are mutually exclusive' })
-
 // bridge is optional
 // infuraId and rpc are optional and exclusive
 
@@ -55,6 +54,7 @@ export const wcResolver: Resolver<SettingsFormData, 'walletconnect'> = (
     values: error ? null : values,
     errors: error
       ? error.details.reduce((previous, currentError) => {
+          // when exlusive fields are both present
           if (currentError.path.length === 0 && currentError.type === 'object.oxor') {
             return {
               ...previous,
@@ -62,6 +62,7 @@ export const wcResolver: Resolver<SettingsFormData, 'walletconnect'> = (
               rpc: currentError,
             }
           }
+          // any other error
           return {
             ...previous,
             [currentError.path[0]]: currentError,
@@ -128,7 +129,6 @@ const FormField = styled.label`
 
   > input {
     width: auto;
-    /* min-width: 32ch; */
     font-size: 1em;
     font-weight: normal;
 
