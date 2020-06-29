@@ -131,6 +131,10 @@ const FormField = styled.label`
   display: flex;
   flex-direction: column;
 
+  > * {
+    padding-left: 0.65rem;
+  }
+
   > span {
     font-weight: bold;
   }
