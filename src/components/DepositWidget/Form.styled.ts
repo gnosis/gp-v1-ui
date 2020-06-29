@@ -19,6 +19,7 @@ export const WalletDrawerInnerWrapper = styled.div`
     font-family: var(--font-default);
     letter-spacing: 0;
     line-height: 1.4;
+    text-align: left;
   }
 
   p.error {

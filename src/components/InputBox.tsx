@@ -19,7 +19,7 @@ export const InputBox = styled.div`
     box-sizing: border-box;
     border-bottom: 0.2rem solid transparent;
     font-weight: var(--font-weight-normal);
-    padding: 0 15rem 0 1rem;
+    padding: 0 19.5rem 0 1rem;
     outline: 0;
 
     &:focus {
