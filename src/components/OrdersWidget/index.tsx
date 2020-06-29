@@ -9,20 +9,23 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 // Const and utils
 import { isOrderActive, isPendingOrderActive } from 'utils'
 import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
+import { filterTradesFn, filterOrdersFn } from 'utils/filter'
 
 // Hooks
 import { useOrders } from 'hooks/useOrders'
+import { useTrades } from 'hooks/useTrades'
 import useSafeState from 'hooks/useSafeState'
 import useDataFilter from 'hooks/useDataFilter'
 import useSortByTopic from 'hooks/useSortByTopic'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 
 // Api
-import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
+import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchange/ExchangeApi'
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { CardTable } from 'components/Layout/Card'
+import { InnerTradesWidget } from 'components/TradesWidget'
 import FilterTools from 'components/FilterTools'
 
 // OrderWidget
@@ -30,11 +33,7 @@ import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
-// Types/misc
-import { DetailedPendingOrder } from 'hooks/usePendingOrders'
-import { TokenDetails } from 'types'
-
-type OrderTabs = 'active' | 'liquidity' | 'closed'
+type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
 
 interface ShowOrdersButtonProps {
   type: OrderTabs
@@ -49,7 +48,7 @@ const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, cou
   </button>
 )
 
-type FilteredOrdersStateKeys = OrderTabs
+type FilteredOrdersStateKeys = Exclude<OrderTabs, 'fills'>
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
     orders: DetailedAuctionElement[]
@@ -87,25 +86,6 @@ function classifyOrders(
   })
 }
 
-function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
-  if (!token) return false
-  return (
-    token?.symbol?.toLowerCase().includes(searchText) ||
-    token?.name?.toLowerCase().includes(searchText) ||
-    token?.address.toLowerCase().includes(searchText)
-  )
-}
-
-const filterOrdersFn = (searchTxt: string) => ({ id, buyToken, sellToken }: DetailedAuctionElement): boolean | null => {
-  if (searchTxt === '') return null
-
-  return (
-    !!id.includes(searchTxt) ||
-    checkTokenAgainstSearch(buyToken, searchTxt) ||
-    checkTokenAgainstSearch(sellToken, searchTxt)
-  )
-}
-
 const compareFnFactory = (topic: TopicNames, asc: boolean) => (
   lhs: DetailedAuctionElement,
   rhs: DetailedAuctionElement,
@@ -130,12 +110,15 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState())
   const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
 
+  // Subscribe to trade events
+  const trades = useTrades()
+
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
     () => ({
-      displayedOrders: classifiedOrders[selectedTab].orders,
-      displayedPendingOrders: classifiedOrders[selectedTab].pendingOrders,
-      markedForDeletion: classifiedOrders[selectedTab].markedForDeletion,
+      displayedOrders: selectedTab === 'fills' ? [] : classifiedOrders[selectedTab].orders,
+      displayedPendingOrders: selectedTab === 'fills' ? [] : classifiedOrders[selectedTab].pendingOrders,
+      markedForDeletion: selectedTab === 'fills' ? new Set<string>() : classifiedOrders[selectedTab].markedForDeletion,
     }),
     [classifiedOrders, selectedTab],
   )
@@ -172,6 +155,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const ordersCount = displayedOrders.length + displayedPendingOrders.length
 
   const noOrders = allOrders.length === 0
+  const noTrades = trades.length === 0
 
   const overBalanceOrders = useMemo(
     () =>
@@ -224,7 +208,9 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   // =========================================
 
   const toggleMarkForDeletionFactory = useCallback(
-    (orderId: string, selectedTab: OrderTabs): (() => void) => (): void =>
+    (orderId: string, selectedTab: OrderTabs): (() => void) => (): void => {
+      if (selectedTab === 'fills') return
+
       setClassifiedOrders(curr => {
         const state = emptyState()
 
@@ -239,12 +225,15 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
         state[selectedTab].markedForDeletion = newSet
 
         return state
-      }),
+      })
+    },
     [setClassifiedOrders],
   )
 
   const toggleSelectAll = useCallback(
-    ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) =>
+    ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) => {
+      if (selectedTab === 'fills') return
+
       setClassifiedOrders(curr => {
         const state = emptyState()
 
@@ -256,7 +245,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
           : new Set()
 
         return state
-      }),
+      })
+    },
     [classifiedOrders, selectedTab, setClassifiedOrders],
   )
 
@@ -265,6 +255,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const onSubmit = useCallback(
     async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
       event.preventDefault()
+
+      if (selectedTab === 'fills') return
 
       const success = await deleteOrders(Array.from(markedForDeletion))
 
@@ -295,27 +287,60 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
+  const {
+    filteredData: filteredTrades,
+    search: tradesSearch,
+    handlers: { handleSearch: handleTradesSearch },
+  } = useDataFilter<Trade>({
+    data: trades,
+    filterFnFactory: filterTradesFn,
+  })
+
+  const { handleTabSpecificSearch, tabSpecficSearch, tabSpecificResultName, tabSpecificDataLength } = useMemo(
+    () => ({
+      handleTabSpecificSearch: (e: React.ChangeEvent<HTMLInputElement>): void =>
+        selectedTab === 'fills' ? handleTradesSearch(e) : handleBothOrderTypeSearch(e),
+      tabSpecficSearch: selectedTab === 'fills' ? tradesSearch : search,
+      tabSpecificResultName: selectedTab === 'fills' ? 'trades' : 'orders',
+      tabSpecificDataLength:
+        selectedTab === 'fills'
+          ? filteredTrades.length
+          : displayedPendingOrders.length + filteredAndSortedOrders.length,
+    }),
+    [
+      selectedTab,
+      tradesSearch,
+      search,
+      filteredTrades.length,
+      displayedPendingOrders.length,
+      filteredAndSortedOrders.length,
+      handleTradesSearch,
+      handleBothOrderTypeSearch,
+    ],
+  )
+
   return (
     <OrdersWrapper>
       {!isConnected ? (
         <ConnectWalletBanner />
       ) : (
-        noOrders && (
+        noOrders &&
+        noTrades && (
           <p className="noOrdersInfo">
             It appears you haven&apos;t placed any order yet. <br /> Create one!
           </p>
         )
       )}
-      {!noOrders && networkId && (
+      {(!noOrders || !noTrades) && networkId && (
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
               className={isWidget ? 'widgetFilterTools' : ''}
-              resultName="orders"
-              searchValue={search}
-              handleSearch={handleBothOrderTypeSearch}
-              showFilter={!!search}
-              dataLength={filteredAndSortedPendingOrders.length + filteredAndSortedOrders.length}
+              resultName={tabSpecificResultName}
+              searchValue={tabSpecficSearch}
+              handleSearch={handleTabSpecificSearch}
+              showFilter={!!tabSpecficSearch}
+              dataLength={tabSpecificDataLength}
             >
               {/* implement later when better data concerning order state and can be saved to global state 
               <label className="balances-hideZero">
@@ -324,6 +349,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
               </label>
               */}
             </FilterTools>
+            {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
             <div className="infoContainer">
               <div className="countContainer">
                 <ShowOrdersButton
@@ -331,6 +357,12 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                   isActive={selectedTab === 'active'}
                   count={classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length}
                   onClick={setSelectedTabFactory('active')}
+                />
+                <ShowOrdersButton
+                  type="fills"
+                  isActive={selectedTab === 'fills'}
+                  count={trades.length}
+                  onClick={setSelectedTabFactory('fills')}
                 />
                 <ShowOrdersButton
                   type="liquidity"
@@ -346,6 +378,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                 />
               </div>
             </div>
+            {/* DELETE ORDERS ROW */}
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
               <b>↴</b>
               <ButtonWithIcon disabled={markedForDeletion.size === 0 || deleting} type="submit">
@@ -353,11 +386,18 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                 {['active', 'liquidity'].includes(selectedTab) ? 'Cancel' : 'Delete'} {markedForDeletion.size} orders
               </ButtonWithIcon>
             </div>
-            {ordersCount > 0 ? (
+            {/* FILLS AKA TRADES */}
+            {selectedTab === 'fills' ? (
+              <div className="ordersContainer">
+                <InnerTradesWidget isTab trades={filteredTrades} />
+              </div>
+            ) : ordersCount > 0 ? (
+              // ACTIVE / LIQUIDITY / CLOSED ORDERS
               <div className="ordersContainer">
                 <CardTable
-                  $columns="3.2rem repeat(2, 1fr) repeat(2, minmax(5.2rem, 0.6fr))"
+                  $columns="3.2rem repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(7.2rem, 0.3fr)"
                   $gap="0 0.6rem"
+                  $padding="0 0.8rem"
                   $rowSeparation="0"
                 >
                   <thead>

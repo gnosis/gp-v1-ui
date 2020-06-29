@@ -106,6 +106,33 @@ export const composeProvider = <T extends Provider>(
     ),
   )
 
+  if (process.env.NODE_ENV === 'development') {
+    // hack to be able to use interface as if from a different account
+    // read-only of course
+    // account will update on the next eth_accounts call
+    // normally on new block in a few seconds
+
+    let substituteAccount = ''
+
+    engine.push(
+      createConditionalMiddleware(
+        req => req.method === 'eth_accounts',
+        (_req, res) => {
+          if (substituteAccount) {
+            res.result = [substituteAccount]
+            return true
+          }
+
+          return false
+        },
+      ),
+    )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).loginAs = (address: string): void => {
+      substituteAccount = address
+    }
+  }
+
   engine.push(
     createConditionalMiddleware<TransactionConfig[]>(
       req => req.method === 'eth_sendTransaction',

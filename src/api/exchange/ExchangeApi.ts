@@ -105,6 +105,10 @@ export interface ExchangeApi extends DepositApi {
   cancelOrders(params: CancelOrdersParams): Promise<Receipt>
 }
 
+export interface DetailedPendingOrder extends DetailedAuctionElement {
+  txHash?: string
+}
+
 export interface DetailedAuctionElement extends AuctionElement {
   buyToken: TokenDetails | null
   sellToken: TokenDetails | null

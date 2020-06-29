@@ -365,8 +365,8 @@ export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   price: '0',
   // ASAP
   validFrom: undefined,
-  // 2 days
-  validUntil: '2880',
+  // Do not expire (never)
+  validUntil: undefined,
 }
 
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
