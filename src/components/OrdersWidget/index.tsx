@@ -107,7 +107,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const { networkId, isConnected } = useWalletConnection()
 
   // allOrders and markedForDeletion, split by tab
-  const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState())
+  const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState)
   const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
 
   // Subscribe to trade events
