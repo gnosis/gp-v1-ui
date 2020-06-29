@@ -10,7 +10,6 @@ import GlobalStyles from 'styles/global'
 
 // Main layout
 import Layout from 'components/Layout'
-import { Settings } from 'pages/Settings'
 
 // Pages
 const About = React.lazy(() =>
@@ -77,6 +76,12 @@ const OrderBook = React.lazy(() =>
   import(
     /* webpackChunkName: "OrderBook_chunk"*/
     'pages/OrderBook'
+  ),
+)
+const Settings = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Settings_chunk"*/
+    'pages/Settings'
   ),
 )
 

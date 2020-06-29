@@ -126,7 +126,7 @@ const getDefaultSettings = (): SettingsFormData => ({
   walletconnect: getWCOptionsFromStorage(),
 })
 
-export const Settings: React.FC = () => {
+const Settings: React.FC = () => {
   // to not touch localStorage on every render
   const [defaultValues] = useState(getDefaultSettings)
 
@@ -163,3 +163,5 @@ export const Settings: React.FC = () => {
     </SettingsWrapper>
   )
 }
+
+export default Settings
