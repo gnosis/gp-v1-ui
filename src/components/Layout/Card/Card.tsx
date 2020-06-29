@@ -315,11 +315,16 @@ export const CardTable = styled.table<{
           > .lowBalance {
             color: #B27800;
             display: flex;
+            align-items: center;
             margin: 0.2rem 0;
             font-size: smaller;
         
             > img {
               margin: 0 0 0.2rem 0.45rem;
+            }
+
+            @media ${MEDIA.mobile} {
+              margin: 0 0 0 1rem;
             }
           }
         }
