@@ -9,26 +9,30 @@ import { useHistory } from 'react-router'
 import { WCSettings, wcResolver } from 'components/Settings/WalletConnect'
 
 const SettingsButtonSubmit = styled.button`
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  background: #355df1;
-  font-size: 1.4rem;
-  color: var(--color-text-CTA);
-  -webkit-letter-spacing: 0;
-  -moz-letter-spacing: 0;
-  -ms-letter-spacing: 0;
-  letter-spacing: 0;
-  line-height: 1;
-  margin: 0 1.6rem;
-  border-radius: 0.6rem;
-  outline: 0;
   height: 3.6rem;
   letter-spacing: 0.03rem;
+
+  border-radius: 0.6rem;
+  padding: 0 1.6rem;
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  line-height: 1;
+`
+
+const ButtonsContainer = styled.div`
+  margin-top: 2em;
+  display: flex;
+  justify-content: space-between;
 `
 
 const SettingsButtonReset = styled(SettingsButtonSubmit)`
-  background: #c7cbda;
+  background-color: transparent;
   color: var(--color-text-active);
+
+  &:hover {
+    color: var(--color-background-button-hover);
+    background-color: transparent;
+  }
 `
 
 export interface SettingsFormData {
@@ -120,6 +124,9 @@ const resolver: ValidationResolver<SettingsFormData> = data => {
 
 const SettingsWrapper = styled.div`
   width: 100%;
+  background: var(--color-background-pageWrapper);
+  padding: 2em;
+  border-radius: 1rem;
 `
 
 const getDefaultSettings = (): SettingsFormData => ({
@@ -154,10 +161,10 @@ const Settings: React.FC = () => {
     <SettingsWrapper>
       <form onSubmit={handleSubmit(onSubmit)}>
         <WCSettings register={register} errors={errors} />
-        <div>
+        <ButtonsContainer>
           <SettingsButtonReset type="reset">Reset</SettingsButtonReset>
           <SettingsButtonSubmit type="submit">Apply Settings</SettingsButtonSubmit>
-        </div>
+        </ButtonsContainer>
       </form>
       {process.env.NODE_ENV === 'development' && <DevTool control={control} />}
     </SettingsWrapper>

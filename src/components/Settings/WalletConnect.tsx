@@ -83,13 +83,12 @@ const OuterFormSection = styled.div`
   font-size: 1.5em;
 
   > div {
-    margin: 0.5em;
+    margin: 0.5em 0;
   }
 `
 
 const AlternativesSection = styled.div`
   display: grid;
-  outline: dotted;
   grid-template-columns: 1fr auto 1fr;
 
   @media ${MEDIA.mobile} {
@@ -100,8 +99,11 @@ const AlternativesSection = styled.div`
 
 const OrSeparator = styled.div`
   padding: 0.5em;
-  text-align: center;
-  font-size: 0.8em;
+    font-size: 0.8em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 `
 
 const ErrorWrapper = styled.p`
@@ -113,9 +115,11 @@ const ErrorWrapper = styled.p`
 
 const InnerFormSection = styled.div`
   padding: 0.5em;
-  background-color: aquamarine;
-  position: relative;
   padding-bottom: 1em;
+  box-shadow: 0 0 7px 0px grey;
+  border-radius: 0.5rem;
+  background: var(--color-background);
+  position: relative;
 
   ${ErrorWrapper} {
     position: absolute;
@@ -126,6 +130,10 @@ const InnerFormSection = styled.div`
 const FormField = styled.label`
   display: flex;
   flex-direction: column;
+
+  > span {
+    font-weight: bold;
+  }
 
   > input {
     width: auto;
@@ -144,11 +152,10 @@ const Disclaimer = styled.div`
 
   > p {
     font-size: 1.4em;
-    max-width: 400px;
-    background-color: antiquewhite;
+    max-width: 600px;
     width: 100%;
     padding: 0.5em;
-    border-radius: 8px;
+    border-radius: 0.8rem;
   }
 `
 
