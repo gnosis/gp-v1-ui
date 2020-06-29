@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useForm, ValidationResolver, FieldErrors } from 'react-hook-form'
-import { DevTool } from '@hookform/devtools'
+import { DevTool } from 'HookFormDevtool'
 import styled from 'styled-components'
 
 import { walletApi } from 'api'
@@ -159,7 +159,7 @@ const Settings: React.FC = () => {
           <SettingsButtonSubmit type="submit">Apply Settings</SettingsButtonSubmit>
         </div>
       </form>
-      <DevTool control={control} />
+      {process.env.NODE_ENV === 'development' && <DevTool control={control} />}
     </SettingsWrapper>
   )
 }
