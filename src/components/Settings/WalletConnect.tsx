@@ -93,7 +93,7 @@ const AlternativesSection = styled.div`
 
   @media ${MEDIA.mobile} {
     grid-template-rows: 1fr auto 1fr;
-    grid-template-columns: auto;
+    grid-template-columns: 100%;
   }
 `
 
