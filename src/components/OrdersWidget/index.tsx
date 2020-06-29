@@ -411,7 +411,11 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                         <input
                           type="checkbox"
                           onChange={toggleSelectAll}
-                          checked={markedForDeletion.size === displayedOrders.length}
+                          checked={
+                            markedForDeletion.size > 0 &&
+                            markedForDeletion.size ===
+                              filteredAndSortedPendingOrders.length + filteredAndSortedOrders.length
+                          }
                           disabled={deleting}
                         />
                       </th>
