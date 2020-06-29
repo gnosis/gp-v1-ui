@@ -48,7 +48,17 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
   }
 
   &&&&& {
-    ${(props): string | false => !props.$open && "td[data-label='Price'] { border: none; }"}
+    td[data-label='Market'] {
+      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+    }
+
+    ${(props): string | false =>
+      !props.$open &&
+      `
+        td[data-label='Price'] { 
+          border: none; 
+        }
+      `}
   }
 `
 

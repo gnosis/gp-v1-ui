@@ -17,7 +17,20 @@ import { ONE_HUNDRED_BIG_NUMBER } from 'const'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   &&&&& {
-    ${(props): string | false => !props.$open && "td[data-label='Type'] { border: none; }"}
+    display: flex;
+    td[data-label='Market'] {
+      order: -1;
+      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+    }
+
+    ${(props): string | false =>
+      !props.$open &&
+      `
+        td[data-label='Date'], 
+        td[data-label='Type'] {
+          border-bottom: none;
+        }
+      `}
   }
 `
 

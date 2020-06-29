@@ -227,7 +227,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
       ) : (
         'Partial Fill'
       )}
-      {!isLowBalance && (
+      {isLowBalance && (
         <>
           <br />
           <span className="lowBalance">

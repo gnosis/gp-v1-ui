@@ -150,10 +150,6 @@ export const FoldableRowWrapper = styled.tr<{ $open?: boolean; $openCSS?: string
       display: none;
     }
 
-    td[data-label='Market'] {
-      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
-    }
-
     @media ${MEDIA.mobile} {
       .cardOpener {
         display: flex;
