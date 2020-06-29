@@ -164,15 +164,16 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
     <div>
       <Disclaimer>
         <p>
-          Here you can set InfuraId or RPC URl that will be used for connecting WalletConnect provider to mainnet. It is
-          also possible to set WalletConnect bridge URL to use instead of the default one
+          Here you can set <strong>InfuraId</strong> or <strong>RPC URL</strong> that will be used for connecting
+          WalletConnect provider to mainnet and rinkeby. It is also possible to set WalletConnect{' '}
+          <strong>Bridge URL</strong> to use instead of the default one.
         </p>
       </Disclaimer>
       <OuterFormSection>
         <AlternativesSection>
           <InnerFormSection>
             <FormField>
-              <span>IfuraId</span>
+              <span>InfuraId</span>
               <input type="text" name="walletconnect.infuraId" ref={register} />
             </FormField>
             <WCError errors={errors} name="infuraId" />
