@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { useForm, ValidationResolver, FieldErrors } from 'react-hook-form'
 import { DevTool } from 'HookFormDevtool'
 import styled from 'styled-components'
@@ -135,7 +135,8 @@ const getDefaultSettings = (): SettingsFormData => ({
 
 const Settings: React.FC = () => {
   // to not touch localStorage on every render
-  const [defaultValues] = useState(getDefaultSettings)
+  // but at the same time pull in updated values from storage on mount
+  const defaultValues = useMemo(getDefaultSettings, [])
 
   const { register, handleSubmit, errors, control } = useForm<SettingsFormData>({
     validationResolver: resolver,
