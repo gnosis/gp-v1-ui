@@ -98,11 +98,11 @@ const AlternativesSection = styled.div`
 `
 
 const OrSeparator = styled.div`
-  padding: 0.5em;
-    font-size: 0.8em;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  padding: 1.5em;
+  font-size: 0.8em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 `
 
