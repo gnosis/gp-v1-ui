@@ -127,7 +127,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Date" className="showReponsive" title={new Date(timestamp).toLocaleString()}>
         {formatDateFromBatchId(batchId, { strict: true })}
       </td>
-      <td data-label="Trade" className="showReponsive">
+      <td data-label="Market" className="showReponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td
@@ -144,7 +144,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatPrice(invertedFillPrice)}
       </td>
       <td
-        data-label="Amount / Received"
+        data-label="Sold / Bought"
         title={`${formatAmountFull({
           amount: sellAmount,
           precision: sellTokenDecimals,
@@ -154,11 +154,11 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         <br />
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
       </td>
-      <td data-label="Type" className="showReponsive" title={typeColumnTitle}>
+      <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
       </td>
       <td data-label="View on Etherscan">
-        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
+        <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
       </td>
       <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
     </TradeRowFoldableWrapper>

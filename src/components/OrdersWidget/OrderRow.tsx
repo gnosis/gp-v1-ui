@@ -201,7 +201,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
-    <td className="status" data-label="Status">
+    <td className="status showResponsive" data-label="Status">
       {pending ? (
         pending
       ) : isFilled ? (
@@ -227,7 +227,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
       ) : (
         'Partial Fill'
       )}
-      {isLowBalance && (
+      {!isLowBalance && (
         <>
           <br />
           <span className="lowBalance">
