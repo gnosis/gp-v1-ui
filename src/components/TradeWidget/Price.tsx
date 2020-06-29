@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
@@ -175,6 +175,8 @@ interface Props {
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
+  swapPrices: () => void
+  priceShown: 'INVERSE' | 'DIRECT'
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -182,14 +184,16 @@ export function invertPriceFromString(priceValue: string): string {
   return price ? invertPrice(price).toString(10) : ''
 }
 
-const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
+const Price: React.FC<Props> = ({
+  sellToken,
+  receiveToken,
+  priceInputId,
+  priceInverseInputId,
+  tabIndex,
+  swapPrices,
+  priceShown,
+}) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
-
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
-
-  const swapPrices = (): void => {
-    setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
-  }
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]

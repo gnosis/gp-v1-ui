@@ -510,6 +510,12 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
+
+  const swapPrices = (): void => {
+    setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
+  }
+
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
     [receiveInputId]: '',
@@ -979,6 +985,8 @@ const TradeWidget: React.FC = () => {
             sellToken={sellToken}
             receiveToken={receiveToken}
             tabIndex={1}
+            swapPrices={swapPrices}
+            priceShown={priceShown}
           />
           <OrderValidity
             validFromInputId={validFromId}
