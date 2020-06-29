@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 import BigNumber from 'bignumber.js'
+import { formatDistanceStrict } from 'date-fns'
 
 import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
@@ -8,7 +9,7 @@ import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/EtherscanLink'
 
-import { isTradeSettled, formatDateFromBatchId } from 'utils'
+import { isTradeSettled } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { ONE_HUNDRED_BIG_NUMBER } from 'const'
 
@@ -89,6 +90,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
   const invertedFillPrice = invertPrice(fillPrice)
 
+  const date = new Date(timestamp)
+
   const typeColumnTitle = useMemo(() => {
     switch (type) {
       case 'full':
@@ -114,8 +117,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <tr data-order-id={orderId} data-batch-id={batchId}>
-      <td data-label="Date" title={new Date(timestamp).toLocaleString()}>
-        {formatDateFromBatchId(batchId, { strict: true })}
+      <td data-label="Date" title={date.toLocaleString()}>
+        {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
       <td data-label="Trade">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}

@@ -233,6 +233,7 @@ const customSelectStyles = {
     ...provided,
     minWidth: '4.5rem',
     padding: '.2rem 0 .2rem .8rem',
+    justifyContent: 'flex-end',
   }),
   indicatorSeparator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
