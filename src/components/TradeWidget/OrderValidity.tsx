@@ -266,14 +266,18 @@ const OrderValidity: React.FC<Props> = ({
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
       // sanitize inputs as multiples of 5
-      const sanitizedFromValue = makeMultipleOf(5, validFromInputValue).toString()
-      const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue).toString()
+      const sanitizedFromValue = makeMultipleOf(5, validFromInputValue)
+      const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue)
 
       batchedUpdates(() => {
-        if (!sanitizedFromValue) setAsap(true)
-        if (!sanitizedUntilValue) setUnlimited(true)
-        setValue(validFromInputId, sanitizedFromValue, true)
-        setValue(validUntilInputId, sanitizedUntilValue, true)
+        if (!sanitizedFromValue || !sanitizedUntilValue) {
+          !sanitizedFromValue
+            ? (setAsap(true), setValue(validFromInputId, undefined, true))
+            : setValue(validFromInputId, sanitizedFromValue.toString(), true)
+          !sanitizedUntilValue
+            ? (setUnlimited(true), setValue(validUntilInputId, undefined, true))
+            : setValue(validUntilInputId, sanitizedUntilValue.toString(), true)
+        }
       })
     }
 
