@@ -315,6 +315,10 @@ const OrdersWidget: React.FC = () => {
     ],
   )
 
+  const markedForDeletionChecked = !!(
+    classifiedOrders[selectedTab].orders.length > 0 && markedForDeletion.size === displayedOrders.length
+  )
+
   return (
     <OrdersWrapper>
       {!isConnected ? (
@@ -344,7 +348,7 @@ const OrdersWidget: React.FC = () => {
                   <input
                     type="checkbox"
                     onChange={toggleSelectAll}
-                    checked={markedForDeletion.size === displayedOrders.length}
+                    checked={markedForDeletionChecked}
                     disabled={deleting}
                   />
                 </label>
@@ -409,7 +413,7 @@ const OrdersWidget: React.FC = () => {
                           <input
                             type="checkbox"
                             onChange={toggleSelectAll}
-                            checked={markedForDeletion.size === displayedOrders.length}
+                            checked={markedForDeletionChecked}
                             disabled={deleting}
                           />
                         </th>
