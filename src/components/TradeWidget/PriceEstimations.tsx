@@ -1,4 +1,5 @@
 import React, { useCallback } from 'react'
+import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import BigNumber from 'bignumber.js'
 
@@ -12,6 +13,28 @@ import { displayTokenSymbolOrLink } from 'utils/display'
 import Spinner from 'components/Spinner'
 
 import { TradeFormData } from 'components/TradeWidget'
+
+const Wrapper = styled.div`
+  > strong {
+    text-transform: capitalize;
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    box-sizing: border-box;
+    display: block;
+  }
+
+  .container {
+    display: grid;
+    grid-template-columns: 4fr 1fr 1fr;
+    gap: 0.25rem;
+    font-size: 1.25rem;
+    align-items: center;
+
+    > small {
+      justify-self: end;
+    }
+  }
+`
 
 interface PriceEstimationsProps {
   networkId: number
@@ -42,13 +65,15 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
   )
 
   return (
-    <div>
+    <Wrapper>
       <strong>Price suggestions</strong>
-      <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
-      {amount && +amount != 0 && +amount != 1 && (
-        <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
-      )}
-    </div>
+      <div className="container">
+        <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
+        {amount && +amount != 0 && +amount != 1 && (
+          <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
+        )}
+      </div>
+    </Wrapper>
   )
 }
 
@@ -87,11 +112,13 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
 
   return (
-    <div
-      style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1em 0 0.1em 0.5em', fontSize: '1.2rem' }}
-    >
+    <>
       <span>
-        Onchain orderbook price for selling <strong>{+amount || '1'}</strong> {displayTokenSymbolOrLink(quoteToken)}:
+        Onchain orderbook price for selling{' '}
+        <strong>
+          {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
+        </strong>
+        :
       </span>
       <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrice(price, invertedPrice)}>
         {isPriceLoading ? <Spinner /> : displayPrice}
@@ -99,6 +126,6 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
       <small>
         {displayTokenSymbolOrLink(displayBaseToken)}/{displayTokenSymbolOrLink(displayQuoteToken)}
       </small>
-    </div>
+    </>
   )
 }
