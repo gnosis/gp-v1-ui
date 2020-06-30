@@ -1,6 +1,7 @@
 import { TheGraphApiImplParams } from 'api/thegraph/TheGraphApi'
 import { MultiTcrApiParams } from 'api/tcr/MultiTcrApi'
 import { DexPriceEstimatorParams } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
+import { Network } from 'types'
 
 export interface MultiTcrConfig {
   type: 'multi-tcr'
@@ -35,6 +36,19 @@ export interface WalletConnectConfig {
   bridge: string
 }
 
+export interface TokenOverride {
+  address: string
+  symbol?: string
+  name?: string
+  reason?: string
+  description?: string
+}
+
+export interface DisabledTokens {
+  [Network.Mainnet]: TokenOverride[]
+  [Network.Rinkeby]: TokenOverride[]
+}
+
 export interface Config {
   name: string
   logoPath: string
@@ -44,4 +58,13 @@ export interface Config {
   theGraphApi: TheGraphApiConfig
   defaultProviderConfig: InfuraProviderConfig | UrlProviderConfig
   walletConnect: WalletConnectConfig
+  disabledTokens: DisabledTokens
+}
+
+export interface AddressToOverrideMap {
+  [key: string]: TokenOverride | undefined
+}
+
+export interface DisabledTokensMaps {
+  [k: number]: AddressToOverrideMap | undefined
 }

@@ -61,3 +61,13 @@ defaultProviderConfig:
 # Wallet Connect
 walletConnect:
   bridge: 'wss://safe-walletconnect.gnosis.io/'
+
+# tokens that aren't allowed to tarde and deposit
+disabledTokens:
+  1: # Mainnet
+    - address: '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
+      name: Synthetics sUSD (deprecated)
+      symbol: sUSD-old
+      description: This token is disable for trading and deposit. sUSD will be deprecated on XXXX
+      reason: Deprecated
+  4: [] # Rinkeby
