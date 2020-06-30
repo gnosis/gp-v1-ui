@@ -65,7 +65,7 @@ export const StandaloneCardWrapper = styled.div`
 
   @media ${MEDIA.mobile} {
     max-width: 100%;
-    min-width: initial;
+    min-width: 100%;
     min-height: 25rem;
   }
   // Pages in standalone mode use bigger fonts

@@ -419,7 +419,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
             }
           }
 
-          &::before {
+          &:not(.cardOpener)::before {
             @media ${MEDIA.mobile} {
               content: attr(data-label);
               margin-right: auto;

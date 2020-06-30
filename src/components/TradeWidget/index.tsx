@@ -251,8 +251,11 @@ const OrdersPanel = styled.div`
     box-shadow: none;
     border-radius: 0;
     min-height: initial;
-    min-width: initial;
     max-width: initial;
+
+    @media ${MEDIA.desktop} {
+      min-width: initial;
+    }
 
     // Search Filter
     .widgetFilterTools {
