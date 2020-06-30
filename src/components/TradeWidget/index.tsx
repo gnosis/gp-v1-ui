@@ -62,7 +62,7 @@ const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  height: 63rem;
+  height: 75rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
