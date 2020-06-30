@@ -153,14 +153,16 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td data-label="Actions">
           {enabled || tokenEnabled ? (
-            <button
-              type="button"
-              className="withdrawToken"
-              onClick={(): void => showForm('deposit')}
-              disabled={isDepositFormVisible}
-            >
-              <PlusSVG />
-            </button>
+            !tokenIsDisabled && (
+              <button
+                type="button"
+                className="withdrawToken"
+                onClick={(): void => showForm('deposit')}
+                disabled={isDepositFormVisible}
+              >
+                <PlusSVG />
+              </button>
+            )
           ) : (
             <>
               <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
