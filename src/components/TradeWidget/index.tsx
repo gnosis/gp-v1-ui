@@ -505,9 +505,7 @@ const TradeWidget: React.FC = () => {
 
   const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
 
-  const swapPrices = (): void => {
-    setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
-  }
+  const swapPrices = (): void => setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
