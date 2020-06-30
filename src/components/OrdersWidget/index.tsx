@@ -435,11 +435,14 @@ const OrdersWidget: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      <MobileLongPressBanner>
-                        <FormMessage className="warning message">
-                          <FontAwesomeIcon icon={faInfoCircle} size="sm" /> Press and hold to select
-                        </FormMessage>
-                      </MobileLongPressBanner>
+                      {ordersCount > 0 && (
+                        <MobileLongPressBanner>
+                          <FormMessage as="td" className="warning message">
+                            <FontAwesomeIcon icon={faInfoCircle} size="sm" />
+                            Press and hold cards to select them. Use the arrow below each card to expand/fold content.
+                          </FormMessage>
+                        </MobileLongPressBanner>
+                      )}
                       {filteredAndSortedPendingOrders.map(order => (
                         <OrderRow
                           key={order.id}

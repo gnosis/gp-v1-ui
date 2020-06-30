@@ -1,21 +1,34 @@
 import styled from 'styled-components'
-import { MEDIA } from 'const'
 import { CardWidgetWrapper } from 'components/Layout/Card'
 import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
+import { MEDIA } from 'const'
 
 export const MobileLongPressBanner = styled.tr`
   &&&&& {
+    display: none;
+    grid-template-columns: max-content;
+    justify-content: flex-start;
+    // width: max-content;
+    font-size: smaller;
     border: none;
     min-height: auto;
-    padding: 0.3rem 0;
+    padding: 0;
 
     > .message {
       display: inline;
       color: var(--color-text-alternate);
+      padding: 0.5rem;
+      margin: 0;
+      > svg {
+        margin-right: 0.5rem;
+      }
     }
 
     &:hover {
       background: initial;
+    }
+    @media ${MEDIA.mobile} {
+      display: inline-flex;
     }
   }
 `
