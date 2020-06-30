@@ -133,7 +133,7 @@ export const OrdersForm = styled.div`
 
     .countContainer {
       display: flex;
-      flex-flow: row wrap;
+      flex-flow: row nowrap;
       width: 100%;
       margin: 0 0 -0.1rem;
       align-items: center;
@@ -177,18 +177,22 @@ export const OrdersForm = styled.div`
         }
 
         @media ${MEDIA.mobile} {
-          flex: 1 1 33%;
+          flex: 1;
           font-size: 1.2rem;
           min-height: 5.4rem;
-
-          &.selected {
-            order: 1;
-          }
 
           > i {
             font-size: 0.9rem;
             height: 1.3rem;
             line-height: 1.36rem;
+          }
+        }
+
+        @media ${MEDIA.xSmallDown} {
+          flex-flow: column nowrap;
+
+          > i {
+            margin: 0.3rem auto;
           }
         }
       }
