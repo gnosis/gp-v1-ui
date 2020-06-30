@@ -12,11 +12,13 @@ import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
 import { useTokenList } from './useTokenList'
+import { AddressToOverrideMap } from 'types/config'
 
 interface UseBalanceResult {
   balances: TokenBalanceDetails[]
   tokens: TokenDetails[]
   error: boolean
+  disabledTokensMap: AddressToOverrideMap
 }
 
 function calculateTotalBalance(balance: BN, currentBatchId: number, pendingDeposit: PendingFlux): BN {
@@ -108,12 +110,12 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   return balances.filter(Boolean) as TokenBalanceDetails[]
 }
 
-export const useTokenBalances = (): UseBalanceResult => {
+export const useTokenBalances = (excludeDisabled?: boolean): UseBalanceResult => {
   const walletInfo = useWalletConnection()
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
-  const tokens = useTokenList(walletInfo.networkId)
+  const { tokenList: tokens, disabledTokensMap } = useTokenList(walletInfo.networkId, excludeDisabled)
 
   // Get token balances
   useEffect(() => {
@@ -134,5 +136,5 @@ export const useTokenBalances = (): UseBalanceResult => {
     }
   }, [setBalances, setError, walletInfo, tokens])
 
-  return { balances, error, tokens }
+  return { balances, error, tokens, disabledTokensMap }
 }
