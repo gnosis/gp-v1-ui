@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react'
 import { useFormContext } from 'react-hook-form'
+import BigNumber from 'bignumber.js'
 
 import { TokenDetails, invertPrice } from '@gnosis.pm/dex-js'
 
@@ -53,6 +54,10 @@ interface OnchainOrderbookPriceEstimationProps extends Omit<PriceEstimationsProp
   updatePrice: (price: string, invertedPrice: string) => () => void
 }
 
+function formatPriceToPrecision(price: BigNumber): string {
+  return price.toFixed(PRICE_ESTIMATION_PRECISION)
+}
+
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
   const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrice } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
@@ -67,12 +72,13 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
     quoteTokenDecimals,
   })
 
-  const price = priceEstimation
-    ? (isPriceInverted ? invertPrice(priceEstimation) : priceEstimation).toFixed(PRICE_ESTIMATION_PRECISION)
-    : '0'
-  const invertedPrice = priceEstimation
-    ? (!isPriceInverted ? invertPrice(priceEstimation) : priceEstimation).toFixed(PRICE_ESTIMATION_PRECISION)
-    : '0'
+  let price = 'N/A'
+  let invertedPrice = 'N/A'
+
+  if (priceEstimation) {
+    price = formatPriceToPrecision(isPriceInverted ? invertPrice(priceEstimation) : priceEstimation)
+    invertedPrice = formatPriceToPrecision(!isPriceInverted ? invertPrice(priceEstimation) : priceEstimation)
+  }
   const displayPrice = price === 'Infinity' || invertedPrice === 'Infinity' ? 'N/A' : price
 
   const displayBaseToken = isPriceInverted ? quoteToken : baseToken
