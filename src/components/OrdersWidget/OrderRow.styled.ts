@@ -55,7 +55,7 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
     ${(props): string | false =>
       !props.$open &&
       `
-        td[data-label='Price'] { 
+        td[data-label='Status'] { 
           border: none; 
         }
       `}

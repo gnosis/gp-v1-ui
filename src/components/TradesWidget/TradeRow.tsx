@@ -26,8 +26,7 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
     ${(props): string | false =>
       !props.$open &&
       `
-        td[data-label='Date'], 
-        td[data-label='Type'] {
+        td[data-label='Sold / Bought'] {
           border-bottom: none;
         }
       `}
@@ -140,10 +139,10 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId} $open={openCard}>
-      <td data-label="Date" className="showReponsive" title={date.toLocaleString()}>
+      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <td data-label="Market" className="showReponsive">
+      <td data-label="Market" className="showResponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td
@@ -161,6 +160,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       </td>
       <td
         data-label="Sold / Bought"
+        className="showResponsive"
         title={`${formatAmountFull({
           amount: sellAmount,
           precision: sellTokenDecimals,

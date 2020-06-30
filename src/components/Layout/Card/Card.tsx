@@ -159,7 +159,7 @@ export const FoldableRowWrapper = styled.tr<{ $open?: boolean; $openCSS?: string
         display: flex;
       }
 
-      td:not(.responsiveRow):not(.cardOpener):not(.showReponsive) {
+      td:not(.responsiveRow):not(.cardOpener):not(.showResponsive) {
         overflow: hidden;
         transition: all 0.4s ease-in-out;
       }
@@ -167,7 +167,7 @@ export const FoldableRowWrapper = styled.tr<{ $open?: boolean; $openCSS?: string
       ${({ $open = true }): string | false =>
         !$open &&
         `
-        td:not(.responsiveRow):not(.cardOpener):not(.showReponsive) {
+        td:not(.responsiveRow):not(.cardOpener):not(.showResponsive) {
           height: 0;
           padding: 0;
           border: none;
