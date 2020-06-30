@@ -69,6 +69,7 @@
     "@types/combine-reducers": "^1.0.0",
     "@types/enzyme": "^3.10.4",
     "@types/enzyme-adapter-react-16": "^1.0.5",
+    "@types/ethereum-protocol": "^1.0.1",
     "@types/hapi__joi": "^16.0.12",
     "@types/jest": "^25.1.1",
     "@types/node": "^13.5.2",

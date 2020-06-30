@@ -19,7 +19,9 @@ import {
   isWalletConnectSubscriptions,
   isMetamaskProvider,
   Subscriptions,
+  JSONRPCRequestPayload,
 } from '@gnosis.pm/dapp-ui'
+import { JSONRPCErrorCallback } from 'ethereum-protocol'
 
 import { logDebug, toBN, gasPriceEncoder } from 'utils'
 import { INFURA_ID, WALLET_CONNECT_BRIDGE } from 'const'
@@ -194,6 +196,42 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
 export const isPromise = <T>(maybePromise: any): maybePromise is Promise<T> =>
   maybePromise instanceof Promise || ('then' in maybePromise && typeof maybePromise.then === 'function')
 
+function _wrapProvider(provider: Provider, web3: Web3): Provider {
+  const sendAsync = provider.sendAsync.bind(provider)
+  const sendAsyncWithGas = (payload: JSONRPCRequestPayload, callback?: JSONRPCErrorCallback): void => {
+    const { id, method, params } = payload
+    if (method === 'eth_sendTransaction') {
+      const txConfig = params ? params[0] : undefined
+      console.log('[WalletApi] Send transaction %d: ', id, txConfig)
+      if (!txConfig.gas) {
+        web3.eth
+          .estimateGas(txConfig)
+          .then(gasLimit => {
+            txConfig.gas = gasLimit.toString(10)
+            console.log('[WalletApi] Send transaction %d with calculated gas %s: ', id, gasLimit, txConfig)
+            sendAsync(payload, callback)
+          })
+          .catch(error => {
+            if (callback) {
+              callback(error)
+            } else {
+              console.error('Error estimating gas for payload', payload, error)
+            }
+          })
+      } else {
+        console.log('[WalletApi] Send transaction %d with provided gas %s: ', id, txConfig.gas, txConfig)
+      }
+    } else {
+      // console.log('[WalletApi] Send async. payload', payload, callback)
+      sendAsync(payload, callback)
+    }
+  }
+
+  console.log('[WalletApi] Wrap wallet Connect provider', provider)
+  provider.sendAsync = sendAsyncWithGas.bind(provider)
+  return provider
+}
+
 /**
  * Basic implementation of Wallet API
  */
@@ -241,7 +279,7 @@ export class WalletApiImpl implements WalletApi {
 
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
 
-    this._provider = provider
+    this._provider = _wrapProvider(provider, this._web3)
 
     closeOpenWebSocketConnection(this._web3)
 
