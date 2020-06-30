@@ -92,8 +92,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         Onchain orderbook price for selling <strong>{amount || '1'}</strong> {displayTokenSymbolOrLink(quoteToken)}:
       </span>
       <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrice(price, invertedPrice)}>
-        {isPriceLoading && <Spinner />}
-        {displayPrice}
+        {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
       <small>
         {displayTokenSymbolOrLink(displayBaseToken)}/{displayTokenSymbolOrLink(displayQuoteToken)}
