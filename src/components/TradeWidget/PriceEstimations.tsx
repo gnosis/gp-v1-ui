@@ -28,7 +28,7 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
 
   const { setValue } = useFormContext<TradeFormData>()
 
-  const updatePrice = useCallback(
+  const updatePrices = useCallback(
     (price: string, invertedPrice) => (): void => {
       if (!isPriceInverted) {
         setValue(priceInputId, price)
@@ -44,14 +44,14 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
   return (
     <div>
       <strong>Price suggestions</strong>
-      <OnchainOrderbookPriceEstimation {...props} amount="" updatePrice={updatePrice} />
-      <OnchainOrderbookPriceEstimation {...props} updatePrice={updatePrice} />
+      <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
+      <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
     </div>
   )
 }
 
 interface OnchainOrderbookPriceEstimationProps extends Omit<PriceEstimationsProps, 'inputId'> {
-  updatePrice: (price: string, invertedPrice: string) => () => void
+  updatePrices: (price: string, invertedPrice: string) => () => void
 }
 
 function formatPriceToPrecision(price: BigNumber): string {
@@ -59,7 +59,7 @@ function formatPriceToPrecision(price: BigNumber): string {
 }
 
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrice } = props
+  const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices: updatePrice } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
   const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
