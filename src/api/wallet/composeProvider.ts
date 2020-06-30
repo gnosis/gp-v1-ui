@@ -70,10 +70,17 @@ const createConditionalMiddleware = <T extends unknown>(
     // if not condition, skip and got to next middleware
     if (!condition(req)) return next()
 
-    // if handled fully, end here
-    if (await handle(req, res)) return end()
-    // otherwise continue to next middleware
-    next()
+    try {
+      const isHandled = await handle(req, res)
+
+      // If handled fully, end here
+      if (isHandled) return end()
+
+      // Otherwise continue to next middleware
+      next()
+    } catch (error) {
+      end(error)
+    }
   }
 }
 
