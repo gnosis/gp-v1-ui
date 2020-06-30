@@ -145,7 +145,7 @@ const PoolingInterface: React.FC = () => {
 
   const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
-  const tokenList = useTokenList(networkIdOrDefault)
+  const { tokenList } = useTokenList(networkIdOrDefault, true)
 
   const tokens = useMemo(() => {
     return (
