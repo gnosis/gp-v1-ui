@@ -1,6 +1,5 @@
 import React, { useCallback } from 'react'
 import { useFormContext } from 'react-hook-form'
-import BigNumber from 'bignumber.js'
 
 import { TokenDetails, invertPrice } from '@gnosis.pm/dex-js'
 
@@ -29,13 +28,13 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
   const { setValue } = useFormContext<TradeFormData>()
 
   const updatePrice = useCallback(
-    (price: string) => (): void => {
+    (price: string, invertedPrice) => (): void => {
       if (!isPriceInverted) {
         setValue(priceInputId, price)
-        setValue(priceInverseInputId, invertPrice(new BigNumber(price)).toFixed(PRICE_ESTIMATION_PRECISION))
+        setValue(priceInverseInputId, invertedPrice)
       } else {
         setValue(priceInverseInputId, price)
-        setValue(priceInputId, invertPrice(new BigNumber(price)).toFixed(PRICE_ESTIMATION_PRECISION))
+        setValue(priceInputId, invertedPrice)
       }
     },
     [isPriceInverted, setValue, priceInputId, priceInverseInputId],
@@ -51,7 +50,7 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
 }
 
 interface OnchainOrderbookPriceEstimationProps extends Omit<PriceEstimationsProps, 'inputId'> {
-  updatePrice: (price: string) => () => void
+  updatePrice: (price: string, invertedPrice: string) => () => void
 }
 
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
@@ -68,9 +67,13 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
     quoteTokenDecimals,
   })
 
-  const displayPrice = priceEstimation
+  const price = priceEstimation
     ? (isPriceInverted ? invertPrice(priceEstimation) : priceEstimation).toFixed(PRICE_ESTIMATION_PRECISION)
     : '0'
+  const invertedPrice = priceEstimation
+    ? (!isPriceInverted ? invertPrice(priceEstimation) : priceEstimation).toFixed(PRICE_ESTIMATION_PRECISION)
+    : '0'
+  const displayPrice = price === 'Infinity' || invertedPrice === 'Infinity' ? 'N/A' : price
 
   return (
     <div
@@ -80,7 +83,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         Onchain orderbook price for <strong>{amount || '1'}</strong>{' '}
         {displayTokenSymbolOrLink(isPriceInverted ? baseToken : quoteToken)}:
       </span>
-      <button disabled={isPriceLoading} onClick={updatePrice(displayPrice)}>
+      <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrice(price, invertedPrice)}>
         {isPriceLoading && <Spinner />}
         {displayPrice}
       </button>
