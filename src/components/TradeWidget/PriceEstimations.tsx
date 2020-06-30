@@ -24,7 +24,7 @@ interface PriceEstimationsProps {
 }
 
 export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
-  const { isPriceInverted, priceInputId, priceInverseInputId } = props
+  const { amount, isPriceInverted, priceInputId, priceInverseInputId } = props
 
   const { setValue } = useFormContext<TradeFormData>()
 
@@ -45,7 +45,9 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
     <div>
       <strong>Price suggestions</strong>
       <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
-      <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
+      {amount && +amount != 0 && +amount != 1 && (
+        <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
+      )}
     </div>
   )
 }
