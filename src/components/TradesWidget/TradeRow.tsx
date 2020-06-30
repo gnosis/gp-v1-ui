@@ -13,23 +13,25 @@ import { ResponsiveRowSizeToggler, FoldableRowWrapper } from 'components/Layout/
 
 import { isTradeSettled } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { ONE_HUNDRED_BIG_NUMBER } from 'const'
+import { ONE_HUNDRED_BIG_NUMBER, MEDIA } from 'const'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
-  &&&&& {
-    display: flex;
-    td[data-label='Market'] {
-      order: -1;
-      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
-    }
+  @media ${MEDIA.mobile} {
+    &&&&& {
+      display: flex;
+      td[data-label='Market'] {
+        order: -1;
+        border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+      }
 
-    ${(props): string | false =>
-      !props.$open &&
-      `
+      ${(props): string | false =>
+        !props.$open &&
+        `
         td[data-label='Sold / Bought'] {
           border-bottom: none;
         }
       `}
+    }
   }
 `
 

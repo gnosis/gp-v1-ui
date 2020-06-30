@@ -47,18 +47,20 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
     }
   }
 
-  &&&&& {
-    td[data-label='Market'] {
-      border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
-    }
+  @media ${MEDIA.mobile} {
+    &&&&& {
+      td[data-label='Market'] {
+        border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+      }
 
-    ${(props): string | false =>
-      !props.$open &&
-      `
+      ${(props): string | false =>
+        !props.$open &&
+        `
         td[data-label='Status'] { 
           border: none; 
         }
       `}
+    }
   }
 `
 
