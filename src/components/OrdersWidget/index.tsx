@@ -3,7 +3,7 @@ import React, { useMemo, useCallback, useEffect } from 'react'
 import { unstable_batchedUpdates } from 'react-dom'
 
 // Assets
-import { faTrashAlt, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
+import { faTrashAlt, faChevronDown, faChevronUp, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Const and utils
@@ -31,7 +31,13 @@ import FilterTools from 'components/FilterTools'
 // OrderWidget
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
-import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
+import {
+  OrdersWrapper,
+  ButtonWithIcon,
+  OrdersForm,
+  MobileLongPressBanner,
+} from 'components/OrdersWidget/OrdersWidget.styled'
+import FormMessage from 'components/TradeWidget/FormMessage'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
 
@@ -429,6 +435,11 @@ const OrdersWidget: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody>
+                      <MobileLongPressBanner>
+                        <FormMessage className="warning message">
+                          <FontAwesomeIcon icon={faInfoCircle} size="sm" /> Press and hold to select
+                        </FormMessage>
+                      </MobileLongPressBanner>
                       {filteredAndSortedPendingOrders.map(order => (
                         <OrderRow
                           key={order.id}

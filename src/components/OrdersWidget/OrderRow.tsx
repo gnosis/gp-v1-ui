@@ -16,6 +16,7 @@ import { ResponsiveRowSizeToggler } from 'components/Layout/Card'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
+import useLongPress from 'hooks/useLongPress'
 
 import {
   formatSmart,
@@ -25,11 +26,11 @@ import {
   dateToBatchId,
   getTimeRemainingInBatch,
 } from 'utils'
+import { displayTokenSymbolOrLink } from 'utils/display'
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper, ResponsiveTitleRow } from 'components/OrdersWidget/OrderRow.styled'
-import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
@@ -291,10 +292,21 @@ const OrderRow: React.FC<Props> = props => {
     fetchToken(order.id, order.sellToken as TokenDetails, setSellToken, isPendingOrder)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
+  const handleDeleteOrder = toggleMarkedForDeletion
+  const { handleLongPress, handleClearTimeout } = useLongPress(handleDeleteOrder)
+
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : 'orderRowWrapper'} $open={openCard}>
+      <OrderRowWrapper
+        data-order-id={order.id}
+        className={pending ? 'pending' : 'orderRowWrapper'}
+        $open={openCard}
+        onTouchStart={handleLongPress}
+        onTouchEnd={handleClearTimeout}
+        onMouseDown={handleLongPress}
+        onMouseUp={handleClearTimeout}
+      >
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}

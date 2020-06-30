@@ -3,6 +3,23 @@ import { MEDIA } from 'const'
 import { CardWidgetWrapper } from 'components/Layout/Card'
 import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 
+export const MobileLongPressBanner = styled.tr`
+  &&&&& {
+    border: none;
+    min-height: auto;
+    padding: 0.3rem 0;
+
+    > .message {
+      display: inline;
+      color: var(--color-text-alternate);
+    }
+
+    &:hover {
+      background: initial;
+    }
+  }
+`
+
 export const OrdersWrapper = styled(StandaloneCardWrapper)`
   > h5 {
     width: 100%;
