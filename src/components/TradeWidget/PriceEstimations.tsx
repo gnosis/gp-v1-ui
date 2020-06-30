@@ -75,18 +75,23 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
     : '0'
   const displayPrice = price === 'Infinity' || invertedPrice === 'Infinity' ? 'N/A' : price
 
+  const displayBaseToken = isPriceInverted ? quoteToken : baseToken
+  const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
+
   return (
     <div
-      style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1em 0 0.1em 0.5em', fontSize: '1.4rem' }}
+      style={{ display: 'flex', justifyContent: 'space-between', padding: '0.1em 0 0.1em 0.5em', fontSize: '1.2rem' }}
     >
       <span>
-        Onchain orderbook price for <strong>{amount || '1'}</strong>{' '}
-        {displayTokenSymbolOrLink(isPriceInverted ? baseToken : quoteToken)}:
+        Onchain orderbook price for selling <strong>{amount || '1'}</strong> {displayTokenSymbolOrLink(quoteToken)}:
       </span>
       <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrice(price, invertedPrice)}>
         {isPriceLoading && <Spinner />}
         {displayPrice}
       </button>
+      <small>
+        {displayTokenSymbolOrLink(displayBaseToken)}/{displayTokenSymbolOrLink(displayQuoteToken)}
+      </small>
     </div>
   )
 }
