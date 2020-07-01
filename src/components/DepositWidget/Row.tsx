@@ -25,7 +25,6 @@ import { TokenRow, RowClaimButton, RowClaimSpan } from 'components/DepositWidget
 // Hooks and reducers
 import useNoScroll from 'hooks/useNoScroll'
 import { TokenLocalState } from 'reducers-actions'
-import { TokenOverride } from 'types/config'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   ethBalance: BN | null
@@ -36,8 +35,6 @@ export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   onEnableToken: Command
   innerWidth?: number
   innerHeight?: number
-  tokenIsDisabled?: boolean
-  tokenOverride?: TokenOverride
 }
 
 const spinner = <Spinner style={{ marginRight: 7 }} />

@@ -30,7 +30,6 @@ import { useManageTokens } from 'hooks/useManageTokens'
 import useGlobalState from 'hooks/useGlobalState'
 import { useEthBalances } from 'hooks/useEthBalance'
 import { TokenLocalState } from 'reducers-actions'
-import { AddressToOverrideMap } from 'types/config'
 
 interface WithdrawState {
   amount: BN
@@ -327,7 +326,6 @@ interface BalanceDisplayProps extends TokenLocalState {
   claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   ethBalance: BN | null
   balances: TokenBalanceDetails[]
-  disabledTokensMap: AddressToOverrideMap
   error: boolean
   requestWithdrawConfirmation(
     amount: BN,
@@ -340,7 +338,6 @@ interface BalanceDisplayProps extends TokenLocalState {
 const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   ethBalance,
   balances,
-  disabledTokensMap,
   error,
   enableToken,
   depositToken,
@@ -439,8 +436,6 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                     key={tokenBalances.address}
                     ethBalance={ethBalance}
                     tokenBalances={tokenBalances}
-                    tokenIsDisabled={!!disabledTokensMap[tokenBalances.address]}
-                    tokenOverride={disabledTokensMap[tokenBalances.address]}
                     onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
                     onSubmitDeposit={(balance, onTxHash): Promise<void> =>
                       depositToken(balance, tokenBalances.address, onTxHash)
@@ -482,7 +477,7 @@ const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 
 const DepositWidget: React.FC = () => {
   const { ethBalance } = useEthBalances()
-  const { balances, error, disabledTokensMap } = useTokenBalances()
+  const { balances, error } = useTokenBalances()
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
 
@@ -533,7 +528,6 @@ const DepositWidget: React.FC = () => {
       <BalancesDisplayMemoed
         ethBalance={ethBalance}
         balances={balances}
-        disabledTokensMap={disabledTokensMap}
         error={error}
         {...restActions}
         requestWithdrawConfirmation={requestWithdrawConfirmation}
