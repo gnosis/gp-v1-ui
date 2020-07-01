@@ -107,7 +107,7 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
   const { networkId, isConnected } = useWalletConnection()
 
   // allOrders and markedForDeletion, split by tab
-  const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState())
+  const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState)
   const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
 
   // Subscribe to trade events
@@ -212,10 +212,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
       if (selectedTab === 'fills') return
 
       setClassifiedOrders(curr => {
-        const state = emptyState()
-
         // copy full state
-        Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
+        const state = { ...curr }
 
         // copy markedForDeletion set
         const newSet = new Set(curr[selectedTab].markedForDeletion)
@@ -235,19 +233,22 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
       if (selectedTab === 'fills') return
 
       setClassifiedOrders(curr => {
-        const state = emptyState()
-
         // copy full state
-        Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
+        const state = { ...curr }
 
+        // filteredOrders are selectedTab specific,
+        // so it's ok to use them directly
+        // without classifiedOrders[selectedTab]
         state[selectedTab].markedForDeletion = checked
-          ? new Set(classifiedOrders[selectedTab].orders.map(order => order.id))
+          ? new Set(filteredAndSortedOrders.concat(filteredAndSortedPendingOrders).map(order => order.id))
           : new Set()
+        // on deselect, better deselect all filtered and unfiltered
+        // to avoid cancelling not shown orders
 
         return state
       })
     },
-    [classifiedOrders, selectedTab, setClassifiedOrders],
+    [filteredAndSortedOrders, filteredAndSortedPendingOrders, selectedTab, setClassifiedOrders],
   )
 
   const { deleteOrders, deleting } = useDeleteOrders()
@@ -265,10 +266,8 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
           // reset selections
 
           setClassifiedOrders(curr => {
-            const state = emptyState()
-
             // copy full state
-            Object.keys(curr).forEach(tab => (state[tab] = curr[tab]))
+            const state = { ...curr }
 
             // remove checked orders
             state[selectedTab].orders = curr[selectedTab].orders.filter(
@@ -406,7 +405,11 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
                         <input
                           type="checkbox"
                           onChange={toggleSelectAll}
-                          checked={markedForDeletion.size === displayedOrders.length}
+                          checked={
+                            markedForDeletion.size > 0 &&
+                            markedForDeletion.size ===
+                              filteredAndSortedPendingOrders.length + filteredAndSortedOrders.length
+                          }
                           disabled={deleting}
                         />
                       </th>
