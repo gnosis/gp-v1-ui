@@ -62,8 +62,6 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     claiming,
     withdrawing,
     depositing,
-    tokenIsDisabled,
-    tokenOverride,
   } = props
 
   const {
@@ -78,7 +76,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     claimable,
     walletBalance,
     enabled: tokenEnabled,
-  } = { ...tokenBalances, ...tokenOverride }
+  } = tokenBalances
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
 
