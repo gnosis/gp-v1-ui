@@ -80,7 +80,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
               name={name}
               symbol={symbol}
               image={image}
-              faded={overrideReason === 'DEPRECATED'}
+              faded={!!overrideReason}
               warning={override?.description}
             >
               <Toggle
