@@ -37,7 +37,7 @@ export interface WalletConnectConfig {
 }
 
 // potentially other reasons
-export type OverrideReason = 'DEPRECATED'
+export type OverrideReason = 'DEPRECATED' | 'DISABLED'
 
 export interface TokenOverride {
   address: string
