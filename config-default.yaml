@@ -81,6 +81,10 @@ disabledTokens:
       name: Paxos Gold
       symbol: PAXG
 
+    - address: '0xa7DE087329BFcda5639247F96140f9DAbe3DeED1'
+      name: Statera
+      symbol: STA
+
       # aTokens:
     - address: '0x7D2D3688Df45Ce7C552E19c27e007673da9204B8'
     - address: '0xA64BD6C70Cb9051F6A9ba1F163Fdc07E0DfB5F84'
