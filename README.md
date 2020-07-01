@@ -202,7 +202,7 @@ Where:
 - `type` can only be `dex-price-estimator`.
 - `networkId` is a number, such as `1` for Mainnet, `4` for Rinkeby and so on.
 - `url_production` the endpoint for given `networkId` to use in production
-- `url_development` the endpoint for given `networkId` to use in development (optional)
+- `url_develop` the endpoint for given `networkId` to use in development (optional)
 
 ### `theGraphApi`
 
