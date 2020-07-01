@@ -102,7 +102,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
-          <TokenImg src={image} alt={name} />
+          <TokenImg src={image} alt={name} opaque={tokenDeprecated} />
           <div>
             <b>
               {symbol}
