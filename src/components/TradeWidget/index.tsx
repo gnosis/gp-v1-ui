@@ -482,7 +482,8 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances, tokens: tokenList } = useTokenBalances()
+  // get all token balances but deprecated
+  const { balances, tokens: tokenList } = useTokenBalances({ excludeDeprecated: true })
 
   // If user is connected, use balances, otherwise get the default list
   const tokens =
