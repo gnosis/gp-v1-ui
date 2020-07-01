@@ -62,7 +62,7 @@ defaultProviderConfig:
 walletConnect:
   bridge: 'wss://safe-walletconnect.gnosis.io/'
 
-# tokens that aren't allowed to tarde and deposit
+# tokens that aren't allowed to be traded nor deposited
 disabledTokens:
   1: # Mainnet
     - address: '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
