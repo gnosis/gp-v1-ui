@@ -119,6 +119,7 @@ if (process.env.INFURA_ID) {
 
 export const INFURA_ID = infuraId
 export const WALLET_CONNECT_BRIDGE = process.env.WALLET_CONNECT_BRIDGE || CONFIG.walletConnect.bridge
+export const STORAGE_KEY_CUSTOM_WC_OPTIONS = 'CustomWCOptions'
 
 let ethNodeUrl
 if (process.env.ETH_NODE_URL) {
