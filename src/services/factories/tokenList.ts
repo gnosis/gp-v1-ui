@@ -18,7 +18,7 @@ export function getTokensFactory(
     tcrApi?: TcrApi
   },
   injects: Injects,
-): (tokenId: number) => TokenDetails[] {
+): (networkId: number) => TokenDetails[] {
   const { tokenListApi, exchangeApi, tcrApi } = factoryParams
   const { getTokenFromErc20 } = injects
 
