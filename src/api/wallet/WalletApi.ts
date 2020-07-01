@@ -8,8 +8,7 @@ import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile }
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
 
-import { logDebug, toBN, txDataEncoder } from 'utils'
-import { INFURA_ID, WALLET_CONNECT_BRIDGE } from 'const'
+import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
@@ -44,6 +43,7 @@ export interface WalletApi {
   isConnected(): Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
   disconnect(): Promise<void>
+  reconnectWC(): Promise<boolean>
   getAddress(): Promise<string>
   getBalance(): Promise<BN>
   getNetworkId(): Promise<number>
@@ -221,13 +221,6 @@ const subscribeToBlockchainUpdate = async ({
 
 type WalletConnectInits = IProviderOptions['walletconnect']
 
-const wcOptions: Omit<WalletConnectInits, 'package'> = {
-  options: {
-    infuraId: INFURA_ID,
-    bridge: WALLET_CONNECT_BRIDGE,
-  },
-}
-
 // needed if Web3 was pre-instantiated with wss | WebsocketProvider
 const closeOpenWebSocketConnection = (web3: Web3): void => {
   if (
@@ -274,14 +267,28 @@ export class WalletApiImpl implements WalletApi {
     return this._connected
   }
 
+  public async reconnectWC(): Promise<boolean> {
+    // if connected to WC reconnect with new data
+    if (await this.isConnected()) {
+      if (isWalletConnectProvider(this._provider)) {
+        await this.disconnect()
+        return this.connect()
+      }
+    }
+
+    // if not don't do anything
+    return false
+  }
+
   public async connect(givenProvider?: Provider): Promise<boolean> {
     let provider: Provider
 
     if (givenProvider) {
       provider = givenProvider
     } else {
+      const options = generateWCOptions()
       const WCoptions: WalletConnectInits = {
-        ...wcOptions,
+        options,
         package: (
           await import(
             /* webpackChunkName: "@walletconnect"*/
