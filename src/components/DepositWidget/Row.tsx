@@ -68,10 +68,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     walletBalance,
     enabled: tokenEnabled,
     override,
-    overrideReason,
+    disabled: tokenDisabled,
   } = tokenBalances
-
-  const tokenDisabled = !!overrideReason
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
 

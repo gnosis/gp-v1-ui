@@ -1,7 +1,7 @@
 import BN from 'bn.js'
 import { TransactionReceipt } from 'web3-core'
 import { PendingFlux } from 'api/deposit/DepositApi'
-import { TokenOverride, OverrideReason } from './config'
+import { TokenOverride } from './config'
 
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
@@ -26,7 +26,7 @@ export interface TokenDetails extends MinimalTokenDetails {
   id: number
   addressMainnet?: string
   image?: string
-  overrideReason?: OverrideReason
+  disabled?: boolean
   override?: TokenOverride
 }
 

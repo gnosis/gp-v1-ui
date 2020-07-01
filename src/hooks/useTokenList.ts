@@ -19,7 +19,7 @@ export const useTokenList = ({ networkId, excludeDeprecated }: UseTokenListParam
   const tokens = useMemo(() => {
     if (!excludeDeprecated) return unfilteredTokens
 
-    return unfilteredTokens.filter(token => token.overrideReason !== 'DEPRECATED')
+    return unfilteredTokens.filter(token => !token.disabled)
   }, [excludeDeprecated, unfilteredTokens])
 
   // force update with a new value each time

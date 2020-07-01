@@ -36,14 +36,11 @@ export interface WalletConnectConfig {
   bridge: string
 }
 
-// potentially other reasons
-export type OverrideReason = 'DEPRECATED' | 'DISABLED'
-
 export interface TokenOverride {
   address: string
   symbol?: string
   name?: string
-  reason?: OverrideReason
+  reason?: string
   description?: string
 }
 
