@@ -70,4 +70,10 @@ disabledTokens:
       symbol: sUSD-old
       description: This token is disabled for trading and deposit. sUSD will be deprecated and replaced by another token at the end of July.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED
+
+    - address: '0xC011A72400E58ecD99Ee497CF89E3775d4bd732F'
+      name: Synthetix Network Token (deprecated)
+      symbol: SNX-old
+      description: This token is disabled for trading and deposit. SNX will be deprecated and replaced by another token at the end of July.  Go to https://www.synthetix.io for more information
+      reason: DEPRECATED
   4: [] # Rinkeby
