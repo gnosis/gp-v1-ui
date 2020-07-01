@@ -63,6 +63,8 @@ import validationSchema from './validationSchema'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
 
+import { DevTool } from 'HookFormDevtool'
+
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
@@ -1008,8 +1010,7 @@ const TradeWidget: React.FC = () => {
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}
-      {process.env.NODE_ENV === 'development' &&
-        React.createElement(require('react-hook-form-devtools').DevTool, { control: methods.control })}
+      {process.env.NODE_ENV === 'development' && <DevTool control={methods.control} />}
     </WrappedWidget>
   )
 }

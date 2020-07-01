@@ -53,6 +53,11 @@ export class WalletApiMock implements WalletApi {
     await this._notifyListeners()
   }
 
+  public async reconnectWC(): Promise<boolean> {
+    await this.disconnect()
+    return this.connect()
+  }
+
   public async getAddress(): Promise<string> {
     assert(this._connected, 'The wallet is not connected')
 
