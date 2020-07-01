@@ -9,7 +9,7 @@ import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
 import { numberToHex } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
-import { logDebug, logInfo } from 'utils'
+import { logDebug } from 'utils'
 import { web3 } from 'api'
 
 // custom providerAsMiddleware
