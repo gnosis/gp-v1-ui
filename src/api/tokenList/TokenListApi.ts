@@ -8,7 +8,7 @@ const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails)
   const tokenOverride = DISABLED_TOKEN_MAPS[networkId]?.[token.address]
   if (tokenOverride) {
     token.override = tokenOverride
-    token.overrideReason = tokenOverride.reason
+    token.disabled = true
     // override only keys present in both token and tokenOverride
     Object.keys(token).forEach(key => {
       if (tokenOverride[key] !== undefined) token[key] = tokenOverride[key]

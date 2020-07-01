@@ -167,6 +167,8 @@ export const DISABLE_SPINNER_DELAY = 1000
 
 const { disabledTokens } = CONFIG
 
+const DEFAULT_DISABLED_TOKEN_DESCRIPTION = 'This token is disabled for trading and deposit.'
+
 export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTokensMaps>(
   (acc, networkId) => {
     const tokensList: TokenOverride[] | undefined = disabledTokens[networkId]
@@ -175,6 +177,7 @@ export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTo
       return acc
     }
     const tokensMap = tokensList.reduce<AddressToOverrideMap>((acc, token) => {
+      if (!token.description) token.description = DEFAULT_DISABLED_TOKEN_DESCRIPTION
       acc[token.address] = token
       return acc
     }, {})

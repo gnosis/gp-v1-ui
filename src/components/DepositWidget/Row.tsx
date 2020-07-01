@@ -68,10 +68,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     walletBalance,
     enabled: tokenEnabled,
     override,
-    overrideReason,
+    disabled: tokenDisabled,
   } = tokenBalances
-
-  const tokenDeprecated = overrideReason === 'DEPRECATED'
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
 
@@ -96,7 +94,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
-          <TokenImg src={image} alt={name} faded={tokenDeprecated} />
+          <TokenImg src={image} alt={name} faded={tokenDisabled} />
           <div>
             <TokenSymbol symbol={symbol} warning={override?.description} />
             {name}
@@ -152,7 +150,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           )}
         </td>
         <td data-label="Actions">
-          {!tokenDeprecated &&
+          {!tokenDisabled &&
             (enabled || tokenEnabled ? (
               <button
                 type="button"
