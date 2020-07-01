@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import BN from 'bn.js'
-import styled from 'styled-components'
 
 // Assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -38,11 +37,6 @@ export interface RowProps extends Record<keyof TokenLocalState, boolean> {
 }
 
 const spinner = <Spinner style={{ marginRight: 7 }} />
-
-const WarningImage = styled.img`
-  width: 1.2em;
-  margin-left: 1em;
-`
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
