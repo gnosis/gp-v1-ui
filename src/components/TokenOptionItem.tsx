@@ -18,6 +18,7 @@ import { TokenImgWrapper } from 'components/TokenImg'
 // hooks
 import useSafeState from 'hooks/useSafeState'
 import { UseAddTokenModalResult } from 'hooks/useBetterAddTokenModal'
+import { TokenSymbol } from './TokenSymbol'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -87,7 +88,7 @@ export const OptionItem: React.FC<OptionItemProps> = ({ image, name, symbol, chi
       <div className="tokenDetails">
         <div className="tokenName">
           <div>
-            <strong>{symbol}</strong>
+            <TokenSymbol symbol={symbol} warning={warning} />
           </div>
           <div>{name}</div>
         </div>

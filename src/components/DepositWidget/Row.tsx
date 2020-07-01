@@ -6,7 +6,6 @@ import styled from 'styled-components'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClock, faPlus, faMinus } from '@fortawesome/free-solid-svg-icons'
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
-import lowBalanceIcon from 'assets/img/lowBalance.svg'
 
 // const, utils, types
 import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
@@ -25,6 +24,7 @@ import { TokenRow, RowClaimButton, RowClaimSpan } from 'components/DepositWidget
 // Hooks and reducers
 import useNoScroll from 'hooks/useNoScroll'
 import { TokenLocalState } from 'reducers-actions'
+import { TokenSymbol } from 'components/TokenSymbol'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   ethBalance: BN | null
@@ -104,10 +104,7 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         <td data-label="Token">
           <TokenImg src={image} alt={name} opaque={tokenDeprecated} />
           <div>
-            <b>
-              {symbol}
-              {tokenIsDisabled && <WarningImage src={lowBalanceIcon} title={tokenOverride?.description} />}
-            </b>
+            <TokenSymbol symbol={symbol} warning={override?.description} />
             {name}
           </div>
         </td>
