@@ -8,7 +8,7 @@ function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>):
 }
 
 interface TokenImgProps {
-  opaque?: boolean
+  faded?: boolean
 }
 
 const TokenImg = styled.img.attrs(() => ({ onError: _loadFallbackTokenImage }))<TokenImgProps>`
@@ -19,7 +19,7 @@ const TokenImg = styled.img.attrs(() => ({ onError: _loadFallbackTokenImage }))<
   margin: 0 1rem 0 0;
   background-color: white;
   padding: 2px;
-  opacity: ${(props): number => (props.opaque ? 0.4 : 1)};
+  opacity: ${(props): number => (props.faded ? 0.4 : 1)};
 `
 
 export default TokenImg
