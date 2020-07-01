@@ -68,6 +68,6 @@ disabledTokens:
     - address: '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
       name: Synthetics sUSD (deprecated)
       symbol: sUSD-old
-      description: This token is disable for trading and deposit. sUSD will be deprecated on XXXX
-      reason: Deprecated
+      description: This token is disabled for trading and deposit. sUSD will be deprecated and replaced by another token at the end of July.  Go to https://www.synthetix.io for more information
+      reason: DEPRECATED
   4: [] # Rinkeby
