@@ -6,6 +6,12 @@ import alertIcon from 'assets/img/alert.svg'
 interface TokenSymbolProps {
   symbol?: string
   warning?: string
+  url?: string
+}
+
+interface WarningProps {
+  title: string
+  url?: string
 }
 
 const WarningImage = styled.img`
@@ -16,15 +22,26 @@ const WarningImage = styled.img`
   }
 `
 
+const Warning: React.FC<WarningProps> = ({ title, url }) => {
+  const img = <WarningImage src={alertIcon} title={title} />
+  if (!url) return img
+
+  return (
+    <a href={url} rel="noopener noreferrer" target="_blank">
+      {img}
+    </a>
+  )
+}
+
 const SymbolStyled = styled.strong`
   display: block;
 `
 
-export const TokenSymbol: React.FC<TokenSymbolProps> = ({ symbol, warning }) => {
+export const TokenSymbol: React.FC<TokenSymbolProps> = ({ symbol, warning, url }) => {
   return (
     <SymbolStyled>
       <span>{symbol}</span>
-      {warning && <WarningImage src={alertIcon} title={warning} />}
+      {warning && <Warning title={warning} url={url} />}
     </SymbolStyled>
   )
 }
