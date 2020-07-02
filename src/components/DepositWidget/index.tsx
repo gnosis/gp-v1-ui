@@ -477,6 +477,7 @@ const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 
 const DepositWidget: React.FC = () => {
   const { ethBalance } = useEthBalances()
+  // get all token balances, including deprecated
   const { balances, error } = useTokenBalances()
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })

@@ -17,6 +17,8 @@ export {
   ALLOWANCE_FOR_ENABLED_TOKEN,
 } from '@gnosis.pm/dex-js'
 import { BATCH_TIME } from '@gnosis.pm/dex-js'
+import { Network } from 'types'
+import { DisabledTokensMaps, TokenOverride, AddressToOverrideMap } from 'types/config'
 
 export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
 
@@ -162,3 +164,30 @@ export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
 // however, the new state, that flows top down once a bock is mined, can have a small delayed
 // This delay mitigates the strange effect of stopping the loading before the data is updated
 export const DISABLE_SPINNER_DELAY = 1000
+
+const { disabledTokens } = CONFIG
+
+const DEFAULT_DISABLED_TOKEN_DESCRIPTION = 'This token is disabled for trading and depositing.'
+
+export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTokensMaps>(
+  (acc, networkId) => {
+    const tokensList: TokenOverride[] | undefined = disabledTokens[networkId]
+    if (!tokensList) {
+      acc[networkId] = {}
+      return acc
+    }
+    const tokensMap = tokensList.reduce<AddressToOverrideMap>((acc, token) => {
+      if (!token.description) token.description = DEFAULT_DISABLED_TOKEN_DESCRIPTION
+      acc[token.address] = token
+      return acc
+    }, {})
+
+    acc[networkId] = tokensMap
+
+    return acc
+  },
+  {
+    [Network.Mainnet]: {},
+    [Network.Rinkeby]: {},
+  },
+)

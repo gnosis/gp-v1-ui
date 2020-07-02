@@ -63,7 +63,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
   return (
     <>
       {tokens.map(token => {
-        const { name, symbol, image, address } = token
+        const { name, symbol, image, address, disabled, override } = token
 
         const checked = !disabledTokens.has(address)
 
@@ -76,7 +76,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
               onToggleToken(address, !checked)
             }}
           >
-            <OptionItem name={name} symbol={symbol} image={image}>
+            <OptionItem name={name} symbol={symbol} image={image} faded={disabled} warning={override?.description}>
               <Toggle
                 type="checkbox"
                 checked={checked}
@@ -135,7 +135,8 @@ const SearchInput: React.FC<SearchInputProps> = props => {
 
 const ManageTokensContainer: React.FC = () => {
   const { networkId, networkIdOrDefault } = useWalletConnection()
-  const tokens = useTokenList(networkId)
+  // get all tokens
+  const tokens = useTokenList({ networkId })
 
   const [search, setSearch] = useState('')
   const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
