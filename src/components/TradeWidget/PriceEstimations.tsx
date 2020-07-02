@@ -13,6 +13,7 @@ import { displayTokenSymbolOrLink } from 'utils/display'
 import Spinner from 'components/Spinner'
 
 import { TradeFormData } from 'components/TradeWidget'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 
 const Wrapper = styled.div`
   > strong {
@@ -44,6 +45,7 @@ interface PriceEstimationsProps {
   isPriceInverted: boolean
   priceInputId: string
   priceInverseInputId: string
+  swapPrices: () => void
 }
 
 export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
@@ -86,7 +88,7 @@ function formatPriceToPrecision(price: BigNumber): string {
 }
 
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices: updatePrice } = props
+  const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices, swapPrices } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
   const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
@@ -120,11 +122,12 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         </strong>
         :
       </span>
-      <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrice(price, invertedPrice)}>
+      <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrices(price, invertedPrice)}>
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
       <small>
         {displayTokenSymbolOrLink(displayBaseToken)}/{displayTokenSymbolOrLink(displayQuoteToken)}
+        <SwapIcon swap={swapPrices} />
       </small>
     </>
   )

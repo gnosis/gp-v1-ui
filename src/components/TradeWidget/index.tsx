@@ -947,6 +947,7 @@ const TradeWidget: React.FC = () => {
             isPriceInverted={priceShown === 'INVERSE'}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
+            swapPrices={swapPrices}
           />
           <OrderValidity
             validFromInputId={validFromId}
