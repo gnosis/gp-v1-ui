@@ -174,7 +174,12 @@ interface Props {
 
 export function invertPriceFromString(priceValue: string): string {
   const price = parseBigNumber(priceValue)
-  return price ? invertPrice(price).toString(10) : ''
+  if (!price) {
+    return ''
+  }
+  const invertedPrice = invertPrice(price)
+  // To avoid `Infinity` on price inputs
+  return invertedPrice.isFinite() ? invertedPrice.toString(10) : '0'
 }
 
 const Price: React.FC<Props> = ({
