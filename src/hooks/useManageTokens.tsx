@@ -86,7 +86,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
               image={image}
               faded={disabled}
               warning={override?.description}
-              url={override?.url}
+              warningUrl={override?.url}
             >
               <Toggle
                 type="checkbox"

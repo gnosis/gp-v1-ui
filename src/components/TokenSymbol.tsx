@@ -6,7 +6,7 @@ import alertIcon from 'assets/img/alert.svg'
 interface TokenSymbolProps {
   symbol?: string
   warning?: string
-  url?: string
+  warningUrl?: string
 }
 
 interface WarningProps {
@@ -37,11 +37,11 @@ const SymbolStyled = styled.strong`
   display: block;
 `
 
-export const TokenSymbol: React.FC<TokenSymbolProps> = ({ symbol, warning, url }) => {
+export const TokenSymbol: React.FC<TokenSymbolProps> = ({ symbol, warning, warningUrl }) => {
   return (
     <SymbolStyled>
       <span>{symbol}</span>
-      {warning && <Warning title={warning} url={url} />}
+      {warning && <Warning title={warning} url={warningUrl} />}
     </SymbolStyled>
   )
 }
