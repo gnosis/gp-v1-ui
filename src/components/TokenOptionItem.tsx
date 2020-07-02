@@ -76,11 +76,20 @@ interface OptionItemProps {
   symbol?: string
   faded?: boolean
   warning?: string
+  warningUrl?: string
 }
 
 // generic component to display token
 // with custom children option
-export const OptionItem: React.FC<OptionItemProps> = ({ image, name, symbol, children, faded, warning }) => {
+export const OptionItem: React.FC<OptionItemProps> = ({
+  image,
+  name,
+  symbol,
+  children,
+  faded,
+  warning,
+  warningUrl,
+}) => {
   return (
     <OptionItemWrapper>
       <TokenImgWrapper src={image} alt={name} faded={faded} />
@@ -88,7 +97,7 @@ export const OptionItem: React.FC<OptionItemProps> = ({ image, name, symbol, chi
       <div className="tokenDetails">
         <div className="tokenName">
           <div>
-            <TokenSymbol symbol={symbol} warning={warning} />
+            <TokenSymbol symbol={symbol} warning={warning} warningUrl={warningUrl} />
           </div>
           <div>{name}</div>
         </div>
