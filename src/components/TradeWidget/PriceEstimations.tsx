@@ -122,7 +122,11 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         </strong>
         :
       </span>
-      <button disabled={isPriceLoading || displayPrice === 'N/A'} onClick={updatePrices(price, invertedPrice)}>
+      <button
+        type="button"
+        disabled={isPriceLoading || displayPrice === 'N/A'}
+        onClick={updatePrices(price, invertedPrice)}
+      >
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
       <small>
