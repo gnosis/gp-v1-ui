@@ -103,6 +103,10 @@ const OrSeparator = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  @media ${MEDIA.mobile} {
+    padding: 1rem 1.5em;
+  }
 }
 `
 
@@ -114,10 +118,9 @@ const ErrorWrapper = styled.p`
 `
 
 const InnerFormSection = styled.div`
-  padding: 0.5em;
-  padding-bottom: 1em;
-  box-shadow: 0 0 7px 0px grey;
-  border-radius: 0.5rem;
+  padding: 0.7em;
+  box-shadow: var(--box-shadow);
+  border-radius: var(--border-radius);
   background: var(--color-background);
   position: relative;
 
@@ -131,22 +134,8 @@ const FormField = styled.label`
   display: flex;
   flex-direction: column;
 
-  > * {
-    padding-left: 0.65rem;
-  }
-
   > span {
-    font-weight: bold;
-  }
-
-  > input {
-    width: auto;
-    font-size: 1em;
-    font-weight: normal;
-
-    ::placeholder {
-      opacity: 0.2;
-    }
+    font-size: 1.8rem;
   }
 `
 
@@ -155,30 +144,77 @@ const Disclaimer = styled.div`
   justify-content: center;
 
   > p {
-    font-size: 1.4em;
-    max-width: 600px;
+    font-size: 1.3em;
     width: 100%;
-    padding: 0.5em;
-    border-radius: 0.8rem;
+    border-radius: var(--border-radius);
+  }
+`
+
+const InputContainer = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 4rem;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0;
+
+  > small.inputLabel {
+    position: absolute;
+    left: 2.5%;
+    font-size: 1.2rem;
+  }
+
+  > input {
+    font-size: 1.2rem;
+    font-weight: normal;
+
+    margin: 0;
+    padding: 0 0.65rem;
+    height: 100%;
+    width: 100%;
+
+    border: none;
+    border-bottom: 0.2rem solid transparent;
+
+    transition: all 0.2s ease-in-out;
+
+    &.rpcUrl {
+      padding: 0 0 0 7.5rem;
+    }
+
+    ::placeholder {
+      opacity: 0.2;
+    }
+
+    &:focus {
+      border-color: var(--color-background-balance-button-hover);
+    }
   }
 `
 
 export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
   return (
     <div>
+      <h1>Connection Settings</h1>
       <Disclaimer>
         <p>
-          Here you can set <strong>InfuraId</strong> or <strong>RPC URL</strong> that will be used for connecting
-          WalletConnect provider to mainnet and rinkeby. It is also possible to set WalletConnect{' '}
+          Here you can set the <strong>InfuraId</strong> or <strong>RPC URL</strong> that will be used for connecting
+          the WalletConnect provider to Mainnet and Rinkeby. It is also possible to set the WalletConnect{' '}
           <strong>Bridge URL</strong> to use instead of the default one.
         </p>
       </Disclaimer>
       <OuterFormSection>
+        <h2>Infura/RPC Settings</h2>
         <AlternativesSection>
           <InnerFormSection>
             <FormField>
               <span>InfuraId</span>
-              <input type="text" name="walletconnect.infuraId" ref={register} />
+              <InputContainer>
+                <input type="text" name="walletconnect.infuraId" ref={register} />
+              </InputContainer>
             </FormField>
             <WCError errors={errors} name="infuraId" />
           </InnerFormSection>
@@ -187,33 +223,43 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
           </OrSeparator>
           <InnerFormSection>
             <FormField>
-              <span>RPC URL</span>
-              <input
-                type="text"
-                name="walletconnect.rpc.mainnet"
-                ref={register}
-                placeholder="MAINNET: https://mainnet.node_url"
-              />
-              <input
-                type="text"
-                name="walletconnect.rpc.rinkeby"
-                ref={register}
-                placeholder="RINKEBY: https://rinkeby.node_url"
-              />
+              <span>RPC URLs</span>
+              <InputContainer>
+                <small className="inputLabel">MAINNET: </small>
+                <input
+                  type="text"
+                  className="rpcUrl"
+                  name="walletconnect.rpc.mainnet"
+                  ref={register}
+                  placeholder="https://mainnet.node_url"
+                />
+              </InputContainer>
+              <InputContainer>
+                <small className="inputLabel">RINKEBY: </small>
+                <input
+                  type="text"
+                  className="rpcUrl"
+                  name="walletconnect.rpc.rinkeby"
+                  ref={register}
+                  placeholder="https://rinkeby.node_url"
+                />
+              </InputContainer>
             </FormField>
             <WCError errors={errors} name="rpc" />
           </InnerFormSection>
         </AlternativesSection>
-
+        <h2>Bridge URL Settings</h2>
         <InnerFormSection>
           <FormField>
             <span>Bridge URL</span>
-            <input
-              type="text"
-              name="walletconnect.bridge"
-              ref={register}
-              placeholder="https://bridge.walletconnect.org"
-            />
+            <InputContainer>
+              <input
+                type="text"
+                name="walletconnect.bridge"
+                ref={register}
+                placeholder="https://bridge.walletconnect.org"
+              />
+            </InputContainer>
           </FormField>
           <WCError errors={errors} name="bridge" />
         </InnerFormSection>
