@@ -11,7 +11,7 @@ import { formatSmart, logDebug, isTokenEnabled } from 'utils'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
-import { useTokenList } from './useTokenList'
+import { useTokenList, UseTokenListParams } from './useTokenList'
 
 interface UseBalanceResult {
   balances: TokenBalanceDetails[]
@@ -108,12 +108,13 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   return balances.filter(Boolean) as TokenBalanceDetails[]
 }
 
-export const useTokenBalances = (): UseBalanceResult => {
+export const useTokenBalances = (passOnParams: Partial<UseTokenListParams> = {}): UseBalanceResult => {
   const walletInfo = useWalletConnection()
   const [balances, setBalances] = useSafeState<TokenBalanceDetails[]>([])
   const [error, setError] = useSafeState(false)
 
-  const tokens = useTokenList(walletInfo.networkId)
+  // get all tokens, maybe without deprecated
+  const tokens = useTokenList({ networkId: walletInfo.networkId, ...passOnParams })
 
   // Get token balances
   useEffect(() => {
