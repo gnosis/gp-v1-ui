@@ -3,9 +3,6 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faRetweet } from '@fortawesome/free-solid-svg-icons'
-
 // types, utils
 import { TokenDetails } from 'types'
 import { parseBigNumber } from 'utils'
@@ -18,6 +15,7 @@ import { OrderBookBtn } from 'components/OrderBookBtn'
 import { TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 
 const Wrapper = styled.div`
   display: flex;
@@ -72,11 +70,6 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
   @media ${MEDIA.mobile} {
     width: 100%;
     margin: 0 0 1.6rem;
-  }
-
-  .swap-icon {
-    padding: 0.7em 0.3em;
-    cursor: pointer;
   }
 
   label {
@@ -254,9 +247,7 @@ const Price: React.FC<Props> = ({
             <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
             <small>per</small>
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
-            <span className="swap-icon" onClick={swapPrices}>
-              <FontAwesomeIcon icon={faRetweet} />
-            </span>
+            <SwapIcon swap={swapPrices} />
           </div>
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
@@ -278,9 +269,7 @@ const Price: React.FC<Props> = ({
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
             <small>per</small>
             <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
-            <span className="swap-icon" onClick={swapPrices}>
-              <FontAwesomeIcon icon={faRetweet} />
-            </span>
+            <SwapIcon swap={swapPrices} />
           </div>
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
