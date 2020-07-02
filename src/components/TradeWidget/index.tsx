@@ -482,7 +482,8 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId = TradeFormTokenId.priceInverse
   const validFromId = TradeFormTokenId.validFrom
   const validUntilId = TradeFormTokenId.validUntil
-  const { balances, tokens: tokenList } = useTokenBalances()
+  // get all token balances but deprecated
+  const { balances, tokens: tokenList } = useTokenBalances({ excludeDeprecated: true })
 
   // If user is connected, use balances, otherwise get the default list
   const tokens =
@@ -718,6 +719,7 @@ const TradeWidget: React.FC = () => {
         userAddress,
         validFromWithBatchID,
         validUntilWithBatchID,
+        expiresNever,
       },
       resetStateOptions: Partial<TradeFormData> = DEFAULT_FORM_STATE,
     ): void => {
@@ -741,7 +743,8 @@ const TradeWidget: React.FC = () => {
         remainingAmount: priceDenominator,
         sellTokenBalance: ZERO,
         validFrom: validFromWithBatchID,
-        validUntil: validUntilWithBatchID,
+        //  when expiresNever == true, validUntilWithBatchID == validFromWithBatchID
+        validUntil: expiresNever ? 0 : validUntilWithBatchID,
         txHash,
       }
 
@@ -813,6 +816,7 @@ const TradeWidget: React.FC = () => {
                   sellToken,
                   validFromWithBatchID,
                   validUntilWithBatchID,
+                  expiresNever: isNever,
                 },
                 {
                   ...DEFAULT_FORM_STATE,
@@ -854,6 +858,7 @@ const TradeWidget: React.FC = () => {
                   userAddress,
                   validFromWithBatchID,
                   validUntilWithBatchID,
+                  expiresNever: isNever,
                 },
                 {
                   ...DEFAULT_FORM_STATE,

@@ -78,7 +78,8 @@ const OrderBookWrapper = styled.div`
 
 const OrderBook: React.FC = () => {
   const { networkIdOrDefault } = useWalletConnection()
-  const tokenList = useTokenList(networkIdOrDefault)
+  // get all tokens
+  const tokenList = useTokenList({ networkId: networkIdOrDefault })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
   const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())

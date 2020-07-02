@@ -18,6 +18,7 @@ import { TokenImgWrapper } from 'components/TokenImg'
 // hooks
 import useSafeState from 'hooks/useSafeState'
 import { UseAddTokenModalResult } from 'hooks/useBetterAddTokenModal'
+import { TokenSymbol } from './TokenSymbol'
 
 const OptionItemWrapper = styled.div`
   display: flex;
@@ -73,18 +74,30 @@ interface OptionItemProps {
   image?: string
   name?: string
   symbol?: string
+  faded?: boolean
+  warning?: string
+  warningUrl?: string
 }
 
 // generic component to display token
 // with custom children option
-export const OptionItem: React.FC<OptionItemProps> = ({ image, name, symbol, children }) => {
+export const OptionItem: React.FC<OptionItemProps> = ({
+  image,
+  name,
+  symbol,
+  children,
+  faded,
+  warning,
+  warningUrl,
+}) => {
   return (
     <OptionItemWrapper>
-      <TokenImgWrapper src={image} alt={name} />
+      <TokenImgWrapper src={image} alt={name} faded={faded} />
+
       <div className="tokenDetails">
         <div className="tokenName">
           <div>
-            <strong>{symbol}</strong>
+            <TokenSymbol symbol={symbol} warning={warning} warningUrl={warningUrl} />
           </div>
           <div>{name}</div>
         </div>

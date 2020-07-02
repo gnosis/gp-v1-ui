@@ -8,7 +8,7 @@ import { getTokenFromExchangeById } from 'services'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import lowBalanceIcon from 'assets/img/lowBalance.svg'
+import alertIcon from 'assets/img/alert.svg'
 import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 // components
@@ -262,7 +262,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
           <br />
           <span className="lowBalance">
             low balance
-            <img src={lowBalanceIcon} />
+            <img src={alertIcon} />
           </span>
         </>
       )}

@@ -1,4 +1,5 @@
 import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig, InfuraProviderConfig } from 'types/config'
+import { Network } from 'types'
 
 describe('Test config defaults', () => {
   it('name', () => {
@@ -78,5 +79,19 @@ describe('Test config defaults', () => {
     }
 
     expect(CONFIG.defaultProviderConfig).toEqual(expected)
+  })
+
+  it('disabledTokens', () => {
+    const disabledTokensArray = expect.arrayContaining([
+      expect.objectContaining({
+        // required field
+        address: expect.any(String),
+      }),
+    ])
+
+    const { [Network.Mainnet]: disabledOnMainnet, [Network.Rinkeby]: disabledOnRinkeby } = CONFIG.disabledTokens
+
+    if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
+    if (disabledOnRinkeby.length) expect(disabledOnRinkeby).toEqual(disabledTokensArray)
   })
 })
