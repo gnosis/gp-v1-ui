@@ -23,6 +23,7 @@ import { TokenRow, RowClaimButton, RowClaimSpan } from 'components/DepositWidget
 // Hooks and reducers
 import useNoScroll from 'hooks/useNoScroll'
 import { TokenLocalState } from 'reducers-actions'
+import { TokenSymbol } from 'components/TokenSymbol'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
   ethBalance: BN | null
@@ -66,6 +67,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     claimable,
     walletBalance,
     enabled: tokenEnabled,
+    override,
+    disabled: tokenDisabled,
   } = tokenBalances
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
@@ -91,9 +94,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
-          <TokenImg src={image} alt={name} />
+          <TokenImg src={image} alt={name} faded={tokenDisabled} />
           <div>
-            <b>{symbol}</b>
+            <TokenSymbol symbol={symbol} warning={override?.description} warningUrl={override?.url} />
             {name}
           </div>
         </td>
@@ -147,29 +150,30 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           )}
         </td>
         <td data-label="Actions">
-          {enabled || tokenEnabled ? (
-            <button
-              type="button"
-              className="withdrawToken"
-              onClick={(): void => showForm('deposit')}
-              disabled={isDepositFormVisible}
-            >
-              <PlusSVG />
-            </button>
-          ) : (
-            <>
-              <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
-                {enabling ? (
-                  <>
-                    <Spinner />
-                    Enabling
-                  </>
-                ) : (
-                  <>Enable Deposit</>
-                )}
+          {!tokenDisabled &&
+            (enabled || tokenEnabled ? (
+              <button
+                type="button"
+                className="withdrawToken"
+                onClick={(): void => showForm('deposit')}
+                disabled={isDepositFormVisible}
+              >
+                <PlusSVG />
               </button>
-            </>
-          )}
+            ) : (
+              <>
+                <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
+                  {enabling ? (
+                    <>
+                      <Spinner />
+                      Enabling
+                    </>
+                  ) : (
+                    <>Enable Deposit</>
+                  )}
+                </button>
+              </>
+            ))}
           {!totalExchangeBalance.isZero() && (
             <button
               type="button"
