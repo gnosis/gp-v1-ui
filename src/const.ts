@@ -167,7 +167,7 @@ export const DISABLE_SPINNER_DELAY = 1000
 
 const { disabledTokens } = CONFIG
 
-const DEFAULT_DISABLED_TOKEN_DESCRIPTION = 'This token is disabled for trading and deposit.'
+const DEFAULT_DISABLED_TOKEN_DESCRIPTION = 'This token is disabled for trading and depositing.'
 
 export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTokensMaps>(
   (acc, networkId) => {
