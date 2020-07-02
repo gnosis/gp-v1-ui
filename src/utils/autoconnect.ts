@@ -1,5 +1,5 @@
-import { delay } from 'utils'
-import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER, WALLET_CONNECT_BRIDGE } from 'const'
+import { delay, generateWCOptions } from 'utils'
+import { STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { logDebug } from 'utils'
 
@@ -8,22 +8,13 @@ const getWCIfConnected = async (): Promise<unknown> => {
     /* webpackChunkName: "@walletconnect"*/
     '@walletconnect/web3-provider'
   )
-  const provider = new WalletConnectProvider({
-    infuraId: INFURA_ID,
-    bridge: WALLET_CONNECT_BRIDGE,
-  })
 
+  const wcOptions = generateWCOptions()
+
+  const provider = new WalletConnectProvider(wcOptions)
   if (!provider.wc.connected) return null
 
   try {
-    await new Promise((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      provider.wc.on('transport_open', (error: Error, event: any) => {
-        if (error) reject(error)
-        else resolve(event)
-      })
-    })
-
     await Promise.race([
       // some time for connection to settle
       delay(250),
