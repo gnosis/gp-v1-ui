@@ -14,6 +14,7 @@ import Spinner from 'components/Spinner'
 
 import { TradeFormData } from 'components/TradeWidget'
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 
 const Wrapper = styled.div`
   > strong {
@@ -87,6 +88,14 @@ function formatPriceToPrecision(price: BigNumber): string {
   return price.toFixed(PRICE_ESTIMATION_PRECISION)
 }
 
+const OnchainOrderbookTooltip = (
+  <HelpTooltipContainer>
+    Based on existing Onchain orders, taking into account possible ring trades. <br />
+    Price is affected by sell amount. <br />
+    Higher amounts might yield worse prices, or no price at all, considering what&apos;s available in the current batch.
+  </HelpTooltipContainer>
+)
+
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
   const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices, swapPrices } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
@@ -116,7 +125,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   return (
     <>
       <span>
-        Onchain orderbook price for selling{' '}
+        Onchain orderbook price <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for selling{' '}
         <strong>
           {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
