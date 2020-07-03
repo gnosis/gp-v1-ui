@@ -171,7 +171,7 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig.gas) {
           const gasLimit = await web3.eth.estimateGas(txConfig)
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
-          txConfig.gas = gasLimit
+          txConfig.gas = numberToHex(gasLimit)
         } else {
           logDebug('[composeProvider] Gas Limit: ' + txConfig.gas)
         }
