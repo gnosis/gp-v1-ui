@@ -177,6 +177,7 @@ module.exports = ({ stats = false } = {}) => ({
       MOCK_WEB3: process.env.MOCK || 'false',
       // AUTOCONNECT: only applies for mock implementation
       AUTOCONNECT: 'true',
+      PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance
