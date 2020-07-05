@@ -11,8 +11,8 @@ import { formatSmart, formatAmountFull, parseAmount, validInputPattern, validate
 // components
 import TokenSelector from 'components/TokenSelector'
 import Form from 'components/DepositWidget/Form'
-import { InputBox } from 'components/InputBox'
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
+import { InputBox } from 'components/InputBox'
 import { Input } from 'components/Input'
 import { Spinner } from 'components/Spinner'
 import { WrapEtherBtn } from 'components/WrapEtherBtn'

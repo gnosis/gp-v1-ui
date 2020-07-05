@@ -1,10 +1,13 @@
 import React from 'react'
+import Joi from '@hapi/joi'
 import { FormContextValues, ErrorMessage, FieldErrors } from 'react-hook-form'
 import styled from 'styled-components'
-import { MEDIA } from 'const'
 
-import Joi from '@hapi/joi'
 import { Resolver, SettingsFormData } from 'pages/Settings'
+import { InputBox } from 'components/InputBox'
+import { Input } from 'components/Input'
+
+import { MEDIA } from 'const'
 import { WCOptions } from 'utils'
 
 const URLSchema = Joi.string()
@@ -80,7 +83,6 @@ interface WCSettingsProps {
 const OuterFormSection = styled.div`
   display: flex;
   flex-direction: column;
-  font-size: 1.5em;
 
   > div {
     margin: 0.5em 0;
@@ -92,7 +94,6 @@ const AlternativesSection = styled.div`
   grid-template-columns: 1fr auto 1fr;
 
   @media ${MEDIA.mobile} {
-    grid-template-rows: 1fr auto 1fr;
     grid-template-columns: 100%;
   }
 `
@@ -121,7 +122,6 @@ const InnerFormSection = styled.div`
   padding: 0.7em;
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
-  background: var(--color-background);
   position: relative;
 
   ${ErrorWrapper} {
@@ -133,10 +133,6 @@ const InnerFormSection = styled.div`
 const FormField = styled.label`
   display: flex;
   flex-direction: column;
-
-  > span {
-    font-size: 1.8rem;
-  }
 `
 
 const Disclaimer = styled.div`
@@ -144,53 +140,46 @@ const Disclaimer = styled.div`
   justify-content: center;
 
   > p {
-    font-size: 1.3em;
+    font-size: 1.3rem;
     width: 100%;
     border-radius: var(--border-radius);
   }
 `
 
 const InputContainer = styled.div`
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  height: 4rem;
-  width: 100%;
-  margin: 0.5rem 0;
-  padding: 0;
-
-  > small.inputLabel {
+  small.inputLabel {
     position: absolute;
     left: 2.5%;
+    top: 1.9rem;
     font-size: 1.2rem;
-  }
-
-  > input {
-    font-size: 1.2rem;
-    font-weight: normal;
-
-    margin: 0;
-    padding: 0 0.65rem;
-    height: 100%;
-    width: 100%;
-
-    border: none;
-    border-bottom: 0.2rem solid transparent;
 
     transition: all 0.2s ease-in-out;
+  }
 
-    &.rpcUrl {
-      padding: 0 0 0 7.5rem;
-    }
+  ${InputBox} {
+    margin: 0.7rem 0;
 
-    ::placeholder {
-      opacity: 0.2;
-    }
+    > input {
+      padding: 0 1rem;
+      transition: all 0.2s ease-in-out;
 
-    &:focus {
-      border-color: var(--color-background-balance-button-hover);
+      &.rpcUrl {
+        padding: 0 1rem 0 7.5rem;
+
+        &:focus {
+          padding: 0 1rem;
+        }
+
+        &:focus ~ small.inputLabel {
+          top: 0.3rem;
+          left: 1.3%;
+          font-size: 0.8rem;
+        }
+      }
+
+      ::placeholder {
+        opacity: 0.2;
+      }
     }
   }
 `
@@ -198,11 +187,11 @@ const InputContainer = styled.div`
 export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
   return (
     <div>
-      <h1>Connection Settings</h1>
+      <h1>WalletConnect Settings</h1>
       <Disclaimer>
         <p>
           Here you can set the <strong>InfuraId</strong> or <strong>RPC URL</strong> that will be used for connecting
-          the WalletConnect provider to Mainnet and Rinkeby. It is also possible to set the WalletConnect{' '}
+          the WalletConnect provider to Mainnet and/or Rinkeby. It is also possible to set a custom WalletConnect{' '}
           <strong>Bridge URL</strong> to use instead of the default one.
         </p>
       </Disclaimer>
@@ -213,7 +202,9 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
             <FormField>
               <span>InfuraId</span>
               <InputContainer>
-                <input type="text" name="walletconnect.infuraId" ref={register} />
+                <InputBox>
+                  <Input type="text" name="walletconnect.infuraId" ref={register} />
+                </InputBox>
               </InputContainer>
             </FormField>
             <WCError errors={errors} name="infuraId" />
@@ -225,40 +216,46 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
             <FormField>
               <span>RPC URLs</span>
               <InputContainer>
-                <small className="inputLabel">MAINNET: </small>
-                <input
-                  type="text"
-                  className="rpcUrl"
-                  name="walletconnect.rpc.mainnet"
-                  ref={register}
-                  placeholder="https://mainnet.node_url"
-                />
+                <InputBox>
+                  <Input
+                    type="text"
+                    className="rpcUrl"
+                    name="walletconnect.rpc.mainnet"
+                    ref={register}
+                    placeholder="https://mainnet.node_url"
+                  />
+                  <small className="inputLabel">MAINNET </small>
+                </InputBox>
               </InputContainer>
               <InputContainer>
-                <small className="inputLabel">RINKEBY: </small>
-                <input
-                  type="text"
-                  className="rpcUrl"
-                  name="walletconnect.rpc.rinkeby"
-                  ref={register}
-                  placeholder="https://rinkeby.node_url"
-                />
+                <InputBox>
+                  <Input
+                    type="text"
+                    className="rpcUrl"
+                    name="walletconnect.rpc.rinkeby"
+                    ref={register}
+                    placeholder="https://rinkeby.node_url"
+                  />
+                  <small className="inputLabel">RINKEBY </small>
+                </InputBox>
               </InputContainer>
             </FormField>
             <WCError errors={errors} name="rpc" />
           </InnerFormSection>
         </AlternativesSection>
-        <h2>Bridge URL Settings</h2>
+        <h2>Bridge Settings</h2>
         <InnerFormSection>
           <FormField>
             <span>Bridge URL</span>
             <InputContainer>
-              <input
-                type="text"
-                name="walletconnect.bridge"
-                ref={register}
-                placeholder="https://bridge.walletconnect.org"
-              />
+              <InputBox>
+                <Input
+                  type="text"
+                  name="walletconnect.bridge"
+                  ref={register}
+                  placeholder="https://bridge.walletconnect.org"
+                />
+              </InputBox>
             </InputContainer>
           </FormField>
           <WCError errors={errors} name="bridge" />
