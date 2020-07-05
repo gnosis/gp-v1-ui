@@ -63,7 +63,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
   return (
     <>
       {tokens.map(token => {
-        const { name, symbol, image, address } = token
+        const { name, symbol, image, address, disabled, override } = token
 
         const checked = !disabledTokens.has(address)
 
@@ -72,11 +72,22 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
             key={address}
             // allow to toggle by clicking on the whole element
             onClick={(e): void => {
+              const target = e.target as HTMLElement
+              //  don't preventDefault on clicks on links
+              if (target.tagName === 'A' || target.parentElement?.tagName === 'A') return
+
               e.preventDefault() // prevents double trigger from checkbox clicks
               onToggleToken(address, !checked)
             }}
           >
-            <OptionItem name={name} symbol={symbol} image={image}>
+            <OptionItem
+              name={name}
+              symbol={symbol}
+              image={image}
+              faded={disabled}
+              warning={override?.description}
+              warningUrl={override?.url}
+            >
               <Toggle
                 type="checkbox"
                 checked={checked}
@@ -135,7 +146,8 @@ const SearchInput: React.FC<SearchInputProps> = props => {
 
 const ManageTokensContainer: React.FC = () => {
   const { networkId, networkIdOrDefault } = useWalletConnection()
-  const tokens = useTokenList(networkId)
+  // get all tokens
+  const tokens = useTokenList({ networkId })
 
   const [search, setSearch] = useState('')
   const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)

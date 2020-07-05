@@ -6,7 +6,7 @@ import { TokenDetails } from 'types'
 import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // assets
-import lowBalanceIcon from 'assets/img/lowBalance.svg'
+import alertIcon from 'assets/img/alert.svg'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -232,7 +232,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
           <br />
           <span className="lowBalance">
             low balance
-            <img src={lowBalanceIcon} />
+            <img src={alertIcon} />
           </span>
         </>
       )}

@@ -114,7 +114,8 @@ function onChangeToken(params: {
 export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnProps) => {
   const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault, label, className } = props
   const { networkIdOrDefault: networkId } = useWalletConnection()
-  const tokenList = useTokenList(networkId)
+  // get all tokens
+  const tokenList = useTokenList({ networkId })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
   const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''
