@@ -1,12 +1,23 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { TokenDetails } from 'types'
 import useSafeState from './useSafeState'
 import { getTokens, subscribeToTokenList } from 'services'
 import { EMPTY_ARRAY } from 'const'
 
-export const useTokenList = (networkId?: number): TokenDetails[] => {
+export interface UseTokenListParams {
+  networkId?: number
+  excludeDeprecated?: boolean
+}
+
+export const useTokenList = ({ networkId, excludeDeprecated }: UseTokenListParams = {}): TokenDetails[] => {
   // sync get tokenList
-  const tokens = networkId === undefined ? EMPTY_ARRAY : getTokens(networkId)
+  const unfilteredTokens = networkId === undefined ? EMPTY_ARRAY : getTokens(networkId)
+
+  const tokens = useMemo(() => {
+    if (!excludeDeprecated) return unfilteredTokens
+
+    return unfilteredTokens.filter(token => !token.disabled)
+  }, [excludeDeprecated, unfilteredTokens])
 
   // force update with a new value each time
   const [, forceUpdate] = useSafeState({})

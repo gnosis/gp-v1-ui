@@ -5,6 +5,7 @@ import {
   InfuraProviderConfig,
   ExchangeContractConfig,
 } from 'types/config'
+import { Network } from 'types'
 
 describe('Test config defaults', () => {
   it('name', () => {
@@ -46,11 +47,13 @@ describe('Test config defaults', () => {
       config: [
         {
           networkId: 1,
-          url: 'https://dex-price-estimator.gnosis.io',
+          url_production: 'https://dex-price-estimator.gnosis.io',
+          url_develop: 'https://price-estimate-mainnet.dev.gnosisdev.com',
         },
         {
           networkId: 4,
-          url: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          url_production: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          url_develop: 'https://price-estimate-rinkeby.dev.gnosisdev.com',
         },
       ],
     }
@@ -95,5 +98,19 @@ describe('Test config defaults', () => {
       ],
     }
     expect(CONFIG.exchangeContractConfig).toEqual(expected)
+  })
+
+  it('disabledTokens', () => {
+    const disabledTokensArray = expect.arrayContaining([
+      expect.objectContaining({
+        // required field
+        address: expect.any(String),
+      }),
+    ])
+
+    const { [Network.Mainnet]: disabledOnMainnet, [Network.Rinkeby]: disabledOnRinkeby } = CONFIG.disabledTokens
+
+    if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
+    if (disabledOnRinkeby.length) expect(disabledOnRinkeby).toEqual(disabledTokensArray)
   })
 })
