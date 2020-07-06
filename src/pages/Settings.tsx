@@ -7,6 +7,7 @@ import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
 import { useHistory } from 'react-router'
 import { WCSettings, wcResolver } from 'components/Settings/WalletConnect'
+import { ContentPage } from 'components/Layout/PageWrapper'
 
 const SettingsButtonSubmit = styled.button`
   height: 3.6rem;
@@ -32,6 +33,20 @@ const SettingsButtonReset = styled(SettingsButtonSubmit)`
   &:hover {
     color: var(--color-background-button-hover);
     background-color: transparent;
+  }
+`
+
+const SettingsWrapper = styled(ContentPage)`
+  padding: 1.5em;
+  width: 90%;
+  max-width: 110rem;
+
+  > form {
+    width: 100%;
+
+    > div > h1 {
+      margin: 0;
+    }
   }
 `
 
@@ -121,13 +136,6 @@ const resolver: ValidationResolver<SettingsFormData> = data => {
     errors: errors || {},
   }
 }
-
-const SettingsWrapper = styled.div`
-  width: 100%;
-  background: var(--color-background-pageWrapper);
-  padding: 2em;
-  border-radius: 1rem;
-`
 
 const getDefaultSettings = (): SettingsFormData => ({
   walletconnect: getWCOptionsFromStorage(),
