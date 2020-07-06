@@ -77,7 +77,7 @@ walletConnect:
 disabledTokens:
   1: # Mainnet
     - address: '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
-      name: Synthetics sUSD (deprecated)
+      name: Synth sUSD (deprecated)
       symbol: sUSD-old
       description: This token is disabled for trading and depositing. sUSD will be deprecated and replaced by another token at the end of July 2020.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED
