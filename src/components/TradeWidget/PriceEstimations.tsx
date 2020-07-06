@@ -93,6 +93,11 @@ const OnchainOrderbookTooltip = (
     Based on existing Onchain orders, taking into account possible ring trades. <br />
     Price is affected by sell amount. <br />
     Higher amounts might yield worse prices, or no price at all, considering what&apos;s available in the current batch.
+    <br />
+    <a href="https://docs.gnosis.io/protocol/docs/introduction1/" rel="noopener noreferrer" target="_blank">
+      More details
+    </a>
+    .
   </HelpTooltipContainer>
 )
 
