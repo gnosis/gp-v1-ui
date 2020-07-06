@@ -272,6 +272,9 @@ const draw = (
 
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
+  // Making the scale start with the first value, without empty spaces
+  // https://www.amcharts.com/docs/v4/concepts/axes/value-axis/#Adjusting_scale
+  xAxis.strictMinMax = true
   xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
 
   const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
