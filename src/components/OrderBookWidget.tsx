@@ -291,7 +291,6 @@ const draw = (
   bidSeries.strokeWidth = 1
   bidSeries.stroke = am4core.color(colors.green)
   bidSeries.fill = bidSeries.stroke
-  bidSeries.startLocation = 0.5
   bidSeries.fillOpacity = 0.1
   bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 
@@ -302,7 +301,6 @@ const draw = (
   askSeries.stroke = am4core.color(colors.red)
   askSeries.fill = askSeries.stroke
   askSeries.fillOpacity = 0.1
-  askSeries.startLocation = 0.5
   askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 
   // Add cursor
