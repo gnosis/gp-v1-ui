@@ -273,8 +273,12 @@ const draw = (
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
   // Making the scale start with the first value, without empty spaces
-  // https://www.amcharts.com/docs/v4/concepts/axes/value-axis/#Adjusting_scale
+  // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
   xAxis.strictMinMax = true
+  // How small we want the column separators be, in pixels
+  // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
+  xAxis.renderer.minGridDistance = 40
+
   xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
 
   const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
