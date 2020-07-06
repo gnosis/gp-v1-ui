@@ -271,8 +271,7 @@ const draw = (
   }
 
   // Create axes
-  const xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
-  xAxis.dataFields.category = 'priceNumber'
+  const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
   xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
 
   const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
@@ -280,7 +279,7 @@ const draw = (
 
   // Create series
   const bidSeries = chart.series.push(new am4charts.StepLineSeries())
-  bidSeries.dataFields.categoryX = 'priceNumber'
+  bidSeries.dataFields.valueX = 'priceNumber'
   bidSeries.dataFields.valueY = 'bidValueY'
   bidSeries.strokeWidth = 1
   bidSeries.stroke = am4core.color(colors.green)
@@ -290,7 +289,7 @@ const draw = (
   bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 
   const askSeries = chart.series.push(new am4charts.StepLineSeries())
-  askSeries.dataFields.categoryX = 'priceNumber'
+  askSeries.dataFields.valueX = 'priceNumber'
   askSeries.dataFields.valueY = 'askValueY'
   askSeries.strokeWidth = 1
   askSeries.stroke = am4core.color(colors.red)
