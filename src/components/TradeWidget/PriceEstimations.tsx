@@ -101,6 +101,11 @@ const OnchainOrderbookTooltip = (
   </HelpTooltipContainer>
 )
 
+const HighlightedText = styled.span`
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+`
+
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
   const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices, swapPrices } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
@@ -130,7 +135,8 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   return (
     <>
       <span>
-        Onchain orderbook price <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for selling{' '}
+        <HighlightedText>Onchain orderbook price</HighlightedText> <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for
+        selling{' '}
         <strong>
           {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
