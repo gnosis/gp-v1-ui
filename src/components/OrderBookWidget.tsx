@@ -273,6 +273,31 @@ const draw = (
 
       _printOrderBook(pricePoints, baseToken, quoteToken)
 
+      // dynamically adjust X axis length based on prices
+      const biggestBid = bids.length ? bids[bids.length - 1].price : null
+      const smallestAsk = asks.length ? asks[0].price : null
+
+      console.log(`BB: ${biggestBid?.toNumber()}; SA: ${smallestAsk?.toNumber()}`)
+
+      if (biggestBid && smallestAsk) {
+        const spread = smallestAsk
+          .minus(biggestBid)
+          .abs() // they might overlap
+          .toNumber()
+        // TODO: magic number
+        const maxRange = spread * 5
+        xAxis.min = Math.max(0, biggestBid.minus(maxRange).toNumber())
+        xAxis.max = smallestAsk.plus(maxRange).toNumber()
+      } else if (biggestBid) {
+        // TODO: magic number
+        const maxRange = biggestBid.minus(bids[0].price).multipliedBy(0.05)
+        xAxis.max = biggestBid.plus(maxRange).toNumber()
+      } else if (smallestAsk) {
+        // TODO: magic number
+        const maxRange = asks[asks.length - 1].price.minus(smallestAsk).multipliedBy(0.05)
+        xAxis.min = Math.max(smallestAsk.minus(maxRange).toNumber(), 0)
+      }
+
       return pricePoints
     } catch (error) {
       console.error('Error processing data', error)
