@@ -154,7 +154,11 @@ const processData = (
   )
 
   // Filter tiny orders
-  pricePoints = pricePoints.filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+  pricePoints = pricePoints
+    .filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+    // sort by price according to type
+    // bid orders must be inverted to calculate the descending total volume
+    .sort(({ price: a }, { price: b }) => (isBid ? b.comparedTo(a) : a.comparedTo(b)))
 
   // Convert the price points that can be represented in the graph (PricePointDetails)
   const { points } = pricePoints.reduce(
@@ -209,7 +213,8 @@ const processData = (
     },
   )
 
-  return points
+  // Bid points were sorted in reverse for the volume calculation. Revert them back
+  return isBid ? points.reverse() : points
 }
 
 function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetails, quoteToken: TokenDetails): void {
@@ -251,9 +256,6 @@ const draw = (
       const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
       const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
       const pricePoints = bids.concat(asks)
-
-      // Sort points by price
-      pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
 
       _printOrderBook(pricePoints, baseToken, quoteToken)
 
