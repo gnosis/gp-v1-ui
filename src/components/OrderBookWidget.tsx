@@ -244,6 +244,20 @@ const draw = (
   const chart = am4core.create(chartElement, am4charts.XYChart)
   const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
+  // Create axes
+  const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
+  // Making the scale start with the first value, without empty spaces
+  // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
+  xAxis.strictMinMax = true
+  // How small we want the column separators be, in pixels
+  // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
+  xAxis.renderer.minGridDistance = 40
+
+  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+
+  const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
+  yAxis.title.text = baseTokenLabel
+
   // Add data
   chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
     baseTokenId: baseToken.id,
@@ -271,20 +285,6 @@ const draw = (
     green: '#3d7542',
     red: '#dc1235',
   }
-
-  // Create axes
-  const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
-  // Making the scale start with the first value, without empty spaces
-  // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
-  xAxis.strictMinMax = true
-  // How small we want the column separators be, in pixels
-  // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
-  xAxis.renderer.minGridDistance = 40
-
-  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
-
-  const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
-  yAxis.title.text = baseTokenLabel
 
   // Create series
   const bidSeries = chart.series.push(new am4charts.StepLineSeries())
