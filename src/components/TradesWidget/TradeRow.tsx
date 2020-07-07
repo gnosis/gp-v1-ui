@@ -24,6 +24,10 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
         border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
       }
 
+      td[data-label='View on Etherscan'] {
+        border-bottom: none;
+      }
+
       ${(props): string | false =>
         !props.$open &&
         `
