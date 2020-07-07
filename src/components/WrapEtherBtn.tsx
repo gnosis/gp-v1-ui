@@ -226,7 +226,15 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         {amountFull} {symbolSource}
       </span>
     ) : (
-      <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
+      <a
+        onClick={(): void =>
+          setValue(
+            INPUT_ID_AMOUNT,
+            formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION, isLocaleAware: false }),
+            true,
+          )
+        }
+      >
         {amountFull} {symbolSource}
       </a>
     )
