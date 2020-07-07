@@ -54,13 +54,9 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
         border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
       }
 
-      ${(props): string | false =>
-        !props.$open &&
-        `
-        td[data-label='Status'] { 
-          border: none; 
-        }
-      `}
+      td[data-label='Status'] {
+        border: none;
+      }
     }
   }
 `

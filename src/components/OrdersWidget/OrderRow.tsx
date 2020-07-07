@@ -12,7 +12,6 @@ import alertIcon from 'assets/img/alert.svg'
 import { EtherscanLink } from 'components/EtherscanLink'
 import { Spinner } from 'components/Spinner'
 import { StatusCountdown } from 'components/StatusCountdown'
-import { ResponsiveRowSizeToggler } from 'components/Layout/Card'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
@@ -284,7 +283,6 @@ const OrderRow: React.FC<Props> = props => {
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
-  const [openCard, setOpenCard] = useSafeState(false)
 
   useEffect(() => {
     fetchToken(order.id, order.buyToken as TokenDetails, setBuyToken, isPendingOrder)
@@ -294,7 +292,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : 'orderRowWrapper'} $open={openCard}>
+      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : 'orderRowWrapper'}>
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}
@@ -310,7 +308,6 @@ const OrderRow: React.FC<Props> = props => {
           isPendingOrder={isPendingOrder}
           transactionHash={transactionHash}
         />
-        <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
         <ResponsiveTitleRow className="responsiveRow" data-label="Market">
           <div>
             {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}

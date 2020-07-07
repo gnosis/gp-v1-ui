@@ -6,10 +6,9 @@ import { formatDistanceStrict } from 'date-fns'
 import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
-import useSafeState from 'hooks/useSafeState'
 
 import { EtherscanLink } from 'components/EtherscanLink'
-import { ResponsiveRowSizeToggler, FoldableRowWrapper } from 'components/Layout/Card'
+import { FoldableRowWrapper } from 'components/Layout/Card'
 
 import { isTradeSettled } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
@@ -27,14 +26,6 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
       td[data-label='View on Etherscan'] {
         border-bottom: none;
       }
-
-      ${(props): string | false =>
-        !props.$open &&
-        `
-        td[data-label='Sold / Bought'] {
-          border-bottom: none;
-        }
-      `}
     }
   }
 `
@@ -94,8 +85,6 @@ function formatPercentage(percentage: BigNumber): string {
 }
 
 export const TradeRow: React.FC<TradeRowProps> = params => {
-  const [openCard, setOpenCard] = useSafeState(false)
-
   const { trade, networkId } = params
   const {
     buyToken,
@@ -144,7 +133,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
-    <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId} $open={openCard}>
+    <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
@@ -182,7 +171,6 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="View on Etherscan">
         <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
       </td>
-      <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
     </TradeRowFoldableWrapper>
   )
 }

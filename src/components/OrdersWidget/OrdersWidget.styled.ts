@@ -37,20 +37,27 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
     > table {
       > tbody {
         > tr.orderRowWrapper {
-          > td.cardOpener {
-            // display: none;
-          }
+          padding-right: 4.3rem;
 
           @media ${MEDIA.mobile} {
             display: flex;
 
             > td.checked {
-              order: 5;
+              position: absolute;
+              right: 0;
+              height: calc(100% - 3.2rem);
+              width: 3.3rem;
+              padding: 0;
+
               border: none;
+              border-left: 0.2rem solid rgba(0, 0, 0, 0.075);
+
+              &::before {
+                display: none;
+              }
 
               > input[type='checkbox'] {
-                margin: 0;
-                margin-left: auto;
+                margin: auto;
               }
             }
           }
