@@ -90,9 +90,13 @@ export const OrdersForm = styled.div`
   > form {
     display: flex;
     flex-flow: column nowrap;
+    height: 71rem;
 
     @media ${MEDIA.tablet} {
-      height: auto;
+      height: inherit;
+    }
+    @media ${MEDIA.mobile} {
+      height: inherit;
     }
   }
 
@@ -219,6 +223,10 @@ export const OrdersForm = styled.div`
     padding: 0 0 5rem;
     box-sizing: border-box;
     overflow-y: auto;
+
+    @media ${MEDIA.tablet} {
+      overflow-y: none;
+    }
   }
 
   .checked {
