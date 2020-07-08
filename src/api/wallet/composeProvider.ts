@@ -9,6 +9,8 @@ import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
 import { numberToHex } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
+import { logDebug } from 'utils'
+import { web3 } from 'api'
 
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
@@ -68,10 +70,17 @@ const createConditionalMiddleware = <T extends unknown>(
     // if not condition, skip and got to next middleware
     if (!condition(req)) return next()
 
-    // if handled fully, end here
-    if (await handle(req, res)) return end()
-    // otherwise continue to next middleware
-    next()
+    try {
+      const isHandled = await handle(req, res)
+
+      // If handled fully, end here
+      if (isHandled) return end()
+
+      // Otherwise continue to next middleware
+      next()
+    } catch (error) {
+      end(error)
+    }
   }
 }
 
@@ -151,8 +160,30 @@ export const composeProvider = <T extends Provider>(
     ),
   )
 
-  const walletMiddleware = providerAsMiddleware(provider)
+  engine.push(
+    createConditionalMiddleware<TransactionConfig[]>(
+      req => req.method === 'eth_sendTransaction',
+      async req => {
+        const txConfig = req.params?.[0]
+        // no parameters, which shouldn't happen
+        if (!txConfig) return false
 
+        if (!txConfig.gas) {
+          const gasLimit = await web3.eth.estimateGas(txConfig)
+          logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
+          txConfig.gas = numberToHex(gasLimit)
+        } else {
+          logDebug('[composeProvider] Gas Limit: ' + txConfig.gas)
+        }
+
+        // don't mark as handled
+        // pass modified tx on
+        return false
+      },
+    ),
+  )
+
+  const walletMiddleware = providerAsMiddleware(provider)
   engine.push(walletMiddleware)
 
   const composedProvider: T = providerFromEngine(engine)
