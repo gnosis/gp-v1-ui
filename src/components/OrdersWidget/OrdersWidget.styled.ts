@@ -90,7 +90,6 @@ export const OrdersForm = styled.div`
   > form {
     display: flex;
     flex-flow: column nowrap;
-    height: 59rem;
 
     @media ${MEDIA.tablet} {
       height: auto;
