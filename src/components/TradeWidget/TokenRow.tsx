@@ -286,7 +286,7 @@ const TokenRow: React.FC<Props> = ({
               )}
             </>
           )}
-          {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
+          {editableAndConnected && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
             {readOnly ? (
