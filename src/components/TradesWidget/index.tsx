@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
+import { formatPrice, TokenDetails, formatAmount, invertPrice } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
@@ -67,8 +67,8 @@ function csvTransformer(trade: Trade): CsvColumns {
     'Buy Token address': buyToken.address,
     'Sell Token symbol': sellToken.symbol || '',
     'Sell Token address': sellToken.address,
-    'Limit Price': limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
-    'Fill Price': formatPrice({ price: fillPrice, decimals: 8 }),
+    'Limit Price': limitPrice ? formatPrice({ price: invertPrice(limitPrice), decimals: 8 }) : 'N/A',
+    'Fill Price': formatPrice({ price: invertPrice(fillPrice), decimals: 8 }),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
