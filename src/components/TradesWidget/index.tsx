@@ -55,6 +55,11 @@ function csvTransformer(trade: Trade): CsvColumns {
     batchId,
   } = trade
 
+  const limitPriceStr = limitPrice ? formatPrice({ price: invertPrice(limitPrice), decimals: 8 }) : 'N/A'
+  const inverseLimitPriceStr = limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A'
+  const fillPriceStr = formatPrice({ price: invertPrice(fillPrice), decimals: 8 })
+  const inverseFillPriceStr = formatPrice({ price: fillPrice, decimals: 8 })
+
   // The order of the keys defines csv column order,
   // as well as names and whether to include it or not.
   // We can optionally define an interface for that.
@@ -67,10 +72,14 @@ function csvTransformer(trade: Trade): CsvColumns {
     'Buy Token address': buyToken.address,
     'Sell Token symbol': sellToken.symbol || '',
     'Sell Token address': sellToken.address,
-    'Limit Price': limitPrice ? formatPrice({ price: invertPrice(limitPrice), decimals: 8 }) : 'N/A',
+    'Limit Price': limitPriceStr,
     'Limit Price Unit': symbolOrAddress(buyToken),
-    'Fill Price': formatPrice({ price: invertPrice(fillPrice), decimals: 8 }),
+    'Fill Price': fillPriceStr,
     'Fill Price Unit': symbolOrAddress(buyToken),
+    'Inverse Limit Price': inverseLimitPriceStr,
+    'Inverse Limit Price Unit': symbolOrAddress(sellToken),
+    'Inverse Fill Price': inverseFillPriceStr,
+    'Inverse Fill Price Unit': symbolOrAddress(sellToken),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
