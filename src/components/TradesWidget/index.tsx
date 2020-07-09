@@ -87,6 +87,7 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
+    'Sold Unit': symbolOrAddress(sellToken),
     Bought: formatAmount({
       amount: buyAmount,
       precision: buyToken.decimals as number,
@@ -94,6 +95,7 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
+    'Bought Unit': symbolOrAddress(buyToken),
     Type: trade.type || '',
     'Transaction Hash': txHash,
     'Event Log Index': eventIndex.toString(),
