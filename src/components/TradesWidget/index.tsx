@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-import { formatPrice, TokenDetails, formatAmount, invertPrice } from '@gnosis.pm/dex-js'
+import { formatPrice, TokenDetails, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
@@ -66,6 +66,11 @@ function csvTransformer(trade: Trade): CsvColumns {
     orderSellAmount && trade.type != 'liquidity'
       ? new BigNumber(sellAmount.toString()).dividedBy(new BigNumber(orderSellAmount.toString())).toString(10)
       : 'N/A'
+  const totalOrderAmount =
+    orderSellAmount && trade.type != 'liquidity'
+      ? formatAmountFull({ amount: orderSellAmount, precision: sellToken.decimals, thousandSeparator: false })
+      : 'N/A'
+
   // The order of the keys defines csv column order,
   // as well as names and whether to include it or not.
   // We can optionally define an interface for that.
@@ -104,6 +109,8 @@ function csvTransformer(trade: Trade): CsvColumns {
     'Bought Unit': symbolOrAddress(buyToken),
     Type: trade.type || '',
     'Fill %': fillPercentage,
+    'Total Order Amount': totalOrderAmount,
+    'Total Order Amount Unit': symbolOrAddress(sellToken),
     'Transaction Hash': txHash,
     'Event Log Index': eventIndex.toString(),
     'Order Id': orderId,
