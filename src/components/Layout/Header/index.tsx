@@ -69,9 +69,17 @@ const CountDownStyled = styled.div`
 
 const DevdocTooltip = (
   <HelpTooltipContainer>
-    <a href="https://docs.gnosis.io/protocol/docs/intro-batches" target="_blank" rel="noopener noreferrer">
-      What Is a Batch and a Batch ID?
-    </a>
+    <p>
+      On Gnosis Protocol, orders placed on-chain are not immediately executed, but rather collected and aggregated to be
+      settled in batches. These batch order settlements occur every 5 minutes consecutively.
+    </p>
+    <p>
+      Learn more{' '}
+      <a href="https://docs.gnosis.io/protocol/docs/intro-batches" target="_blank" rel="noopener noreferrer">
+        here
+      </a>
+      .
+    </p>
   </HelpTooltipContainer>
 )
 
