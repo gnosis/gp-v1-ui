@@ -55,6 +55,17 @@ const DeleteOrder: React.FC<Pick<
   </td>
 )
 
+interface MarketProps {
+  sellToken: TokenDetails
+  buyToken: TokenDetails
+}
+
+const Market: React.FC<MarketProps> = ({ sellToken, buyToken }) => (
+  <td data-label="Market">
+    {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
+  </td>
+)
+
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
   sellToken: TokenDetails
@@ -301,6 +312,7 @@ const OrderRow: React.FC<Props> = props => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
+        <Market sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
