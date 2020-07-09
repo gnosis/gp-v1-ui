@@ -8,10 +8,27 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/EtherscanLink'
+import { FoldableRowWrapper } from 'components/Layout/Card'
 
 import { isTradeSettled } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { ONE_HUNDRED_BIG_NUMBER } from 'const'
+import { ONE_HUNDRED_BIG_NUMBER, MEDIA } from 'const'
+
+const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
+  @media ${MEDIA.mobile} {
+    &&&&& {
+      display: flex;
+      td[data-label='Market'] {
+        order: -1;
+        border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+      }
+
+      td[data-label='View on Etherscan'] {
+        border-bottom: none;
+      }
+    }
+  }
+`
 
 interface TradeRowProps {
   trade: Trade
@@ -116,11 +133,11 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
-    <tr data-order-id={orderId} data-batch-id={batchId}>
-      <td data-label="Date" title={date.toLocaleString()}>
+    <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
+      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <td data-label="Trade">
+      <td data-label="Market" className="showResponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td
@@ -137,7 +154,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatPrice(invertedFillPrice)}
       </td>
       <td
-        data-label="Amount / Received"
+        data-label="Sold / Bought"
+        className="showResponsive"
         title={`${formatAmountFull({
           amount: sellAmount,
           precision: sellTokenDecimals,
@@ -151,8 +169,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         <TypePill tradeType={type}>{type}</TypePill>
       </td>
       <td data-label="View on Etherscan">
-        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
+        <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
       </td>
-    </tr>
+    </TradeRowFoldableWrapper>
   )
 }

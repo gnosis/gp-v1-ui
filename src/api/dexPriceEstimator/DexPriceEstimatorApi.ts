@@ -43,7 +43,8 @@ interface GetPriceResponse {
 
 export interface PriceEstimatorEndpoint {
   networkId: number
-  url: string
+  url_production: string
+  url_develop?: string
 }
 
 export type DexPriceEstimatorParams = PriceEstimatorEndpoint[]
@@ -57,7 +58,11 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
 
   public constructor(params: DexPriceEstimatorParams) {
     params.forEach(endpoint => {
-      this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(endpoint.url)
+      this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(
+        process.env.PRICE_ESTIMATOR_URL === 'production'
+          ? endpoint.url_production
+          : endpoint.url_develop || endpoint.url_production, // fallback on required url_production
+      )
     })
   }
 

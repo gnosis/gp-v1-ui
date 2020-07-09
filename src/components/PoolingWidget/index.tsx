@@ -20,7 +20,7 @@ import ProgressBar from 'components/PoolingWidget/ProgressBar'
 import { StepDescription } from 'components/PoolingWidget/StepDescriptors'
 import SubComponents from 'components/PoolingWidget/SubComponents'
 import LiquidityButtons from 'components/PoolingWidget/LiquidityButtons'
-import { PoolingInterfaceWrapper, PoolingWidgetWrapper } from 'components/PoolingWidget/PoolingWidget.styled'
+import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.styled'
 
 // Hooks and actions
 import useSafeState from 'hooks/useSafeState'
@@ -32,6 +32,7 @@ import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { useTokenList } from 'hooks/useTokenList'
 import OrdersWidget from 'pages/Orders'
+import Widget from 'components/Layout/Widget'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -149,7 +150,7 @@ const PoolingInterface: React.FC = () => {
 
   const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
-  const tokenList = useTokenList(networkIdOrDefault)
+  const tokenList = useTokenList({ networkId: networkIdOrDefault })
 
   const tokens = useMemo(() => {
     return (
@@ -284,8 +285,8 @@ const PoolingInterface: React.FC = () => {
     ],
   )
   return (
-    <PoolingWidgetWrapper className={ordersVisible ? '' : 'expanded'}>
-      <PoolingInterfaceWrapper $width="100%">
+    <Widget>
+      <PoolingInterfaceWrapper>
         <FormContext {...methods}>
           <form onSubmit={handleSubmit(sendTransaction)} noValidate>
             <h2>New Liquidity Order</h2>
@@ -332,10 +333,10 @@ const PoolingInterface: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your liquidity orders</h5>
-          <OrdersWidget isWidget displayOnly={'liquidity'} />
+          <OrdersWidget displayOnly={'liquidity'} />
         </div>
       </OrdersPanel>
-    </PoolingWidgetWrapper>
+    </Widget>
   )
 }
 

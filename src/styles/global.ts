@@ -14,6 +14,7 @@ const GlobalStyles = createGlobalStyle`
   html, body {  
     width: 100%;
     min-height: 100vh;
+    min-width: 300px;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;

@@ -17,6 +17,8 @@ export {
   ALLOWANCE_FOR_ENABLED_TOKEN,
 } from '@gnosis.pm/dex-js'
 import { BATCH_TIME } from '@gnosis.pm/dex-js'
+import { Network } from 'types'
+import { DisabledTokensMaps, TokenOverride, AddressToOverrideMap } from 'types/config'
 
 export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
 
@@ -65,6 +67,7 @@ export const PRICES_CACHE_TIME = 60 // in seconds
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',
+  xSmallScreen: '430px',
   smallScreen: '736px',
   smallScreenUp: '737px',
   mediumScreenSmall: '850px',
@@ -72,6 +75,9 @@ export const MEDIA = {
   desktopScreen: '1025px',
   get tinyDown(): string {
     return `only screen and (max-width : ${this.tinyScreen})`
+  },
+  get xSmallDown(): string {
+    return `only screen and (max-width : ${this.xSmallScreen})`
   },
   get mobile(): string {
     return `only screen and (max-width : ${this.smallScreen})`
@@ -119,6 +125,7 @@ if (process.env.INFURA_ID) {
 
 export const INFURA_ID = infuraId
 export const WALLET_CONNECT_BRIDGE = process.env.WALLET_CONNECT_BRIDGE || CONFIG.walletConnect.bridge
+export const STORAGE_KEY_CUSTOM_WC_OPTIONS = 'CustomWCOptions'
 
 let ethNodeUrl
 if (process.env.ETH_NODE_URL) {
@@ -173,3 +180,30 @@ export const DEFAULT_ORDERS_SORTABLE_TOPIC = 'validUntil'
 /** ERROR CODES **/
 // https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1474.md
 export const LIMIT_EXCEEDED_ERROR_CODE = -32005
+
+const { disabledTokens } = CONFIG
+
+const DEFAULT_DISABLED_TOKEN_DESCRIPTION = 'This token is disabled for trading and depositing.'
+
+export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTokensMaps>(
+  (acc, networkId) => {
+    const tokensList: TokenOverride[] | undefined = disabledTokens[networkId]
+    if (!tokensList) {
+      acc[networkId] = {}
+      return acc
+    }
+    const tokensMap = tokensList.reduce<AddressToOverrideMap>((acc, token) => {
+      if (!token.description) token.description = DEFAULT_DISABLED_TOKEN_DESCRIPTION
+      acc[token.address] = token
+      return acc
+    }, {})
+
+    acc[networkId] = tokensMap
+
+    return acc
+  },
+  {
+    [Network.Mainnet]: {},
+    [Network.Rinkeby]: {},
+  },
+)

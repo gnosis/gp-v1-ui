@@ -1,8 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { PageWrapper } from 'components/Layout/PageWrapper'
 
-const Wrapper = styled(PageWrapper)`
+const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
@@ -15,11 +14,7 @@ interface Props {
 }
 
 const Widget: React.FC<Props> = ({ children, className }) => {
-  return (
-    <Wrapper className={className} $bgColor="transparent" $boxShadow="none" $width="auto">
-      {children}
-    </Wrapper>
-  )
+  return <Wrapper className={className}>{children}</Wrapper>
 }
 
 export default Widget

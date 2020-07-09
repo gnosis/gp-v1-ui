@@ -1,10 +1,7 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faRetweet } from '@fortawesome/free-solid-svg-icons'
 
 // types, utils
 import { TokenDetails } from 'types'
@@ -18,6 +15,7 @@ import { OrderBookBtn } from 'components/OrderBookBtn'
 import { TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 
 const Wrapper = styled.div`
   display: flex;
@@ -72,11 +70,6 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
   @media ${MEDIA.mobile} {
     width: 100%;
     margin: 0 0 1.6rem;
-  }
-
-  .swap-icon {
-    padding: 0.7em 0.3em;
-    cursor: pointer;
   }
 
   label {
@@ -175,21 +168,30 @@ interface Props {
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
+  swapPrices: () => void
+  priceShown: 'INVERSE' | 'DIRECT'
 }
 
 export function invertPriceFromString(priceValue: string): string {
   const price = parseBigNumber(priceValue)
-  return price ? invertPrice(price).toString(10) : ''
+  if (!price) {
+    return ''
+  }
+  const invertedPrice = invertPrice(price)
+  // To avoid `Infinity` on price inputs
+  return invertedPrice.isFinite() ? invertedPrice.toString(10) : '0'
 }
 
-const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
+const Price: React.FC<Props> = ({
+  sellToken,
+  receiveToken,
+  priceInputId,
+  priceInverseInputId,
+  tabIndex,
+  swapPrices,
+  priceShown,
+}) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
-
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
-
-  const swapPrices = (): void => {
-    setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
-  }
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
@@ -250,9 +252,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
             <small>per</small>
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
-            <span className="swap-icon" onClick={swapPrices}>
-              <FontAwesomeIcon icon={faRetweet} />
-            </span>
+            <SwapIcon swap={swapPrices} />
           </div>
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
@@ -274,9 +274,7 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             <small title={sellToken.symbol}>{sellToken.symbol}</small>
             <small>per</small>
             <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
-            <span className="swap-icon" onClick={swapPrices}>
-              <FontAwesomeIcon icon={faRetweet} />
-            </span>
+            <SwapIcon swap={swapPrices} />
           </div>
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />

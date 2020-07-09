@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
+import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
 import { useForm, FormContext } from 'react-hook-form'
 import { useParams } from 'react-router'
@@ -9,13 +9,23 @@ import Modali from 'modali'
 import BN from 'bn.js'
 import { isAddress } from 'web3-utils'
 
+import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
+
 // assets
 import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 
 // const, types
-import { MEDIA, PRICE_ESTIMATION_PRECISION, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
+import { ZERO } from 'const'
+import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
+
+// utils
+import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, formatTimeToFromBatch } from 'utils'
+
+// api
+import { PendingTxObj } from 'api/exchange/ExchangeApi'
+import { tokenListApi } from 'api'
 
 // components
 import Widget from 'components/Layout/Widget'
@@ -29,6 +39,9 @@ import { Spinner } from 'components/Spinner'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
 import FormMessage from 'components/TradeWidget/FormMessage'
+import { PriceEstimations } from 'components/TradeWidget/PriceEstimations'
+import validationSchema from 'components/TradeWidget/validationSchema'
+import Price, { invertPriceFromString } from 'components/TradeWidget/Price'
 
 // hooks and reducers
 import useURLParams from 'hooks/useURLParams'
@@ -38,44 +51,23 @@ import { usePlaceOrder } from 'hooks/usePlaceOrder'
 import { useQuery, buildSearchQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
-import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
-
-import {
-  getToken,
-  parseAmount,
-  parseBigNumber,
-  dateToBatchId,
-  logDebug,
-  resolverFactory,
-  formatTimeToFromBatch,
-} from 'utils'
-
-import { ZERO } from 'const'
-
-import Price, { invertPriceFromString } from './Price'
 import { useConnectWallet } from 'hooks/useConnectWallet'
-import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-import { updateTradeState } from 'reducers-actions/trade'
-import { tokenListApi } from 'api'
-
-import validationSchema from './validationSchema'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
-import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
+import { updateTradeState } from 'reducers-actions/trade'
+
+import { DevTool } from 'HookFormDevtool'
 
 const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  height: 63rem;
+  height: 75rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
   background: var(--color-background-pageWrapper);
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
   margin: 0 auto;
   min-height: 63rem;
@@ -254,8 +246,30 @@ export const OrdersPanel = styled.div`
     box-shadow: none;
     border-radius: 0;
     min-height: initial;
-    min-width: initial;
     max-width: initial;
+
+    @media ${MEDIA.desktop} {
+      min-width: initial;
+    }
+
+    // Search Filter
+    .widgetFilterTools {
+      > .balances-searchTokens {
+        height: 3.6rem;
+        margin: 0.8rem;
+      }
+    }
+
+    .widgetCardWrapper {
+      thead,
+      tbody {
+        font-size: 1.1rem;
+
+        > tr {
+          padding: 0 1.4rem;
+        }
+      }
+    }
   }
 
   > div {
@@ -479,7 +493,9 @@ const TradeWidget: React.FC = () => {
   const priceInverseInputId: TradeFormTokenId = 'priceInverse'
   const validFromId: TradeFormTokenId = 'validFrom'
   const validUntilId: TradeFormTokenId = 'validUntil'
-  const { balances, tokens: tokenList } = useTokenBalances()
+
+  // get all token balances but deprecated
+  const { balances, tokens: tokenList } = useTokenBalances({ excludeDeprecated: true })
 
   // If user is connected, use balances, otherwise get the default list
   const tokens =
@@ -505,6 +521,10 @@ const TradeWidget: React.FC = () => {
   const defaultSellAmount = trade.sellAmount || sellParam
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
+
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
+
+  const swapPrices = (): void => setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
@@ -587,15 +607,6 @@ const TradeWidget: React.FC = () => {
   // Avoid querying for a new price at every input change
   const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
 
-  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
-    networkId: networkIdOrDefault,
-    baseTokenId: receiveToken.id,
-    baseTokenDecimals: receiveToken.decimals,
-    quoteTokenId: sellToken.id,
-    quoteTokenDecimals: sellToken.decimals,
-    amount: debouncedSellValue,
-  })
-
   // Updating global trade state on change
   useEffect(() => {
     dispatch(
@@ -609,37 +620,6 @@ const TradeWidget: React.FC = () => {
       }),
     )
   }, [dispatch, priceValue, sellValue, sellToken, receiveToken, validFromValue, validUntilValue])
-
-  const initialPrice = useRef(defaultPrice)
-
-  useEffect(() => {
-    // We DON'T want to use the price estimation when the page is being loaded with a price in the URL.
-    // For example when sharing the URL or when filling in from Telegram bot suggestions
-    // We DO want to use price estimation when there's no price coming from the URL
-    const shouldUsePriceEstimation = !initialPrice.current || +initialPrice.current === 0
-
-    // Only try to update price estimation when not loading
-    if (!isPriceLoading) {
-      // If there was a price set coming from the URL, reset it
-      // It was supposed to be used only once. Initial price doesn't matter anymore
-      if (initialPrice.current) {
-        initialPrice.current = ''
-      }
-
-      logDebug(`[TradeWidget] priceEstimation ${priceEstimation}`)
-
-      if (shouldUsePriceEstimation) {
-        // Price estimation can be null. In that case, set the input to 0
-        const newPrice = priceEstimation ? priceEstimation.toFixed(PRICE_ESTIMATION_PRECISION) : '0'
-
-        setValue(priceInputId, newPrice)
-        setValue(priceInverseInputId, invertPriceFromString(newPrice))
-
-        setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [priceEstimation, isPriceLoading])
 
   // Update receive amount
   useEffect(() => {
@@ -717,6 +697,7 @@ const TradeWidget: React.FC = () => {
         userAddress,
         validFromWithBatchID,
         validUntilWithBatchID,
+        expiresNever,
       },
       resetStateOptions: Partial<TradeFormData> = DEFAULT_FORM_STATE,
     ): void => {
@@ -740,7 +721,8 @@ const TradeWidget: React.FC = () => {
         remainingAmount: priceDenominator,
         sellTokenBalance: ZERO,
         validFrom: validFromWithBatchID,
-        validUntil: validUntilWithBatchID,
+        //  when expiresNever == true, validUntilWithBatchID == validFromWithBatchID
+        validUntil: expiresNever ? 0 : validUntilWithBatchID,
         txHash,
         isUnlimited: false,
       }
@@ -809,6 +791,7 @@ const TradeWidget: React.FC = () => {
                   sellToken,
                   validFromWithBatchID,
                   validUntilWithBatchID,
+                  expiresNever: isNever,
                 },
                 {
                   ...DEFAULT_FORM_STATE,
@@ -848,6 +831,7 @@ const TradeWidget: React.FC = () => {
                   userAddress,
                   validFromWithBatchID,
                   validUntilWithBatchID,
+                  expiresNever: isNever,
                 },
                 {
                   ...DEFAULT_FORM_STATE,
@@ -933,7 +917,7 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
-      {/* // Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
+      {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
@@ -949,6 +933,7 @@ const TradeWidget: React.FC = () => {
             validateMaxAmount
             tabIndex={1}
             readOnly={false}
+            userConnected={!!(userAddress && networkId)}
           />
           <IconWrapper onClick={swapTokens}>
             <SwitcherSVG />
@@ -970,6 +955,18 @@ const TradeWidget: React.FC = () => {
             sellToken={sellToken}
             receiveToken={receiveToken}
             tabIndex={1}
+            swapPrices={swapPrices}
+            priceShown={priceShown}
+          />
+          <PriceEstimations
+            networkId={networkIdOrDefault}
+            baseToken={receiveToken}
+            quoteToken={sellToken}
+            amount={debouncedSellValue}
+            isPriceInverted={priceShown === 'INVERSE'}
+            priceInputId={priceInputId}
+            priceInverseInputId={priceInverseInputId}
+            swapPrices={swapPrices}
           />
           <OrderValidity
             validFromInputId={validFromId}
@@ -1003,12 +1000,11 @@ const TradeWidget: React.FC = () => {
         {/* Actual orders content */}
         <div>
           <h5>Your orders</h5>
-          <OrdersWidget isWidget displayOnly={'regular'} />
+          <OrdersWidget displayOnly={'regular'} />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}
-      {process.env.NODE_ENV === 'development' &&
-        React.createElement(require('react-hook-form-devtools').DevTool, { control: methods.control })}
+      {process.env.NODE_ENV === 'development' && <DevTool control={methods.control} />}
     </WrappedWidget>
   )
 }
