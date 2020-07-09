@@ -282,7 +282,7 @@ const PoolingInterface: React.FC = () => {
   )
   return (
     <Widget>
-      <PoolingInterfaceWrapper $width="100%">
+      <PoolingInterfaceWrapper>
         <FormContext {...methods}>
           <form onSubmit={handleSubmit(sendTransaction)} noValidate>
             <h2>New Liquidity Order</h2>

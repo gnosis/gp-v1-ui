@@ -10,6 +10,7 @@ import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
+import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 import { TradeRow } from 'components/TradesWidget/TradeRow'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -25,9 +26,9 @@ import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
 
 const CsvButtonContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  width: 75%;
 `
 
 const SplitHeaderTitle = styled.div`
@@ -125,8 +126,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $padding="0 0 0 2rem"
-      $columns={`1fr 0.8fr 0.9fr 1.2fr 6.5rem ${isTab ? '1.23fr' : '0.74fr'}`}
+      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
     >
       <thead>
         <tr>
@@ -183,17 +183,19 @@ export const TradesWidget: React.FC = () => {
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
-    <CardWidgetWrapper>
-      <FilterTools
-        className="widgetFilterTools"
-        resultName="trades"
-        searchValue={search}
-        handleSearch={handleSearch}
-        showFilter={!!search}
-        dataLength={filteredData.length}
-      />
-      <InnerTradesWidget trades={filteredData} />
-    </CardWidgetWrapper>
+    <StandaloneCardWrapper>
+      <CardWidgetWrapper>
+        <FilterTools
+          className="widgetFilterTools"
+          resultName="trades"
+          searchValue={search}
+          handleSearch={handleSearch}
+          showFilter={!!search}
+          dataLength={filteredData.length}
+        />
+        <InnerTradesWidget trades={filteredData} />
+      </CardWidgetWrapper>
+    </StandaloneCardWrapper>
   )
 }
 
