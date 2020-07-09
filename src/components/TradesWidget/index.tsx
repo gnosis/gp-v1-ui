@@ -63,12 +63,12 @@ function csvTransformer(trade: Trade): CsvColumns {
   return {
     Date: new Date(timestamp).toISOString(),
     Market: `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
-    BuyTokenSymbol: buyToken.symbol || '',
-    BuyTokenAddress: buyToken.address,
-    SellTokenSymbol: sellToken.symbol || '',
-    SellTokenAddress: sellToken.address,
-    LimitPrice: limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
-    FillPrice: formatPrice({ price: fillPrice, decimals: 8 }),
+    'Buy Token symbol': buyToken.symbol || '',
+    'Buy Token address': buyToken.address,
+    'Sell Token symbol': sellToken.symbol || '',
+    'Sell Token address': sellToken.address,
+    'Limit Price': limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
+    'Fill Price': formatPrice({ price: fillPrice, decimals: 8 }),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
@@ -84,10 +84,10 @@ function csvTransformer(trade: Trade): CsvColumns {
       isLocaleAware: false,
     }),
     Type: trade.type || '',
-    TransactionHash: txHash,
-    EventLogIndex: eventIndex.toString(),
-    OrderId: orderId,
-    BatchId: batchId.toString(),
+    'Transaction Hash': txHash,
+    'Event Log Index': eventIndex.toString(),
+    'Order Id': orderId,
+    'Batch Id': batchId.toString(),
   }
 }
 
