@@ -2,6 +2,7 @@ import { delay, generateWCOptions } from 'utils'
 import { STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { logDebug } from 'utils'
+import { connectors } from 'web3modal'
 
 const getWCIfConnected = async (): Promise<unknown> => {
   const { default: WalletConnectProvider } = await import(
@@ -76,7 +77,7 @@ export const getLastProvider = async (): Promise<any> => {
     // last provider is the current injected provider
     // and it's still injected
     if (injectedProviderName && injectedProviderName === lastProviderName) {
-      return connectToInjected()
+      return connectors.injected()
     }
   } catch (error) {
     console.warn('Error connecting to last used provider', lastProviderName, error)
