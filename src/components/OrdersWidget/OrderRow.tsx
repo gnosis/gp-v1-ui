@@ -209,7 +209,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
         'Expired'
       ) : isActiveNextBatch ? (
         <>
-          {`Active in next batch: `} <StatusCountdown />
+          {`Tradable in next batch: `} <StatusCountdown />
         </>
       ) : isFirstActiveBatch ? (
         <>

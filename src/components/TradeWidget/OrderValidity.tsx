@@ -227,7 +227,7 @@ const OrderValidityBox = styled(PriceInputBox)`
 `
 
 const OrderStartsTooltip = (
-  <HelpTooltipContainer>Orders that are valid ASAP will be considered for the next batch.</HelpTooltipContainer>
+  <HelpTooltipContainer>Orders that are valid now will be considered for the next batch.</HelpTooltipContainer>
 )
 
 interface Props {
@@ -316,9 +316,9 @@ const OrderValidity: React.FC<Props> = ({
 
   // This side effect is for not requiring disable on validFrom/Until inputs
   // and auto-magically updating the checkbox/values on change
-  // also allows auto focus and select when manually unchecking ASAP or Never checkboxes
+  // also allows auto focus and select when manually unchecking Now or Never checkboxes
   useEffect(() => {
-    // undefined validFrom input - set ASAP
+    // undefined validFrom input - set Now
     !validFromInputValue
       ? batchedUpdates(() => {
           setAsap(true)
@@ -360,7 +360,7 @@ const OrderValidity: React.FC<Props> = ({
     <Wrapper>
       <div>
         <div>
-          Order starts: <b>{formatTimeInHours(validFrom!, 'ASAP')}</b>
+          Order starts: <b>{formatTimeInHours(validFrom!, 'Now')}</b>
           <HelpTooltip tooltip={OrderStartsTooltip} />
           &nbsp;- expires: <b>{formatTimeInHours(validUntil!, 'Never')}</b>
         </div>
@@ -395,7 +395,7 @@ const OrderValidity: React.FC<Props> = ({
                 onChange={handleASAPClick}
                 tabIndex={tabIndex}
               />
-              <small>ASAP</small>
+              <small>Now</small>
             </div>
           </label>
           <FormInputError errorMessage={validFromError?.message as string} />
