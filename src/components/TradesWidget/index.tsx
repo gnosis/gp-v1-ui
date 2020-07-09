@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
+import BigNumber from 'bignumber.js'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
@@ -48,6 +49,7 @@ function csvTransformer(trade: Trade): CsvColumns {
     fillPrice,
     sellAmount,
     buyAmount,
+    orderSellAmount,
     timestamp,
     txHash,
     eventIndex,
@@ -60,6 +62,10 @@ function csvTransformer(trade: Trade): CsvColumns {
   const fillPriceStr = formatPrice({ price: invertPrice(fillPrice), decimals: 8 })
   const inverseFillPriceStr = formatPrice({ price: fillPrice, decimals: 8 })
 
+  const fillPercentage =
+    orderSellAmount && trade.type != 'liquidity'
+      ? new BigNumber(sellAmount.toString()).dividedBy(new BigNumber(orderSellAmount.toString())).toString(10)
+      : 'N/A'
   // The order of the keys defines csv column order,
   // as well as names and whether to include it or not.
   // We can optionally define an interface for that.
@@ -97,6 +103,7 @@ function csvTransformer(trade: Trade): CsvColumns {
     }),
     'Bought Unit': symbolOrAddress(buyToken),
     Type: trade.type || '',
+    'Fill %': fillPercentage,
     'Transaction Hash': txHash,
     'Event Log Index': eventIndex.toString(),
     'Order Id': orderId,
