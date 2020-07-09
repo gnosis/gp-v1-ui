@@ -16,6 +16,7 @@ import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
 
 // hooks
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
+import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
 export interface HeaderProps {
   [key: string]: {
@@ -65,6 +66,14 @@ const CountDownStyled = styled.div`
  }
 `
 
+const DevdocTooltip = (
+  <HelpTooltipContainer>
+    <a href="https://docs.gnosis.io/protocol/docs/intro-batches" target="_blank" rel="noopener noreferrer">
+      What Is a Batch and a Batch ID?
+    </a>
+  </HelpTooltipContainer>
+)
+
 const BatchCountDown: React.FC = () => {
   const timeRemainingInBatch = useTimeRemainingInBatch()
   return (
@@ -74,6 +83,8 @@ const BatchCountDown: React.FC = () => {
       </div>
       <div>
         Current batch: <strong>{dateToBatchId()}</strong>
+        &nbsp;
+        <HelpTooltip tooltip={DevdocTooltip} />
       </div>
     </CountDownStyled>
   )
