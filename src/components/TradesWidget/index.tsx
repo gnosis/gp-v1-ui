@@ -68,7 +68,9 @@ function csvTransformer(trade: Trade): CsvColumns {
     'Sell Token symbol': sellToken.symbol || '',
     'Sell Token address': sellToken.address,
     'Limit Price': limitPrice ? formatPrice({ price: invertPrice(limitPrice), decimals: 8 }) : 'N/A',
+    'Limit Price Unit': symbolOrAddress(buyToken),
     'Fill Price': formatPrice({ price: invertPrice(fillPrice), decimals: 8 }),
+    'Fill Price Unit': symbolOrAddress(buyToken),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
