@@ -150,7 +150,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
       <small>
-        {displayTokenSymbolOrLink(displayBaseToken)}/{displayTokenSymbolOrLink(displayQuoteToken)}
+        {displayTokenSymbolOrLink(displayQuoteToken)}/{displayTokenSymbolOrLink(displayBaseToken)}
         <SwapIcon swap={swapPrices} />
       </small>
     </>
