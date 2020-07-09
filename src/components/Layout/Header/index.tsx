@@ -50,9 +50,10 @@ const CountDownStyled = styled.div`
   font-family: var(--font-mono);
   font-size: 1.2rem;
   color: var(--color-text-primary);
-  width: 16rem;
+  min-width: 16rem;
   letter-spacing: 0;
   margin: 0.5rem 0;
+  align-items: baseline;
 
   @media ${MEDIA.mobile} {
     flex-flow: row wrap;
