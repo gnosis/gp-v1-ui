@@ -263,9 +263,14 @@ const TokenRow: React.FC<Props> = ({
         <div>
           {editableAndConnected && !tokenDisabled && (
             <>
-              <div className="btn" onClick={(): void => showForm('deposit')}>
+              <TooltipWrapper
+                as="button"
+                type="button"
+                tooltip="Deposit tokens into the Exchange Balance so it can be used for trading"
+                onClick={(): void => showForm('deposit')}
+              >
                 + Deposit
-              </div>
+              </TooltipWrapper>
               {isDepositFormVisible && (
                 <Form
                   title={
@@ -286,7 +291,7 @@ const TokenRow: React.FC<Props> = ({
               )}
             </>
           )}
-          {!readOnly && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
+          {editableAndConnected && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
             {readOnly ? (
