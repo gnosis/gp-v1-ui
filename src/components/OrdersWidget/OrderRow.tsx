@@ -74,13 +74,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   return (
     <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        {price} {displayTokenSymbolOrLink(sellToken)}
-        {'/'}
-        {displayTokenSymbolOrLink(buyToken)}
-        <br />
         {priceInverse} {displayTokenSymbolOrLink(buyToken)}
         {'/'}
         {displayTokenSymbolOrLink(sellToken)}
+        <br />
+        {price} {displayTokenSymbolOrLink(sellToken)}
+        {'/'}
+        {displayTokenSymbolOrLink(buyToken)}
       </div>
     </td>
   )
