@@ -32,7 +32,6 @@ import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { useTokenList } from 'hooks/useTokenList'
 import OrdersWidget from 'pages/Orders'
-import Widget from 'components/Layout/Widget'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -98,7 +97,7 @@ const ContentWrapper = styled.div`
 
 const LiquidityMessage = styled.div`
   font-size: 1.3rem;
-  margin: 2.4rem 0 0;
+  margin: 2rem 0;
   display: flex;
   width: 100%;
   flex-flow: row wrap;
@@ -285,44 +284,42 @@ const PoolingInterface: React.FC = () => {
     ],
   )
   return (
-    <Widget>
-      <PoolingInterfaceWrapper>
-        <FormContext {...methods}>
-          <form onSubmit={handleSubmit(sendTransaction)} noValidate>
-            <h2>New Liquidity Order</h2>
-            <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
+    <PoolingInterfaceWrapper>
+      <FormContext {...methods}>
+        <form onSubmit={handleSubmit(sendTransaction)} noValidate>
+          <h2>New Liquidity Order</h2>
+          <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
 
-            <ContentWrapper>
-              <StepDescription step={step} />
-              {/* Main Components here */}
-              <SubComponents {...restProps} />
-            </ContentWrapper>
+          <ContentWrapper>
+            <StepDescription step={step} />
+            {/* Main Components here */}
+            <SubComponents {...restProps} />
+          </ContentWrapper>
 
-            <LiquidityMessage>
-              <p>
-                Your liquidity is equal to the amount you have deposited into your exchange wallet.
-                <br />
-                <b>
-                  Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
-                </b>
-              </p>
-            </LiquidityMessage>
+          <LiquidityMessage>
+            <p>
+              Your liquidity is equal to the amount you have deposited into your exchange wallet.
+              <br />
+              <b>
+                Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
+              </b>
+            </p>
+          </LiquidityMessage>
 
-            {/* BUTTONS */}
-            <LiquidityButtons
-              handleSubmit={handleSubmit(sendTransaction)}
-              disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
-              disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
-              disableSubmit={!!txHash || isSubmitting}
-              showContinue={step !== LAST_STEP}
-              showFinish={!!txReceipt}
-              showLoader={isSubmitting || !!(txHash && !txReceipt)}
-              showTooltipHover={selectedTokensMap.size < 2}
-              {...restProps}
-            />
-          </form>
-        </FormContext>
-      </PoolingInterfaceWrapper>
+          {/* BUTTONS */}
+          <LiquidityButtons
+            handleSubmit={handleSubmit(sendTransaction)}
+            disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
+            disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
+            disableSubmit={!!txHash || isSubmitting}
+            showContinue={step !== LAST_STEP}
+            showFinish={!!txReceipt}
+            showLoader={isSubmitting || !!(txHash && !txReceipt)}
+            showTooltipHover={selectedTokensMap.size < 2}
+            {...restProps}
+          />
+        </form>
+      </FormContext>
       <OrdersPanel>
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
@@ -336,7 +333,7 @@ const PoolingInterface: React.FC = () => {
           <OrdersWidget displayOnly={'liquidity'} />
         </div>
       </OrdersPanel>
-    </Widget>
+    </PoolingInterfaceWrapper>
   )
 }
 

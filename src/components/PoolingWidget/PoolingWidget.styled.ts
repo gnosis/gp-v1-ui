@@ -4,47 +4,42 @@ import { MEDIA } from 'const'
 // assets
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
+// components
+import { WrappedWidget } from 'components/TradeWidget'
 
-// TODO: this is how I had managed to put both (liquidity and orders) side by side
-// TODO: but with the refactor it's no longer used.
-// TODO: rather than spend time on this, I'll leave as is because I know David will do a much
-// TODO: better and faster job than me
-// export const PoolingWidgetWrapper = styled(Widget)`
-// flex-flow: row nowrap;
-// `
+export const PoolingInterfaceWrapper = styled(WrappedWidget)`
+  min-height: 67rem;
+  font-size: 1.35rem;
+  line-height: 1.25;
 
-export const PoolingInterfaceWrapper = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  padding: 2.4rem 2.4rem 8rem;
-  box-sizing: border-box;
-  align-items: flex-start;
-  align-content: flex-start;
-  position: relative;
-  max-width: 85rem;
-  background: var(--color-background-pageWrapper);
-  box-shadow: var(--box-shadow-wrapper);
-  border-radius: 0.6rem;
-  margin: 0 auto;
-  min-height: 54rem;
-  font-size: 1.4rem;
-  line-height: 1.4;
+  > form {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 2rem 4rem;
+    max-width: 75rem;
+
+    > h2 {
+      margin: 1rem auto 2.4rem;
+      width: 100%;
+      text-align: center;
+      font-weight: var(--font-weight-bold);
+      font-size: 2rem;
+      color: var(--color-text-primary);
+      letter-spacing: 0;
+    }
+  }
+
+  @media ${MEDIA.tablet} {
+    > form {
+      max-width: 100%;
+    }
+  }
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
     padding: 1.6rem 1.6rem 0;
     width: 100%;
     font-size: 1.3rem;
-  }
-
-  form > h2 {
-    margin: 1rem auto 2.4rem;
-    width: 100%;
-    text-align: center;
-    font-weight: var(--font-weight-bold);
-    font-size: 2rem;
-    color: var(--color-text-primary);
-    letter-spacing: 0;
   }
 `
 
@@ -125,18 +120,10 @@ export const StepButtonsWrapper = styled.div`
   display: flex;
   width: 100%;
   margin: auto 0 0;
-  height: 5.6rem;
-  position: absolute;
-  bottom: 0;
-  left: 0;
   border-top: 0.1rem solid var(--color-background-banner);
   justify-content: space-between;
   align-items: center;
-
-  @media ${MEDIA.mobile} {
-    position: relative;
-    height: auto;
-  }
+  padding: 2rem 0 0;
 
   > button,
   > a {

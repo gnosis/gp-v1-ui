@@ -58,11 +58,11 @@ import { updateTradeState } from 'reducers-actions/trade'
 
 import { DevTool } from 'HookFormDevtool'
 
-const WrappedWidget = styled(Widget)`
+export const WrappedWidget = styled(Widget)`
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  height: 75rem;
+  min-height: 75rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
@@ -70,7 +70,6 @@ const WrappedWidget = styled(Widget)`
   box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
   margin: 0 auto;
-  min-height: 63rem;
   font-size: 1.6rem;
   line-height: 1;
 
