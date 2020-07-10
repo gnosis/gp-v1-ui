@@ -328,9 +328,7 @@ const PoolingInterface: React.FC = () => {
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}
-        <div>
-          <OrdersWidget displayOnly="liquidity" />
-        </div>
+        <OrdersWidget displayOnly="liquidity" />
       </OrdersPanel>
     </PoolingInterfaceWrapper>
   )
