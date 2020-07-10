@@ -284,7 +284,7 @@ const PoolingInterface: React.FC = () => {
     ],
   )
   return (
-    <PoolingInterfaceWrapper>
+    <PoolingInterfaceWrapper className={ordersVisible ? '' : 'expanded'}>
       <FormContext {...methods}>
         <form onSubmit={handleSubmit(sendTransaction)} noValidate>
           <h2>New Liquidity Order</h2>
@@ -329,8 +329,7 @@ const PoolingInterface: React.FC = () => {
         />
         {/* Actual orders content */}
         <div>
-          <h5>Your liquidity orders</h5>
-          <OrdersWidget displayOnly={'liquidity'} />
+          <OrdersWidget displayOnly="liquidity" />
         </div>
       </OrdersPanel>
     </PoolingInterfaceWrapper>

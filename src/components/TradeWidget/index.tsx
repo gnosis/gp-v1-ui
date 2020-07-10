@@ -73,6 +73,16 @@ export const WrappedWidget = styled(Widget)`
   font-size: 1.6rem;
   line-height: 1;
 
+  &.expanded {
+    > form {
+      width: 0;
+      overflow: hidden;
+      flex: none;
+      padding: 0;
+      opacity: 0;
+    }
+  }
+
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     flex-flow: column wrap;
     max-height: initial;
@@ -100,14 +110,6 @@ const WrappedForm = styled.form`
   input[type='checkbox']:focus,
   button:focus {
     outline: 1px dotted gray;
-  }
-
-  .expanded & {
-    width: 0;
-    overflow: hidden;
-    flex: none;
-    padding: 0;
-    opacity: 0;
   }
 
   @media ${MEDIA.tablet} {
