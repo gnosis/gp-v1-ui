@@ -1,4 +1,5 @@
 import BN from 'bn.js'
+import BigNumber from 'bignumber.js'
 
 import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
@@ -186,4 +187,8 @@ export function flattenMapOfLists<K, T>(map: Map<K, T[]>): T[] {
 
 export function flattenMapOfSets<K, T>(map: Map<K, Set<T>>): T[] {
   return Array.from(map.values()).reduce<T[]>((acc, set) => acc.concat(Array.from(set)), [])
+}
+
+export function divideBN(numerator: BN, denominator: BN): BigNumber {
+  return new BigNumber(numerator.toString()).dividedBy(denominator.toString())
 }

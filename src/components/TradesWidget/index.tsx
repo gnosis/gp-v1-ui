@@ -1,11 +1,10 @@
 import React, { useCallback, useMemo } from 'react'
-import BigNumber from 'bignumber.js'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-import { formatPrice, TokenDetails, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
+import { formatPrice, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
@@ -23,7 +22,8 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { toCsv, CsvColumns } from 'utils/csv'
 import { filterTradesFn } from 'utils/filter'
 
-import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
+import { getNetworkFromId, isTradeSettled, isTradeReverted, divideBN } from 'utils'
+import { symbolOrAddress } from 'utils/display'
 
 const CsvButtonContainer = styled.div`
   display: flex;
@@ -36,10 +36,6 @@ const SplitHeaderTitle = styled.div`
   display: flex;
   flex-flow: column;
 `
-
-function symbolOrAddress(token: TokenDetails): string {
-  return token.symbol || token.address
-}
 
 function csvTransformer(trade: Trade): CsvColumns {
   const {
@@ -63,9 +59,7 @@ function csvTransformer(trade: Trade): CsvColumns {
   const inverseFillPriceStr = formatPrice({ price: fillPrice, decimals: 8 })
 
   const fillPercentage =
-    orderSellAmount && trade.type != 'liquidity'
-      ? new BigNumber(sellAmount.toString()).dividedBy(new BigNumber(orderSellAmount.toString())).toString(10)
-      : 'N/A'
+    orderSellAmount && trade.type != 'liquidity' ? divideBN(sellAmount, orderSellAmount).toString(10) : 'N/A'
   const totalOrderAmount =
     orderSellAmount && trade.type != 'liquidity'
       ? formatAmountFull({ amount: orderSellAmount, precision: sellToken.decimals, thousandSeparator: false })
