@@ -1,35 +1,9 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
+import { CardWidgetWrapper } from 'components/Layout/Card'
+import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 
-export const OrdersWrapper = styled.div`
-  width: 100%;
-  display: flex;
-  flex-flow: column wrap;
-  position: relative;
-
-  /* In use when accessed as a dedicated page and not part of OrdersPanel */
-  background: var(--color-background-pageWrapper);
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
-  border-radius: 0.6rem;
-  min-height: 54rem;
-  min-width: 85rem;
-  max-width: 140rem;
-  /* ====================================================================== */
-
-  @media ${MEDIA.tabletSmall} {
-    min-width: ${MEDIA.smallScreen};
-  }
-
-  @media ${MEDIA.mobile} {
-    max-width: 100%;
-    min-width: initial;
-    min-height: 25rem;
-    width: 100%;
-  }
-
+export const OrdersWrapper = styled(StandaloneCardWrapper)`
   > h5 {
     width: 100%;
     margin: 0 auto;
@@ -58,6 +32,39 @@ export const OrdersWrapper = styled.div`
     text-align: center;
     line-height: 1.4;
   }
+
+  ${CardWidgetWrapper} {
+    > table {
+      > tbody {
+        > tr.orderRowWrapper {
+          padding-right: 4.3rem;
+
+          @media ${MEDIA.mobile} {
+            display: flex;
+
+            > td.checked {
+              position: absolute;
+              right: 0;
+              height: calc(100% - 3.2rem);
+              width: 3.3rem;
+              padding: 0;
+
+              border: none;
+              border-left: 0.2rem solid rgba(0, 0, 0, 0.075);
+
+              &::before {
+                display: none;
+              }
+
+              > input[type='checkbox'] {
+                margin: auto;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 `
 
 export const ButtonWithIcon = styled.button`
@@ -83,10 +90,13 @@ export const OrdersForm = styled.div`
   > form {
     display: flex;
     flex-flow: column nowrap;
-    height: 59rem;
+    height: 71rem;
 
     @media ${MEDIA.tablet} {
-      height: auto;
+      height: inherit;
+    }
+    @media ${MEDIA.mobile} {
+      height: inherit;
     }
   }
 
@@ -96,13 +106,24 @@ export const OrdersForm = styled.div`
       border-radius: 0 0 1.6rem 0rem;
     }
 
-    .balances-searchTokens {
-      height: 3.6rem;
-      margin: 0.8rem;
-      width: 100%;
+    > label.checked {
+      display: none;
+      justify-content: center;
+      margin: auto 1rem;
+      white-space: nowrap;
 
-      > input {
-        width: 100%;
+      > small {
+        margin-right: 1rem;
+      }
+    }
+
+    @media ${MEDIA.mobile} {
+      > .balances-searchTokens {
+        margin: 0.8rem;
+      }
+
+      > label.checked {
+        display: flex;
       }
     }
   }
@@ -113,7 +134,6 @@ export const OrdersForm = styled.div`
     flex-flow: row nowrap;
     width: 100%;
     justify-content: center;
-    min-height: 6.4rem;
     border-bottom: 0.1rem solid var(--color-text-secondary);
     align-items: center;
 
@@ -123,8 +143,8 @@ export const OrdersForm = styled.div`
 
     .countContainer {
       display: flex;
+      flex-flow: row nowrap;
       width: 100%;
-      height: 100%;
       margin: 0 0 -0.1rem;
       align-items: center;
 
@@ -140,6 +160,7 @@ export const OrdersForm = styled.div`
         outline: 0;
         text-transform: uppercase;
         display: flex;
+        flex: 1 1 25%;
         width: 100%;
         justify-content: center;
         transition: border 0.2s ease-in-out;
@@ -147,27 +168,43 @@ export const OrdersForm = styled.div`
         border-bottom: 0.3rem solid transparent;
         min-height: 6.4rem;
 
-        @media ${MEDIA.mobile} {
-          font-size: 1.3rem;
+        > i {
+          height: 1.8rem;
+          font-weight: inherit;
+          font-size: 1.1rem;
+          color: var(--color-background-pageWrapper);
+          letter-spacing: -0.046rem;
+          text-align: center;
+          background: var(--color-text-secondary);
+          border-radius: 6rem;
+          padding: 0 0.75rem;
+          box-sizing: border-box;
+          line-height: 1.8rem;
+          font-style: normal;
+          display: inline-block;
+          height: 1.8rem;
+          margin: 0 0 0 0.5rem;
         }
-      }
 
-      > button > i {
-        height: 1.8rem;
-        font-weight: inherit;
-        font-size: 1.1rem;
-        color: var(--color-background-pageWrapper);
-        letter-spacing: -0.046rem;
-        text-align: center;
-        background: var(--color-text-secondary);
-        border-radius: 6rem;
-        padding: 0 0.75rem;
-        box-sizing: border-box;
-        line-height: 1.8rem;
-        font-style: normal;
-        display: inline-block;
-        height: 1.8rem;
-        margin: 0 0 0 0.5rem;
+        @media ${MEDIA.mobile} {
+          flex: 1;
+          font-size: 1.2rem;
+          min-height: 5.4rem;
+
+          > i {
+            font-size: 0.9rem;
+            height: 1.3rem;
+            line-height: 1.36rem;
+          }
+        }
+
+        @media ${MEDIA.xSmallDown} {
+          flex-flow: column nowrap;
+
+          > i {
+            margin: 0.3rem auto;
+          }
+        }
       }
 
       > button.selected {
@@ -186,6 +223,10 @@ export const OrdersForm = styled.div`
     padding: 0 0 5rem;
     box-sizing: border-box;
     overflow-y: auto;
+
+    @media ${MEDIA.tablet} {
+      overflow-y: none;
+    }
   }
 
   .checked {

@@ -24,7 +24,7 @@ import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchang
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
-import { CardTable } from 'components/Layout/Card'
+import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { InnerTradesWidget } from 'components/TradesWidget'
 import FilterTools from 'components/FilterTools'
 
@@ -97,11 +97,7 @@ const compareFnFactory = (topic: TopicNames, asc: boolean) => (
   }
 }
 
-interface Props {
-  isWidget?: boolean
-}
-
-const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
+const OrdersWidget: React.FC = () => {
   const { orders: allOrders, pendingOrders: allPendingOrders, forceOrdersRefresh } = useOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
@@ -318,6 +314,10 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
     ],
   )
 
+  const markedForDeletionChecked = !!(
+    classifiedOrders[selectedTab]?.orders?.length > 0 && markedForDeletion.size === displayedOrders.length
+  )
+
   return (
     <OrdersWrapper>
       {!isConnected ? (
@@ -334,19 +334,24 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
-              className={isWidget ? 'widgetFilterTools' : ''}
+              className="widgetFilterTools"
               resultName={tabSpecificResultName}
               searchValue={tabSpecficSearch}
               handleSearch={handleTabSpecificSearch}
               showFilter={!!tabSpecficSearch}
               dataLength={tabSpecificDataLength}
             >
-              {/* implement later when better data concerning order state and can be saved to global state 
-              <label className="balances-hideZero">
-                <input type="checkbox" checked={hideUntouchedOrders} onChange={handleHideUntouchedOrders} />
-                <b>Hide untouched orders</b>
-              </label>
-              */}
+              {selectedTab !== 'fills' && (
+                <label className="checked">
+                  <small>Cancel All Orders:</small>
+                  <input
+                    type="checkbox"
+                    onChange={toggleSelectAll}
+                    checked={markedForDeletionChecked}
+                    disabled={deleting}
+                  />
+                </label>
+              )}
             </FilterTools>
             {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
             <div className="infoContainer">
@@ -388,69 +393,68 @@ const OrdersWidget: React.FC<Props> = ({ isWidget = false }) => {
             {/* FILLS AKA TRADES */}
             {selectedTab === 'fills' ? (
               <div className="ordersContainer">
-                <InnerTradesWidget isTab trades={filteredTrades} />
+                <CardWidgetWrapper className="widgetCardWrapper">
+                  <InnerTradesWidget isTab trades={filteredTrades} />
+                </CardWidgetWrapper>
               </div>
             ) : ordersCount > 0 ? (
               // ACTIVE / LIQUIDITY / CLOSED ORDERS
               <div className="ordersContainer">
-                <CardTable
-                  $columns="3.2rem repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(7.2rem, 0.3fr)"
-                  $gap="0 0.6rem"
-                  $padding="0 0.8rem"
-                  $rowSeparation="0"
-                >
-                  <thead>
-                    <tr>
-                      <th className="checked">
-                        <input
-                          type="checkbox"
-                          onChange={toggleSelectAll}
-                          checked={
-                            markedForDeletion.size > 0 &&
-                            markedForDeletion.size ===
-                              filteredAndSortedPendingOrders.length + filteredAndSortedOrders.length
-                          }
+                <CardWidgetWrapper className="widgetCardWrapper">
+                  <CardTable
+                    $columns="3.2rem repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(8.6rem, 0.3fr)"
+                    $gap="0 0.6rem"
+                    $rowSeparation="0"
+                  >
+                    <thead>
+                      <tr>
+                        <th className="checked">
+                          <input
+                            type="checkbox"
+                            onChange={toggleSelectAll}
+                            checked={markedForDeletionChecked}
+                            disabled={deleting}
+                          />
+                        </th>
+                        <th>Limit price</th>
+                        <th className="filled">Filled / Total</th>
+                        <th
+                          className="sortable"
+                          onClick={(): void => setSortTopic(prev => ({ ...prev, asc: !prev.asc }))}
+                        >
+                          Expires <FontAwesomeIcon size="xs" icon={!sortTopic.asc ? faChevronDown : faChevronUp} />
+                        </th>
+                        <th className="status">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredAndSortedPendingOrders.map(order => (
+                        <OrderRow
+                          key={order.id}
+                          order={order}
+                          networkId={networkId}
+                          isOverBalance={false}
+                          pending
+                          disabled={deleting}
+                          isPendingOrder
+                          transactionHash={order.txHash}
+                        />
+                      ))}
+                      {filteredAndSortedOrders.map(order => (
+                        <OrderRow
+                          key={order.id}
+                          order={order}
+                          networkId={networkId}
+                          isOverBalance={overBalanceOrders.has(order.id)}
+                          isMarkedForDeletion={markedForDeletion.has(order.id)}
+                          toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id, selectedTab)}
+                          pending={deleting && markedForDeletion.has(order.id)}
                           disabled={deleting}
                         />
-                      </th>
-                      <th>Limit price</th>
-                      <th className="filled">Filled / Total</th>
-                      <th
-                        className="sortable"
-                        onClick={(): void => setSortTopic(prev => ({ ...prev, asc: !prev.asc }))}
-                      >
-                        Expires <FontAwesomeIcon size="xs" icon={!sortTopic.asc ? faChevronDown : faChevronUp} />
-                      </th>
-                      <th className="status">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAndSortedPendingOrders.map(order => (
-                      <OrderRow
-                        key={order.id}
-                        order={order}
-                        networkId={networkId}
-                        isOverBalance={false}
-                        pending
-                        disabled={deleting}
-                        isPendingOrder
-                        transactionHash={order.txHash}
-                      />
-                    ))}
-                    {filteredAndSortedOrders.map(order => (
-                      <OrderRow
-                        key={order.id}
-                        order={order}
-                        networkId={networkId}
-                        isOverBalance={overBalanceOrders.has(order.id)}
-                        isMarkedForDeletion={markedForDeletion.has(order.id)}
-                        toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id, selectedTab)}
-                        pending={deleting && markedForDeletion.has(order.id)}
-                        disabled={deleting}
-                      />
-                    ))}
-                  </tbody>
-                </CardTable>
+                      ))}
+                    </tbody>
+                  </CardTable>
+                </CardWidgetWrapper>
               </div>
             ) : (
               <div className="noOrders">

@@ -6,9 +6,7 @@ import { TokenDetails } from 'types'
 import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // assets
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import alertIcon from 'assets/img/alert.svg'
-import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -29,7 +27,7 @@ import {
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
-import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
+import { OrderRowWrapper, ResponsiveTitleRow } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
@@ -47,7 +45,7 @@ const DeleteOrder: React.FC<Pick<
   Props,
   'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
 >> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
-  <td data-label="Actions" className="checked">
+  <td data-label="Cancel Order" className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
@@ -74,7 +72,7 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])
 
   return (
-    <td data-label="Price">
+    <td data-label="Price" className="showResponsive">
       <div className="order-details">
         {price} {displayTokenSymbolOrLink(sellToken)}
         {'/'}
@@ -202,7 +200,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
-    <td className="status">
+    <td className="status showResponsive" data-label="Status">
       {pending ? (
         pending
       ) : isFilled ? (
@@ -257,19 +255,6 @@ function fetchToken(
   }
 }
 
-interface ResponsiveRowSizeTogglerProps {
-  handleOpen: () => void
-  openStatus: boolean
-}
-
-const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
-  return (
-    <td className="cardOpener" onClick={handleOpen}>
-      <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
-    </td>
-  )
-}
-
 interface Props {
   order: DetailedAuctionElement
   isOverBalance: boolean
@@ -298,7 +283,6 @@ const OrderRow: React.FC<Props> = props => {
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
-  const [openCard, setOpenCard] = useSafeState(true)
 
   useEffect(() => {
     fetchToken(order.id, order.buyToken as TokenDetails, setBuyToken, isPendingOrder)
@@ -308,7 +292,7 @@ const OrderRow: React.FC<Props> = props => {
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : ''} $open={openCard}>
+      <OrderRowWrapper data-order-id={order.id} className={pending ? 'pending' : 'orderRowWrapper'}>
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}
@@ -324,7 +308,11 @@ const OrderRow: React.FC<Props> = props => {
           isPendingOrder={isPendingOrder}
           transactionHash={transactionHash}
         />
-        <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
+        <ResponsiveTitleRow className="responsiveRow" data-label="Market">
+          <div>
+            {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
+          </div>
+        </ResponsiveTitleRow>
       </OrderRowWrapper>
     )
   )

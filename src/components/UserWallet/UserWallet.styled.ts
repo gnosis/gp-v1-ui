@@ -167,10 +167,7 @@ export const UserWalletSlideWrapper = styled.div`
   flex-flow: column wrap;
   top: 100%;
   margin: 1rem 0 0;
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  box-shadow: var(--box-shadow-wrapper);
 
   @media ${MEDIA.mobile} {
     width: 100%;

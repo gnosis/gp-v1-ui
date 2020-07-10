@@ -67,6 +67,7 @@ export const PRICES_CACHE_TIME = 60 // in seconds
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',
+  xSmallScreen: '430px',
   smallScreen: '736px',
   smallScreenUp: '737px',
   mediumScreenSmall: '850px',
@@ -74,6 +75,9 @@ export const MEDIA = {
   desktopScreen: '1025px',
   get tinyDown(): string {
     return `only screen and (max-width : ${this.tinyScreen})`
+  },
+  get xSmallDown(): string {
+    return `only screen and (max-width : ${this.xSmallScreen})`
   },
   get mobile(): string {
     return `only screen and (max-width : ${this.smallScreen})`

@@ -32,16 +32,28 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 
   // label + search input
   > .balances-searchTokens {
-    display: flex;
-    width: auto;
-    max-width: 100%;
     position: relative;
-    height: 5.6rem;
-    margin: 1.6rem;
+    display: flex;
+    width: 100%;
+    height: 4rem;
+    margin: 1.2rem;
+
+    @media ${MEDIA.mobile} {
+      height: 4.6rem;
+      margin: 0 0 1.6rem 0;
+
+      > input {
+        flex: 1 1 50%;
+      }
+
+      > ${FormMessage} {
+        bottom: -1.2rem;
+        border-radius: 0 0 1.6rem 0rem;
+      }
+    }
 
     > input {
       margin: 0;
-      width: 35rem;
       max-width: 100%;
       background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
@@ -56,7 +68,6 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 
       @media ${MEDIA.mobile} {
         font-size: 1.3rem;
-        width: 100%;
       }
 
       &::placeholder {
@@ -85,16 +96,6 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 
       &:disabled {
         box-shadow: none;
-      }
-    }
-    @media ${MEDIA.mobile} {
-      width: 100%;
-      height: 4.6rem;
-      margin: 0 0 2.4rem;
-
-      > ${FormMessage} {
-        bottom: -1.2rem;
-        border-radius: 0 0 1.6rem 0rem;
       }
     }
   }
