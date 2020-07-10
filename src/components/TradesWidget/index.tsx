@@ -58,12 +58,19 @@ function csvTransformer(trade: Trade): CsvColumns {
   const fillPriceStr = formatPrice({ price: invertPrice(fillPrice), decimals: 8 })
   const inverseFillPriceStr = formatPrice({ price: fillPrice, decimals: 8 })
 
-  const fillPercentage =
-    orderSellAmount && trade.type != 'liquidity' ? divideBN(sellAmount, orderSellAmount).toString(10) : 'N/A'
-  const totalOrderAmount =
-    orderSellAmount && trade.type != 'liquidity'
-      ? formatAmountFull({ amount: orderSellAmount, precision: sellToken.decimals, thousandSeparator: false })
-      : 'N/A'
+  let fillPercentage = 'N/A'
+  let totalOrderAmount = 'N/A'
+  if (trade.type === 'liquidity') {
+    fillPercentage = 'unlimited'
+    totalOrderAmount = 'unlimited'
+  } else if (orderSellAmount) {
+    fillPercentage = divideBN(sellAmount, orderSellAmount).toString(10)
+    totalOrderAmount = formatAmountFull({
+      amount: orderSellAmount,
+      precision: sellToken.decimals,
+      thousandSeparator: false,
+    })
+  }
 
   // The order of the keys defines csv column order,
   // as well as names and whether to include it or not.
