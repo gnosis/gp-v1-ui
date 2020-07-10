@@ -85,10 +85,10 @@ function csvTransformer(trade: Trade): CsvColumns {
     'Sell Token Address': sellToken.address,
     'Limit Price': limitPriceStr,
     'Fill Price': fillPriceStr,
-    'Price Unit': symbolOrAddress(buyToken),
+    'Price Unit': symbolOrAddress(sellToken),
     'Inverse Limit Price': inverseLimitPriceStr,
     'Inverse Fill Price': inverseFillPriceStr,
-    'Inverse Price Unit': symbolOrAddress(sellToken),
+    'Inverse Price Unit': symbolOrAddress(buyToken),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
