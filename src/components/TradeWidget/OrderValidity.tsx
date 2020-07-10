@@ -227,7 +227,10 @@ const OrderValidityBox = styled(PriceInputBox)`
 `
 
 const OrderStartsTooltip = (
-  <HelpTooltipContainer>Orders that are valid now will be considered for the next batch.</HelpTooltipContainer>
+  <HelpTooltipContainer>
+    Orders configured to start <strong>now</strong> will be considered for the next batch. Click the ⚙️ icon on the
+    right to customise order validity times.
+  </HelpTooltipContainer>
 )
 
 interface Props {
