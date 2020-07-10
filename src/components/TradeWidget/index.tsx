@@ -286,7 +286,10 @@ export const OrdersPanel = styled.div`
     }
 
     @media ${MEDIA.mobile} {
-      display: none;
+      &.hideOnMobile {
+        display: none;
+      }
+
       &.visible {
         display: flex;
         position: fixed;
@@ -997,9 +1000,9 @@ const TradeWidget: React.FC = () => {
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}
-        <div>
+        <div className="hideOnMobile">
           <h5>Your orders</h5>
-          <OrdersWidget displayOnly={'regular'} />
+          <OrdersWidget displayOnly="regular" />
         </div>
       </OrdersPanel>
       {/* React Forms DevTool debugger */}
