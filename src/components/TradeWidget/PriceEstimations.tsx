@@ -34,6 +34,7 @@ const Wrapper = styled.div`
 
     > small {
       justify-self: end;
+      white-space: nowrap;
     }
   }
 `
