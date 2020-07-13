@@ -29,14 +29,14 @@ interface Token {
 
 // Sample response:
 // {
-//   "baseTokenId": "1",
-//   "quoteTokenId": "2",
-//   "buyAmountInBase": 4.6553080250243255e+27,
-//   "sellAmountInQuote": 1000000000000000000
+//   "baseTokenId": 1,
+//   "quoteTokenId": 2,
+//   "buyAmountInBase": "4655308025024325536192659456",
+//   "sellAmountInQuote": "1000000000000000000"
 // }
 interface GetPriceResponse {
-  baseTokenId: string
-  quoteTokenId: string
+  baseTokenId: number
+  quoteTokenId: number
   buyAmountInBase: string
   sellAmountInQuote: string
 }
