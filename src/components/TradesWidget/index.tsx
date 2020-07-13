@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
+import { formatPrice, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
@@ -22,7 +22,8 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { toCsv, CsvColumns } from 'utils/csv'
 import { filterTradesFn } from 'utils/filter'
 
-import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
+import { getNetworkFromId, isTradeSettled, isTradeReverted, divideBN } from 'utils'
+import { symbolOrAddress } from 'utils/display'
 
 const CsvButtonContainer = styled.div`
   display: flex;
@@ -36,10 +37,6 @@ const SplitHeaderTitle = styled.div`
   flex-flow: column;
 `
 
-function symbolOrAddress(token: TokenDetails): string {
-  return token.symbol || token.address
-}
-
 function csvTransformer(trade: Trade): CsvColumns {
   const {
     buyToken,
@@ -48,12 +45,32 @@ function csvTransformer(trade: Trade): CsvColumns {
     fillPrice,
     sellAmount,
     buyAmount,
+    orderSellAmount,
     timestamp,
     txHash,
     eventIndex,
     orderId,
     batchId,
   } = trade
+
+  const limitPriceStr = limitPrice ? formatPrice({ price: invertPrice(limitPrice), decimals: 8 }) : 'N/A'
+  const inverseLimitPriceStr = limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A'
+  const fillPriceStr = formatPrice({ price: invertPrice(fillPrice), decimals: 8 })
+  const inverseFillPriceStr = formatPrice({ price: fillPrice, decimals: 8 })
+
+  let fillPercentage = 'N/A'
+  let totalOrderAmount = 'N/A'
+  if (trade.type === 'liquidity') {
+    fillPercentage = 'unlimited'
+    totalOrderAmount = 'unlimited'
+  } else if (orderSellAmount) {
+    fillPercentage = divideBN(sellAmount, orderSellAmount).toString(10)
+    totalOrderAmount = formatAmountFull({
+      amount: orderSellAmount,
+      precision: sellToken.decimals,
+      thousandSeparator: false,
+    })
+  }
 
   // The order of the keys defines csv column order,
   // as well as names and whether to include it or not.
@@ -63,12 +80,16 @@ function csvTransformer(trade: Trade): CsvColumns {
   return {
     Date: new Date(timestamp).toISOString(),
     Market: `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
-    'Buy Token symbol': buyToken.symbol || '',
-    'Buy Token address': buyToken.address,
-    'Sell Token symbol': sellToken.symbol || '',
-    'Sell Token address': sellToken.address,
-    'Limit Price': limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
-    'Fill Price': formatPrice({ price: fillPrice, decimals: 8 }),
+    'Buy Token Symbol': buyToken.symbol || '',
+    'Buy Token Address': buyToken.address,
+    'Sell Token Symbol': sellToken.symbol || '',
+    'Sell Token Address': sellToken.address,
+    'Limit Price': limitPriceStr,
+    'Fill Price': fillPriceStr,
+    'Price Unit': symbolOrAddress(sellToken),
+    'Inverse Limit Price': inverseLimitPriceStr,
+    'Inverse Fill Price': inverseFillPriceStr,
+    'Inverse Price Unit': symbolOrAddress(buyToken),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
@@ -76,6 +97,7 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
+    'Sold Unit': symbolOrAddress(sellToken),
     Bought: formatAmount({
       amount: buyAmount,
       precision: buyToken.decimals as number,
@@ -83,7 +105,11 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
+    'Bought Unit': symbolOrAddress(buyToken),
     Type: trade.type || '',
+    'Fill %': fillPercentage,
+    'Total Order Amount': totalOrderAmount,
+    'Total Order Amount Unit': symbolOrAddress(sellToken),
     'Transaction Hash': txHash,
     'Event Log Index': eventIndex.toString(),
     'Order Id': orderId,
