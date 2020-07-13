@@ -43,10 +43,9 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
     > table {
       > tbody {
         > tr.orderRowWrapper {
-          padding-right: 4.3rem;
-
           @media ${MEDIA.mobile} {
             display: flex;
+            padding-right: 4.3rem;
 
             > td.checked {
               position: absolute;

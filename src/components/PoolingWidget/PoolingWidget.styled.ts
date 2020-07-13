@@ -35,7 +35,6 @@ export const StepDescriptionWrapper = styled.div`
 `
 
 export const PoolingInterfaceWrapper = styled(WrappedWidget)`
-  min-height: 67rem;
   font-size: 1.35rem;
   line-height: 1.25;
 

@@ -59,10 +59,10 @@ import { updateTradeState } from 'reducers-actions/trade'
 import { DevTool } from 'HookFormDevtool'
 
 export const WrappedWidget = styled(Widget)`
+  height: 73rem;
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  height: 73rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
@@ -74,6 +74,8 @@ export const WrappedWidget = styled(Widget)`
   line-height: 1;
 
   &.expanded {
+    width: calc(50vw + 50rem);
+
     > form {
       width: 0;
       overflow: hidden;
@@ -253,7 +255,8 @@ export const ExpandableOrdersPanel = styled.div`
 
   // Orders widget when inside the ExpandableOrdersPanel
   ${OrdersWrapper} {
-    height: 100%;
+    width: calc(100% - 1.6rem);
+    height: 90%;
     background: transparent;
     box-shadow: none;
     border-radius: 0;
@@ -284,7 +287,7 @@ export const ExpandableOrdersPanel = styled.div`
 
   > div.ordersTogglerContainer {
     height: 100%;
-    width: calc(100% - 1.6rem);
+    width: 100%;
     box-sizing: border-box;
     display: flex;
     flex-flow: column nowrap;
@@ -295,6 +298,7 @@ export const ExpandableOrdersPanel = styled.div`
       flex: 0 0 5rem;
       align-items: center;
       justify-content: center;
+      height: 10%;
       width: 100%;
       margin: 0;
       padding: 0;
