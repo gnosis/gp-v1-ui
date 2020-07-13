@@ -44,16 +44,16 @@ export const ContentPage = styled.div`
 `
 
 export const StandaloneCardWrapper = styled.div`
+  height: 100%;
   width: 100%;
   display: flex;
   flex-flow: column wrap;
   position: relative;
 
-  /* In use when accessed as a dedicated page and not part of OrdersPanel */
+  /* In use when accessed as a dedicated page and not part of ExpandableOrdersPanel */
   background: var(--color-background-pageWrapper);
   box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
-  min-height: 54rem;
   min-width: 85rem;
   max-width: 140rem;
   /* ====================================================================== */

@@ -13,7 +13,7 @@ import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 
 // components
-import { OrdersPanel, OrdersToggler } from 'components/TradeWidget'
+import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
@@ -93,6 +93,8 @@ const ContentWrapper = styled.div`
   flex-flow: row wrap;
   font-size: inherit;
   line-height: inherit;
+
+  overflow-y: auto;
 `
 
 const LiquidityMessage = styled.div`
@@ -320,7 +322,7 @@ const PoolingInterface: React.FC = () => {
           />
         </form>
       </FormContext>
-      <OrdersPanel>
+      <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
           type="button"
@@ -329,7 +331,7 @@ const PoolingInterface: React.FC = () => {
         />
         {/* Actual orders content */}
         <OrdersWidget displayOnly="liquidity" />
-      </OrdersPanel>
+      </ExpandableOrdersPanel>
     </PoolingInterfaceWrapper>
   )
 }

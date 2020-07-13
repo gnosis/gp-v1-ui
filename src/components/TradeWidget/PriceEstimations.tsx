@@ -30,7 +30,8 @@ const Wrapper = styled.div`
     grid-template-columns: 4fr 1fr 1fr;
     gap: 0.25rem;
     font-size: 1.25rem;
-    align-items: center;
+    align-items: flex-start;
+    line-height: 1.4;
 
     > small {
       justify-self: end;
