@@ -55,6 +55,17 @@ const DeleteOrder: React.FC<Pick<
   </td>
 )
 
+interface MarketProps {
+  sellToken: TokenDetails
+  buyToken: TokenDetails
+}
+
+const Market: React.FC<MarketProps> = ({ sellToken, buyToken }) => (
+  <td data-label="Market">
+    {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
+  </td>
+)
+
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
   sellToken: TokenDetails
@@ -74,13 +85,11 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   return (
     <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        {price} {displayTokenSymbolOrLink(sellToken)}
-        {'/'}
-        {displayTokenSymbolOrLink(buyToken)}
+        <strong>
+          {priceInverse} {displayTokenSymbolOrLink(sellToken)}
+        </strong>
         <br />
-        {priceInverse} {displayTokenSymbolOrLink(buyToken)}
-        {'/'}
-        {displayTokenSymbolOrLink(sellToken)}
+        {price} {displayTokenSymbolOrLink(buyToken)}
       </div>
     </td>
   )
@@ -299,6 +308,7 @@ const OrderRow: React.FC<Props> = props => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
+        <Market sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />

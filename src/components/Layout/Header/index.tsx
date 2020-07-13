@@ -16,6 +16,7 @@ import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
 
 // hooks
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
+import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
 export interface HeaderProps {
   [key: string]: {
@@ -49,9 +50,10 @@ const CountDownStyled = styled.div`
   font-family: var(--font-mono);
   font-size: 1.2rem;
   color: var(--color-text-primary);
-  width: 16rem;
+  min-width: 16rem;
   letter-spacing: 0;
   margin: 0.5rem 0;
+  align-items: baseline;
 
   @media ${MEDIA.mobile} {
     flex-flow: row wrap;
@@ -65,6 +67,22 @@ const CountDownStyled = styled.div`
  }
 `
 
+const DevdocTooltip = (
+  <HelpTooltipContainer>
+    <p>
+      On Gnosis Protocol, orders placed on-chain are not immediately executed, but rather collected and aggregated to be
+      settled in batches. These batch order settlements occur every 5 minutes consecutively.
+    </p>
+    <p>
+      Learn more{' '}
+      <a href="https://docs.gnosis.io/protocol/docs/intro-batches" target="_blank" rel="noopener noreferrer">
+        here
+      </a>
+      .
+    </p>
+  </HelpTooltipContainer>
+)
+
 const BatchCountDown: React.FC = () => {
   const timeRemainingInBatch = useTimeRemainingInBatch()
   return (
@@ -74,6 +92,8 @@ const BatchCountDown: React.FC = () => {
       </div>
       <div>
         Current batch: <strong>{dateToBatchId()}</strong>
+        &nbsp;
+        <HelpTooltip tooltip={DevdocTooltip} />
       </div>
     </CountDownStyled>
   )
