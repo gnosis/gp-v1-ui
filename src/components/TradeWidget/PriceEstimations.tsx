@@ -34,6 +34,7 @@ const Wrapper = styled.div`
 
     > small {
       justify-self: end;
+      white-space: nowrap;
     }
   }
 `
@@ -150,7 +151,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
       <small>
-        {displayTokenSymbolOrLink(displayBaseToken)}/{displayTokenSymbolOrLink(displayQuoteToken)}
+        {displayTokenSymbolOrLink(displayQuoteToken)}/{displayTokenSymbolOrLink(displayBaseToken)}
         <SwapIcon swap={swapPrices} />
       </small>
     </>

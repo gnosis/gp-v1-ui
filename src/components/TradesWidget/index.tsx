@@ -4,12 +4,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-import { formatPrice, TokenDetails, formatAmount } from '@gnosis.pm/dex-js'
+import { formatPrice, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
+import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 import { TradeRow } from 'components/TradesWidget/TradeRow'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -21,23 +22,20 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { toCsv, CsvColumns } from 'utils/csv'
 import { filterTradesFn } from 'utils/filter'
 
-import { getNetworkFromId, isTradeSettled, isTradeReverted } from 'utils'
+import { getNetworkFromId, isTradeSettled, isTradeReverted, divideBN } from 'utils'
+import { symbolOrAddress } from 'utils/display'
 
 const CsvButtonContainer = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  width: 75%;
 `
 
 const SplitHeaderTitle = styled.div`
   display: flex;
   flex-flow: column;
 `
-
-function symbolOrAddress(token: TokenDetails): string {
-  return token.symbol || token.address
-}
 
 function csvTransformer(trade: Trade): CsvColumns {
   const {
@@ -47,12 +45,32 @@ function csvTransformer(trade: Trade): CsvColumns {
     fillPrice,
     sellAmount,
     buyAmount,
+    orderSellAmount,
     timestamp,
     txHash,
     eventIndex,
     orderId,
     batchId,
   } = trade
+
+  const limitPriceStr = limitPrice ? formatPrice({ price: invertPrice(limitPrice), decimals: 8 }) : 'N/A'
+  const inverseLimitPriceStr = limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A'
+  const fillPriceStr = formatPrice({ price: invertPrice(fillPrice), decimals: 8 })
+  const inverseFillPriceStr = formatPrice({ price: fillPrice, decimals: 8 })
+
+  let fillPercentage = 'N/A'
+  let totalOrderAmount = 'N/A'
+  if (trade.type === 'liquidity') {
+    fillPercentage = 'unlimited'
+    totalOrderAmount = 'unlimited'
+  } else if (orderSellAmount) {
+    fillPercentage = divideBN(sellAmount, orderSellAmount).toString(10)
+    totalOrderAmount = formatAmountFull({
+      amount: orderSellAmount,
+      precision: sellToken.decimals,
+      thousandSeparator: false,
+    })
+  }
 
   // The order of the keys defines csv column order,
   // as well as names and whether to include it or not.
@@ -62,12 +80,16 @@ function csvTransformer(trade: Trade): CsvColumns {
   return {
     Date: new Date(timestamp).toISOString(),
     Market: `${symbolOrAddress(buyToken)}/${symbolOrAddress(sellToken)}`,
-    BuyTokenSymbol: buyToken.symbol || '',
-    BuyTokenAddress: buyToken.address,
-    SellTokenSymbol: sellToken.symbol || '',
-    SellTokenAddress: sellToken.address,
-    LimitPrice: limitPrice ? formatPrice({ price: limitPrice, decimals: 8 }) : 'N/A',
-    FillPrice: formatPrice({ price: fillPrice, decimals: 8 }),
+    'Buy Token Symbol': buyToken.symbol || '',
+    'Buy Token Address': buyToken.address,
+    'Sell Token Symbol': sellToken.symbol || '',
+    'Sell Token Address': sellToken.address,
+    'Limit Price': limitPriceStr,
+    'Fill Price': fillPriceStr,
+    'Price Unit': symbolOrAddress(sellToken),
+    'Inverse Limit Price': inverseLimitPriceStr,
+    'Inverse Fill Price': inverseFillPriceStr,
+    'Inverse Price Unit': symbolOrAddress(buyToken),
     Sold: formatAmount({
       amount: sellAmount,
       precision: sellToken.decimals as number,
@@ -75,6 +97,7 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
+    'Sold Unit': symbolOrAddress(sellToken),
     Bought: formatAmount({
       amount: buyAmount,
       precision: buyToken.decimals as number,
@@ -82,11 +105,15 @@ function csvTransformer(trade: Trade): CsvColumns {
       thousandSeparator: false,
       isLocaleAware: false,
     }),
+    'Bought Unit': symbolOrAddress(buyToken),
     Type: trade.type || '',
-    TransactionHash: txHash,
-    EventLogIndex: eventIndex.toString(),
-    OrderId: orderId,
-    BatchId: batchId.toString(),
+    'Fill %': fillPercentage,
+    'Total Order Amount': totalOrderAmount,
+    'Total Order Amount Unit': symbolOrAddress(sellToken),
+    'Transaction Hash': txHash,
+    'Event Log Index': eventIndex.toString(),
+    'Order Id': orderId,
+    'Batch Id': batchId.toString(),
   }
 }
 
@@ -125,8 +152,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $padding="0 0 0 2rem"
-      $columns={`1fr 0.8fr 0.9fr 1.2fr 6.5rem ${isTab ? '1.23fr' : '0.74fr'}`}
+      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
     >
       <thead>
         <tr>
@@ -183,17 +209,19 @@ export const TradesWidget: React.FC = () => {
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
-    <CardWidgetWrapper>
-      <FilterTools
-        className="widgetFilterTools"
-        resultName="trades"
-        searchValue={search}
-        handleSearch={handleSearch}
-        showFilter={!!search}
-        dataLength={filteredData.length}
-      />
-      <InnerTradesWidget trades={filteredData} />
-    </CardWidgetWrapper>
+    <StandaloneCardWrapper>
+      <CardWidgetWrapper>
+        <FilterTools
+          className="widgetFilterTools"
+          resultName="trades"
+          searchValue={search}
+          handleSearch={handleSearch}
+          showFilter={!!search}
+          dataLength={filteredData.length}
+        />
+        <InnerTradesWidget trades={filteredData} />
+      </CardWidgetWrapper>
+    </StandaloneCardWrapper>
   )
 }
 

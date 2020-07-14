@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
-import BigNumber from 'bignumber.js'
 import { formatDistanceStrict } from 'date-fns'
 
 import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
@@ -8,10 +7,27 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/EtherscanLink'
+import { FoldableRowWrapper } from 'components/Layout/Card'
 
-import { isTradeSettled } from 'utils'
+import { isTradeSettled, divideBN, formatPercentage } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { ONE_HUNDRED_BIG_NUMBER } from 'const'
+import { MEDIA } from 'const'
+
+const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
+  @media ${MEDIA.mobile} {
+    &&&&& {
+      display: flex;
+      td[data-label='Market'] {
+        order: -1;
+        border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+      }
+
+      td[data-label='View on Etherscan'] {
+        border-bottom: none;
+      }
+    }
+  }
+`
 
 interface TradeRowProps {
   trade: Trade
@@ -45,28 +61,6 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
-// TODO: move to dex-js
-/**
- * Formats percentage values with 2 decimals of precision.
- * Adds `%` at the end
- * Adds `<` at start when smaller than 0.01
- * Adds `>` at start when greater than 99.99
- *
- * @param percentage Raw percentage value. E.g.: 50% == 0.5
- */
-function formatPercentage(percentage: BigNumber): string {
-  const displayPercentage = percentage.times(ONE_HUNDRED_BIG_NUMBER)
-  let result = ''
-  if (!displayPercentage.gte('0.01')) {
-    result = '<0.01'
-  } else if (displayPercentage.gt('99.99')) {
-    result = '>99.99'
-  } else {
-    result = displayPercentage.decimalPlaces(2, BigNumber.ROUND_FLOOR).toString(10)
-  }
-  return result + '%'
-}
-
 export const TradeRow: React.FC<TradeRowProps> = params => {
   const { trade, networkId } = params
   const {
@@ -97,9 +91,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       case 'full':
       case 'partial': {
         if (orderSellAmount) {
-          const fillPercentage = formatPercentage(
-            new BigNumber(sellAmount.toString()).dividedBy(new BigNumber(orderSellAmount.toString())),
-          )
+          const fillPercentage = formatPercentage(divideBN(sellAmount, orderSellAmount))
           const orderAmount = formatSmart({
             amount: orderSellAmount,
             precision: sellTokenDecimals,
@@ -116,11 +108,11 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
-    <tr data-order-id={orderId} data-batch-id={batchId}>
-      <td data-label="Date" title={date.toLocaleString()}>
+    <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
+      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <td data-label="Trade">
+      <td data-label="Market" className="showResponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
       <td
@@ -137,7 +129,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         {formatPrice(invertedFillPrice)}
       </td>
       <td
-        data-label="Amount / Received"
+        data-label="Sold / Bought"
+        className="showResponsive"
         title={`${formatAmountFull({
           amount: sellAmount,
           precision: sellTokenDecimals,
@@ -151,8 +144,8 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
         <TypePill tradeType={type}>{type}</TypePill>
       </td>
       <td data-label="View on Etherscan">
-        <EtherscanLink type={'event'} identifier={txHash} networkId={networkId} />
+        <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
       </td>
-    </tr>
+    </TradeRowFoldableWrapper>
   )
 }

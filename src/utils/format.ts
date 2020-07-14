@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import { ONE_HUNDRED_BIG_NUMBER } from 'const'
 
 export {
   formatSmart,
@@ -98,3 +99,25 @@ export const formatTimeToFromBatch = (
   returnType: 'TIME' | 'BATCH' = 'TIME',
   batchLength = 5,
 ): number => (returnType === 'TIME' ? Number(value) * batchLength : Number(value) / batchLength)
+
+// TODO: move to dex-js
+/**
+ * Formats percentage values with 2 decimals of precision.
+ * Adds `%` at the end
+ * Adds `<` at start when smaller than 0.01
+ * Adds `>` at start when greater than 99.99
+ *
+ * @param percentage Raw percentage value. E.g.: 50% == 0.5
+ */
+export function formatPercentage(percentage: BigNumber): string {
+  const displayPercentage = percentage.times(ONE_HUNDRED_BIG_NUMBER)
+  let result = ''
+  if (!displayPercentage.gte('0.01')) {
+    result = '<0.01'
+  } else if (displayPercentage.gt('99.99')) {
+    result = '>99.99'
+  } else {
+    result = displayPercentage.decimalPlaces(2, BigNumber.ROUND_FLOOR).toString(10)
+  }
+  return result + '%'
+}
