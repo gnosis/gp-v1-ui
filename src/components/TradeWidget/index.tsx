@@ -158,7 +158,7 @@ const WrappedForm = styled.form`
     }
 
     > i {
-      margin: 0.3rem 0;
+      margin: 0;
       font-style: normal;
       width: 100%;
 
