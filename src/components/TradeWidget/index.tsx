@@ -21,7 +21,15 @@ import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
 
 // utils
-import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, formatTimeToFromBatch } from 'utils'
+import {
+  getToken,
+  parseAmount,
+  parseBigNumber,
+  dateToBatchId,
+  resolverFactory,
+  formatTimeToFromBatch,
+  logDebug,
+} from 'utils'
 
 // api
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
@@ -862,7 +870,23 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (!buyAmount || !sellAmount || !cachedBuyToken || !cachedSellToken || !networkId) return
+    if (
+      !buyAmount ||
+      buyAmount.isZero() ||
+      !sellAmount ||
+      sellAmount.isZero() ||
+      !cachedBuyToken ||
+      !cachedSellToken ||
+      !networkId
+    ) {
+      logDebug(
+        `Preventing null values on submit: 
+        buyAmount:${buyAmount}, sellAmount:${sellAmount}, 
+        cachedBuyToken:${cachedBuyToken}, cachedSellToken${cachedSellToken}, 
+        networkId:${networkId}`,
+      )
+      return
+    }
     const orderParams = {
       price,
       validFrom: validFromAsBatch,
