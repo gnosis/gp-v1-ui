@@ -10,6 +10,10 @@ export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode |
   return displayName
 }
 
+export function symbolOrAddress(token: TokenDetails): string {
+  return token.symbol || token.address
+}
+
 /**
  * computeMarketProp
  * @description returns array of potentially accepted market names by:: BUYTOKEN <SEPARATOR> SELLTOKEN
