@@ -1,7 +1,9 @@
-import { delay, generateWCOptions } from 'utils'
+import { generateWCOptions } from 'utils'
 import { STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
 import { logDebug } from 'utils'
+import { connectors } from 'web3modal'
+import { IWalletConnectConnectorOptions } from 'web3modal/dist/providers/connectors/walletconnect'
 
 const getWCIfConnected = async (): Promise<unknown> => {
   const { default: WalletConnectProvider } = await import(
@@ -11,50 +13,18 @@ const getWCIfConnected = async (): Promise<unknown> => {
 
   const wcOptions = generateWCOptions()
 
-  const provider = new WalletConnectProvider(wcOptions)
-  if (!provider.wc.connected) return null
-
   try {
-    await Promise.race([
-      // some time for connection to settle
-      delay(250),
-      new Promise((resolve, reject) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        provider.wc.on('disconnect', (error: Error, event: any) => {
-          // wc.connected is set to false here
-          if (error) reject(error)
-          else resolve(event)
-        })
-      }),
-    ])
+    const provider = (await connectors.walletconnect(
+      WalletConnectProvider,
+      wcOptions as IWalletConnectConnectorOptions,
+    )) as InstanceType<typeof WalletConnectProvider>
 
     if (!provider.wc.connected) return null
-
-    await provider.enable()
+    return provider
   } catch (error) {
     console.warn('Error reestablishing previous WC connection', error)
     return null
   }
-
-  return provider
-}
-
-// from web3connect/providers/connectors/injected.ts
-const connectToInjected = async (): Promise<unknown> => {
-  let provider
-  if (window.ethereum) {
-    provider = window.ethereum
-    try {
-      await window.ethereum.enable()
-    } catch (error) {
-      throw new Error('User Rejected')
-    }
-  } else if (window.web3 && window.web3.currentProvider && typeof window.web3.currentProvider === 'object') {
-    provider = window.web3.currentProvider
-  } else {
-    throw new Error('No Web3 Provider found')
-  }
-  return provider
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,7 +46,7 @@ export const getLastProvider = async (): Promise<any> => {
     // last provider is the current injected provider
     // and it's still injected
     if (injectedProviderName && injectedProviderName === lastProviderName) {
-      return connectToInjected()
+      return connectors.injected()
     }
   } catch (error) {
     console.warn('Error connecting to last used provider', lastProviderName, error)
