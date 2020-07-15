@@ -7,8 +7,34 @@ import arrowWhite from 'assets/img/arrow-white.svg'
 // components
 import { WrappedWidget } from 'components/TradeWidget'
 
+export const StepDescriptionWrapper = styled.div`
+  width: 50%;
+  padding: 0 2.4rem 0 0;
+  box-sizing: border-box;
+
+  .liqContent {
+    color: var(--color-text-primary);
+    font-size: inherit;
+    line-height: inherit;
+    margin: 1.6rem 0 0;
+
+    > ul {
+      list-style: none;
+      padding-inline-start: 2rem;
+      padding: 0;
+    }
+
+    > ul > li {
+      margin: 0 0 0.5rem;
+    }
+
+    > ul > li > img {
+      margin: 0 0.5rem 0 0;
+    }
+  }
+`
+
 export const PoolingInterfaceWrapper = styled(WrappedWidget)`
-  min-height: 67rem;
   font-size: 1.35rem;
   line-height: 1.25;
 
@@ -37,9 +63,18 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
-    padding: 1.6rem 1.6rem 0;
     width: 100%;
     font-size: 1.3rem;
+
+    > form {
+      max-width: 100%;
+      padding: 1.6rem;
+    }
+
+    ${StepDescriptionWrapper} {
+      width: 100%;
+      padding: 0;
+    }
   }
 `
 
@@ -240,38 +275,6 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
   > ${StepSeparator} {
     @media ${MEDIA.mobile} {
       margin: 0 0 2.1rem;
-    }
-  }
-`
-
-export const StepDescriptionWrapper = styled.div`
-  width: 50%;
-  padding: 0 2.4rem 0 0;
-  box-sizing: border-box;
-
-  @media ${MEDIA.mobile} {
-    width: 100%;
-    padding: 0;
-  }
-
-  .liqContent {
-    color: var(--color-text-primary);
-    font-size: inherit;
-    line-height: inherit;
-    margin: 1.6rem 0 0;
-
-    > ul {
-      list-style: none;
-      padding-inline-start: 2rem;
-      padding: 0;
-    }
-
-    > ul > li {
-      margin: 0 0 0.5rem;
-    }
-
-    > ul > li > img {
-      margin: 0 0.5rem 0 0;
     }
   }
 `
