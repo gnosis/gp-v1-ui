@@ -63,9 +63,13 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
-    padding: 1.6rem 1.6rem 0;
     width: 100%;
     font-size: 1.3rem;
+
+    > form {
+      max-width: 100%;
+      padding: 1.6rem;
+    }
 
     ${StepDescriptionWrapper} {
       width: 100%;
