@@ -18,6 +18,7 @@ import useSafeState from 'hooks/useSafeState'
 import useDataFilter from 'hooks/useDataFilter'
 import useSortByTopic from 'hooks/useSortByTopic'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import useTabs from 'hooks/useTabs'
 
 // Api
 import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchange/ExchangeApi'
@@ -34,19 +35,6 @@ import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
 type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
-
-interface ShowOrdersButtonProps {
-  type: OrderTabs
-  isActive: boolean
-  count: number
-  onClick: (event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>) => void
-}
-
-const ShowOrdersButton: React.FC<ShowOrdersButtonProps> = ({ type, isActive, count, onClick }) => (
-  <button type="button" className={isActive ? 'selected' : ''} onClick={onClick}>
-    {type} <i>{count}</i>
-  </button>
-)
 
 type FilteredOrdersStateKeys = Exclude<OrderTabs, 'fills'>
 type FilteredOrdersState = {
@@ -104,11 +92,11 @@ const OrdersWidget: React.FC = () => {
 
   // allOrders and markedForDeletion, split by tab
   const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState)
-  const [selectedTab, setSelectedTab] = useSafeState<OrderTabs>('active')
 
   // Subscribe to trade events
   const trades = useTrades()
 
+  const { selectedTab, Tabs } = useTabs<OrderTabs>('active')
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
     () => ({
@@ -117,18 +105,6 @@ const OrdersWidget: React.FC = () => {
       markedForDeletion: selectedTab === 'fills' ? new Set<string>() : classifiedOrders[selectedTab].markedForDeletion,
     }),
     [classifiedOrders, selectedTab],
-  )
-
-  const setSelectedTabFactory = useCallback(
-    (type: OrderTabs): ((event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>) => void) => (
-      event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>,
-    ): void => {
-      // form is being submitted when clicking on tab buttons, thus preventing default
-      event.preventDefault()
-
-      setSelectedTab(type)
-    },
-    [setSelectedTab],
   )
 
   // Update classifiedOrders state whenever there's a change to allOrders
@@ -354,34 +330,27 @@ const OrdersWidget: React.FC = () => {
               )}
             </FilterTools>
             {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
-            <div className="infoContainer">
-              <div className="countContainer">
-                <ShowOrdersButton
-                  type="active"
-                  isActive={selectedTab === 'active'}
-                  count={classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length}
-                  onClick={setSelectedTabFactory('active')}
-                />
-                <ShowOrdersButton
-                  type="fills"
-                  isActive={selectedTab === 'fills'}
-                  count={trades.length}
-                  onClick={setSelectedTabFactory('fills')}
-                />
-                <ShowOrdersButton
-                  type="liquidity"
-                  isActive={selectedTab === 'liquidity'}
-                  count={classifiedOrders.liquidity.orders.length + classifiedOrders.liquidity.pendingOrders.length}
-                  onClick={setSelectedTabFactory('liquidity')}
-                />
-                <ShowOrdersButton
-                  type="closed"
-                  isActive={selectedTab === 'closed'}
-                  count={classifiedOrders.closed.orders.length + classifiedOrders.closed.pendingOrders.length}
-                  onClick={setSelectedTabFactory('closed')}
-                />
-              </div>
-            </div>
+            <Tabs
+              tabsList={[
+                {
+                  type: 'active',
+                  count: classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length,
+                },
+                {
+                  type: 'fills',
+                  count: trades.length,
+                },
+                {
+                  type: 'liquidity',
+                  count: classifiedOrders.liquidity.orders.length + classifiedOrders.active.pendingOrders.length,
+                },
+                {
+                  type: 'closed',
+                  count: classifiedOrders.closed.orders.length + classifiedOrders.active.pendingOrders.length,
+                },
+              ]}
+            />
+
             {/* DELETE ORDERS ROW */}
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
               <b>↴</b>
