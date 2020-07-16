@@ -44,7 +44,6 @@
     "combine-reducers": "^1.0.0",
     "date-fns": "^2.9.0",
     "detect-browser": "^5.1.0",
-    "eth-json-rpc-middleware": "^4.4.1",
     "json-rpc-engine": "^5.1.8",
     "modali": "^1.2.0",
     "node-cache": "^5.1.0",
@@ -58,7 +57,7 @@
     "react-select": "^3.0.8",
     "react-toastify": "^5.5.0",
     "styled-components": "^5.0.0",
-    "web3": "^1.2.9-rc.0",
+    "web3": "^1.2.10-rc.0",
     "web3modal": "^1.6.3"
   },
   "devDependencies": {
