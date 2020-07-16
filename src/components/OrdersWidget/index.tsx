@@ -18,7 +18,7 @@ import useSafeState from 'hooks/useSafeState'
 import useDataFilter from 'hooks/useDataFilter'
 import useSortByTopic from 'hooks/useSortByTopic'
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import useTabs from 'hooks/useTabs'
+import { useTabs, Tabs, TabData } from 'hooks/useTabs'
 
 // Api
 import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchange/ExchangeApi'
@@ -96,7 +96,35 @@ const OrdersWidget: React.FC = () => {
   // Subscribe to trade events
   const trades = useTrades()
 
-  const { selectedTab, Tabs } = useTabs<OrderTabs>('active')
+  const tabList = useMemo<TabData<OrderTabs>[]>(
+    () => [
+      {
+        type: 'active',
+        count: classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length,
+      },
+      {
+        type: 'fills',
+        count: trades.length,
+      },
+      {
+        type: 'liquidity',
+        count: classifiedOrders.liquidity.orders.length + classifiedOrders.active.pendingOrders.length,
+      },
+      {
+        type: 'closed',
+        count: classifiedOrders.closed.orders.length + classifiedOrders.active.pendingOrders.length,
+      },
+    ],
+    [
+      classifiedOrders.active.orders.length,
+      classifiedOrders.active.pendingOrders.length,
+      classifiedOrders.closed.orders.length,
+      classifiedOrders.liquidity.orders.length,
+      trades.length,
+    ],
+  )
+
+  const { selectedTab, tabsProps } = useTabs<OrderTabs>('active', tabList)
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
     () => ({
@@ -330,26 +358,7 @@ const OrdersWidget: React.FC = () => {
               )}
             </FilterTools>
             {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
-            <Tabs
-              tabsList={[
-                {
-                  type: 'active',
-                  count: classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length,
-                },
-                {
-                  type: 'fills',
-                  count: trades.length,
-                },
-                {
-                  type: 'liquidity',
-                  count: classifiedOrders.liquidity.orders.length + classifiedOrders.active.pendingOrders.length,
-                },
-                {
-                  type: 'closed',
-                  count: classifiedOrders.closed.orders.length + classifiedOrders.active.pendingOrders.length,
-                },
-              ]}
-            />
+            <Tabs<OrderTabs> {...tabsProps} />
 
             {/* DELETE ORDERS ROW */}
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
