@@ -2,7 +2,7 @@
 import React, { useCallback, Dispatch, SetStateAction, useRef, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, Controller, Control, FieldError } from 'react-hook-form'
 
 // assets
 import cog from 'assets/img/cog.svg'
@@ -22,6 +22,60 @@ import { FormInputError } from 'components/TradeWidget/FormMessage'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
+import useTabs from 'hooks/useTabs'
+
+import { DateTimePicker, BaseDateTimePickerProps } from '@material-ui/pickers'
+import TextField from '@material-ui/core/TextField'
+import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns'
+
+interface TimePickerProps extends BaseDateTimePickerProps {
+  control: Control<TradeFormData>
+  formValues: {
+    value: string
+    setValue: Function
+    errors?: FieldError
+    inputName: keyof TradeFormData
+  }
+}
+
+const TimePicker: React.FC<TimePickerProps> = ({ control, formValues, minDate = new Date(), ...restProps }) => {
+  // const [selectedDate, handleDateChange] = useSafeState<Date | null>(new Date())
+
+  const memoizedDateAdapter = React.useMemo(() => {
+    return new DateFnsAdapter()
+  }, [])
+
+  const currentError = formValues.errors
+
+  return (
+    <Controller
+      render={({ onChange }): JSX.Element => (
+        <DateTimePicker
+          {...restProps}
+          onChange={onChange}
+          dateAdapter={memoizedDateAdapter}
+          value={formValues.value}
+          renderInput={(props): JSX.Element => (
+            <TextField
+              name={formValues.inputName}
+              {...props}
+              error={Boolean(currentError)}
+              helperText={currentError ?? props.helperText}
+              // Make sure that your 3d param is set to `true` in order to run validation
+              // onBlur={() => form.setFieldTouched(name, true, true)}
+            />
+          )}
+          inputFormat="yyyy/MM/dd HH:mm a"
+          ampm={false}
+          minDate={minDate}
+        />
+      )}
+      control={control}
+      name={formValues.inputName}
+      placeholder="Valid From Date"
+    />
+  )
+}
 
 const Wrapper = styled.div`
   display: flex;
@@ -129,7 +183,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     font-size: 1.6rem;
     text-align: left;
     color: var(--color-text-primary);
-    margin: 0 0 2.4rem;
+    margin: 0;
     display: flex;
     align-items: center;
     font-family: var(--font-default);
@@ -152,6 +206,22 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
     &:hover {
       opacity: 1;
+    }
+  }
+
+  .tabsList {
+    height: 4rem;
+    margin-bottom: 2rem;
+    border: none;
+
+    button {
+      border-radius: 0 0 1.6rem 0;
+
+      &.selected {
+        flex: 1 1 75%;
+      }
+
+      transition: all 0.3s ease-in-out;
     }
   }
 
@@ -255,7 +325,10 @@ const OrderValidity: React.FC<Props> = ({
   validUntilInputId,
 }) => {
   const [showOrderConfig, setShowOrderConfig] = useSafeState(false)
-  const { setValue, errors, register, getValues, watch } = useFormContext<TradeFormData>()
+
+  const { selectedTab, Tabs } = useTabs<'basic' | 'advanced'>('basic')
+
+  const { control, setValue, errors, register, getValues, watch } = useFormContext<TradeFormData>()
   const { validFrom, validUntil } = getValues()
 
   const validFromError = errors[validFromInputId]
@@ -268,6 +341,7 @@ const OrderValidity: React.FC<Props> = ({
 
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
+      console.debug('validFromInputValue::', validFromInputValue)
       // sanitize inputs as multiples of 5
       const sanitizedFromValue = makeMultipleOf(5, validFromInputValue)
       const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue)
@@ -275,11 +349,11 @@ const OrderValidity: React.FC<Props> = ({
       batchedUpdates(() => {
         if (!sanitizedFromValue || !sanitizedUntilValue) {
           !sanitizedFromValue
-            ? (setAsap(true), setValue(validFromInputId, undefined, true))
-            : setValue(validFromInputId, sanitizedFromValue.toString(), true)
+            ? (setAsap(true), setValue(validFromInputId, undefined, { shouldValidate: true }))
+            : setValue(validFromInputId, sanitizedFromValue.toString(), { shouldValidate: true })
           !sanitizedUntilValue
-            ? (setUnlimited(true), setValue(validUntilInputId, undefined, true))
-            : setValue(validUntilInputId, sanitizedUntilValue.toString(), true)
+            ? (setUnlimited(true), setValue(validUntilInputId, undefined, { shouldValidate: true }))
+            : setValue(validUntilInputId, sanitizedUntilValue.toString(), { shouldValidate: true })
         }
       })
     }
@@ -325,14 +399,14 @@ const OrderValidity: React.FC<Props> = ({
     !validFromInputValue
       ? batchedUpdates(() => {
           setAsap(true)
-          setValue(validFromInputId, undefined, true)
+          setValue(validFromInputId, undefined, { shouldValidate: true })
         })
       : setAsap(false)
     // undefined validUntil input - set unlimited
     !validUntilInputValue
       ? batchedUpdates(() => {
           setUnlimited(true)
-          setValue(validUntilInputId, undefined, true)
+          setValue(validUntilInputId, undefined, { shouldValidate: true })
         })
       : setUnlimited(false)
   }, [setAsap, setUnlimited, setValue, validFromInputValue, validFromInputId, validUntilInputValue, validUntilInputId])
@@ -341,21 +415,21 @@ const OrderValidity: React.FC<Props> = ({
     const reffedInput = validUntilRef.current!
     setUnlimited(isUnlimited => !isUnlimited)
     if (!isUnlimited) {
-      return setValue(validUntilInputId, undefined, true)
+      return setValue(validUntilInputId, undefined, { shouldValidate: true })
     }
 
     reffedInput.focus()
-    setValue(validUntilInputId, VALID_UNTIL_DEFAULT, true)
+    setValue(validUntilInputId, VALID_UNTIL_DEFAULT, { shouldValidate: true })
     reffedInput.select()
   }
   function handleASAPClick(): void {
     const reffedInput = validFromRef.current!
     setAsap(isAsap => !isAsap)
     if (!isAsap) {
-      return setValue(validFromInputId, undefined, true)
+      return setValue(validFromInputId, undefined, { shouldValidate: true })
     }
     reffedInput.focus()
-    setValue(validFromInputId, VALID_FROM_DEFAULT, true)
+    setValue(validFromInputId, VALID_FROM_DEFAULT, { shouldValidate: true })
     reffedInput.select()
   }
 
@@ -363,7 +437,11 @@ const OrderValidity: React.FC<Props> = ({
     <Wrapper>
       <div>
         <div>
-          Order starts: <b>{formatTimeInHours(validFrom!, 'Now')}</b>
+          Order starts:{' '}
+          <b>
+            {new Date(Number(validFrom!)).toString()} / {Number(validFrom!)}
+          </b>
+          {/* <b>{formatTimeInHours(validFrom!, 'Now')}</b> */}
           <HelpTooltip tooltip={OrderStartsTooltip} />
           &nbsp;- expires: <b>{formatTimeInHours(validUntil!, 'Never')}</b>
         </div>
@@ -374,64 +452,94 @@ const OrderValidity: React.FC<Props> = ({
         <h4>
           Order settings <i onClick={handleShowConfig}>×</i>
         </h4>
-        <OrderValidityBox>
-          <strong>Order starts in (min)</strong>
-          <label>
-            <input
-              className={validFromClassName}
-              name={validFromInputId}
-              type="text"
-              disabled={isDisabled}
-              required
-              ref={(e): void => {
-                register(e!)
-                validFromRef.current = e
-              }}
-              onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex}
-            />
-            <div className="radio-container">
+        <Tabs className="tabsList" tabsList={[{ type: 'basic' }, { type: 'advanced' }]} />
+
+        {/* TODO: fix this crap with display */}
+        <div
+          style={{
+            display: selectedTab === 'basic' ? 'flex' : 'none',
+            flexFlow: 'row nowrap',
+            justifyContent: 'center',
+          }}
+        >
+          <OrderValidityBox>
+            <strong>Order starts in (min)</strong>
+            <label>
               <input
-                type="checkbox"
-                checked={isAsap}
+                className={validFromClassName}
+                name={validFromInputId}
+                type="text"
                 disabled={isDisabled}
-                onChange={handleASAPClick}
+                required
+                ref={(e): void => {
+                  register(e!)
+                  validFromRef.current = e
+                }}
+                onFocus={(e): void => e.target.select()}
                 tabIndex={tabIndex}
               />
-              <small>Now</small>
-            </div>
-          </label>
-          <FormInputError errorMessage={validFromError?.message as string} />
-        </OrderValidityBox>
-        <OrderValidityBox>
-          <strong>Order expires in (min)</strong>
-          <label>
-            <input
-              className={validUntilClassName}
-              name={validUntilInputId}
-              type="text"
-              disabled={isDisabled}
-              required
-              ref={(e): void => {
-                register(e!)
-                validUntilRef.current = e
-              }}
-              onFocus={(e): void => e.target.select()}
-              tabIndex={tabIndex}
-            />
-            <div className="radio-container">
+              <div className="radio-container">
+                <input
+                  type="checkbox"
+                  checked={isAsap}
+                  disabled={isDisabled}
+                  onChange={handleASAPClick}
+                  tabIndex={tabIndex}
+                />
+                <small>Now</small>
+              </div>
+            </label>
+            <FormInputError errorMessage={validFromError?.message as string} />
+          </OrderValidityBox>
+          <OrderValidityBox>
+            <strong>Order expires in (min)</strong>
+            <label>
               <input
-                type="checkbox"
+                className={validUntilClassName}
+                name={validUntilInputId}
+                type="text"
                 disabled={isDisabled}
-                checked={isUnlimited}
-                onChange={handleUnlimitedClick}
+                required
+                ref={(e): void => {
+                  register(e!)
+                  validUntilRef.current = e
+                }}
+                onFocus={(e): void => e.target.select()}
                 tabIndex={tabIndex}
               />
-              <small>Never</small>
-            </div>
-          </label>
-          <FormInputError errorMessage={validUntilError?.message as string} />
-        </OrderValidityBox>
+              <div className="radio-container">
+                <input
+                  type="checkbox"
+                  disabled={isDisabled}
+                  checked={isUnlimited}
+                  onChange={handleUnlimitedClick}
+                  tabIndex={tabIndex}
+                />
+                <small>Never</small>
+              </div>
+            </label>
+            <FormInputError errorMessage={validUntilError?.message as string} />
+          </OrderValidityBox>
+        </div>
+        {/* TODO: fix this crap with display */}
+        <div
+          style={{
+            display: selectedTab === 'basic' ? 'none' : 'flex',
+            flexFlow: 'row nowrap',
+            justifyContent: 'center',
+          }}
+        >
+          <TimePicker
+            control={control}
+            formValues={{
+              value: validFromInputValue!,
+              setValue,
+              errors: validFromError,
+              inputName: validFromInputId,
+            }}
+          />
+        </div>
+
         <span>
           <button
             type="button"
