@@ -240,7 +240,7 @@ const TokenRow: React.FC<Props> = ({
         thousandSeparator: false,
         isLocaleAware: false,
       }),
-      true,
+      { shouldValidate: true },
     )
   }
 

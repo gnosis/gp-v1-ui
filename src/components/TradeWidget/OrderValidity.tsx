@@ -60,7 +60,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ control, formValues, minDate = 
               name={formValues.inputName}
               {...props}
               error={Boolean(currentError)}
-              helperText={currentError ?? props.helperText}
+              // helperText={currentError ?? props.helperText}
               // Make sure that your 3d param is set to `true` in order to run validation
               // onBlur={() => form.setFieldTouched(name, true, true)}
             />

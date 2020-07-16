@@ -1025,7 +1025,7 @@ const TradeWidget: React.FC = () => {
         </div>
       </ExpandableOrdersPanel>
       {/* React Forms DevTool debugger */}
-      {process.env.NODE_ENV === 'development' && <DevTool control={methods.control} />}
+      {/* process.env.NODE_ENV === 'development' && <DevTool control={methods.control} /> */}
     </WrappedWidget>
   )
 }

@@ -23,7 +23,7 @@ export function useNumberInput(params: Params): Result {
   const enforcePrecision = useCallback(() => {
     const newValue = adjustPrecision(inputValue, precision)
     if (inputValue !== newValue) {
-      setValue(inputId, newValue, true)
+      setValue(inputId, newValue, { shouldValidate: true })
     }
   }, [inputId, inputValue, precision, setValue])
 
@@ -43,7 +43,7 @@ export function useNumberInput(params: Params): Result {
       const newValue = formatPartialNumber(value)
 
       if (value != newValue) {
-        setValue(inputId, newValue, true)
+        setValue(inputId, newValue, { shouldValidate: true })
       }
     },
     [inputId, setValue],

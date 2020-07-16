@@ -1,17 +1,17 @@
 import React from 'react'
 import Joi from '@hapi/joi'
 import { UseFormMethods } from 'react-hook-form'
-import { FieldErrors, ResolverError } from 'react-hook-form/dist/types/form'
+import { FieldErrors } from 'react-hook-form/dist/types/form'
 import { ErrorMessage } from '@hookform/error-message'
 import styled from 'styled-components'
 
-import { SettingsFormData } from 'pages/Settings'
+import { SettingsFormData, CustomResolverResult } from 'pages/Settings'
 import { InputBox } from 'components/InputBox'
 import { Input } from 'components/Input'
 
 import { MEDIA } from 'const'
 import { WCOptions } from 'utils'
-import { DeepMap, EmptyObject } from 'react-hook-form/dist/types/utils'
+
 const URLSchema = Joi.string()
   .empty('')
   .optional()
@@ -47,13 +47,7 @@ const WCSettingsSchema = Joi.object({
 } */
 
 // validates only walletconnect slice of form data
-export const wcResolver = async (
-  data: WCOptions,
-): Promise<{
-  values: WCOptions | null
-  errors: ResolverError['errors'] | null
-  name: 'walletconnect'
-}> => {
+export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData> => {
   const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
@@ -79,7 +73,7 @@ export const wcResolver = async (
             [currentError.path[0]]: currentError,
           }
         }, {})
-      : null,
+      : {},
   }
 }
 

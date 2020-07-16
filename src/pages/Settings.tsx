@@ -52,7 +52,7 @@ const SettingsWrapper = styled(ContentPage)`
 `
 
 export interface SettingsFormData {
-  walletconnect: WCOptions
+  walletconnect: WCOptions | {}
 }
 
 export type CustomResolverResult<T extends SettingsFormData, K extends keyof T = keyof T> = ResolverResult<T> & {
@@ -63,8 +63,8 @@ export interface SliceResolver<T extends SettingsFormData, K extends keyof T = k
   (data: T[K]): CustomResolverResult<T>
 }
 
-const composeValuesErrors = <T extends SettingsFormData>(
-  resolvedResults: CustomResolverResult<SettingsFormData, 'walletconnect'>[],
+const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
+  resolvedResults: { errors: null | FieldErrors<T[K]>; values: null | T[K]; name: K }[],
 ): {
   values: T | null
   errors: FieldErrors<T> | null
@@ -174,7 +174,7 @@ const Settings: React.FC = () => {
           <SettingsButtonSubmit type="submit">Apply Settings</SettingsButtonSubmit>
         </ButtonsContainer>
       </form>
-      {process.env.NODE_ENV === 'development' && <DevTool control={control} />}
+      {/* process.env.NODE_ENV === 'development' && <DevTool control={control} /> */}
     </SettingsWrapper>
   )
 }
