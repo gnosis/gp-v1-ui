@@ -11,6 +11,7 @@ import { numberToHex } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
+import { createLoggerMiddleware } from './loggerMiddleware'
 
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
@@ -95,6 +96,11 @@ export const composeProvider = <T extends Provider>(
 ): T => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
+
+  if (process.env.NODE_ENV === 'development') {
+    // Logger middleware
+    engine.push(createLoggerMiddleware())
+  }
 
   engine.push(
     createConditionalMiddleware<[]>(
