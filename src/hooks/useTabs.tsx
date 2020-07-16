@@ -95,61 +95,64 @@ const TabsWrapper = styled.div`
   }
 `
 
-interface TabData<T> {
+export interface TabData<T extends string> {
   type: T
   count?: string | number
 }
 
-interface TabsProps<T> {
+interface TabsProps<T extends string> {
   className?: string
   tabsList?: TabData<T>[]
-}
-
-interface UseTabsReturn<T> {
   selectedTab: T
   setSelectedTabFactory: (type: T) => (event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>) => void
-  Tabs: React.FC<TabsProps<T>>
 }
 
-function useTabs<T>(defaultTab: T): UseTabsReturn<T> {
+interface UseTabsReturn<T extends string> {
+  selectedTab: T
+  tabsProps: Pick<TabsProps<T>, 'tabsList' | 'selectedTab' | 'setSelectedTabFactory'>
+}
+
+export function useTabs<T extends string>(defaultTab: T, tabsList: TabData<T>[] = []): UseTabsReturn<T> {
   const [selectedTab, setSelectedTab] = useSafeState<T>(defaultTab)
-  const setSelectedTabFactory = useCallback(
-    (type: T): ((event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>) => void) => (
-      event: React.SyntheticEvent<HTMLButtonElement | HTMLFormElement>,
-    ): void => {
-      // form is being submitted when clicking on tab buttons, thus preventing default
-      event.preventDefault()
-
-      setSelectedTab(type)
-    },
-    [setSelectedTab],
-  )
-
-  const Tabs: React.FC<TabsProps<T>> = ({ children, className, tabsList = [] }) => {
-    return (
-      <TabsWrapper className={className}>
-        <div className="countContainer">
-          {children ||
-            tabsList.map((tab, index) => (
-              <button
-                key={index}
-                type="button"
-                className={tab.type === selectedTab ? 'selected' : ''}
-                onClick={setSelectedTabFactory(tab.type)}
-              >
-                {tab.type} {tab.count && <i>{tab.count}</i>}
-              </button>
-            ))}
-        </div>
-      </TabsWrapper>
-    )
-  }
+  const setSelectedTabFactory = useCallback((type: T): (() => void) => (): void => setSelectedTab(type), [
+    setSelectedTab,
+  ])
 
   return {
-    Tabs,
     selectedTab,
-    setSelectedTabFactory,
+    tabsProps: {
+      selectedTab,
+      tabsList,
+      setSelectedTabFactory,
+    },
   }
 }
 
-export default useTabs
+// can pass {..tabProps} from useTabs
+// or override individual props on <Tabs {...tabProps} selectedTab="activ"/>
+// not a React.FC to allow for generic Props
+export const Tabs = <T extends string>({
+  children,
+  className,
+  tabsList = [],
+  selectedTab,
+  setSelectedTabFactory,
+}: React.PropsWithChildren<TabsProps<T>>): React.ReactElement | null => {
+  return (
+    <TabsWrapper className={className}>
+      <div className="countContainer">
+        {children ||
+          tabsList.map((tab, index) => (
+            <button
+              key={index}
+              type="button"
+              className={tab.type === selectedTab ? 'selected' : ''}
+              onClick={setSelectedTabFactory(tab.type)}
+            >
+              {tab.type} {tab.count && <i>{tab.count}</i>}
+            </button>
+          ))}
+      </div>
+    </TabsWrapper>
+  )
+}
