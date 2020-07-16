@@ -1,6 +1,6 @@
 import { ValidationError, ObjectSchema } from '@hapi/joi'
-import { ValidationResolver } from 'react-hook-form'
 import { validInputPattern } from 'utils'
+import { ResolverResult } from 'react-hook-form/dist/types/form'
 
 export function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (
@@ -24,9 +24,9 @@ export function validatePositive(value: string, constraint = 0): true | string {
  * @param type [OPTIONAL] 'number' | undefined - sets casting use or straight FormData use
  */
 
-export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => (
+export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => async (
   data: FormData,
-): ReturnType<ValidationResolver<FormData, {}>> => {
+): Promise<ResolverResult<FormData>> => {
   const castedData: Partial<FormData> = Object.keys(data).reduce((acc, key) => {
     acc[key] = data[key] || undefined
     return acc

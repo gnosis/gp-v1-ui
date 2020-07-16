@@ -1,9 +1,8 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
-import { useForm, FormContext } from 'react-hook-form'
+import { useForm, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
 import styled from 'styled-components'
-import { FieldValues } from 'react-hook-form/dist/types'
 import { toast } from 'toastify'
 import Modali from 'modali'
 import BN from 'bn.js'
@@ -600,7 +599,7 @@ const TradeWidget: React.FC = () => {
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
     defaultValues: defaultFormValues,
-    validationResolver,
+    resolver: validationResolver,
   })
   const { handleSubmit, reset, watch, setValue } = methods
 
@@ -855,7 +854,7 @@ const TradeWidget: React.FC = () => {
     [placeMultipleOrders, placeOrder, savePendingTransactionsAndResetForm, setIsSubmitting],
   )
 
-  async function onSubmit(data: FieldValues): Promise<void> {
+  async function onSubmit(data: SubmitHandler<TradeFormData>): Promise<void> {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     const price = data[priceInputId]
@@ -939,8 +938,8 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
-      {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
-      <FormContext {...methods}>
+      {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
+      <FormProvider {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
@@ -1011,7 +1010,7 @@ const TradeWidget: React.FC = () => {
             {sameToken ? 'Please select different tokens' : 'Submit limit order'}
           </SubmitButton>
         </WrappedForm>
-      </FormContext>
+      </FormProvider>
       <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler

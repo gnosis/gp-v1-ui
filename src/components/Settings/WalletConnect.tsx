@@ -1,15 +1,17 @@
 import React from 'react'
 import Joi from '@hapi/joi'
-import { FormContextValues, ErrorMessage, FieldErrors } from 'react-hook-form'
+import { UseFormMethods } from 'react-hook-form'
+import { FieldErrors, ResolverError } from 'react-hook-form/dist/types/form'
+import { ErrorMessage } from '@hookform/error-message'
 import styled from 'styled-components'
 
-import { Resolver, SettingsFormData } from 'pages/Settings'
+import { SettingsFormData } from 'pages/Settings'
 import { InputBox } from 'components/InputBox'
 import { Input } from 'components/Input'
 
 import { MEDIA } from 'const'
 import { WCOptions } from 'utils'
-
+import { DeepMap, EmptyObject } from 'react-hook-form/dist/types/utils'
 const URLSchema = Joi.string()
   .empty('')
   .optional()
@@ -38,14 +40,20 @@ const WCSettingsSchema = Joi.object({
 // bridge is optional
 // infuraId and rpc are optional and exclusive
 
-// validates only walletconnect slice of form data
-export const wcResolver: Resolver<SettingsFormData, 'walletconnect'> = (
-  data: WCOptions,
-): {
+/* {
   values: WCOptions | null
-  errors: FieldErrors<WCOptions> | null
+  errors: DeepMap<SettingsFormData, FieldError> | (EmptyObject & DeepMap<SettingsFormData, FieldError>)
   name: 'walletconnect'
-} => {
+} */
+
+// validates only walletconnect slice of form data
+export const wcResolver = async (
+  data: WCOptions,
+): Promise<{
+  values: WCOptions | null
+  errors: ResolverError['errors'] | null
+  name: 'walletconnect'
+}> => {
   const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
@@ -76,7 +84,7 @@ export const wcResolver: Resolver<SettingsFormData, 'walletconnect'> = (
 }
 
 interface WCSettingsProps {
-  register: FormContextValues['register']
+  register: UseFormMethods['register']
   errors: FieldErrors<SettingsFormData>
 }
 

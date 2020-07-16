@@ -27,7 +27,7 @@ import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
-import { useForm, FormContext } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
@@ -174,7 +174,7 @@ const PoolingInterface: React.FC = () => {
       spread: spread.toString(),
     },
     mode: 'onChange',
-    validationResolver,
+    resolver: validationResolver,
   })
   const { handleSubmit, watch } = methods
   // Watch input and set defaultValue to state spread
@@ -293,7 +293,7 @@ const PoolingInterface: React.FC = () => {
   )
   return (
     <PoolingInterfaceWrapper className={ordersVisible ? '' : 'expanded'}>
-      <FormContext {...methods}>
+      <FormProvider {...methods}>
         <form onSubmit={handleSubmit(sendTransaction)} noValidate>
           <h2>New Liquidity Order</h2>
           <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
@@ -327,7 +327,7 @@ const PoolingInterface: React.FC = () => {
             {...restProps}
           />
         </form>
-      </FormContext>
+      </FormProvider>
       <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
