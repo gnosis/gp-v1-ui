@@ -194,6 +194,7 @@ export const CardTable = styled.table<{
   display: grid;
   flex: 1;
   width: 100%;
+  padding-bottom: 2rem;
 
   .checked {
     margin: 0;
@@ -340,18 +341,10 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
 
   width: 100%;
   margin: 0 auto;
-  padding: 0 0 2rem;
 
   border-radius: 0.6rem;
   font-size: 1.6rem;
   line-height: 1;
-
-  @media ${MEDIA.tablet} {
-    min-width: 100vw;
-    min-width: calc(100vw - 4.8rem);
-    width: 100%;
-    max-width: 100%;
-  }
 
   @media ${MEDIA.mobile} {
     max-width: 100%;

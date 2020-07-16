@@ -7,7 +7,6 @@ import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 export const OrdersWrapper = styled(StandaloneCardWrapper)`
   height: 73rem;
   width: 100%;
-  flex: 1;
 
   > h5 {
     width: 100%;
@@ -225,7 +224,6 @@ export const OrdersForm = styled.div`
 
   .ordersContainer {
     display: grid;
-    padding: 0 0 5rem;
     box-sizing: border-box;
     overflow-y: auto;
 

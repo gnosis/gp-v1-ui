@@ -87,14 +87,12 @@ export const WrappedWidget = styled(Widget)`
 
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     flex-flow: column wrap;
-    max-height: initial;
-    min-height: initial;
+    height: auto;
     width: 100%;
-    height: initial;
   }
 
   @media ${MEDIA.tablet} {
-    width: 96%;
+    min-width: 90vw;
   }
 `
 
@@ -350,7 +348,7 @@ export const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   margin: 0;
   outline: 0;
 
-  @media ${MEDIA.mobile} {
+  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     display: none;
   }
 
