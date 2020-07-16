@@ -5,7 +5,6 @@ import RpcEngine, {
   JsonRpcResponse,
   JsonRpcError,
 } from 'json-rpc-engine'
-import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
 import { numberToHex, hexToNumber } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
@@ -29,6 +28,38 @@ const sanitizeErrorData = (jsonRpcError?: JsonRpcError<any>): void => {
   if (jsonRpcError.data?.originalError) {
     jsonRpcError.data = jsonRpcError.data.originalError.data
   }
+}
+
+type RpcCallBack<T extends unknown> = (error: JsonRpcError<T>, res: JsonRpcResponse<T>) => void
+
+function providerFromEngine<T extends Provider>(engine: JsonRpcEngine): T {
+  const sendAsync = engine.handle.bind(engine)
+
+  const send = <T extends unknown>(req: JsonRpcRequest<T>, callback: RpcCallBack<T>): void => {
+    if (!callback) throw new Error('Web3 Provider - must provider callback to "send" method')
+    engine.handle(req, callback)
+  }
+  const request = <T extends unknown>(req: JsonRpcRequest<T>): Promise<JsonRpcResponse<T>> => {
+    return new Promise((resolve, reject) => {
+      engine.handle(req, (error: JsonRpcError<T>, res: JsonRpcResponse<T>) => {
+        // console.log('CPROV::handled error:', error, 'res:', res)
+        if (error) {
+          reject(error)
+          return
+        }
+
+        resolve(res)
+      })
+    })
+  }
+
+  return ({ request, send, sendAsync } as unknown) as T
+}
+
+type RequestMethod = <T extends unknown>(req: JsonRpcRequest<T>) => Promise<JsonRpcResponse<T>['result']>
+
+const supportsRequestMethod = (provider: Provider): provider is Provider & { request: RequestMethod } => {
+  return 'request' in provider
 }
 
 // custom providerAsMiddleware
@@ -68,6 +99,23 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
           end(error)
         },
       )
+    }
+  }
+
+  if (supportsRequestMethod(provider)) {
+    return async (req, res, _next, end): Promise<void> => {
+      try {
+        // send request to provider
+        const providerRes = await provider.request(req)
+        console.log('CPROV::providerResult', providerRes)
+
+        // attach result from provider
+        res.result = providerRes
+        end()
+      } catch (error) {
+        // forward any error
+        end(error)
+      }
     }
   }
 
@@ -357,7 +405,8 @@ export const composeProvider = <T extends Provider>(
 
   const providerProxy = new Proxy(composedProvider, {
     get: function (target, prop, receiver): unknown {
-      if (prop === 'sendAsync' || prop === 'send') {
+      // console.log('CPROV::Proxy, target, prop', target, prop)
+      if (prop === 'request' || prop === 'sendAsync' || prop === 'send') {
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)
       }
