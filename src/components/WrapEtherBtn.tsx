@@ -37,6 +37,10 @@ const ModalWrapper = styled(ModalBodyWrapper)`
         display: flex;
         flex-flow: row wrap;
 
+        input {
+          padding: 0 4.5rem 0 1rem;
+        }
+
         i {
           position: absolute;
           right: 1rem;
