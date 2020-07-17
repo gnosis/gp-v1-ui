@@ -315,6 +315,7 @@ export const CardTable = styled.table<{
             align-items: center;
             margin: 0.2rem 0;
             font-size: smaller;
+            width: 100%;
         
             > img {
               margin: 0 0 0.2rem 0.45rem;
@@ -322,6 +323,7 @@ export const CardTable = styled.table<{
 
             @media ${MEDIA.mobile} {
               margin: 0 0 0 1rem;
+              width: auto;
             }
           }
         }
