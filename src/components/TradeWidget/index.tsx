@@ -234,11 +234,6 @@ export const ExpandableOrdersPanel = styled.div`
   align-items: flex-start;
   align-content: flex-start;
 
-  .expanded & {
-    flex: 1 1 100%;
-    min-width: 85rem;
-  }
-
   @media ${MEDIA.tablet} {
     flex: 1 1 50%;
     min-width: initial;
@@ -263,6 +258,10 @@ export const ExpandableOrdersPanel = styled.div`
       min-width: initial;
     }
 
+    @media ${MEDIA.tablet} {
+      width: 100%;
+    }
+
     // Search Filter
     .widgetFilterTools {
       > .balances-searchTokens {
@@ -283,7 +282,7 @@ export const ExpandableOrdersPanel = styled.div`
     }
   }
 
-  > div.ordersTogglerContainer {
+  > div.innerWidgetContainer {
     height: 100%;
     width: 100%;
     box-sizing: border-box;
@@ -322,19 +321,7 @@ export const ExpandableOrdersPanel = styled.div`
     }
 
     @media ${MEDIA.mobile} {
-      &.ordersTogglerContainer {
-        display: none;
-      }
-
-      &.visible {
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow-y: scroll;
-      }
+      display: none;
     }
   }
 `
@@ -357,13 +344,9 @@ export const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
     content: ' ';
     background: url(${arrow}) no-repeat center/contain;
     height: 1.2rem;
-    width: 1.6rem;
+    width: 100%;
     margin: 0;
     transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
-
-    @media ${MEDIA.tablet} {
-      display: none;
-    }
   }
 
   &:hover {
@@ -1009,7 +992,7 @@ const TradeWidget: React.FC = () => {
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}
-        <div className="ordersTogglerContainer">
+        <div className="innerWidgetContainer">
           <h5>Your orders</h5>
           <OrdersWidget displayOnly="regular" />
         </div>
