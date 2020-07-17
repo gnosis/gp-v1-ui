@@ -36,7 +36,7 @@ function providerFromEngine<T extends Provider>(engine: JsonRpcEngine): T {
   const sendAsync = engine.handle.bind(engine)
 
   const send = <T extends unknown>(req: JsonRpcRequest<T>, callback: RpcCallBack<T>): void => {
-    if (!callback) throw new Error('Web3 Provider - must provider callback to "send" method')
+    if (!callback) throw new Error('Web3 Provider - must provide callback to "send" method')
     engine.handle(req, callback)
   }
   const request = <T extends unknown>(req: JsonRpcRequest<T>): Promise<JsonRpcResponse<T>> => {
