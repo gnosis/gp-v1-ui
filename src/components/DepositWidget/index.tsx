@@ -239,7 +239,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const {
     filteredData: filteredBalances,
     search,
-    handlers: { handleSearch, clearFilters },
+    handlers: { handleSearch, clearFilters: clearFilters1 },
   } = useDataFilter(memoizedSearchFilterParams)
 
   const memoizedZeroFilterParams = useMemo(
@@ -254,8 +254,13 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const {
     filteredData: displayedBalances,
     showFilter: hideZeroBalances,
-    handlers: { handleToggleFilter: handleHideZeroBalances },
+    handlers: { handleToggleFilter: handleHideZeroBalances, clearFilters: clearFilters2 },
   } = useDataFilter(memoizedZeroFilterParams)
+
+  const clearFilters = useCallback(() => {
+    clearFilters1()
+    clearFilters2()
+  }, [clearFilters1, clearFilters2])
 
   const { modalProps, toggleModal } = useManageTokens()
 
