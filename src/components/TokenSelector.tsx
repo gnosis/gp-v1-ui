@@ -196,6 +196,7 @@ const customSelectStyles = {
     bottom: '0',
     margin: 'auto',
     width: '42rem',
+    maxWidth: '100%',
     minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',

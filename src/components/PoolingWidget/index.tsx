@@ -13,7 +13,8 @@ import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 
 // components
-import Widget from 'components/Layout/Widget'
+import OrdersWidget from 'components/OrdersWidget'
+import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
@@ -92,11 +93,13 @@ const ContentWrapper = styled.div`
   flex-flow: row wrap;
   font-size: inherit;
   line-height: inherit;
+
+  overflow-y: auto;
 `
 
 const LiquidityMessage = styled.div`
   font-size: 1.3rem;
-  margin: 2.4rem 0 0;
+  margin: 2rem 0;
   display: flex;
   width: 100%;
   flex-flow: row wrap;
@@ -143,6 +146,8 @@ const PoolingInterface: React.FC = () => {
   const [txHash, setTxHash] = useSafeState('')
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
+
+  const [ordersVisible, setOrdersVisible] = useSafeState(true)
 
   const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
@@ -281,45 +286,53 @@ const PoolingInterface: React.FC = () => {
     ],
   )
   return (
-    <Widget>
-      <PoolingInterfaceWrapper>
-        <FormContext {...methods}>
-          <form onSubmit={handleSubmit(sendTransaction)} noValidate>
-            <h2>New Liquidity Order</h2>
-            <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
+    <PoolingInterfaceWrapper className={ordersVisible ? '' : 'expanded'}>
+      <FormContext {...methods}>
+        <form onSubmit={handleSubmit(sendTransaction)} noValidate>
+          <h2>New Liquidity Order</h2>
+          <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
 
-            <ContentWrapper>
-              <StepDescription step={step} />
-              {/* Main Components here */}
-              <SubComponents {...restProps} />
-            </ContentWrapper>
+          <ContentWrapper>
+            <StepDescription step={step} />
+            {/* Main Components here */}
+            <SubComponents {...restProps} />
+          </ContentWrapper>
 
-            <LiquidityMessage>
-              <p>
-                Your liquidity is equal to the amount you have deposited into your exchange wallet.
-                <br />
-                <b>
-                  Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
-                </b>
-              </p>
-            </LiquidityMessage>
+          <LiquidityMessage>
+            <p>
+              Your liquidity is equal to the amount you have deposited into your exchange wallet.
+              <br />
+              <b>
+                Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
+              </b>
+            </p>
+          </LiquidityMessage>
 
-            {/* BUTTONS */}
-            <LiquidityButtons
-              handleSubmit={handleSubmit(sendTransaction)}
-              disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
-              disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
-              disableSubmit={!!txHash || isSubmitting}
-              showContinue={step !== LAST_STEP}
-              showFinish={!!txReceipt}
-              showLoader={isSubmitting || !!(txHash && !txReceipt)}
-              showTooltipHover={selectedTokensMap.size < 2}
-              {...restProps}
-            />
-          </form>
-        </FormContext>
-      </PoolingInterfaceWrapper>
-    </Widget>
+          {/* BUTTONS */}
+          <LiquidityButtons
+            handleSubmit={handleSubmit(sendTransaction)}
+            disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
+            disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
+            disableSubmit={!!txHash || isSubmitting}
+            showContinue={step !== LAST_STEP}
+            showFinish={!!txReceipt}
+            showLoader={isSubmitting || !!(txHash && !txReceipt)}
+            showTooltipHover={selectedTokensMap.size < 2}
+            {...restProps}
+          />
+        </form>
+      </FormContext>
+      <ExpandableOrdersPanel>
+        {/* Toggle panel visibility (arrow) */}
+        <OrdersToggler
+          type="button"
+          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          $isOpen={ordersVisible}
+        />
+        {/* Actual orders content */}
+        <OrdersWidget displayOnly="liquidity" />
+      </ExpandableOrdersPanel>
+    </PoolingInterfaceWrapper>
   )
 }
 
