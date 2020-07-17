@@ -146,6 +146,7 @@ const BalancesWidget = styled(CardWidgetWrapper)`
 const NoTokensMessage = styled.tr`
   /* increase speicifcity */
   &&&&&& {
+    grid-template-columns: auto;
     margin: auto;
     border: none;
 
@@ -238,7 +239,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const {
     filteredData: filteredBalances,
     search,
-    handlers: { handleSearch },
+    handlers: { handleSearch, clearFilters },
   } = useDataFilter(memoizedSearchFilterParams)
 
   const memoizedZeroFilterParams = useMemo(
@@ -253,7 +254,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const {
     filteredData: displayedBalances,
     showFilter: hideZeroBalances,
-    handlers: { handleToggleFilter: handleHideZeroBalances, clearFilters },
+    handlers: { handleToggleFilter: handleHideZeroBalances },
   } = useDataFilter(memoizedZeroFilterParams)
 
   const { modalProps, toggleModal } = useManageTokens()
