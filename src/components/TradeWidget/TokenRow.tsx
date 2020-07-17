@@ -211,20 +211,21 @@ const TokenRow: React.FC<Props> = ({
     <FormInputError errorMessage={error.message as string} />
   ) : (
     overMax.gt(ZERO) && (
-      <FormMessage className="warning">
+      <FormMessage className="warning tradeWarning">
         <i>
           Have you already deposited <b>{selectedToken.symbol}</b> into the exchange wallet?{' '}
         </i>
-        <i>Sell amount exceeds your balance by</i>
-        <strong>
-          {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
-        </strong>
         {editableAndConnected && !tokenDisabled && (
           <div className="btn" onClick={(): void => showForm('deposit')}>
             + Deposit {selectedToken.symbol}
           </div>
         )}
-        {/* This creates a standing order. <a href="#">Read more</a>. */}
+        <i>
+          Sell amount exceeds your balance by:{' '}
+          <strong>
+            {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}
+          </strong>
+        </i>
       </FormMessage>
     )
   )

@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import BigNumber from 'bignumber.js'
 
-import { TokenDetails, invertPrice } from '@gnosis.pm/dex-js'
+import { TokenDetails, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
@@ -15,6 +15,7 @@ import Spinner from 'components/Spinner'
 import { TradeFormData } from 'components/TradeWidget'
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
+import { EllipsisText } from 'components/Layout'
 
 const Wrapper = styled.div`
   > strong {
@@ -27,14 +28,30 @@ const Wrapper = styled.div`
 
   .container {
     display: grid;
-    grid-template-columns: 4fr 1fr 1fr;
+    grid-template-columns: 4fr 1fr 1.5fr;
     gap: 0.25rem;
     font-size: 1.25rem;
-    align-items: center;
+    align-items: flex-start;
+    line-height: 1.4;
 
-    > small {
-      justify-self: end;
-      white-space: nowrap;
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+
+      > ${EllipsisText} {
+        display: inline-block;
+        font-size: smaller;
+      }
+
+      > div:nth-child(2) {
+        font-size: larger;
+        margin: 0 0.1rem;
+      }
+
+      > span:last-child {
+        padding: 0 0.2rem 0 0.4rem;
+      }
     }
   }
 `
@@ -133,13 +150,16 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   const displayBaseToken = isPriceInverted ? quoteToken : baseToken
   const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
 
+  const displayBtName = displayTokenSymbolOrLink(displayBaseToken)
+  const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
+
   return (
     <>
       <span>
         <HighlightedText>Onchain orderbook price</HighlightedText> <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for
         selling{' '}
         <strong>
-          {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
+          {+amount || '1'} {displayQtName}
         </strong>
         :
       </span>
@@ -150,10 +170,12 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
       >
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
-      <small>
-        {displayTokenSymbolOrLink(displayQuoteToken)}/{displayTokenSymbolOrLink(displayBaseToken)}
+      <div>
+        <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
+        <div>/</div>
+        <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
         <SwapIcon swap={swapPrices} />
-      </small>
+      </div>
     </>
   )
 }

@@ -66,38 +66,47 @@ import { updateTradeState } from 'reducers-actions/trade'
 
 import { DevTool } from 'HookFormDevtool'
 
-const WrappedWidget = styled(Widget)`
+export const WrappedWidget = styled(Widget)`
+  height: 100%;
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
-  height: 75rem;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
   background: var(--color-background-pageWrapper);
-  box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
   margin: 0 auto;
-  min-height: 63rem;
   font-size: 1.6rem;
   line-height: 1;
 
+  &.expanded {
+    width: calc(50vw + 50rem);
+
+    > form {
+      width: 0;
+      min-width: 0;
+      overflow: hidden;
+      flex: none;
+      padding: 0;
+      opacity: 0;
+    }
+  }
+
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     flex-flow: column wrap;
-    max-height: initial;
-    min-height: initial;
+    height: auto;
     width: 100%;
-    height: initial;
   }
 
   @media ${MEDIA.tablet} {
-    width: 96%;
+    min-width: 90vw;
   }
 `
 
 const WrappedForm = styled.form`
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: column nowrap;
   flex: 1 0 42rem;
   max-width: 50rem;
   padding: 1.6rem;
@@ -109,14 +118,6 @@ const WrappedForm = styled.form`
   input[type='checkbox']:focus,
   button:focus {
     outline: 1px dotted gray;
-  }
-
-  .expanded & {
-    width: 0;
-    overflow: hidden;
-    flex: none;
-    padding: 0;
-    opacity: 0;
   }
 
   @media ${MEDIA.tablet} {
@@ -147,9 +148,12 @@ const WrappedForm = styled.form`
 
   ${FormMessage} {
     font-size: 1.3rem;
+    line-height: 1.2;
     margin: 0.5rem 0 0;
     flex-flow: row wrap;
     justify-content: flex-start;
+
+    overflow-y: auto;
 
     @media ${MEDIA.mediumUp} {
       max-height: 11rem;
@@ -158,14 +162,21 @@ const WrappedForm = styled.form`
     > b {
       margin: 0.3rem;
     }
+
     > i {
-      margin: 0.3rem 0 0.3rem 0;
+      margin: 0;
       font-style: normal;
+      width: 100%;
+
+      > strong {
+        margin: 0.3rem 0 0.3rem 0.3rem;
+        font-size: 1.3rem;
+        word-break: break-all;
+      }
     }
-    > strong {
-      margin: 0.3rem 0 0.3rem 0.3rem;
-      font-size: 1.3rem;
-      word-break: break-word;
+
+    > .btn {
+      margin: 0.3rem 0;
     }
   }
 `
@@ -217,7 +228,7 @@ const SubmitButton = styled.button`
   }
 `
 
-const OrdersPanel = styled.div`
+export const ExpandableOrdersPanel = styled.div`
   overflow: hidden;
   display: flex;
   flex-flow: column wrap;
@@ -231,11 +242,6 @@ const OrdersPanel = styled.div`
   align-items: flex-start;
   align-content: flex-start;
 
-  .expanded & {
-    flex: 1 1 100%;
-    min-width: 85rem;
-  }
-
   @media ${MEDIA.tablet} {
     flex: 1 1 50%;
     min-width: initial;
@@ -248,16 +254,20 @@ const OrdersPanel = styled.div`
     box-shadow: none;
   }
 
-  // Orders widget when inside the OrdersPanel
+  // Orders widget when inside the ExpandableOrdersPanel
   ${OrdersWrapper} {
+    width: calc(100% - 1.6rem);
+    height: 90%;
     background: transparent;
     box-shadow: none;
     border-radius: 0;
-    min-height: initial;
-    max-width: initial;
 
     @media ${MEDIA.desktop} {
       min-width: initial;
+    }
+
+    @media ${MEDIA.tablet}, ${MEDIA.mobile} {
+      width: 100%;
     }
 
     // Search Filter
@@ -275,18 +285,46 @@ const OrdersPanel = styled.div`
 
         > tr {
           padding: 0 1.4rem;
+
+          @media ${MEDIA.mobile} {
+            padding: 1.4rem;
+          }
         }
       }
     }
   }
 
-  > div {
+  > div.innerWidgetContainer {
+    height: 100%;
     width: 100%;
-    width: calc(100% - 1.6rem);
     box-sizing: border-box;
     display: flex;
-    flex-flow: row wrap;
+    flex-flow: column nowrap;
     border-radius: 0 0.6rem 0.6rem 0;
+
+    > h5 {
+      display: flex;
+      flex: 0 0 5rem;
+      align-items: center;
+      justify-content: center;
+      height: 10%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+
+      font-weight: var(--font-weight-bold);
+      font-size: 1.6rem;
+      color: var(--color-text-primary);
+      letter-spacing: 0.03rem;
+      text-align: center;
+
+      > a {
+        font-size: 1.3rem;
+        font-weight: var(--font-weight-normal);
+        color: var(--color-text-active);
+        text-decoration: underline;
+      }
+    }
 
     @media ${MEDIA.tablet} {
       width: 100%;
@@ -296,47 +334,11 @@ const OrdersPanel = styled.div`
 
     @media ${MEDIA.mobile} {
       display: none;
-      &.visible {
-        display: flex;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        overflow-y: scroll;
-      }
     }
-  }
-
-  > div > h5 {
-    width: 100%;
-    margin: 0 auto;
-    padding: 1.6rem 0 1rem;
-    font-weight: var(--font-weight-bold);
-    font-size: 1.6rem;
-    color: var(--color-text-primary);
-    letter-spacing: 0.03rem;
-    text-align: center;
-    box-sizing: border-box;
-    text-align: center;
-  }
-
-  > div > h5 > a {
-    font-size: 1.3rem;
-    font-weight: var(--font-weight-normal);
-    color: var(--color-text-active);
-    text-decoration: underline;
-  }
-
-  > div > h5 > a {
-    font-size: 1.3rem;
-    font-weight: var(--font-weight-normal);
-    color: var(--color-text-active);
-    text-decoration: underline;
   }
 `
 
-const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
+export const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   width: 1.6rem;
   height: 100%;
   border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
@@ -345,7 +347,7 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
   margin: 0;
   outline: 0;
 
-  @media ${MEDIA.mobile} {
+  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     display: none;
   }
 
@@ -354,13 +356,9 @@ const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
     content: ' ';
     background: url(${arrow}) no-repeat center/contain;
     height: 1.2rem;
-    width: 1.6rem;
+    width: 100%;
     margin: 0;
     transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
-
-    @media ${MEDIA.tablet} {
-      display: none;
-    }
   }
 
   &:hover {
@@ -941,7 +939,7 @@ const TradeWidget: React.FC = () => {
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
-      {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
+      {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
@@ -1014,7 +1012,7 @@ const TradeWidget: React.FC = () => {
           </SubmitButton>
         </WrappedForm>
       </FormContext>
-      <OrdersPanel>
+      <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
           type="button"
@@ -1022,11 +1020,11 @@ const TradeWidget: React.FC = () => {
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}
-        <div>
+        <div className="innerWidgetContainer">
           <h5>Your orders</h5>
-          <OrdersWidget />
+          <OrdersWidget displayOnly="regular" />
         </div>
-      </OrdersPanel>
+      </ExpandableOrdersPanel>
       {/* React Forms DevTool debugger */}
       {process.env.NODE_ENV === 'development' && <DevTool control={methods.control} />}
     </WrappedWidget>
