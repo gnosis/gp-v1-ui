@@ -161,7 +161,13 @@ const PoolingInterface: React.FC = () => {
     )
   }, [tokenList])
 
-  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(setFullTokenMap(tokens))
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(() =>
+    setFullTokenMap(tokens),
+  )
+
+  useEffect(() => {
+    setSelectedTokensMap(setFullTokenMap(tokens))
+  }, [setSelectedTokensMap, tokens])
 
   const methods = useForm<PoolingFormData>({
     defaultValues: {
