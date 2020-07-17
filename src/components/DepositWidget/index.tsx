@@ -39,14 +39,22 @@ interface WithdrawState {
 
 const BalancesWidget = styled(CardWidgetWrapper)`
   background: var(--color-background-pageWrapper);
+  height: 100%;
+
+  > .filterToolsBar {
+    height: 10%;
+  }
 
   > ${CardTable} {
+    height: 90%;
+    overflow: hidden;
+
     > thead,
     > tbody {
       font-size: 1.3rem;
 
       > tr:not(.cardRowDrawer) {
-        padding: 0.8rem 1.6rem;
+        min-height: 6.3rem;
         > td,
         > th {
           justify-content: flex-end;
@@ -55,20 +63,33 @@ const BalancesWidget = styled(CardWidgetWrapper)`
       }
     }
 
-    > tbody > tr:not(.cardRowDrawer) > td {
-      &[data-label='Token'] {
-        font-family: var(--font-default);
-        letter-spacing: 0;
-        line-height: 1.2;
-        flex-flow: row nowrap;
+    > thead {
+      > tr:not(.cardRowDrawer) {
+        padding: 0.8rem 3rem;
       }
+    }
 
-      &[data-label='Token'] > div {
-        word-break: break-word;
+    > tbody {
+      overflow-y: auto;
 
-        > b {
-          display: block;
-          color: var(--color-text-primary);
+      > tr:not(.cardRowDrawer) {
+        padding: 0.8rem 1.6rem;
+        > td {
+          &[data-label='Token'] {
+            font-family: var(--font-default);
+            letter-spacing: 0;
+            line-height: 1.2;
+            flex-flow: row nowrap;
+          }
+        }
+
+        &[data-label='Token'] > div {
+          word-break: break-word;
+
+          > b {
+            display: block;
+            color: var(--color-text-primary);
+          }
         }
       }
     }
@@ -241,6 +262,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
     <StandaloneCardWrapper>
       <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
         <FilterTools
+          className="filterToolsBar"
           resultName="tokens"
           searchValue={search}
           handleSearch={handleSearch}
@@ -365,7 +387,7 @@ const DepositWidget: React.FC = () => {
   }
 
   return (
-    <section>
+    <>
       <BalancesDisplayMemoed
         ethBalance={ethBalance}
         balances={balances}
@@ -375,7 +397,7 @@ const DepositWidget: React.FC = () => {
       />
       <Modali.Modal {...withdrawOverwriteModal} />
       <Modali.Modal {...withdrawAndClaimModal} />
-    </section>
+    </>
   )
 }
 

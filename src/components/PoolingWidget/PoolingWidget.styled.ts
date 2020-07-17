@@ -41,7 +41,8 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
   > form {
     display: flex;
     flex-flow: column nowrap;
-    padding: 2rem 4rem;
+    padding: 2rem;
+    min-width: 51.4rem;
     max-width: 75rem;
 
     > h2 {
@@ -58,6 +59,7 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
   @media ${MEDIA.tablet} {
     > form {
       max-width: 100%;
+      padding: 2rem 4rem;
     }
   }
 

@@ -13,6 +13,7 @@ import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 
 // components
+import OrdersWidget from 'components/OrdersWidget'
 import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
 
 // PoolingWidget: subcomponents
@@ -31,7 +32,6 @@ import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 import { useTokenList } from 'hooks/useTokenList'
-import OrdersWidget from 'pages/Orders'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2

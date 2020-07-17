@@ -59,7 +59,7 @@ import { updateTradeState } from 'reducers-actions/trade'
 import { DevTool } from 'HookFormDevtool'
 
 export const WrappedWidget = styled(Widget)`
-  height: 73rem;
+  height: 100%;
   overflow-x: visible;
   min-width: 0;
   margin: 0 auto;
@@ -67,7 +67,6 @@ export const WrappedWidget = styled(Widget)`
   flex-flow: row nowrap;
   display: flex;
   background: var(--color-background-pageWrapper);
-  box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
   margin: 0 auto;
   font-size: 1.6rem;
@@ -78,6 +77,7 @@ export const WrappedWidget = styled(Widget)`
 
     > form {
       width: 0;
+      min-width: 0;
       overflow: hidden;
       flex: none;
       padding: 0;
@@ -258,7 +258,7 @@ export const ExpandableOrdersPanel = styled.div`
       min-width: initial;
     }
 
-    @media ${MEDIA.tablet} {
+    @media ${MEDIA.tablet}, ${MEDIA.mobile} {
       width: 100%;
     }
 
@@ -277,6 +277,10 @@ export const ExpandableOrdersPanel = styled.div`
 
         > tr {
           padding: 0 1.4rem;
+
+          @media ${MEDIA.mobile} {
+            padding: 1.4rem;
+          }
         }
       }
     }

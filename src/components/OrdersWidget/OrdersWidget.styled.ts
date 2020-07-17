@@ -5,7 +5,7 @@ import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
 
 // OrdersWidget outside wrapper
 export const OrdersWrapper = styled(StandaloneCardWrapper)`
-  height: 73rem;
+  height: 100%;
   width: 100%;
 
   > h5 {
@@ -49,7 +49,7 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
             > td.checked {
               position: absolute;
               right: 0;
-              height: calc(100% - 3.2rem);
+              height: calc(100% - 2.8rem);
               width: 3.3rem;
               padding: 0;
 
