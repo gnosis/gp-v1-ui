@@ -17,16 +17,17 @@ import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
-import { PriceInputBox } from 'components/TradeWidget/Price'
 import { FormInputError } from 'components/TradeWidget/FormMessage'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
-import useTabs from 'hooks/useTabs'
 
 import { DateTimePicker, BaseDateTimePickerProps } from '@material-ui/pickers'
 import TextField from '@material-ui/core/TextField'
 import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns'
+
+const ORDER_START_PRESETS = [10, 15, 20]
+const ORDER_EXPIRE_PRESETS = [5, 15, 30]
 
 interface TimePickerProps extends BaseDateTimePickerProps {
   control: Control<TradeFormData>
@@ -61,7 +62,7 @@ const TimePicker: React.FC<TimePickerProps> = ({ control, formValues, minDate = 
           renderInput={(props): JSX.Element => (
             <TextField
               {...props}
-              label="Select date"
+              label="Set custom date"
               name={formValues.inputName}
               error={Boolean(currentError)}
               helperText={currentError && <FormInputError errorMessage={currentError.message} />}
@@ -89,8 +90,10 @@ const Wrapper = styled.div`
   flex-flow: row wrap;
   border-bottom: 0.1rem solid var(--color-background-banner);
 
-  > input {
+  > input,
+  button {
     width: 100%;
+    color: var(--color-text-primary);
   }
 
   .radio-container {
@@ -148,6 +151,19 @@ const Wrapper = styled.div`
         transform: rotate(90deg);
       }
     }
+  }
+`
+
+const OrderValidityBox = styled.div`
+  width: 90%;
+  margin: auto;
+
+  > strong {
+    margin-bottom: 1rem;
+  }
+
+  > input[type='checkbox'] {
+    margin: auto;
   }
 `
 
@@ -233,21 +249,24 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     padding: 0 6.5rem 0 1rem;
   }
 
-  ${PriceInputBox} {
-    padding: 0 0.8rem;
+  > div {
+    width: 100%;
 
-    @media ${MEDIA.mobile} {
-      padding: 0 1.6rem;
-    }
+    ${OrderValidityBox} {
+      padding: 0 0.8rem;
 
-    > strong {
-      text-transform: capitalize;
-      color: var(--color-text-primary);
-      font-size: 1.5rem;
-      width: 100%;
-      margin: 0 0 1rem;
-      padding: 0;
-      box-sizing: border-box;
+      @media ${MEDIA.mobile} {
+        padding: 0 1.6rem;
+      }
+
+      > p {
+        text-transform: capitalize;
+        color: var(--color-text-primary);
+        font-size: 1.2rem;
+        width: 100%;
+        padding: 0;
+        box-sizing: border-box;
+      }
     }
   }
 
@@ -283,20 +302,37 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   }
 `
 
-const OrderValidityBox = styled(PriceInputBox)`
-  flex-flow: column nowrap;
-  width: calc(50% - 0.8rem);
+const TimePickerPreset = styled.button`
+  height: 100%;
+  padding: 0;
+  margin: 0 0.85rem;
+  font-size: 1rem;
+  background: var(--color-background-pageWrapper);
+  border: 0.2rem solid var(--color-background-CTA);
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 
-  strong {
-    margin-bottom: 1rem;
+  &:hover {
+    background: var(--color-background-CTA);
+    color: var(--color-background-pageWrapper);
   }
 
-  label {
-    height: 7rem;
+  &:focus {
+    border-color: var(--color-background-CTA);
   }
+`
 
-  input[type='checkbox'] {
-    margin: auto;
+const TimePickerWrapper = styled.div`
+  position: relative;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  height: 4rem;
+
+  > .MuiFormControl-root,
+  .MuiTextField-root {
+    min-width: 10rem;
   }
 `
 
@@ -330,18 +366,17 @@ const OrderValidity: React.FC<Props> = ({
 }) => {
   const [showOrderConfig, setShowOrderConfig] = useSafeState(false)
 
-  const { selectedTab, Tabs } = useTabs<'basic' | 'advanced'>('basic')
-
   const { control, setValue, errors, register, getValues, watch } = useFormContext<TradeFormData>()
   const { validFrom, validUntil } = getValues()
+  console.debug('validFrom, validUntil', validFrom, validUntil)
 
   const validFromError = errors[validFromInputId]
   const validUntilError = errors[validUntilInputId]
   const validFromInputValue = watch(validFromInputId)
   const validUntilInputValue = watch(validUntilInputId)
   const overMax = ZERO
-  const validFromClassName = validFromError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
-  const validUntilClassName = validUntilError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
+  // const validFromClassName = validFromError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
+  // const validUntilClassName = validUntilError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
@@ -392,8 +427,8 @@ const OrderValidity: React.FC<Props> = ({
     [handleShowConfig, validFromError, validUntilError],
   )
 
-  const validFromRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
-  const validUntilRef: React.MutableRefObject<HTMLInputElement | null> = useRef(null)
+  const validFromRef: React.MutableRefObject<HTMLInputElement | HTMLButtonElement | null> = useRef(null)
+  const validUntilRef: React.MutableRefObject<HTMLInputElement | HTMLButtonElement | null> = useRef(null)
 
   // This side effect is for not requiring disable on validFrom/Until inputs
   // and auto-magically updating the checkbox/values on change
@@ -443,7 +478,7 @@ const OrderValidity: React.FC<Props> = ({
         <div>
           Order starts:{' '}
           <b>
-            {new Date(Number(validFrom!)).toString()} / {Number(validFrom!)}
+            {new Date(Number(validFrom! * 1000)).toString()} / {Number(validFrom!)}
           </b>
           {/* <b>{formatTimeInHours(validFrom!, 'Now')}</b> */}
           <HelpTooltip tooltip={OrderStartsTooltip} />
@@ -456,10 +491,10 @@ const OrderValidity: React.FC<Props> = ({
         <h4>
           Order settings <i onClick={handleShowConfig}>×</i>
         </h4>
-        <Tabs className="tabsList" tabsList={[{ type: 'basic' }, { type: 'advanced' }]} />
+        {/* <Tabs className="tabsList" {...tabsProps} /> */}
 
         {/* TODO: fix this crap with display */}
-        <div
+        {/* <div
           style={{
             display: selectedTab === 'basic' ? 'flex' : 'none',
             flexFlow: 'row nowrap',
@@ -500,15 +535,15 @@ const OrderValidity: React.FC<Props> = ({
             <label>
               <input
                 className={validUntilClassName}
-                name={validUntilInputId}
                 type="text"
-                disabled={isDisabled}
                 required
+                onFocus={(e): void => e.target.select()}
+                name={validUntilInputId}
+                disabled={isDisabled}
                 ref={(e): void => {
                   register(e!)
                   validUntilRef.current = e
                 }}
-                onFocus={(e): void => e.target.select()}
                 tabIndex={tabIndex}
               />
               <div className="radio-container">
@@ -524,26 +559,90 @@ const OrderValidity: React.FC<Props> = ({
             </label>
             <FormInputError errorMessage={validUntilError?.message as string} />
           </OrderValidityBox>
+        </div> */}
+        <div>
+          <OrderValidityBox>
+            <p>Order starts in:</p>
+            <TimePickerWrapper>
+              <TimePickerPreset
+                type="button"
+                value="Now"
+                // checked={isAsap}
+                disabled={isDisabled}
+                onClick={handleASAPClick}
+                tabIndex={tabIndex}
+              >
+                Now
+              </TimePickerPreset>
+              {ORDER_START_PRESETS.map(time => (
+                <TimePickerPreset
+                  key={time}
+                  className="timeSelectPresets"
+                  type="button"
+                  // onClick={console.debug}
+                  name={validFromInputId}
+                  disabled={isDisabled}
+                  ref={(e): void => {
+                    register(e!)
+                    validFromRef.current = e
+                  }}
+                  tabIndex={tabIndex}
+                >
+                  {time + 'min'}
+                </TimePickerPreset>
+              ))}
+              <TimePicker
+                control={control}
+                formValues={{
+                  value: validFromInputValue!,
+                  setValue,
+                  errors: validFromError,
+                  inputName: validFromInputId,
+                }}
+              />
+            </TimePickerWrapper>
+          </OrderValidityBox>
+          <OrderValidityBox>
+            <p>Order expires in:</p>
+            <TimePickerWrapper>
+              <TimePickerPreset
+                type="button"
+                // checked={isUnlimited}
+                disabled={isDisabled}
+                onClick={handleUnlimitedClick}
+                tabIndex={tabIndex}
+              >
+                Never
+              </TimePickerPreset>
+              {ORDER_EXPIRE_PRESETS.map(time => (
+                <TimePickerPreset
+                  key={time}
+                  className="timeSelectPresets"
+                  type="button"
+                  // onClick={console.debug}
+                  name={validUntilInputId}
+                  disabled={isDisabled}
+                  ref={(e): void => {
+                    register(e!)
+                    validUntilRef.current = e
+                  }}
+                  tabIndex={tabIndex}
+                >
+                  {time + 'min'}
+                </TimePickerPreset>
+              ))}
+              <TimePicker
+                control={control}
+                formValues={{
+                  value: validFromInputValue!,
+                  setValue,
+                  errors: validFromError,
+                  inputName: validFromInputId,
+                }}
+              />
+            </TimePickerWrapper>
+          </OrderValidityBox>
         </div>
-        {/* TODO: fix this crap with display */}
-        <div
-          style={{
-            display: selectedTab === 'basic' ? 'none' : 'flex',
-            flexFlow: 'row nowrap',
-            justifyContent: 'center',
-          }}
-        >
-          <TimePicker
-            control={control}
-            formValues={{
-              value: validFromInputValue!,
-              setValue,
-              errors: validFromError,
-              inputName: validFromInputId,
-            }}
-          />
-        </div>
-
         <span>
           <button
             type="button"

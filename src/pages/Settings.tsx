@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import { useForm, Resolver as FormResolver } from 'react-hook-form'
-import { DevTool } from 'HookFormDevtool'
+// import { DevTool } from 'HookFormDevtool'
 import styled from 'styled-components'
 
 import { walletApi } from 'api'
@@ -145,7 +145,7 @@ const Settings: React.FC = () => {
   // but at the same time pull in updated values from storage on mount
   const defaultValues = useMemo(getDefaultSettings, [])
 
-  const { register, handleSubmit, errors, control } = useForm<SettingsFormData>({
+  const { register, handleSubmit, errors /* , control */ } = useForm<SettingsFormData>({
     resolver,
     defaultValues,
   })

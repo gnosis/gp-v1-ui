@@ -63,7 +63,7 @@ import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
 
-import { DevTool } from 'HookFormDevtool'
+// import { DevTool } from 'HookFormDevtool'
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
