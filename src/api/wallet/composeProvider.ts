@@ -39,7 +39,7 @@ function providerFromEngine<T extends Provider>(engine: JsonRpcEngine): T {
     if (!callback) throw new Error('Web3 Provider - must provide callback to "send" method')
     engine.handle(req, callback)
   }
-  const request = <T extends unknown>(req: JsonRpcRequest<T>): Promise<JsonRpcResponse<T>> => {
+  const request = <T extends unknown>(req: JsonRpcRequest<T>): Promise<JsonRpcResponse<T>['result']> => {
     return new Promise((resolve, reject) => {
       engine.handle(req, (error: JsonRpcError<T>, res: JsonRpcResponse<T>) => {
         // console.log('CPROV::handled error:', error, 'res:', res)
@@ -48,7 +48,7 @@ function providerFromEngine<T extends Provider>(engine: JsonRpcEngine): T {
           return
         }
 
-        resolve(res)
+        resolve(res.result)
       })
     })
   }
