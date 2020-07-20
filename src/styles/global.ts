@@ -43,6 +43,17 @@ const GlobalStyles = createGlobalStyle`
     line-height: revert;
   }
 
+  ::-webkit-scrollbar {
+    width: 6px!important;
+    height: 6px!important;
+  }
+  ::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,.2);
+  }
+  ::-webkit-scrollbar-track {
+      background: hsla(0,0%,100%,.1);
+  }
+
   *, *:before, *:after {
     box-sizing: inherit;
   }

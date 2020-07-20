@@ -34,7 +34,7 @@ import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
-type OrderTabs = 'active' | 'liquidity' | 'closed' | 'fills'
+type OrderTabs = 'active' | 'closed' | 'fills'
 
 type FilteredOrdersStateKeys = Exclude<OrderTabs, 'fills'>
 type FilteredOrdersState = {
@@ -51,7 +51,6 @@ function emptyState(): FilteredOrdersState {
   return {
     active: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
     closed: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
-    liquidity: { orders: [], pendingOrders: [], markedForDeletion: new Set() },
   }
 }
 
@@ -66,8 +65,6 @@ function classifyOrders(
   orders.forEach(order => {
     if (!isOrderActiveFn(order, now)) {
       state.closed[ordersType].push(order)
-    } else if (order.isUnlimited) {
-      state.liquidity[ordersType].push(order)
     } else {
       state.active[ordersType].push(order)
     }
@@ -85,7 +82,23 @@ const compareFnFactory = (topic: TopicNames, asc: boolean) => (
   }
 }
 
-const OrdersWidget: React.FC = () => {
+interface Props {
+  displayOnly?: 'liquidity' | 'regular'
+}
+
+function filterOrdersByDisplayType(
+  orders: DetailedAuctionElement[],
+  displayOnly?: 'liquidity' | 'regular',
+): DetailedAuctionElement[] {
+  return !displayOnly
+    ? orders
+    : orders.filter(
+        order =>
+          (displayOnly === 'liquidity' && order.isUnlimited) || (displayOnly === 'regular' && !order.isUnlimited),
+      )
+}
+
+const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const { orders: allOrders, pendingOrders: allPendingOrders, forceOrdersRefresh } = useOrders()
   // this page is behind login wall so networkId should always be set
   const { networkId, isConnected } = useWalletConnection()
@@ -94,7 +107,19 @@ const OrdersWidget: React.FC = () => {
   const [classifiedOrders, setClassifiedOrders] = useSafeState<FilteredOrdersState>(emptyState)
 
   // Subscribe to trade events
-  const trades = useTrades()
+  const allTrades = useTrades()
+  // Filter only `ordersType` trades
+  const trades = useMemo(
+    () =>
+      !displayOnly
+        ? allTrades
+        : allTrades.filter(
+            trade =>
+              (displayOnly === 'liquidity' && trade.type === 'liquidity') ||
+              (displayOnly === 'regular' && trade.type != 'liquidity'),
+          ),
+    [allTrades, displayOnly],
+  )
 
   const { selectedTab, Tabs } = useTabs<OrderTabs>('active')
   // syntactic sugar
@@ -112,8 +137,8 @@ const OrdersWidget: React.FC = () => {
   useEffect(() => {
     const classifiedOrders = emptyState()
 
-    classifyOrders(allOrders, classifiedOrders, 'orders')
-    classifyOrders(allPendingOrders, classifiedOrders, 'pendingOrders')
+    classifyOrders(filterOrdersByDisplayType(allOrders, displayOnly), classifiedOrders, 'orders')
+    classifyOrders(filterOrdersByDisplayType(allPendingOrders, displayOnly), classifiedOrders, 'pendingOrders')
 
     setClassifiedOrders(curr => {
       // copy markedForDeletion
@@ -122,7 +147,7 @@ const OrdersWidget: React.FC = () => {
       )
       return classifiedOrders
     })
-  }, [allOrders, allPendingOrders, setClassifiedOrders])
+  }, [allOrders, allPendingOrders, displayOnly, setClassifiedOrders])
 
   const ordersCount = displayedOrders.length + displayedPendingOrders.length
 
@@ -339,10 +364,6 @@ const OrdersWidget: React.FC = () => {
                 {
                   type: 'fills',
                   count: trades.length,
-                },
-                {
-                  type: 'liquidity',
-                  count: classifiedOrders.liquidity.orders.length + classifiedOrders.active.pendingOrders.length,
                 },
                 {
                   type: 'closed',

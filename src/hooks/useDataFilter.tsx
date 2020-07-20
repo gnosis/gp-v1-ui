@@ -46,7 +46,7 @@ function useDataFilter<T>({
     const clearFilters = (): void => {
       setSearch('')
       setDebouncedSearch('')
-      setShowFilter(false)
+      setShowFilter(isSearchFilter)
     }
 
     return {
@@ -54,7 +54,7 @@ function useDataFilter<T>({
       handleToggleFilter,
       clearFilters,
     }
-  }, [setDebouncedSearch])
+  }, [setDebouncedSearch, isSearchFilter])
 
   const filteredData = useMemo(() => {
     const failsBasicSearchReq = !showFilter || (isSearchFilter && !debouncedSearch) || !data || data.length === 0
