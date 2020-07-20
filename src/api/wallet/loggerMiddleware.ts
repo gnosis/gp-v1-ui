@@ -1,7 +1,7 @@
 import { JsonRpcMiddleware } from 'json-rpc-engine'
 
 export const createLoggerMiddleware = (): JsonRpcMiddleware => {
-  let logRequestResponse = true
+  let logRequestResponse = false
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ;(window as any).logMiddleware = (enableLogging: boolean): void => {
