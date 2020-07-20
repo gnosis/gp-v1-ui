@@ -60,14 +60,3 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
     }
   }
 `
-
-export const ResponsiveTitleRow = styled.td`
-  // force first
-  order: -1;
-
-  > div:first-of-type {
-    display: flex;
-    justify-content: center;
-    align-items: items;
-  }
-`
