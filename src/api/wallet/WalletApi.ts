@@ -292,7 +292,7 @@ export class WalletApiImpl implements WalletApi {
         package: (
           await import(
             /* webpackChunkName: "@walletconnect"*/
-            '@walletconnect/web3-provider'
+            './customWCProvider'
             // '@walletconnect/web3-provider/dist/umd/index.min.js' // this also works
             // because inde.min is a full bundle minified with all correct dependencies
           )
@@ -311,38 +311,6 @@ export class WalletApiImpl implements WalletApi {
     if (!provider) return false
 
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
-    else if (isWalletConnectProvider(provider)) {
-      // hackaround
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-      // @ts-ignore
-      provider.handleReadRequests = async function(payload: unknown): Promise<unknown> {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        if (!this.http) {
-          const error = new Error('HTTP Connection not available')
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-          // @ts-ignore
-          this.emit('error', error)
-          throw error
-        }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-        // @ts-ignore
-        return this.http.send(payload)
-
-        // was
-        // this.http.send(payload);
-
-        // return new Promise(resolve => {
-        //   this.on("payload", (response: IJsonRpcResponseSuccess) => {
-        //     if (response.id === payload.id) {
-        //       resolve(response);
-        //     }
-        //   });
-        // });
-
-        // but HttpConnection doesn't have any events
-      }
-    }
 
     this._provider = provider
 

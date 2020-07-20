@@ -7,7 +7,7 @@ import RpcEngine, {
 } from 'json-rpc-engine'
 import { TransactionConfig } from 'web3-core'
 import { numberToHex } from 'web3-utils'
-import { isWalletConnectProvider, Provider } from './providerUtils'
+import { Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
 import { createLoggerMiddleware } from './loggerMiddleware'
@@ -46,37 +46,6 @@ const supportsRequestMethod = (provider: Provider): provider is Provider & { req
 
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
-  // WalletConnectProvider.sendAsync is web3-provider-engine.sendAsync
-  // it doesn't pass payload on to HttpConnection (WalletConnectProvider.http)
-  // WalletConnectProvider.send with callback also doesn't
-  // need to either strip callback and call 'send'
-  // or use 'request', valid only for call requests
-  // txs have to go through send(sendAsync) with callback
-  if (isWalletConnectProvider(provider)) {
-    const methodsToSend = new Set(['eth_sendRawTransaction', 'eth_sendTransaction', 'eth_sign'])
-
-    return (req, res, _next, end): void => {
-      // send request to provider
-
-      if (methodsToSend.has(req.method)) {
-        provider.send(req, (err: JsonRpcError<unknown>, providerRes: JsonRpcResponse<unknown>) => {
-          // forward any error
-          if (err) return end(err)
-          // copy provider response onto original response
-          Object.assign(res, providerRes)
-          end()
-        })
-
-        return
-      }
-
-      provider.request(req).then(providerRes => {
-        Object.assign(res, providerRes)
-        end()
-      }, end)
-    }
-  }
-
   if (supportsRequestMethod(provider)) {
     return async (req, res, _next, end): Promise<void> => {
       try {
