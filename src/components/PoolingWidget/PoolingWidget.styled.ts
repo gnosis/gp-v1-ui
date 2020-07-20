@@ -58,8 +58,7 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
 
   @media ${MEDIA.tablet} {
     > form {
-      min-width: 100%;
-      max-width: 100%;
+      width: 100%;
       padding: 2rem 4rem;
     }
   }
