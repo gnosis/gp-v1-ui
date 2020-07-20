@@ -37,7 +37,7 @@ interface WithdrawState {
   tokenAddress: string
 }
 
-const BalancesWidget = styled(CardWidgetWrapper)`
+export const BalancesWidget = styled(CardWidgetWrapper)`
   background: var(--color-background-pageWrapper);
   height: 100%;
 
