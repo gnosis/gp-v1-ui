@@ -159,7 +159,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         <HighlightedText>Onchain orderbook price</HighlightedText> <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for
         selling{' '}
         <strong>
-          {+amount || '1'} {displayQtName}
+          {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
         :
       </span>
