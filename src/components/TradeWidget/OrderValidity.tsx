@@ -9,7 +9,7 @@ import cog from 'assets/img/cog.svg'
 
 // utils, const
 import { ZERO } from '@gnosis.pm/dex-js'
-import { formatTimeInHours, makeMultipleOf } from 'utils'
+import { formatTimeInHours, makeMultipleOf, dateToBatchId, batchIdToDate } from 'utils'
 import { MEDIA, VALID_UNTIL_DEFAULT, VALID_FROM_DEFAULT } from 'const'
 
 // components
@@ -52,15 +52,19 @@ const TimePicker: React.FC<TimePickerProps> = ({ control, formValues, minDate = 
       render={({ onChange }): JSX.Element => (
         <DateTimePicker
           {...restProps}
-          onChange={onChange}
+          onChange={(e): void => {
+            console.debug('EVENT::', e, 'BATCHID::', dateToBatchId(e))
+            onChange(makeMultipleOf(5, dateToBatchId(e)))
+          }}
           dateAdapter={memoizedDateAdapter}
-          value={formValues.value}
+          value={batchIdToDate(Number(formValues.value))}
           renderInput={(props): JSX.Element => (
             <TextField
-              name={formValues.inputName}
               {...props}
+              label="Select date"
+              name={formValues.inputName}
               error={Boolean(currentError)}
-              // helperText={currentError ?? props.helperText}
+              helperText={currentError && <FormInputError errorMessage={currentError.message} />}
               // Make sure that your 3d param is set to `true` in order to run validation
               // onBlur={() => form.setFieldTouched(name, true, true)}
             />
