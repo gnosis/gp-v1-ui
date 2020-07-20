@@ -7,7 +7,7 @@ import { faTrashAlt, faChevronDown, faChevronUp } from '@fortawesome/free-solid-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Const and utils
-import { isOrderActive, isPendingOrderActive } from 'utils'
+import { isOrderActive, isPendingOrderActive, isTradeSettled, isTradeReverted } from 'utils'
 import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 import { filterTradesFn, filterOrdersFn } from 'utils/filter'
 
@@ -307,12 +307,17 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
+  const settledAndNotRevertedTrades = useMemo(
+    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
+    [trades],
+  )
+
   const {
     filteredData: filteredTrades,
     search: tradesSearch,
     handlers: { handleSearch: handleTradesSearch },
   } = useDataFilter<Trade>({
-    data: trades,
+    data: settledAndNotRevertedTrades,
     filterFnFactory: filterTradesFn,
   })
 
@@ -390,7 +395,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                 <ShowOrdersButton
                   type="fills"
                   isActive={selectedTab === 'fills'}
-                  count={trades.length}
+                  count={settledAndNotRevertedTrades.length}
                   onClick={setSelectedTabFactory('fills')}
                 />
                 <ShowOrdersButton
