@@ -43,8 +43,8 @@ const Wrapper = styled.div`
 
     > section {
       width: 100%;
+
       @media ${MEDIA.mobile} {
-        width: 100%;
         overflow: initial;
       }
     }
