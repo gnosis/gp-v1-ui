@@ -44,30 +44,13 @@ export const ContentPage = styled.div`
 `
 
 export const StandaloneCardWrapper = styled.div`
+  height: 100%;
   width: 100%;
   display: flex;
+  flex: 1 auto;
   flex-flow: column wrap;
   position: relative;
 
-  /* In use when accessed as a dedicated page and not part of OrdersPanel */
-  background: var(--color-background-pageWrapper);
-  box-shadow: var(--box-shadow-wrapper);
-  border-radius: 0.6rem;
-  min-height: 54rem;
-  min-width: 85rem;
-  max-width: 140rem;
-  /* ====================================================================== */
-
-  @media ${MEDIA.tablet} {
-    max-width: 100%;
-    min-width: 73.7rem;
-  }
-
-  @media ${MEDIA.mobile} {
-    max-width: 100%;
-    min-width: 100%;
-    min-height: 25rem;
-  }
   // Pages in standalone mode use bigger fonts
   ${CardWidgetWrapper} {
     > table {
@@ -76,5 +59,28 @@ export const StandaloneCardWrapper = styled.div`
         font-size: 1.3rem;
       }
     }
+  }
+`
+export const PageWrapper = styled.section`
+  height: 71rem;
+  min-width: 85rem;
+  max-width: 100%;
+
+  background: var(--color-background-pageWrapper);
+  border-radius: 0.6rem;
+  box-shadow: var(--box-shadow-wrapper);
+
+  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
+    min-height: 35rem;
+    height: auto;
+    // max-width: 100%;
+  }
+
+  @media ${MEDIA.tablet} {
+    min-width: 72.7rem;
+  }
+
+  @media ${MEDIA.mobile} {
+    min-width: 100%;
   }
 `

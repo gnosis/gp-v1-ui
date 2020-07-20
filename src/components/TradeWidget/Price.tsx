@@ -16,6 +16,7 @@ import { TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+import { EllipsisText } from 'components/Layout'
 
 const Wrapper = styled.div`
   display: flex;
@@ -104,13 +105,6 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
     @media ${MEDIA.mobile} {
       font-size: 1rem;
       letter-spacing: 0.03rem;
-    }
-    > small:not(:nth-child(2)) {
-      font-size: inherit;
-      max-width: 6ch;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
     }
     > small:nth-child(2) {
       margin: 0 0.3rem;
@@ -249,9 +243,13 @@ const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <div>
-            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+            <EllipsisText as="small" title={receiveToken.symbol}>
+              {receiveToken.symbol}
+            </EllipsisText>
             <small>per</small>
-            <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <EllipsisText as="small" title={sellToken.symbol}>
+              {sellToken.symbol}
+            </EllipsisText>
             <SwapIcon swap={swapPrices} />
           </div>
         </label>
@@ -271,9 +269,13 @@ const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <div>
-            <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <EllipsisText as="small" title={sellToken.symbol}>
+              {sellToken.symbol}
+            </EllipsisText>
             <small>per</small>
-            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+            <EllipsisText as="small" title={receiveToken.symbol}>
+              {receiveToken.symbol}
+            </EllipsisText>
             <SwapIcon swap={swapPrices} />
           </div>
         </label>
