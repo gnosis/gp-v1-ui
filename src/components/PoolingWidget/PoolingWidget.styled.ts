@@ -70,7 +70,8 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
     font-size: 1.3rem;
 
     > form {
-      width: 100%;
+      min-width: 100%;
+      max-width: 100%;
       padding: 1.6rem;
     }
 
