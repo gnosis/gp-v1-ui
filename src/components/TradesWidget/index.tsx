@@ -22,7 +22,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 import { toCsv, CsvColumns } from 'utils/csv'
 import { filterTradesFn } from 'utils/filter'
 
-import { getNetworkFromId, isTradeSettled, isTradeReverted, divideBN } from 'utils'
+import { getNetworkFromId, divideBN } from 'utils'
 import { symbolOrAddress } from 'utils/display'
 
 const CsvButtonContainer = styled.div`
@@ -129,18 +129,13 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
 
   const { networkId, userAddress } = useWalletConnection()
 
-  const filteredTrades = useMemo(
-    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
-    [trades],
-  )
-
   const generateCsv = useCallback(
     () =>
       toCsv({
-        data: filteredTrades,
+        data: trades,
         transformer: csvTransformer,
       }),
-    [filteredTrades],
+    [trades],
   )
 
   const filename = useMemo(
@@ -185,7 +180,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
         </tr>
       </thead>
       <tbody>
-        {filteredTrades.map(trade => (
+        {trades.map(trade => (
           <TradeRow key={trade.id} trade={trade} networkId={networkId} />
         ))}
       </tbody>
