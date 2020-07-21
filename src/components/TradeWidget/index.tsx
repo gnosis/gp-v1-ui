@@ -868,15 +868,7 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (
-      !buyAmount ||
-      buyAmount.isZero() ||
-      !sellAmount ||
-      sellAmount.isZero() ||
-      !cachedBuyToken ||
-      !cachedSellToken ||
-      !networkId
-    ) {
+    if (!buyAmount || buyAmount.isZero() || !sellAmount || sellAmount.isZero() || !cachedBuyToken || !cachedSellToken) {
       logDebug(
         `Preventing null values on submit: 
         buyAmount:${buyAmount}, sellAmount:${sellAmount}, 
@@ -894,7 +886,7 @@ const TradeWidget: React.FC = () => {
       sellToken: cachedSellToken,
       buyToken: cachedBuyToken,
     }
-    if (isConnected && userAddress) {
+    if (isConnected && userAddress && networkId) {
       await _placeOrder({
         ...orderParams,
         networkId,
