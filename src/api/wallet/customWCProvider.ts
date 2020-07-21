@@ -12,7 +12,6 @@ const overrides = {
     this: WalletConnectProvider,
     payload: IJsonRpcRequest,
   ): Promise<IJsonRpcResponseSuccess | IJsonRpcResponseError> {
-    console.log('P', payload)
     try {
       let response
       let result = null

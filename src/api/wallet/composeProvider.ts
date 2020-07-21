@@ -107,7 +107,7 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
       try {
         // send request to provider
         const providerRes = await provider.request(req)
-        console.log('CPROV::providerResult', providerRes)
+        // console.log('CPROV::providerResult', providerRes)
 
         // attach result from provider
         res.result = providerRes
