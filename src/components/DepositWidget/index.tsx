@@ -183,13 +183,7 @@ interface BalanceDisplayProps extends TokenLocalState {
   ): Promise<void>
 }
 
-const customFilterFnFactory = (localTokens: LocalTokensState) => (searchTxt: string) => ({
-  symbol,
-  name,
-  address,
-}: TokenBalanceDetails): boolean => {
-  if (localTokens.disabled.has(address)) return false
-
+const customFilterFnFactory = (searchTxt: string) => ({ symbol, name, address }: TokenBalanceDetails): boolean => {
   if (searchTxt === '') return true
 
   return (
@@ -229,7 +223,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const memoizedSearchFilterParams = useMemo(
     () => ({
       data: balances,
-      filterFnFactory: customFilterFnFactory(localTokens),
+      filterFnFactory: customFilterFnFactory,
       userConditionalCheck: ({ debouncedSearch }: { debouncedSearch: string }): boolean =>
         !debouncedSearch && localTokens.disabled.size === 0,
     }),
