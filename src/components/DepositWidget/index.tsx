@@ -29,7 +29,6 @@ import { useEthBalances } from 'hooks/useEthBalance'
 import useDataFilter from 'hooks/useDataFilter'
 
 // Reducer/Actions
-import { LocalTokensState } from 'reducers-actions/localTokens'
 import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
@@ -291,41 +290,49 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               </tr>
             </thead>
             <tbody>
-              {displayedBalances && displayedBalances.length > 0
-                ? displayedBalances.map(tokenBalances => (
-                    <Row
-                      key={tokenBalances.address}
-                      ethBalance={ethBalance}
-                      tokenBalances={tokenBalances}
-                      onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                      onSubmitDeposit={(balance, onTxHash): Promise<void> =>
-                        depositToken(balance, tokenBalances.address, onTxHash)
-                      }
-                      onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
-                        return requestWithdrawConfirmation(
-                          balance,
-                          tokenBalances.address,
-                          tokenBalances.claimable,
-                          onTxHash,
-                        )
-                      }}
-                      onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
-                      claiming={claiming.has(tokenBalances.address)}
-                      withdrawing={withdrawing.has(tokenBalances.address)}
-                      depositing={depositing.has(tokenBalances.address)}
-                      highlighted={highlighted.has(tokenBalances.address)}
-                      enabling={enabling.has(tokenBalances.address)}
-                      enabled={enabled.has(tokenBalances.address)}
-                      {...windowSpecs}
-                    />
-                  ))
-                : (search || hideZeroBalances) && (
-                    <NoTokensMessage>
-                      <td>
-                        No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
-                      </td>
-                    </NoTokensMessage>
-                  )}
+              {displayedBalances && displayedBalances.length > 0 ? (
+                displayedBalances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.address}
+                    ethBalance={ethBalance}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                      depositToken(balance, tokenBalances.address, onTxHash)
+                    }
+                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                      return requestWithdrawConfirmation(
+                        balance,
+                        tokenBalances.address,
+                        tokenBalances.claimable,
+                        onTxHash,
+                      )
+                    }}
+                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    claiming={claiming.has(tokenBalances.address)}
+                    withdrawing={withdrawing.has(tokenBalances.address)}
+                    depositing={depositing.has(tokenBalances.address)}
+                    highlighted={highlighted.has(tokenBalances.address)}
+                    enabling={enabling.has(tokenBalances.address)}
+                    enabled={enabled.has(tokenBalances.address)}
+                    {...windowSpecs}
+                  />
+                ))
+              ) : balances.length === 0 ? (
+                <NoTokensMessage>
+                  <td>
+                    All tokens disabled. Enable some in <a onClick={toggleModal}>Manage Tokens</a>
+                  </td>
+                </NoTokensMessage>
+              ) : (
+                (search || hideZeroBalances) && (
+                  <NoTokensMessage>
+                    <td>
+                      No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                    </td>
+                  </NoTokensMessage>
+                )
+              )}
             </tbody>
           </CardTable>
         )}
