@@ -65,6 +65,8 @@ import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
 
 import { DevTool } from 'HookFormDevtool'
+import { ButtonWrapper } from 'hooks/useSubmitTxModal'
+import { TxMessage } from './TxMessage'
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
@@ -928,12 +930,14 @@ const TradeWidget: React.FC = () => {
     })
   }
 
+  const onConfirm = handleSubmit(onSubmit)
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
-        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
+        <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             autoFocus
@@ -993,15 +997,20 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
           />
           <p>This order might be partially filled.</p>
-          <SubmitButton
-            data-text="This order might be partially filled."
-            type="submit"
-            disabled={isSubmitting}
-            tabIndex={1}
+          <ButtonWrapper
+            onConfirm={onConfirm}
+            message={(): React.ReactNode => <TxMessage sellToken={sellToken} receiveToken={receiveToken} />}
           >
-            {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
-            {sameToken ? 'Please select different tokens' : 'Submit limit order'}
-          </SubmitButton>
+            <SubmitButton
+              data-text="This order might be partially filled."
+              type="submit"
+              disabled={isSubmitting || !methods.formState.isValid}
+              tabIndex={1}
+            >
+              {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
+              {sameToken ? 'Please select different tokens' : 'Submit limit order'}
+            </SubmitButton>
+          </ButtonWrapper>
         </WrappedForm>
       </FormContext>
       <ExpandableOrdersPanel>
