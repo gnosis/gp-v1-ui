@@ -34,7 +34,8 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
   return (
     <>
-      <Spinner size="sm" /> Pending...
+      <Spinner size="sm" />
+      &nbsp;Pending...
       <br />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
     </>
