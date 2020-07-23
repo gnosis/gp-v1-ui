@@ -15,15 +15,9 @@ import { TEN_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
 import { TokenDetails, Network } from 'types'
 import BN from 'bn.js'
 import { DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+import useSafeState from 'hooks/useSafeState'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
-
-interface OrderBookProps {
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
-  networkId: number
-  hops?: number
-}
 
 const Wrapper = styled.div`
   display: flex;
@@ -229,129 +223,163 @@ function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetai
   })
 }
 
-const draw = (
-  chartElement: HTMLElement,
-  baseToken: TokenDetails,
-  quoteToken: TokenDetails,
-  networkId: number,
-  hops?: number,
-): am4charts.XYChart => {
-  const baseTokenLabel = safeTokenName(baseToken)
-  const quoteTokenLabel = safeTokenName(quoteToken)
-  const market = baseTokenLabel + '-' + quoteTokenLabel
-  am4core.useTheme(am4themesSpiritedaway)
-  am4core.options.autoSetClassName = true
-  const chart = am4core.create(chartElement, am4charts.XYChart)
-  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
-
-  // Create axes
-  const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
-  // Making the scale start with the first value, without empty spaces
-  // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
-  xAxis.strictMinMax = true
-  // How small we want the column separators be, in pixels
-  // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
-  xAxis.renderer.minGridDistance = 40
-
-  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
-
-  const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
-  yAxis.title.text = baseTokenLabel
-
-  // Add data
-  chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
-    baseTokenId: baseToken.id,
-    quoteTokenId: quoteToken.id,
-    hops,
-    networkId,
-  })
-  chart.dataSource.adapter.add('parsedData', data => {
-    try {
-      const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
-      const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
-      const pricePoints = bids.concat(asks)
-
-      _printOrderBook(pricePoints, baseToken, quoteToken)
-
-      // dynamically adjust X axis length based on prices
-      const biggestBid = bids.length ? bids[bids.length - 1].price : null
-      const smallestAsk = asks.length ? asks[0].price : null
-
-      console.log(`BB: ${biggestBid?.toNumber()}; SA: ${smallestAsk?.toNumber()}`)
-
-      if (biggestBid && smallestAsk) {
-        const spread = smallestAsk
-          .minus(biggestBid)
-          .abs() // they might overlap
-          .toNumber()
-        // TODO: magic number
-        const maxRange = spread * 5
-        xAxis.min = Math.max(0, biggestBid.minus(maxRange).toNumber())
-        xAxis.max = smallestAsk.plus(maxRange).toNumber()
-      } else if (biggestBid) {
-        // TODO: magic number
-        const maxRange = biggestBid.minus(bids[0].price).multipliedBy(0.05)
-        xAxis.max = biggestBid.plus(maxRange).toNumber()
-      } else if (smallestAsk) {
-        // TODO: magic number
-        const maxRange = asks[asks.length - 1].price.minus(smallestAsk).multipliedBy(0.05)
-        xAxis.min = Math.max(smallestAsk.minus(maxRange).toNumber(), 0)
-      }
-
-      return pricePoints
-    } catch (error) {
-      console.error('Error processing data', error)
-      return []
-    }
-  })
-
-  // Colors
-  const colors = {
-    green: '#3d7542',
-    red: '#dc1235',
-  }
-
-  // Create series
-  const bidSeries = chart.series.push(new am4charts.StepLineSeries())
-  bidSeries.dataFields.valueX = 'priceNumber'
-  bidSeries.dataFields.valueY = 'bidValueY'
-  bidSeries.strokeWidth = 1
-  bidSeries.stroke = am4core.color(colors.green)
-  bidSeries.fill = bidSeries.stroke
-  bidSeries.fillOpacity = 0.1
-  bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-
-  const askSeries = chart.series.push(new am4charts.StepLineSeries())
-  askSeries.dataFields.valueX = 'priceNumber'
-  askSeries.dataFields.valueY = 'askValueY'
-  askSeries.strokeWidth = 1
-  askSeries.stroke = am4core.color(colors.red)
-  askSeries.fill = askSeries.stroke
-  askSeries.fillOpacity = 0.1
-  askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-
-  // Add cursor
-  chart.cursor = new am4charts.XYCursor()
-  return chart
+interface ChartProps {
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+  networkId: number
+  hops?: number
+  zoom?: number
 }
 
-const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken, networkId, hops } = props
+export const Chart: React.FC<ChartProps> = props => {
+  const { baseToken, quoteToken, networkId, hops, zoom } = props
+  const [chart, setChart] = useSafeState<null | am4charts.XYChart>(null)
+  const [defaults, setDefaults] = useSafeState<{ min?: number; max?: number }>({})
+
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!mountPoint.current) return
-    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops)
+    if (!mountPoint.current) {
+      return
+    }
 
-    return (): void => chart.dispose()
-  }, [baseToken, quoteToken, networkId, hops])
+    const _chart = am4core.create(mountPoint.current, am4charts.XYChart)
 
-  return (
-    <Wrapper ref={mountPoint}>
-      Show order book for token {safeTokenName(baseToken)} ({baseToken.id}) and {safeTokenName(baseToken)} (
-      {quoteToken.id})
-    </Wrapper>
-  )
+    // Create axes
+    const xAxis = _chart.xAxes.push(new am4charts.ValueAxis())
+    // Making the scale start with the first value, without empty spaces
+    // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
+    xAxis.strictMinMax = true
+    // How small we want the column separators be, in pixels
+    // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
+    xAxis.renderer.minGridDistance = 40
+
+    _chart.yAxes.push(new am4charts.ValueAxis())
+
+    // Colors
+    const colors = {
+      green: '#3d7542',
+      red: '#dc1235',
+    }
+
+    // Create series
+    const bidSeries = _chart.series.push(new am4charts.StepLineSeries())
+    bidSeries.dataFields.valueX = 'priceNumber'
+    bidSeries.dataFields.valueY = 'bidValueY'
+    bidSeries.strokeWidth = 1
+    bidSeries.stroke = am4core.color(colors.green)
+    bidSeries.fill = bidSeries.stroke
+    bidSeries.fillOpacity = 0.1
+
+    const askSeries = _chart.series.push(new am4charts.StepLineSeries())
+    askSeries.dataFields.valueX = 'priceNumber'
+    askSeries.dataFields.valueY = 'askValueY'
+    askSeries.strokeWidth = 1
+    askSeries.stroke = am4core.color(colors.red)
+    askSeries.fill = askSeries.stroke
+    askSeries.fillOpacity = 0.1
+
+    // Add cursor
+    _chart.cursor = new am4charts.XYCursor()
+
+    _chart.cursor.snapToSeries = [bidSeries, askSeries]
+
+    am4core.useTheme(am4themesSpiritedaway)
+    am4core.options.autoSetClassName = true
+
+    setChart(_chart)
+
+    return (): void => _chart.dispose()
+    // We'll create only one instance as long as the component is not unmounted
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (chart) {
+      const baseTokenLabel = safeTokenName(baseToken)
+      const quoteTokenLabel = safeTokenName(quoteToken)
+      const market = baseTokenLabel + '-' + quoteTokenLabel
+
+      const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
+
+      // Axes configs
+      const xAxis = chart.xAxes.values[0]
+      xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+
+      const yAxis = chart.yAxes.values[0]
+      yAxis.title.text = baseTokenLabel
+
+      // Add data
+      chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+        baseTokenId: baseToken.id,
+        quoteTokenId: quoteToken.id,
+        hops,
+        networkId,
+      })
+
+      // Removing any previous event handler
+      chart.dataSource.adapter.remove('parsedData')
+      // Adding new event handler
+      chart.dataSource.adapter.add('parsedData', data => {
+        try {
+          const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
+          const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
+          const pricePoints = bids.concat(asks)
+
+          _printOrderBook(pricePoints, baseToken, quoteToken)
+
+          // dynamically adjust X axis length based on prices
+          const biggestBid = bids.length ? bids[bids.length - 1].price : null
+          const smallestAsk = asks.length ? asks[0].price : null
+
+          if (biggestBid && smallestAsk) {
+            const spread = smallestAsk
+              .minus(biggestBid)
+              .abs() // they might overlap
+              .toNumber()
+            // TODO: magic number
+            const maxRange = spread * 5
+            const min = Math.max(0, biggestBid.minus(maxRange).toNumber())
+            const max = smallestAsk.plus(maxRange).toNumber()
+            setDefaults({ min, max })
+            console.log(`updated min ${min} max ${max} | both present`)
+          } else if (biggestBid) {
+            // TODO: magic number
+            const maxRange = biggestBid.minus(bids[0].price).multipliedBy(0.05)
+            const max = biggestBid.plus(maxRange).toNumber()
+            const min = undefined
+            setDefaults({ min, max })
+            console.log(`updated min ${min} max ${max} | only bids`)
+          } else if (smallestAsk) {
+            // TODO: magic number
+            const maxRange = asks[asks.length - 1].price.minus(smallestAsk).multipliedBy(0.05)
+            const min = Math.max(smallestAsk.minus(maxRange).toNumber(), 0)
+            const max = undefined
+            setDefaults({ min, max })
+            console.log(`updated min ${min} max ${max} | only asks`)
+          } else {
+            setDefaults({ min: undefined, max: undefined })
+            console.log(`updated min - max - | nothing`)
+          }
+
+          return pricePoints
+        } catch (error) {
+          console.error('Error processing data', error)
+          return []
+        }
+      })
+
+      // Reload data from data source re-using same chart
+      chart.dataSource.load()
+
+      // Setting up tooltips based on currently loaded tokens
+      const [bidSeries, askSeries] = chart.series.values
+      bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+      askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+    }
+  }, [baseToken, chart, hops, networkId, quoteToken, setDefaults])
+
+  useEffect(() => {
+
+  return <Wrapper ref={mountPoint} />
 }
-
-export default OrderBookWidget

@@ -13,7 +13,7 @@ import { safeTokenName, getNetworkFromId } from '@gnosis.pm/dex-js'
 
 // components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
-import OrderBookWidget from 'components/OrderBookWidget'
+import { Chart } from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 
 // hooks
@@ -167,7 +167,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
             }
           />
         </span>
-        <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
+        <Chart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
       </ModalWrapper>
     ),
     buttons: [
