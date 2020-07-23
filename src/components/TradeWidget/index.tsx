@@ -669,10 +669,17 @@ const TradeWidget: React.FC = () => {
 
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
 
+  const resetPrices = useCallback((): void => {
+    setValue(priceInputId, '0')
+    setValue(priceInverseInputId, '0')
+  }, [setValue])
+
   const swapTokens = useCallback((): void => {
     setSellToken(receiveTokenBalance)
     setReceiveToken(sellTokenBalance)
-  }, [receiveTokenBalance, sellTokenBalance])
+    // selected price no longer has meaning, reset and force user pick/insert new one
+    resetPrices()
+  }, [receiveTokenBalance, resetPrices, sellTokenBalance])
 
   const onSelectChangeFactory = useCallback(
     (
@@ -684,10 +691,12 @@ const TradeWidget: React.FC = () => {
           swapTokens()
         } else {
           setToken(selected)
+          // selected price no longer has meaning, reset and force user pick/insert new one
+          resetPrices()
         }
       }
     },
-    [swapTokens],
+    [swapTokens, resetPrices],
   )
 
   const sameToken = sellToken === receiveToken
