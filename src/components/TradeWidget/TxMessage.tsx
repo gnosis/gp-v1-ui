@@ -35,10 +35,10 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
       </p>
       <p>At a price of</p>
       <p>
-        {price} {displaySellToken} per {displayReceiveToken}
+        {priceInverse} {displaySellToken} per {displayReceiveToken}
       </p>
       <p>
-        {priceInverse} {displayReceiveToken} per {displaySellToken}
+        {price} {displayReceiveToken} per {displaySellToken}
       </p>
       <p>
         <strong>
