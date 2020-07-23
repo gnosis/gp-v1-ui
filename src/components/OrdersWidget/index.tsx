@@ -193,6 +193,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     displayedOrders,
     DEFAULT_ORDERS_SORTABLE_TOPIC,
     compareFnFactory,
+    'desc',
   )
 
   // Why 2 useDataFilter instead of concatenating pending + current?
