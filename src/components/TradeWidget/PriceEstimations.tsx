@@ -70,7 +70,7 @@ interface PriceEstimationsProps {
 export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
   const { amount, isPriceInverted, priceInputId, priceInverseInputId } = props
 
-  const { setValue } = useFormContext<TradeFormData>()
+  const { setValue, triggerValidation } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => (): void => {
@@ -81,8 +81,9 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
         setValue(priceInverseInputId, price)
         setValue(priceInputId, invertedPrice)
       }
+      triggerValidation()
     },
-    [isPriceInverted, setValue, priceInputId, priceInverseInputId],
+    [isPriceInverted, triggerValidation, setValue, priceInputId, priceInverseInputId],
   )
 
   return (
