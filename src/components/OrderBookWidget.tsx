@@ -295,7 +295,9 @@ export const Chart: React.FC<ChartProps> = props => {
   }, [])
 
   useEffect(() => {
+    console.log(`something changed, updating everything!!!`)
     if (chart) {
+      console.log(`and we have a chart!!`)
       const baseTokenLabel = safeTokenName(baseToken)
       const quoteTokenLabel = safeTokenName(quoteToken)
       const market = baseTokenLabel + '-' + quoteTokenLabel
@@ -331,6 +333,8 @@ export const Chart: React.FC<ChartProps> = props => {
           // dynamically adjust X axis length based on prices
           const biggestBid = bids.length ? bids[bids.length - 1].price : null
           const smallestAsk = asks.length ? asks[0].price : null
+
+          console.log(`BB: ${biggestBid?.toNumber()}; SA: ${smallestAsk?.toNumber()}`)
 
           if (biggestBid && smallestAsk) {
             const spread = smallestAsk
@@ -380,6 +384,29 @@ export const Chart: React.FC<ChartProps> = props => {
   }, [baseToken, chart, hops, networkId, quoteToken, setDefaults])
 
   useEffect(() => {
+    console.log(`zoom updated, updating chart: ${zoom}`)
+    if (chart && chart.xAxes.length > 0) {
+      console.log(`chart.xAxes.length ${chart.xAxes.length}: zoom ${zoom}`, chart.xAxes.values[0])
+      const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+
+      const { min = xAxis.min, max = xAxis.max } = defaults
+      if (zoom && min != undefined && max != undefined) {
+        const diff = (max - min) * zoom
+        const newMin = min + diff
+        const newMax = max - diff
+        if (newMin < newMax) {
+          // Only set new values if min < max
+          xAxis.min = min + diff
+          xAxis.max = max - diff
+        }
+      } else {
+        // Zoom set to 0, reset
+        xAxis.min = min
+        xAxis.max = max
+      }
+      console.log(`new min ${xAxis.min}|${min} new max ${xAxis.max}|${max} | zoom ${zoom}`)
+    }
+  }, [zoom, chart, defaults])
 
   return <Wrapper ref={mountPoint} />
 }
