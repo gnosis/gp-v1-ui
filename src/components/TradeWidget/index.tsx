@@ -604,7 +604,7 @@ const TradeWidget: React.FC = () => {
     defaultValues: defaultFormValues,
     validationResolver,
   })
-  const { handleSubmit, reset, watch, setValue } = methods
+  const { handleSubmit, reset, watch, setValue, formState } = methods
 
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
@@ -1006,6 +1006,10 @@ const TradeWidget: React.FC = () => {
               type="submit"
               disabled={isSubmitting}
               tabIndex={1}
+              onClick={(e): void => {
+                // don't show Submit Confirm modal for invalid form
+                if (!formState.isValid) e.stopPropagation()
+              }}
             >
               {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
               {sameToken ? 'Please select different tokens' : 'Submit limit order'}
