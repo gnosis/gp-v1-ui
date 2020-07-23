@@ -180,6 +180,7 @@ interface BalanceDisplayProps extends TokenLocalState {
     claimable: boolean,
     onTxHash: (hash: string) => void,
   ): Promise<void>
+  hasTokensToShow?: boolean
 }
 
 const customFilterFnFactory = (searchTxt: string) => ({ symbol, name, address }: TokenBalanceDetails): boolean => {
@@ -214,6 +215,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   enabling,
   enabled,
   requestWithdrawConfirmation,
+  hasTokensToShow = false,
 }) => {
   const windowSpecs = useWindowSizes()
 
@@ -318,7 +320,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                     {...windowSpecs}
                   />
                 ))
-              ) : balances.length === 0 ? (
+              ) : balances.length === 0 && hasTokensToShow ? (
                 <NoTokensMessage>
                   <td>
                     All tokens disabled. Enable some in <a onClick={toggleModal}>Manage Tokens</a>
@@ -404,6 +406,7 @@ const DepositWidget: React.FC = () => {
       <BalancesDisplayMemoed
         ethBalance={ethBalance}
         balances={balances}
+        hasTokensToShow={allBalances.length > 0}
         error={error}
         {...restActions}
         requestWithdrawConfirmation={requestWithdrawConfirmation}
