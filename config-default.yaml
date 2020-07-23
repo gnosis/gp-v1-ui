@@ -30,10 +30,12 @@ dexPriceEstimator:
   type: 'dex-price-estimator' # choices: dex-price-estimator
   config:
     - networkId: 1
-      url: https://dex-price-estimator.gnosis.io
+      url_production: https://dex-price-estimator.gnosis.io
+      url_develop: https://price-estimate-mainnet.dev.gnosisdev.com
 
     - networkId: 4
-      url: https://dex-price-estimator.rinkeby.gnosis.io
+      url_production: https://dex-price-estimator.rinkeby.gnosis.io
+      url_develop: https://price-estimate-rinkeby.dev.gnosisdev.com
 
 # Subgraph abstraction, used for getting the last price
 theGraphApi:
@@ -58,6 +60,15 @@ defaultProviderConfig:
   # config:
   #   ethNodeUrl: <local eth node>
 
+# Exchange contract config
+exchangeContractConfig:
+  type: 'contractBlock' # choices: contractBlock
+  config:
+    - networkId: 1
+      blockNumber: 9340147
+    - networkId: 4
+      blockNumber: 5844678
+
 # Wallet Connect
 walletConnect:
   bridge: 'wss://safe-walletconnect.gnosis.io/'
@@ -66,7 +77,7 @@ walletConnect:
 disabledTokens:
   1: # Mainnet
     - address: '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
-      name: Synthetics sUSD (deprecated)
+      name: Synth sUSD (deprecated)
       symbol: sUSD-old
       description: This token is disabled for trading and depositing. sUSD will be deprecated and replaced by another token at the end of July 2020.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED

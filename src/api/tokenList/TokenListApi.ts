@@ -136,11 +136,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   public addTokens({ tokens, networkId }: AddTokensParams): void {
     const addedTokens: TokenDetails[] = []
     tokens.forEach(token => {
-      logDebug('[TokenListApi]: Added new Token to userlist', token)
-
       const key = TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId })
 
       if (this._tokenAddressNetworkSet.has(key)) return
+      logDebug('[TokenListApi]: Added new Token to userlist', token)
 
       this._tokenAddressNetworkSet.add(key)
       addedTokens.push(token)

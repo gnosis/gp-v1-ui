@@ -227,7 +227,10 @@ const OrderValidityBox = styled(PriceInputBox)`
 `
 
 const OrderStartsTooltip = (
-  <HelpTooltipContainer>Orders that are valid ASAP will be considered for the next batch.</HelpTooltipContainer>
+  <HelpTooltipContainer>
+    Orders configured to start <strong>now</strong> will be considered for the next batch. Click the ⚙️ icon on the
+    right to customise order validity times.
+  </HelpTooltipContainer>
 )
 
 interface Props {
@@ -266,14 +269,18 @@ const OrderValidity: React.FC<Props> = ({
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
       // sanitize inputs as multiples of 5
-      const sanitizedFromValue = validFromInputValue ? makeMultipleOf(5, validFromInputValue).toString() : undefined
-      const sanitizedUntilValue = validUntilInputValue ? makeMultipleOf(5, validUntilInputValue).toString() : undefined
+      const sanitizedFromValue = makeMultipleOf(5, validFromInputValue)
+      const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue)
 
       batchedUpdates(() => {
-        if (!sanitizedFromValue) setAsap(true)
-        if (!sanitizedUntilValue) setUnlimited(true)
-        setValue(validFromInputId, sanitizedFromValue, true)
-        setValue(validUntilInputId, sanitizedUntilValue, true)
+        if (!sanitizedFromValue || !sanitizedUntilValue) {
+          !sanitizedFromValue
+            ? (setAsap(true), setValue(validFromInputId, undefined, true))
+            : setValue(validFromInputId, sanitizedFromValue.toString(), true)
+          !sanitizedUntilValue
+            ? (setUnlimited(true), setValue(validUntilInputId, undefined, true))
+            : setValue(validUntilInputId, sanitizedUntilValue.toString(), true)
+        }
       })
     }
 
@@ -312,9 +319,9 @@ const OrderValidity: React.FC<Props> = ({
 
   // This side effect is for not requiring disable on validFrom/Until inputs
   // and auto-magically updating the checkbox/values on change
-  // also allows auto focus and select when manually unchecking ASAP or Never checkboxes
+  // also allows auto focus and select when manually unchecking Now or Never checkboxes
   useEffect(() => {
-    // undefined validFrom input - set ASAP
+    // undefined validFrom input - set Now
     !validFromInputValue
       ? batchedUpdates(() => {
           setAsap(true)
@@ -356,9 +363,9 @@ const OrderValidity: React.FC<Props> = ({
     <Wrapper>
       <div>
         <div>
-          Order starts: <b>{formatTimeInHours(validFrom, 'ASAP')}</b>
+          Order starts: <b>{formatTimeInHours(validFrom!, 'Now')}</b>
           <HelpTooltip tooltip={OrderStartsTooltip} />
-          &nbsp;- expires: <b>{formatTimeInHours(validUntil, 'Never')}</b>
+          &nbsp;- expires: <b>{formatTimeInHours(validUntil!, 'Never')}</b>
         </div>
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
       </div>
@@ -377,7 +384,7 @@ const OrderValidity: React.FC<Props> = ({
               disabled={isDisabled}
               required
               ref={(e): void => {
-                register(e)
+                register(e!)
                 validFromRef.current = e
               }}
               onFocus={(e): void => e.target.select()}
@@ -391,7 +398,7 @@ const OrderValidity: React.FC<Props> = ({
                 onChange={handleASAPClick}
                 tabIndex={tabIndex}
               />
-              <small>ASAP</small>
+              <small>Now</small>
             </div>
           </label>
           <FormInputError errorMessage={validFromError?.message as string} />
@@ -406,7 +413,7 @@ const OrderValidity: React.FC<Props> = ({
               disabled={isDisabled}
               required
               ref={(e): void => {
-                register(e)
+                register(e!)
                 validUntilRef.current = e
               }}
               onFocus={(e): void => e.target.select()}

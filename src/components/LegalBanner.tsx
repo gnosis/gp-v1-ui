@@ -36,7 +36,7 @@ const BannerCloser = styled.span`
 }
 `
 
-const DISCLAIMER = 'GP_DISCLAIMER'
+const DISCLAIMER = 'DISCLAIMER'
 
 const LegalBanner: React.FC = ({ children }) => {
   const [open, setOpen] = useState(localStorage.getItem(DISCLAIMER) || 'OPEN')

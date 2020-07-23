@@ -1,16 +1,8 @@
 import styled from 'styled-components'
+import { CardWidgetWrapper } from './Card'
+import { MEDIA } from 'const'
 
-export const PageWrapper = styled.div<{ $bgColor?: string; $boxShadow?: string; $width?: string }>`
-  /* background-color: ${({ $bgColor = 'var(--color-background-pageWrapper)' }): string => $bgColor}; */
-  /* border-radius: var(--border-radius); */
-  /* box-shadow: ${({ $boxShadow = 'var(--box-shadow)' }): string => $boxShadow}; */
-  /* margin: auto; */
-  /* padding: 0; */
-  /* width: ${({ $width = '95vw' }): string => $width}; */
-  /* width: 100%; */
-`
-
-export const ContentPage = styled(PageWrapper)`
+export const ContentPage = styled.div`
   display: flex;
   flex-flow: row wrap;
   padding: 2.4rem 2.4rem 8rem;
@@ -20,10 +12,7 @@ export const ContentPage = styled(PageWrapper)`
   position: relative;
   max-width: 85rem;
   background: var(--color-background-pageWrapper);
-  box-shadow: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
-    rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
-    rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
-    rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
+  box-shadow: var(--box-shadow-wrapper);
   border-radius: 0.6rem;
   margin: 0 auto;
   min-height: 54rem;
@@ -51,5 +40,47 @@ export const ContentPage = styled(PageWrapper)`
     display: block;
     margin: 0;
     width: 100%;
+  }
+`
+
+export const StandaloneCardWrapper = styled.div`
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex: 1 auto;
+  flex-flow: column wrap;
+  position: relative;
+
+  // Pages in standalone mode use bigger fonts
+  ${CardWidgetWrapper} {
+    > table {
+      > thead,
+      > tbody {
+        font-size: 1.3rem;
+      }
+    }
+  }
+`
+export const PageWrapper = styled.section`
+  height: 71rem;
+  min-width: 85rem;
+  max-width: 100%;
+
+  background: var(--color-background-pageWrapper);
+  border-radius: 0.6rem;
+  box-shadow: var(--box-shadow-wrapper);
+
+  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
+    min-height: 35rem;
+    height: auto;
+    // max-width: 100%;
+  }
+
+  @media ${MEDIA.tablet} {
+    min-width: 72.7rem;
+  }
+
+  @media ${MEDIA.mobile} {
+    min-width: 100%;
   }
 `

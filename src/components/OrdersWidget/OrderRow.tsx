@@ -3,42 +3,39 @@ import { toast } from 'toastify'
 
 // types, utils and services
 import { TokenDetails } from 'types'
-import { isOrderUnlimited, isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
-import { getTokenFromExchangeById } from 'services'
+import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
 
 // assets
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import alertIcon from 'assets/img/alert.svg'
-import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
 import { Spinner } from 'components/Spinner'
+import { StatusCountdown } from 'components/StatusCountdown'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
 
 import {
-  safeTokenName,
   formatSmart,
   formatDateFromBatchId,
   batchIdToDate,
   isOrderFilled,
   dateToBatchId,
-  formatSeconds,
   getTimeRemainingInBatch,
 } from 'utils'
-import { onErrorFactory } from 'utils/onError'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
 
-import { OrderRowWrapper } from './OrderRow.styled'
-import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
+
+import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
+import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
   return (
     <>
-      <Spinner size="sm" /> Pending...
+      <Spinner size="sm" />
+      &nbsp;Pending...
       <br />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
     </>
@@ -49,7 +46,7 @@ const DeleteOrder: React.FC<Pick<
   Props,
   'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
 >> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
-  <td data-label="Actions" className="checked">
+  <td data-label="Cancel Order" className="checked">
     <input
       type="checkbox"
       onChange={toggleMarkedForDeletion}
@@ -59,13 +56,16 @@ const DeleteOrder: React.FC<Pick<
   </td>
 )
 
-function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
-  const displayName = safeTokenName(token)
-  if (displayName.startsWith('0x')) {
-    return <EtherscanLink type="token" identifier={token.address} />
-  }
-  return displayName
+interface MarketProps {
+  sellToken: TokenDetails
+  buyToken: TokenDetails
 }
+
+const Market: React.FC<MarketProps> = ({ sellToken, buyToken }) => (
+  <td data-label="Market">
+    {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
+  </td>
+)
 
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
@@ -84,15 +84,13 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
   }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])
 
   return (
-    <td data-label="Price">
+    <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        {price} {displayTokenSymbolOrLink(sellToken)}
-        {'/'}
-        {displayTokenSymbolOrLink(buyToken)}
+        <strong>
+          {priceInverse} {displayTokenSymbolOrLink(sellToken)}
+        </strong>
         <br />
-        {priceInverse} {displayTokenSymbolOrLink(buyToken)}
-        {'/'}
-        {displayTokenSymbolOrLink(sellToken)}
+        {price} {displayTokenSymbolOrLink(buyToken)}
       </div>
     </td>
   )
@@ -100,10 +98,9 @@ const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order 
 
 interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
   sellToken: TokenDetails
-  isUnlimited: boolean
 }
 
-const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
+const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
   const filledAmount = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
@@ -117,7 +114,7 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order, isUnlimited }) => {
 
   return (
     <td data-label="Unfilled Amount">
-      {isUnlimited ? (
+      {order.isUnlimited ? (
         <span>no limit</span>
       ) : (
         <>
@@ -143,20 +140,6 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = (
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
 
-const StatusCountdown: React.FC<{ timeoutDelta?: number }> = ({ timeoutDelta }) => {
-  // If it's rendered, it means it should display the countdown
-  const timeRemainingInBatch = useTimeRemainingInBatch()
-
-  // `timeoutDelta` use case is for a countdown that's shorter than batch duration
-  // instead of counting all the way down to (currently 5min) batch time, we count instead to
-  // batchTime - timeoutDelta.
-  // When this countdown is over but there's still time left in the batch, return 0 for safety.
-  // Up to parent component to stop rendering at that time
-  const timeRemaining = timeoutDelta ? Math.max(0, timeRemainingInBatch - timeoutDelta) : timeRemainingInBatch
-
-  return <>{formatSeconds(timeRemaining)}</>
-}
-
 const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
   order,
   isOverBalance,
@@ -171,11 +154,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   const isScheduled = batchIdToDate(order.validFrom) > now
   const isActiveNextBatch = batchId === order.validFrom
   const isFirstActiveBatch = batchId === order.validFrom + 1 && msRemainingInBatch > 60 * 1000 // up until minute 4
-
-  const isUnlimited = useMemo(() => isOrderUnlimited(order.priceNumerator, order.priceDenominator), [
-    order.priceDenominator,
-    order.priceNumerator,
-  ])
+  const isUnlimited = order.isUnlimited
   const isActive = useMemo(() => order.remainingAmount.eq(order.priceDenominator), [
     order.priceDenominator,
     order.remainingAmount,
@@ -231,16 +210,16 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
-    <td className="status">
+    <td className="status showResponsive" data-label="Status">
       {pending ? (
         pending
-      ) : isExpiredOrder ? (
-        'Expired'
       ) : isFilled ? (
         'Filled'
+      ) : isExpiredOrder ? (
+        'Expired'
       ) : isActiveNextBatch ? (
         <>
-          {`Active in next batch: `} <StatusCountdown />
+          {`Tradable in next batch: `} <StatusCountdown />
         </>
       ) : isFirstActiveBatch ? (
         <>
@@ -270,42 +249,24 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   )
 }
 
-async function fetchToken(
-  tokenId: number,
+function fetchToken(
   orderId: string,
-  networkId: number,
+  token: TokenDetails | null,
   setFn: React.Dispatch<React.SetStateAction<TokenDetails | null>>,
   isPendingOrder?: boolean,
-): Promise<void> {
-  const token = await getTokenFromExchangeById({ tokenId, networkId })
-
+): void {
   // It is unlikely the token ID coming form the order won't exist
   // Still, if that ever happens, store null and keep this order hidden
   setFn(token)
 
   // Also, inform the user this token failed and the order is hidden.
   if (!token && !isPendingOrder) {
-    toast.warn(
-      `Token id ${tokenId} used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`,
-    )
+    toast.warn(`Token used on orderId ${orderId} is not a valid ERC20 token. Order will not be displayed.`)
   }
 }
 
-interface ResponsiveRowSizeTogglerProps {
-  handleOpen: () => void
-  openStatus: boolean
-}
-
-const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> = ({ handleOpen, openStatus }) => {
-  return (
-    <td className="cardOpener" onClick={handleOpen}>
-      <FontAwesomeIcon icon={openStatus ? faChevronUp : faChevronDown} />
-    </td>
-  )
-}
-
 interface Props {
-  order: AuctionElement
+  order: DetailedAuctionElement
   isOverBalance: boolean
   networkId: number
   pending?: boolean
@@ -315,8 +276,6 @@ interface Props {
   disabled: boolean
   isPendingOrder?: boolean
 }
-
-const onError = onErrorFactory('Failed to fetch token')
 
 const OrderRow: React.FC<Props> = props => {
   const {
@@ -334,27 +293,25 @@ const OrderRow: React.FC<Props> = props => {
   // Fetching buy and sell tokens
   const [sellToken, setSellToken] = useSafeState<TokenDetails | null>(null)
   const [buyToken, setBuyToken] = useSafeState<TokenDetails | null>(null)
-  const [openCard, setOpenCard] = useSafeState(true)
 
   useEffect(() => {
-    fetchToken(order.buyTokenId, order.id, networkId, setBuyToken, isPendingOrder).catch(onError)
-    fetchToken(order.sellTokenId, order.id, networkId, setSellToken, isPendingOrder).catch(onError)
+    fetchToken(order.id, order.buyToken as TokenDetails, setBuyToken, isPendingOrder)
+    fetchToken(order.id, order.sellToken as TokenDetails, setSellToken, isPendingOrder)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
-
-  const isUnlimited = isOrderUnlimited(order.priceDenominator, order.priceNumerator)
 
   return (
     sellToken &&
     buyToken && (
-      <OrderRowWrapper className={pending ? 'pending' : ''} $open={openCard}>
+      <OrderRowWrapper data-order-id={order.id} className={`orderRowWrapper${pending ? ' pending' : ''}`}>
         <DeleteOrder
           isMarkedForDeletion={isMarkedForDeletion}
           toggleMarkedForDeletion={toggleMarkedForDeletion}
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
+        <Market sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
-        <Amounts order={order} sellToken={sellToken} isUnlimited={isUnlimited} />
+        <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
         <Status
           order={order}
@@ -362,7 +319,6 @@ const OrderRow: React.FC<Props> = props => {
           isPendingOrder={isPendingOrder}
           transactionHash={transactionHash}
         />
-        <ResponsiveRowSizeToggler handleOpen={(): void => setOpenCard(!openCard)} openStatus={openCard} />
       </OrderRowWrapper>
     )
   )

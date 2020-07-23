@@ -114,13 +114,13 @@ export const usePlaceOrder = (): Result => {
           //  the actual value of the constant
           const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
           toast.success(
-            `Transaction mined! Successfully placed order valid ASAP and expiring ${formatTimeInHours(
+            `Transaction mined! Successfully placed order valid in the next batch and expiring ${formatTimeInHours(
               validityInMinutes,
               'never',
             )}`,
           )
         } else {
-          toast.success(`Transaction mined! Successfully placed order valid ASAP and never expiring`)
+          toast.success(`Transaction mined! Successfully placed order valid in the next batch and never expiring`)
         }
 
         return { success: true, receipt }
@@ -207,14 +207,14 @@ export const usePlaceOrder = (): Result => {
             toast.success(
               `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
                 validityFromInMinutes,
-                'ASAP',
+                'in the next batch',
               )} and expiring ${formatTimeInHours(validityUntilInMinutes, 'never')}`,
             )
           } else if (orders[0].validUntil) {
             const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid ASAP and expiring ${formatTimeInHours(
+              `Transaction mined! Succesfully placed order valid in the next batch and expiring ${formatTimeInHours(
                 validityUntilInMinutes,
                 'never',
               )}`,
@@ -225,7 +225,7 @@ export const usePlaceOrder = (): Result => {
             toast.success(
               `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
                 validityFromInMinutes,
-                'ASAP',
+                'in the next batch',
               )} and never expiring`,
             )
           }

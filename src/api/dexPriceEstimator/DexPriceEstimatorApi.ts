@@ -29,21 +29,22 @@ interface Token {
 
 // Sample response:
 // {
-//   "baseTokenId": "1",
-//   "quoteTokenId": "2",
-//   "buyAmountInBase": 4.6553080250243255e+27,
-//   "sellAmountInQuote": 1000000000000000000
+//   "baseTokenId": 1,
+//   "quoteTokenId": 2,
+//   "buyAmountInBase": "4655308025024325536192659456",
+//   "sellAmountInQuote": "1000000000000000000"
 // }
 interface GetPriceResponse {
-  baseTokenId: string
-  quoteTokenId: string
+  baseTokenId: number
+  quoteTokenId: number
   buyAmountInBase: string
   sellAmountInQuote: string
 }
 
 export interface PriceEstimatorEndpoint {
   networkId: number
-  url: string
+  url_production: string
+  url_develop?: string
 }
 
 export type DexPriceEstimatorParams = PriceEstimatorEndpoint[]
@@ -57,7 +58,11 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
 
   public constructor(params: DexPriceEstimatorParams) {
     params.forEach(endpoint => {
-      this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(endpoint.url)
+      this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(
+        process.env.PRICE_ESTIMATOR_URL === 'production'
+          ? endpoint.url_production
+          : endpoint.url_develop || endpoint.url_production, // fallback on required url_production
+      )
     })
   }
 

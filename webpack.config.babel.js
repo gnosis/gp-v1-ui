@@ -24,8 +24,8 @@ module.exports = ({ stats = false } = {}) => ({
   devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
-    chunkFilename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
-    filename: isProduction ? '[name].[chunkhash:4].js' : '[name].js',
+    chunkFilename: isProduction ? '[name].[contenthash].js' : '[name].js',
+    filename: isProduction ? '[name].[contenthash].js' : '[name].js',
     publicPath: baseUrl,
   },
   module: {
@@ -114,6 +114,14 @@ module.exports = ({ stats = false } = {}) => ({
     modules: ['custom', 'src', 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
   },
+  // drop unused deps
+  // https://www.amcharts.com/docs/v4/getting-started/integrations/using-webpack/#Large_file_sizes
+  externals: function(context, request, callback) {
+    if (/xlsx|canvg|pdfmake/.test(request)) {
+      return callback(null, 'commonjs ' + request)
+    }
+    callback()
+  },
   plugins: [
     new HtmlWebPackPlugin({
       template: config.templatePath,
@@ -169,6 +177,7 @@ module.exports = ({ stats = false } = {}) => ({
       MOCK_WEB3: process.env.MOCK || 'false',
       // AUTOCONNECT: only applies for mock implementation
       AUTOCONNECT: 'true',
+      PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance
@@ -180,6 +189,7 @@ module.exports = ({ stats = false } = {}) => ({
     }),
   ].filter(Boolean),
   optimization: {
+    moduleIds: 'hashed',
     splitChunks: {
       chunks: 'all',
       minSize: 20000,

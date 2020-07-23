@@ -12,6 +12,14 @@ import Header from 'components/Layout/Header'
 import Footer from 'components/Layout/Footer'
 import LegalBanner from 'components/LegalBanner'
 
+export const EllipsisText = styled.div<{ $maxWidth?: string }>`
+  font-size: inherit;
+  max-width: ${({ $maxWidth = '6ch' }): string => $maxWidth};
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+`
+
 const Wrapper = styled.div`
   width: 100%;
   min-height: 100%;
@@ -35,8 +43,8 @@ const Wrapper = styled.div`
 
     > section {
       width: 100%;
+
       @media ${MEDIA.mobile} {
-        width: 100%;
         overflow: initial;
       }
     }

@@ -2,7 +2,6 @@
 import React, { useCallback, useMemo, useEffect } from 'react'
 import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { useForm, FormContext } from 'react-hook-form'
 import { toast } from 'toastify'
 import styled from 'styled-components'
 import joi from '@hapi/joi'
@@ -14,7 +13,8 @@ import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
 import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
 
 // components
-import Widget from 'components/Layout/Widget'
+import OrdersWidget from 'components/OrdersWidget'
+import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
@@ -27,9 +27,11 @@ import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
+import { useForm, FormContext } from 'react-hook-form'
 import useGlobalState from 'hooks/useGlobalState'
+import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
+
 import { useTokenList } from 'hooks/useTokenList'
-import { savePendingOrdersAction, removePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
@@ -91,11 +93,13 @@ const ContentWrapper = styled.div`
   flex-flow: row wrap;
   font-size: inherit;
   line-height: inherit;
+
+  overflow-y: auto;
 `
 
 const LiquidityMessage = styled.div`
   font-size: 1.3rem;
-  margin: 2.4rem 0 0;
+  margin: 2rem 0;
   display: flex;
   width: 100%;
   flex-flow: row wrap;
@@ -143,6 +147,8 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
+  const [ordersVisible, setOrdersVisible] = useSafeState(true)
+
   const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
   const tokenList = useTokenList({ networkId: networkIdOrDefault })
@@ -155,7 +161,13 @@ const PoolingInterface: React.FC = () => {
     )
   }, [tokenList])
 
-  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(setFullTokenMap(tokens))
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(() =>
+    setFullTokenMap(tokens),
+  )
+
+  useEffect(() => {
+    setSelectedTokensMap(setFullTokenMap(tokens))
+  }, [setSelectedTokensMap, tokens])
 
   const methods = useForm<PoolingFormData>({
     defaultValues: {
@@ -181,7 +193,6 @@ const PoolingInterface: React.FC = () => {
   const sendTransaction = useCallback(async () => {
     if (!networkId || !userAddress) return
     const orders = createOrderParams(Array.from(selectedTokensMap.values()), spread)
-    let pendingTxHash: string | undefined
     try {
       setIsSubmitting(true)
       setTxReceipt(undefined)
@@ -192,29 +203,30 @@ const PoolingInterface: React.FC = () => {
         orders,
         txOptionalParams: {
           onSentTransaction: (txHash: string): void => {
-            pendingTxHash = txHash
-
             setTxHash(txHash)
 
-            batchedUpdates(() => {
-              orders.forEach(({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }) => {
-                const pendingOrder = {
-                  txHash,
-                  id: 'PENDING ORDER',
+            const batchedOrders = orders.map(
+              ({ buyToken: buyTokenId, sellToken: sellTokenId, buyAmount, sellAmount }, index) => {
+                return {
+                  id: `${Date.now()}_${index}`,
                   buyTokenId,
                   sellTokenId,
                   priceNumerator: buyAmount,
                   priceDenominator: sellAmount,
                   user: userAddress,
-                  remainingAmount: ZERO,
+                  remainingAmount: sellAmount,
                   sellTokenBalance: ZERO,
                   validFrom: 0,
                   validUntil: 0,
+                  txHash,
+                  isUnlimited: true,
                 }
+              },
+            )
 
-                setIsSubmitting(false)
-                dispatch(savePendingOrdersAction({ orders: pendingOrder, networkId, userAddress }))
-              })
+            batchedUpdates(() => {
+              setIsSubmitting(false)
+              dispatch(savePendingOrdersAction({ orders: batchedOrders, networkId, userAddress }))
             })
           },
         },
@@ -227,8 +239,6 @@ const PoolingInterface: React.FC = () => {
 
       // Error handle
       setTxError(e)
-    } finally {
-      pendingTxHash && dispatch(removePendingOrdersAction({ networkId, pendingTxHash, userAddress }))
     }
   }, [
     dispatch,
@@ -282,45 +292,53 @@ const PoolingInterface: React.FC = () => {
     ],
   )
   return (
-    <Widget>
-      <PoolingInterfaceWrapper $width="100%">
-        <FormContext {...methods}>
-          <form onSubmit={handleSubmit(sendTransaction)} noValidate>
-            <h2>New Liquidity Order</h2>
-            <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
+    <PoolingInterfaceWrapper className={ordersVisible ? '' : 'expanded'}>
+      <FormContext {...methods}>
+        <form onSubmit={handleSubmit(sendTransaction)} noValidate>
+          <h2>New Liquidity Order</h2>
+          <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
 
-            <ContentWrapper>
-              <StepDescription step={step} />
-              {/* Main Components here */}
-              <SubComponents step={step} {...restProps} />
-            </ContentWrapper>
+          <ContentWrapper>
+            <StepDescription step={step} />
+            {/* Main Components here */}
+            <SubComponents {...restProps} />
+          </ContentWrapper>
 
-            <LiquidityMessage>
-              <p>
-                Your liquidity is equal to the amount you have deposited into your exchange wallet.
-                <br />
-                <b>
-                  Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
-                </b>
-              </p>
-            </LiquidityMessage>
+          <LiquidityMessage>
+            <p>
+              Your liquidity is equal to the amount you have deposited into your exchange wallet.
+              <br />
+              <b>
+                Be sure to deposit at least one stablecoin on the <Link to="/wallet">Balances</Link> tab.
+              </b>
+            </p>
+          </LiquidityMessage>
 
-            {/* BUTTONS */}
-            <LiquidityButtons
-              handleSubmit={handleSubmit(sendTransaction)}
-              disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
-              disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
-              disableSubmit={!!txHash || isSubmitting}
-              showContinue={step !== LAST_STEP}
-              showFinish={!!txReceipt}
-              showLoader={isSubmitting || !!(txHash && !txReceipt)}
-              showTooltipHover={selectedTokensMap.size < 2}
-              {...restProps}
-            />
-          </form>
-        </FormContext>
-      </PoolingInterfaceWrapper>
-    </Widget>
+          {/* BUTTONS */}
+          <LiquidityButtons
+            handleSubmit={handleSubmit(sendTransaction)}
+            disableBack={step < FIRST_STEP + 1 || selectedTokensMap.size < 2 || isSubmitting || !!txHash}
+            disableContinue={(step > FIRST_STEP && !methods.formState.isValid) || selectedTokensMap.size < 2}
+            disableSubmit={!!txHash || isSubmitting}
+            showContinue={step !== LAST_STEP}
+            showFinish={!!txReceipt}
+            showLoader={isSubmitting || !!(txHash && !txReceipt)}
+            showTooltipHover={selectedTokensMap.size < 2}
+            {...restProps}
+          />
+        </form>
+      </FormContext>
+      <ExpandableOrdersPanel>
+        {/* Toggle panel visibility (arrow) */}
+        <OrdersToggler
+          type="button"
+          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          $isOpen={ordersVisible}
+        />
+        {/* Actual orders content */}
+        <OrdersWidget displayOnly="liquidity" />
+      </ExpandableOrdersPanel>
+    </PoolingInterfaceWrapper>
   )
 }
 

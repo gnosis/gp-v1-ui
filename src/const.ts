@@ -33,7 +33,9 @@ export const ONE_HUNDRED_BIG_NUMBER = new BigNumber(100)
 // ∴ when the amount is < 5 the order will be considered filled.
 export const ORDER_FILLED_FACTOR = new BN(10000) // 0.01%
 
-export const MINIMUM_ALLOWANCE_DECIMALS = 12
+export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
+
+export const MINIMUM_ALLOWANCE_DECIMALS = 10
 
 export const APP_NAME = 'fuse'
 
@@ -65,6 +67,7 @@ export const PRICES_CACHE_TIME = 60 // in seconds
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',
+  xSmallScreen: '430px',
   smallScreen: '736px',
   smallScreenUp: '737px',
   mediumScreenSmall: '850px',
@@ -72,6 +75,9 @@ export const MEDIA = {
   desktopScreen: '1025px',
   get tinyDown(): string {
     return `only screen and (max-width : ${this.tinyScreen})`
+  },
+  get xSmallDown(): string {
+    return `only screen and (max-width : ${this.xSmallScreen})`
   },
   get mobile(): string {
     return `only screen and (max-width : ${this.smallScreen})`
@@ -119,6 +125,7 @@ if (process.env.INFURA_ID) {
 
 export const INFURA_ID = infuraId
 export const WALLET_CONNECT_BRIDGE = process.env.WALLET_CONNECT_BRIDGE || CONFIG.walletConnect.bridge
+export const STORAGE_KEY_CUSTOM_WC_OPTIONS = 'CustomWCOptions'
 
 let ethNodeUrl
 if (process.env.ETH_NODE_URL) {
@@ -136,13 +143,13 @@ if (process.env.ETH_NODE_URL) {
 export const ETH_NODE_URL = ethNodeUrl
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
-
+export const STORAGE_PENDING_ORDER_TX_HASHES = {
+  1: 'STORAGE_PENDING_ORDER_TX_HASHES_1',
+  4: 'STORAGE_PENDING_ORDER_TX_HASHES_4',
+}
 export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
 
-export const GP_ORDER_TX_HASHES = {
-  1: 'GP_ORDER_TX_HASHES_1',
-  4: 'GP_ORDER_TX_HASHES_4',
-}
+export const TRADES_LOCAL_STORAGE_KEY = 'TRADES_PER_ACCOUNT'
 
 const LIQUIDITY_TOKEN_LIST_VALUES = process.env.LIQUIDITY_TOKEN_LIST || 'USDT,TUSD,USDC,PAX,GUSD,DAI,sUSD'
 export const LIQUIDITY_TOKEN_LIST = new Set(LIQUIDITY_TOKEN_LIST_VALUES.split(',').map(symbol => symbol.trim()))
@@ -154,6 +161,11 @@ export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
 
+export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
+// for stable reference
+// to avoid updates on setState([])
+export const EMPTY_ARRAY = []
+
 export const SLIPPAGE_MAP = new Map([
   ['0.1', false],
   ['0.5', true],
@@ -164,6 +176,10 @@ export const DEFAULT_SUGGESTED_SLIPPAGE = '0.5'
 // however, the new state, that flows top down once a bock is mined, can have a small delayed
 // This delay mitigates the strange effect of stopping the loading before the data is updated
 export const DISABLE_SPINNER_DELAY = 1000
+export const DEFAULT_ORDERS_SORTABLE_TOPIC = 'validUntil'
+/** ERROR CODES **/
+// https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1474.md
+export const LIMIT_EXCEEDED_ERROR_CODE = -32005
 
 const { disabledTokens } = CONFIG
 

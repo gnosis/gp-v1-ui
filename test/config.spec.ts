@@ -1,4 +1,10 @@
-import { MultiTcrConfig, DexPriceEstimatorConfig, TheGraphApiConfig, InfuraProviderConfig } from 'types/config'
+import {
+  MultiTcrConfig,
+  DexPriceEstimatorConfig,
+  TheGraphApiConfig,
+  InfuraProviderConfig,
+  ExchangeContractConfig,
+} from 'types/config'
 import { Network } from 'types'
 
 describe('Test config defaults', () => {
@@ -41,11 +47,13 @@ describe('Test config defaults', () => {
       config: [
         {
           networkId: 1,
-          url: 'https://dex-price-estimator.gnosis.io',
+          url_production: 'https://dex-price-estimator.gnosis.io',
+          url_develop: 'https://price-estimate-mainnet.dev.gnosisdev.com',
         },
         {
           networkId: 4,
-          url: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          url_production: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          url_develop: 'https://price-estimate-rinkeby.dev.gnosisdev.com',
         },
       ],
     }
@@ -79,6 +87,17 @@ describe('Test config defaults', () => {
     }
 
     expect(CONFIG.defaultProviderConfig).toEqual(expected)
+  })
+
+  it('exchangeContractConfig', () => {
+    const expected: ExchangeContractConfig = {
+      type: 'contractBlock',
+      config: [
+        { networkId: 1, blockNumber: 9340147 },
+        { networkId: 4, blockNumber: 5844678 },
+      ],
+    }
+    expect(CONFIG.exchangeContractConfig).toEqual(expected)
   })
 
   it('disabledTokens', () => {

@@ -1,11 +1,12 @@
 import { Actions } from 'reducers-actions'
-import { AuctionElement } from 'api/exchange/ExchangeApi'
-import { ZERO } from '@gnosis.pm/dex-js'
+import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
+import { addUnlistedTokensToUserTokenListById } from 'services'
+import { isOrderDeleted } from 'utils'
 
 export type ActionTypes = 'OVERWRITE_ORDERS' | 'APPEND_ORDERS' | 'UPDATE_ORDERS' | 'UPDATE_OFFSET'
 
 export interface OrdersState {
-  orders: AuctionElement[]
+  orders: DetailedAuctionElement[]
   offset: number
 }
 
@@ -13,17 +14,17 @@ type UpdateOrdersActionType = Actions<ActionTypes, Pick<OrdersState, 'orders'>>
 type UpdateOffsetActionType = Actions<ActionTypes, Pick<OrdersState, 'offset'>>
 type ReducerActionType = Actions<ActionTypes, OrdersState>
 
-export const overwriteOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+export const overwriteOrders = (orders: DetailedAuctionElement[]): UpdateOrdersActionType => ({
   type: 'OVERWRITE_ORDERS',
   payload: { orders },
 })
 
-export const appendOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+export const appendOrders = (orders: DetailedAuctionElement[]): UpdateOrdersActionType => ({
   type: 'APPEND_ORDERS',
   payload: { orders },
 })
 
-export const updateOrders = (orders: AuctionElement[]): UpdateOrdersActionType => ({
+export const updateOrders = (orders: DetailedAuctionElement[]): UpdateOrdersActionType => ({
   type: 'UPDATE_ORDERS',
   payload: { orders },
 })
@@ -34,24 +35,6 @@ export const updateOffset = (offset: number): UpdateOffsetActionType => ({
 })
 
 export const INITIAL_ORDERS_STATE = { orders: [], offset: 0 }
-
-/**
- * When orders are `deleted` from the contract, they are still returned, but with all fields set to zero.
- * We will not display such orders.
- *
- * This function checks whether the order has been zeroed out.
- * @param order The order object to check
- */
-function isOrderDeleted(order: AuctionElement): boolean {
-  return (
-    order.buyTokenId === 0 &&
-    order.sellTokenId === 0 &&
-    order.priceDenominator.eq(ZERO) &&
-    order.priceNumerator.eq(ZERO) &&
-    order.validFrom === 0 &&
-    order.validUntil === 0
-  )
-}
 
 export const reducer = (state: OrdersState, action: ReducerActionType): OrdersState => {
   switch (action.type) {
@@ -84,7 +67,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       // First we process reversedNewOrders, then currentOrders.
       // Thanks to processedOrderIds newOrders override currentOrders with same id
-      const updatedOrders = reversedNewOrders.concat(currentOrders).reduce<AuctionElement[]>((acc, order) => {
+      const updatedOrders = reversedNewOrders.concat(currentOrders).reduce<DetailedAuctionElement[]>((acc, order) => {
         // already included a potentially updated order
         // or the order was deleted
         if (processedOrderIds.has(order.id)) {
@@ -124,5 +107,19 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
     }
     default:
       return state
+  }
+}
+
+export async function sideEffect(state: OrdersState, action: ReducerActionType): Promise<void> {
+  switch (action.type) {
+    case 'OVERWRITE_ORDERS':
+    case 'UPDATE_ORDERS':
+    case 'APPEND_ORDERS':
+      const newTokenIdsFromOrders = new Set<number>()
+
+      // orders can contain many duplicated tokenIds
+      state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
+
+      addUnlistedTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
   }
 }

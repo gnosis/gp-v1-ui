@@ -1,10 +1,7 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import { invertPrice } from '@gnosis.pm/dex-js'
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faRetweet } from '@fortawesome/free-solid-svg-icons'
 
 // types, utils
 import { TokenDetails } from 'types'
@@ -18,6 +15,8 @@ import { OrderBookBtn } from 'components/OrderBookBtn'
 import { TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+import { EllipsisText } from 'components/Layout'
 
 const Wrapper = styled.div`
   display: flex;
@@ -74,11 +73,6 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
     margin: 0 0 1.6rem;
   }
 
-  .swap-icon {
-    padding: 0.7em 0.3em;
-    cursor: pointer;
-  }
-
   label {
     display: flex;
     width: auto;
@@ -111,13 +105,6 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
     @media ${MEDIA.mobile} {
       font-size: 1rem;
       letter-spacing: 0.03rem;
-    }
-    > small:not(:nth-child(2)) {
-      font-size: inherit;
-      max-width: 6ch;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
     }
     > small:nth-child(2) {
       margin: 0 0.3rem;
@@ -175,21 +162,30 @@ interface Props {
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
+  swapPrices: () => void
+  priceShown: 'INVERSE' | 'DIRECT'
 }
 
 export function invertPriceFromString(priceValue: string): string {
   const price = parseBigNumber(priceValue)
-  return price ? invertPrice(price).toString(10) : ''
+  if (!price) {
+    return ''
+  }
+  const invertedPrice = invertPrice(price)
+  // To avoid `Infinity` on price inputs
+  return invertedPrice.isFinite() ? invertedPrice.toString(10) : '0'
 }
 
-const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceInverseInputId, tabIndex }) => {
+const Price: React.FC<Props> = ({
+  sellToken,
+  receiveToken,
+  priceInputId,
+  priceInverseInputId,
+  tabIndex,
+  swapPrices,
+  priceShown,
+}) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
-
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
-
-  const swapPrices = (): void => {
-    setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
-  }
 
   const errorPrice = errors[priceInputId]
   const errorPriceInverse = errors[priceInverseInputId]
@@ -247,12 +243,14 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             tabIndex={tabIndex}
           />
           <div>
-            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
+            <EllipsisText as="small" title={receiveToken.symbol}>
+              {receiveToken.symbol}
+            </EllipsisText>
             <small>per</small>
-            <small title={sellToken.symbol}>{sellToken.symbol}</small>
-            <span className="swap-icon" onClick={swapPrices}>
-              <FontAwesomeIcon icon={faRetweet} />
-            </span>
+            <EllipsisText as="small" title={sellToken.symbol}>
+              {sellToken.symbol}
+            </EllipsisText>
+            <SwapIcon swap={swapPrices} />
           </div>
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
@@ -271,12 +269,14 @@ const Price: React.FC<Props> = ({ sellToken, receiveToken, priceInputId, priceIn
             tabIndex={tabIndex}
           />
           <div>
-            <small title={sellToken.symbol}>{sellToken.symbol}</small>
+            <EllipsisText as="small" title={sellToken.symbol}>
+              {sellToken.symbol}
+            </EllipsisText>
             <small>per</small>
-            <small title={receiveToken.symbol}>{receiveToken.symbol}</small>
-            <span className="swap-icon" onClick={swapPrices}>
-              <FontAwesomeIcon icon={faRetweet} />
-            </span>
+            <EllipsisText as="small" title={receiveToken.symbol}>
+              {receiveToken.symbol}
+            </EllipsisText>
+            <SwapIcon swap={swapPrices} />
           </div>
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />

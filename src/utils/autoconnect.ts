@@ -1,81 +1,34 @@
-import { Provider, WalletConnectProvider as WCProvider } from '@gnosis.pm/dapp-ui'
-import { delay } from 'utils'
-import { INFURA_ID, STORAGE_KEY_LAST_PROVIDER, WALLET_CONNECT_BRIDGE } from 'const'
+import { generateWCOptions } from 'utils'
+import { STORAGE_KEY_LAST_PROVIDER } from 'const'
 import { WalletApi } from 'api/wallet/WalletApi'
-import Web3 from 'web3'
 import { logDebug } from 'utils'
+import { connectors } from 'web3modal'
+import { IWalletConnectConnectorOptions } from 'web3modal/dist/providers/connectors/walletconnect'
 
-const getWCIfConnected = async (): Promise<WCProvider | null> => {
+const getWCIfConnected = async (): Promise<unknown> => {
   const { default: WalletConnectProvider } = await import(
     /* webpackChunkName: "@walletconnect"*/
     '@walletconnect/web3-provider'
   )
-  const provider = new WalletConnectProvider({
-    infuraId: INFURA_ID,
-    bridge: WALLET_CONNECT_BRIDGE,
-  })
 
-  if (!provider.wc.connected) return null
+  const wcOptions = generateWCOptions()
 
   try {
-    await new Promise((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      provider.wc.on('transport_open', (error: Error, event: any) => {
-        if (error) reject(error)
-        else resolve(event)
-      })
-    })
-
-    await Promise.race([
-      // some time for connection to settle
-      delay(250),
-      new Promise((resolve, reject) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        provider.wc.on('disconnect', (error: Error, event: any) => {
-          // wc.connected is set to false here
-          if (error) reject(error)
-          else resolve(event)
-        })
-      }),
-    ])
+    const provider = (await connectors.walletconnect(
+      WalletConnectProvider,
+      wcOptions as IWalletConnectConnectorOptions,
+    )) as InstanceType<typeof WalletConnectProvider>
 
     if (!provider.wc.connected) return null
-
-    await provider.enable()
+    return provider
   } catch (error) {
     console.warn('Error reestablishing previous WC connection', error)
     return null
   }
-
-  return provider
 }
 
-declare global {
-  interface Window {
-    ethereum?: Provider & { enable(): Promise<string[]> }
-    web3?: Web3 & { currentProvider: Provider }
-  }
-}
-
-// from web3connect/providers/connectors/injected.ts
-const connectToInjected = async (): Promise<Provider> => {
-  let provider: Provider
-  if (window.ethereum) {
-    provider = window.ethereum
-    try {
-      await window.ethereum.enable()
-    } catch (error) {
-      throw new Error('User Rejected')
-    }
-  } else if (window.web3) {
-    provider = window.web3.currentProvider
-  } else {
-    throw new Error('No Web3 Provider found')
-  }
-  return provider
-}
-
-export const getLastProvider = async (): Promise<Provider | null> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getLastProvider = async (): Promise<any> => {
   const lastProviderName = localStorage.getItem(STORAGE_KEY_LAST_PROVIDER)
 
   try {
@@ -84,16 +37,16 @@ export const getLastProvider = async (): Promise<Provider | null> => {
     // but account for possibly stale session
     if (lastProviderName === 'WalletConnect') return getWCIfConnected()
 
-    const { default: Web3Connect } = await import(
-      /* webpackChunkName: "@web3connect"*/
-      'web3connect'
+    const { getInjectedProviderName } = await import(
+      /* webpackChunkName: "web3modal"*/
+      'web3modal'
     )
 
-    const injectedProviderName = Web3Connect.getInjectedProviderName()
+    const injectedProviderName = getInjectedProviderName()
     // last provider is the current injected provider
     // and it's still injected
     if (injectedProviderName && injectedProviderName === lastProviderName) {
-      return connectToInjected()
+      return connectors.injected()
     }
   } catch (error) {
     console.warn('Error connecting to last used provider', lastProviderName, error)

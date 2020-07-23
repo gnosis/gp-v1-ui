@@ -1,8 +1,9 @@
 import styled from 'styled-components'
+import { FoldableRowWrapper } from 'components/Layout/Card'
+import { MEDIA } from 'const'
 
-export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
+export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
   color: ${({ $color = '' }): string => $color};
-  min-height: 4rem;
 
   &.pending {
     background: rgba(33, 141, 255, 0.1);
@@ -22,10 +23,7 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
 
   .order-details {
     white-space: normal;
-    word-break: break-all;
-
-    .order-details-subgrid {
-    }
+    word-break: break-word;
   }
 
   .sub-columns {
@@ -47,6 +45,18 @@ export const OrderRowWrapper = styled.tr<{ $color?: string; $open?: boolean }>`
     a {
       top: 100%;
       position: absolute;
+    }
+  }
+
+  @media ${MEDIA.mobile} {
+    &&&&& {
+      td[data-label='Market'] {
+        border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
+      }
+
+      td[data-label='Status'] {
+        border: none;
+      }
     }
   }
 `

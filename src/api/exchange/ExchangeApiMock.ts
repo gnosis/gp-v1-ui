@@ -1,5 +1,7 @@
 import BN from 'bn.js'
 
+import { isOrderUnlimited } from '@gnosis.pm/dex-js'
+
 import assert from 'assert'
 
 import { DepositApiMock, BalancesByUserAndToken } from '../deposit/DepositApiMock'
@@ -21,6 +23,9 @@ import {
   GetOrdersPaginatedParams,
   GetOrdersPaginatedResult,
   HasTokenParams,
+  BaseTradeEvent,
+  GetOrderParams,
+  GetOrderFromOrderPlacementEventParams,
 } from './ExchangeApi'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { wait } from 'utils'
@@ -58,6 +63,29 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     }, {})
     this.maxTokens = maxTokens
     this.orders = ordersByUser
+  }
+
+  public async getPastTrades(): Promise<BaseTradeEvent[]> {
+    return []
+  }
+
+  public async getPastTradeReversions(): Promise<BaseTradeEvent[]> {
+    return []
+  }
+
+  public async getOrder({ userAddress, orderId }: GetOrderParams): Promise<Order> {
+    this._initOrders(userAddress)
+
+    return this.orders[userAddress][orderId]
+  }
+
+  public async getOrderFromOrderPlacementEvent({
+    userAddress,
+    orderId,
+  }: GetOrderFromOrderPlacementEventParams): Promise<Order> {
+    this._initOrders(userAddress)
+
+    return this.orders[userAddress][orderId]
   }
 
   public async getOrders({ userAddress }: GetOrdersParams): Promise<AuctionElement[]> {
@@ -208,6 +236,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
       user: userAddress,
       sellTokenBalance: new BN('1500000000000000000000').add(ONE),
       id: index.toString(),
+      isUnlimited: isOrderUnlimited(order.priceNumerator, order.priceDenominator),
     }
   }
 }

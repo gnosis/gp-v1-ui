@@ -2,10 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { TokenDetails } from 'types'
 import useSafeState from './useSafeState'
 import { getTokens, subscribeToTokenList } from 'services'
-
-// for stable reference
-// to avoid updates on setState([])
-const emptyArray: TokenDetails[] = []
+import { EMPTY_ARRAY } from 'const'
 
 export interface UseTokenListParams {
   networkId?: number
@@ -14,7 +11,7 @@ export interface UseTokenListParams {
 
 export const useTokenList = ({ networkId, excludeDeprecated }: UseTokenListParams = {}): TokenDetails[] => {
   // sync get tokenList
-  const unfilteredTokens = networkId === undefined ? emptyArray : getTokens(networkId)
+  const unfilteredTokens = networkId === undefined ? EMPTY_ARRAY : getTokens(networkId)
 
   const tokens = useMemo(() => {
     if (!excludeDeprecated) return unfilteredTokens

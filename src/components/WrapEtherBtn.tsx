@@ -37,6 +37,10 @@ const ModalWrapper = styled(ModalBodyWrapper)`
         display: flex;
         flex-flow: row wrap;
 
+        input {
+          padding: 0 4.5rem 0 1rem;
+        }
+
         i {
           position: absolute;
           right: 1rem;
@@ -226,7 +230,15 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
         {amountFull} {symbolSource}
       </span>
     ) : (
-      <a onClick={(): void => setValue(INPUT_ID_AMOUNT, formatAmountFull(balance), true)}>
+      <a
+        onClick={(): void =>
+          setValue(
+            INPUT_ID_AMOUNT,
+            formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION, isLocaleAware: false }),
+            true,
+          )
+        }
+      >
         {amountFull} {symbolSource}
       </a>
     )
@@ -354,14 +366,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
   return (
     <>
-      <TooltipWrapper
-        as="button"
-        type="button"
-        className={className}
-        style={{ minWidth: '7em' }}
-        onClick={toggleModal}
-        tooltip={tooltipText}
-      >
+      <TooltipWrapper as="button" type="button" className={className} onClick={toggleModal} tooltip={tooltipText}>
         {loading && <FontAwesomeIcon icon={faSpinner} spin />} {label || title}
       </TooltipWrapper>
       <Modali.Modal {...modalHook} />

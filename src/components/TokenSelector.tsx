@@ -196,6 +196,7 @@ const customSelectStyles = {
     bottom: '0',
     margin: 'auto',
     width: '42rem',
+    maxWidth: '100%',
     minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',
@@ -233,6 +234,7 @@ const customSelectStyles = {
     ...provided,
     minWidth: '4.5rem',
     padding: '.2rem 0 .2rem .8rem',
+    justifyContent: 'flex-end',
   }),
   indicatorSeparator: (provided: CSSProperties): CSSProperties => ({
     ...provided,
@@ -286,7 +288,8 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
   const { networkId } = useWalletConnection()
 
   const onSelectChange = useCallback(
-    (selected: { token: TokenDetails }, { action }: ActionMeta): void => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (selected: { token: TokenDetails }, { action }: ActionMeta<any>): void => {
       // When an option is chosen, give control back to react-select
       setIsFocused(false)
 

@@ -14,6 +14,7 @@ const GlobalStyles = createGlobalStyle`
   html, body {  
     width: 100%;
     min-height: 100vh;
+    min-width: 300px;
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
@@ -40,6 +41,17 @@ const GlobalStyles = createGlobalStyle`
 
   *::-moz-placeholder {
     line-height: revert;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px!important;
+    height: 6px!important;
+  }
+  ::-webkit-scrollbar-thumb {
+      background-color: rgba(0,0,0,.2);
+  }
+  ::-webkit-scrollbar-track {
+      background: hsla(0,0%,100%,.1);
   }
 
   *, *:before, *:after {
@@ -959,7 +971,6 @@ const GlobalStyles = createGlobalStyle`
   #walletconnect-qrcode-modal {
     .walletconnect-modal__headerLogo {
       max-width: 24rem;
-      height: auto;
       margin: 2.4rem auto;
     }
     

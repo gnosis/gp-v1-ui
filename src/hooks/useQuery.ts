@@ -1,7 +1,6 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
 import { sanitizeInput, sanitizeNegativeAndMakeMultipleOf } from 'utils'
-import { DEFAULT_FORM_STATE } from 'components/TradeWidget'
 
 export function useQuery(): { sellAmount: string; price: string; validFrom?: string; validUntil?: string } {
   const { search } = useLocation()
@@ -13,7 +12,7 @@ export function useQuery(): { sellAmount: string; price: string; validFrom?: str
       sellAmount: sanitizeInput(query.get('sell')),
       price: sanitizeInput(query.get('price')),
       validFrom: Number(query.get('from')) ? sanitizeNegativeAndMakeMultipleOf(query.get('from')) : undefined,
-      validUntil: sanitizeNegativeAndMakeMultipleOf(query.get('expires'), DEFAULT_FORM_STATE.validUntil ?? ''),
+      validUntil: Number(query.get('from')) ? sanitizeNegativeAndMakeMultipleOf(query.get('expires')) : undefined,
     }
   }, [search])
 }

@@ -18,10 +18,18 @@ const About = React.lazy(() =>
     'pages/About'
   ),
 )
+
 const Trade = React.lazy(() =>
   import(
     /* webpackChunkName: "Trade_chunk"*/
     'pages/Trade'
+  ),
+)
+
+const Trades = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Trade_chunk"*/
+    'pages/Trades'
   ),
 )
 
@@ -70,6 +78,12 @@ const OrderBook = React.lazy(() =>
     'pages/OrderBook'
   ),
 )
+const Settings = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Settings_chunk"*/
+    'pages/Settings'
+  ),
+)
 
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
@@ -95,6 +109,8 @@ const App: React.FC = () => (
             <Route path="/faq" exact component={FAQ} />
             <Route path="/book" exact component={OrderBook} />
             <Route path="/connect-wallet" exact component={ConnectWallet} />
+            <Route path="/trades" exact component={Trades} />
+            <Route path="/settings" exact component={Settings} />
             <Redirect from="/" to="/trade/DAI-USDC?sell=0&price=0" />
             <Route component={NotFound} />
           </Switch>
