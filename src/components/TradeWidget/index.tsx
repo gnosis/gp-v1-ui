@@ -1004,7 +1004,7 @@ const TradeWidget: React.FC = () => {
             <SubmitButton
               data-text="This order might be partially filled."
               type="submit"
-              disabled={isSubmitting || !methods.formState.isValid}
+              disabled={isSubmitting}
               tabIndex={1}
             >
               {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
