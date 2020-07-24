@@ -21,10 +21,9 @@ const filterTradesAndOrdersFnFactory = <
 
   const market =
     sellToken && buyToken && computeMarketProp({ sellToken, buyToken, inverseMarket: includeInverseMarket })
-
+  console.debug(id, rest)
   return (
-    !!id.includes(searchTxt) ||
-    (rest.orderId && !!rest.orderId.includes(searchTxt)) ||
+    (rest.orderId ? !!rest.orderId.includes(searchTxt) : !!id.includes(searchTxt)) ||
     (market && !!market.includes(searchTxt)) ||
     checkTokenAgainstSearch(buyToken, searchTxt) ||
     checkTokenAgainstSearch(sellToken, searchTxt)
