@@ -1,6 +1,6 @@
 import React, { useEffect, ChangeEvent } from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
-import OrderBookWidget from 'components/OrderBookWidget'
+import { Chart } from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 import { useTokenList } from 'hooks/useTokenList'
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -130,7 +130,7 @@ const OrderBook: React.FC = () => {
         </span>
       </OrderBookWrapper>
 
-      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} hops={+hops} />
+      <Chart baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} hops={+hops} />
     </OrderBookPage>
   )
 }
