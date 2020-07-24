@@ -287,6 +287,9 @@ export const Chart: React.FC<ChartProps> = props => {
     am4core.useTheme(am4themesSpiritedaway)
     am4core.options.autoSetClassName = true
 
+    _chart.scrollbarX = new am4core.Scrollbar()
+    _chart.scrollbarY = new am4core.Scrollbar()
+
     setChart(_chart)
 
     return (): void => _chart.dispose()
