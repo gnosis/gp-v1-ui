@@ -5,6 +5,7 @@ import BN from 'bn.js'
 
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
+import { checkTokenAgainstSearch } from 'utils/filter'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 
@@ -182,14 +183,10 @@ interface BalanceDisplayProps extends TokenLocalState {
   ): Promise<void>
 }
 
-const customFilterFnFactory = (searchTxt: string) => ({ symbol, name, address }: TokenBalanceDetails): boolean => {
+const customFilterFnFactory = (searchTxt: string) => (token: TokenBalanceDetails): boolean => {
   if (searchTxt === '') return true
 
-  return (
-    symbol?.toLowerCase().includes(searchTxt) ||
-    name?.toLowerCase().includes(searchTxt) ||
-    address.toLowerCase().includes(searchTxt)
-  )
+  return checkTokenAgainstSearch(token, searchTxt)
 }
 
 const customHideZeroFilterFn = ({

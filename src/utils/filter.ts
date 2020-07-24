@@ -1,13 +1,14 @@
 import { TokenDetails } from 'types'
 import { DetailedAuctionElement, Trade } from 'api/exchange/ExchangeApi'
 import { computeMarketProp } from './display'
+import { web3 } from 'api'
 
 export function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
   if (!token) return false
   return (
     token?.symbol?.toLowerCase().includes(searchText) ||
     token?.name?.toLowerCase().includes(searchText) ||
-    token?.address.toLowerCase().includes(searchText)
+    (web3.utils.isAddress(searchText) && token?.address.toLowerCase().includes(searchText))
   )
 }
 
