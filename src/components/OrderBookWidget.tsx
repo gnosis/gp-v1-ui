@@ -286,13 +286,11 @@ interface ChartProps {
   quoteToken: TokenDetails
   networkId: number
   hops?: number
-  zoom?: number
 }
 
 export const Chart: React.FC<ChartProps> = props => {
-  const { baseToken, quoteToken, networkId, hops, zoom } = props
+  const { baseToken, quoteToken, networkId, hops } = props
   const [chart, setChart] = useSafeState<null | am4charts.XYChart>(null)
-  const [defaults, setDefaults] = useSafeState<{ min?: number; max?: number }>({})
 
   const mountPoint = useRef<HTMLDivElement>(null)
 
@@ -475,32 +473,7 @@ export const Chart: React.FC<ChartProps> = props => {
       bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
       askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
     }
-  }, [baseToken, chart, hops, networkId, quoteToken, setDefaults])
-
-  useEffect(() => {
-    console.log(`zoom updated, updating chart: ${zoom}`)
-    if (chart && chart.xAxes.length > 0) {
-      console.log(`chart.xAxes.length ${chart.xAxes.length}: zoom ${zoom}`, chart.xAxes.values[0])
-      const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-
-      const { min = xAxis.min, max = xAxis.max } = defaults
-      if (zoom && min != undefined && max != undefined) {
-        const diff = (max - min) * zoom
-        const newMin = min + diff
-        const newMax = max - diff
-        if (newMin < newMax) {
-          // Only set new values if min < max
-          xAxis.min = min + diff
-          xAxis.max = max - diff
-        }
-      } else {
-        // Zoom set to 0, reset
-        xAxis.min = min
-        xAxis.max = max
-      }
-      console.log(`new min ${xAxis.min}|${min} new max ${xAxis.max}|${max} | zoom ${zoom}`)
-    }
-  }, [zoom, chart, defaults])
+  }, [baseToken, chart, hops, networkId, quoteToken])
 
   return <Wrapper ref={mountPoint} />
 }

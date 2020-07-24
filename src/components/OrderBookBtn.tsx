@@ -121,9 +121,6 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
 
   const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''
 
-  // zoom %
-  const [zoom, setZoom] = useSafeState<number>(0)
-
   // Update if any of the base tokens change
   useEffect(() => {
     setBaseToken(baseTokenDefault)
@@ -171,18 +168,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
             }
           />
         </span>
-        <span>
-          <button type="button" onClick={(): void => setZoom(curr => (curr ? curr + 0.1 : 0.1))}>
-            {/* <button type="button" onClick={(): void => setZoom(1.5)}> */}+
-          </button>
-          <button type="button" onClick={(): void => setZoom(curr => (curr ? curr - 0.1 : -0.1))}>
-            {/* <button type="button" onClick={(): void => setZoom(0.5)}> */}-
-          </button>
-          <button type="button" onClick={(): void => setZoom(0)}>
-            reset
-          </button>
-        </span>
-        <Chart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} zoom={zoom} />
+        <Chart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
       </ModalWrapper>
     ),
     buttons: [
