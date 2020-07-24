@@ -42,7 +42,6 @@ export default Joi.object({
   validFrom: Joi.number()
     // no floating points
     .integer()
-    .multiple(5)
     .min(15)
     .messages({
       [BASE]: 'Invalid time',
@@ -53,7 +52,6 @@ export default Joi.object({
   validUntil: Joi.number()
     // no floating points
     .integer()
-    .multiple(5)
     .min(5)
     .messages({
       [BASE]: 'Invalid time',

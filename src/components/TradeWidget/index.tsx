@@ -63,7 +63,7 @@ import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
 
-// import { DevTool } from 'HookFormDevtool'
+import { DevTool } from 'HookFormDevtool'
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
@@ -1025,7 +1025,7 @@ const TradeWidget: React.FC = () => {
         </div>
       </ExpandableOrdersPanel>
       {/* React Forms DevTool debugger */}
-      {/* process.env.NODE_ENV === 'development' && <DevTool control={methods.control} /> */}
+      {process.env.NODE_ENV === 'development' && <DevTool control={methods.control} />}
     </WrappedWidget>
   )
 }
