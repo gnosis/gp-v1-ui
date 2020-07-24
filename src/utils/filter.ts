@@ -12,10 +12,10 @@ export function checkTokenAgainstSearch(token: TokenDetails | null, searchText: 
 }
 
 const filterTradesAndOrdersFnFactory = <
-  T extends { id: string; buyToken: TokenDetails | null; sellToken: TokenDetails | null }
+  T extends { id: string; buyToken: TokenDetails | null; sellToken: TokenDetails | null; orderId?: string }
 >(
   includeInverseMarket?: boolean,
-) => (searchTxt: string) => ({ id, buyToken, sellToken }: T): boolean | null => {
+) => (searchTxt: string) => ({ id, buyToken, sellToken, ...rest }: T): boolean | null => {
   if (searchTxt === '') return null
 
   const market =
@@ -23,6 +23,7 @@ const filterTradesAndOrdersFnFactory = <
 
   return (
     !!id.includes(searchTxt) ||
+    (rest.orderId && !!rest.orderId.includes(searchTxt)) ||
     (market && !!market.includes(searchTxt)) ||
     checkTokenAgainstSearch(buyToken, searchTxt) ||
     checkTokenAgainstSearch(sellToken, searchTxt)
