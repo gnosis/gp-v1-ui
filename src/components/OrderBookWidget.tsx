@@ -223,6 +223,64 @@ function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetai
   })
 }
 
+// --- Initial zoom calculation helper functions ---
+function calcRange(minBid: number, maxBid: number, minAsk: number, maxAsk: number): number {
+  return Math.max(maxBid, maxAsk) - Math.min(minBid, minAsk)
+}
+
+function calcSpread(maxBid: number, minAsk: number): number {
+  return Math.abs(minAsk - maxBid)
+}
+
+function calcZoomInterval(spread: number): number {
+  // TODO: magic number, move to const
+  return spread * 2
+}
+
+function calcLowerZoomX(minBid: number, maxBid: number, minAsk: number, zoomInterval: number): number {
+  return Math.max(Math.min(maxBid, minAsk) - zoomInterval, minBid)
+}
+
+function calcUpperZoomX(minAsk: number, maxAsk: number, maxBid: number, zoomInterval: number): number {
+  return Math.min(Math.max(maxBid, minAsk) + zoomInterval, maxAsk)
+}
+
+function calcUpperZoomY(
+  bids: PricePointDetails[],
+  asks: PricePointDetails[],
+  lowerZoomX: number,
+  upperZoomX: number,
+): number {
+  let bidsVolume = 0
+  for (let i = 0; i < bids.length; i++) {
+    if (lowerZoomX < bids[i].priceNumber) {
+      bidsVolume = bids[i].totalVolumeNumber
+      break
+    }
+  }
+  let asksVolume = asks.length > 0 ? asks[0].totalVolumeNumber : 0
+  for (let i = 0; i < asks.length; i++) {
+    if (upperZoomX < asks[i].priceNumber) {
+      break
+    }
+    asksVolume = asks[i].totalVolumeNumber
+  }
+  console.log(`bidsVolume: ${bidsVolume}; asksVolume: ${asksVolume}`)
+  return Math.max(bidsVolume, asksVolume)
+}
+
+function calcMinX(minBid: number, minAsk: number): number {
+  return Math.min(minBid, minAsk)
+}
+
+function calcMaxY(minBid: number, maxAsk: number): number {
+  return Math.max(minBid, maxAsk)
+}
+
+function calcPercentageOfAxis(position: number, start: number, range: number): number {
+  return (position - start) / range
+}
+
 interface ChartProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
@@ -254,7 +312,16 @@ export const Chart: React.FC<ChartProps> = props => {
     // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
     xAxis.renderer.minGridDistance = 40
 
-    _chart.yAxes.push(new am4charts.ValueAxis())
+    // To start zoomed in when data loads
+    // https://www.amcharts.com/docs/v4/reference/valueaxis/#keepSelection_property
+    xAxis.keepSelection = true
+    // To allow we to zoom reaaaaly tiny fractions
+    xAxis.maxZoomFactor = 10 ** 18
+
+    const yAxis = _chart.yAxes.push(new am4charts.ValueAxis())
+
+    yAxis.keepSelection = true
+    yAxis.maxZoomFactor = 10 ** 18
 
     // Colors
     const colors = {
@@ -298,9 +365,7 @@ export const Chart: React.FC<ChartProps> = props => {
   }, [])
 
   useEffect(() => {
-    console.log(`something changed, updating everything!!!`)
     if (chart) {
-      console.log(`and we have a chart!!`)
       const baseTokenLabel = safeTokenName(baseToken)
       const quoteTokenLabel = safeTokenName(quoteToken)
       const market = baseTokenLabel + '-' + quoteTokenLabel
@@ -308,10 +373,10 @@ export const Chart: React.FC<ChartProps> = props => {
       const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
       // Axes configs
-      const xAxis = chart.xAxes.values[0]
+      const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
       xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
 
-      const yAxis = chart.yAxes.values[0]
+      const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
       yAxis.title.text = baseTokenLabel
 
       // Add data
@@ -331,43 +396,69 @@ export const Chart: React.FC<ChartProps> = props => {
           const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
           const pricePoints = bids.concat(asks)
 
-          _printOrderBook(pricePoints, baseToken, quoteToken)
+          let startX = 0
+          let endX = 1
 
-          // dynamically adjust X axis length based on prices
-          const biggestBid = bids.length ? bids[bids.length - 1].price : null
-          const smallestAsk = asks.length ? asks[0].price : null
+          if (bids.length > 0 && asks.length > 0) {
+            const minBid = bids[0].priceNumber
+            const maxBid = bids[bids.length - 1].priceNumber
+            const minAsk = asks[0].priceNumber
+            const maxAsk = asks[asks.length - 1].priceNumber
+            // What's the left most value? (given by price)
+            const minX = calcMinX(minBid, minAsk)
+            // What's the highest value? (given by volume)
+            const maxY = calcMaxY(bids[0].totalVolumeNumber, asks[asks.length - 1].totalVolumeNumber)
 
-          console.log(`BB: ${biggestBid?.toNumber()}; SA: ${smallestAsk?.toNumber()}`)
+            // What's the difference between start and end prices
+            const range = calcRange(minBid, maxBid, minAsk, maxAsk)
+            // What's the difference between highest bid and lowest ask (modulus)
+            const spread = calcSpread(maxBid, minAsk)
+            // How much will we zoom, based on the spread
+            const zoomInterval = calcZoomInterval(spread)
+            // Starting X value
+            const lowerZoomX = calcLowerZoomX(minBid, maxBid, minAsk, zoomInterval)
+            // Ending X value
+            const upperZoomX = calcUpperZoomX(minAsk, maxAsk, maxBid, zoomInterval)
+            // Ending Y value (Y always starts on 0)
+            const upperZoomY = calcUpperZoomY(bids, asks, lowerZoomX, upperZoomX)
 
-          if (biggestBid && smallestAsk) {
-            const spread = smallestAsk
-              .minus(biggestBid)
-              .abs() // they might overlap
-              .toNumber()
-            // TODO: magic number
-            const maxRange = spread * 5
-            const min = Math.max(0, biggestBid.minus(maxRange).toNumber())
-            const max = smallestAsk.plus(maxRange).toNumber()
-            setDefaults({ min, max })
-            console.log(`updated min ${min} max ${max} | both present`)
-          } else if (biggestBid) {
-            // TODO: magic number
-            const maxRange = biggestBid.minus(bids[0].price).multipliedBy(0.05)
-            const max = biggestBid.plus(maxRange).toNumber()
-            const min = undefined
-            setDefaults({ min, max })
-            console.log(`updated min ${min} max ${max} | only bids`)
-          } else if (smallestAsk) {
-            // TODO: magic number
-            const maxRange = asks[asks.length - 1].price.minus(smallestAsk).multipliedBy(0.05)
-            const min = Math.max(smallestAsk.minus(maxRange).toNumber(), 0)
-            const max = undefined
-            setDefaults({ min, max })
-            console.log(`updated min ${min} max ${max} | only asks`)
-          } else {
-            setDefaults({ min: undefined, max: undefined })
-            console.log(`updated min - max - | nothing`)
+            // Calculate, given `upperZoomY`, where in % terms it fits
+            const endY = calcPercentageOfAxis(upperZoomY, 0, maxY)
+            // Same as above, for `lowerZoomX` and `upperZoomX`
+            startX = calcPercentageOfAxis(lowerZoomX, minX, range)
+            endX = calcPercentageOfAxis(upperZoomX, minX, range)
+
+            logDebug(`bids[${minBid.toFixed(10)}...${maxBid.toFixed(10)}]`)
+            logDebug(`asks[${minAsk.toFixed(10)}...${maxAsk.toFixed(10)}]`)
+            logDebug(`range: ${range}; minX: ${minX}`)
+            logDebug(`spread: ${spread}`)
+            logDebug(`zoomInterval: ${zoomInterval}`)
+            logDebug(`lowerZoomX: ${lowerZoomX}; upperZoomX: ${upperZoomX}`)
+            logDebug(`startX %: ${startX}; endX %: ${endX}`)
+            logDebug(`upperZoomY: ${upperZoomY}; maxY: ${maxY}`)
+            logDebug(`endY %: ${endY}`)
+
+            // Setting Y axis initial zoom
+            yAxis.end = endY
+          } else if (bids.length > 0) {
+            // There are no asks. Zoom on the right side of the graph
+            // TODO: magic number, move to const
+            xAxis.start = 0.95
+            xAxis.end = 1
+            // TODO: adjust yAxis
+          } else if (asks.length > 0) {
+            // There are no bids. Zoom on the left side of the graph
+            xAxis.start = 0
+            // TODO: magic number, move to const
+            xAxis.end = 0.5
+            // TODO: adjust yAxis
           }
+
+          // Setting X axis initial zoom
+          xAxis.start = startX
+          xAxis.end = endX
+
+          _printOrderBook(pricePoints, baseToken, quoteToken)
 
           return pricePoints
         } catch (error) {
