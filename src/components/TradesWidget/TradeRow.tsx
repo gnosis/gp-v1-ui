@@ -12,6 +12,7 @@ import { FoldableRowWrapper } from 'components/Layout/Card'
 import { isTradeSettled, divideBN, formatPercentage } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { MEDIA } from 'const'
+import { EllipsisText } from 'components/Layout'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   @media ${MEDIA.mobile} {
@@ -112,6 +113,7 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
+      <EllipsisText title={orderId}>{orderId}</EllipsisText>
       <td data-label="Market" className="showResponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>

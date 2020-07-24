@@ -29,6 +29,7 @@ import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
+import { EllipsisText } from 'components/Layout'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
@@ -309,6 +310,9 @@ const OrderRow: React.FC<Props> = props => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
+        <td>
+          <EllipsisText title={order.id}>{order.id}</EllipsisText>
+        </td>
         <Market sellToken={sellToken} buyToken={buyToken} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
