@@ -3,12 +3,12 @@ import { DetailedAuctionElement, Trade } from 'api/exchange/ExchangeApi'
 import { computeMarketProp } from './display'
 import { web3 } from 'api'
 
-export function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string): boolean {
+export function checkTokenAgainstSearch(token: TokenDetails | null, searchText: string, isAddress?: boolean): boolean {
   if (!token) return false
   return (
     token?.symbol?.toLowerCase().includes(searchText) ||
     token?.name?.toLowerCase().includes(searchText) ||
-    (web3.utils.isAddress(searchText) && token?.address.toLowerCase().includes(searchText))
+    (!!isAddress && token?.address.toLowerCase().includes(searchText))
   )
 }
 
@@ -19,14 +19,15 @@ const filterTradesAndOrdersFnFactory = <
 ) => (searchTxt: string) => ({ id, buyToken, sellToken, ...rest }: T): boolean | null => {
   if (searchTxt === '') return null
 
+  const searchIsAddress = web3.utils.isAddress(searchTxt)
   const market =
     sellToken && buyToken && computeMarketProp({ sellToken, buyToken, inverseMarket: includeInverseMarket })
-  console.debug(id, rest)
+
   return (
     (rest.orderId ? !!rest.orderId.includes(searchTxt) : !!id.includes(searchTxt)) ||
     (market && !!market.includes(searchTxt)) ||
-    checkTokenAgainstSearch(buyToken, searchTxt) ||
-    checkTokenAgainstSearch(sellToken, searchTxt)
+    checkTokenAgainstSearch(buyToken, searchTxt, searchIsAddress) ||
+    checkTokenAgainstSearch(sellToken, searchTxt, searchIsAddress)
   )
 }
 
