@@ -30,16 +30,22 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
 
   return (
     <TxMessageWrapper>
-      <p>
-        Your are selling {sellTokenAmount} {displaySellToken} for {displayReceiveToken}
-      </p>
-      <p>At a price of</p>
-      <p>
-        {priceInverse} {displaySellToken} per {displayReceiveToken}
-      </p>
-      <p>
-        {price} {displayReceiveToken} per {displaySellToken}
-      </p>
+      <div className="intro-text">
+        This is the final step before your order will be submitted to the blockchain. Please review the information
+        below carefully to make sure everything looks correct.
+      </div>
+      <div>
+        Sell Order: {sellTokenAmount} <strong>{displaySellToken}</strong> for <strong>{displayReceiveToken}</strong>
+      </div>
+      <div className="message">
+        <b>Price direct:</b>
+        <p>
+          {priceInverse} <strong>{displaySellToken}</strong> per <strong>{displayReceiveToken}</strong>
+        </p>
+        <p>
+          {price} {displayReceiveToken} per {displaySellToken}
+        </p>
+      </div>
       <p>
         <strong>
           You will receive at least {receiveTokenAmount} {displayReceiveToken}

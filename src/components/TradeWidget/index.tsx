@@ -67,6 +67,19 @@ import { updateTradeState } from 'reducers-actions/trade'
 import { DevTool } from 'HookFormDevtool'
 import { ButtonWrapper } from 'hooks/useSubmitTxModal'
 import { TxMessage } from './TxMessage'
+import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
+
+const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
+  padding: 0;
+
+  .intro-text {
+    margin: 0 0 1rem 0;
+  }
+
+  .message {
+    margin: 1rem;
+  }
+`
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
@@ -999,7 +1012,11 @@ const TradeWidget: React.FC = () => {
           <p>This order might be partially filled.</p>
           <ButtonWrapper
             onConfirm={onConfirm}
-            message={(): React.ReactNode => <TxMessage sellToken={sellToken} receiveToken={receiveToken} />}
+            message={(): React.ReactNode => (
+              <ConfirmationModalWrapper>
+                <TxMessage sellToken={sellToken} receiveToken={receiveToken} />
+              </ConfirmationModalWrapper>
+            )}
           >
             <SubmitButton
               data-text="This order might be partially filled."
