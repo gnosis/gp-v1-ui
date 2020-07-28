@@ -8,7 +8,7 @@ export interface Flag<T extends string> {
 
 // OUR specific flags
 // lowercase hex value to be appended to tx.data
-const SENTINEL = CONFIG.transactions.sentinel
+const SENTINEL = process.env.SENTINEL || CONFIG.transactions.sentinel
 
 type DxFlagName = 'provider' | 'mobile' | 'browser' | 'screenSize'
 
