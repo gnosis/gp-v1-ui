@@ -289,3 +289,18 @@ walletConnect:
 ```
 
 Alternatively you can set the bridge by declaring the env var `WALLET_CONNECT_BRIDGE` that would take precedence over the config.
+
+### transactions
+
+Transactions config. Used to apply some postprocessing toevery transaction submitted through the interface
+
+**Config format:**
+
+```yaml
+transactions:
+  sentinel: string
+```
+
+Where:
+
+- `sentinel` is lowercase hex value appended to transaction input data and followed by on-chain analytics flags
