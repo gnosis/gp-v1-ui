@@ -122,4 +122,5 @@ disabledTokens:
 transactions:
   # lowercase hex value appended to transaction input data
   # and followed by on-chain analytics flags
+  # IMPORTANT: If you fork the project, change sentinel to a different value. See Readme for details
   sentinel: 'dec0de'
