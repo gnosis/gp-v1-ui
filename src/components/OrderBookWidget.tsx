@@ -251,20 +251,9 @@ function calcUpperZoomY(
   lowerZoomX: number,
   upperZoomX: number,
 ): number {
-  let bidsVolume = 0
-  for (let i = 0; i < bids.length; i++) {
-    if (lowerZoomX < bids[i].priceNumber) {
-      bidsVolume = bids[i].totalVolumeNumber
-      break
-    }
-  }
+  const bidsVolume = bids.find(bid => lowerZoomX < bid.priceNumber)?.totalVolumeNumber || 0
   let asksVolume = asks.length > 0 ? asks[0].totalVolumeNumber : 0
-  for (let i = 0; i < asks.length; i++) {
-    if (upperZoomX < asks[i].priceNumber) {
-      break
-    }
-    asksVolume = asks[i].totalVolumeNumber
-  }
+  asksVolume = asks.find((_ask, i) => upperZoomX < asks[i + 1]?.priceNumber)?.totalVolumeNumber || asksVolume
   console.log(`bidsVolume: ${bidsVolume}; asksVolume: ${asksVolume}`)
   return Math.max(bidsVolume, asksVolume)
 }
