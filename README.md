@@ -304,3 +304,24 @@ transactions:
 Where:
 
 - `sentinel` is lowercase hex value appended to transaction input data and followed by on-chain analytics flags
+
+Sentinel can also be passed as an environment variable, e.g. `SENTINEL=4e3a yarn start`. In which case it overrides the `sentinel` from config file.
+
+Following the `sentinel` are 6 digits: 2 for provider name, 1 for mobile or desktop flag, 2 for browser name, 1 for screen size.
+
+For example given
+ - **sentinel** `'dec0de'`
+ - **provider** Metamask (01)
+ - **desktop** (0)
+ - **browser** Chrome (13)
+ - XL(width >= 1200px) **screen size** (0)
+
+Input data for each transaction would have a tail of
+
+```
+<sentinel><provider:2><mobile_or_desktop:1><browser:2><screen_size:1>
+
+dec0de010130
+```
+
+All flags can be found in [flagCodes.ts](src/utils/flagCodes.ts)
