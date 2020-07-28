@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react'
+import BN from 'bn.js'
 import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
+import { DEFAULT_PRECISION, ONE_BIG_NUMBER } from '@gnosis.pm/dex-js'
 
 import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
@@ -12,10 +14,10 @@ import { getNetworkFromId, safeTokenName, formatSmart, logDebug } from 'utils'
 
 import { TEN_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
 
-import { TokenDetails, Network } from 'types'
-import BN from 'bn.js'
-import { DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 import useSafeState from 'hooks/useSafeState'
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+
+import { TokenDetails, Network } from 'types'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 
@@ -135,6 +137,7 @@ const processData = (
   baseToken: TokenDetails,
   quoteToken: TokenDetails,
   type: Offer,
+  owlPrice: BigNumber | null,
 ): PricePointDetails[] => {
   const isBid = type == Offer.Bid
   const quoteTokenDecimals = quoteToken.decimals
@@ -148,8 +151,14 @@ const processData = (
   )
 
   // Filter tiny orders
+  const minimumOrderVolume = !owlPrice // is there a price returned?
+    ? new BigNumber(SMALL_VOLUME_THRESHOLD) // No, use default dumb threshold
+    : owlPrice.eq(0) // Is price 0?
+    ? ONE_BIG_NUMBER // It's OWL itself, use 1
+    : owlPrice // Not OWL, use returned price
+
   pricePoints = pricePoints
-    .filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+    .filter(pricePoint => pricePoint.volume.gt(minimumOrderVolume))
     // sort by price according to type
     // bid orders must be inverted to calculate the descending total volume
     .sort(({ price: a }, { price: b }) => (isBid ? b.comparedTo(a) : a.comparedTo(b)))
@@ -212,13 +221,13 @@ const processData = (
 }
 
 function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetails, quoteToken: TokenDetails): void {
-  logDebug('Order Book: ' + baseToken.symbol + '-' + quoteToken.symbol)
+  logDebug('[Order Book]: ' + baseToken.symbol + '-' + quoteToken.symbol)
   pricePoints.forEach(pricePoint => {
     const isBid = pricePoint.type === Offer.Bid
     logDebug(
-      `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseToken.symbol} at ${
+      `[Order Book]\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseToken.symbol} at ${
         pricePoint.priceFormatted
-      } ${quoteToken.symbol}`,
+      } ${quoteToken.symbol}\tinverted ${_formatSmartBigNumber(ONE_BIG_NUMBER.dividedBy(pricePoint.price))}`,
     )
   })
 }
@@ -341,6 +350,15 @@ export const Chart: React.FC<ChartProps> = props => {
   const { baseToken, quoteToken, networkId, hops } = props
   const [chart, setChart] = useSafeState<null | am4charts.XYChart>(null)
 
+  // Get the price of 1 OWL in quote token
+  const { priceEstimation: oneOwlInQuoteToken, isPriceLoading } = usePriceEstimationWithSlippage({
+    networkId,
+    amount: '0', // no amount means 1 unit === 1 OWL
+    baseTokenId: 0, // OWL
+    quoteTokenId: quoteToken.id,
+    quoteTokenDecimals: quoteToken.decimals,
+  })
+
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -358,117 +376,120 @@ export const Chart: React.FC<ChartProps> = props => {
   }, [])
 
   useEffect(() => {
-    if (chart) {
-      const baseTokenLabel = safeTokenName(baseToken)
-      const quoteTokenLabel = safeTokenName(quoteToken)
-      const market = baseTokenLabel + '-' + quoteTokenLabel
-
-      const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
-
-      // Axes configs
-      const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-      xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
-
-      const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-      yAxis.title.text = baseTokenLabel
-
-      // Add data
-      chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
-        baseTokenId: baseToken.id,
-        quoteTokenId: quoteToken.id,
-        hops,
-        networkId,
-      })
-
-      // Removing any previous event handler
-      chart.dataSource.adapter.remove('parsedData')
-      // Adding new event handler
-      chart.dataSource.adapter.add('parsedData', data => {
-        try {
-          const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
-          const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
-          const pricePoints = bids.concat(asks)
-
-          let startX = 0
-          let endX = 1
-
-          if (bids.length > 0 && asks.length > 0) {
-            const minBid = bids[0].priceNumber
-            const maxBid = bids[bids.length - 1].priceNumber
-            const minAsk = asks[0].priceNumber
-            const maxAsk = asks[asks.length - 1].priceNumber
-            // What's the left most value? (given by price)
-            const minX = calcMinX(minBid, minAsk)
-            // What's the highest value? (given by volume)
-            const maxY = calcMaxY(bids[0].totalVolumeNumber, asks[asks.length - 1].totalVolumeNumber)
-
-            // What's the difference between start and end prices
-            const range = calcRange(minBid, maxBid, minAsk, maxAsk)
-            // What's the difference between highest bid and lowest ask (modulus)
-            const spread = calcSpread(maxBid, minAsk)
-            // How much will we zoom, based on the spread
-            const zoomInterval = calcZoomInterval(spread)
-            // Starting X value
-            const lowerZoomX = calcLowerZoomX(minBid, maxBid, minAsk, zoomInterval)
-            // Ending X value
-            const upperZoomX = calcUpperZoomX(minAsk, maxAsk, maxBid, zoomInterval)
-            // Ending Y value (Y always starts on 0)
-            const upperZoomY = calcUpperZoomY(bids, asks, lowerZoomX, upperZoomX)
-
-            // Calculate, given `upperZoomY`, where in % terms it fits
-            const endY = calcPercentageOfAxis(upperZoomY, 0, maxY)
-            // Same as above, for `lowerZoomX` and `upperZoomX`
-            startX = calcPercentageOfAxis(lowerZoomX, minX, range)
-            endX = calcPercentageOfAxis(upperZoomX, minX, range)
-
-            logDebug(`bids[${minBid.toFixed(10)}...${maxBid.toFixed(10)}]`)
-            logDebug(`asks[${minAsk.toFixed(10)}...${maxAsk.toFixed(10)}]`)
-            logDebug(`range: ${range}; minX: ${minX}`)
-            logDebug(`spread: ${spread}`)
-            logDebug(`zoomInterval: ${zoomInterval}`)
-            logDebug(`lowerZoomX: ${lowerZoomX}; upperZoomX: ${upperZoomX}`)
-            logDebug(`startX %: ${startX}; endX %: ${endX}`)
-            logDebug(`upperZoomY: ${upperZoomY}; maxY: ${maxY}`)
-            logDebug(`endY %: ${endY}`)
-
-            // Setting Y axis initial zoom
-            yAxis.end = endY
-          } else if (bids.length > 0) {
-            // There are no asks. Zoom on the right side of the graph
-            // TODO: magic number, move to const
-            xAxis.start = 0.95
-            xAxis.end = 1
-            // TODO: adjust yAxis
-          } else if (asks.length > 0) {
-            // There are no bids. Zoom on the left side of the graph
-            xAxis.start = 0
-            // TODO: magic number, move to const
-            xAxis.end = 0.5
-            // TODO: adjust yAxis
-          }
-
-          // Setting X axis initial zoom
-          xAxis.start = startX
-          xAxis.end = endX
-
-          _printOrderBook(pricePoints, baseToken, quoteToken)
-
-          return pricePoints
-        } catch (error) {
-          console.error('Error processing data', error)
-          return []
-        }
-      })
-
-      // Reload data from data source re-using same chart
-      chart.dataSource.load()
-
-      // Setting up tooltips based on currently loaded tokens
-      const [bidSeries, askSeries] = chart.series.values
-      bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-      askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+    if (!chart || isPriceLoading) {
+      return
     }
-  }, [baseToken, chart, hops, networkId, quoteToken])
+
+    const baseTokenLabel = safeTokenName(baseToken)
+    const quoteTokenLabel = safeTokenName(quoteToken)
+
+    const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
+
+    // Axes configs
+    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+
+    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    yAxis.title.text = baseTokenLabel
+
+    // Add data
+    chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+      baseTokenId: baseToken.id,
+      quoteTokenId: quoteToken.id,
+      hops,
+      networkId,
+    })
+
+    // Removing any previous event handler
+    chart.dataSource.adapter.remove('parsedData')
+    // Adding new event handler
+    chart.dataSource.adapter.add('parsedData', data => {
+      try {
+        const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid, oneOwlInQuoteToken)
+        const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
+        const pricePoints = bids.concat(asks)
+
+        let startX = 0
+        let endX = 1
+
+        if (bids.length > 0 && asks.length > 0) {
+          const minBid = bids[0].priceNumber
+          const maxBid = bids[bids.length - 1].priceNumber
+          const minAsk = asks[0].priceNumber
+          const maxAsk = asks[asks.length - 1].priceNumber
+          // What's the left most value? (given by price)
+          const minX = calcMinX(minBid, minAsk)
+          // What's the highest value? (given by volume)
+          const maxY = calcMaxY(bids[0].totalVolumeNumber, asks[asks.length - 1].totalVolumeNumber)
+
+          // What's the difference between start and end prices
+          const range = calcRange(minBid, maxBid, minAsk, maxAsk)
+          // What's the difference between highest bid and lowest ask (modulus)
+          const spread = calcSpread(maxBid, minAsk)
+          // How much will we zoom, based on the spread
+          const zoomInterval = calcZoomInterval(spread)
+          // Starting X value
+          const lowerZoomX = calcLowerZoomX(minBid, maxBid, minAsk, zoomInterval)
+          // Ending X value
+          const upperZoomX = calcUpperZoomX(minAsk, maxAsk, maxBid, zoomInterval)
+          // Ending Y value (Y always starts on 0)
+          const upperZoomY = calcUpperZoomY(bids, asks, lowerZoomX, upperZoomX)
+
+          // Calculate, given `upperZoomY`, where in % terms it fits
+          const endY = calcPercentageOfAxis(upperZoomY, 0, maxY)
+          // Same as above, for `lowerZoomX` and `upperZoomX`
+          startX = calcPercentageOfAxis(lowerZoomX, minX, range)
+          endX = calcPercentageOfAxis(upperZoomX, minX, range)
+
+          logDebug(`[Order Book] bids[${minBid.toFixed(15)}...${maxBid.toFixed(15)}]`)
+          logDebug(`[Order Book] asks[${minAsk.toFixed(15)}...${maxAsk.toFixed(15)}]`)
+          logDebug(`[Order Book] range: ${range.toFixed(15)}; minX: ${minX.toFixed(15)}`)
+          logDebug(`[Order Book] spread: ${spread.toFixed(15)}`)
+          logDebug(`[Order Book] zoomInterval: ${zoomInterval.toFixed(15)}`)
+          logDebug(`[Order Book] lowerZoomX: ${lowerZoomX.toFixed(15)}; upperZoomX: ${upperZoomX.toFixed(15)}`)
+          logDebug(`[Order Book] startX %: ${startX}; endX %: ${endX}`)
+          logDebug(`[Order Book] upperZoomY: ${upperZoomY.toFixed(15)}; maxY: ${maxY.toFixed(15)}`)
+          logDebug(`[Order Book] endY %: ${endY.toFixed(15)}`)
+
+          // Setting Y axis initial zoom
+          yAxis.end = endY
+        } else if (bids.length > 0) {
+          // There are no asks. Zoom on the right side of the graph
+          // TODO: magic number, move to const
+          xAxis.start = 0.95
+          xAxis.end = 1
+          // TODO: adjust yAxis
+        } else if (asks.length > 0) {
+          // There are no bids. Zoom on the left side of the graph
+          xAxis.start = 0
+          // TODO: magic number, move to const
+          xAxis.end = 0.5
+          // TODO: adjust yAxis
+        }
+
+        // Setting X axis initial zoom
+        xAxis.start = startX
+        xAxis.end = endX
+
+        _printOrderBook(pricePoints, baseToken, quoteToken)
+
+        return pricePoints
+      } catch (error) {
+        console.error('Error processing data', error)
+        return []
+      }
+    })
+
+    // Reload data from data source re-using same chart
+    chart.dataSource.load()
+
+    const market = baseTokenLabel + '-' + quoteTokenLabel
+
+    // Setting up tooltips based on currently loaded tokens
+    const [bidSeries, askSeries] = chart.series.values
+    bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+    askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+  }, [baseToken, chart, hops, networkId, quoteToken, oneOwlInQuoteToken, isPriceLoading])
 
   return <Wrapper ref={mountPoint} />
 }
