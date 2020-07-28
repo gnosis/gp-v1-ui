@@ -116,6 +116,9 @@ export class CacheMixin {
 
   private hash(obj: any): string {
     // primitive type
+    if (obj === undefined) {
+      return 'undefined'
+    }
     if (typeof obj !== 'object') {
       return obj.toString()
     }
@@ -124,6 +127,7 @@ export class CacheMixin {
     // array
     if (Array.isArray(obj)) {
       return obj
+        .filter(item => item === 0 || !!item)
         .sort()
         .map(hash)
         .join('|')
