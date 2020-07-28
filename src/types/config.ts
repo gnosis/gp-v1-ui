@@ -56,6 +56,11 @@ export interface DisabledTokens {
   [Network.Rinkeby]: TokenOverride[]
 }
 
+export interface Transactions {
+  // lowercase hex value to be appended to tx.data
+  sentinel: string
+}
+
 export interface Config {
   name: string
   logoPath: string
@@ -67,6 +72,7 @@ export interface Config {
   exchangeContractConfig: ExchangeContractConfig
   walletConnect: WalletConnectConfig
   disabledTokens: DisabledTokens
+  transactions: Transactions
 }
 
 export interface AddressToOverrideMap {

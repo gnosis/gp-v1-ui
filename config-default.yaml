@@ -117,3 +117,9 @@ disabledTokens:
     - address: '0x6Fb0855c404E09c47C3fBCA25f08d4E41f9F062f'
     - address: '0xFC4B8ED459e00e5400be803A9BB3954234FD50e3'
   4: [] # Rinkeby
+
+# modifiers for transactions
+transactions:
+  # lowercase hex value appended to transaction input data
+  # and followed by on-chain analytics flags
+  sentinel: 'dec0de'
