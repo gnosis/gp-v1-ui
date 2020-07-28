@@ -32,8 +32,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
   return (
     <TxMessageWrapper>
       <div className="intro-text">
-        This is the <UnderlinedText>final</UnderlinedText> step before your order will be submitted to the blockchain.
-        <p>Please review the information below carefully to make sure everything looks correct.</p>
+        <div>Carefully review the information below to make sure everything looks correct.</div>
       </div>
       <div className="message">
         {/* Details */}
