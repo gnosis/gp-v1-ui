@@ -270,6 +270,66 @@ function calcPercentageOfAxis(position: number, start: number, range: number): n
   return (position - start) / range
 }
 
+function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
+  const chart = am4core.create(mountPoint, am4charts.XYChart)
+
+  // Create axes
+  const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
+  // Making the scale start with the first value, without empty spaces
+  // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
+  xAxis.strictMinMax = true
+  // How small we want the column separators be, in pixels
+  // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
+  xAxis.renderer.minGridDistance = 40
+
+  // To start zoomed in when data loads
+  // https://www.amcharts.com/docs/v4/reference/valueaxis/#keepSelection_property
+  xAxis.keepSelection = true
+  // To allow we to zoom reaaaaly tiny fractions
+  xAxis.maxZoomFactor = 10 ** 18
+
+  const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
+
+  yAxis.keepSelection = true
+  yAxis.maxZoomFactor = 10 ** 18
+
+  // Colors
+  const colors = {
+    green: '#3d7542',
+    red: '#dc1235',
+  }
+
+  // Create series
+  const bidSeries = chart.series.push(new am4charts.StepLineSeries())
+  bidSeries.dataFields.valueX = 'priceNumber'
+  bidSeries.dataFields.valueY = 'bidValueY'
+  bidSeries.strokeWidth = 1
+  bidSeries.stroke = am4core.color(colors.green)
+  bidSeries.fill = bidSeries.stroke
+  bidSeries.fillOpacity = 0.1
+
+  const askSeries = chart.series.push(new am4charts.StepLineSeries())
+  askSeries.dataFields.valueX = 'priceNumber'
+  askSeries.dataFields.valueY = 'askValueY'
+  askSeries.strokeWidth = 1
+  askSeries.stroke = am4core.color(colors.red)
+  askSeries.fill = askSeries.stroke
+  askSeries.fillOpacity = 0.1
+
+  // Add cursor
+  chart.cursor = new am4charts.XYCursor()
+
+  chart.cursor.snapToSeries = [bidSeries, askSeries]
+
+  am4core.useTheme(am4themesSpiritedaway)
+  am4core.options.autoSetClassName = true
+
+  chart.scrollbarX = new am4core.Scrollbar()
+  chart.scrollbarY = new am4core.Scrollbar()
+
+  return chart
+}
+
 interface ChartProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
@@ -288,61 +348,7 @@ export const Chart: React.FC<ChartProps> = props => {
       return
     }
 
-    const _chart = am4core.create(mountPoint.current, am4charts.XYChart)
-
-    // Create axes
-    const xAxis = _chart.xAxes.push(new am4charts.ValueAxis())
-    // Making the scale start with the first value, without empty spaces
-    // https://www.amcharts.com/docs/v4/reference/valueaxis/#strictMinMax_property
-    xAxis.strictMinMax = true
-    // How small we want the column separators be, in pixels
-    // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
-    xAxis.renderer.minGridDistance = 40
-
-    // To start zoomed in when data loads
-    // https://www.amcharts.com/docs/v4/reference/valueaxis/#keepSelection_property
-    xAxis.keepSelection = true
-    // To allow we to zoom reaaaaly tiny fractions
-    xAxis.maxZoomFactor = 10 ** 18
-
-    const yAxis = _chart.yAxes.push(new am4charts.ValueAxis())
-
-    yAxis.keepSelection = true
-    yAxis.maxZoomFactor = 10 ** 18
-
-    // Colors
-    const colors = {
-      green: '#3d7542',
-      red: '#dc1235',
-    }
-
-    // Create series
-    const bidSeries = _chart.series.push(new am4charts.StepLineSeries())
-    bidSeries.dataFields.valueX = 'priceNumber'
-    bidSeries.dataFields.valueY = 'bidValueY'
-    bidSeries.strokeWidth = 1
-    bidSeries.stroke = am4core.color(colors.green)
-    bidSeries.fill = bidSeries.stroke
-    bidSeries.fillOpacity = 0.1
-
-    const askSeries = _chart.series.push(new am4charts.StepLineSeries())
-    askSeries.dataFields.valueX = 'priceNumber'
-    askSeries.dataFields.valueY = 'askValueY'
-    askSeries.strokeWidth = 1
-    askSeries.stroke = am4core.color(colors.red)
-    askSeries.fill = askSeries.stroke
-    askSeries.fillOpacity = 0.1
-
-    // Add cursor
-    _chart.cursor = new am4charts.XYCursor()
-
-    _chart.cursor.snapToSeries = [bidSeries, askSeries]
-
-    am4core.useTheme(am4themesSpiritedaway)
-    am4core.options.autoSetClassName = true
-
-    _chart.scrollbarX = new am4core.Scrollbar()
-    _chart.scrollbarY = new am4core.Scrollbar()
+    const _chart = createChart(mountPoint.current)
 
     setChart(_chart)
 
