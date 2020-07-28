@@ -9,6 +9,11 @@ export interface Flag<T extends string> {
 // OUR specific flags
 // lowercase hex value to be appended to tx.data
 const SENTINEL = process.env.SENTINEL || CONFIG.transactions.sentinel
+console.log('SENTINEL', SENTINEL)
+
+if (!/^[0-9a-f]+$/.test(SENTINEL)) {
+  throw new Error(`SENTINEL isn't valid. Expected lowercase hex value, got ${SENTINEL}`)
+}
 
 type DxFlagName = 'provider' | 'mobile' | 'browser' | 'screenSize'
 
