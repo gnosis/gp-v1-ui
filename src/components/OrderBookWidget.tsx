@@ -271,12 +271,35 @@ function calcMinX(minBid: number, minAsk: number): number {
   return Math.min(minBid, minAsk)
 }
 
-function calcMaxY(minBid: number, maxAsk: number): number {
-  return Math.max(minBid, maxAsk)
-}
-
 function calcPercentageOfAxis(position: number, start: number, range: number): number {
   return (position - start) / range
+}
+
+function calcValueFromPercentage(percentage: number, range: number): number {
+  return range * percentage
+}
+
+function calcZoomX(initialStart: number, initialEnd: number, zoomFactor: number): { start: number; end: number } {
+  const interval = (initialEnd - initialStart) * zoomFactor
+  const start = Math.max(initialStart + interval, 0)
+  const end = Math.min(initialEnd - interval, 1)
+  return { start, end }
+}
+
+function calcZoomY(
+  bids: PricePointDetails[],
+  asks: PricePointDetails[],
+  xAxisMinValue: number,
+  xAxisMaxValue: number,
+  xAxisStartZoomPercentage: number,
+  xAxisEndZoomPercentage: number,
+  yAxisMaxValue: number,
+): number {
+  const range = xAxisMaxValue - xAxisMinValue
+  const lowerZoomX = calcValueFromPercentage(xAxisStartZoomPercentage, range)
+  const upperZoomX = calcValueFromPercentage(xAxisEndZoomPercentage, range)
+  const upperZoomY = calcUpperZoomY(bids, asks, lowerZoomX, upperZoomX)
+  return calcPercentageOfAxis(upperZoomY, 0, yAxisMaxValue)
 }
 
 function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
@@ -339,16 +362,73 @@ function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   return chart
 }
 
+function calcInitialZoomX(bids: PricePointDetails[], asks: PricePointDetails[]): { start: number; end: number } {
+  let start = 0
+  let end = 1
+  if (bids.length > 0 && asks.length > 0) {
+    const minBid = bids[0].priceNumber
+    const maxBid = bids[bids.length - 1].priceNumber
+    const minAsk = asks[0].priceNumber
+    const maxAsk = asks[asks.length - 1].priceNumber
+    // What's the left most value? (given by price)
+    const minX = calcMinX(minBid, minAsk)
+    // What's the difference between start and end prices
+    const range = calcRange(minBid, maxBid, minAsk, maxAsk)
+    // What's the difference between highest bid and lowest ask (modulus)
+    const spread = calcSpread(maxBid, minAsk)
+    // How much will we zoom, based on the spread
+    const zoomInterval = calcZoomInterval(spread)
+    // Starting X value
+    const lowerZoomX = calcLowerZoomX(minBid, maxBid, minAsk, zoomInterval)
+    // Ending X value
+    const upperZoomX = calcUpperZoomX(minAsk, maxAsk, maxBid, zoomInterval)
+
+    start = calcPercentageOfAxis(lowerZoomX, minX, range)
+    end = calcPercentageOfAxis(upperZoomX, minX, range)
+
+    logDebug(`[Order Book] bids[${minBid.toFixed(15)}...${maxBid.toFixed(15)}]`)
+    logDebug(`[Order Book] asks[${minAsk.toFixed(15)}...${maxAsk.toFixed(15)}]`)
+    logDebug(`[Order Book] range: ${range.toFixed(15)}; minX: ${minX.toFixed(15)}`)
+    logDebug(`[Order Book] spread: ${spread.toFixed(15)}`)
+    logDebug(`[Order Book] zoomInterval: ${zoomInterval.toFixed(15)}`)
+    logDebug(`[Order Book] lowerZoomX: ${lowerZoomX.toFixed(15)}; upperZoomX: ${upperZoomX.toFixed(15)}`)
+    logDebug(`[Order Book] start %: ${start}; end %: ${end}`)
+  } else if (bids.length > 0) {
+    // There are no asks. Zoom on the right side of the graph
+    // TODO: magic number, move to const
+    start = 0.95
+    // TODO: adjust yAxis
+  } else if (asks.length > 0) {
+    // There are no bids. Zoom on the left side of the graph
+    // TODO: magic number, move to const
+    end = 0.05
+    // TODO: adjust yAxis
+  }
+  return { start, end }
+}
+
+interface ZoomValues {
+  startX: number
+  endX: number
+  endY: number
+}
+
 interface ChartProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   networkId: number
   hops?: number
+  zoomFactor?: number
+  setCanZoomIn?: React.Dispatch<React.SetStateAction<boolean>>
+  setCanZoomOut?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const Chart: React.FC<ChartProps> = props => {
-  const { baseToken, quoteToken, networkId, hops } = props
+  const { baseToken, quoteToken, networkId, hops, zoomFactor = 0, setCanZoomIn, setCanZoomOut } = props
   const [chart, setChart] = useSafeState<null | am4charts.XYChart>(null)
+  const [initialZoom, setInitialZoom] = useSafeState<ZoomValues>({ startX: 0, endX: 1, endY: 1 })
+  const [bids, setBids] = useSafeState<PricePointDetails[]>([])
+  const [asks, setAsks] = useSafeState<PricePointDetails[]>([])
 
   // Get the price of 1 OWL in quote token
   const { priceEstimation: oneOwlInQuoteToken, isPriceLoading } = usePriceEstimationWithSlippage({
@@ -409,67 +489,16 @@ export const Chart: React.FC<ChartProps> = props => {
         const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
         const pricePoints = bids.concat(asks)
 
-        let startX = 0
-        let endX = 1
+        setBids(bids)
+        setAsks(asks)
 
-        if (bids.length > 0 && asks.length > 0) {
-          const minBid = bids[0].priceNumber
-          const maxBid = bids[bids.length - 1].priceNumber
-          const minAsk = asks[0].priceNumber
-          const maxAsk = asks[asks.length - 1].priceNumber
-          // What's the left most value? (given by price)
-          const minX = calcMinX(minBid, minAsk)
-          // What's the highest value? (given by volume)
-          const maxY = calcMaxY(bids[0].totalVolumeNumber, asks[asks.length - 1].totalVolumeNumber)
-
-          // What's the difference between start and end prices
-          const range = calcRange(minBid, maxBid, minAsk, maxAsk)
-          // What's the difference between highest bid and lowest ask (modulus)
-          const spread = calcSpread(maxBid, minAsk)
-          // How much will we zoom, based on the spread
-          const zoomInterval = calcZoomInterval(spread)
-          // Starting X value
-          const lowerZoomX = calcLowerZoomX(minBid, maxBid, minAsk, zoomInterval)
-          // Ending X value
-          const upperZoomX = calcUpperZoomX(minAsk, maxAsk, maxBid, zoomInterval)
-          // Ending Y value (Y always starts on 0)
-          const upperZoomY = calcUpperZoomY(bids, asks, lowerZoomX, upperZoomX)
-
-          // Calculate, given `upperZoomY`, where in % terms it fits
-          const endY = calcPercentageOfAxis(upperZoomY, 0, maxY)
-          // Same as above, for `lowerZoomX` and `upperZoomX`
-          startX = calcPercentageOfAxis(lowerZoomX, minX, range)
-          endX = calcPercentageOfAxis(upperZoomX, minX, range)
-
-          logDebug(`[Order Book] bids[${minBid.toFixed(15)}...${maxBid.toFixed(15)}]`)
-          logDebug(`[Order Book] asks[${minAsk.toFixed(15)}...${maxAsk.toFixed(15)}]`)
-          logDebug(`[Order Book] range: ${range.toFixed(15)}; minX: ${minX.toFixed(15)}`)
-          logDebug(`[Order Book] spread: ${spread.toFixed(15)}`)
-          logDebug(`[Order Book] zoomInterval: ${zoomInterval.toFixed(15)}`)
-          logDebug(`[Order Book] lowerZoomX: ${lowerZoomX.toFixed(15)}; upperZoomX: ${upperZoomX.toFixed(15)}`)
-          logDebug(`[Order Book] startX %: ${startX}; endX %: ${endX}`)
-          logDebug(`[Order Book] upperZoomY: ${upperZoomY.toFixed(15)}; maxY: ${maxY.toFixed(15)}`)
-          logDebug(`[Order Book] endY %: ${endY.toFixed(15)}`)
-
-          // Setting Y axis initial zoom
-          yAxis.end = endY
-        } else if (bids.length > 0) {
-          // There are no asks. Zoom on the right side of the graph
-          // TODO: magic number, move to const
-          xAxis.start = 0.95
-          xAxis.end = 1
-          // TODO: adjust yAxis
-        } else if (asks.length > 0) {
-          // There are no bids. Zoom on the left side of the graph
-          xAxis.start = 0
-          // TODO: magic number, move to const
-          xAxis.end = 0.5
-          // TODO: adjust yAxis
-        }
+        const { start, end } = calcInitialZoomX(bids, asks)
 
         // Setting X axis initial zoom
-        xAxis.start = startX
-        xAxis.end = endX
+        xAxis.start = start
+        xAxis.end = end
+        // Storing calculated zoom values as the basis for zoom calculation
+        setInitialZoom({ startX: start, endX: end, endY: 1 })
 
         _printOrderBook(pricePoints, baseToken, quoteToken)
 
@@ -489,7 +518,65 @@ export const Chart: React.FC<ChartProps> = props => {
     const [bidSeries, askSeries] = chart.series.values
     bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
     askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-  }, [baseToken, chart, hops, networkId, quoteToken, oneOwlInQuoteToken, isPriceLoading])
+  }, [
+    baseToken,
+    chart,
+    hops,
+    networkId,
+    quoteToken,
+    oneOwlInQuoteToken,
+    isPriceLoading,
+    setInitialZoom,
+    setBids,
+    setAsks,
+  ])
+
+  useEffect(() => {
+    if (!chart) {
+      return
+    }
+
+    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+
+    // When any of these is not set, there's no data in the chart, thus we don't need to adjust the zoom
+    if (!xAxis || !xAxis.min || !xAxis.max || !yAxis || !yAxis.max) {
+      return
+    }
+
+    logDebug(`[Order Book] Zoom factor: ${zoomFactor * 100}%`)
+
+    // X axis
+    const { start, end } = calcZoomX(initialZoom.startX, initialZoom.endX, zoomFactor)
+    if (start >= end) {
+      // Zooming too much, can't go further.
+      // Disable zoom in
+      logDebug(`[Order Book] Zooming in too much`)
+      setCanZoomIn && setCanZoomIn(false)
+      xAxis.start = start * 0.95
+      xAxis.end = start * 1.05
+    } else if (start === 0 && end === 1) {
+      // We can't zoom out further.
+      // Disable zoom out
+      logDebug(`[Order Book] Zooming out too much, stopping here`)
+      setCanZoomOut && setCanZoomOut(false)
+      xAxis.start = start
+      xAxis.end = end
+      // No need to recalculate Y
+      yAxis.end = 1
+      return
+    } else {
+      setCanZoomIn && setCanZoomIn(true)
+      setCanZoomOut && setCanZoomOut(true)
+      xAxis.start = start
+      xAxis.end = end
+    }
+
+    // Y axis
+    const endY = calcZoomY(bids, asks, xAxis.min, xAxis.max, start, end, yAxis.max)
+    logDebug(`[Order Book] New zoom boundaries X: ${start * 100}% - ${end * 100}%; Y ${endY * 100}%`)
+    yAxis.end = endY
+  }, [zoomFactor, chart, initialZoom, bids, asks, setCanZoomIn, setCanZoomOut])
 
   return <Wrapper ref={mountPoint} />
 }
