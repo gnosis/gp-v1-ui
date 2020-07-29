@@ -123,7 +123,7 @@ describe('Test config defaults', () => {
 
     expect(Number.isInteger(CONFIG.transactions.appId)).toBe(true)
 
-    expect(CONFIG.transactions.appId).toBeGreaterThanOrEqual(0)
+    expect(CONFIG.transactions.appId).toBeGreaterThanOrEqual(1)
     expect(CONFIG.transactions.appId).toBeLessThanOrEqual(99)
   })
 })

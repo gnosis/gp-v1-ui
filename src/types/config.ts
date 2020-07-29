@@ -57,7 +57,7 @@ export interface DisabledTokens {
 }
 
 export interface Transactions {
-  // 0 <= number <= 99, incorporated into sentinel
+  // positive integer <= 99, incorporated into sentinel
   // sentinel is appended to tx.data
   appId: number
 }

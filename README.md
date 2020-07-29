@@ -303,7 +303,7 @@ transactions:
 
 Where:
 
-- `appId` is an integer value >=0 and <=99 included in sentinel hex value, which together with on-chain analytics flags is appended to transaction input data.
+- `appId` is a positive integer <=99 included in sentinel hex value, which together with on-chain analytics flags is appended to transaction input data.
 
 `appId` can also be passed as an environment variable, e.g. `APP_ID=2 yarn start`. In which case it overrides the `appId` from config file.
 
