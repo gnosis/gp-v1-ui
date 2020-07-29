@@ -10,6 +10,10 @@ export interface Flag<T extends string> {
 const FIXED_SENTINEL = 'dec0de'
 
 const APP_ID = Number(process.env.APP_ID || CONFIG.transactions.appId)
+if (!Number.isInteger(APP_ID) || APP_ID < 0 || APP_ID > 99) {
+  throw new Error(`APP_ID isn't valid. Expected 0 <= integer <= 99, got ${APP_ID}`)
+}
+
 // lowercase hex value to be appended to tx.data
 const SENTINEL = FIXED_SENTINEL + String(APP_ID).padStart(2, '0')
 console.log('SENTINEL', SENTINEL)
