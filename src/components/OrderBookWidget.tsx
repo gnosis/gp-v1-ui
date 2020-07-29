@@ -262,8 +262,8 @@ function calcUpperZoomY(
 ): number {
   const bidsVolume = bids.find(bid => lowerZoomX < bid.priceNumber)?.totalVolumeNumber || 0
   let asksVolume = asks.length > 0 ? asks[0].totalVolumeNumber : 0
-  asksVolume = asks.find((_ask, i) => upperZoomX < asks[i + 1]?.priceNumber)?.totalVolumeNumber || asksVolume
-  console.log(`bidsVolume: ${bidsVolume}; asksVolume: ${asksVolume}`)
+  asksVolume = asks.find((_ask, i) => upperZoomX <= asks[i + 1]?.priceNumber)?.totalVolumeNumber || asksVolume
+  logDebug(`[Order Book] bidsVolume: ${bidsVolume}; asksVolume: ${asksVolume}`)
   return Math.max(bidsVolume, asksVolume)
 }
 
