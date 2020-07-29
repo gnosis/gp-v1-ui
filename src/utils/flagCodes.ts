@@ -7,8 +7,11 @@ export interface Flag<T extends string> {
 }
 
 // OUR specific flags
+const FIXED_SENTINEL = 'dec0de'
+
+const APP_ID = Number(process.env.APP_ID || CONFIG.transactions.appId)
 // lowercase hex value to be appended to tx.data
-const SENTINEL = process.env.SENTINEL || CONFIG.transactions.sentinel
+const SENTINEL = FIXED_SENTINEL + String(APP_ID).padStart(2, '0')
 console.log('SENTINEL', SENTINEL)
 
 if (!/^[0-9a-f]+$/.test(SENTINEL)) {

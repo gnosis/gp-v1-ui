@@ -178,7 +178,7 @@ module.exports = ({ stats = false } = {}) => ({
       // AUTOCONNECT: only applies for mock implementation
       AUTOCONNECT: 'true',
       PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
-      SENTINEL: process.env.SENTINEL,
+      APP_ID: process.env.APP_ID,
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance

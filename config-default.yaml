@@ -120,7 +120,7 @@ disabledTokens:
 
 # modifiers for transactions
 transactions:
-  # lowercase hex value appended to transaction input data
-  # and followed by on-chain analytics flags
-  # IMPORTANT: If you fork the project, change sentinel to a different value. See Readme for details
-  sentinel: 'dec0de'
+  # 0 <= number <= 99 used to differentiate between applications, incorporated into sentinel
+  # sentinel + flags for on-chain analytics is appended to transaction input data
+  # IMPORTANT: If you fork the project, change appId to a different value. See Readme for details
+  appId: 0

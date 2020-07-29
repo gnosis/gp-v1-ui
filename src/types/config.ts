@@ -57,8 +57,9 @@ export interface DisabledTokens {
 }
 
 export interface Transactions {
-  // lowercase hex value to be appended to tx.data
-  sentinel: string
+  // 0 <= number <= 99, incorporated into sentinel
+  // sentinel is appended to tx.data
+  appId: number
 }
 
 export interface Config {
