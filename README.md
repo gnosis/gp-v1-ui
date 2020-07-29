@@ -292,36 +292,37 @@ Alternatively you can set the bridge by declaring the env var `WALLET_CONNECT_BR
 
 ### transactions
 
-Transactions config. Used to apply some post processing to every transaction submitted through the interface
+Transactions config. Used to apply some post-processing to every transaction submitted through the interface
 
 **Config format:**
 
 ```yaml
 transactions:
-  sentinel: string
+  appId: number
 ```
 
 Where:
 
-- `sentinel` is lowercase hex value appended to transaction input data and followed by on-chain analytics flags
+- `appId` is an integer value >=0 and <=99 included in sentinel hex value, which together with on-chain analytics flags is appended to transaction input data.
 
-Sentinel can also be passed as an environment variable, e.g. `SENTINEL=4e3a yarn start`. In which case it overrides the `sentinel` from config file.
+`appId` can also be passed as an environment variable, e.g. `APP_ID=2 yarn start`. In which case it overrides the `appId` from config file.
+
+So `SENTINEL = 'dec0de' + appId`, where `appId` is left-padded with 0 to length of 2.
 
 Following the `sentinel` are 6 digits: 2 for provider name, 1 for mobile or desktop flag, 2 for browser name, 1 for screen size.
 
 For example given
- - **sentinel** `'dec0de'`
- - **provider** Metamask (01)
- - **desktop** (0)
- - **browser** Chrome (13)
- - XL(width >= 1200px) **screen size** (0)
+ - **fixed_sentinel** `'dec0de'` [🔗](src/utils/flagCodes.ts#L10)
+ - **appId** 1, left-padded with 0 to length of 2, (01) [🔗](src/utils/flagCodes.ts#L12)
+ - **provider** Metamask (01) [🔗](src/utils/flagCodes.ts#L30)
+ - **desktop** (0) [🔗](src/utils/flagCodes.ts#L50)
+ - **browser** Chrome (13) [🔗](src/utils/flagCodes.ts#L58)
+ - XL(width >= 1200px) **screen size** (0) [🔗](src/utils/flagCodes.ts#L94)
 
 Input data for each transaction would have a tail of
 
 ```
 <sentinel><provider:2><mobile_or_desktop:1><browser:2><screen_size:1>
 
-dec0de010130
+dec0de01010130
 ```
-
-All flags can be found in [flagCodes.ts](src/utils/flagCodes.ts)
