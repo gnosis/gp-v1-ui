@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useCallback } from 'react'
 import styled from 'styled-components'
 import Modali, { useModali } from 'modali'
 
 // assets
-import { faChartLine } from '@fortawesome/free-solid-svg-icons'
+import { faChartLine, faMinus, faEraser, faPlus, faRetweet } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // const, types, utils
@@ -103,12 +103,14 @@ function onChangeToken(params: {
   newToken: TokenDetails
   setOtherToken: React.Dispatch<React.SetStateAction<TokenDetails>>
   otherToken: TokenDetails
+  resetZoom: () => void
 }): void {
-  const { setChangedToken, currentToken, newToken, setOtherToken, otherToken } = params
+  const { setChangedToken, currentToken, newToken, setOtherToken, otherToken, resetZoom } = params
   if (newToken.address === otherToken.address) {
     setOtherToken(currentToken)
   }
   setChangedToken(newToken)
+  resetZoom()
 }
 
 export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnProps) => {
@@ -118,14 +120,33 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
   const tokenList = useTokenList({ networkId })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
+  const [zoomFactor, setZoomFactor] = useSafeState<number>(0)
+  const [canZoomIn, setCanZoomIn] = useSafeState(true)
+  const [canZoomOut, setCanZoomOut] = useSafeState(true)
 
   const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''
 
+  const zoomIn = useCallback(() => setZoomFactor(zoom => zoom + 0.25), [setZoomFactor])
+  const zoomOut = useCallback(() => setZoomFactor(zoom => zoom - 0.25), [setZoomFactor])
+  const resetZoom = useCallback(() => {
+    setZoomFactor(0)
+    setCanZoomIn(true)
+    setCanZoomOut(true)
+  }, [setCanZoomIn, setCanZoomOut, setZoomFactor])
+
   // Update if any of the base tokens change
+  // TODO: if a base or quote token change, there's a re-render and the state is updated, so this is not needed. No?
   useEffect(() => {
     setBaseToken(baseTokenDefault)
     setQuoteToken(quoteTokenDefault)
-  }, [baseTokenDefault, quoteTokenDefault, setBaseToken, setQuoteToken])
+    resetZoom()
+  }, [baseTokenDefault, quoteTokenDefault, resetZoom, setBaseToken, setQuoteToken])
+
+  const swapTokens = useCallback(() => {
+    setBaseToken(quoteToken)
+    setQuoteToken(baseToken)
+    resetZoom()
+  }, [baseToken, quoteToken, resetZoom, setBaseToken, setQuoteToken])
 
   const [modalHook, toggleModal] = useModali({
     ...DEFAULT_MODAL_OPTIONS,
@@ -149,6 +170,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
                 newToken: token,
                 setOtherToken: setQuoteToken,
                 otherToken: quoteToken,
+                resetZoom,
               })
             }
           />
@@ -164,11 +186,33 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
                 newToken: token,
                 setOtherToken: setBaseToken,
                 otherToken: baseToken,
+                resetZoom,
               })
             }
           />
         </span>
-        <Chart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} />
+        <span>
+          <button type="button" onClick={swapTokens}>
+            <FontAwesomeIcon icon={faRetweet} />
+          </button>
+          <button type="button" onClick={zoomIn} disabled={!canZoomIn}>
+            <FontAwesomeIcon icon={faPlus} />
+          </button>
+          <button type="button" onClick={zoomOut} disabled={!canZoomOut}>
+            <FontAwesomeIcon icon={faMinus} />
+          </button>
+          <button type="button" onClick={resetZoom}>
+            <FontAwesomeIcon icon={faEraser} />
+          </button>
+        </span>
+        <Chart
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+          networkId={networkId}
+          zoomFactor={zoomFactor}
+          setCanZoomIn={setCanZoomIn}
+          setCanZoomOut={setCanZoomOut}
+        />
       </ModalWrapper>
     ),
     buttons: [
