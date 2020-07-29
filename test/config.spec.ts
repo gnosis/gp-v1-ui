@@ -113,4 +113,17 @@ describe('Test config defaults', () => {
     if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
     if (disabledOnRinkeby.length) expect(disabledOnRinkeby).toEqual(disabledTokensArray)
   })
+
+  it('transactions', () => {
+    const transactionConfig = expect.objectContaining({
+      appId: expect.any(Number),
+    })
+
+    expect(CONFIG.transactions).toEqual(transactionConfig)
+
+    expect(Number.isInteger(CONFIG.transactions.appId)).toBe(true)
+
+    expect(CONFIG.transactions.appId).toBeGreaterThanOrEqual(0)
+    expect(CONFIG.transactions.appId).toBeLessThanOrEqual(99)
+  })
 })
