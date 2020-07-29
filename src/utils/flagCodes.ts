@@ -166,7 +166,7 @@ type DecodedFlags<T extends string> = {
 
 export type Decoder<T extends string> = (code: string) => DecodedFlags<T> | null
 
-// creates and decoder for given sentinel, flags and optionally prefix and postfix
+// creates a decoder for given sentinel, flags and optionally prefix and postfix
 // decoder accepts an encoded string (encoded by encoder from encoderFactory)
 // and produces an object of {flag => flag value} or null if unable to decode
 export const decoderFactory = <T extends string>({
