@@ -292,7 +292,7 @@ Alternatively you can set the bridge by declaring the env var `WALLET_CONNECT_BR
 
 ### transactions
 
-Transactions config. Used to apply some postprocessing toevery transaction submitted through the interface
+Transactions config. Used to apply some post processing to every transaction submitted through the interface
 
 **Config format:**
 
