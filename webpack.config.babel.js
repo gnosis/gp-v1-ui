@@ -180,7 +180,7 @@ module.exports = ({ stats = false } = {}) => ({
       PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
       APP_ID: process.env.APP_ID,
       INFURA_ID: process.env.INFURA_ID,
-      WALLET_CONNECT_BRIDGEWALLET_CONNECT_BRIDGE: process.env.WALLET_CONNECT_BRIDGEWALLET_CONNECT_BRIDGE,
+      WALLET_CONNECT_BRIDGE: process.env.WALLET_CONNECT_BRIDGE,
       ETH_NODE_URL: process.env.ETH_NODE_URL,
       LIQUIDITY_TOKEN_LIST: process.env.LIQUIDITY_TOKEN_LIST,
     }),
