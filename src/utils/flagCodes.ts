@@ -1,5 +1,4 @@
 import { MEDIA_QUERY_NAMES } from './mediaQueries'
-import { MAX_APP_ID } from 'const'
 
 export interface Flag<T extends string> {
   name: T
@@ -10,11 +9,6 @@ export interface Flag<T extends string> {
 // OUR specific flags
 const FIXED_SENTINEL = 'dec0de'
 
-// Do basic config checks
-const APP_ID = Number(CONFIG.appId)
-if (!Number.isInteger(APP_ID) || APP_ID < 1 || APP_ID > MAX_APP_ID) {
-  throw new Error(`APP_ID isn't valid. Expected a positive integer <= ${MAX_APP_ID}, got ${APP_ID}`)
-}
 // lowercase hex value to be appended to tx.data
 const SENTINEL =
   FIXED_SENTINEL +
