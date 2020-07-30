@@ -302,6 +302,14 @@ function calcZoomY(
   return calcPercentageOfAxis(upperZoomY, 0, yAxisMaxValue)
 }
 
+function disableGrip(grip: am4core.ResizeButton): void {
+  // Remove default grip image
+  grip.icon.disabled = true
+
+  // Disable background
+  grip.background.disabled = true
+}
+
 function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   const chart = am4core.create(mountPoint, am4charts.XYChart)
 
@@ -356,8 +364,13 @@ function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   am4core.useTheme(am4themesSpiritedaway)
   am4core.options.autoSetClassName = true
 
-  chart.scrollbarX = new am4core.Scrollbar()
-  chart.scrollbarY = new am4core.Scrollbar()
+  const scrollbarX = new am4charts.XYChartScrollbar()
+  scrollbarX.series.push(bidSeries)
+  scrollbarX.series.push(askSeries)
+  disableGrip(scrollbarX.startGrip)
+  disableGrip(scrollbarX.endGrip)
+
+  chart.scrollbarX = scrollbarX
 
   return chart
 }
