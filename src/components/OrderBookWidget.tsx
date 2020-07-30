@@ -535,6 +535,8 @@ export const Chart: React.FC<ChartProps> = props => {
       const delta = diff * ZOOM_DELTA
       xAxis.start -= delta
       xAxis.end += delta
+      xAxis.start = Math.max(xAxis.start - delta, 0)
+      xAxis.end = Math.min(xAxis.end + delta, 1)
 
       const endY = calcZoomY(bids, asks, xAxis.min, xAxis.max, xAxis.start, xAxis.end, yAxis.max)
       logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${endY * 100}%`)
