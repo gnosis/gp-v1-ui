@@ -20,15 +20,7 @@ import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
 
 // utils
-import {
-  getToken,
-  parseAmount,
-  parseBigNumber,
-  dateToBatchId,
-  resolverFactory,
-  formatTimeToFromBatch,
-  logDebug,
-} from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, logDebug } from 'utils'
 
 // api
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
@@ -370,8 +362,8 @@ export type TradeFormTokenId = keyof TradeFormData
 export interface TradeFormData {
   sellToken: string
   receiveToken: string
-  validFrom?: string
-  validUntil?: string
+  validFrom?: string | null
+  validUntil?: string | null
   price: string
   priceInverse: string
 }
@@ -766,8 +758,17 @@ const TradeWidget: React.FC = () => {
 
       // TODO: Review this logic. This should be calculated in the same place where we send the tx
       const currentBatch = dateToBatchId(new Date())
-      const validFromWithBatchID = currentBatch + validFrom
-      const validUntilWithBatchID = currentBatch + validUntil
+      const validFromWithBatchID = validFrom
+      const validUntilWithBatchID = validUntil
+
+      if (currentBatch > validFromWithBatchID) {
+        throw console.error(
+          'Current batchID is greater than input validity start. Please check again. Current batchID:',
+          currentBatch,
+          'ValidFrom batchID:',
+          validFromWithBatchID,
+        )
+      }
 
       const isASAP = validFrom === 0
       const isNever = validUntil === 0
@@ -803,7 +804,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: undefined,
-                  validUntil: isNever ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validUntil: isNever ? undefined : validFromWithBatchID.toString(),
                 },
               )
             },
@@ -842,8 +843,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: formatTimeToFromBatch(validFrom, 'TIME').toString(),
-                  validUntil: isNever ? undefined : formatTimeToFromBatch(validUntil, 'TIME').toString(),
+                  validFrom: validFrom.toString(),
+                  validUntil: isNever ? undefined : validUntil.toString(),
                 },
               )
             },
@@ -861,8 +862,8 @@ const TradeWidget: React.FC = () => {
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
-    const validFromAsBatch = formatTimeToFromBatch(data[validFromId], 'BATCH')
-    const validUntilAsBatch = formatTimeToFromBatch(data[validUntilId], 'BATCH')
+    const validFromAsBatch = Number(data[validFromId])
+    const validUntilAsBatch = Number(data[validUntilId])
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 

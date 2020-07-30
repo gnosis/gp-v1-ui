@@ -1,6 +1,8 @@
-import { formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
+import { format, formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
 
 import { BATCH_TIME, BATCH_TIME_IN_MS, BATCH_SUBMISSION_CLOSE_TIME } from 'const'
+
+export const formatDate = format
 
 /**
  * Epoch in seconds

@@ -98,7 +98,7 @@ export const usePlaceOrder = (): Result => {
           userAddress,
           buyTokenId,
           sellTokenId,
-          validUntil: validUntil ? batchId + validUntil : MAX_BATCH_ID,
+          validUntil: validUntil || MAX_BATCH_ID,
           buyAmount,
           sellAmount,
           networkId,
@@ -166,16 +166,16 @@ export const usePlaceOrder = (): Result => {
         const buyAmounts: BN[] = []
         const sellAmounts: BN[] = []
 
-        const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
+        // const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
 
         orders.forEach(order => {
           buyTokens.push(order.buyToken)
           sellTokens.push(order.sellToken)
 
           // if not set, order is valid from placement + wait period
-          validFroms.push(currentBatchId + (order.validFrom ? order.validFrom : BATCHES_TO_WAIT))
+          validFroms.push(order.validFrom || BATCHES_TO_WAIT)
           // if not set, order is valid forever
-          validUntils.push(order.validUntil ? currentBatchId + order.validUntil : MAX_BATCH_ID)
+          validUntils.push(order.validUntil || MAX_BATCH_ID)
 
           buyAmounts.push(order.buyAmount)
           sellAmounts.push(order.sellAmount)
