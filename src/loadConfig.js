@@ -42,7 +42,11 @@ function loadConfig(isTesting = false) {
     console.warn('Using default config from %s. If you want to override, use %s', configPath, customPath)
   }
 
-  return config
+  return {
+    ...config,
+    // Overrides using ENV
+    APP_ID: process.env.APP_ID ? Number(process.env.APP_ID) : config.APP_ID,
+  }
 }
 
 module.exports = loadConfig
