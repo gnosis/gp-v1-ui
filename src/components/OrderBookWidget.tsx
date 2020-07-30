@@ -21,7 +21,7 @@ import { TokenDetails, Network } from 'types'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 const BUTTON_CONTAINER_ID = 'buttonContainer'
-const ZOOM_DELTA = 0.25 // %
+const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
 
 const Wrapper = styled.div`
   display: flex;
@@ -414,6 +414,7 @@ function calcInitialZoom(bids: PricePointDetails[], asks: PricePointDetails[]): 
 
     startX = calcPercentageOfAxis(lowerZoomX, minX, range)
     endX = calcPercentageOfAxis(upperZoomX, minX, range)
+    // TODO: refactor calcZoomY. Calculating to-from % twice
     endY = calcZoomY(
       bids,
       asks,
@@ -443,6 +444,18 @@ function calcInitialZoom(bids: PricePointDetails[], asks: PricePointDetails[]): 
     // TODO: adjust yAxis
   }
   return { startX, endX, endY }
+}
+
+/**
+ * Just because TS won't let me do this directly...
+ *
+ * @param optionalLabel optional label
+ * @param text label text
+ */
+function setLabel(optionalLabel: am4core.Optional<am4core.Label>, text: string): void {
+  if (optionalLabel) {
+    optionalLabel.text = text
+  }
 }
 
 interface ZoomValues {
@@ -504,22 +517,25 @@ export const Chart: React.FC<ChartProps> = props => {
     if (!buttonContainer) {
       return
     }
+    buttonContainer.disposeChildren()
 
     const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
     const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
 
     // When any of these is not set, there's no data in the chart, thus we don't need to adjust the zoom
-    if (!xAxis || !xAxis.min || !xAxis.max || !yAxis || !yAxis.max) {
+    if (!xAxis || xAxis.min === undefined || xAxis.max === undefined || !yAxis || yAxis.max === undefined) {
       return
     }
 
-    buttonContainer.disposeChildren()
-
     const zoomInButton = buttonContainer.createChild(am4core.Button)
-    zoomInButton.label.text = '+'
+    setLabel(zoomInButton.label, '+')
     zoomInButton.events.on('hit', () => {
+      // Even though there's a check in the parent context, TS won't shut up unless I put this up
+      if (xAxis.min === undefined || xAxis.max === undefined || yAxis.max === undefined) {
+        return
+      }
       const diff = xAxis.end - xAxis.start
-      const delta = diff * ZOOM_DELTA
+      const delta = diff * ZOOM_INCREMENT_PERCENTAGE
       xAxis.start += delta
       xAxis.end -= delta
 
@@ -529,22 +545,22 @@ export const Chart: React.FC<ChartProps> = props => {
     })
 
     const zoomOutButton = buttonContainer.createChild(am4core.Button)
-    zoomOutButton.label.text = '-'
+    setLabel(zoomOutButton.label, '-')
     zoomOutButton.events.on('hit', () => {
+      if (xAxis.min === undefined || xAxis.max === undefined || yAxis.max === undefined) {
+        return
+      }
       const diff = xAxis.end - xAxis.start
-      const delta = diff * ZOOM_DELTA
-      xAxis.start -= delta
-      xAxis.end += delta
+      const delta = diff * ZOOM_INCREMENT_PERCENTAGE
       xAxis.start = Math.max(xAxis.start - delta, 0)
       xAxis.end = Math.min(xAxis.end + delta, 1)
 
-      const endY = calcZoomY(bids, asks, xAxis.min, xAxis.max, xAxis.start, xAxis.end, yAxis.max)
-      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${endY * 100}%`)
-      yAxis.end = endY
+      yAxis.end = calcZoomY(bids, asks, xAxis.min, xAxis.max, xAxis.start, xAxis.end, yAxis.max)
+      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${yAxis.end * 100}%`)
     })
 
     const resetZoomButton = buttonContainer.createChild(am4core.Button)
-    resetZoomButton.label.text = 'Reset'
+    setLabel(resetZoomButton.label, 'Reset')
     resetZoomButton.events.on('hit', () => {
       xAxis.start = initialZoom.startX
       xAxis.end = initialZoom.endX
@@ -553,7 +569,7 @@ export const Chart: React.FC<ChartProps> = props => {
     })
 
     const seeAllButton = buttonContainer.createChild(am4core.Button)
-    seeAllButton.label.text = 'full'
+    setLabel(seeAllButton.label, 'full')
     seeAllButton.events.on('hit', () => {
       xAxis.start = 0
       xAxis.end = 1
