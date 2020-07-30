@@ -56,13 +56,8 @@ export interface DisabledTokens {
   [Network.Rinkeby]: TokenOverride[]
 }
 
-export interface Transactions {
-  // positive integer <= 99, incorporated into sentinel
-  // sentinel is appended to tx.data
-  appId: number
-}
-
 export interface Config {
+  appId: number
   name: string
   logoPath: string
   templatePath: string
@@ -73,7 +68,6 @@ export interface Config {
   exchangeContractConfig: ExchangeContractConfig
   walletConnect: WalletConnectConfig
   disabledTokens: DisabledTokens
-  transactions: Transactions
 }
 
 export interface AddressToOverrideMap {
