@@ -24,11 +24,11 @@ Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximi
 - See the balances for any token: available in their wallet and on the exchange
 - Deposit and withdraw tokens to/from the exchange wallet
 
-# Wiki
+## 📚 Wiki
 
 Learn more about Gnosis Protocol Web in the [wiki](https://github.com/gnosis/dex-react/wiki).
 
-# Run it locally
+## 🏃‍♀️ Run it locally
 
 ```bash
 # Install dependencies (we use Yarn but NPM should work too)
@@ -40,7 +40,7 @@ yarn start
 
 Open http://localhost:8080 in your browser.
 
-# Build app
+## 👷‍♀️Build app
 
 ```bash
 yarn build
@@ -48,25 +48,25 @@ yarn build
 
 Static files will be generated inside the `./dist` dir.
 
-# Run tests
+## 🧪 Run tests
 
 ```bash
 yarn test
 ```
 
-# 🍴Fork it
+## 🍴Fork it
 
 **Gnosis Protocol Web** can be forked, this way any project can use its own token list, rebrand it, add new pages or modify the existing ones.
 
 Read more [here](https://github.com/gnosis/dex-react/wiki/Fork-project).
 
-# Customizing components
+## 🎩 Customizing components
 
 **Gnosis Protocol Web** allows to redefine any React component, so you can add new pages, modify the existing ones, or modify the layout and styles.
 
 Learn about customizing components [here](https://github.com/gnosis/dex-react/wiki/Customize-Components).
 
-# Testnet faucets
+## 🦺 Testnet faucets
 
 Test faucets allow to get some tokens for using them in a testnet.
 
