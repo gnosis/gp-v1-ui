@@ -275,8 +275,8 @@ function calcPercentageOfAxis(position: number, start: number, range: number): n
   return (position - start) / range
 }
 
-function calcValueFromPercentage(percentage: number, range: number): number {
-  return range * percentage
+function calcValueFromPercentage(percentage: number, start: number, range: number): number {
+  return range * percentage + start
 }
 
 function calcZoomX(initialStart: number, initialEnd: number, zoomFactor: number): { start: number; end: number } {
@@ -296,8 +296,8 @@ function calcZoomY(
   yAxisMaxValue: number,
 ): number {
   const range = xAxisMaxValue - xAxisMinValue
-  const lowerZoomX = calcValueFromPercentage(xAxisStartZoomPercentage, range)
-  const upperZoomX = calcValueFromPercentage(xAxisEndZoomPercentage, range)
+  const lowerZoomX = calcValueFromPercentage(xAxisStartZoomPercentage, xAxisMinValue, range)
+  const upperZoomX = calcValueFromPercentage(xAxisEndZoomPercentage, xAxisMinValue, range)
   const upperZoomY = calcUpperZoomY(bids, asks, lowerZoomX, upperZoomX)
   return calcPercentageOfAxis(upperZoomY, 0, yAxisMaxValue)
 }
