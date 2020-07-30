@@ -10,7 +10,7 @@ function getAppId(config) {
     error = 'The appId config, or APP_ID environment variable is required'
   } else {
     if (!Number.isInteger(appId) || appId < 1 || appId > MAX_APP_ID) {
-      error = `APP_ID isn't valid. Expected a positive integer <= ${MAX_APP_ID}, got ${appId}`
+      error = `appId config or APP_ID environment variable isn't valid. Expected a positive integer <= ${MAX_APP_ID}, got ${appId}`
     }
   }
 
