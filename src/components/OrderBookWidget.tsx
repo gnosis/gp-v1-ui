@@ -20,6 +20,8 @@ import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { TokenDetails, Network } from 'types'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
+const BUTTON_CONTAINER_ID = 'buttonContainer'
+const ZOOM_DELTA = 0.25 // %
 
 const Wrapper = styled.div`
   display: flex;
@@ -279,13 +281,6 @@ function calcValueFromPercentage(percentage: number, start: number, range: numbe
   return range * percentage + start
 }
 
-function calcZoomX(initialStart: number, initialEnd: number, zoomFactor: number): { start: number; end: number } {
-  const interval = (initialEnd - initialStart) * zoomFactor
-  const start = Math.max(initialStart + interval, 0)
-  const end = Math.min(initialEnd - interval, 1)
-  return { start, end }
-}
-
 function calcZoomY(
   bids: PricePointDetails[],
   asks: PricePointDetails[],
@@ -358,26 +353,47 @@ function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
-
+  // Make the cursor visible for Value series
   chart.cursor.snapToSeries = [bidSeries, askSeries]
 
+  // Theme-ing
   am4core.useTheme(am4themesSpiritedaway)
   am4core.options.autoSetClassName = true
 
+  // Scrollbar
   const scrollbarX = new am4charts.XYChartScrollbar()
+  // Show minimap stype
   scrollbarX.series.push(bidSeries)
   scrollbarX.series.push(askSeries)
+  // Disable grips
   disableGrip(scrollbarX.startGrip)
   disableGrip(scrollbarX.endGrip)
+  // Min width of the thumb area
+  scrollbarX.thumb.minWidth = 10
 
   chart.scrollbarX = scrollbarX
+
+  // Zoom buttons container
+  const buttonContainer = chart.plotContainer.createChild(am4core.Container)
+  buttonContainer.shouldClone = false
+  buttonContainer.align = 'center'
+  buttonContainer.valign = 'top'
+  buttonContainer.zIndex = Number.MAX_SAFE_INTEGER
+  buttonContainer.marginTop = 5
+  // buttonContainer.marginRight = 5
+  buttonContainer.layout = 'horizontal'
+  buttonContainer.id = BUTTON_CONTAINER_ID
+
+  // Disabling default zoom out button
+  chart.zoomOutButton.disabled = true
 
   return chart
 }
 
-function calcInitialZoomX(bids: PricePointDetails[], asks: PricePointDetails[]): { start: number; end: number } {
-  let start = 0
-  let end = 1
+function calcInitialZoom(bids: PricePointDetails[], asks: PricePointDetails[]): ZoomValues {
+  let startX = 0
+  let endX = 1
+  let endY = 1
   if (bids.length > 0 && asks.length > 0) {
     const minBid = bids[0].priceNumber
     const maxBid = bids[bids.length - 1].priceNumber
@@ -396,8 +412,17 @@ function calcInitialZoomX(bids: PricePointDetails[], asks: PricePointDetails[]):
     // Ending X value
     const upperZoomX = calcUpperZoomX(minAsk, maxAsk, maxBid, zoomInterval)
 
-    start = calcPercentageOfAxis(lowerZoomX, minX, range)
-    end = calcPercentageOfAxis(upperZoomX, minX, range)
+    startX = calcPercentageOfAxis(lowerZoomX, minX, range)
+    endX = calcPercentageOfAxis(upperZoomX, minX, range)
+    endY = calcZoomY(
+      bids,
+      asks,
+      minX,
+      Math.max(maxBid, maxAsk),
+      startX,
+      endX,
+      Math.max(bids[0].totalVolumeNumber, asks[asks.length - 1].totalVolumeNumber),
+    )
 
     logDebug(`[Order Book] bids[${minBid.toFixed(15)}...${maxBid.toFixed(15)}]`)
     logDebug(`[Order Book] asks[${minAsk.toFixed(15)}...${maxAsk.toFixed(15)}]`)
@@ -405,19 +430,19 @@ function calcInitialZoomX(bids: PricePointDetails[], asks: PricePointDetails[]):
     logDebug(`[Order Book] spread: ${spread.toFixed(15)}`)
     logDebug(`[Order Book] zoomInterval: ${zoomInterval.toFixed(15)}`)
     logDebug(`[Order Book] lowerZoomX: ${lowerZoomX.toFixed(15)}; upperZoomX: ${upperZoomX.toFixed(15)}`)
-    logDebug(`[Order Book] start %: ${start}; end %: ${end}`)
+    logDebug(`[Order Book] start %: ${startX}; end %: ${endX}`)
   } else if (bids.length > 0) {
     // There are no asks. Zoom on the right side of the graph
     // TODO: magic number, move to const
-    start = 0.95
+    startX = 0.95
     // TODO: adjust yAxis
   } else if (asks.length > 0) {
     // There are no bids. Zoom on the left side of the graph
     // TODO: magic number, move to const
-    end = 0.05
+    endX = 0.05
     // TODO: adjust yAxis
   }
-  return { start, end }
+  return { startX, endX, endY }
 }
 
 interface ZoomValues {
@@ -431,13 +456,10 @@ interface ChartProps {
   quoteToken: TokenDetails
   networkId: number
   hops?: number
-  zoomFactor?: number
-  setCanZoomIn?: React.Dispatch<React.SetStateAction<boolean>>
-  setCanZoomOut?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const Chart: React.FC<ChartProps> = props => {
-  const { baseToken, quoteToken, networkId, hops, zoomFactor = 0, setCanZoomIn, setCanZoomOut } = props
+  const { baseToken, quoteToken, networkId, hops } = props
   const [chart, setChart] = useSafeState<null | am4charts.XYChart>(null)
   const [initialZoom, setInitialZoom] = useSafeState<ZoomValues>({ startX: 0, endX: 1, endY: 1 })
   const [bids, setBids] = useSafeState<PricePointDetails[]>([])
@@ -467,6 +489,75 @@ export const Chart: React.FC<ChartProps> = props => {
     // We'll create only one instance as long as the component is not unmounted
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (!chart) {
+      return
+    }
+
+    // Finding the container for zoom buttons
+    const buttonContainer = Array.from(chart.plotContainer.children).find(
+      ({ id }) => id === BUTTON_CONTAINER_ID,
+    ) as am4core.Container
+
+    // Data not loaded yet, there's no button
+    if (!buttonContainer) {
+      return
+    }
+
+    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+
+    // When any of these is not set, there's no data in the chart, thus we don't need to adjust the zoom
+    if (!xAxis || !xAxis.min || !xAxis.max || !yAxis || !yAxis.max) {
+      return
+    }
+
+    buttonContainer.disposeChildren()
+
+    const zoomInButton = buttonContainer.createChild(am4core.Button)
+    zoomInButton.label.text = '+'
+    zoomInButton.events.on('hit', () => {
+      const diff = xAxis.end - xAxis.start
+      const delta = diff * ZOOM_DELTA
+      xAxis.start += delta
+      xAxis.end -= delta
+
+      const endY = calcZoomY(bids, asks, xAxis.min, xAxis.max, xAxis.start, xAxis.end, yAxis.max)
+      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${endY * 100}%`)
+      yAxis.end = endY
+    })
+
+    const zoomOutButton = buttonContainer.createChild(am4core.Button)
+    zoomOutButton.label.text = '-'
+    zoomOutButton.events.on('hit', () => {
+      const diff = xAxis.end - xAxis.start
+      const delta = diff * ZOOM_DELTA
+      xAxis.start -= delta
+      xAxis.end += delta
+
+      const endY = calcZoomY(bids, asks, xAxis.min, xAxis.max, xAxis.start, xAxis.end, yAxis.max)
+      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${endY * 100}%`)
+      yAxis.end = endY
+    })
+
+    const resetZoomButton = buttonContainer.createChild(am4core.Button)
+    resetZoomButton.label.text = 'Reset'
+    resetZoomButton.events.on('hit', () => {
+      xAxis.start = initialZoom.startX
+      xAxis.end = initialZoom.endX
+      yAxis.end = initialZoom.endY
+      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${yAxis.end * 100}%`)
+    })
+
+    const seeAllButton = buttonContainer.createChild(am4core.Button)
+    seeAllButton.label.text = 'full'
+    seeAllButton.events.on('hit', () => {
+      xAxis.start = 0
+      xAxis.end = 1
+      yAxis.end = 1
+    })
+  }, [chart, initialZoom, bids, asks])
 
   useEffect(() => {
     if (!chart || isPriceLoading) {
@@ -502,16 +593,18 @@ export const Chart: React.FC<ChartProps> = props => {
         const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
         const pricePoints = bids.concat(asks)
 
+        // Store bids and asks for later Y zoom calculation
         setBids(bids)
         setAsks(asks)
 
-        const { start, end } = calcInitialZoomX(bids, asks)
+        const initialZoom = calcInitialZoom(bids, asks)
 
-        // Setting X axis initial zoom
-        xAxis.start = start
-        xAxis.end = end
-        // Storing calculated zoom values as the basis for zoom calculation
-        setInitialZoom({ startX: start, endX: end, endY: 1 })
+        // Setting initial zoom
+        xAxis.start = initialZoom.startX
+        xAxis.end = initialZoom.endX
+        yAxis.end = initialZoom.endY
+        // Storing calculated zoom values
+        setInitialZoom(initialZoom)
 
         _printOrderBook(pricePoints, baseToken, quoteToken)
 
@@ -543,53 +636,6 @@ export const Chart: React.FC<ChartProps> = props => {
     setBids,
     setAsks,
   ])
-
-  useEffect(() => {
-    if (!chart) {
-      return
-    }
-
-    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-
-    // When any of these is not set, there's no data in the chart, thus we don't need to adjust the zoom
-    if (!xAxis || !xAxis.min || !xAxis.max || !yAxis || !yAxis.max) {
-      return
-    }
-
-    logDebug(`[Order Book] Zoom factor: ${zoomFactor * 100}%`)
-
-    // X axis
-    const { start, end } = calcZoomX(initialZoom.startX, initialZoom.endX, zoomFactor)
-    if (start >= end) {
-      // Zooming too much, can't go further.
-      // Disable zoom in
-      logDebug(`[Order Book] Zooming in too much`)
-      setCanZoomIn && setCanZoomIn(false)
-      xAxis.start = start * 0.95
-      xAxis.end = start * 1.05
-    } else if (start === 0 && end === 1) {
-      // We can't zoom out further.
-      // Disable zoom out
-      logDebug(`[Order Book] Zooming out too much, stopping here`)
-      setCanZoomOut && setCanZoomOut(false)
-      xAxis.start = start
-      xAxis.end = end
-      // No need to recalculate Y
-      yAxis.end = 1
-      return
-    } else {
-      setCanZoomIn && setCanZoomIn(true)
-      setCanZoomOut && setCanZoomOut(true)
-      xAxis.start = start
-      xAxis.end = end
-    }
-
-    // Y axis
-    const endY = calcZoomY(bids, asks, xAxis.min, xAxis.max, start, end, yAxis.max)
-    logDebug(`[Order Book] New zoom boundaries X: ${start * 100}% - ${end * 100}%; Y ${endY * 100}%`)
-    yAxis.end = endY
-  }, [zoomFactor, chart, initialZoom, bids, asks, setCanZoomIn, setCanZoomOut])
 
   return <Wrapper ref={mountPoint} />
 }
