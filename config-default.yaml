@@ -17,7 +17,8 @@
 #       https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
 #   More information about forking the web:
 #       https://github.com/gnosis/dex-react/wiki/Fork-project
-appId: 1
+#
+#appId: 1
 
 # Name of the app
 name: Gnosis Protocol Web
