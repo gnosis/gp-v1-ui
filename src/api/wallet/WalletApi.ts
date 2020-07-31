@@ -349,7 +349,7 @@ export class WalletApiImpl implements WalletApi {
     }
 
     this._provider = provider
-    this.setProviderInfo()
+    this._setProviderInfo()
 
     closeOpenWebSocketConnection(this._web3)
 
@@ -457,10 +457,10 @@ export class WalletApiImpl implements WalletApi {
 
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
-    this.setProviderInfo()
 
     logDebug('[WalletApiImpl] Disconnected')
     await this._notifyListeners()
+    this._setProviderInfo()
   }
 
   public async getAddress(): Promise<string> {
@@ -521,7 +521,7 @@ export class WalletApiImpl implements WalletApi {
 
   /* ****************      Private Functions      **************** */
 
-  private setProviderInfo(): void {
+  private _setProviderInfo(): void {
     // this can get expensive depending on the number and complexity of checks in getProviderInfo
     // so retrigger only on connect/disconnect
     this._providerInfo = getProviderInfo(this._provider)
