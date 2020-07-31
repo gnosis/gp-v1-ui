@@ -13,10 +13,10 @@ import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
 import { TokenDetails, Network } from 'types'
 
-import { Offer, PricePointDetails, ZoomValues } from 'components/OrderBookWidget/types'
-import { calcInitialZoom, calcZoomY } from 'components/OrderBookWidget/zoomFunctions'
-import { createChart, getZoomButtonContainer, setLabel } from 'components/OrderBookWidget/chartFunctions'
-import { processData, _printOrderBook } from 'components/OrderBookWidget/dataProcessingFunctions'
+import { Offer, PricePointDetails, ZoomValues } from 'components/OrderBookChart/types'
+import { calcInitialZoom, calcZoomY } from 'components/OrderBookChart/zoomFunctions'
+import { createChart, getZoomButtonContainer, setLabel } from 'components/OrderBookChart/chartFunctions'
+import { processData, _printOrderBook } from 'components/OrderBookChart/dataProcessingFunctions'
 
 const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
 

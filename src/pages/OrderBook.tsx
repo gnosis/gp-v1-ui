@@ -1,6 +1,6 @@
 import React, { useEffect, ChangeEvent } from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
-import { Chart } from 'components/OrderBookWidget'
+import { Chart } from 'components/OrderBookChart'
 import TokenSelector from 'components/TokenSelector'
 import { useTokenList } from 'hooks/useTokenList'
 import { useWalletConnection } from 'hooks/useWalletConnection'
