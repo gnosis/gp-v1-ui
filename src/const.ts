@@ -37,6 +37,10 @@ export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
 
 export const MINIMUM_ALLOWANCE_DECIMALS = 10
 
+// Max App Id: Read more here:
+//    https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
+export const MAX_APP_ID = 255
+
 export const APP_NAME = 'Gnosis Protocol Web'
 
 export const ETHER_PNG =

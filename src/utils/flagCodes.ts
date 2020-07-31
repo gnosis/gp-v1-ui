@@ -9,13 +9,12 @@ export interface Flag<T extends string> {
 // OUR specific flags
 const FIXED_SENTINEL = 'dec0de'
 
-const APP_ID = Number(process.env.APP_ID || CONFIG.transactions.appId)
-if (!Number.isInteger(APP_ID) || APP_ID < 1 || APP_ID > 99) {
-  throw new Error(`APP_ID isn't valid. Expected a positive integer <= 99, got ${APP_ID}`)
-}
-
 // lowercase hex value to be appended to tx.data
-const SENTINEL = FIXED_SENTINEL + String(APP_ID).padStart(2, '0')
+const SENTINEL =
+  FIXED_SENTINEL +
+  Number(CONFIG.appId)
+    .toString(16)
+    .padStart(2, '0')
 console.log('SENTINEL', SENTINEL)
 
 if (!/^[0-9a-f]+$/.test(SENTINEL)) {

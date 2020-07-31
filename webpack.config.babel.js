@@ -10,6 +10,7 @@ import path from 'path'
 
 import dotenv from 'dotenv'
 import loadConfig from './src/loadConfig'
+import overrideEnvConfig from './src/overrideEnvConfig'
 
 // Setup env vars
 dotenv.config()
@@ -17,7 +18,7 @@ dotenv.config()
 const isProduction = process.env.NODE_ENV == 'production'
 
 const baseUrl = isProduction ? '' : '/'
-const config = loadConfig()
+const config = overrideEnvConfig(loadConfig())
 const { name: appName } = config
 
 module.exports = ({ stats = false } = {}) => ({
