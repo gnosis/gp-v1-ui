@@ -5,6 +5,7 @@ import BN from 'bn.js'
 
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
+import { checkTokenAgainstSearch } from 'utils/filter'
 import { ZERO, MEDIA } from 'const'
 import { TokenBalanceDetails } from 'types'
 
@@ -29,7 +30,6 @@ import { useEthBalances } from 'hooks/useEthBalance'
 import useDataFilter from 'hooks/useDataFilter'
 
 // Reducer/Actions
-import { LocalTokensState } from 'reducers-actions/localTokens'
 import { TokenLocalState } from 'reducers-actions'
 
 interface WithdrawState {
@@ -37,7 +37,7 @@ interface WithdrawState {
   tokenAddress: string
 }
 
-const BalancesWidget = styled(CardWidgetWrapper)`
+export const BalancesWidget = styled(CardWidgetWrapper)`
   background: var(--color-background-pageWrapper);
   height: 100%;
 
@@ -183,20 +183,10 @@ interface BalanceDisplayProps extends TokenLocalState {
   ): Promise<void>
 }
 
-const customFilterFnFactory = (localTokens: LocalTokensState) => (searchTxt: string) => ({
-  symbol,
-  name,
-  address,
-}: TokenBalanceDetails): boolean => {
-  if (localTokens.disabled.has(address)) return false
-
+const customFilterFnFactory = (searchTxt: string) => (token: TokenBalanceDetails): boolean => {
   if (searchTxt === '') return true
 
-  return (
-    symbol?.toLowerCase().includes(searchTxt) ||
-    name?.toLowerCase().includes(searchTxt) ||
-    address.toLowerCase().includes(searchTxt)
-  )
+  return checkTokenAgainstSearch(token, searchTxt)
 }
 
 const customHideZeroFilterFn = ({
@@ -229,7 +219,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   const memoizedSearchFilterParams = useMemo(
     () => ({
       data: balances,
-      filterFnFactory: customFilterFnFactory(localTokens),
+      filterFnFactory: customFilterFnFactory,
       userConditionalCheck: ({ debouncedSearch }: { debouncedSearch: string }): boolean =>
         !debouncedSearch && localTokens.disabled.size === 0,
     }),
@@ -297,41 +287,49 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               </tr>
             </thead>
             <tbody>
-              {displayedBalances && displayedBalances.length > 0
-                ? displayedBalances.map(tokenBalances => (
-                    <Row
-                      key={tokenBalances.address}
-                      ethBalance={ethBalance}
-                      tokenBalances={tokenBalances}
-                      onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                      onSubmitDeposit={(balance, onTxHash): Promise<void> =>
-                        depositToken(balance, tokenBalances.address, onTxHash)
-                      }
-                      onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
-                        return requestWithdrawConfirmation(
-                          balance,
-                          tokenBalances.address,
-                          tokenBalances.claimable,
-                          onTxHash,
-                        )
-                      }}
-                      onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
-                      claiming={claiming.has(tokenBalances.address)}
-                      withdrawing={withdrawing.has(tokenBalances.address)}
-                      depositing={depositing.has(tokenBalances.address)}
-                      highlighted={highlighted.has(tokenBalances.address)}
-                      enabling={enabling.has(tokenBalances.address)}
-                      enabled={enabled.has(tokenBalances.address)}
-                      {...windowSpecs}
-                    />
-                  ))
-                : (search || hideZeroBalances) && (
-                    <NoTokensMessage>
-                      <td>
-                        No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
-                      </td>
-                    </NoTokensMessage>
-                  )}
+              {displayedBalances && displayedBalances.length > 0 ? (
+                displayedBalances.map(tokenBalances => (
+                  <Row
+                    key={tokenBalances.address}
+                    ethBalance={ethBalance}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                      depositToken(balance, tokenBalances.address, onTxHash)
+                    }
+                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                      return requestWithdrawConfirmation(
+                        balance,
+                        tokenBalances.address,
+                        tokenBalances.claimable,
+                        onTxHash,
+                      )
+                    }}
+                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    claiming={claiming.has(tokenBalances.address)}
+                    withdrawing={withdrawing.has(tokenBalances.address)}
+                    depositing={depositing.has(tokenBalances.address)}
+                    highlighted={highlighted.has(tokenBalances.address)}
+                    enabling={enabling.has(tokenBalances.address)}
+                    enabled={enabled.has(tokenBalances.address)}
+                    {...windowSpecs}
+                  />
+                ))
+              ) : balances.length === 0 ? (
+                <NoTokensMessage>
+                  <td>
+                    All tokens disabled. Enable some in <a onClick={toggleModal}>Manage Tokens</a>
+                  </td>
+                </NoTokensMessage>
+              ) : (
+                (search || hideZeroBalances) && (
+                  <NoTokensMessage>
+                    <td>
+                      No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                    </td>
+                  </NoTokensMessage>
+                )
+              )}
             </tbody>
           </CardTable>
         )}
@@ -346,7 +344,13 @@ const BalancesDisplayMemoed = React.memo(BalancesDisplay)
 const DepositWidget: React.FC = () => {
   const { ethBalance } = useEthBalances()
   // get all token balances, including deprecated
-  const { balances, error } = useTokenBalances()
+  const { balances: allBalances, error } = useTokenBalances()
+
+  const [{ localTokens }] = useGlobalState()
+
+  const balances = useMemo(() => {
+    return allBalances.filter(bal => !localTokens.disabled.has(bal.address))
+  }, [allBalances, localTokens.disabled])
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
 

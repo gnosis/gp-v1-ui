@@ -669,10 +669,17 @@ const TradeWidget: React.FC = () => {
 
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
 
+  const resetPrices = useCallback((): void => {
+    setValue(priceInputId, '0')
+    setValue(priceInverseInputId, '0')
+  }, [setValue])
+
   const swapTokens = useCallback((): void => {
     setSellToken(receiveTokenBalance)
     setReceiveToken(sellTokenBalance)
-  }, [receiveTokenBalance, sellTokenBalance])
+    // selected price no longer has meaning, reset and force user pick/insert new one
+    resetPrices()
+  }, [receiveTokenBalance, resetPrices, sellTokenBalance])
 
   const onSelectChangeFactory = useCallback(
     (
@@ -684,10 +691,12 @@ const TradeWidget: React.FC = () => {
           swapTokens()
         } else {
           setToken(selected)
+          // selected price no longer has meaning, reset and force user pick/insert new one
+          resetPrices()
         }
       }
     },
-    [swapTokens],
+    [swapTokens, resetPrices],
   )
 
   const sameToken = sellToken === receiveToken
@@ -868,15 +877,7 @@ const TradeWidget: React.FC = () => {
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
 
     // Do not let potential null values through
-    if (
-      !buyAmount ||
-      buyAmount.isZero() ||
-      !sellAmount ||
-      sellAmount.isZero() ||
-      !cachedBuyToken ||
-      !cachedSellToken ||
-      !networkId
-    ) {
+    if (!buyAmount || buyAmount.isZero() || !sellAmount || sellAmount.isZero() || !cachedBuyToken || !cachedSellToken) {
       logDebug(
         `Preventing null values on submit: 
         buyAmount:${buyAmount}, sellAmount:${sellAmount}, 
@@ -894,7 +895,7 @@ const TradeWidget: React.FC = () => {
       sellToken: cachedSellToken,
       buyToken: cachedBuyToken,
     }
-    if (isConnected && userAddress) {
+    if (isConnected && userAddress && networkId) {
       await _placeOrder({
         ...orderParams,
         networkId,

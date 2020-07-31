@@ -27,14 +27,15 @@ import {
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
-import { OrderRowWrapper, ResponsiveTitleRow } from 'components/OrdersWidget/OrderRow.styled'
+import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
   const { transactionHash } = props
   return (
     <>
-      <Spinner size="sm" /> Pending...
+      <Spinner size="sm" />
+      &nbsp;Pending...
       <br />
       {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
     </>
@@ -318,11 +319,6 @@ const OrderRow: React.FC<Props> = props => {
           isPendingOrder={isPendingOrder}
           transactionHash={transactionHash}
         />
-        <ResponsiveTitleRow className="responsiveRow" data-label="Market">
-          <div>
-            {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
-          </div>
-        </ResponsiveTitleRow>
       </OrderRowWrapper>
     )
   )

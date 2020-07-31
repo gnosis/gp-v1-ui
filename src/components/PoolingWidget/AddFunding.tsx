@@ -37,11 +37,7 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
     </HighlightDiv>
     <p>
       <strong>Great</strong> - your liquidity provision is being created right now. Your standing orders will be visible
-      on the{' '}
-      <strong>
-        <Link to="orders">Orders page</Link>
-      </strong>{' '}
-      where you can also cancel these at any time.
+      on this very page, where you can also cancel them at any time.
     </p>
     <p>
       <strong>What now?</strong>

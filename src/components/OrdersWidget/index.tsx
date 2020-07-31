@@ -7,7 +7,7 @@ import { faTrashAlt, faChevronDown, faChevronUp } from '@fortawesome/free-solid-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Const and utils
-import { isOrderActive, isPendingOrderActive } from 'utils'
+import { isOrderActive, isPendingOrderActive, isTradeSettled, isTradeReverted } from 'utils'
 import { DEFAULT_ORDERS_SORTABLE_TOPIC } from 'const'
 import { filterTradesFn, filterOrdersFn } from 'utils/filter'
 
@@ -34,9 +34,8 @@ import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
 
-type OrderTabs = 'active' | 'closed' | 'fills'
-
-type FilteredOrdersStateKeys = Exclude<OrderTabs, 'fills'>
+type OrderTabs = 'active' | 'closed' | 'trades'
+type FilteredOrdersStateKeys = Exclude<OrderTabs, 'trades'>
 type FilteredOrdersState = {
   [key in FilteredOrdersStateKeys]: {
     orders: DetailedAuctionElement[]
@@ -128,7 +127,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
         count: classifiedOrders.active.orders.length + classifiedOrders.active.pendingOrders.length,
       },
       {
-        type: 'fills',
+        type: 'trades',
         count: trades.length,
       },
       {
@@ -148,9 +147,9 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   // syntactic sugar
   const { displayedOrders, displayedPendingOrders, markedForDeletion } = useMemo(
     () => ({
-      displayedOrders: selectedTab === 'fills' ? [] : classifiedOrders[selectedTab].orders,
-      displayedPendingOrders: selectedTab === 'fills' ? [] : classifiedOrders[selectedTab].pendingOrders,
-      markedForDeletion: selectedTab === 'fills' ? new Set<string>() : classifiedOrders[selectedTab].markedForDeletion,
+      displayedOrders: selectedTab === 'trades' ? [] : classifiedOrders[selectedTab].orders,
+      displayedPendingOrders: selectedTab === 'trades' ? [] : classifiedOrders[selectedTab].pendingOrders,
+      markedForDeletion: selectedTab === 'trades' ? new Set<string>() : classifiedOrders[selectedTab].markedForDeletion,
     }),
     [classifiedOrders, selectedTab],
   )
@@ -192,6 +191,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     displayedOrders,
     DEFAULT_ORDERS_SORTABLE_TOPIC,
     compareFnFactory,
+    'desc',
   )
 
   // Why 2 useDataFilter instead of concatenating pending + current?
@@ -229,7 +229,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
 
   const toggleMarkForDeletionFactory = useCallback(
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void => {
-      if (selectedTab === 'fills') return
+      if (selectedTab === 'trades') return
 
       setClassifiedOrders(curr => {
         // copy full state
@@ -250,7 +250,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
 
   const toggleSelectAll = useCallback(
     ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) => {
-      if (selectedTab === 'fills') return
+      if (selectedTab === 'trades') return
 
       setClassifiedOrders(curr => {
         // copy full state
@@ -277,7 +277,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     async (event: React.SyntheticEvent<HTMLFormElement>): Promise<void> => {
       event.preventDefault()
 
-      if (selectedTab === 'fills') return
+      if (selectedTab === 'trades') return
 
       const success = await deleteOrders(Array.from(markedForDeletion))
 
@@ -306,23 +306,28 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
   )
 
+  const settledAndNotRevertedTrades = useMemo(
+    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
+    [trades],
+  )
+
   const {
     filteredData: filteredTrades,
     search: tradesSearch,
     handlers: { handleSearch: handleTradesSearch },
   } = useDataFilter<Trade>({
-    data: trades,
+    data: settledAndNotRevertedTrades,
     filterFnFactory: filterTradesFn,
   })
 
   const { handleTabSpecificSearch, tabSpecficSearch, tabSpecificResultName, tabSpecificDataLength } = useMemo(
     () => ({
       handleTabSpecificSearch: (e: React.ChangeEvent<HTMLInputElement>): void =>
-        selectedTab === 'fills' ? handleTradesSearch(e) : handleBothOrderTypeSearch(e),
-      tabSpecficSearch: selectedTab === 'fills' ? tradesSearch : search,
-      tabSpecificResultName: selectedTab === 'fills' ? 'trades' : 'orders',
+        selectedTab === 'trades' ? handleTradesSearch(e) : handleBothOrderTypeSearch(e),
+      tabSpecficSearch: selectedTab === 'trades' ? tradesSearch : search,
+      tabSpecificResultName: selectedTab === 'trades' ? 'trades' : 'orders',
       tabSpecificDataLength:
-        selectedTab === 'fills'
+        selectedTab === 'trades'
           ? filteredTrades.length
           : displayedPendingOrders.length + filteredAndSortedOrders.length,
     }),
@@ -365,7 +370,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               showFilter={!!tabSpecficSearch}
               dataLength={tabSpecificDataLength}
             >
-              {selectedTab !== 'fills' && (
+              {selectedTab !== 'trades' && (
                 <label className="checked">
                   <small>Cancel All Orders:</small>
                   <input
@@ -377,7 +382,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                 </label>
               )}
             </FilterTools>
-            {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
+            {/* ORDERS TABS: ACTIVE/TRADES/CLOSED */}
             <Tabs<OrderTabs> {...tabsProps} />
 
             {/* DELETE ORDERS ROW */}
@@ -389,7 +394,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               </ButtonWithIcon>
             </div>
             {/* FILLS AKA TRADES */}
-            {selectedTab === 'fills' ? (
+            {selectedTab === 'trades' ? (
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
                   <InnerTradesWidget isTab trades={filteredTrades} />

@@ -4,7 +4,7 @@ import { PageWrapper } from 'components/Layout/PageWrapper'
 
 const Orders: React.FC = () => (
   <PageWrapper>
-    <OrdersWidget />
+    <OrdersWidget displayOnly="regular" />
   </PageWrapper>
 )
 
