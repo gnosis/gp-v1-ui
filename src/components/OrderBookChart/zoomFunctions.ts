@@ -1,6 +1,8 @@
 import { PricePointDetails, ZoomValues } from 'components/OrderBookChart/types'
 import { logDebug } from 'utils'
 
+const ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE = 0.05 // %
+
 // --- Initial zoom calculation helper functions ---
 export function calcRange(minBid: number, maxBid: number, minAsk: number, maxAsk: number): number {
   return Math.max(maxBid, maxAsk) - Math.min(minBid, minAsk)
@@ -105,17 +107,31 @@ export function calcInitialZoom(bids: PricePointDetails[], asks: PricePointDetai
     logDebug(`[Order Book] spread: ${spread.toFixed(15)}`)
     logDebug(`[Order Book] zoomInterval: ${zoomInterval.toFixed(15)}`)
     logDebug(`[Order Book] lowerZoomX: ${lowerZoomX.toFixed(15)}; upperZoomX: ${upperZoomX.toFixed(15)}`)
-    logDebug(`[Order Book] start %: ${startX}; end %: ${endX}`)
   } else if (bids.length > 0) {
     // There are no asks. Zoom on the right side of the graph
-    // TODO: magic number, move to const
-    startX = 0.95
-    // TODO: adjust yAxis
+    startX = 1 - ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE
+    endY = calcZoomY(
+      bids,
+      asks,
+      bids[0].priceNumber,
+      bids[bids.length - 1].priceNumber,
+      startX,
+      endX,
+      bids[0].totalVolumeNumber,
+    )
   } else if (asks.length > 0) {
     // There are no bids. Zoom on the left side of the graph
-    // TODO: magic number, move to const
-    endX = 0.05
-    // TODO: adjust yAxis
+    endX = ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE
+    endY = calcZoomY(
+      bids,
+      asks,
+      asks[0].priceNumber,
+      asks[asks.length - 1].priceNumber,
+      startX,
+      endX,
+      asks[asks.length - 1].totalVolumeNumber,
+    )
   }
+  logDebug(`[Order Book] X start: ${startX * 100}%; end: ${endX * 100}%; Y end ${endY * 100}%`)
   return { startX, endX, endY }
 }
