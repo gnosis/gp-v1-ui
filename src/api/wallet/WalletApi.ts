@@ -4,6 +4,7 @@ import assert from 'assert'
 import { getDefaultProvider } from '..'
 
 import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile } from 'web3modal'
+import { IClientMeta } from '@walletconnect/types'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -50,7 +51,7 @@ export interface WalletApi {
   getWalletInfo(): Promise<WalletInfo>
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
-  getProviderInfo(): ProviderInfo
+  getProviderInfo(): ProviderInfo | null
   blockchainState: BlockchainUpdatePrompt
   userPrintAsync: Promise<string>
 }
@@ -62,7 +63,9 @@ export interface WalletInfo {
   blockNumber?: number
 }
 
-export type ProviderInfo = IProviderInfo
+export interface ProviderInfo extends IProviderInfo {
+  peerMeta?: IClientMeta
+}
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -245,6 +248,7 @@ export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
   private _web3: Web3
+  private _providerInfo: ProviderInfo | null = null
   public userPrintAsync: Promise<string> = Promise.resolve('')
   public blockchainState: BlockchainUpdatePrompt
 
@@ -345,6 +349,7 @@ export class WalletApiImpl implements WalletApi {
     }
 
     this._provider = provider
+    this.setProviderInfo()
 
     closeOpenWebSocketConnection(this._web3)
 
@@ -452,6 +457,7 @@ export class WalletApiImpl implements WalletApi {
 
     this._provider = null
     this._web3?.setProvider(getDefaultProvider())
+    this.setProviderInfo()
 
     logDebug('[WalletApiImpl] Disconnected')
     await this._notifyListeners()
@@ -498,8 +504,8 @@ export class WalletApiImpl implements WalletApi {
     this._listeners = this._listeners.filter(c => c !== callback)
   }
 
-  public getProviderInfo(): ProviderInfo {
-    return getProviderInfo(this._provider)
+  public getProviderInfo(): ProviderInfo | null {
+    return this._providerInfo
   }
 
   public async getWalletInfo(): Promise<WalletInfo> {
@@ -514,6 +520,19 @@ export class WalletApiImpl implements WalletApi {
   }
 
   /* ****************      Private Functions      **************** */
+
+  private setProviderInfo(): void {
+    // this can get expensive depending on the number and complexity of checks in getProviderInfo
+    // so retrigger only on connect/disconnect
+    this._providerInfo = getProviderInfo(this._provider)
+
+    if (this._providerInfo && isWalletConnectProvider(this._provider) && this._provider.wc.peerMeta) {
+      this._providerInfo = {
+        ...this._providerInfo,
+        peerMeta: this._provider.wc.peerMeta,
+      }
+    }
+  }
 
   private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
     let chainIdChanged = false
