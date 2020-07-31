@@ -9,7 +9,7 @@ import { dexPriceEstimatorApi } from 'api'
 import { getNetworkFromId, safeTokenName, logDebug } from 'utils'
 
 import useSafeState from 'hooks/useSafeState'
-import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+import { useOwlAmountInQuoteUnits } from 'hooks/useOwlAmountInQuoteUnits'
 
 import { TokenDetails, Network } from 'types'
 
@@ -19,6 +19,7 @@ import { createChart, getZoomButtonContainer, setLabel } from 'components/OrderB
 import { processData, _printOrderBook } from 'components/OrderBookChart/dataProcessingFunctions'
 
 const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
+const ORDERBOOK_MINIMUM_OWL_VOLUME = 10
 
 const Wrapper = styled.div`
   display: flex;
@@ -71,14 +72,12 @@ export const Chart: React.FC<ChartProps> = props => {
   const [bids, setBids] = useSafeState<PricePointDetails[]>([])
   const [asks, setAsks] = useSafeState<PricePointDetails[]>([])
 
-  // Get the price of 1 OWL in quote token
-  const { priceEstimation: oneOwlInQuoteToken, isPriceLoading } = usePriceEstimationWithSlippage({
+  // Get the price of X OWL in quote token
+  const { amount: amountInOwl, isLoading } = useOwlAmountInQuoteUnits(
+    ORDERBOOK_MINIMUM_OWL_VOLUME,
     networkId,
-    amount: '0', // no amount means 1 unit === 1 OWL
-    baseTokenId: 0, // OWL
-    quoteTokenId: quoteToken.id,
-    quoteTokenDecimals: quoteToken.decimals,
-  })
+    quoteToken,
+  )
 
   const mountPoint = useRef<HTMLDivElement>(null)
 
@@ -101,7 +100,7 @@ export const Chart: React.FC<ChartProps> = props => {
   // Sets chart configs that depend on token
   // Does the initial zoom calculation
   useEffect(() => {
-    if (!chart || isPriceLoading) {
+    if (!chart || isLoading) {
       return
     }
 
@@ -138,8 +137,8 @@ export const Chart: React.FC<ChartProps> = props => {
     // Adding new event handler
     chart.dataSource.adapter.add('parsedData', data => {
       try {
-        const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid, oneOwlInQuoteToken)
-        const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
+        const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid, amountInOwl)
+        const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, amountInOwl)
         const pricePoints = bids.concat(asks)
 
         // Store bids and asks for later Y zoom calculation
@@ -166,18 +165,7 @@ export const Chart: React.FC<ChartProps> = props => {
 
     // Trigger data load re-using same chart
     chart.dataSource.load()
-  }, [
-    baseToken,
-    chart,
-    hops,
-    networkId,
-    quoteToken,
-    oneOwlInQuoteToken,
-    isPriceLoading,
-    setInitialZoom,
-    setBids,
-    setAsks,
-  ])
+  }, [baseToken, chart, hops, networkId, quoteToken, amountInOwl, isLoading, setInitialZoom, setBids, setAsks])
 
   // Creates zoom buttons once initialZoom has been calculated
   useEffect(() => {
