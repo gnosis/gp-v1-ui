@@ -170,7 +170,6 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   justify-content: center;
   align-items: flex-start;
   align-content: flex-start;
-  transition: all 0.2s ease-in-out;
 
   @media ${MEDIA.mobile} {
     height: 40rem;
@@ -207,22 +206,6 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
     &:hover {
       opacity: 1;
-    }
-  }
-
-  .tabsList {
-    height: 4rem;
-    margin-bottom: 2rem;
-    border: none;
-
-    button {
-      border-radius: 0 0 1.6rem 0;
-
-      &.selected {
-        flex: 1 1 75%;
-      }
-
-      transition: all 0.3s ease-in-out;
     }
   }
 
@@ -298,7 +281,7 @@ const TimePickerPreset = styled.button<{ $selected?: boolean }>`
   border-radius: 0.6rem;
 
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
+  transition: background 0.2s ease-in-out;
 
   &:hover {
     background: var(--color-background-CTA);
