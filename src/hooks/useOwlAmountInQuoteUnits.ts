@@ -1,10 +1,13 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import BigNumber from 'bignumber.js'
 
 import { TokenDetails } from 'types'
 
 import useSafeState from 'hooks/useSafeState'
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+import { logDebug } from 'utils'
+
+const OWL_TOKEN_ID = 0
 
 /**
  * Hook to query how much in quote token is equivalent to given amount in OWL
@@ -21,6 +24,8 @@ export function useOwlAmountInQuoteUnits(
   const [isLoading, setIsLoading] = useSafeState(false)
   const [owlsInQuote, setOwlsInQuote] = useSafeState<BigNumber | null>(null)
 
+  const owlUnitsBigNumber = useMemo(() => new BigNumber(owlUnits), [owlUnits])
+
   // Get the price of 1 OWL in quote token
   // But why quoting 1 OWL instead of `owlUnits` OWL ?
   // Because due to slippage, the price might be smaller.
@@ -28,7 +33,7 @@ export function useOwlAmountInQuoteUnits(
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
     amount: '1',
-    baseTokenId: 0, // OWL
+    baseTokenId: OWL_TOKEN_ID,
     quoteTokenId: quoteToken.id,
     quoteTokenDecimals: quoteToken.decimals,
   })
@@ -36,11 +41,21 @@ export function useOwlAmountInQuoteUnits(
   useEffect(() => {
     if (isPriceLoading) {
       setIsLoading(true)
+      setOwlsInQuote(null)
       return
     }
+
     setIsLoading(false)
-    priceEstimation && setOwlsInQuote(priceEstimation.multipliedBy(owlUnits))
-  }, [isPriceLoading, owlUnits, priceEstimation, setOwlsInQuote, setIsLoading])
+
+    if (priceEstimation) {
+      setOwlsInQuote(
+        quoteToken.id == OWL_TOKEN_ID
+          ? owlUnitsBigNumber // Quote token is OWL, 1 OWL in OWL == 1
+          : priceEstimation.multipliedBy(owlUnitsBigNumber),
+      )
+      logDebug(`[useOwlAmountInQuoteUnits] 1 OWL in ${quoteToken.symbol} => ${priceEstimation.toString(10)}`)
+    }
+  }, [isPriceLoading, owlUnitsBigNumber, priceEstimation, setOwlsInQuote, setIsLoading, quoteToken])
 
   return { amount: owlsInQuote, isLoading }
 }

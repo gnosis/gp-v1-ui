@@ -61,9 +61,7 @@ export function processData(
   // Filter tiny orders
   const minimumOrderVolume = !owlPrice // is there a price returned?
     ? new BigNumber(SMALL_VOLUME_THRESHOLD) // No, use default dumb threshold
-    : owlPrice.eq(0) // Is price 0?
-    ? ONE_BIG_NUMBER // It's OWL itself, use 1
-    : owlPrice // Not OWL, use returned price
+    : owlPrice // Use returned price
 
   pricePoints = pricePoints
     .filter(pricePoint => pricePoint.volume.gt(minimumOrderVolume))
