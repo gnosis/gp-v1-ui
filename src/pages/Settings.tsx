@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { useForm, Resolver as FormResolver } from 'react-hook-form'
-// import { DevTool } from 'HookFormDevtool'
 import styled from 'styled-components'
+import { DevTool } from 'HookFormDevtool'
 
 import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
@@ -145,7 +145,7 @@ const Settings: React.FC = () => {
   // but at the same time pull in updated values from storage on mount
   const defaultValues = useMemo(getDefaultSettings, [])
 
-  const { register, handleSubmit, errors /* , control */ } = useForm<SettingsFormData>({
+  const { register, handleSubmit, errors, control } = useForm<SettingsFormData>({
     resolver,
     defaultValues,
   })
@@ -174,7 +174,7 @@ const Settings: React.FC = () => {
           <SettingsButtonSubmit type="submit">Apply Settings</SettingsButtonSubmit>
         </ButtonsContainer>
       </form>
-      {/* process.env.NODE_ENV === 'development' && <DevTool control={control} /> */}
+      {process.env.NODE_ENV === 'development' && <DevTool control={control} />}
     </SettingsWrapper>
   )
 }
