@@ -10,6 +10,7 @@ import BigNumber from 'bignumber.js'
 import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
+import { useGasPrice } from 'hooks/useGasPrice'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -33,12 +34,20 @@ const Warning = styled.p`
   }
 `
 
-const MIN_ECONOMICAL_VIABLE_FEE_IN_OWL = 1.2
+const DEFAULT_GASP_RICE = 40e9 // 40 Gwei
+const ETH_PRICE_IN_OWL = 240 * 1000
 const SUBSIDIZE_FACTOR = 10
-const MIN_FEE = MIN_ECONOMICAL_VIABLE_FEE_IN_OWL / SUBSIDIZE_FACTOR
+
 const SETTLEMENT_FACTOR = 1.5
 const FEE_FACTOR = 1000
-const MIN_TRADABLE_AMOUNT_IN_OWL = new BigNumber(MIN_FEE * FEE_FACTOR * SETTLEMENT_FACTOR)
+
+const calcMinTradableAmountInOwl = (gasPrice: number): BigNumber => {
+  //                            trade tx gasLimit
+  const MIN_ECONOMICAL_VIABLE_FEE_IN_OWL = 120000 * gasPrice * ETH_PRICE_IN_OWL
+
+  const MIN_FEE = MIN_ECONOMICAL_VIABLE_FEE_IN_OWL / SUBSIDIZE_FACTOR
+  return new BigNumber(MIN_FEE * FEE_FACTOR * SETTLEMENT_FACTOR)
+}
 
 interface LowVolumeParams {
   sellToken: TokenDetails
@@ -60,22 +69,27 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
     networkId,
   })
 
+  const gasPrice = useGasPrice(DEFAULT_GASP_RICE)
+
   return useMemo(() => {
-    if (isPriceLoading || priceEstimation === null) return { isLoading: true }
+    if (isPriceLoading || priceEstimation === null || gasPrice === null) return { isLoading: true }
     console.log('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
 
-    const minTradableAmountPerToken = MIN_TRADABLE_AMOUNT_IN_OWL.dividedBy(priceEstimation)
+    const minTradableAmountInOwl = calcMinTradableAmountInOwl(gasPrice)
+
+    const minTradableAmountPerToken = minTradableAmountInOwl.dividedBy(priceEstimation)
     const isLowVolume = minTradableAmountPerToken.isGreaterThan(sellTokenAmount)
 
     const difference = isLowVolume ? minTradableAmountPerToken.minus(sellTokenAmount) : ZERO_BIG_NUMBER
 
-    console.log('{ isLowVolume, difference, minAmount }', {
+    console.log('{ isLowVolume, difference, minAmount, gasPrice }', {
       isLowVolume,
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
+      gasPrice,
     })
     return { isLowVolume, difference, isLoading: false, minAmount: minTradableAmountPerToken }
-  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount])
+  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice])
 }
 
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {
