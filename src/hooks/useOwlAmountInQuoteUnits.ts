@@ -33,9 +33,9 @@ export function useOwlAmountInQuoteUnits(
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
     amount: '1',
-    baseTokenId: OWL_TOKEN_ID,
-    quoteTokenId: quoteToken.id,
-    quoteTokenDecimals: quoteToken.decimals,
+    quoteTokenId: OWL_TOKEN_ID,
+    baseTokenId: quoteToken.id,
+    baseTokenDecimals: quoteToken.decimals,
   })
 
   useEffect(() => {
