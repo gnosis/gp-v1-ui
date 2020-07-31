@@ -562,7 +562,10 @@ export class WalletApiImpl implements WalletApi {
   // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
   private async _generateAsyncUserPrint(): Promise<string> {
-    const { name: providerName } = this.getProviderInfo()
+    const providerInfo = this.getProviderInfo()
+    if (!providerInfo) return ''
+
+    const { name: providerName } = providerInfo
 
     const mobile = isMobile() ? 'mobile' : 'desktop'
 
