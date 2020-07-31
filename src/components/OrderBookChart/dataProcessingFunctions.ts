@@ -2,9 +2,10 @@ import BN from 'bn.js'
 import BigNumber from 'bignumber.js'
 import { TEN_BIG_NUMBER, formatSmart, DEFAULT_PRECISION, ONE_BIG_NUMBER, ZERO_BIG_NUMBER } from '@gnosis.pm/dex-js'
 
-import { TokenDetails } from 'types'
-import { RawPricePoint, PricePoint, Offer, PricePointDetails } from 'components/OrderBookWidget/types'
 import { logDebug } from 'utils'
+import { TokenDetails } from 'types'
+
+import { RawPricePoint, PricePoint, Offer, PricePointDetails } from 'components/OrderBookChart/types'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 

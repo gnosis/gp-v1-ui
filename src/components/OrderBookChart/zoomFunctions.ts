@@ -1,4 +1,4 @@
-import { PricePointDetails, ZoomValues } from 'components/OrderBookWidget/types'
+import { PricePointDetails, ZoomValues } from 'components/OrderBookChart/types'
 import { logDebug } from 'utils'
 
 // --- Initial zoom calculation helper functions ---
