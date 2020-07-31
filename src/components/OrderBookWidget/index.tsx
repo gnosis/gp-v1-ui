@@ -82,6 +82,7 @@ export const Chart: React.FC<ChartProps> = props => {
 
   const mountPoint = useRef<HTMLDivElement>(null)
 
+  // Creates chart instance upon load
   useEffect(() => {
     if (!mountPoint.current) {
       return
@@ -96,6 +97,89 @@ export const Chart: React.FC<ChartProps> = props => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Reloads data on token/network change
+  // Sets chart configs that depend on token
+  // Does the initial zoom calculation
+  useEffect(() => {
+    if (!chart || isPriceLoading) {
+      return
+    }
+
+    const baseTokenLabel = safeTokenName(baseToken)
+    const quoteTokenLabel = safeTokenName(quoteToken)
+
+    const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
+
+    // Axes config
+    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+
+    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    yAxis.title.text = baseTokenLabel
+
+    // Tool tip
+    const market = baseTokenLabel + '-' + quoteTokenLabel
+
+    const [bidSeries, askSeries] = chart.series.values
+    bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+    askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+
+    // Update data source according to network/base token/quote token
+    chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+      baseTokenId: baseToken.id,
+      quoteTokenId: quoteToken.id,
+      hops,
+      networkId,
+    })
+
+    // Removing any previous event handler
+    chart.dataSource.adapter.remove('parsedData')
+
+    // Adding new event handler
+    chart.dataSource.adapter.add('parsedData', data => {
+      try {
+        const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid, oneOwlInQuoteToken)
+        const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
+        const pricePoints = bids.concat(asks)
+
+        // Store bids and asks for later Y zoom calculation
+        setBids(bids)
+        setAsks(asks)
+
+        const initialZoom = calcInitialZoom(bids, asks)
+
+        // Setting initial zoom
+        xAxis.start = initialZoom.startX
+        xAxis.end = initialZoom.endX
+        yAxis.end = initialZoom.endY
+        // Storing calculated zoom values
+        setInitialZoom(initialZoom)
+
+        _printOrderBook(pricePoints, baseToken, quoteToken)
+
+        return pricePoints
+      } catch (error) {
+        console.error('Error processing data', error)
+        return []
+      }
+    })
+
+    // Trigger data load re-using same chart
+    chart.dataSource.load()
+  }, [
+    baseToken,
+    chart,
+    hops,
+    networkId,
+    quoteToken,
+    oneOwlInQuoteToken,
+    isPriceLoading,
+    setInitialZoom,
+    setBids,
+    setAsks,
+  ])
+
+  // Creates zoom buttons once initialZoom has been calculated
   useEffect(() => {
     if (!chart) {
       return
@@ -104,7 +188,7 @@ export const Chart: React.FC<ChartProps> = props => {
     // Finding the container for zoom buttons
     const buttonContainer = getZoomButtonContainer(chart)
 
-    // Data not loaded yet, there's no button
+    // Data not loaded yet, there's no container
     if (!buttonContainer) {
       return
     }
@@ -167,84 +251,6 @@ export const Chart: React.FC<ChartProps> = props => {
       yAxis.end = 1
     })
   }, [chart, initialZoom, bids, asks])
-
-  useEffect(() => {
-    if (!chart || isPriceLoading) {
-      return
-    }
-
-    const baseTokenLabel = safeTokenName(baseToken)
-    const quoteTokenLabel = safeTokenName(quoteToken)
-
-    const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
-
-    // Axes configs
-    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
-
-    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    yAxis.title.text = baseTokenLabel
-
-    // Add data
-    chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
-      baseTokenId: baseToken.id,
-      quoteTokenId: quoteToken.id,
-      hops,
-      networkId,
-    })
-
-    // Removing any previous event handler
-    chart.dataSource.adapter.remove('parsedData')
-    // Adding new event handler
-    chart.dataSource.adapter.add('parsedData', data => {
-      try {
-        const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid, oneOwlInQuoteToken)
-        const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
-        const pricePoints = bids.concat(asks)
-
-        // Store bids and asks for later Y zoom calculation
-        setBids(bids)
-        setAsks(asks)
-
-        const initialZoom = calcInitialZoom(bids, asks)
-
-        // Setting initial zoom
-        xAxis.start = initialZoom.startX
-        xAxis.end = initialZoom.endX
-        yAxis.end = initialZoom.endY
-        // Storing calculated zoom values
-        setInitialZoom(initialZoom)
-
-        _printOrderBook(pricePoints, baseToken, quoteToken)
-
-        return pricePoints
-      } catch (error) {
-        console.error('Error processing data', error)
-        return []
-      }
-    })
-
-    // Reload data from data source re-using same chart
-    chart.dataSource.load()
-
-    const market = baseTokenLabel + '-' + quoteTokenLabel
-
-    // Setting up tooltips based on currently loaded tokens
-    const [bidSeries, askSeries] = chart.series.values
-    bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-    askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-  }, [
-    baseToken,
-    chart,
-    hops,
-    networkId,
-    quoteToken,
-    oneOwlInQuoteToken,
-    isPriceLoading,
-    setInitialZoom,
-    setBids,
-    setAsks,
-  ])
 
   return <Wrapper ref={mountPoint} />
 }
