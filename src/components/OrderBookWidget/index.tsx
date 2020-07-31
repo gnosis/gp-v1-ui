@@ -77,14 +77,106 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
 
   const { value: debouncedBatchId } = useDebounce(batchId, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME)
 
-  // sync resetting ApiData to avoid old data on new labels flash
-  // and layout changes
-  useMemo(() => {
-    setApiData(null)
-    setError(null)
+  const mountPoint = useRef<HTMLDivElement>(null)
+
+  // Creates chart instance upon load
+  useEffect(() => {
+    if (!mountPoint.current) {
+      return
+    }
+
+    const _chart = createChart(mountPoint.current)
+
+    setChart(_chart)
+
+    return (): void => _chart.dispose()
+    // We'll create only one instance as long as the component is not unmounted
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseToken, quoteToken, networkId, hops, debouncedBatchId])
 
+  // Reloads data on token/network change
+  // Sets chart configs that depend on token
+  // Does the initial zoom calculation
+  useEffect(() => {
+    if (!chart || isPriceLoading) {
+      return
+    }
+
+    const baseTokenLabel = safeTokenName(baseToken)
+    const quoteTokenLabel = safeTokenName(quoteToken)
+
+    const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
+
+    // Axes config
+    const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+
+    const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
+    yAxis.title.text = baseTokenLabel
+
+    // Tool tip
+    const market = baseTokenLabel + '-' + quoteTokenLabel
+
+    const [bidSeries, askSeries] = chart.series.values
+    bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+    askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+
+    // Update data source according to network/base token/quote token
+    chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+      baseTokenId: baseToken.id,
+      quoteTokenId: quoteToken.id,
+      hops,
+      networkId,
+    })
+
+    // Removing any previous event handler
+    chart.dataSource.adapter.remove('parsedData')
+
+    // Adding new event handler
+    chart.dataSource.adapter.add('parsedData', data => {
+      try {
+        const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid, oneOwlInQuoteToken)
+        const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask, oneOwlInQuoteToken)
+        const pricePoints = bids.concat(asks)
+
+        // Store bids and asks for later Y zoom calculation
+        setBids(bids)
+        setAsks(asks)
+
+        const initialZoom = calcInitialZoom(bids, asks)
+
+        // Setting initial zoom
+        xAxis.start = initialZoom.startX
+        xAxis.end = initialZoom.endX
+        yAxis.end = initialZoom.endY
+        // Storing calculated zoom values
+        setInitialZoom(initialZoom)
+
+        _printOrderBook(pricePoints, baseToken, quoteToken)
+
+        return pricePoints
+      } catch (error) {
+        console.error('Error processing data', error)
+        return []
+      }
+    })
+
+    // Trigger data load re-using same chart
+    chart.dataSource.load()
+  }, [
+    baseToken,
+    chart,
+    hops,
+    networkId,
+    quoteToken,
+    oneOwlInQuoteToken,
+    isPriceLoading,
+    setInitialZoom,
+    setBids,
+    setAsks,
+  ])
+
+  // Creates zoom buttons once initialZoom has been calculated
   useEffect(() => {
     if (!chart) {
       return
@@ -93,15 +185,11 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
     // Finding the container for zoom buttons
     const buttonContainer = getZoomButtonContainer(chart)
 
-    const fetchApiData = async (): Promise<void> => {
-      try {
-        const rawData = await dexPriceEstimatorApi.getOrderBookData({
-          baseTokenId: baseToken.id,
-          quoteTokenId: quoteToken.id,
-          hops,
-          networkId,
-          batchId: debouncedBatchId,
-        })
+    // Data not loaded yet, there's no container
+    if (!buttonContainer) {
+      return
+    }
+    buttonContainer.disposeChildren()
 
         if (cancelled) return
 
@@ -113,18 +201,34 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
         console.error('Error populating orderbook with data', error)
         setError(error)
       }
-    }
+      const diff = xAxis.end - xAxis.start
+      const delta = diff * ZOOM_INCREMENT_PERCENTAGE
+      xAxis.start = Math.max(xAxis.start - delta, 0)
+      xAxis.end = Math.min(xAxis.end + delta, 1)
 
-    fetchApiData()
+      yAxis.end = calcZoomY(bids, asks, xAxis.min, xAxis.max, xAxis.start, xAxis.end, yAxis.max)
+      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${yAxis.end * 100}%`)
+    })
 
-    return (): void => {
-      cancelled = true
-    }
-  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
+    const resetZoomButton = buttonContainer.createChild(am4core.Button)
+    setLabel(resetZoomButton.label, 'Reset')
+    resetZoomButton.events.on('hit', () => {
+      xAxis.start = initialZoom.startX
+      xAxis.end = initialZoom.endX
+      yAxis.end = initialZoom.endY
+      logDebug(`[Order Book] New zoom boundaries X: ${xAxis.start * 100}% - ${xAxis.end * 100}%; Y ${yAxis.end * 100}%`)
+    })
 
-  if (error) return <OrderBookError error={error} />
+    const seeAllButton = buttonContainer.createChild(am4core.Button)
+    setLabel(seeAllButton.label, 'full')
+    seeAllButton.events.on('hit', () => {
+      xAxis.start = 0
+      xAxis.end = 1
+      yAxis.end = 1
+    })
+  }, [chart, initialZoom, bids, asks])
 
-  return <OrderBookChart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} data={apiData} />
+  return <Wrapper ref={mountPoint} />
 }
 
 export default OrderBookWidget
