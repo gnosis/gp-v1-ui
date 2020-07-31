@@ -1,9 +1,8 @@
-import { format, formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
-
+import { format, formatDistance, formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
 import { BATCH_TIME, BATCH_TIME_IN_MS, BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
-export const formatDate = format
-
+export { formatDistanceStrict, format as formatDate }
+export const DEFAULT_DATE_FORMAT = 'yyyy.MM.dd HH:mm'
 /**
  * Epoch in seconds
  */
@@ -30,6 +29,17 @@ export function dateToBatchId(date?: Date | string | number): number {
 export function batchIdToDate(batchId: number): Date {
   const timestamp = batchId * BATCH_TIME_IN_MS
   return new Date(timestamp)
+}
+
+export const formatRelativeBatchId = (
+  newBatchId: string | number,
+  baseBatchId: string | number,
+  strict?: boolean,
+): string => {
+  const newDate = batchIdToDate(+newBatchId)
+  const baseDate = batchIdToDate(+baseBatchId)
+
+  return strict ? formatDistanceStrict(newDate, baseDate) : formatDistance(newDate, baseDate)
 }
 
 export function formatDateFromBatchId(batchId: number, options?: { strict?: boolean; addSuffix?: boolean }): string {

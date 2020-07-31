@@ -7,7 +7,14 @@ import { useFormContext } from 'react-hook-form'
 import cog from 'assets/img/cog.svg'
 
 // utils, const
-import { makeMultipleOf, dateToBatchId, batchIdToDate, formatDateFromBatchId, formatDate } from 'utils'
+import {
+  formatDistanceStrict,
+  makeMultipleOf,
+  dateToBatchId,
+  batchIdToDate,
+  formatDateFromBatchId,
+  formatDate,
+} from 'utils'
 import { MEDIA } from 'const'
 
 // components
@@ -22,7 +29,6 @@ import useSafeState from 'hooks/useSafeState'
 
 const VALID_UNTIL_DEFAULT = '1440'
 const VALID_FROM_DEFAULT = '30'
-
 // now, 30min, 60min, 24h
 const ORDER_START_PRESETS = ['0', '10', '30', '60', '1440']
 // 5min, 30min, 24h, 7d
@@ -485,10 +491,10 @@ const OrderValidity: React.FC<Props> = ({
             Order expires:{' '}
             <b>
               {validUntilBatchId
-                ? formatDateFromBatchId(
-                    validFromBatchId && +validUntilBatchId > +validFromBatchId
-                      ? +validUntilBatchId
-                      : minutesToRelativeBatchId(+VALID_UNTIL_DEFAULT),
+                ? formatDistanceStrict(
+                    batchIdToDate(+validUntilBatchId),
+                    validFromBatchId ? batchIdToDate(+validFromBatchId) : Date.now(),
+                    { addSuffix: true },
                   )
                 : 'Never'}
             </b>
