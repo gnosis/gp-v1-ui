@@ -8,7 +8,6 @@ const TabsWrapper = styled.div`
   margin: 0 auto;
   display: flex;
   flex-flow: row nowrap;
-  height: 6.4rem;
   width: 100%;
   justify-content: center;
   border-bottom: 0.1rem solid var(--color-text-secondary);
@@ -21,7 +20,7 @@ const TabsWrapper = styled.div`
   .countContainer {
     display: flex;
     flex-flow: row nowrap;
-    height 100%;
+    height: 6.4rem;
     width: 100%;
     margin: 0 0 -0.1rem;
     align-items: center;

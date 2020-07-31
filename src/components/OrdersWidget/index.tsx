@@ -382,7 +382,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                 </label>
               )}
             </FilterTools>
-            {/* ORDERS TABS: ACTIVE/FILLS/LIQUIDITY/CLOSED */}
+            {/* ORDERS TABS: ACTIVE/TRADES/CLOSED */}
             <Tabs<OrderTabs> {...tabsProps} />
 
             {/* DELETE ORDERS ROW */}
