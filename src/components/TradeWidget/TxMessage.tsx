@@ -11,6 +11,7 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
+import { DEFAULT_GAS_PRICE, calcMinTradableAmountInOwl } from 'utils/minFee'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -34,21 +35,6 @@ const Warning = styled.p`
   }
 `
 
-const DEFAULT_GASP_RICE = 40e9 // 40 Gwei
-const ETH_PRICE_IN_OWL = 240 * 1000
-const SUBSIDIZE_FACTOR = 10
-
-const SETTLEMENT_FACTOR = 1.5
-const FEE_FACTOR = 1000
-
-const calcMinTradableAmountInOwl = (gasPrice: number): BigNumber => {
-  //                            trade tx gasLimit
-  const MIN_ECONOMICAL_VIABLE_FEE_IN_OWL = 120000 * gasPrice * ETH_PRICE_IN_OWL
-
-  const MIN_FEE = MIN_ECONOMICAL_VIABLE_FEE_IN_OWL / SUBSIDIZE_FACTOR
-  return new BigNumber(MIN_FEE * FEE_FACTOR * SETTLEMENT_FACTOR)
-}
-
 interface LowVolumeParams {
   sellToken: TokenDetails
   networkId: number
@@ -69,7 +55,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
     networkId,
   })
 
-  const gasPrice = useGasPrice(DEFAULT_GASP_RICE)
+  const gasPrice = useGasPrice(DEFAULT_GAS_PRICE)
 
   return useMemo(() => {
     if (isPriceLoading || priceEstimation === null || gasPrice === null) return { isLoading: true }
