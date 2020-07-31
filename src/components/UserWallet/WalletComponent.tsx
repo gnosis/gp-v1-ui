@@ -22,6 +22,7 @@ import {
   MonospaceAddress,
   ConnectWallet,
   LogInOutButton,
+  ProviderName,
 } from './UserWallet.styled'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -32,6 +33,7 @@ import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
 import WalletImg from 'assets/img/eth-network.svg'
 import { Spinner } from 'components/Spinner'
+import { walletApi } from 'api'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string
@@ -46,6 +48,10 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const { connectWallet: _connectWallet, disconnectWallet: _disconnectWallet } = useConnectWallet()
 
   const orderPageMatch = useRouteMatch('/order/')
+
+  // providerInfo is cached, so ok to re-get on render
+  const providerInfo = walletApi.getProviderInfo()
+  const providerName = providerInfo && (providerInfo.peerMeta?.name || providerInfo.name)
 
   /***************************** */
   // EVENT HANDLERS
@@ -134,6 +140,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                     : getNetworkFromId(networkId)
                   : 'Unknown Network'}
               </NetworkTitle>
+              {providerName && <ProviderName>{providerName}</ProviderName>}
             </UserAddress>
           </UserWalletToggler>
         </>

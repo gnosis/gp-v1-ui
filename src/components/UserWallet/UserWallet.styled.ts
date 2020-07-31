@@ -221,6 +221,12 @@ export const NetworkTitle = styled.div`
   white-space: nowrap;
 `
 
+export const ProviderName = styled.div`
+  position: absolute;
+  top: 100%;
+  font-size: 1rem;
+`
+
 export const MonospaceAddress = styled.div`
   margin: 0 0 1.6rem;
   font-family: var(--font-mono);
