@@ -9,7 +9,7 @@ import { dexPriceEstimatorApi } from 'api'
 import { getNetworkFromId, safeTokenName, logDebug } from 'utils'
 
 import useSafeState from 'hooks/useSafeState'
-import { useOwlAmountInQuoteUnits } from 'hooks/useOwlAmountInQuoteUnits'
+import { useOwlAmountInBaseTokenUnits } from 'hooks/useOwlAmountInBaseTokenUnits'
 
 import { TokenDetails, Network } from 'types'
 
@@ -73,10 +73,10 @@ export const Chart: React.FC<ChartProps> = props => {
   const [asks, setAsks] = useSafeState<PricePointDetails[]>([])
 
   // Get the price of X OWL in quote token
-  const { amount: amountInOwl, isLoading } = useOwlAmountInQuoteUnits(
+  const { amount: amountInOwl, isLoading } = useOwlAmountInBaseTokenUnits(
     ORDERBOOK_MINIMUM_OWL_VOLUME,
     networkId,
-    quoteToken,
+    baseToken,
   )
 
   const mountPoint = useRef<HTMLDivElement>(null)

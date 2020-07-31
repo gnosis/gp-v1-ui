@@ -10,23 +10,23 @@ import { logDebug } from 'utils'
 const OWL_TOKEN_ID = 0
 
 /**
- * Hook to query how much in quote token is equivalent to given amount in OWL
+ * Hook to query how much in base token is equivalent to given amount in OWL
  *
  * @param owlUnits How many OWL
  * @param networkId The network id
- * @param quoteToken Token to quote OWL in
+ * @param baseToken Token to base OWL in
  */
-export function useOwlAmountInQuoteUnits(
+export function useOwlAmountInBaseTokenUnits(
   owlUnits: number,
   networkId: number,
-  quoteToken: TokenDetails,
+  baseToken: TokenDetails,
 ): { amount: BigNumber | null; isLoading: boolean } {
   const [isLoading, setIsLoading] = useSafeState(false)
-  const [owlsInQuote, setOwlsInQuote] = useSafeState<BigNumber | null>(null)
+  const [owlsInBaseToken, setOwlsInBaseToken] = useSafeState<BigNumber | null>(null)
 
   const owlUnitsBigNumber = useMemo(() => new BigNumber(owlUnits), [owlUnits])
 
-  // Get the price of 1 OWL in quote token
+  // Get the price of 1 OWL in base token
   // But why quoting 1 OWL instead of `owlUnits` OWL ?
   // Because due to slippage, the price might be smaller.
   // We don't want that here, thus we multiply the result by given `owlUnits`
@@ -34,28 +34,28 @@ export function useOwlAmountInQuoteUnits(
     networkId,
     amount: '1',
     quoteTokenId: OWL_TOKEN_ID,
-    baseTokenId: quoteToken.id,
-    baseTokenDecimals: quoteToken.decimals,
+    baseTokenId: baseToken.id,
+    baseTokenDecimals: baseToken.decimals,
   })
 
   useEffect(() => {
     if (isPriceLoading) {
       setIsLoading(true)
-      setOwlsInQuote(null)
+      setOwlsInBaseToken(null)
       return
     }
 
     setIsLoading(false)
 
     if (priceEstimation) {
-      setOwlsInQuote(
-        quoteToken.id == OWL_TOKEN_ID
+      setOwlsInBaseToken(
+        baseToken.id == OWL_TOKEN_ID
           ? owlUnitsBigNumber // Quote token is OWL, 1 OWL in OWL == 1
           : priceEstimation.multipliedBy(owlUnitsBigNumber),
       )
-      logDebug(`[useOwlAmountInQuoteUnits] 1 OWL in ${quoteToken.symbol} => ${priceEstimation.toString(10)}`)
+      logDebug(`[useOwlAmountInBaseTokenUnits] 1 OWL in ${baseToken.symbol} => ${priceEstimation.toString(10)}`)
     }
-  }, [isPriceLoading, owlUnitsBigNumber, priceEstimation, setOwlsInQuote, setIsLoading, quoteToken])
+  }, [isPriceLoading, owlUnitsBigNumber, priceEstimation, setOwlsInBaseToken, setIsLoading, baseToken])
 
-  return { amount: owlsInQuote, isLoading }
+  return { amount: owlsInBaseToken, isLoading }
 }
