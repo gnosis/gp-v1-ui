@@ -513,9 +513,9 @@ const OrderValidity: React.FC<Props> = ({
               {ORDER_START_PRESETS.map(time => {
                 const props = {
                   onClick: (): void => handlePresetClick(validFromInputId, +time ? time : null),
-                  $selected: time
-                    ? presetSelected[validFromInputId]?.time === time
-                    : !presetSelected[validFromInputId]?.time,
+                  $selected:
+                    presetSelected[validFromInputId]?.time === time ||
+                    (time == '0' && !presetSelected[validFromInputId]?.time),
                 }
 
                 return (
@@ -528,7 +528,7 @@ const OrderValidity: React.FC<Props> = ({
                     type="button"
                     {...props}
                   >
-                    {formatOrderValidityTimes(time!, 'Now')}
+                    {formatOrderValidityTimes(+time!, 'Now')}
                   </TimePickerPreset>
                 )
               })}
@@ -552,9 +552,9 @@ const OrderValidity: React.FC<Props> = ({
               {ORDER_EXPIRE_PRESETS.map(time => {
                 const props = {
                   onClick: (): void => handlePresetClick(validUntilInputId, +time ? time : null),
-                  $selected: time
-                    ? presetSelected[validUntilInputId]?.time === time
-                    : !presetSelected[validUntilInputId]?.time,
+                  $selected:
+                    presetSelected[validUntilInputId]?.time === time ||
+                    (time == '0' && !presetSelected[validUntilInputId]?.time),
                 }
 
                 return (
@@ -567,7 +567,7 @@ const OrderValidity: React.FC<Props> = ({
                     type="button"
                     {...props}
                   >
-                    {formatOrderValidityTimes(time!, 'Never')}
+                    {formatOrderValidityTimes(+time!, 'Never')}
                   </TimePickerPreset>
                 )
               })}
