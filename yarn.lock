@@ -1320,11 +1320,6 @@
   resolved "https://registry.yarnpkg.com/@hookform/error-message/-/error-message-0.0.3.tgz#b6f11d5d9dfe17f0545aecec17fc3b1a9e891d70"
   integrity sha512-4ZCiyvwcV5GHGira0PnNCgSgEU9Tqo5Kx2yKpku7m943JYqyJfeKIO+zQg2W4CkNSSS905c9BVIo8+ntB08QYA==
 
-"@hookform/resolvers@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@hookform/resolvers/-/resolvers-0.0.6.tgz#f3e1d3a53861e82d5405ae08dd1879fba9ac9706"
-  integrity sha512-20ebJH7iHoGFxgQZkSepe3cx9UXMOwp8WHjyq2VbvPx+GfNktuCCH4g9WO/KQ0RZCGYHgTdbHZERfCfNNp5aow==
-
 "@hot-loader/react-dom@^16.11.0":
   version "16.13.0"
   resolved "https://registry.yarnpkg.com/@hot-loader/react-dom/-/react-dom-16.13.0.tgz#de245b42358110baf80aaf47a0592153d4047997"

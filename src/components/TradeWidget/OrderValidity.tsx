@@ -227,6 +227,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
         text-transform: capitalize;
         color: var(--color-text-primary);
         font-size: 1.2rem;
+        height: 2.4rem;
         width: 100%;
         padding: 0;
         box-sizing: border-box;

@@ -50,7 +50,7 @@ const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>>
               {...props}
               label="Set custom date"
               name={formValues.inputName}
-              error={Boolean(currentError)}
+              error={!!currentError}
               helperText={currentError && <FormInputError errorMessage={currentError.message} />}
             />
           )}
