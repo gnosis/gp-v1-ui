@@ -109,10 +109,10 @@ export const Chart: React.FC<ChartProps> = props => {
 
     // Axes config
     const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+    xAxis.title.text = `${networkDescription} Price (${baseTokenLabel}/${quoteTokenLabel})`
 
     const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    yAxis.title.text = baseTokenLabel
+    yAxis.title.text = `Volume (${baseTokenLabel})`
 
     // Tool tip
     const market = baseTokenLabel + '-' + quoteTokenLabel
