@@ -1,7 +1,6 @@
 import { PricePointDetails, ZoomValues } from 'components/OrderBookChart/types'
 import { logDebug } from 'utils'
-
-const ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE = 0.05 // %
+import { ORDER_BOOK_ZOOM_MULTIPLIER, ORDER_BOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE } from 'const'
 
 // --- Initial zoom calculation helper functions ---
 export function calcRange(minBid: number, maxBid: number, minAsk: number, maxAsk: number): number {
@@ -13,8 +12,7 @@ export function calcSpread(maxBid: number, minAsk: number): number {
 }
 
 export function calcZoomInterval(spread: number): number {
-  // TODO: magic number, move to const
-  return spread * 2
+  return spread * ORDER_BOOK_ZOOM_MULTIPLIER
 }
 
 export function calcLowerZoomX(minBid: number, maxBid: number, minAsk: number, zoomInterval: number): number {
@@ -109,7 +107,7 @@ export function calcInitialZoom(bids: PricePointDetails[], asks: PricePointDetai
     logDebug(`[Order Book] lowerZoomX: ${lowerZoomX.toFixed(15)}; upperZoomX: ${upperZoomX.toFixed(15)}`)
   } else if (bids.length > 0) {
     // There are no asks. Zoom on the right side of the graph
-    startX = 1 - ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE
+    startX = 1 - ORDER_BOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE
     endY = calcZoomY(
       bids,
       asks,
@@ -121,7 +119,7 @@ export function calcInitialZoom(bids: PricePointDetails[], asks: PricePointDetai
     )
   } else if (asks.length > 0) {
     // There are no bids. Zoom on the left side of the graph
-    endX = ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE
+    endX = ORDER_BOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE
     endY = calcZoomY(
       bids,
       asks,

@@ -13,14 +13,12 @@ import { useOwlAmountInBaseTokenUnits } from 'hooks/useOwlAmountInBaseTokenUnits
 
 import { TokenDetails, Network } from 'types'
 
+import { ORDER_BOOK_MINIMUM_OWL_VOLUME, ORDER_BOOK_REFRESH_INTERVAL, ORDER_BOOK_ZOOM_INCREMENT_PERCENTAGE } from 'const'
+
 import { Offer, PricePointDetails, ZoomValues } from 'components/OrderBookChart/types'
 import { calcInitialZoom, calcZoomY } from 'components/OrderBookChart/zoomFunctions'
 import { createChart, getZoomButtonContainer, setLabel } from 'components/OrderBookChart/chartFunctions'
 import { processData, _printOrderBook } from 'components/OrderBookChart/dataProcessingFunctions'
-
-const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
-const ORDERBOOK_MINIMUM_OWL_VOLUME = 10
-const ORDERBOOK_REFRESH_INTERVAL = 30000 // ms
 
 const Wrapper = styled.div`
   display: flex;
@@ -75,7 +73,7 @@ export const Chart: React.FC<ChartProps> = props => {
 
   // Get the price of X OWL in quote token
   const { amount: amountInOwl, isLoading } = useOwlAmountInBaseTokenUnits(
-    ORDERBOOK_MINIMUM_OWL_VOLUME,
+    ORDER_BOOK_MINIMUM_OWL_VOLUME,
     networkId,
     baseToken,
   )
@@ -183,7 +181,7 @@ export const Chart: React.FC<ChartProps> = props => {
     chart.dataSource.load()
 
     // Refresh data automatically
-    chart.dataSource.reloadFrequency = ORDERBOOK_REFRESH_INTERVAL
+    chart.dataSource.reloadFrequency = ORDER_BOOK_REFRESH_INTERVAL
   }, [baseToken, chart, hops, networkId, quoteToken, amountInOwl, isLoading, setInitialZoom, setBids, setAsks])
 
   // Creates zoom buttons once initialZoom has been calculated
@@ -217,7 +215,7 @@ export const Chart: React.FC<ChartProps> = props => {
         return
       }
       const diff = xAxis.end - xAxis.start
-      const delta = diff * ZOOM_INCREMENT_PERCENTAGE
+      const delta = diff * ORDER_BOOK_ZOOM_INCREMENT_PERCENTAGE
       xAxis.start += delta
       xAxis.end -= delta
 
@@ -233,7 +231,7 @@ export const Chart: React.FC<ChartProps> = props => {
         return
       }
       const diff = xAxis.end - xAxis.start
-      const delta = diff * ZOOM_INCREMENT_PERCENTAGE
+      const delta = diff * ORDER_BOOK_ZOOM_INCREMENT_PERCENTAGE
       xAxis.start = Math.max(xAxis.start - delta, 0)
       xAxis.end = Math.min(xAxis.end + delta, 1)
 

@@ -6,8 +6,7 @@ import { logDebug } from 'utils'
 import { TokenDetails } from 'types'
 
 import { RawPricePoint, PricePoint, Offer, PricePointDetails } from 'components/OrderBookChart/types'
-
-const SMALL_VOLUME_THRESHOLD = 0.01
+import { ORDER_BOOK_SMALL_VOLUME_THRESHOLD } from 'const'
 
 export function _toPricePoint(
   pricePoint: RawPricePoint,
@@ -60,7 +59,7 @@ export function processData(
 
   // Filter tiny orders
   const minimumOrderVolume = !owlPrice // is there a price returned?
-    ? new BigNumber(SMALL_VOLUME_THRESHOLD) // No, use default dumb threshold
+    ? new BigNumber(ORDER_BOOK_SMALL_VOLUME_THRESHOLD) // No, use default dumb threshold
     : owlPrice // Use returned price
 
   pricePoints = pricePoints
