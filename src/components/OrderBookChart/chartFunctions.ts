@@ -22,7 +22,7 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   xAxis.strictMinMax = true
   // How small we want the column separators be, in pixels
   // https://www.amcharts.com/docs/v4/reference/axisrendererx/#minGridDistance_property
-  xAxis.renderer.minGridDistance = 40
+  // xAxis.renderer.minGridDistance = 40
 
   // To start zoomed in when data loads
   // https://www.amcharts.com/docs/v4/reference/valueaxis/#keepSelection_property
