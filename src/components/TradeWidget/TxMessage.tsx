@@ -5,7 +5,7 @@ import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { TradeFormData } from '.'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { usePriceEstimationInOwl } from 'hooks/usePriceEstimation'
+import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
 import BigNumber from 'bignumber.js'
 import { ZERO_BIG_NUMBER } from 'const'
 
@@ -55,13 +55,23 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
     networkId,
   })
 
+  const { priceEstimation: wethPriceInOwl, isPriceLoading: isWETHPriceLoading } = useWETHPriceInOwl(networkId)
+
   const gasPrice = useGasPrice(DEFAULT_GAS_PRICE)
 
   return useMemo(() => {
-    if (isPriceLoading || priceEstimation === null || gasPrice === null) return { isLoading: true }
+    if (
+      isPriceLoading ||
+      isWETHPriceLoading ||
+      priceEstimation === null ||
+      wethPriceInOwl === null ||
+      gasPrice === null
+    )
+      return { isLoading: true }
     console.log('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
+    console.log('WETH price in OWL', wethPriceInOwl.toString(10))
 
-    const minTradableAmountInOwl = calcMinTradableAmountInOwl(gasPrice)
+    const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
 
     const minTradableAmountPerToken = minTradableAmountInOwl.dividedBy(priceEstimation)
     const isLowVolume = minTradableAmountPerToken.isGreaterThan(sellTokenAmount)
@@ -75,7 +85,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       gasPrice,
     })
     return { isLowVolume, difference, isLoading: false, minAmount: minTradableAmountPerToken }
-  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice])
+  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
 }
 
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {
