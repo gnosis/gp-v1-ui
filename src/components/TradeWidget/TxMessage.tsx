@@ -4,9 +4,11 @@ import { useFormContext } from 'react-hook-form'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { TradeFormData } from '.'
-import { displayTokenSymbolOrLink } from 'utils/display'
+import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
 import { HelpTooltip } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
+import { EllipsisText } from 'components/Layout'
+import { SwapIcon } from './SwapIcon'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -18,7 +20,10 @@ const TxMessageWrapper = styled.div`
 
   > div.message {
     div.sectionTitle {
-      margin: 0 0 0.2rem 0;
+      margin-bottom: 0.2rem;
+      &:not(:first-of-type) {
+        margin-top: 1rem;
+      }
     }
 
     div:not(.sectionTitle) {
@@ -42,8 +47,45 @@ const ReceiveTooltip: React.FC<{ amount: string; buyToken: string | React.ReactN
   </>
 )
 
+interface SimpleDisplayPriceProps extends TxMessageProps {
+  price: string
+  priceInverse: string
+}
+
+export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
+  price,
+  priceInverse,
+  sellToken,
+  receiveToken,
+}) => {
+  // true = direct
+  // false = indirect
+  const [showPrice, setShowPrice] = useSafeState(true)
+  const swapPrices = (): void => setShowPrice(state => !state)
+
+  const displaySellToken = displayTokenSymbolOrLink(sellToken)
+  const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
+  const sellTokenTitle = symbolOrAddress(sellToken)
+  const receiveTokenTitle = symbolOrAddress(receiveToken)
+
+  return (
+    <div>
+      <span>{showPrice ? priceInverse : price}</span>{' '}
+      <EllipsisText as="strong" title={showPrice ? sellTokenTitle : receiveTokenTitle}>
+        {showPrice ? displaySellToken : displayReceiveToken}
+      </EllipsisText>
+      <small> per </small>
+      <EllipsisText as="strong" title={showPrice ? receiveTokenTitle : sellTokenTitle}>
+        {showPrice ? displayReceiveToken : displaySellToken}
+      </EllipsisText>
+      <SwapIcon swap={swapPrices} />
+    </div>
+  )
+}
+
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken }) => {
   const [orderHelpVisible, showOrderHelp] = useSafeState(false)
+
   const { getValues } = useFormContext<TradeFormData>()
   const {
     price,
@@ -107,42 +149,39 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
         </div>
 
         {/* Prices */}
-        <p>
-          <div className="sectionTitle">
-            <strong>Prices</strong>
-          </div>
-          <div>
-            Direct: <span>{price}</span> <strong>{displayReceiveToken}</strong> per <strong>{displaySellToken}</strong>
-          </div>
-          <div>
-            Inverse: <span>{priceInverse}</span> <strong>{displaySellToken}</strong> per{' '}
-            <strong>{displayReceiveToken}</strong>
-          </div>
-        </p>
+
+        <div className="sectionTitle">
+          <strong>Prices</strong>
+        </div>
+        <SimpleDisplayPrice
+          receiveToken={receiveToken}
+          sellToken={sellToken}
+          price={price}
+          priceInverse={priceInverse}
+        />
 
         {/* Order Validity */}
-        <p>
-          <div className="sectionTitle">
-            <strong>Order Validity Details</strong>{' '}
-            <HelpTooltip
-              tooltip={
-                <>
-                  ⚠️ Learn more about the validity of orders in the Gnosis Protocol{' '}
-                  <a target="_blank" rel="noreferrer" href="https://docs.gnosis.io/protocol/docs/intro-batches/#orders">
-                    here
-                  </a>
-                  .
-                </>
-              }
-            />
-          </div>
-          <div>
-            Starts: <span>{formatTimeInHours(validFrom || 0, 'Now')}</span>
-          </div>
-          <div>
-            Expires: <span>{formatTimeInHours(validUntil || 0, 'Never')}</span>
-          </div>
-        </p>
+
+        <div className="sectionTitle">
+          <strong>Order Validity Details</strong>{' '}
+          <HelpTooltip
+            tooltip={
+              <>
+                ⚠️ Learn more about the validity of orders in the Gnosis Protocol{' '}
+                <a target="_blank" rel="noreferrer" href="https://docs.gnosis.io/protocol/docs/intro-batches/#orders">
+                  here
+                </a>
+                .
+              </>
+            }
+          />
+        </div>
+        <div>
+          Starts: <span>{formatTimeInHours(validFrom || 0, 'Now')}</span>
+        </div>
+        <div>
+          Expires: <span>{formatTimeInHours(validUntil || 0, 'Never')}</span>
+        </div>
       </div>
     </TxMessageWrapper>
   )
