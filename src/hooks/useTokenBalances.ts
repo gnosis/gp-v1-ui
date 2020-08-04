@@ -39,6 +39,7 @@ async function fetchBalancesForToken(
     pendingDeposit,
     pendingWithdraw,
     currentBatchId,
+    lastCreditBatchId,
     walletBalance,
     allowance,
   ] = await Promise.all([
@@ -46,6 +47,7 @@ async function fetchBalancesForToken(
     depositApi.getPendingDeposit({ userAddress, tokenAddress, networkId }),
     depositApi.getPendingWithdraw({ userAddress, tokenAddress, networkId }),
     depositApi.getCurrentBatchId(networkId),
+    depositApi.getLastCreditBatchId({ userAddress, tokenAddress, networkId }),
     erc20Api.balanceOf({ userAddress, tokenAddress, networkId }),
     erc20Api.allowance({ userAddress, tokenAddress, networkId, spenderAddress: contractAddress }),
   ])
@@ -57,7 +59,9 @@ async function fetchBalancesForToken(
     totalExchangeBalance: calculateTotalBalance(exchangeBalance, currentBatchId, pendingDeposit),
     pendingDeposit,
     pendingWithdraw,
-    claimable: pendingWithdraw.amount.isZero() ? false : pendingWithdraw.batchId < currentBatchId,
+    claimable: pendingWithdraw.amount.isZero()
+      ? false
+      : lastCreditBatchId !== currentBatchId && pendingWithdraw.batchId < currentBatchId,
     walletBalance,
     enabled: isTokenEnabled(allowance, token),
   }
