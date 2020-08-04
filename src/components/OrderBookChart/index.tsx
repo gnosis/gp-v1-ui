@@ -20,6 +20,7 @@ import { processData, _printOrderBook } from 'components/OrderBookChart/dataProc
 
 const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
 const ORDERBOOK_MINIMUM_OWL_VOLUME = 10
+const ORDERBOOK_REFRESH_INTERVAL = 30000 // ms
 
 const Wrapper = styled.div`
   display: flex;
@@ -134,6 +135,22 @@ export const Chart: React.FC<ChartProps> = props => {
     // Removing any previous event handler
     chart.dataSource.adapter.remove('parsedData')
 
+    // Store initialZoom in useEffect context
+    // Whenever we do automatic updates on the background
+    // this value will be set, avoiding re-setting the zoom
+    let initialZoom: ZoomValues | null = null
+
+    function adjustZoomOnFirstLoad(zoomValues: ZoomValues): void {
+      if (!initialZoom) {
+        initialZoom = zoomValues
+
+        // Setting initial zoom
+        xAxis.start = initialZoom.startX
+        xAxis.end = initialZoom.endX
+        yAxis.end = initialZoom.endY
+      }
+    }
+
     // Adding new event handler
     chart.dataSource.adapter.add('parsedData', data => {
       try {
@@ -147,11 +164,10 @@ export const Chart: React.FC<ChartProps> = props => {
 
         const initialZoom = calcInitialZoom(bids, asks)
 
+        // Zoom in, only if this is the first load of this token pair
+        adjustZoomOnFirstLoad(initialZoom)
+
         // Setting initial zoom
-        xAxis.start = initialZoom.startX
-        xAxis.end = initialZoom.endX
-        yAxis.end = initialZoom.endY
-        // Storing calculated zoom values
         setInitialZoom(initialZoom)
 
         _printOrderBook(pricePoints, baseToken, quoteToken)
@@ -165,6 +181,9 @@ export const Chart: React.FC<ChartProps> = props => {
 
     // Trigger data load re-using same chart
     chart.dataSource.load()
+
+    // Refresh data automatically
+    chart.dataSource.reloadFrequency = ORDERBOOK_REFRESH_INTERVAL
   }, [baseToken, chart, hops, networkId, quoteToken, amountInOwl, isLoading, setInitialZoom, setBids, setAsks])
 
   // Creates zoom buttons once initialZoom has been calculated
