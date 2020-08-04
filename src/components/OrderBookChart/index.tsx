@@ -130,24 +130,21 @@ export const Chart: React.FC<ChartProps> = props => {
       networkId,
     })
 
-    // Removing any previous event handler
-    chart.dataSource.adapter.remove('parsedData')
-
-    // Store initialZoom in useEffect context
-    // Whenever we do automatic updates on the background
-    // this value will be set, avoiding re-setting the zoom
-    let initialZoom: ZoomValues | null = null
+    let firstLoad = true
 
     function adjustZoomOnFirstLoad(zoomValues: ZoomValues): void {
-      if (!initialZoom) {
-        initialZoom = zoomValues
+      if (firstLoad) {
+        logDebug(`[Order Book] First load for token pair. Adjusting zoom to `, zoomValues)
+        xAxis.start = zoomValues.startX
+        xAxis.end = zoomValues.endX
+        yAxis.end = zoomValues.endY
 
-        // Setting initial zoom
-        xAxis.start = initialZoom.startX
-        xAxis.end = initialZoom.endX
-        yAxis.end = initialZoom.endY
+        firstLoad = false
       }
     }
+
+    // Removing any previous event handler
+    chart.dataSource.adapter.remove('parsedData')
 
     // Adding new event handler
     chart.dataSource.adapter.add('parsedData', data => {
