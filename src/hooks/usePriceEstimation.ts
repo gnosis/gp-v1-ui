@@ -137,3 +137,18 @@ export function usePriceEstimationInOwl(params: PriceInOwlParams): Result {
 
   return usePriceEstimationWithSlippage(getPriceParams)
 }
+
+const WETHestimationInOWLDefaults = {
+  ...estimationInOwlDefaults,
+  quoteTokenId: 1,
+  quoteTokenDecimals: 18,
+}
+
+export function useWETHPriceInOwl(networkId: number): Result {
+  const getPriceParams: SlippageParams = {
+    ...WETHestimationInOWLDefaults,
+    networkId,
+  }
+
+  return usePriceEstimationWithSlippage(getPriceParams)
+}
