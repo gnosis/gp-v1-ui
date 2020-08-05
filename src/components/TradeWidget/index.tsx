@@ -1008,7 +1008,9 @@ const TradeWidget: React.FC = () => {
           <p>This order might be partially filled.</p>
           <ButtonWrapper
             onConfirm={onConfirm}
-            message={(): React.ReactNode => <TxMessage sellToken={sellToken} receiveToken={receiveToken} />}
+            message={(): React.ReactNode => (
+              <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
+            )}
           >
             <SubmitButton
               data-text="This order might be partially filled."
