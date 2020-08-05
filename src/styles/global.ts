@@ -1138,23 +1138,87 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body > div.MuiDialog-root { 
+    h3, h4, h5, h6, span.MuiTypography-overline {
+      color: var(--color-text-CTA);
+    }
+
+    svg.MuiSvgIcon-root {
+      fill: var(--color-text-CTA);
+    }
+
     span {
-      font-size: 1.05rem;
+      color: var(--color-text-primary);
+      font-size: 1.1rem;
+
+      &.MuiTabs-indicator {
+        background-color: var(--color-background-pageWrapper);
+      }
+      
+      &.MuiPickersClockNumber-clockNumberSelected {
+        color: var(--color-text-CTA);
+      }
+    }
+
+    button {
+      &.Mui-selected.MuiTab-fullWidth:hover {
+        background: var(--color-background-modali);
+      }
+
+      &.MuiButtonBase-root.MuiPickersDay-day.MuiPickersDay-dayDisabled.MuiPickersDay-dayWithMargin {
+        span {
+          color: var(--color-background-input);
+        }
+      }
+
+      &.MuiPickersDay-dayWithMargin:not(.MuiPickersDay-daySelected) {
+        background-color: var(--color-background-pageWrapper);
+
+        &:hover {
+          background-color: var(--color-background-balance-button-hover);
+
+          span.MuiPickersDay-dayLabel {
+            color: var(--color-background-pageWrapper);
+          }
+        }
+      }
+
+      &.MuiPickersDay-daySelected,
+      &.MuiPickersDay-day:focus {
+        background-color: var(--color-background-balance-button-hover);
+
+        span.MuiPickersDay-dayLabel {
+          color: var(--color-background-pageWrapper);
+        }
+      }
+      
+
+      &.MuiPickersArrowSwitcher-iconButton {
+        background-color: var(--color-background-modali);
+      }
+    }
+
+    div {
+      & {
+        .MuiPickersClock-pin,
+        .MuiPickersClockPointer-pointer,
+        .MuiPickersClockPointer-thumb.MuiPickersClockPointer-noPoint {
+          background-color: var(--color-background-CTA);
+          border-color: var(--color-background-CTA);
+        }
+
+      }
+
+      & {
+        .MuiPickersModalDialog-dialogRoot {
+          background: var(--color-background-pageWrapper);
+        }
+      }
     }
 
     .MuiToolbar-root.MuiToolbar-regular.MuiPickersToolbar-toolbar.MuiPickersDateTimePickerToolbar-toolbar.MuiToolbar-gutters, 
     div.MuiPaper-root.MuiPaper-elevation1.MuiPaper-rounded > div.MuiTabs-root.MuiPickerDTTabs-tabs {
-      background-color: var(--color-background-button-hover);  
-    }
-
-    span.PrivateTabIndicator-root-1.PrivateTabIndicator-colorSecondary-3.MuiTabs-indicator,
-    span.PrivateTabIndicator-root-5.PrivateTabIndicator-colorSecondary-7.MuiTabs-indicator, 
-    span.PrivateTabIndicator-root-9.PrivateTabIndicator-colorSecondary-11.MuiTabs-indicator {
+      // background-color: var(--color-background-button-hover);  
       background-color: var(--color-background-CTA);
-    }
-
-    span.MuiButton-label {
-      color: var(--color-text-primary);
     }
   }
 `
