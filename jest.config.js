@@ -1,4 +1,7 @@
-const config = require('./src/loadConfig')(true)
+const loadConfig = require('./src/loadConfig')
+const overrideEnvConfig = require('./src/overrideEnvConfig')
+
+const config = overrideEnvConfig(loadConfig(true))
 
 module.exports = {
   roots: ['<rootDir>/test'],
