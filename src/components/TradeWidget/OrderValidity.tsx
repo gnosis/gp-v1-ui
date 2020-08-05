@@ -107,7 +107,7 @@ const Wrapper = styled.div`
 
       > div {
         display: grid;
-        grid-template-columns: 9rem auto;
+        grid-template-columns: 9rem min-content auto;
         width: 100%;
 
         > b {
