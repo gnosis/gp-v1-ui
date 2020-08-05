@@ -27,8 +27,8 @@ import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
 // hooks
 import useSafeState from 'hooks/useSafeState'
 
-const VALID_UNTIL_DEFAULT = '1440'
-const VALID_FROM_DEFAULT = '30'
+const VALID_UNTIL_DEFAULT: TradeFormData['validUntil'] = '1440'
+const VALID_FROM_DEFAULT: TradeFormData['validFrom'] = null
 // now, 30min, 60min, 24h
 const ORDER_START_PRESETS = ['0', '10', '30', '60', '1440']
 // 5min, 30min, 24h, 7d
@@ -339,11 +339,19 @@ const OrderValidity: React.FC<Props> = ({
   }>(() => ({
     [validFromInputId]: {
       time: isAsap ? null : VALID_FROM_DEFAULT,
-      batchId: minutesToRelativeBatchId(+VALID_FROM_DEFAULT),
+      batchId: isAsap
+        ? null
+        : VALID_FROM_DEFAULT
+        ? minutesToRelativeBatchId(+VALID_FROM_DEFAULT)
+        : +VALID_FROM_DEFAULT!,
     },
     [validUntilInputId]: {
       time: isUnlimited ? null : VALID_UNTIL_DEFAULT,
-      batchId: minutesToRelativeBatchId(+VALID_UNTIL_DEFAULT),
+      batchId: isUnlimited
+        ? null
+        : VALID_UNTIL_DEFAULT
+        ? minutesToRelativeBatchId(+VALID_UNTIL_DEFAULT)
+        : +VALID_UNTIL_DEFAULT,
     },
   }))
 
@@ -455,7 +463,6 @@ const OrderValidity: React.FC<Props> = ({
       },
     }))
   }
-
   return (
     <Wrapper>
       <div>
