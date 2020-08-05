@@ -1,4 +1,5 @@
 import { BigNumber } from 'bignumber.js'
+import { logDebug } from './miscellaneous'
 
 export const DEFAULT_GAS_PRICE = 40e9 // 40 Gwei
 export const SUBSIDIZE_FACTOR = 10
@@ -24,7 +25,7 @@ export const calcMinTradableAmountInOwl = ({
   const minEconocmicalViableFeeInOwl = ethPriceInOwl
     .multipliedBy(TRADE_TX_GASLIMIT * gasPrice)
     .dividedBy(OWL_DECIMAL_UNITS)
-  console.log('MIN_ECONOMICAL_VIABLE_FEE_IN_OWL', minEconocmicalViableFeeInOwl.toString(10))
+  logDebug('MIN_ECONOMICAL_VIABLE_FEE_IN_OWL', minEconocmicalViableFeeInOwl.toString(10))
 
   const minFee = minEconocmicalViableFeeInOwl.multipliedBy(BUFFER_MULTIPLIER).dividedBy(SUBSIDIZE_FACTOR)
   return minFee.multipliedBy(FEE_FACTOR * SETTLEMENT_FACTOR)

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { formatTimeInHours } from 'utils'
+import { formatTimeInHours, logDebug } from 'utils'
 import { useFormContext } from 'react-hook-form'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
@@ -68,8 +68,8 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       gasPrice === null
     )
       return { isLoading: true }
-    console.log('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
-    console.log('WETH price in OWL', wethPriceInOwl.toString(10))
+    logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
+    logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
 
     const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
 
@@ -78,7 +78,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
     const difference = isLowVolume ? minTradableAmountPerToken.minus(sellTokenAmount) : ZERO_BIG_NUMBER
 
-    console.log('{ isLowVolume, difference, minAmount, gasPrice }', {
+    logDebug({
       isLowVolume,
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
@@ -127,8 +127,8 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
       {!isLoading && isLowVolume && (
         <Warning>
           <span>
-            This is a low volume order. Please keep in mind that solvers might not include your order if it does not generate
-            enough fee to pay their running costs. Learn more [here]
+            This is a low volume order. Please keep in mind that solvers might not include your order if it does not
+            generate enough fee to pay their running costs. Learn more [here]
           </span>
           <img className="alert" src={alertIcon} />
         </Warning>
