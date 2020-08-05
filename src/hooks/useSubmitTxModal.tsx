@@ -17,7 +17,7 @@ export const useSubmitTxModal = ({ onCancel, onConfirm, message }: ClickWrapperP
   const [modalProps, toggleModal] = useModali({
     animated: true,
     centered: true,
-    title: 'You are about to submit an Order',
+    title: 'Order Confirmation',
     // Function tosave on TxMessage renders
     message: isShown.current && (typeof message === 'function' ? message() : message),
     buttons: [

@@ -67,6 +67,19 @@ import { updateTradeState } from 'reducers-actions/trade'
 import { DevTool } from 'HookFormDevtool'
 import { ButtonWrapper } from 'hooks/useSubmitTxModal'
 import { TxMessage } from './TxMessage'
+import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
+
+const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
+  padding: 0;
+
+  .intro-text {
+    margin: 0 0 1rem 0;
+  }
+
+  .message {
+    margin: 1rem;
+  }
+`
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
@@ -1009,7 +1022,9 @@ const TradeWidget: React.FC = () => {
           <ButtonWrapper
             onConfirm={onConfirm}
             message={(): React.ReactNode => (
-              <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
+              <ConfirmationModalWrapper>
+                <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
+              </ConfirmationModalWrapper>
             )}
           >
             <SubmitButton
