@@ -13,7 +13,7 @@ import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 import { composeProvider } from './composeProvider'
-import fetchGasPriceFactory from 'api/gasStation'
+import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
 
@@ -53,7 +53,7 @@ export interface WalletApi {
   getProviderInfo(): ProviderInfo
   blockchainState: BlockchainUpdatePrompt
   userPrintAsync: Promise<string>
-  getGasPrice(): Promise<number | null>
+  getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null>
 }
 
 export interface WalletInfo {
@@ -462,10 +462,10 @@ export class WalletApiImpl implements WalletApi {
     await this._notifyListeners()
   }
 
-  public async getGasPrice(): Promise<number | null> {
+  public async getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null> {
     // this never errors
     // returns undefined if unable to fetch
-    let gasPrice = await this._fetchGasPrice()
+    let gasPrice = await this._fetchGasPrice(gasPriceLevel)
 
     if (gasPrice) return +gasPrice
     try {
