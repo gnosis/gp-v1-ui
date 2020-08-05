@@ -23,7 +23,7 @@ const Wrapper = styled.div`
     margin: 0 0 1rem;
     font-size: 1.5rem;
     box-sizing: border-box;
-    display: block;
+    display: inline-block;
   }
 
   button {
@@ -60,6 +60,19 @@ const Wrapper = styled.div`
   }
 `
 
+const OnchainOrderbookTooltip = (
+  <HelpTooltipContainer>
+    Based on existing Onchain orders, taking into account possible ring trades. <br />
+    Price is affected by sell amount. <br />
+    Higher amounts might yield worse prices, or no price at all, considering what&apos;s available in the current batch.
+    <br />
+    <a href="https://docs.gnosis.io/protocol/docs/introduction1/" rel="noopener noreferrer" target="_blank">
+      More details
+    </a>
+    .
+  </HelpTooltipContainer>
+)
+
 interface PriceEstimationsProps {
   networkId: number
   baseToken: TokenDetails
@@ -92,6 +105,7 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
   return (
     <Wrapper>
       <strong>Price suggestions</strong>
+      <small> - Onchain Orderbook Prices</small> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
       <div className="container">
         <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
         {amount && +amount != 0 && +amount != 1 && (
@@ -109,19 +123,6 @@ interface OnchainOrderbookPriceEstimationProps extends Omit<PriceEstimationsProp
 function formatPriceToPrecision(price: BigNumber): string {
   return price.toFixed(PRICE_ESTIMATION_PRECISION)
 }
-
-const OnchainOrderbookTooltip = (
-  <HelpTooltipContainer>
-    Based on existing Onchain orders, taking into account possible ring trades. <br />
-    Price is affected by sell amount. <br />
-    Higher amounts might yield worse prices, or no price at all, considering what&apos;s available in the current batch.
-    <br />
-    <a href="https://docs.gnosis.io/protocol/docs/introduction1/" rel="noopener noreferrer" target="_blank">
-      More details
-    </a>
-    .
-  </HelpTooltipContainer>
-)
 
 const HighlightedText = styled.span`
   text-decoration-line: underline;
@@ -160,8 +161,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   return (
     <>
       <span>
-        <HighlightedText>Onchain orderbook price</HighlightedText> <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for
-        selling{' '}
+        <HighlightedText>Onchain price</HighlightedText> for selling{' '}
         <strong>
           {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
