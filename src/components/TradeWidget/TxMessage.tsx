@@ -1,5 +1,5 @@
-import React from 'react'
-import { formatTimeInHours } from 'utils'
+import React, { useMemo } from 'react'
+import { formatTimeInHours, logDebug } from 'utils'
 import { useFormContext } from 'react-hook-form'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
@@ -9,10 +9,18 @@ import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
 import { EllipsisText } from 'components/Layout'
 import { SwapIcon } from './SwapIcon'
+import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
+import BigNumber from 'bignumber.js'
+import { ZERO_BIG_NUMBER } from 'const'
+
+import alertIcon from 'assets/img/alert.svg'
+import { useGasPrice } from 'hooks/useGasPrice'
+import { DEFAULT_GAS_PRICE, calcMinTradableAmountInOwl } from 'utils/minFee'
 
 interface TxMessageProps {
   sellToken: TokenDetails
   receiveToken: TokenDetails
+  networkId: number
 }
 
 const TxMessageWrapper = styled.div`
@@ -62,7 +70,7 @@ const OrderValidityTooltip: React.FC = () => (
   </HelpTooltipContainer>
 )
 
-interface SimpleDisplayPriceProps extends TxMessageProps {
+interface SimpleDisplayPriceProps extends Omit<TxMessageProps, 'networkId'> {
   price: string
   priceInverse: string
 }
@@ -98,9 +106,76 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   )
 }
 
-export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken }) => {
-  const [orderHelpVisible, showOrderHelp] = useSafeState(false)
+const Warning = styled.p`
+  background: beige;
+  padding: 0.5em;
+  border-radius: 0.3em;
+  display: flex;
+  border: 1px solid gray;
+  font-weight: bold;
 
+  .alert {
+    min-width: 2.5em;
+  }
+`
+
+interface LowVolumeParams {
+  sellToken: TokenDetails
+  networkId: number
+  sellTokenAmount: string
+}
+
+interface LowVolumeResult {
+  isLoading: boolean
+  isLowVolume?: boolean
+  difference?: BigNumber
+  minAmount?: BigNumber
+}
+
+const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolumeParams): LowVolumeResult => {
+  const { priceEstimation, isPriceLoading } = usePriceEstimationInOwl({
+    tokenId: sellToken.id,
+    tokenDecimals: sellToken.decimals,
+    networkId,
+  })
+
+  const { priceEstimation: wethPriceInOwl, isPriceLoading: isWETHPriceLoading } = useWETHPriceInOwl(networkId)
+
+  const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
+
+  return useMemo(() => {
+    if (
+      isPriceLoading ||
+      isWETHPriceLoading ||
+      priceEstimation === null ||
+      wethPriceInOwl === null ||
+      gasPrice === null
+    ) {
+      return { isLoading: true }
+    }
+
+    logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
+    logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
+
+    const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
+
+    const minTradableAmountPerToken = minTradableAmountInOwl.dividedBy(priceEstimation)
+    const isLowVolume = minTradableAmountPerToken.isGreaterThan(sellTokenAmount)
+
+    const difference = isLowVolume ? minTradableAmountPerToken.minus(sellTokenAmount) : ZERO_BIG_NUMBER
+
+    logDebug({
+      isLowVolume,
+      difference: difference.toString(10),
+      minAmount: minTradableAmountPerToken.toString(10),
+      gasPrice,
+    })
+    return { isLowVolume, difference, isLoading: false, minAmount: minTradableAmountPerToken }
+  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
+}
+
+export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {
+  const [orderHelpVisible, showOrderHelp] = useSafeState(false)
   const { getValues } = useFormContext<TradeFormData>()
   const {
     price,
@@ -112,6 +187,8 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
   } = getValues()
   const displaySellToken = displayTokenSymbolOrLink(sellToken)
   const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
+
+  const { isLoading, isLowVolume } = useLowVolumeAmount({ sellToken, networkId, sellTokenAmount })
 
   return (
     <TxMessageWrapper>
@@ -187,6 +264,15 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
           Expires: <span>{formatTimeInHours(validUntil || 0, 'Never')}</span>
         </div>
       </div>
+      {!isLoading && isLowVolume && (
+        <Warning>
+          <span>
+            This is a low volume order. Please keep in mind that solvers might not include your order if it does not
+            generate enough fee to pay their running costs. Learn more [here]
+          </span>
+          <img className="alert" src={alertIcon} />
+        </Warning>
+      )}
     </TxMessageWrapper>
   )
 }

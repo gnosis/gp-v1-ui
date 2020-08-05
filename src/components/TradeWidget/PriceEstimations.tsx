@@ -26,6 +26,10 @@ const Wrapper = styled.div`
     display: block;
   }
 
+  button {
+    border-radius: 1rem;
+  }
+
   .container {
     display: grid;
     grid-template-columns: 4fr 1fr 1.5fr;
