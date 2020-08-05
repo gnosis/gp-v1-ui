@@ -66,8 +66,10 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       priceEstimation === null ||
       wethPriceInOwl === null ||
       gasPrice === null
-    )
+    ) {
       return { isLoading: true }
+    }
+
     logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
     logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
 
