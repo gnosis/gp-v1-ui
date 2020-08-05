@@ -5,7 +5,7 @@ import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { TradeFormData } from '.'
 import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
-import { HelpTooltip } from 'components/Tooltip'
+import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import useSafeState from 'hooks/useSafeState'
 import { EllipsisText } from 'components/Layout'
 import { SwapIcon } from './SwapIcon'
@@ -30,13 +30,18 @@ const TxMessageWrapper = styled.div`
       margin-left: 1rem;
     }
   }
+  a.showMoreAnchor {
+    color: rgb(33, 141, 255);
+    font-size: 1.2rem;
+    margin-left: 0.2rem;
+  }
 `
 const ReceiveTooltip: React.FC<{ amount: string; buyToken: string | React.ReactNode; linkURL?: string }> = ({
   amount,
   linkURL = 'https://docs.gnosis.io/protocol/',
   buyToken,
 }) => (
-  <>
+  <HelpTooltipContainer>
     You will receive at least {amount} {buyToken} if your order is completely executed. <br />
     ⚠️ Please remember that your order can be also partially executed, or not executed at all. <br />
     Read more about how Gnosis Protocol works{' '}
@@ -44,7 +49,17 @@ const ReceiveTooltip: React.FC<{ amount: string; buyToken: string | React.ReactN
       here
     </a>
     .
-  </>
+  </HelpTooltipContainer>
+)
+
+const OrderValidityTooltip: React.FC = () => (
+  <HelpTooltipContainer>
+    ⚠️ Learn more about the validity of orders in the Gnosis Protocol{' '}
+    <a target="_blank" rel="noreferrer" href="https://docs.gnosis.io/protocol/docs/intro-batches/#orders">
+      here
+    </a>
+    .
+  </HelpTooltipContainer>
 )
 
 interface SimpleDisplayPriceProps extends TxMessageProps {
@@ -105,15 +120,15 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
       </div>
       <p>
         How is the order executed?
-        <a onClick={(): void => showOrderHelp(!orderHelpVisible)}>
+        <a className="showMoreAnchor" onClick={(): void => showOrderHelp(!orderHelpVisible)}>
           {orderHelpVisible ? '[-] Show less...' : '[+] Show more...'}
         </a>
         {orderHelpVisible && (
           <>
             <ul>
               <li>
-                After you confirm and send the ethereum transaction, your order will be active during the expecified
-                validity time.
+                After confirming and sending the transaction, your order will be active during the specified validity
+                time.
               </li>
               <li>
                 During that time, it will be matched against other orders as long as there is an overlap in the limit
@@ -163,18 +178,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken })
         {/* Order Validity */}
 
         <div className="sectionTitle">
-          <strong>Order Validity Details</strong>{' '}
-          <HelpTooltip
-            tooltip={
-              <>
-                ⚠️ Learn more about the validity of orders in the Gnosis Protocol{' '}
-                <a target="_blank" rel="noreferrer" href="https://docs.gnosis.io/protocol/docs/intro-batches/#orders">
-                  here
-                </a>
-                .
-              </>
-            }
-          />
+          <strong>Order Validity Details</strong> <HelpTooltip tooltip={<OrderValidityTooltip />} />
         </div>
         <div>
           Starts: <span>{formatTimeInHours(validFrom || 0, 'Now')}</span>
