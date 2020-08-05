@@ -476,7 +476,7 @@ const OrderValidity: React.FC<Props> = ({
                   : formatDateFromBatchId(presetSelected[validFromInputId].batchId!)
                 : 'Now'}
             </b>
-            <HelpTooltip tooltip={OrderStartsTooltip} />
+            {!validFromBatchId && <HelpTooltip tooltip={OrderStartsTooltip} />}
           </div>
           <div>
             Order expires:{' '}
