@@ -30,7 +30,7 @@ import useSafeState from 'hooks/useSafeState'
 const VALID_UNTIL_DEFAULT: TradeFormData['validUntil'] = '1440'
 const VALID_FROM_DEFAULT: TradeFormData['validFrom'] = null
 // now, 30min, 60min, 24h
-const ORDER_START_PRESETS = ['0', '10', '30', '60', '1440']
+const ORDER_START_PRESETS = ['0', '30', '60', '1440']
 // 5min, 30min, 24h, 7d
 const ORDER_EXPIRE_PRESETS = ['5', '30', '1440', '10080', '0']
 
@@ -369,34 +369,8 @@ const OrderValidity: React.FC<Props> = ({
   // const validUntilClassName = validUntilError ? 'error' : overMax.gt(ZERO) ? 'warning' : ''
 
   const handleShowConfig = useCallback((): void => {
-    // if (showOrderConfig) {
-    //   // sanitize inputs as multiples of 5
-    //   const sanitizedFromValue = makeMultipleOf(5, validFromInputValue)
-    //   const sanitizedUntilValue = makeMultipleOf(5, validUntilInputValue)
-
-    //   batchedUpdates(() => {
-    //     if (!sanitizedFromValue || !sanitizedUntilValue) {
-    //       !sanitizedFromValue
-    //         ? (setAsap(true), setValue(validFromInputId, undefined, { shouldValidate: true }))
-    //         : setValue(validFromInputId, sanitizedFromValue.toString(), { shouldValidate: true })
-    //       !sanitizedUntilValue
-    //         ? (setUnlimited(true), setValue(validUntilInputId, undefined, { shouldValidate: true }))
-    //         : setValue(validUntilInputId, sanitizedUntilValue.toString(), { shouldValidate: true })
-    //     }
-    //   })
-    // }
-
     setShowOrderConfig(showOrderConfig => !showOrderConfig)
-  }, [
-    setShowOrderConfig,
-    // setAsap,
-    // setUnlimited,
-    // setValue,
-    // validFromInputId,
-    // validFromInputValue,
-    // validUntilInputId,
-    // validUntilInputValue,
-  ])
+  }, [setShowOrderConfig])
 
   const onModalEnter: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
     (e): void => {
@@ -537,9 +511,10 @@ const OrderValidity: React.FC<Props> = ({
                   errors: validFromError,
                   inputName: validFromInputId,
                 }}
-                customOnChange={(e): void =>
-                  handlePresetClick(validFromInputId, makeMultipleOf(5, dateToBatchId(e!)).toString(), true)
-                }
+                customOnChange={(e): void => {
+                  const dateMs = Date.parse(e.toString())
+                  handlePresetClick(validFromInputId, dateToBatchId(makeMultipleOf(5, dateMs)).toString(), true)
+                }}
               />
             </DateTimePickerWrapper>
           </OrderValidityBox>
@@ -576,9 +551,10 @@ const OrderValidity: React.FC<Props> = ({
                   errors: validUntilError,
                   inputName: validUntilInputId,
                 }}
-                customOnChange={(e): void =>
-                  handlePresetClick(validUntilInputId, makeMultipleOf(5, dateToBatchId(e!)).toString(), true)
-                }
+                customOnChange={(e): void => {
+                  const dateMs = Date.parse(e.toString())
+                  handlePresetClick(validUntilInputId, dateToBatchId(makeMultipleOf(5, dateMs)).toString(), true)
+                }}
               />
             </DateTimePickerWrapper>
           </OrderValidityBox>
