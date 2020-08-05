@@ -7,6 +7,7 @@ import { Control, UseFormMethods, FieldError, Controller } from 'react-hook-form
 
 import { TradeFormData } from './TradeWidget'
 import { FormInputError } from './TradeWidget/FormMessage'
+import { BATCH_TIME, BATCH_TIME_IN_MS } from 'const'
 
 interface DateTimePickerControlProps<T> extends BaseDateTimePickerProps {
   control: Control<T>
@@ -23,7 +24,7 @@ interface DateTimePickerControlProps<T> extends BaseDateTimePickerProps {
 const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>> = ({
   control,
   formValues,
-  minDate = Date.now(),
+  minDateTime = Date.now() + BATCH_TIME_IN_MS * 2,
   customOnChange,
   ...restProps
 }) => {
@@ -42,9 +43,12 @@ const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>>
           dateAdapter={memoizedDateAdapter}
           value={formValues.value}
           onChange={customOnChange}
+          disablePast
+          showTodayButton
+          minutesStep={BATCH_TIME / 60}
           inputFormat="yyyy/MM/dd HH:mm a"
           ampm={false}
-          minDate={minDate}
+          minDateTime={minDateTime}
           renderInput={(props): JSX.Element => (
             <TextField
               {...props}
