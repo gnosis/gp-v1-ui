@@ -1136,6 +1136,27 @@ const GlobalStyles = createGlobalStyle`
   body.modali-open .modali-body-style {
     padding: 0;
   }
+
+  body > div.MuiDialog-root { 
+    span {
+      font-size: 1.05rem;
+    }
+
+    .MuiToolbar-root.MuiToolbar-regular.MuiPickersToolbar-toolbar.MuiPickersDateTimePickerToolbar-toolbar.MuiToolbar-gutters, 
+    div.MuiPaper-root.MuiPaper-elevation1.MuiPaper-rounded > div.MuiTabs-root.MuiPickerDTTabs-tabs {
+      background-color: var(--color-background-button-hover);  
+    }
+
+    span.PrivateTabIndicator-root-1.PrivateTabIndicator-colorSecondary-3.MuiTabs-indicator,
+    span.PrivateTabIndicator-root-5.PrivateTabIndicator-colorSecondary-7.MuiTabs-indicator, 
+    span.PrivateTabIndicator-root-9.PrivateTabIndicator-colorSecondary-11.MuiTabs-indicator {
+      background-color: var(--color-background-CTA);
+    }
+
+    span.MuiButton-label {
+      color: var(--color-text-primary);
+    }
+  }
 `
 
 export default GlobalStyles
