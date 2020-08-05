@@ -57,7 +57,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
   const { priceEstimation: wethPriceInOwl, isPriceLoading: isWETHPriceLoading } = useWETHPriceInOwl(networkId)
 
-  const gasPrice = useGasPrice(DEFAULT_GAS_PRICE)
+  const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
   return useMemo(() => {
     if (
