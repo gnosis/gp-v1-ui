@@ -21,11 +21,11 @@ export const calcMinTradableAmountInOwl = ({
   gasPrice,
   ethPriceInOwl,
 }: CalcMinTradableAmountInOwlParams): BigNumber => {
-  const MIN_ECONOMICAL_VIABLE_FEE_IN_OWL = ethPriceInOwl
+  const minEconocmicalViableFeeInOwl = ethPriceInOwl
     .multipliedBy(TRADE_TX_GASLIMIT * gasPrice)
     .dividedBy(OWL_DECIMAL_UNITS)
-  console.log('MIN_ECONOMICAL_VIABLE_FEE_IN_OWL', MIN_ECONOMICAL_VIABLE_FEE_IN_OWL.toString(10))
+  console.log('MIN_ECONOMICAL_VIABLE_FEE_IN_OWL', minEconocmicalViableFeeInOwl.toString(10))
 
-  const MIN_FEE = MIN_ECONOMICAL_VIABLE_FEE_IN_OWL.multipliedBy(BUFFER_MULTIPLIER).dividedBy(SUBSIDIZE_FACTOR)
-  return MIN_FEE.multipliedBy(FEE_FACTOR * SETTLEMENT_FACTOR)
+  const minFee = minEconocmicalViableFeeInOwl.multipliedBy(BUFFER_MULTIPLIER).dividedBy(SUBSIDIZE_FACTOR)
+  return minFee.multipliedBy(FEE_FACTOR * SETTLEMENT_FACTOR)
 }
