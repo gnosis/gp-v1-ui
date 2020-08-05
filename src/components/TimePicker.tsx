@@ -67,14 +67,14 @@ const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>>
 const DateTimePickerWrapper = styled.div<{ $customDateSelected?: boolean }>`
   position: relative;
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   justify-content: center;
   align-items: center;
-  height: 4rem;
+  height: auto;
 
   > .MuiFormControl-root,
   .MuiTextField-root {
-    min-width: 12rem;
+    min-width: max-content;
   }
 
   > .MuiFormControl-root {
@@ -82,6 +82,16 @@ const DateTimePickerWrapper = styled.div<{ $customDateSelected?: boolean }>`
     > .MuiInputLabel-formControl {
       color: inherit;
       font-weight: inherit;
+      text-align: center;
+    }
+
+    > .MuiInput-underline {
+      &:before {
+        border-color: var(--color-background-button-hover);
+      }
+      &:after {
+        border-color: transparent;
+      }
     }
   }
 
@@ -90,7 +100,7 @@ const DateTimePickerWrapper = styled.div<{ $customDateSelected?: boolean }>`
     `
       > .MuiFormControl-root {
         // when selected only
-        background: var(--color-background-highlighted);
+        background: var(--color-background-validation-warning);
         padding: 0.6rem 0.6rem 0 0.6rem;
         border-bottom: 0.3rem solid var(--color-background-CTA);
 
@@ -100,6 +110,13 @@ const DateTimePickerWrapper = styled.div<{ $customDateSelected?: boolean }>`
           // only when selected
           top: 0.6rem;
           left: 0.6rem;
+
+        }
+
+        > .MuiInput-formControl {
+          > input {
+            font-weight: bold;
+          }
         }
 
         > .MuiInput-underline:before, > .MuiInput-underline:after {

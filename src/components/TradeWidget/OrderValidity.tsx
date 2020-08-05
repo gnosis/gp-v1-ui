@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useCallback, Dispatch, SetStateAction, useEffect } from 'react'
+import React, { useCallback, Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 
@@ -107,12 +107,14 @@ const Wrapper = styled.div`
 
       > div {
         display: grid;
-        grid-template-columns: 9rem min-content auto;
+        grid-template-columns: 9rem auto;
         width: 100%;
 
         > b {
           color: #218dff;
           margin: 0 0.4rem;
+          overflow: hidden;
+          text-overflow: ellipsis;
           white-space: nowrap;
         }
       }
@@ -148,6 +150,35 @@ const OrderValidityBox = styled.div`
   }
 `
 
+const TimePickerPreset = styled.button<{ $selected?: boolean }>`
+  height: 100%;
+  width: 100%;
+  padding: 0;
+  margin: 0 0.85rem;
+
+  color: var(--color-text-primary);
+  font-size: 1rem;
+  font-weight: 100;
+  background: var(--color-background-pageWrapper);
+
+  border: 0.1rem solid var(--color-background-CTA);
+  border-radius: 0.6rem;
+
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+
+  ${({ $selected = false }): string | false =>
+    $selected &&
+    `{
+    background: var(--color-background-balance-button-hover);
+    color: var(--color-text-button-hover);
+  }`}
+
+  &:focus {
+    border-color: var(--color-background-CTA);
+  }
+`
+
 const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   visibility: ${({ $visible }): string => ($visible ? 'visible' : 'hidden')};
   position: fixed;
@@ -160,9 +191,9 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   color: var(--color-text-primary);
   z-index: 3;
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
-  max-width: 50rem;
+  max-width: 72rem;
   min-width: 30rem;
-  height: 30rem;
+  height: 36rem;
   padding: 0 0 2.4rem;
   border-radius: 0.8rem;
   display: flex;
@@ -172,7 +203,11 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   align-content: flex-start;
 
   @media ${MEDIA.mobile} {
-    height: 40rem;
+    height: 42rem;
+  }
+
+  @media ${MEDIA.xSmallDown} {
+    height: 52rem;
   }
 
   > h4 {
@@ -215,6 +250,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
   > div {
     width: 100%;
+    height: calc(100% - 8.8rem);
 
     ${OrderValidityBox} {
       padding: 0 0.8rem;
@@ -223,12 +259,30 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
         padding: 0 1.6rem;
       }
 
+      > ${DateTimePickerWrapper} {
+        padding: 0 1rem 1rem;
+
+        > ${TimePickerPreset} {
+          height: 3.8rem;
+          margin: 0.6rem;
+        }
+
+        > .MuiFormControl-root {
+          margin: 0 0 0.6rem 0.6rem;
+        }
+
+        > ${TimePickerPreset}, .MuiFormControl-root {
+          flex: 1 1 8rem;
+        }
+      }
+
       > p {
         text-transform: capitalize;
         color: var(--color-text-primary);
         font-size: 1.2rem;
         height: 2.4rem;
         width: 100%;
+        margin-bottom: 0;
         padding: 0;
         box-sizing: border-box;
       }
@@ -264,40 +318,6 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     justify-content: center;
     align-items: center;
     letter-spacing: 0.03rem;
-  }
-`
-
-const TimePickerPreset = styled.button<{ $selected?: boolean }>`
-  height: 100%;
-  width: 100%;
-  padding: 0;
-  margin: 0 0.85rem;
-
-  color: var(--color-text-primary);
-  font-size: 1rem;
-  font-weight: 100;
-  background: var(--color-background-pageWrapper);
-
-  border: 0.1rem solid var(--color-background-CTA);
-  border-radius: 0.6rem;
-
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-
-  &:hover {
-    background: var(--color-background-CTA);
-    color: var(--color-background-pageWrapper);
-  }
-
-  ${({ $selected = false }): string | false =>
-    $selected &&
-    `{
-    background: var(--color-background-CTA);
-    color: var(--color-background-pageWrapper);
-  }`}
-
-  &:focus {
-    border-color: var(--color-background-CTA);
   }
 `
 
@@ -358,7 +378,6 @@ const OrderValidity: React.FC<Props> = ({
   const formMethods = useFormContext<TradeFormData>()
   const { control, setValue, errors, register, getValues, watch } = formMethods
   const { validFrom: validFromBatchId, validUntil: validUntilBatchId } = getValues()
-  // console.debug('validFromBatchId, validUntilBatchId', validFromBatchId, validUntilBatchId)
 
   const validFromError = errors[validFromInputId]
   const validUntilError = errors[validUntilInputId]
@@ -437,32 +456,39 @@ const OrderValidity: React.FC<Props> = ({
       },
     }))
   }
+
+  const validFromDisplayTime = useMemo(
+    () =>
+      validFromBatchId
+        ? getNumberOfBatchesLeftUntilNow(+validFromBatchId) > 3
+          ? `${formatDate(batchIdToDate(+validFromBatchId), 'yyyy.MM.dd HH:mm')} - [BatchID: ${validFromBatchId}]`
+          : `${formatDateFromBatchId(presetSelected[validFromInputId].batchId!)} - [BatchID: ${validFromBatchId}]`
+        : 'Now',
+    [presetSelected, validFromInputId, validFromBatchId],
+  )
+
+  const validUntilDisplayTime = useMemo(
+    () =>
+      validUntilBatchId
+        ? formatDistanceStrict(
+            batchIdToDate(+validUntilBatchId),
+            validFromBatchId ? batchIdToDate(+validFromBatchId) : Date.now(),
+            { addSuffix: true },
+          )
+        : 'Never',
+    [validUntilBatchId, validFromBatchId],
+  )
+
   return (
     <Wrapper>
       <div>
         <div>
           <div>
-            Order starts:{' '}
-            <b>
-              {validFromBatchId
-                ? getNumberOfBatchesLeftUntilNow(+validFromBatchId) > 3
-                  ? formatDate(batchIdToDate(+validFromBatchId), 'yyyy.MM.dd HH:mm')
-                  : formatDateFromBatchId(presetSelected[validFromInputId].batchId!)
-                : 'Now'}
-            </b>
+            Order starts: <b title={validFromDisplayTime}>{validFromDisplayTime}</b>
             {!validFromBatchId && <HelpTooltip tooltip={OrderStartsTooltip} />}
           </div>
           <div>
-            Order expires:{' '}
-            <b>
-              {validUntilBatchId
-                ? formatDistanceStrict(
-                    batchIdToDate(+validUntilBatchId),
-                    validFromBatchId ? batchIdToDate(+validFromBatchId) : Date.now(),
-                    { addSuffix: true },
-                  )
-                : 'Never'}
-            </b>
+            Order expires: <b title={validUntilDisplayTime}>{validUntilDisplayTime}</b>
           </div>
         </div>
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
@@ -474,12 +500,7 @@ const OrderValidity: React.FC<Props> = ({
         </h4>
         <div>
           <OrderValidityBox>
-            <p>
-              Order starts:{' '}
-              {validFromInputValue
-                ? `${validFromInputValue} - ${new Date(batchIdToDate(+validFromInputValue))}`
-                : 'Now'}
-            </p>
+            <p>Start Time{validFromInputValue ? ` - BatchID ${validFromInputValue}` : ': Now'}</p>
             <DateTimePickerWrapper $customDateSelected={presetSelected[validFromInputId]?.isCustomTime}>
               {ORDER_START_PRESETS.map(time => {
                 const props = {
@@ -519,7 +540,7 @@ const OrderValidity: React.FC<Props> = ({
             </DateTimePickerWrapper>
           </OrderValidityBox>
           <OrderValidityBox>
-            <p>Order expires:</p>
+            <p>Expire Time</p>
             <DateTimePickerWrapper $customDateSelected={presetSelected[validUntilInputId]?.isCustomTime}>
               {ORDER_EXPIRE_PRESETS.map(time => {
                 const props = {
