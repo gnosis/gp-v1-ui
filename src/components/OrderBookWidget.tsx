@@ -156,6 +156,10 @@ const processData = (
   // Filter tiny orders
   pricePoints = pricePoints.filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
 
+  if (isBid && pricePoints.length > 0) {
+    pricePoints.push({ price: ZERO_BIG_NUMBER, volume: ZERO_BIG_NUMBER })
+  }
+
   // Convert the price points that can be represented in the graph (PricePointDetails)
   const { points } = pricePoints.reduce(
     (acc, pricePoint, index) => {
