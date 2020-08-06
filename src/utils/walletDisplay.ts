@@ -18,7 +18,7 @@ export const getWalletDisplayInfo = (): WalletDisplayInfo => {
     }
   }
   const walletName = providerInfo.peerMeta?.name || providerInfo.name
-  const walletIconURL = providerInfo.peerMeta?.icons[0] || provName2Icon[walletName]
+  const walletIconURL = providerInfo.peerMeta?.icons?.[0] || provName2Icon[walletName]
 
   return {
     walletName,
