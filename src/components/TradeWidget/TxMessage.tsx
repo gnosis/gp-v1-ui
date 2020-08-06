@@ -116,6 +116,7 @@ const Warning = styled.p`
 
   .alert {
     min-width: 2.5em;
+    align-self: center;
   }
 `
 
