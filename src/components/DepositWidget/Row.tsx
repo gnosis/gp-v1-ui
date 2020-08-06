@@ -129,7 +129,10 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <>{withdrawing && spinner}0</>
           )}
         </td>
-        <td data-label="Wallet">
+        <td
+          data-label="Wallet"
+          title={(!isWeth && formatAmountFull({ amount: walletBalance, precision: decimals })) || ''}
+        >
           {isWeth ? (
             <ul>
               <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
