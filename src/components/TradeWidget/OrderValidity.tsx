@@ -107,7 +107,7 @@ const Wrapper = styled.div`
 
       > div {
         display: grid;
-        grid-template-columns: 9rem min-content auto;
+        grid-template-columns: 9rem auto;
         width: 100%;
 
         > b {
@@ -116,6 +116,10 @@ const Wrapper = styled.div`
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
+
+          > span {
+            color: var(--color-text-secondary);
+          }
         }
       }
     }
@@ -484,8 +488,11 @@ const OrderValidity: React.FC<Props> = ({
       <div>
         <div>
           <div>
-            Order starts: <b title={validFromDisplayTime}>{validFromDisplayTime}</b>
-            {!validFromBatchId && <HelpTooltip tooltip={OrderStartsTooltip} />}
+            Order starts:{' '}
+            <b title={validFromDisplayTime}>
+              {' '}
+              {validFromDisplayTime} {!validFromBatchId && <HelpTooltip tooltip={OrderStartsTooltip} />}
+            </b>
           </div>
           <div>
             Order expires: <b title={validUntilDisplayTime}>{validUntilDisplayTime}</b>

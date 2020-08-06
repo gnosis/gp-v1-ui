@@ -223,7 +223,7 @@ const TokenRow: React.FC<Props> = ({
         <i>
           Sell amount exceeds your balance by:{' '}
           <strong>
-            {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}
+            {formatSmart({ amount: overMax, precision: selectedToken.decimals })} <span>{selectedToken.symbol}</span>
           </strong>
         </i>
       </FormMessage>
