@@ -22,7 +22,8 @@ import {
   MonospaceAddress,
   ConnectWallet,
   LogInOutButton,
-  ProviderName,
+  WalletName,
+  WalletImage,
 } from './UserWallet.styled'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -128,7 +129,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
         <>
           {/* Wallet logo + address + chevron */}
           <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)} className={showWallet ? 'visible' : ''}>
-            <EtherImage src={WalletImg} />
+            {walletIconURL ? <WalletImage src={walletIconURL} /> : <EtherImage src={WalletImg} />}
             <UserAddress>
               {abbreviateString(userAddress, 6, 4)}
               {/* Network */}
@@ -140,7 +141,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                     : getNetworkFromId(networkId)
                   : 'Unknown Network'}
               </NetworkTitle>
-              {providerName && <ProviderName>{providerName}</ProviderName>}
+              {walletName && <WalletName>{walletName}</WalletName>}
             </UserAddress>
           </UserWalletToggler>
         </>
