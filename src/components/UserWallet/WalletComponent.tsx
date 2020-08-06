@@ -33,7 +33,7 @@ import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
 import WalletImg from 'assets/img/eth-network.svg'
 import { Spinner } from 'components/Spinner'
-import { walletApi } from 'api'
+import { getWalletDisplayInfo } from 'utils/walletDisplay'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string
@@ -50,8 +50,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const orderPageMatch = useRouteMatch('/order/')
 
   // providerInfo is cached, so ok to re-get on render
-  const providerInfo = walletApi.getProviderInfo()
-  const providerName = providerInfo && (providerInfo.peerMeta?.name || providerInfo.name)
+  const { walletName, walletIconURL } = getWalletDisplayInfo()
+  console.log('{ walletName, walletIconURL }', { walletName, walletIconURL })
 
   /***************************** */
   // EVENT HANDLERS
