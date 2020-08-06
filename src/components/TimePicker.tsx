@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { BaseDateTimePickerProps, DateTimePicker } from '@material-ui/pickers'
+import { BaseDateTimePickerProps, MobileDateTimePicker } from '@material-ui/pickers'
 import { TextField } from '@material-ui/core'
 import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns'
 import { Control, UseFormMethods, FieldError, Controller } from 'react-hook-form'
@@ -38,7 +38,7 @@ const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>>
       control={control}
       name={formValues.inputName}
       render={(): JSX.Element => (
-        <DateTimePicker
+        <MobileDateTimePicker
           {...restProps}
           dateAdapter={memoizedDateAdapter}
           value={formValues.value}
