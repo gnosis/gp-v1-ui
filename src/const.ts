@@ -171,7 +171,7 @@ export const ORDER_BOOK_ZOOM_MULTIPLIER = 3 // Initial zoom length = spread + 2 
 export const ORDER_BOOK_SMALL_VOLUME_THRESHOLD = 0.01
 export const ORDER_BOOK_ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
 export const ORDER_BOOK_MINIMUM_OWL_VOLUME = 10
-export const ORDER_BOOK_REFRESH_INTERVAL = 30000 // ms
+export const ORDER_BOOK_REFRESH_INTERVAL = 5000 // ms
 
 export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 // for stable reference
