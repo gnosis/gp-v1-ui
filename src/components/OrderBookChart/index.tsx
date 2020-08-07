@@ -140,6 +140,9 @@ export const Chart: React.FC<ChartProps> = props => {
         yAxis.end = zoomValues.endY
 
         firstLoad = false
+
+        // From now on, update the same data to remove flickering
+        if (chart) chart.dataSource.updateCurrentData = false
       }
     }
 
@@ -176,6 +179,9 @@ export const Chart: React.FC<ChartProps> = props => {
 
     // Trigger data load re-using same chart
     chart.dataSource.load()
+
+    // First load, do not update current data because it was a different token pair/network
+    chart.dataSource.updateCurrentData = false
 
     // Refresh data automatically
     chart.dataSource.reloadFrequency = ORDER_BOOK_REFRESH_INTERVAL
