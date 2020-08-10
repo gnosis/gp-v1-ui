@@ -67,7 +67,7 @@ const CountDownStyled = styled.div`
  }
 `
 
-const DevdocTooltip = (
+export const DevdocTooltip = (
   <HelpTooltipContainer>
     <p>
       On Gnosis Protocol, orders placed on-chain are not immediately executed, but rather collected and aggregated to be
