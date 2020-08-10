@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, Dispatch, SetStateAction, useEffect, useMemo } from 'react'
+import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 
@@ -358,26 +359,34 @@ const OrderValidity: React.FC<Props> = ({
   const [validUntilButton, setValidUntilButton] = useSafeState<number | null>(isUnlimited ? null : VALID_UNTIL_DEFAULT)
   const [validUntilCustomTime, setValidUntilCustomTime] = useSafeState<number | null>(null)
 
-  function handleValidFromRelativeChange(relativeTime: number | null): void {
-    setValidFromButton(relativeTime)
+  function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
     const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
-    setValidFromCustomTime(relativeTimeToDate)
+
+    if (inputId === validFromInputId) {
+      batchedUpdates(() => {
+        setValidFromButton(relativeTime)
+        setValidFromCustomTime(relativeTimeToDate)
+      })
+    } else {
+      batchedUpdates(() => {
+        setValidUntilButton(relativeTime)
+        setValidUntilCustomTime(relativeTimeToDate)
+      })
+    }
   }
 
-  function handleValidUntilRelativeChange(relativeTime: number | null): void {
-    setValidUntilButton(relativeTime)
-    const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
-    setValidUntilCustomTime(relativeTimeToDate)
-  }
-
-  function handleValidFromCustomTime(time: number | null): void {
-    setValidFromCustomTime(time)
-    setValidFromButton(Infinity)
-  }
-
-  function handleValidUntilCustomTime(time: number | null): void {
-    setValidUntilCustomTime(time)
-    setValidUntilButton(Infinity)
+  function handleCustomTimeSelect(inputId: string, time: number | null): void {
+    if (inputId === validFromInputId) {
+      batchedUpdates(() => {
+        setValidFromCustomTime(time)
+        setValidFromButton(Infinity)
+      })
+    } else {
+      batchedUpdates(() => {
+        setValidUntilCustomTime(time)
+        setValidUntilButton(Infinity)
+      })
+    }
   }
 
   useEffect(() => {
@@ -505,17 +514,20 @@ const OrderValidity: React.FC<Props> = ({
                   ref={register}
                   tabIndex={tabIndex}
                   type="button"
-                  onClick={(): void => handleValidFromRelativeChange(time)}
+                  onClick={(): void => handleRelativeTimeSelect(validFromInputId, time)}
                   $selected={validFromButton === time}
                 >
-                  {formatOrderValidityTimes(+time!, 'Now')}
+                  {formatOrderValidityTimes(time, 'Now')}
                 </TimePickerPreset>
               ))}
               <DateTimePickerBase
                 value={validFromCustomTime}
                 error={validFromError}
                 inputName={validFromInputId}
-                onChange={(e?: Date | string): void => handleValidFromCustomTime(e ? Date.parse(e.toString()) : null)}
+                maxDateTime={validUntilCustomTime ? validUntilCustomTime - BATCH_TIME_IN_MS : null}
+                onChange={(e?: Date | string): void =>
+                  handleCustomTimeSelect(validFromInputId, e ? Date.parse(e.toString()) : null)
+                }
               />
             </DateTimePickerWrapper>
           </OrderValidityBox>
@@ -532,10 +544,10 @@ const OrderValidity: React.FC<Props> = ({
                   ref={register}
                   tabIndex={tabIndex}
                   type="button"
-                  onClick={(): void => handleValidUntilRelativeChange(time)}
+                  onClick={(): void => handleRelativeTimeSelect(validUntilInputId, time)}
                   $selected={validUntilButton === time}
                 >
-                  {formatOrderValidityTimes(+time!, 'Never')}
+                  {formatOrderValidityTimes(time, 'Never')}
                 </TimePickerPreset>
               ))}
               <DateTimePickerBase
@@ -543,7 +555,9 @@ const OrderValidity: React.FC<Props> = ({
                 error={validUntilError}
                 inputName={validUntilInputId}
                 minDateTime={(validFromCustomTime || Date.now()) + BATCH_TIME_IN_MS}
-                onChange={(e?: Date | string): void => handleValidUntilCustomTime(e ? Date.parse(e.toString()) : null)}
+                onChange={(e?: Date | string): void =>
+                  handleCustomTimeSelect(validUntilInputId, e ? Date.parse(e.toString()) : null)
+                }
               />
             </DateTimePickerWrapper>
           </OrderValidityBox>
