@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { BaseDateTimePickerProps, MobileDateTimePicker } from '@material-ui/pickers'
+import { BaseDateTimePickerProps, DateTimePickerProps, MobileDateTimePicker } from '@material-ui/pickers'
 import { TextField } from '@material-ui/core'
 import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns'
 import { Control, UseFormMethods, FieldError, Controller } from 'react-hook-form'
@@ -9,10 +9,14 @@ import { TradeFormData } from './TradeWidget'
 import { FormInputError } from './TradeWidget/FormMessage'
 import { BATCH_TIME, BATCH_TIME_IN_MS } from 'const'
 
-interface DateTimePickerControlProps<T> extends BaseDateTimePickerProps {
+interface DateTimePickerBase extends Omit<DateTimePickerProps, 'renderInput'> {
+  error?: FieldError
+  customOnChange?: (date: Date, keyboardInputValue?: string | undefined) => void
+  inputName: string
+}
+
+interface DateTimePickerControlProps<T> extends DateTimePickerBase, BaseDateTimePickerProps {
   control: Control<T>
-  onClose?: () => void
-  customOnChange: (date: Date, keyboardInputValue?: string | undefined) => void
   formValues: {
     value: string | null
     setValue: UseFormMethods['setValue']
@@ -21,43 +25,58 @@ interface DateTimePickerControlProps<T> extends BaseDateTimePickerProps {
   }
 }
 
-const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>> = ({
-  control,
-  formValues,
+const DateTimePickerBase: React.FC<DateTimePickerBase> = ({
+  error,
+  inputName,
   minDateTime = Date.now() + BATCH_TIME_IN_MS * 2,
-  customOnChange,
+  // customOnChange,
   ...restProps
 }) => {
   const memoizedDateAdapter = React.useMemo(() => {
     return new DateFnsAdapter()
   }, [])
 
+  return (
+    <MobileDateTimePicker
+      {...restProps}
+      dateAdapter={memoizedDateAdapter}
+      // onChange={customOnChange}
+      disablePast
+      showTodayButton
+      minutesStep={BATCH_TIME / 60}
+      inputFormat="yyyy/MM/dd HH:mm a"
+      ampm={false}
+      minDateTime={minDateTime}
+      renderInput={(props): JSX.Element => (
+        <TextField
+          {...props}
+          label="Set custom date"
+          name={inputName}
+          error={!!error}
+          helperText={error && <FormInputError errorMessage={error.message} />}
+        />
+      )}
+    />
+  )
+}
+
+const DateTimePickerControl: React.FC<DateTimePickerControlProps<TradeFormData>> = ({
+  control,
+  formValues,
+  customOnChange,
+  ...restProps
+}) => {
   const currentError = formValues.errors
   return (
     <Controller
       control={control}
       name={formValues.inputName}
       render={(): JSX.Element => (
-        <MobileDateTimePicker
+        <DateTimePickerBase
           {...restProps}
-          dateAdapter={memoizedDateAdapter}
-          value={formValues.value}
-          onChange={customOnChange}
-          disablePast
-          showTodayButton
-          minutesStep={BATCH_TIME / 60}
-          inputFormat="yyyy/MM/dd HH:mm a"
-          ampm={false}
-          minDateTime={minDateTime}
-          renderInput={(props): JSX.Element => (
-            <TextField
-              {...props}
-              label="Set custom date"
-              name={formValues.inputName}
-              error={!!currentError}
-              helperText={currentError && <FormInputError errorMessage={currentError.message} />}
-            />
-          )}
+          error={currentError}
+          inputName={formValues.inputName}
+          customOnChange={customOnChange}
         />
       )}
     />
@@ -127,4 +146,4 @@ const DateTimePickerWrapper = styled.div<{ $customDateSelected?: boolean }>`
   `}
 `
 
-export { DateTimePickerWrapper, DateTimePickerControl as default }
+export { DateTimePickerWrapper, DateTimePickerControl, DateTimePickerBase }
