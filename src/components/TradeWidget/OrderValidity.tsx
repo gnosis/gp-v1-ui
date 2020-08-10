@@ -20,7 +20,7 @@ import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
-import { DevdocTooltip } from 'components/Layout/Header'
+import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 
 const VALID_UNTIL_DEFAULT: number | null = 1440
 const VALID_FROM_DEFAULT: number | null = null
@@ -109,8 +109,9 @@ const Wrapper = styled.div`
           text-overflow: ellipsis;
           white-space: nowrap;
 
-          > span {
-            color: var(--color-text-secondary);
+          > .BatchNumberWrapper {
+            color: var(--color-text-primary);
+            font-weight: 400;
           }
         }
       }
@@ -450,7 +451,7 @@ const OrderValidity: React.FC<Props> = ({
     () =>
       validFromBatchId && !!+validFromBatchId
         ? getNumberOfBatchesLeftUntilNow(+validFromBatchId) > 3
-          ? `${formatDate(batchIdToDate(+validFromBatchId), 'yyyy.MM.dd HH:mm')} - [BatchID: ${validFromBatchId}]`
+          ? `${formatDate(batchIdToDate(+validFromBatchId), 'yyyy.MM.dd HH:mm')}`
           : 'NULL'
         : 'Now',
     [validFromBatchId],
@@ -476,7 +477,12 @@ const OrderValidity: React.FC<Props> = ({
             Order starts:{' '}
             <b title={validFromDisplayTime}>
               {' '}
-              {validFromDisplayTime} {!validFromBatchId && <HelpTooltip tooltip={OrderStartsTooltip} />}
+              {validFromDisplayTime}
+              {!validFromBatchId ? (
+                <HelpTooltip tooltip={OrderStartsTooltip} />
+              ) : (
+                <BatchNumberWithHelp title="&nbsp;- batch:" />
+              )}
             </b>
           </div>
           <div>
@@ -524,7 +530,7 @@ const OrderValidity: React.FC<Props> = ({
                 value={validFromCustomTime}
                 error={validFromError}
                 inputName={validFromInputId}
-                maxDateTime={validUntilCustomTime ? validUntilCustomTime - BATCH_TIME_IN_MS : null}
+                maxDateTime={validUntilButton === Infinity ? validUntilCustomTime! - BATCH_TIME_IN_MS : null}
                 onChange={(e?: Date | string): void =>
                   handleCustomTimeSelect(validFromInputId, e ? Date.parse(e.toString()) : null)
                 }

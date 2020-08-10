@@ -44,27 +44,6 @@ const CountDownStyled = styled.div`
   display: flex;
   flex-flow: column;
   order 2;
-
- > div {
-  display: flex;
-  font-family: var(--font-mono);
-  font-size: 1.2rem;
-  color: var(--color-text-primary);
-  min-width: 16rem;
-  letter-spacing: 0;
-  margin: 0.5rem 0;
-  align-items: baseline;
-
-  @media ${MEDIA.mobile} {
-    flex-flow: row wrap;
-    line-height: 1.2;
-    width: auto;
-  }
-
-  > strong {
-    color: var(--color-text-active);
-  }
- }
 `
 
 export const DevdocTooltip = (
@@ -83,18 +62,46 @@ export const DevdocTooltip = (
   </HelpTooltipContainer>
 )
 
+const BatchNumberWrapper = styled.span`
+  &&&&& {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    min-width: 16rem;
+    letter-spacing: 0;
+    margin: 0.5rem 0;
+    align-items: baseline;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
+
+    > strong {
+      color: var(--color-text-active);
+    }
+  }
+`
+
+export const BatchNumberWithHelp: React.FC<{ title?: string }> = ({ title = 'Current batch: ' }) => (
+  <BatchNumberWrapper className="BatchNumberWrapper">
+    {title}
+    <strong>{dateToBatchId()}</strong>
+    &nbsp;
+    <HelpTooltip tooltip={DevdocTooltip} />
+  </BatchNumberWrapper>
+)
+
 const BatchCountDown: React.FC = () => {
   const timeRemainingInBatch = useTimeRemainingInBatch()
   return (
     <CountDownStyled>
-      <div>
+      <BatchNumberWrapper>
         Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
-      </div>
-      <div>
-        Current batch: <strong>{dateToBatchId()}</strong>
-        &nbsp;
-        <HelpTooltip tooltip={DevdocTooltip} />
-      </div>
+      </BatchNumberWrapper>
+      <BatchNumberWithHelp />
     </CountDownStyled>
   )
 }
