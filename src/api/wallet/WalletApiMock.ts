@@ -91,6 +91,8 @@ export class WalletApiMock implements WalletApi {
     return {
       id: '',
       name: 'MockProvider',
+      walletName: 'MockWallet',
+      walletIcon: '',
       type: 'mock',
       logo: '',
       check: '',

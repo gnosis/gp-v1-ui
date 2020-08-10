@@ -17,6 +17,7 @@ import { composeProvider } from './composeProvider'
 import fetchGasPriceFactory from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
+import { getWCWalletIconURL } from './walletUtils'
 
 interface ProviderState {
   accounts: string[]
@@ -65,6 +66,8 @@ export interface WalletInfo {
 
 export interface ProviderInfo extends IProviderInfo {
   peerMeta?: IClientMeta
+  walletName: string
+  walletIcon: string
 }
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
@@ -524,13 +527,26 @@ export class WalletApiImpl implements WalletApi {
   private _setProviderInfo(): void {
     // this can get expensive depending on the number and complexity of checks in getProviderInfo
     // so retrigger only on connect/disconnect
-    this._providerInfo = getProviderInfo(this._provider)
+    const providerInfo = getProviderInfo(this._provider)
 
-    if (this._providerInfo && isWalletConnectProvider(this._provider) && this._provider.wc.peerMeta) {
-      this._providerInfo = {
-        ...this._providerInfo,
-        peerMeta: this._provider.wc.peerMeta,
-      }
+    if (!providerInfo) {
+      this._providerInfo = null
+      return
+    }
+
+    this._providerInfo = {
+      ...providerInfo,
+      walletIcon: providerInfo.logo,
+      walletName: providerInfo.name,
+    }
+
+    // not all WC wallets fill in peerMeat (Pillar doesn't)
+    if (isWalletConnectProvider(this._provider) && this._provider.wc.peerMeta) {
+      this._providerInfo.peerMeta = this._provider.wc.peerMeta
+      this._providerInfo.walletName = this._provider.wc.peerMeta.name
+
+      const WCWalletIcon = this._provider.wc.peerMeta.icons?.[0] || getWCWalletIconURL(this._providerInfo.walletName)
+      if (WCWalletIcon) this._providerInfo.walletIcon = WCWalletIcon
     }
   }
 
