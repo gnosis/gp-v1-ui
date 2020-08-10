@@ -275,9 +275,14 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
           <span>
             This is a low volume order. Please keep in mind that solvers might not include your order if it does not
             generate enough fee to pay their running costs. Learn more{' '}
-            <a href="#" target="_blank" rel="noreferrer">
+            <a
+              href="https://docs.gnosis.io/protocol/docs/introduction1/#minimum-order"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
               here
             </a>
+            .
           </span>
           <img className="alert" src={alertIcon} />
         </Warning>
