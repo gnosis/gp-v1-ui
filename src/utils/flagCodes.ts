@@ -15,7 +15,6 @@ const SENTINEL =
   Number(CONFIG.appId)
     .toString(16)
     .padStart(2, '0')
-console.log('SENTINEL', SENTINEL)
 
 if (!/^[0-9a-f]+$/.test(SENTINEL)) {
   throw new Error(`SENTINEL isn't valid. Expected lowercase hex value, got ${SENTINEL}`)

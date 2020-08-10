@@ -179,11 +179,11 @@ module.exports = ({ stats = false } = {}) => ({
       // AUTOCONNECT: only applies for mock implementation
       AUTOCONNECT: 'true',
       PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
-      APP_ID: process.env.APP_ID,
-      INFURA_ID: process.env.INFURA_ID,
-      WALLET_CONNECT_BRIDGE: process.env.WALLET_CONNECT_BRIDGE,
-      ETH_NODE_URL: process.env.ETH_NODE_URL,
-      LIQUIDITY_TOKEN_LIST: process.env.LIQUIDITY_TOKEN_LIST,
+      APP_ID: null,
+      INFURA_ID: null,
+      WALLET_CONNECT_BRIDGE: null,
+      ETH_NODE_URL: null,
+      LIQUIDITY_TOKEN_LIST: null,
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance
