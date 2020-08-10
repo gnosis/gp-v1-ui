@@ -105,13 +105,11 @@ const Wrapper = styled.div`
         > b {
           color: #218dff;
           margin: 0 0.4rem;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
 
           > .BatchNumberWrapper {
             color: var(--color-text-primary);
             font-weight: 400;
+            margin: 0;
           }
         }
       }
@@ -262,6 +260,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
         > ${TimePickerPreset}, .MuiFormControl-root {
           flex: 1 1 8rem;
+          font-size: 1.2rem;
         }
       }
 
@@ -451,8 +450,8 @@ const OrderValidity: React.FC<Props> = ({
     () =>
       validFromBatchId && !!+validFromBatchId
         ? getNumberOfBatchesLeftUntilNow(+validFromBatchId) > 3
-          ? `${formatDate(batchIdToDate(+validFromBatchId), 'yyyy.MM.dd HH:mm')}`
-          : 'NULL'
+          ? batchIdToDate(+validFromBatchId).toLocaleString()
+          : formatDistanceStrict(batchIdToDate(+validFromBatchId), Date.now(), { addSuffix: true })
         : 'Now',
     [validFromBatchId],
   )
@@ -477,11 +476,11 @@ const OrderValidity: React.FC<Props> = ({
             Order starts:{' '}
             <b title={validFromDisplayTime}>
               {' '}
-              {validFromDisplayTime}
+              {validFromDisplayTime}{' '}
               {!validFromBatchId ? (
                 <HelpTooltip tooltip={OrderStartsTooltip} />
               ) : (
-                <BatchNumberWithHelp title="&nbsp;- batch:" />
+                <BatchNumberWithHelp title="batch:" />
               )}
             </b>
           </div>

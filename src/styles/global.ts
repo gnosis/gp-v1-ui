@@ -1165,6 +1165,12 @@ const GlobalStyles = createGlobalStyle`
       }
     }
 
+    input {
+      &.MuiInputBase-input.MuiInput-input {
+        font-size: 1.2rem;
+      }
+    }
+
     button {
       &.Mui-selected.MuiTab-fullWidth:hover {
         background: var(--color-background-modali);
@@ -1191,6 +1197,14 @@ const GlobalStyles = createGlobalStyle`
 
         > span {
           color: var(--color-text-CTA);
+        }
+      }
+
+      &.MuiButtonBase-root.MuiButton-root.MuiButton-text.MuiButton-textPrimary:nth-child(2) {
+        background-color: var(--color-background-pageWrapper);
+
+        > span {
+          color: var(--color-button-primary);
         }
       }
 

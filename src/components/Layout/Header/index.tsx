@@ -27,6 +27,27 @@ export interface HeaderProps {
   }[]
 }
 
+const BatchNumberWrapper = styled.span`
+  &&&&& {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    min-width: 16rem;
+    letter-spacing: 0;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
+
+    > strong {
+      color: var(--color-text-active);
+    }
+  }
+`
+
 const TopWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
@@ -44,6 +65,11 @@ const CountDownStyled = styled.div`
   display: flex;
   flex-flow: column;
   order 2;
+
+  > ${BatchNumberWrapper} {
+    margin: 0.5rem 0;
+    align-items: baseline;
+  }
 `
 
 export const DevdocTooltip = (
@@ -61,29 +87,6 @@ export const DevdocTooltip = (
     </p>
   </HelpTooltipContainer>
 )
-
-const BatchNumberWrapper = styled.span`
-  &&&&& {
-    display: inline-flex;
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
-    color: var(--color-text-primary);
-    min-width: 16rem;
-    letter-spacing: 0;
-    margin: 0.5rem 0;
-    align-items: baseline;
-
-    @media ${MEDIA.mobile} {
-      flex-flow: row wrap;
-      line-height: 1.2;
-      width: auto;
-    }
-
-    > strong {
-      color: var(--color-text-active);
-    }
-  }
-`
 
 export const BatchNumberWithHelp: React.FC<{ title?: string }> = ({ title = 'Current batch: ' }) => (
   <BatchNumberWrapper className="BatchNumberWrapper">
