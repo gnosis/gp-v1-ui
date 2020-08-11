@@ -42,7 +42,6 @@ function providerFromEngine<T extends Provider>(engine: JsonRpcEngine): T {
   const request = <T extends unknown>(req: JsonRpcRequest<T>): Promise<JsonRpcResponse<T>['result']> => {
     return new Promise((resolve, reject) => {
       engine.handle(req, (error: JsonRpcError<T>, res: JsonRpcResponse<T>) => {
-        // console.log('CPROV::handled error:', error, 'res:', res)
         if (error) {
           reject(error)
           return
@@ -107,7 +106,6 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
       try {
         // send request to provider
         const providerRes = await provider.request(req)
-        // console.log('CPROV::providerResult', providerRes)
 
         // attach result from provider
         res.result = providerRes
@@ -405,7 +403,6 @@ export const composeProvider = <T extends Provider>(
 
   const providerProxy = new Proxy(composedProvider, {
     get: function (target, prop, receiver): unknown {
-      // console.log('CPROV::Proxy, target, prop', target, prop)
       if (prop === 'request' || prop === 'sendAsync' || prop === 'send') {
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)
