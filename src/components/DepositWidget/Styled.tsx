@@ -86,7 +86,7 @@ export const TokenRow = styled.tr`
 
     button.wrapUnwrapEther {
       font-size: 1rem;
-      padding 0.2rem 0.5rem;
+      padding: 0.2rem 0.5rem;
       margin: 0.2rem 0;
       display: inline;
       min-width: 5rem;
