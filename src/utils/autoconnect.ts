@@ -8,7 +8,7 @@ import { IWalletConnectConnectorOptions } from 'web3modal/dist/providers/connect
 const getWCIfConnected = async (): Promise<unknown> => {
   const { default: WalletConnectProvider } = await import(
     /* webpackChunkName: "@walletconnect"*/
-    'api/wallet/customWCProvider'
+    '@walletconnect/web3-provider'
   )
 
   const wcOptions = generateWCOptions()
