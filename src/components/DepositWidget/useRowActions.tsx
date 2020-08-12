@@ -153,9 +153,21 @@ export const useRowActions = (params: Params): Result => {
       try {
         assert(userAddress, ON_ERROR_MESSAGE)
         assert(networkId, ON_ERROR_MESSAGE)
-
         const token = getToken('address', tokenAddress, balances)
         assert(token, 'No token')
+
+        // highlight row after asserting tokenaddress exists
+        dispatch(setHighlightAndClaimingAction(tokenAddress))
+
+        const [lastCreditedBatchId, currentBatchId] = await Promise.all([
+          depositApi.getLastCreditBatchId({ userAddress, tokenAddress, networkId }),
+          depositApi.getCurrentBatchId(networkId),
+        ])
+        // throw if user is in edgecase state where there are claimable tokens in current batch
+        assert(
+          lastCreditedBatchId !== currentBatchId,
+          'You are currently in a claimable state, but have additional pending claimable tokens allotted in the current batch. Please wait for the current batch to close and try again.',
+        )
 
         const { pendingWithdraw, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
@@ -165,8 +177,6 @@ export const useRowActions = (params: Params): Result => {
             precision: decimals,
           })} of ${symbol}`,
         )
-
-        dispatch(setHighlightAndClaimingAction(tokenAddress))
 
         const receipt = await depositApi.withdraw({
           userAddress,
@@ -179,7 +189,7 @@ export const useRowActions = (params: Params): Result => {
         toast.success(`Withdraw of ${formatSmart(pendingWithdraw.amount, decimals)} ${symbol} completed`)
       } catch (error) {
         console.error('[DepositWidget:useRowActions] Error executing the withdraw request', error)
-        toast.error(`Error executing the withdraw request: ${error.message}`)
+        toast.error(`Error executing the withdraw request: ${error.message}`, { autoClose: false })
       } finally {
         dispatch(setHighlightAndClaimingAction(tokenAddress))
       }
