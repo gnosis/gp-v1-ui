@@ -129,6 +129,20 @@ export const RowClaimButton = styled.button`
     cursor: not-allowed;
     opacity: 0.5;
   }
+
+  > div {
+    display: flex;
+    align-items: inherit;
+
+    > .immatureClaimTooltip {
+      color: #d2a827;
+      margin-left: 0.5rem;
+
+      > span {
+        margin: 0.5rem;
+      }
+    }
+  }
 `
 
 export const RowClaimSpan = styled.span`

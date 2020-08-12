@@ -171,7 +171,7 @@ const NoTokensMessage = styled.tr`
 interface BalanceDisplayProps extends TokenLocalState {
   enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
-  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void | React.ReactText>
   ethBalance: BN | null
   balances: TokenBalanceDetails[]
   error: boolean
@@ -211,6 +211,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   highlighted,
   enabling,
   enabled,
+  immatureClaim,
   requestWithdrawConfirmation,
   hasTokensToShow = false,
 }) => {
@@ -307,13 +308,14 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                         onTxHash,
                       )
                     }}
-                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    onClaim={(): Promise<void | React.ReactText> => claimToken(tokenBalances.address)}
                     claiming={claiming.has(tokenBalances.address)}
                     withdrawing={withdrawing.has(tokenBalances.address)}
                     depositing={depositing.has(tokenBalances.address)}
                     highlighted={highlighted.has(tokenBalances.address)}
                     enabling={enabling.has(tokenBalances.address)}
                     enabled={enabled.has(tokenBalances.address)}
+                    immatureClaim={immatureClaim.has(tokenBalances.address)}
                     {...windowSpecs}
                   />
                 ))
