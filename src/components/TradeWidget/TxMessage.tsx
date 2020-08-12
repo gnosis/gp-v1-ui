@@ -121,6 +121,7 @@ const Warning = styled.p`
   .alert {
     width: 5.2%;
     opacity: 0.4;
+    align-self: center;
   }
 `
 
