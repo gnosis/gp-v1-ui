@@ -56,6 +56,21 @@ import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
 
 import { DevTool } from 'HookFormDevtool'
+import { ButtonWrapper } from 'hooks/useSubmitTxModal'
+import { TxMessage } from './TxMessage'
+import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
+
+const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
+  padding: 0;
+
+  .intro-text {
+    margin: 0 0 1rem 0;
+  }
+
+  .message {
+    margin: 1rem;
+  }
+`
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
@@ -606,7 +621,7 @@ const TradeWidget: React.FC = () => {
     defaultValues: defaultFormValues,
     resolver: validationResolver,
   })
-  const { handleSubmit, reset, watch, setValue } = methods
+  const { handleSubmit, reset, watch, setValue, formState } = methods
 
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
@@ -975,12 +990,14 @@ const TradeWidget: React.FC = () => {
     })
   }
 
+  const onConfirm = handleSubmit(onSubmit)
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormProvider {...methods}>
-        <WrappedForm onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
+        <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             autoFocus
@@ -1040,15 +1057,28 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
           />
           <p>This order might be partially filled.</p>
-          <SubmitButton
-            data-text="This order might be partially filled."
-            type="submit"
-            disabled={isSubmitting}
-            tabIndex={1}
+          <ButtonWrapper
+            onConfirm={onConfirm}
+            message={(): React.ReactNode => (
+              <ConfirmationModalWrapper>
+                <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
+              </ConfirmationModalWrapper>
+            )}
           >
-            {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
-            {sameToken ? 'Please select different tokens' : 'Submit limit order'}
-          </SubmitButton>
+            <SubmitButton
+              data-text="This order might be partially filled."
+              type="submit"
+              disabled={isSubmitting}
+              tabIndex={1}
+              onClick={(e): void => {
+                // don't show Submit Confirm modal for invalid form
+                if (!formState.isValid) e.stopPropagation()
+              }}
+            >
+              {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
+              {sameToken ? 'Please select different tokens' : 'Submit limit order'}
+            </SubmitButton>
+          </ButtonWrapper>
         </WrappedForm>
       </FormProvider>
       <ExpandableOrdersPanel>

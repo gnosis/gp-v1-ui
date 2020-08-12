@@ -13,7 +13,7 @@ import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 import { composeProvider } from './composeProvider'
-import fetchGasPriceFactory from 'api/gasStation'
+import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
 
@@ -53,6 +53,7 @@ export interface WalletApi {
   getProviderInfo(): ProviderInfo
   blockchainState: BlockchainUpdatePrompt
   userPrintAsync: Promise<string>
+  getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null>
 }
 
 export interface WalletInfo {
@@ -249,6 +250,7 @@ export class WalletApiImpl implements WalletApi {
   public blockchainState: BlockchainUpdatePrompt
 
   private _unsubscribe: Command
+  private _fetchGasPrice: ReturnType<typeof fetchGasPriceFactory> = async () => undefined
 
   public constructor(web3: Web3) {
     this._listeners = []
@@ -349,6 +351,9 @@ export class WalletApiImpl implements WalletApi {
     closeOpenWebSocketConnection(this._web3)
 
     const fetchGasPrice = fetchGasPriceFactory(this)
+
+    this._fetchGasPrice = fetchGasPrice
+
     const earmarkingFunction = async (data?: string): Promise<string> => earmarkTxData(data, await this.userPrintAsync)
 
     const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTxData: earmarkingFunction })
@@ -455,6 +460,26 @@ export class WalletApiImpl implements WalletApi {
 
     logDebug('[WalletApiImpl] Disconnected')
     await this._notifyListeners()
+  }
+
+  public async getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null> {
+    // this never errors
+    // returns undefined if unable to fetch
+    let gasPrice = await this._fetchGasPrice(gasPriceLevel)
+
+    if (gasPrice) return +gasPrice
+    try {
+      // fallback to gasPrice from provider
+      // {"jsonrpc":"2.0","method":"eth_gasPrice"} call
+      gasPrice = await this._web3.eth.getGasPrice()
+
+      if (gasPrice) return +gasPrice
+    } catch (error) {
+      console.error('Error fetching gas price', error)
+    }
+
+    // unable to fetch
+    return null
   }
 
   public async getAddress(): Promise<string> {

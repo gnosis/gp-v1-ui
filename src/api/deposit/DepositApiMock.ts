@@ -22,6 +22,7 @@ import { Erc20Api } from 'api/erc20/Erc20Api'
 
 export interface BalanceState {
   balance: BN
+  lastCreditedBatchId: number
   pendingDeposits: PendingFlux
   pendingWithdraws: PendingFlux
 }
@@ -45,6 +46,16 @@ export class DepositApiMock implements DepositApi {
 
   public async getBatchTime(_networkId = 0): Promise<number> {
     return BATCH_TIME
+  }
+
+  public async getLastCreditBatchId({ userAddress, tokenAddress }: GetPendingDepositParams): Promise<number> {
+    const userBalanceStates = this._balanceStates[userAddress]
+    if (!userBalanceStates) {
+      return 0
+    }
+    const balanceState = userBalanceStates[tokenAddress]
+
+    return balanceState ? balanceState.lastCreditedBatchId : 0
   }
 
   public async getCurrentBatchId(_networkId = 0): Promise<number> {
@@ -191,6 +202,7 @@ export class DepositApiMock implements DepositApi {
     if (!balanceState) {
       balanceState = {
         balance: ZERO,
+        lastCreditedBatchId: 0,
         pendingDeposits: {
           batchId: currentBatchId,
           amount: ZERO,
