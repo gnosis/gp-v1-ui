@@ -49,8 +49,17 @@ const Wrapper = styled.div`
     }
   }
 
-  g.amcharts-Container.amcharts-Scrollbar.amcharts-XYChartScrollbar > g.amcharts-Sprite-group {
-    fill: var(--color-background-pageWrapper);
+  g {
+    &.amcharts-Container.amcharts-Scrollbar.amcharts-XYChartScrollbar > g.amcharts-Sprite-group {
+      fill: var(--color-background-pageWrapper);
+    }
+    &.amcharts-Sprite-group.amcharts-RoundedRectangle-group {
+      fill-opacity: 0.3;
+    }
+
+    // &[role='scrollbar'] tspan {
+    //   font-weight: bold;
+    // }
   }
 
   path.amcharts-RoundedRectangle {
