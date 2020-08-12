@@ -13,7 +13,7 @@ import { safeTokenName, getNetworkFromId } from '@gnosis.pm/dex-js'
 
 // components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
-import { Chart } from 'components/OrderBookChart'
+import OrderBookWidget from 'components/OrderBook/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 
 // hooks
@@ -51,23 +51,37 @@ const ModalWrapper = styled(ModalBodyWrapper)`
     flex-flow: row wrap;
     align-items: center;
     margin: 1.6rem 0 1rem;
-  }
 
-  > span:first-of-type::after {
-    content: '/';
-    margin: 0 1rem;
+    &:first-of-type {
+      > p {
+        margin: 0 1rem 0 0;
+      }
 
-    @media ${MEDIA.mobile} {
-      display: none;
+      &::after {
+        content: '/';
+        margin: 0 0.6rem;
+        font-size: 2.2rem;
+        opacity: 0.4;
+
+        @media ${MEDIA.mobile} {
+          display: none;
+        }
+      }
     }
-  }
 
-  > span:first-of-type > p {
-    margin: 0 1rem 0 0;
-  }
+    &:last-of-type {
+      > p {
+        margin: 0 0 0 1rem;
+      }
+    }
 
-  > span:last-of-type > p {
-    margin: 0 0 0 1rem;
+    &.swapButtonContainer {
+      margin-left: 1rem;
+
+      > button {
+        border-radius: var(--border-radius);
+      }
+    }
   }
 
   .amcharts-Sprite-group {
@@ -134,7 +148,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
       setQuoteToken(quoteTokenDefault)
     },
     large: true,
-    title: `${safeTokenName(baseToken)}-${safeTokenName(quoteToken)} Order book${networkDescription}`,
+    title: `${safeTokenName(baseToken)}/${safeTokenName(quoteToken)} Order Book${networkDescription}`,
     message: (
       <ModalWrapper>
         <span>

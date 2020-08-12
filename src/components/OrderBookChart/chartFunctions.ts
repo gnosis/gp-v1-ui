@@ -87,7 +87,6 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   buttonContainer.valign = 'top'
   buttonContainer.zIndex = Number.MAX_SAFE_INTEGER
   buttonContainer.marginTop = 5
-  // buttonContainer.marginRight = 5
   buttonContainer.layout = 'horizontal'
   buttonContainer.id = ZOOM_BUTTON_CONTAINER_ID
 

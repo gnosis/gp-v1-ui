@@ -28,8 +28,6 @@ const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
-  /* min-height: 40rem; */
-  /* height: calc(100vh - 30rem); */
   min-height: calc(100vh - 30rem);
   text-align: center;
   width: 100%;
@@ -55,10 +53,41 @@ const Wrapper = styled.div`
     }
   }
 
-  .amcharts-AxisLabel,
-  .amcharts-CategoryAxis .amcharts-Label-group > .amcharts-Label,
-  .amcharts-ValueAxis-group .amcharts-Label-group > .amcharts-Label {
-    fill: var(--color-text-primary);
+  g {
+    &.amcharts-Container.amcharts-Scrollbar.amcharts-XYChartScrollbar > g.amcharts-Sprite-group {
+      fill: var(--color-background-pageWrapper);
+    }
+    &.amcharts-Sprite-group.amcharts-RoundedRectangle-group {
+      fill-opacity: 0.3;
+    }
+
+    // &[role='scrollbar'] tspan {
+    //   font-weight: bold;
+    // }
+  }
+
+  path.amcharts-RoundedRectangle {
+    fill: var(--color-background-input);
+  }
+
+  .amcharts-XYChart,
+  .amcharts-Button,
+  .amcharts-AxisLabel-group,
+  .amcharts-Axis,
+  .amcharts-ValueAxis,
+  .amcharts-AxisTitles {
+    fill-opacity: 0.8;
+    tspan {
+      fill: var(--color-text-primary);
+    }
+  }
+
+  .amcharts-Button-group {
+    cursor: pointer;
+
+    tspan {
+      font-weight: 800;
+    }
   }
 `
 
@@ -109,13 +138,14 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
 
     // Axes config
     const xAxis = chart.xAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+    xAxis.title.text = `${networkDescription} Price (${baseTokenLabel}/${quoteTokenLabel})`
 
     const yAxis = chart.yAxes.values[0] as am4charts.ValueAxis<am4charts.AxisRenderer>
-    yAxis.title.text = baseTokenLabel
+    yAxis.title.text = `Volume (${baseTokenLabel})`
+    xAxis.title.userClassName = yAxis.title.userClassName = 'amcharts-AxisTitles'
 
     // Tool tip
-    const market = baseTokenLabel + '-' + quoteTokenLabel
+    const market = baseTokenLabel + '/' + quoteTokenLabel
 
     const [bidSeries, askSeries] = chart.series.values
     bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
@@ -224,7 +254,8 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
     seeAllButton.events.on('hit', () => {
       xAxis.start = 0
       xAxis.end = 1
-      yAxis.end = 1
+      // to compensate for zoom buttons
+      yAxis.end = 1.13
     })
   }, [chart, initialZoom, bids, asks])
 
