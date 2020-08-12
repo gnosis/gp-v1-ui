@@ -7,7 +7,7 @@ import { TokenDetails, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
-import { PRICE_ESTIMATION_PRECISION } from 'const'
+import { PRICE_ESTIMATION_PRECISION, MEDIA } from 'const'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
 import Spinner from 'components/Spinner'
@@ -18,25 +18,52 @@ import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { EllipsisText } from 'components/Layout'
 
 const Wrapper = styled.div`
-  > strong {
-    text-transform: capitalize;
+  > div {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
     margin: 0 0 1rem;
-    font-size: 1.5rem;
-    box-sizing: border-box;
-    display: inline-block;
+
+    > strong {
+      display: inline-block;
+      box-sizing: border-box;
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+      text-transform: capitalize;
+
+      // tooltip
+      ~ span {
+        font-size: 1.2rem;
+      }
+    }
+    // swapper
+    > div {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      font-size: 1.2rem;
+
+      @media ${MEDIA.mobile} {
+        display: flex;
+      }
+    }
   }
 
   button {
-    border-radius: 1rem;
+    border-radius: 3rem;
+    padding: 0.5rem 1rem;
+    font-size: smaller;
   }
 
   .container {
     display: grid;
-    grid-template-columns: 4fr 1fr 1.5fr;
-    gap: 0.25rem;
+    grid-template-columns: 4fr 1fr min-content;
+    gap: 0.5rem;
     font-size: 1.25rem;
-    align-items: flex-start;
+    align-items: center;
     line-height: 1.4;
+    padding: 0 0.8rem;
 
     > div {
       display: flex;
@@ -48,17 +75,59 @@ const Wrapper = styled.div`
         font-size: smaller;
       }
 
+      // Separator
       > div:nth-child(2) {
         font-size: larger;
         margin: 0 0.1rem;
       }
-
+      // Swap SVG
       > span:last-child {
         padding: 0 0.2rem 0 0.4rem;
       }
     }
+
+    @media ${MEDIA.mobile} {
+      grid-auto-flow: row;
+
+      > div {
+        > div {
+          &:nth-child(2),
+          &:nth-child(3),
+          ~ span {
+            display: none;
+          }
+        }
+      }
+    }
   }
 `
+
+interface SwapPriceProps
+  extends Pick<PriceEstimationsProps, 'baseToken' | 'quoteToken' | 'isPriceInverted' | 'swapPrices'> {
+  separator?: string
+}
+
+export const SwapPrice: React.FC<SwapPriceProps> = ({
+  baseToken,
+  quoteToken,
+  separator = '/',
+  isPriceInverted,
+  swapPrices,
+}) => {
+  const displayBaseToken = isPriceInverted ? quoteToken : baseToken
+  const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
+  const displayBtName = displayTokenSymbolOrLink(displayBaseToken)
+  const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
+
+  return (
+    <div>
+      <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
+      <div>{separator}</div>
+      <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
+      <SwapIcon swap={swapPrices} />
+    </div>
+  )
+}
 
 const OnchainOrderbookTooltip = (
   <HelpTooltipContainer>
@@ -85,7 +154,7 @@ interface PriceEstimationsProps {
 }
 
 export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
-  const { amount, isPriceInverted, priceInputId, priceInverseInputId } = props
+  const { amount, baseToken, quoteToken, isPriceInverted, priceInputId, priceInverseInputId, swapPrices } = props
 
   const { setValue } = useFormContext<TradeFormData>()
 
@@ -104,8 +173,15 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
 
   return (
     <Wrapper>
-      <strong>Price suggestions</strong>
-      <small> - Onchain Orderbook Prices</small> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
+      <div>
+        <strong>Price Suggestions</strong> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
+        <SwapPrice
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+          swapPrices={swapPrices}
+          isPriceInverted={isPriceInverted}
+        />
+      </div>
       <div className="container">
         <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
         {amount && +amount != 0 && +amount != 1 && (
@@ -130,7 +206,7 @@ const HighlightedText = styled.span`
 `
 
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices, swapPrices } = props
+  const { networkId, amount, baseToken, quoteToken, isPriceInverted, swapPrices, updatePrices } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
   const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
@@ -152,18 +228,12 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   }
   const displayPrice = price === 'Infinity' || invertedPrice === 'Infinity' ? 'N/A' : price
 
-  const displayBaseToken = isPriceInverted ? quoteToken : baseToken
-  const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
-
-  const displayBtName = displayTokenSymbolOrLink(displayBaseToken)
-  const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
-
   return (
     <>
       <span>
-        <HighlightedText>Onchain price</HighlightedText> for selling{' '}
+        <HighlightedText>{!isPriceInverted ? 'Selling' : 'Buying'}</HighlightedText>{' '}
         <strong>
-          {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
+          {+amount || '1'} {displayTokenSymbolOrLink(!isPriceInverted ? quoteToken : baseToken)}
         </strong>
         :
       </span>
@@ -174,12 +244,12 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
       >
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
-      <div>
-        <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
-        <div>/</div>
-        <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
-        <SwapIcon swap={swapPrices} />
-      </div>
+      <SwapPrice
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        swapPrices={swapPrices}
+        isPriceInverted={isPriceInverted}
+      />
     </>
   )
 }
