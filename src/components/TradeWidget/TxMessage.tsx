@@ -107,15 +107,20 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
 }
 
 const Warning = styled.p`
-  background: beige;
-  padding: 0.5em;
-  border-radius: 0.3em;
+  position: relative;
   display: flex;
-  border: 1px solid gray;
-  font-weight: bold;
+  background: var(--color-background-deleteOrders);
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 0.3em;
+
+  > span {
+    width: 94%;
+  }
 
   .alert {
-    min-width: 2.5em;
+    width: 5.2%;
+    opacity: 0.4;
     align-self: center;
   }
 `
@@ -266,10 +271,11 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         </div>
       </div>
       {!isLoading && isLowVolume && (
+        // TODO: needs article URL
         <Warning>
           <span>
-            This is a low volume order. Please keep in mind that solvers might not include your order if it does not
-            generate enough fee to pay their running costs. Learn more{' '}
+            This is a low volume order. Please keep in mind that solvers may not include your order if it does not
+            generate enough fees to pay their running costs. Learn more{' '}
             <a
               href="https://docs.gnosis.io/protocol/docs/introduction1/#minimum-order"
               rel="noopener noreferrer"
