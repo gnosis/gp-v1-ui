@@ -72,10 +72,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
   } = tokenBalances
 
   const [visibleForm, showForm] = useState<'deposit' | 'withdraw' | void>()
+  // block background scrolling on open modals
+  useNoScroll(!!visibleForm)
 
   // Checks innerWidth
   const showResponsive = !!innerWidth && innerWidth < MEDIA.MOBILE_LARGE_PX
-  useNoScroll(!!visibleForm && showResponsive)
 
   let className
   if (highlighted) {
