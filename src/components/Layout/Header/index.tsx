@@ -88,10 +88,13 @@ export const DevdocTooltip = (
   </HelpTooltipContainer>
 )
 
-export const BatchNumberWithHelp: React.FC<{ title?: string }> = ({ title = 'Current batch: ' }) => (
+export const BatchNumberWithHelp: React.FC<{ batchId?: number | null; title?: string }> = ({
+  batchId,
+  title = 'Current batch: ',
+}) => (
   <BatchNumberWrapper className="BatchNumberWrapper">
     {title}
-    <strong>{dateToBatchId()}</strong>
+    <strong>{batchId || dateToBatchId()}</strong>
     &nbsp;
     <HelpTooltip tooltip={DevdocTooltip} />
   </BatchNumberWrapper>

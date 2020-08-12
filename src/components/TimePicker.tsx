@@ -40,9 +40,7 @@ const DateTimePickerBase: React.FC<DateTimePickerBase> = ({
     <MobileDateTimePicker
       {...restProps}
       dateAdapter={memoizedDateAdapter}
-      // onChange={customOnChange}
       disablePast
-      showTodayButton
       minutesStep={BATCH_TIME / 60}
       inputFormat="yyyy/MM/dd HH:mm a"
       ampm={false}

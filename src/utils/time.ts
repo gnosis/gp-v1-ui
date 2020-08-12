@@ -48,6 +48,13 @@ export function formatDateFromBatchId(batchId: number, options?: { strict?: bool
   return strict ? formatDistanceStrict(date, new Date(), { addSuffix }) : formatDistanceToNow(date, { addSuffix })
 }
 
+export function formatDateLocaleShortTime(date: Date): string {
+  const localeDate = date.toLocaleDateString()
+  const time = format(date, 'HH:mm')
+
+  return localeDate + ' ' + time
+}
+
 /**
  * Calculates the time when given batch is settled == no longer accepting solutions
  *
@@ -65,10 +72,10 @@ export function calculateSettlingTimestamp(batchId: number): number {
  *
  * @param inMilliseconds  Optional parameter indicating time unit. Defaults to false == in seconds
  */
-export function getTimeRemainingInBatch(params?: { inMilliseconds: boolean }): number {
-  const { inMilliseconds = false } = params || {}
-
-  const timeRemainingInMs = BATCH_TIME_IN_MS - (Date.now() % BATCH_TIME_IN_MS)
+export function getTimeRemainingInBatch(params?: { batches?: number; inMilliseconds?: boolean }): number {
+  const { inMilliseconds = false, batches = 1 } = params || {}
+  const calculatedBatchTimeMs = BATCH_TIME_IN_MS * batches
+  const timeRemainingInMs = calculatedBatchTimeMs - (Date.now() % BATCH_TIME_IN_MS)
 
   return inMilliseconds ? timeRemainingInMs : Math.floor(timeRemainingInMs / 1000)
 }

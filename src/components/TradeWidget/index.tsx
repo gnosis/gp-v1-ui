@@ -24,7 +24,7 @@ import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, 
 
 // api
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { tokenListApi } from 'api'
+import { tokenListApi, exchangeApi } from 'api'
 
 // components
 import Widget from 'components/Layout/Widget'
@@ -372,6 +372,8 @@ export interface TradeFormData {
   priceInverse: string
 }
 
+// 10 minutes
+export const BATCH_START_THRESHOLD = 2
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
 export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
@@ -517,11 +519,18 @@ const TradeWidget: React.FC = () => {
     validUntil: validUntilParam,
   } = useQuery()
 
+  const calculateValidityTimes = (timeSelected?: string | null): string | null => {
+    const currentBatch = dateToBatchId()
+
+    if (!timeSelected || !Number(timeSelected) || currentBatch + 1 > Number(timeSelected)) return null
+
+    return timeSelected
+  }
   // Combining global state with query params
   const defaultPrice = trade.price || priceParam
   const defaultSellAmount = trade.sellAmount || sellParam
-  const defaultValidFrom = trade.validFrom || validFromParam
-  const defaultValidUntil = trade.validUntil || validUntilParam
+  const defaultValidFrom = calculateValidityTimes(trade.validFrom || validFromParam)
+  const defaultValidUntil = calculateValidityTimes(trade.validUntil || validUntilParam)
 
   const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
 
@@ -770,21 +779,20 @@ const TradeWidget: React.FC = () => {
       setIsSubmitting(true)
 
       // TODO: Review this logic. This should be calculated in the same place where we send the tx
-      const currentBatch = dateToBatchId(new Date())
       const validFromWithBatchID = validFrom
       const validUntilWithBatchID = validUntil
 
-      if (currentBatch > validFromWithBatchID) {
-        throw console.error(
-          'Current batchID is greater than input validity start. Please check again. Current batchID:',
-          currentBatch,
-          'ValidFrom batchID:',
-          validFromWithBatchID,
-        )
-      }
+      // if (currentBatch > validFromWithBatchID) {
+      //   throw console.error(
+      //     'Current batchID is greater than input validity start. Please check again. Current batchID:',
+      //     currentBatch,
+      //     'ValidFrom batchID:',
+      //     validFromWithBatchID,
+      //   )
+      // }
 
-      const isASAP = validFrom === 0
-      const isNever = validUntil === 0
+      const isASAP = validFromWithBatchID === 0
+      const isNever = validUntilWithBatchID === 0
 
       // ASAP ORDER
       if (isASAP) {
@@ -879,44 +887,70 @@ const TradeWidget: React.FC = () => {
     const validUntilAsBatch = Number(data[validUntilId])
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
-
-    // Do not let potential null values through
-    if (!buyAmount || buyAmount.isZero() || !sellAmount || sellAmount.isZero() || !cachedBuyToken || !cachedSellToken) {
-      logDebug(
-        `Preventing null values on submit: 
+    try {
+      // Do not let potential null values through
+      if (
+        !buyAmount ||
+        buyAmount.isZero() ||
+        !sellAmount ||
+        sellAmount.isZero() ||
+        !cachedBuyToken ||
+        !cachedSellToken
+      ) {
+        logDebug(
+          `Preventing null values on submit: 
         buyAmount:${buyAmount}, sellAmount:${sellAmount}, 
         cachedBuyToken:${cachedBuyToken}, cachedSellToken${cachedSellToken}, 
         networkId:${networkId}`,
-      )
-      return
-    }
-    const orderParams = {
-      price,
-      validFrom: validFromAsBatch,
-      validUntil: validUntilAsBatch,
-      sellAmount,
-      buyAmount,
-      sellToken: cachedSellToken,
-      buyToken: cachedBuyToken,
-    }
-    if (isConnected && userAddress && networkId) {
-      await _placeOrder({
-        ...orderParams,
-        networkId,
-        userAddress,
-      })
-    } else {
-      // Not connected. Prompt user to connect his wallet
-      const walletInfo = await connectWallet()
+        )
+        return
+      }
 
-      // Then place the order if connection was successful
-      if (walletInfo && walletInfo.networkId === Network.Mainnet && walletInfo.userAddress) {
+      const orderParams = {
+        price,
+        validFrom: validFromAsBatch,
+        validUntil: validUntilAsBatch,
+        sellAmount,
+        buyAmount,
+        sellToken: cachedSellToken,
+        buyToken: cachedBuyToken,
+      }
+
+      const checkBatchStatus = async (batchId: number, network: number): Promise<void> => {
+        // Check that selected validity times arent in the past (calculated as batches)
+        const currentBatchId = await exchangeApi.getCurrentBatchId(network!)
+
+        if (batchId && currentBatchId + BATCH_START_THRESHOLD > batchId) {
+          throw new Error(
+            'Error submitting order. Selected order validity start time has run into the past. Please reselect a time at least 15 minutes (3 batches) in the future and try again. Order was successfully cancelled and no information has been sent to the blockchain.',
+          )
+        }
+      }
+
+      if (isConnected && userAddress && networkId) {
+        await checkBatchStatus(validFromAsBatch, networkId)
         await _placeOrder({
           ...orderParams,
-          networkId: walletInfo.networkId,
-          userAddress: walletInfo.userAddress,
+          networkId,
+          userAddress,
         })
+      } else {
+        // Not connected. Prompt user to connect his wallet
+        const walletInfo = await connectWallet()
+
+        // Then place the order if connection was successful
+        if (walletInfo && walletInfo.networkId === Network.Mainnet && walletInfo.userAddress) {
+          await checkBatchStatus(validFromAsBatch, walletInfo.networkId)
+          await _placeOrder({
+            ...orderParams,
+            networkId: walletInfo.networkId,
+            userAddress: walletInfo.userAddress,
+          })
+        }
       }
+    } catch (error) {
+      console.error('Trade submission error:', error)
+      toast.error(error.message)
     }
   }
 

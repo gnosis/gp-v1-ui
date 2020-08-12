@@ -8,7 +8,7 @@ import { useFormContext } from 'react-hook-form'
 import cog from 'assets/img/cog.svg'
 
 // utils, const
-import { formatDistanceStrict, dateToBatchId, batchIdToDate, formatDate } from 'utils'
+import { formatDistanceStrict, dateToBatchId, batchIdToDate, formatDateLocaleShortTime, formatSeconds } from 'utils'
 import { MEDIA, BATCH_TIME_IN_MS } from 'const'
 
 // components
@@ -16,11 +16,12 @@ import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { DateTimePickerBase, DateTimePickerWrapper } from 'components/TimePicker'
 
 // TradeWidget: subcomponents
-import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
+import { TradeFormTokenId, TradeFormData, BATCH_START_THRESHOLD } from 'components/TradeWidget'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
 import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
+import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 
 const VALID_UNTIL_DEFAULT: number | null = 1440
 const VALID_FROM_DEFAULT: number | null = null
@@ -106,6 +107,12 @@ const Wrapper = styled.div`
           color: #218dff;
           margin: 0 0.4rem;
 
+          // tooltip svg
+          > span {
+            font-size: 1.25rem;
+            color: var(--color-text-primary);
+          }
+
           > .BatchNumberWrapper {
             color: var(--color-text-primary);
             font-weight: 400;
@@ -180,7 +187,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 72rem;
   min-width: 30rem;
-  height: 36rem;
+  height: 40rem;
   padding: 0 0 2.4rem;
   border-radius: 0.8rem;
   display: flex;
@@ -333,6 +340,10 @@ const OrderStartsTooltip = (
   </HelpTooltipContainer>
 )
 
+const OrderExpiresTooltip = (
+  <HelpTooltipContainer>Expiration time is always shown relative to order start time.</HelpTooltipContainer>
+)
+
 interface Props {
   validFromInputId: TradeFormTokenId
   validUntilInputId: TradeFormTokenId
@@ -354,26 +365,40 @@ const OrderValidity: React.FC<Props> = ({
 }) => {
   const [showOrderConfig, setShowOrderConfig] = useSafeState(false)
 
+  const formMethods = useFormContext<TradeFormData>()
+  const { setValue, errors, register, /* getValues, */ watch } = formMethods
+  const validFromBatchId = watch(validFromInputId)
+  const validUntilBatchId = watch(validUntilInputId)
+  // const { validFrom: validFromBatchId, validUntil: validUntilBatchId } = getValues()
+  // console.debug('validFromBatchId', validFromBatchId, validFrom)
+
+  const validFromDefault = validFromBatchId ? Date.parse(batchIdToDate(+validFromBatchId).toString()) : null
   const [validFromButton, setValidFromButton] = useSafeState<number | null>(isAsap ? null : VALID_FROM_DEFAULT)
-  const [validFromCustomTime, setValidFromCustomTime] = useSafeState<number | null>(null)
+  const [validFromCustomTime, setValidFromCustomTime] = useSafeState<number | null>(validFromDefault)
   const [validUntilButton, setValidUntilButton] = useSafeState<number | null>(isUnlimited ? null : VALID_UNTIL_DEFAULT)
   const [validUntilCustomTime, setValidUntilCustomTime] = useSafeState<number | null>(null)
 
-  function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
-    const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
+  const validFromError = errors[validFromInputId]
+  const validUntilError = errors[validUntilInputId]
 
-    if (inputId === validFromInputId) {
-      batchedUpdates(() => {
-        setValidFromButton(relativeTime)
-        setValidFromCustomTime(relativeTimeToDate)
-      })
-    } else {
-      batchedUpdates(() => {
-        setValidUntilButton(relativeTime)
-        setValidUntilCustomTime(relativeTimeToDate)
-      })
-    }
-  }
+  const handleRelativeTimeSelect = useCallback(
+    function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
+      const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
+
+      if (inputId === validFromInputId) {
+        batchedUpdates(() => {
+          setValidFromButton(relativeTime)
+          setValidFromCustomTime(relativeTimeToDate)
+        })
+      } else {
+        batchedUpdates(() => {
+          setValidUntilButton(relativeTime)
+          setValidUntilCustomTime(relativeTimeToDate)
+        })
+      }
+    },
+    [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
+  )
 
   function handleCustomTimeSelect(inputId: string, time: number | null): void {
     if (inputId === validFromInputId) {
@@ -388,22 +413,6 @@ const OrderValidity: React.FC<Props> = ({
       })
     }
   }
-
-  useEffect(() => {
-    if (validFromCustomTime && validUntilButton && validUntilButton !== Infinity) {
-      const adjustedValidUntilTime = validFromCustomTime + validUntilButton * 60 * 1000
-      setValidUntilCustomTime(adjustedValidUntilTime)
-    }
-  }, [setValidUntilCustomTime, validFromCustomTime, validUntilButton])
-
-  const formMethods = useFormContext<TradeFormData>()
-  const { setValue, errors, register, getValues } = formMethods
-  const { validFrom: validFromBatchId, validUntil: validUntilBatchId } = getValues()
-
-  const validFromError = errors[validFromInputId]
-  const validUntilError = errors[validUntilInputId]
-  // const validFromInputValue = watch(validFromInputId)
-  // const validUntilInputValue = watch(validUntilInputId)
 
   const handleShowConfig = useCallback((): void => {
     if (showOrderConfig) {
@@ -446,25 +455,71 @@ const OrderValidity: React.FC<Props> = ({
     [handleShowConfig, validFromError, validUntilError],
   )
 
+  // check differences in batches between now and current batch
+  // used below to start countdown if difference is 3 batches or less
+  const timeRemainingInBatch = useTimeRemainingInBatch(
+    validFromBatchId ? getNumberOfBatchesLeftUntilNow(+validFromBatchId) : 1,
+  )
+
+  // Auto update validUntil when changing validFrom
+  // as validUntil is always relative to validFrom
+  useEffect(() => {
+    if (validUntilButton) {
+      if (validFromButton) {
+        // If a custom until time is chosen
+        if (validUntilButton !== Infinity) {
+          const adjustedValidUntilTime = validFromCustomTime! + validUntilButton * 60 * 1000
+          setValidUntilCustomTime(adjustedValidUntilTime)
+          // if a validUntil time is chosen but a relative validFrom time is selected
+          // when a custom time is not null, neither is button
+        } else if (validFromButton !== Infinity) {
+          const adjustedValidUntilTime = validUntilCustomTime! + validFromButton * 60 * 1000
+          setValidUntilCustomTime(adjustedValidUntilTime)
+        }
+      } else if (validUntilButton !== Infinity) {
+        // validFromButton = NOW aka null
+        const adjustedValidUntilTime = Date.now() + validUntilButton * 60 * 1000
+        setValidUntilCustomTime(adjustedValidUntilTime)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setValidUntilCustomTime, validFromButton, validUntilButton])
+
+  // if time left in batchLimit < 2 seconds
+  // set time explicitly to now
+  // this prevents underflow aka past time
+  useEffect(() => {
+    if (validFromBatchId && timeRemainingInBatch < 2) {
+      handleRelativeTimeSelect(validFromInputId, null)
+      setValue(validFromInputId, null)
+    }
+  }, [setValue, handleRelativeTimeSelect, validFromBatchId, timeRemainingInBatch, validFromInputId])
+
   const validFromDisplayTime = useMemo(
     () =>
       validFromBatchId && !!+validFromBatchId
         ? getNumberOfBatchesLeftUntilNow(+validFromBatchId) > 3
-          ? batchIdToDate(+validFromBatchId).toLocaleString()
-          : formatDistanceStrict(batchIdToDate(+validFromBatchId), Date.now(), { addSuffix: true })
-        : 'Now',
-    [validFromBatchId],
+          ? formatDateLocaleShortTime(batchIdToDate(+validFromBatchId))
+          : formatSeconds(timeRemainingInBatch)
+        : /* formatDistanceStrict(batchIdToDate(+validFromBatchId), Date.now(), { addSuffix: true }) */
+          'Now',
+    [validFromBatchId, timeRemainingInBatch],
   )
 
   const validUntilDisplayTime = useMemo(
     () =>
-      validUntilBatchId && !!+validUntilBatchId
-        ? formatDistanceStrict(
+      validUntilBatchId && !!+validUntilBatchId ? (
+        <>
+          {formatDistanceStrict(
             batchIdToDate(+validUntilBatchId),
             validFromBatchId ? batchIdToDate(+validFromBatchId) : Date.now(),
             { addSuffix: true },
-          )
-        : 'Never',
+          )}{' '}
+          <HelpTooltip tooltip={OrderExpiresTooltip} />
+        </>
+      ) : (
+        'Never'
+      ),
     [validUntilBatchId, validFromBatchId],
   )
 
@@ -474,18 +529,21 @@ const OrderValidity: React.FC<Props> = ({
         <div>
           <div>
             Order starts:{' '}
-            <b title={validFromDisplayTime}>
+            <b>
               {' '}
+              {/* Memoed valid from time */}
               {validFromDisplayTime}{' '}
               {!validFromBatchId ? (
+                // Time is NOW - show tooltip
                 <HelpTooltip tooltip={OrderStartsTooltip} />
               ) : (
-                <BatchNumberWithHelp title="batch:" />
+                // Else show BatchNumber with batch tooltip
+                <BatchNumberWithHelp batchId={+validFromBatchId} title="batch:" />
               )}
             </b>
           </div>
           <div>
-            Order expires: <b title={validUntilDisplayTime}>{validUntilDisplayTime}</b>
+            Order expires: <b>{validUntilDisplayTime}</b>
           </div>
         </div>
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
@@ -530,9 +588,22 @@ const OrderValidity: React.FC<Props> = ({
                 error={validFromError}
                 inputName={validFromInputId}
                 maxDateTime={validUntilButton === Infinity ? validUntilCustomTime! - BATCH_TIME_IN_MS : null}
-                onChange={(e?: Date | string): void =>
-                  handleCustomTimeSelect(validFromInputId, e ? Date.parse(e.toString()) : null)
-                }
+                onClose={(): void => {
+                  if (validFromCustomTime) {
+                    if (validFromCustomTime < Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD) {
+                      handleCustomTimeSelect(validFromInputId, Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD)
+                    }
+
+                    if (validUntilCustomTime && validFromCustomTime >= validUntilCustomTime) {
+                      handleCustomTimeSelect(validUntilInputId, validFromCustomTime + BATCH_TIME_IN_MS)
+                    }
+                  }
+                }}
+                onChange={(e?: Date | string): void => {
+                  if (e) {
+                    handleCustomTimeSelect(validFromInputId, Date.parse(e.toString()))
+                  }
+                }}
               />
             </DateTimePickerWrapper>
           </OrderValidityBox>
@@ -560,9 +631,23 @@ const OrderValidity: React.FC<Props> = ({
                 error={validUntilError}
                 inputName={validUntilInputId}
                 minDateTime={(validFromCustomTime || Date.now()) + BATCH_TIME_IN_MS}
-                onChange={(e?: Date | string): void =>
-                  handleCustomTimeSelect(validUntilInputId, e ? Date.parse(e.toString()) : null)
-                }
+                onClose={(): void => {
+                  // prevent choosing values in the past relative to either Date.now or chosen start date
+                  if (validUntilCustomTime) {
+                    if (validUntilCustomTime < Date.now() + BATCH_TIME_IN_MS) {
+                      handleCustomTimeSelect(validUntilInputId, Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD)
+                    }
+
+                    if (validFromCustomTime && validUntilCustomTime <= validFromCustomTime + BATCH_TIME_IN_MS) {
+                      handleCustomTimeSelect(validUntilInputId, validFromCustomTime + BATCH_TIME_IN_MS)
+                    }
+                  }
+                }}
+                onChange={(e?: Date | string): void => {
+                  if (e) {
+                    handleCustomTimeSelect(validUntilInputId, Date.parse(e.toString()))
+                  }
+                }}
               />
             </DateTimePickerWrapper>
           </OrderValidityBox>
