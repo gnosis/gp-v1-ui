@@ -136,13 +136,17 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
           {isWeth ? (
             <ul>
               <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
-                {ethBalance ? formatSmart(ethBalance, decimals) : '-'} ETH{' '}
+                <span>
+                  {ethBalance ? formatSmart(ethBalance, decimals) : '-'} <span>ETH</span>
+                </span>{' '}
                 <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
               <li title={formatAmountFull({ amount: walletBalance, precision: decimals }) || undefined}>
                 {(claiming || depositing) && spinner}
-                {formatSmart(walletBalance, decimals) + ' '}
-                WETH <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
+                <span>
+                  {formatSmart(walletBalance, decimals)} <span>WETH</span>
+                </span>{' '}
+                <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
               </li>
             </ul>
           ) : (

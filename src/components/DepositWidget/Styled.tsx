@@ -85,12 +85,18 @@ export const TokenRow = styled.tr`
     padding: 0;
 
     li {
-      white-space: nowrap;
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-end;
+
+      > span {
+        margin-right: 0.5rem;
+      }
     }
 
     button.wrapUnwrapEther {
       font-size: 1rem;
-      padding 0.2rem 0.5rem;
+      padding: 0.2rem 0.5rem;
       margin: 0.2rem 0;
       display: inline;
       min-width: 5rem;
