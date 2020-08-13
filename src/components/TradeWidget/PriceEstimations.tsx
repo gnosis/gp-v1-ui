@@ -77,7 +77,7 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
   const { setValue } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
-    (price: string, invertedPrice) => (): void => {
+    (price: string, invertedPrice: string) => (): void => {
       if (!isPriceInverted) {
         setValue(priceInputId, price)
         setValue(priceInverseInputId, invertedPrice)
