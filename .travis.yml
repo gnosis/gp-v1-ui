@@ -16,8 +16,7 @@ before_install:
     $TRAVIS_BRANCH = master || \
     $TRAVIS_BRANCH = release/* || \
     $TRAVIS_BRANCH = hotfix/* || \
-    $TRAVIS_TAG != "" ]] && \
-    echo "production" || echo "develop")
+    $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
 before_deploy:
   # zip ./dist folder if tag IS present
   - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = "" ]]; then
@@ -72,7 +71,7 @@ deploy:
   # add release_v*.zip file to tagged Releases on github
   - provider: releases
     api_key: $GITHUB_RELEASE_TAG_API_TOKEN
-    body: "IPFS hash: $IPFS_HASH"
+    release_notes: "IPFS hash: $IPFS_HASH"
     file: 
       - web_$TRAVIS_TAG.zip
       - ipfs_hash.txt

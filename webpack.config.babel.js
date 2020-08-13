@@ -178,7 +178,7 @@ module.exports = ({ stats = false } = {}) => ({
       MOCK_WEB3: process.env.MOCK || 'false',
       // AUTOCONNECT: only applies for mock implementation
       AUTOCONNECT: 'true',
-      PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
+      PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || (isProduction && 'production') || 'develop',
       APP_ID: null,
       INFURA_ID: null,
       WALLET_CONNECT_BRIDGE: null,
