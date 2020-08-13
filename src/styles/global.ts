@@ -44,8 +44,8 @@ const GlobalStyles = createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 6px!important;
-    height: 6px!important;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-thumb {
       background-color: rgba(0,0,0,.2);

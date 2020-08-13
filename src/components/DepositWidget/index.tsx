@@ -80,6 +80,44 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
             letter-spacing: 0;
             line-height: 1.2;
             flex-flow: row nowrap;
+
+            > div {
+              overflow-y: auto;
+              padding: 0.3rem 0;
+              white-space: nowrap;
+              
+              &::scrollbar {
+                height: 0.3rem;
+              }
+              &::-webkit-scrollbar {
+                height: 0.3rem;
+              }
+              &::-moz-scrollbar {
+                height: 0.3rem;
+              }
+
+              &::scrollbar-thumb {
+                background-color: var(--color-background-row-hover);
+              }
+              &::-webkit-scrollbar-thumb {
+                background-color: var(--color-background-row-hover);
+              }
+              &::-moz-scrollbar-thumb {
+                background-color: var(--color-background-row-hover);
+              }
+
+              &:hover {
+                ::scrollbar-thumb {
+                  background-color: var(--color-background-button-hover);
+                }
+                ::-webkit-scrollbar-thumb {
+                  background-color: var(--color-background-button-hover);
+                }
+                ::-moz-scrollbar-thumb {
+                  background-color: var(--color-background-button-hover);
+                }
+              }
+            }
           }
         }
 
@@ -259,7 +297,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 
   return (
     <StandaloneCardWrapper>
-      <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
+      <BalancesWidget $columns="14.1rem repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
         <FilterTools
           className="filterToolsBar"
           resultName="tokens"
@@ -279,64 +317,64 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
         {error ? (
           <ErrorMsg title="oops..." message="Something happened while loading the balances" />
         ) : (
-          <CardTable className="balancesOverview" $gap="0 1rem">
-            <thead>
-              <tr>
-                <th>Token</th>
-                <th>Exchange Balance</th>
-                <th>Pending Withdrawals</th>
-                <th>Wallet Balance</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedBalances && displayedBalances.length > 0 ? (
-                displayedBalances.map(tokenBalances => (
-                  <Row
-                    key={tokenBalances.address}
-                    ethBalance={ethBalance}
-                    tokenBalances={tokenBalances}
-                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
-                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
-                      depositToken(balance, tokenBalances.address, onTxHash)
-                    }
-                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
-                      return requestWithdrawConfirmation(
-                        balance,
-                        tokenBalances.address,
-                        tokenBalances.claimable,
-                        onTxHash,
-                      )
-                    }}
-                    onClaim={(): Promise<void | React.ReactText> => claimToken(tokenBalances.address)}
-                    claiming={claiming.has(tokenBalances.address)}
-                    withdrawing={withdrawing.has(tokenBalances.address)}
-                    depositing={depositing.has(tokenBalances.address)}
-                    highlighted={highlighted.has(tokenBalances.address)}
-                    enabling={enabling.has(tokenBalances.address)}
-                    enabled={enabled.has(tokenBalances.address)}
-                    immatureClaim={immatureClaim.has(tokenBalances.address)}
-                    {...windowSpecs}
-                  />
-                ))
-              ) : balances.length === 0 && hasTokensToShow ? (
-                <NoTokensMessage>
-                  <td>
-                    All tokens disabled. Enable some in <a onClick={toggleModal}>Manage Tokens</a>
-                  </td>
-                </NoTokensMessage>
-              ) : (
-                (search || hideZeroBalances) && (
+            <CardTable className="balancesOverview" $gap="0 1rem">
+              <thead>
+                <tr>
+                  <th>Token</th>
+                  <th>Exchange Balance</th>
+                  <th>Pending Withdrawals</th>
+                  <th>Wallet Balance</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedBalances && displayedBalances.length > 0 ? (
+                  displayedBalances.map(tokenBalances => (
+                    <Row
+                      key={tokenBalances.address}
+                      ethBalance={ethBalance}
+                      tokenBalances={tokenBalances}
+                      onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                      onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                        depositToken(balance, tokenBalances.address, onTxHash)
+                      }
+                      onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                        return requestWithdrawConfirmation(
+                          balance,
+                          tokenBalances.address,
+                          tokenBalances.claimable,
+                          onTxHash,
+                        )
+                      }}
+                      onClaim={(): Promise<void | React.ReactText> => claimToken(tokenBalances.address)}
+                      claiming={claiming.has(tokenBalances.address)}
+                      withdrawing={withdrawing.has(tokenBalances.address)}
+                      depositing={depositing.has(tokenBalances.address)}
+                      highlighted={highlighted.has(tokenBalances.address)}
+                      enabling={enabling.has(tokenBalances.address)}
+                      enabled={enabled.has(tokenBalances.address)}
+                      immatureClaim={immatureClaim.has(tokenBalances.address)}
+                      {...windowSpecs}
+                    />
+                  ))
+                ) : balances.length === 0 && hasTokensToShow ? (
                   <NoTokensMessage>
                     <td>
-                      No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                      All tokens disabled. Enable some in <a onClick={toggleModal}>Manage Tokens</a>
                     </td>
                   </NoTokensMessage>
-                )
-              )}
-            </tbody>
-          </CardTable>
-        )}
+                ) : (
+                      (search || hideZeroBalances) && (
+                        <NoTokensMessage>
+                          <td>
+                            No enabled tokens match provided filters <a onClick={clearFilters}>clear filters</a>
+                          </td>
+                        </NoTokensMessage>
+                      )
+                    )}
+              </tbody>
+            </CardTable>
+          )}
         <Modali.Modal {...modalProps} />
       </BalancesWidget>
     </StandaloneCardWrapper>
