@@ -44,7 +44,7 @@ const Wrapper = styled.div`
       margin-left: auto;
       font-size: 1.2rem;
 
-      @media ${MEDIA.mobile} {
+      @media ${MEDIA.xSmallDown} {
         display: flex;
       }
     }
@@ -86,13 +86,17 @@ const Wrapper = styled.div`
       }
     }
 
-    @media ${MEDIA.mobile} {
+    @media ${MEDIA.xSmallDown} {
       grid-auto-flow: row;
 
       > div {
+        // tokenA/TokenB swapSVG
         > div {
+          // hide: /
           &:nth-child(2),
+          // hide: tokenB
           &:nth-child(3),
+          // hide: swapSVG
           ~ span {
             display: none;
           }
