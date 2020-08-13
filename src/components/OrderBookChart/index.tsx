@@ -17,6 +17,7 @@ import { Offer, PricePointDetails, ZoomValues } from 'components/OrderBookChart/
 import { calcInitialZoom, calcZoomY } from 'components/OrderBookChart/zoomFunctions'
 import { createChart, getZoomButtonContainer, setLabel } from 'components/OrderBookChart/chartFunctions'
 import { processData, _printOrderBook } from 'components/OrderBookChart/dataProcessingFunctions'
+import { useOrderbookContext } from 'components/TradeWidget'
 
 const ZOOM_INCREMENT_PERCENTAGE = 0.25 // %
 const ORDERBOOK_MINIMUM_OWL_VOLUME = 10
@@ -270,6 +271,41 @@ export const Chart: React.FC<ChartProps> = props => {
       yAxis.end = 1.13
     })
   }, [chart, initialZoom, bids, asks])
+
+  const orderbookContext = useOrderbookContext()
+
+  useEffect(() => {
+    if (!chart) return
+    const [bidSeries, askSeries] = chart.series.values
+
+    const [bidBullet] = bidSeries.bullets
+    const [askBullet] = askSeries.bullets
+
+    const onBulletClick: Parameters<typeof bidBullet.events.on>[1] = (evt): void => {
+      const dataPoint = evt.target.dataItem?.dataContext as PricePointDetails
+      if (!dataPoint) return
+
+      const { price } = dataPoint
+
+      console.log('Setting price', price.toString(10), 'sellToken', quoteToken.symbol, 'receiveToken', baseToken.symbol)
+
+      const { setPrice, setSellToken, setReceiveToken } = orderbookContext
+
+      setPrice(price)
+      // if chart tokens changed
+      // change TradeWidget tokens
+      setSellToken(quoteToken)
+      setReceiveToken(baseToken)
+    }
+
+    const bidEvent = bidBullet.events.on('hit', onBulletClick)
+    const askEvent = askBullet.events.on('hit', onBulletClick)
+
+    return (): void => {
+      bidEvent.dispose()
+      askEvent.dispose()
+    }
+  }, [baseToken, chart, quoteToken, orderbookContext])
 
   return <Wrapper ref={mountPoint} />
 }
