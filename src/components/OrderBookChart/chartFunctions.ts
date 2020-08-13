@@ -50,6 +50,14 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   bidSeries.fill = bidSeries.stroke
   bidSeries.fillOpacity = 0.1
 
+  const bidBullet = bidSeries.bullets.push(new am4charts.CircleBullet())
+
+  bidBullet.fillOpacity = 0
+  bidBullet.strokeOpacity = 0
+  bidBullet.cursorOverStyle = am4core.MouseCursorStyle.pointer
+
+  bidBullet.states.create('hover').properties.strokeOpacity = 1
+
   const askSeries = chart.series.push(new am4charts.StepLineSeries())
   askSeries.dataFields.valueX = 'priceNumber'
   askSeries.dataFields.valueY = 'askValueY'
@@ -57,6 +65,14 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   askSeries.stroke = am4core.color(colors.red)
   askSeries.fill = askSeries.stroke
   askSeries.fillOpacity = 0.1
+
+  const askBullet = askSeries.bullets.push(new am4charts.CircleBullet())
+
+  askBullet.fillOpacity = 0
+  askBullet.strokeOpacity = 0
+  askBullet.cursorOverStyle = am4core.MouseCursorStyle.pointer
+
+  askBullet.states.create('hover').properties.strokeOpacity = 1
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
