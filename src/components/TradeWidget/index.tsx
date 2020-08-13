@@ -9,14 +9,14 @@ import Modali from 'modali'
 import BN from 'bn.js'
 import { isAddress } from 'web3-utils'
 
-import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
+import { encodeTokenSymbol, decodeSymbol, invertPrice } from '@gnosis.pm/dex-js'
 
 // assets
 import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 
 // const, types
-import { ZERO } from 'const'
+import { ZERO, PRICE_ESTIMATION_PRECISION } from 'const'
 import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
 
@@ -65,6 +65,7 @@ import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
 
 import { DevTool } from 'HookFormDevtool'
+import BigNumber from 'bignumber.js'
 
 export const WrappedWidget = styled(Widget)`
   height: 100%;
@@ -488,6 +489,20 @@ function buildUrl(params: {
   return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
 }
 
+export interface OrderbookContextI {
+  setSellToken: (token: TokenDetails) => void
+  setReceiveToken: (token: TokenDetails) => void
+  setPrice: (price: BigNumber) => void
+}
+
+const OrderbookContext = React.createContext<OrderbookContextI>({
+  setSellToken: () => void 0,
+  setReceiveToken: () => void 0,
+  setPrice: () => void 0,
+})
+
+export const useOrderbookContext = (): OrderbookContextI => React.useContext(OrderbookContext)
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -609,6 +624,19 @@ const TradeWidget: React.FC = () => {
   const sellValue = watch(sellInputId)
   const validFromValue = watch(validFromId)
   const validUntilValue = watch(validUntilId)
+
+  const orderbookContextValue: OrderbookContextI = useMemo(
+    () => ({
+      setSellToken,
+      setReceiveToken,
+      setPrice: (price): void => {
+        const invertedPrice = invertPrice(price)
+        setValue(priceInputId, price.toFixed(PRICE_ESTIMATION_PRECISION), true)
+        setValue(priceInverseInputId, invertedPrice.toFixed(PRICE_ESTIMATION_PRECISION), true)
+      },
+    }),
+    [setValue],
+  )
 
   // Avoid querying for a new price at every input change
   const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
@@ -972,15 +1000,17 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
             readOnly
           />
-          <Price
-            priceInputId={priceInputId}
-            priceInverseInputId={priceInverseInputId}
-            sellToken={sellToken}
-            receiveToken={receiveToken}
-            tabIndex={1}
-            swapPrices={swapPrices}
-            priceShown={priceShown}
-          />
+          <OrderbookContext.Provider value={orderbookContextValue}>
+            <Price
+              priceInputId={priceInputId}
+              priceInverseInputId={priceInverseInputId}
+              sellToken={sellToken}
+              receiveToken={receiveToken}
+              tabIndex={1}
+              swapPrices={swapPrices}
+              priceShown={priceShown}
+            />
+          </OrderbookContext.Provider>
           <PriceEstimations
             networkId={networkIdOrDefault}
             baseToken={receiveToken}
