@@ -85,12 +85,18 @@ export const TokenRow = styled.tr`
     padding: 0;
 
     li {
-      white-space: nowrap;
+      display: flex;
+      align-items: baseline;
+      justify-content: flex-end;
+
+      > span {
+        margin-right: 0.5rem;
+      }
     }
 
     button.wrapUnwrapEther {
       font-size: 1rem;
-      padding 0.2rem 0.5rem;
+      padding: 0.2rem 0.5rem;
       margin: 0.2rem 0;
       display: inline;
       min-width: 5rem;
@@ -122,6 +128,20 @@ export const RowClaimButton = styled.button`
     color: currentColor;
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  > div {
+    display: flex;
+    align-items: inherit;
+
+    > .immatureClaimTooltip {
+      color: #d2a827;
+      margin-left: 0.5rem;
+
+      > span {
+        margin: 0.5rem;
+      }
+    }
   }
 `
 

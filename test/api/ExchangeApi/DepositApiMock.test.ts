@@ -27,26 +27,31 @@ beforeEach(() => {
       [USER_1]: {
         [TOKEN_1]: {
           balance: ZERO,
+          lastCreditedBatchId: 0,
           pendingDeposits: { amount: ZERO, batchId: 0 },
           pendingWithdraws: { amount: ZERO, batchId: 0 },
         },
         [TOKEN_2]: {
           balance: AMOUNT,
+          lastCreditedBatchId: 0,
           pendingDeposits: { amount: ZERO, batchId: 0 },
           pendingWithdraws: { amount: ZERO, batchId: 0 },
         },
         [TOKEN_4]: {
           balance: ZERO,
+          lastCreditedBatchId: 0,
           pendingDeposits: { amount: AMOUNT, batchId: 1 },
           pendingWithdraws: { amount: AMOUNT, batchId: 1 },
         },
         [TOKEN_5]: {
           balance: AMOUNT,
+          lastCreditedBatchId: 0,
           pendingDeposits: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
           pendingWithdraws: { amount: AMOUNT, batchId: testHelpers.BATCH_ID },
         },
         [TOKEN_6]: {
           balance: AMOUNT,
+          lastCreditedBatchId: 0,
           pendingDeposits: { amount: AMOUNT_SMALL, batchId: 1 },
           pendingWithdraws: { amount: AMOUNT_SMALL, batchId: 1 },
         },
