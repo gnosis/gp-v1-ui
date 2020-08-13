@@ -16,8 +16,7 @@ before_install:
     $TRAVIS_BRANCH = master || \
     $TRAVIS_BRANCH = release/* || \
     $TRAVIS_BRANCH = hotfix/* || \
-    $TRAVIS_TAG != "" ]] && \
-    echo "production" || echo "develop")
+    $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
 before_deploy:
   # zip ./dist folder if tag IS present
   - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = "" ]]; then
