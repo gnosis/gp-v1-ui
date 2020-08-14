@@ -116,7 +116,7 @@
     "jest-enzyme": "^7.1.2",
     "markdown-it-link-attributes": "^3.0.0",
     "preload-webpack-plugin": "^3.0.0-beta.4",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.5",
     "react-dev-utils": "^10.0.0",
     "react-test-renderer": "^16.12.0",
     "rimraf": "^3.0.1",
