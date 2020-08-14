@@ -83,10 +83,7 @@ export const formatTimeInHours = (
     : +validTime < 0
     ? errorText
     : `in ~
-${(+validTime / 60)
-  .toFixed(2)
-  .replace(leadingAndTrailingZeros, '')
-  .replace(trailingZerosAfterDot, '$1')}
+${(+validTime / 60).toFixed(2).replace(leadingAndTrailingZeros, '').replace(trailingZerosAfterDot, '$1')}
 hours`
 
 export function parseBigNumber(value: string): BigNumber | null {

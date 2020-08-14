@@ -79,7 +79,7 @@ export const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDiv
     () => ({
       show: (): void => setIsShown(true),
       hide: (): void => setIsShown(false),
-      toggle: (): void => setIsShown(isShown => !isShown),
+      toggle: (): void => setIsShown((isShown) => !isShown),
       target: targetRef,
       ref: popupRef,
     }),

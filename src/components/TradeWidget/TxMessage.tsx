@@ -84,7 +84,7 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   // true = direct
   // false = indirect
   const [showPrice, setShowPrice] = useSafeState(true)
-  const swapPrices = (): void => setShowPrice(state => !state)
+  const swapPrices = (): void => setShowPrice((state) => !state)
 
   const displaySellToken = displayTokenSymbolOrLink(sellToken)
   const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
