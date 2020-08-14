@@ -38,6 +38,7 @@ export interface TokenBalanceDetails extends TokenDetails {
   claimable: boolean
   enabled: boolean
   totalExchangeBalance: BN
+  immatureClaim?: boolean
 }
 
 export interface WithTxOptionalParams {

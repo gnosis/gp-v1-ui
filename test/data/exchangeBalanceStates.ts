@@ -13,6 +13,7 @@ export const createFlux = (amount: BN = ZERO, batchId = 0): PendingFlux => {
 
 const STATE_ZERO = {
   balance: ZERO,
+  lastCreditedBatchId: 0,
   pendingDeposits: createFlux(),
   pendingWithdraws: createFlux(),
 }
@@ -22,7 +23,9 @@ export const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_1]: STATE_ZERO, // 0. WETH: decimals=18
     [TOKEN_2]: {
       // 0. USDT: decimals=6
+      // Not claimable, lastCreditedBatchId = pending batchId withdraw
       balance: new BN('1750173903'), // 1,750.17
+      lastCreditedBatchId: 1,
       pendingDeposits: {
         amount: new BN('850000'), // 0.85,
         batchId: 1,
@@ -32,6 +35,7 @@ export const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_3]: {
       // 0. TUSD: decimals=18
       balance: new BN('500000000000000000'), // 0.5
+      lastCreditedBatchId: 0,
       pendingDeposits: createFlux(),
       pendingWithdraws: {
         amount: new BN('100000000000000000'), // 0.1,
@@ -42,12 +46,14 @@ export const exchangeBalanceStates: BalancesByUserAndToken = {
     [TOKEN_5]: {
       // 0. PAX: decimals=18
       balance: new BN('100144563322323'), // 50,048.29
+      lastCreditedBatchId: 0,
       pendingDeposits: createFlux(),
       pendingWithdraws: createFlux(),
     },
     [TOKEN_6]: {
       // 0. GUSD: decimals=2
       balance: new BN('5004829'), // 50,048.29
+      lastCreditedBatchId: Number.MAX_SAFE_INTEGER - 20,
       pendingDeposits: createFlux(),
       pendingWithdraws: {
         amount: new BN('10147'), // 101.47
