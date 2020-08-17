@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js'
 
-import { calcMinTradableAmountInOwl } from 'utils/minFee'
+import { calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
 
 describe('calcMinTradableAmountInOwl', () => {
   const samples = {
@@ -78,5 +78,19 @@ describe('calcMinTradableAmountInOwl', () => {
         },
       ]
     `)
+  })
+})
+
+describe('roundToNext', () => {
+  it('rounds up to a number', () => {
+    const rounded = roundToNext(1234, 500)
+
+    expect(rounded.isEqualTo(1500)).toBe(true)
+  })
+
+  it('does not increase when already matching', () => {
+    const rounded = roundToNext(2000, 500)
+
+    expect(rounded.isEqualTo(2000)).toBe(true)
   })
 })
