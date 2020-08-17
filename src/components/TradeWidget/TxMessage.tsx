@@ -115,7 +115,11 @@ const Warning = styled.p`
   padding: 1rem;
   border-radius: 0.3em;
 
-  > span {
+  a {
+    color: var(--color-text-active);
+  }
+
+  > div {
     width: 94%;
   }
 
@@ -137,8 +141,9 @@ interface LowVolumeResult {
   isLowVolume?: boolean
   difference?: BigNumber
   minAmount?: BigNumber
-  roundedUpTradeAmount?: BigNumber
+  roundedUpAmount?: BigNumber
   roundedUpTo?: number
+  roundedUpAmountInOwl?: BigNumber
 }
 
 const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolumeParams): LowVolumeResult => {
@@ -182,15 +187,17 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
       gasPrice,
-      roundedUpTradeAmount: roundedUpAmount.toString(10),
+      roundedUpAmount: roundedUpAmount.toString(10),
+      roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp.toString(10),
     })
     return {
       isLowVolume,
       difference,
       isLoading: false,
       minAmount: minTradableAmountPerToken,
-      roundedUpTradeAmount: roundedUpAmount,
+      roundedUpAmount: roundedUpAmount,
       roundedUpTo: ROUND_TO_NUMBER,
+      roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp,
     }
   }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
 }
@@ -213,7 +220,12 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
   const displaySellToken = displayTokenSymbolOrLink(sellToken)
   const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
 
-  const { isLoading, isLowVolume, roundedUpTradeAmount: recommendedAmount } = useLowVolumeAmount({
+  const {
+    isLoading,
+    isLowVolume,
+    roundedUpAmount: recommendedAmount,
+    roundedUpAmountInOwl: roundedAmountInUSD,
+  } = useLowVolumeAmount({
     sellToken,
     networkId,
     sellTokenAmount,
@@ -305,24 +317,30 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         </div>
       </div>
       {!isLoading && isLowVolume && (
-        // TODO: needs article URL
         <Warning>
-          <span>
-            This is a low volume order. Please keep in mind that solvers may not include your order if it does not
-            generate enough fees to pay their running costs. Learn more{' '}
-            <a
-              href="https://docs.gnosis.io/protocol/docs/introduction1/#minimum-order"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              here
-            </a>
-            . We recommend setting sell token amount to{' '}
-            <a onClick={setRecommendedSellAmount}>
-              <strong>{adjustedRecommendedAmount}</strong>
-            </a>
-            .
-          </span>
+          <div>
+            <p>
+              This is a low volume order. We recommend selling at least{' '}
+              <a onClick={setRecommendedSellAmount}>
+                <strong>
+                  ${roundedAmountInUSD?.toString(10)} ({adjustedRecommendedAmount})
+                </strong>
+              </a>{' '}
+              of the token.
+            </p>
+            <p>
+              Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
+              their running consts. Learn more{' '}
+              <a
+                href="https://docs.gnosis.io/protocol/docs/introduction1/#minimum-order"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                here
+              </a>
+              .
+            </p>
+          </div>
           <img className="alert" src={alertIcon} />
         </Warning>
       )}
