@@ -1,8 +1,13 @@
 import { useLocation } from 'react-router'
 import { useMemo } from 'react'
-import { sanitizeInput, sanitizeNegativeAndMakeMultipleOf } from 'utils'
+import { sanitizeInput, checkDateOrValidBatchTime } from 'utils'
 
-export function useQuery(): { sellAmount: string; price: string; validFrom?: string; validUntil?: string } {
+export function useQuery(): {
+  sellAmount: string
+  price: string
+  validFrom: string | null
+  validUntil: string | null
+} {
   const { search } = useLocation()
 
   return useMemo(() => {
@@ -11,8 +16,8 @@ export function useQuery(): { sellAmount: string; price: string; validFrom?: str
     return {
       sellAmount: sanitizeInput(query.get('sell')),
       price: sanitizeInput(query.get('price')),
-      validFrom: Number(query.get('from')) ? sanitizeNegativeAndMakeMultipleOf(query.get('from')) : undefined,
-      validUntil: Number(query.get('from')) ? sanitizeNegativeAndMakeMultipleOf(query.get('expires')) : undefined,
+      validFrom: checkDateOrValidBatchTime(query.get('from')),
+      validUntil: checkDateOrValidBatchTime(query.get('expires')),
     }
   }, [search])
 }
