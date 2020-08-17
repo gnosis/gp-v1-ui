@@ -123,10 +123,7 @@ export class CacheMixin {
     const hash = this.hash.bind(this)
     // array
     if (Array.isArray(obj)) {
-      return obj
-        .sort()
-        .map(hash)
-        .join('|')
+      return obj.sort().map(hash).join('|')
     }
     // obj
     return Object.keys(obj)

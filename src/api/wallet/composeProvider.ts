@@ -189,7 +189,7 @@ export const composeProvider = <T extends Provider>(
   const composedProvider: T = providerFromEngine(engine)
 
   const providerProxy = new Proxy(composedProvider, {
-    get: function(target, prop, receiver): unknown {
+    get: function (target, prop, receiver): unknown {
       if (prop === 'sendAsync' || prop === 'send') {
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)

@@ -6,7 +6,6 @@ import DateFnsAdapter from '@material-ui/pickers/adapter/date-fns'
 import { Control, UseFormMethods, FieldError, Controller } from 'react-hook-form'
 
 import { TradeFormData } from './TradeWidget'
-import { FormInputError } from './TradeWidget/FormMessage'
 import { BATCH_TIME, BATCH_TIME_IN_MS } from 'const'
 
 interface DateTimePickerBase extends Omit<DateTimePickerProps, 'renderInput'> {
@@ -46,13 +45,7 @@ const DateTimePickerBase: React.FC<DateTimePickerBase> = ({
       ampm={false}
       minDateTime={minDateTime}
       renderInput={(props): JSX.Element => (
-        <TextField
-          {...props}
-          label="Set custom date"
-          name={inputName}
-          error={!!error}
-          helperText={error && <FormInputError errorMessage={error.message} />}
-        />
+        <TextField {...props} label="Set custom date" name={inputName} error={!!error} />
       )}
     />
   )

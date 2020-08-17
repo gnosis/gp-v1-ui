@@ -228,7 +228,7 @@ export function getTokensFactory(factoryParams: {
     }
   }
 
-  return function(networkId: number): TokenDetails[] {
+  return function (networkId: number): TokenDetails[] {
     if (!areTokensUpdated.has(networkId)) {
       logDebug(`[tokenListFactory][${networkId}] Will update tokens for network`)
       updateTokens(networkId)
@@ -241,7 +241,7 @@ export function subscribeToTokenListFactory(factoryParams: {
   tokenListApi: TokenList
 }): (callback: SubscriptionCallback<TokenDetails[]>) => Command {
   const { tokenListApi } = factoryParams
-  return function(callback: SubscriptionCallback<TokenDetails[]>): Command {
+  return function (callback: SubscriptionCallback<TokenDetails[]>): Command {
     return tokenListApi.subscribe(callback)
   }
 }

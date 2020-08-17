@@ -317,7 +317,7 @@ export class WalletApiImpl implements WalletApi {
       // hackaround
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
-      provider.handleReadRequests = async function(payload: unknown): Promise<unknown> {
+      provider.handleReadRequests = async function (payload: unknown): Promise<unknown> {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         if (!this.http) {

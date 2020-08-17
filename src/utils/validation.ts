@@ -1,4 +1,4 @@
-import { ValidationError, ObjectSchema } from '@hapi/joi'
+import { ValidationError, ObjectSchema } from 'joi'
 import { validInputPattern } from 'utils'
 import { ResolverResult } from 'react-hook-form/dist/types/form'
 
@@ -54,6 +54,7 @@ export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown
 }
 
 export const NUMBER_VALIDATION_KEYS = {
+  REF: 'any.ref',
   BASE: 'number.base',
   UNSAFE: 'number.unsafe',
   REQUIRED: 'any.required',
@@ -63,4 +64,5 @@ export const NUMBER_VALIDATION_KEYS = {
   MAX: 'number.max',
   MULTIPLE: 'number.multiple',
   INTEGER: 'number.integer',
+  DATE_MIN: 'date.min',
 }

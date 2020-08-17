@@ -4,7 +4,7 @@ import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { toast } from 'toastify'
 import styled from 'styled-components'
-import joi from '@hapi/joi'
+import joi from 'joi'
 
 // const, type, utils
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'

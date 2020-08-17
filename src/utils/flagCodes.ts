@@ -10,11 +10,7 @@ export interface Flag<T extends string> {
 const FIXED_SENTINEL = 'dec0de'
 
 // lowercase hex value to be appended to tx.data
-const SENTINEL =
-  FIXED_SENTINEL +
-  Number(CONFIG.appId)
-    .toString(16)
-    .padStart(2, '0')
+const SENTINEL = FIXED_SENTINEL + Number(CONFIG.appId).toString(16).padStart(2, '0')
 
 if (!/^[0-9a-f]+$/.test(SENTINEL)) {
   throw new Error(`SENTINEL isn't valid. Expected lowercase hex value, got ${SENTINEL}`)

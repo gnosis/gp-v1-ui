@@ -1,5 +1,5 @@
 import React from 'react'
-import Joi from '@hapi/joi'
+import Joi from 'joi'
 import { UseFormMethods } from 'react-hook-form'
 import { FieldErrors } from 'react-hook-form/dist/types/form'
 import { ErrorMessage } from '@hookform/error-message'
@@ -18,11 +18,7 @@ const URLSchema = Joi.string()
   .uri({ scheme: ['http', 'https'] })
 const BridgeSchema = URLSchema.message('Bridge must be a valid URL')
 const RPCSchema = URLSchema.message('RPC must be a valid URL')
-const InfuraIdSchema = Joi.string()
-  .empty('')
-  .optional()
-  .length(32)
-  .message('Must be a valid id')
+const InfuraIdSchema = Joi.string().empty('').optional().length(32).message('Must be a valid id')
 
 const WCSettingsSchema = Joi.object({
   bridge: BridgeSchema,
