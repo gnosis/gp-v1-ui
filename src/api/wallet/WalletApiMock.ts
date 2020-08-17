@@ -58,6 +58,10 @@ export class WalletApiMock implements WalletApi {
     return this.connect()
   }
 
+  public async getGasPrice(): Promise<null> {
+    return null
+  }
+
   public async getAddress(): Promise<string> {
     assert(this._connected, 'The wallet is not connected')
 
