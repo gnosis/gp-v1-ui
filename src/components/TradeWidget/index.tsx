@@ -15,7 +15,7 @@ import { SwitcherSVG } from 'assets/img/SVG'
 import arrow from 'assets/img/arrow.svg'
 
 // const, types
-import { ZERO } from 'const'
+import { ZERO, BATCH_TIME_IN_MS } from 'const'
 import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
 
@@ -24,7 +24,7 @@ import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, 
 
 // api
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
-import { tokenListApi, exchangeApi } from 'api'
+import { tokenListApi } from 'api'
 
 // components
 import Widget from 'components/Layout/Widget'
@@ -39,7 +39,7 @@ import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
 import FormMessage from 'components/TradeWidget/FormMessage'
 import { PriceEstimations } from 'components/TradeWidget/PriceEstimations'
-import validationSchema from 'components/TradeWidget/validationSchema'
+import validationSchema, { BATCH_START_THRESHOLD } from 'components/TradeWidget/validationSchema'
 import Price, { invertPriceFromString } from 'components/TradeWidget/Price'
 
 // hooks and reducers
@@ -381,14 +381,12 @@ export type TradeFormTokenId = keyof TradeFormData
 export interface TradeFormData {
   sellToken: string
   receiveToken: string
-  validFrom?: string | null
-  validUntil?: string | null
+  validFrom: string | null
+  validUntil: string | null
   price: string
   priceInverse: string
 }
 
-// 10 minutes
-export const BATCH_START_THRESHOLD = 2
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
 export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
@@ -396,9 +394,9 @@ export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   receiveToken: '0',
   price: '0',
   // ASAP
-  validFrom: undefined,
+  validFrom: null,
   // Do not expire (never)
-  validUntil: undefined,
+  validUntil: null,
 }
 
 function calculateReceiveAmount(priceValue: string, sellValue: string): string {
@@ -500,6 +498,12 @@ function buildUrl(params: {
   return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
 }
 
+const calculateValidityTimes = (timeSelected: string | null): string | null => {
+  if (!timeSelected || Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD > +timeSelected) return null
+
+  return timeSelected.toString()
+}
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -534,13 +538,6 @@ const TradeWidget: React.FC = () => {
     validUntil: validUntilParam,
   } = useQuery()
 
-  const calculateValidityTimes = (timeSelected?: string | null): string | null => {
-    const currentBatch = dateToBatchId()
-
-    if (!timeSelected || !Number(timeSelected) || currentBatch + 1 > Number(timeSelected)) return null
-
-    return timeSelected
-  }
   // Combining global state with query params
   const defaultPrice = trade.price || priceParam
   const defaultSellAmount = trade.sellAmount || sellParam
@@ -621,13 +618,15 @@ const TradeWidget: React.FC = () => {
     defaultValues: defaultFormValues,
     resolver: validationResolver,
   })
-  const { handleSubmit, reset, watch, setValue, formState } = methods
+  const { handleSubmit, reset, watch, setValue, trigger, formState } = methods
 
-  const priceValue = watch(priceInputId)
-  const priceInverseValue = watch(priceInverseInputId)
-  const sellValue = watch(sellInputId)
-  const validFromValue = watch(validFromId)
-  const validUntilValue = watch(validUntilId)
+  const {
+    sellToken: sellValue,
+    validFrom: validFromValue,
+    validUntil: validUntilValue,
+    price: priceValue,
+    priceInverse: priceInverseValue,
+  } = watch([priceInputId, priceInverseInputId, sellInputId, validFromId, validUntilId])
 
   // Avoid querying for a new price at every input change
   const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
@@ -654,8 +653,8 @@ const TradeWidget: React.FC = () => {
   const url = buildUrl({
     sell: sellValue,
     price: priceValue,
-    from: validFromValue || '',
-    expires: validUntilValue || '',
+    from: validFromValue?.toString() || '',
+    expires: validUntilValue?.toString() || '',
     sellToken: sellToken,
     buyToken: receiveToken,
   })
@@ -797,15 +796,6 @@ const TradeWidget: React.FC = () => {
       const validFromWithBatchID = validFrom
       const validUntilWithBatchID = validUntil
 
-      // if (currentBatch > validFromWithBatchID) {
-      //   throw console.error(
-      //     'Current batchID is greater than input validity start. Please check again. Current batchID:',
-      //     currentBatch,
-      //     'ValidFrom batchID:',
-      //     validFromWithBatchID,
-      //   )
-      // }
-
       const isASAP = validFromWithBatchID === 0
       const isNever = validUntilWithBatchID === 0
 
@@ -839,8 +829,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: undefined,
-                  validUntil: isNever ? undefined : validFromWithBatchID.toString(),
+                  validFrom: null,
+                  validUntil: isNever ? null : validFromWithBatchID.toString(),
                 },
               )
             },
@@ -880,7 +870,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: validFrom.toString(),
-                  validUntil: isNever ? undefined : validUntil.toString(),
+                  validUntil: isNever ? null : validUntil.toString(),
                 },
               )
             },
@@ -898,11 +888,12 @@ const TradeWidget: React.FC = () => {
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
-    const validFromAsBatch = Number(data[validFromId])
-    const validUntilAsBatch = Number(data[validUntilId])
+    const validFromAsBatch = data[validFromId] ? dateToBatchId(Number(data[validFromId])) : 0
+    const validUntilAsBatch = data[validUntilId] ? dateToBatchId(Number(data[validUntilId])) : 0
     const cachedBuyToken = getToken('symbol', receiveToken.symbol, tokens)
     const cachedSellToken = getToken('symbol', sellToken.symbol, tokens)
     try {
+      await trigger()
       // Do not let potential null values through
       if (
         !buyAmount ||
@@ -931,19 +922,7 @@ const TradeWidget: React.FC = () => {
         buyToken: cachedBuyToken,
       }
 
-      const checkBatchStatus = async (batchId: number, network: number): Promise<void> => {
-        // Check that selected validity times arent in the past (calculated as batches)
-        const currentBatchId = await exchangeApi.getCurrentBatchId(network!)
-
-        if (batchId && currentBatchId + BATCH_START_THRESHOLD > batchId) {
-          throw new Error(
-            'Error submitting order. Selected order validity start time has run into the past. Please reselect a time at least 15 minutes (3 batches) in the future and try again. Order was successfully cancelled and no information has been sent to the blockchain.',
-          )
-        }
-      }
-
       if (isConnected && userAddress && networkId) {
-        await checkBatchStatus(validFromAsBatch, networkId)
         await _placeOrder({
           ...orderParams,
           networkId,
@@ -955,7 +934,6 @@ const TradeWidget: React.FC = () => {
 
         // Then place the order if connection was successful
         if (walletInfo && walletInfo.networkId === Network.Mainnet && walletInfo.userAddress) {
-          await checkBatchStatus(validFromAsBatch, walletInfo.networkId)
           await _placeOrder({
             ...orderParams,
             networkId: walletInfo.networkId,
@@ -1067,12 +1045,14 @@ const TradeWidget: React.FC = () => {
           >
             <SubmitButton
               data-text="This order might be partially filled."
-              type="submit"
+              type="button"
               disabled={isSubmitting}
               tabIndex={1}
-              onClick={(e): void => {
+              onClick={async (e): Promise<boolean> => {
                 // don't show Submit Confirm modal for invalid form
                 if (!formState.isValid) e.stopPropagation()
+
+                return trigger()
               }}
             >
               {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}

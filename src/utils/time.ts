@@ -10,6 +10,9 @@ export function getEpoch(): number {
   return Math.floor(Date.now() / 1000)
 }
 
+export const simpleIsDateCheck = (date?: Date | string | number): number =>
+  !date ? Date.now() : typeof date === 'string' || typeof date === 'number' ? +date : date.getTime()
+
 /**
  * Calculates the batchId. Either current batchId based on current Epoch
  * or calculated if given a date
@@ -21,7 +24,7 @@ export function getEpoch(): number {
  *  Defaults to Date.now()
  */
 export function dateToBatchId(date?: Date | string | number): number {
-  const timestamp = !date ? Date.now() : typeof date === 'string' || typeof date === 'number' ? +date : date.getTime()
+  const timestamp = simpleIsDateCheck(date)
   const timestampInSeconds = Math.floor(timestamp / 1000)
   return Math.floor(timestampInSeconds / BATCH_TIME)
 }
@@ -48,9 +51,9 @@ export function formatDateFromBatchId(batchId: number, options?: { strict?: bool
   return strict ? formatDistanceStrict(date, new Date(), { addSuffix }) : formatDistanceToNow(date, { addSuffix })
 }
 
-export function formatDateLocaleShortTime(date: Date): string {
-  const localeDate = date.toLocaleDateString()
-  const time = format(date, 'HH:mm')
+export function formatDateLocaleShortTime(dateMs: number): string {
+  const localeDate = new Date(dateMs).toLocaleDateString()
+  const time = format(dateMs, 'HH:mm')
 
   return localeDate + ' ' + time
 }
