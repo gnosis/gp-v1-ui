@@ -107,7 +107,7 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   )
 }
 
-const Warning = styled.p`
+const Warning = styled.div`
   position: relative;
   display: flex;
   background: var(--color-background-deleteOrders);
@@ -247,7 +247,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
       <div className="intro-text">
         <div>Carefully review the information below to make sure everything looks correct.</div>
       </div>
-      <p>
+      <div>
         How is the order executed?
         <a className="showMoreAnchor" onClick={(): void => showOrderHelp(!orderHelpVisible)}>
           {orderHelpVisible ? '[-] Show less...' : '[+] Show more...'}
@@ -278,7 +278,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
             </p>
           </>
         )}
-      </p>
+      </div>
       <div className="message">
         {/* Details */}
         <div className="sectionTitle">
