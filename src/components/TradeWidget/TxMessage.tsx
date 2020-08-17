@@ -323,7 +323,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
               This is a low volume order. We recommend selling at least{' '}
               <a onClick={setRecommendedSellAmount}>
                 <strong>
-                  ${roundedAmountInUSD?.toString(10)} ({adjustedRecommendedAmount})
+                  ${roundedAmountInUSD?.toString(10)} (≈{adjustedRecommendedAmount})
                 </strong>
               </a>{' '}
               of the token.
