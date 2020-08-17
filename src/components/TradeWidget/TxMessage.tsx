@@ -15,7 +15,8 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
-import { DEFAULT_GAS_PRICE, calcMinTradableAmountInOwl } from 'utils/minFee'
+import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
+import { adjustPrecision } from '@gnosis.pm/dex-js'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -84,7 +85,7 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   // true = direct
   // false = indirect
   const [showPrice, setShowPrice] = useSafeState(true)
-  const swapPrices = (): void => setShowPrice(state => !state)
+  const swapPrices = (): void => setShowPrice((state) => !state)
 
   const displaySellToken = displayTokenSymbolOrLink(sellToken)
   const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
@@ -136,6 +137,8 @@ interface LowVolumeResult {
   isLowVolume?: boolean
   difference?: BigNumber
   minAmount?: BigNumber
+  roundedUpTradeAmount?: BigNumber
+  roundedUpTo?: number
 }
 
 const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolumeParams): LowVolumeResult => {
@@ -165,8 +168,12 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
     const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
 
+    const minTradableAmountInOwlRoundedUp = roundToNext(minTradableAmountInOwl)
+
     const minTradableAmountPerToken = minTradableAmountInOwl.dividedBy(priceEstimation)
     const isLowVolume = minTradableAmountPerToken.isGreaterThan(sellTokenAmount)
+
+    const roundedUpAmount = minTradableAmountInOwlRoundedUp.dividedBy(priceEstimation)
 
     const difference = isLowVolume ? minTradableAmountPerToken.minus(sellTokenAmount) : ZERO_BIG_NUMBER
 
@@ -175,8 +182,16 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
       gasPrice,
+      roundedUpTradeAmount: roundedUpAmount.toString(10),
     })
-    return { isLowVolume, difference, isLoading: false, minAmount: minTradableAmountPerToken }
+    return {
+      isLowVolume,
+      difference,
+      isLoading: false,
+      minAmount: minTradableAmountPerToken,
+      roundedUpTradeAmount: roundedUpAmount,
+      roundedUpTo: ROUND_TO_NUMBER,
+    }
   }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
 }
 
@@ -194,7 +209,11 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
   const displaySellToken = displayTokenSymbolOrLink(sellToken)
   const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
 
-  const { isLoading, isLowVolume } = useLowVolumeAmount({ sellToken, networkId, sellTokenAmount })
+  const { isLoading, isLowVolume, roundedUpTradeAmount: recommendedAmount } = useLowVolumeAmount({
+    sellToken,
+    networkId,
+    sellTokenAmount,
+  })
 
   return (
     <TxMessageWrapper>
@@ -283,7 +302,8 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
             >
               here
             </a>
-            .
+            . We recommend setting sell token amount to{' '}
+            <strong>{adjustPrecision(recommendedAmount?.toString(), 2)}</strong>.
           </span>
           <img className="alert" src={alertIcon} />
         </Warning>
