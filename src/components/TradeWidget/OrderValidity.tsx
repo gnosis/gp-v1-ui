@@ -111,6 +111,7 @@ const Wrapper = styled.div`
 
         > b {
           color: #218dff;
+          cursor: pointer;
           margin: 0 0.4rem;
 
           // tooltip svg
@@ -270,7 +271,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
         > ${InputContainer}, > .MuiFormControl-root {
           margin: 0.6rem;
-          height: 4.4rem;
+          height: 5.6rem;
         }
 
         > ${InputContainer} {
@@ -278,12 +279,20 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
             height: 100%;
             margin: 0;
 
-            > input {
-              padding: 0 1rem 0 6rem;
-            }
             > small.inputLabel {
-              font-size: 1rem;
-              top: 1.7rem;
+              top: 40%;
+            }
+
+            > input.movingLabel {
+              padding: 0.2rem 1rem 0 7.1rem;
+
+              &:focus {
+                padding: 0.2rem 1rem 0 1rem;
+
+                ~ small.inputLabel {
+                  top: 0.5rem;
+                }
+              }
             }
           }
         }
@@ -296,11 +305,15 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
           border-radius: 0.6rem 0.6rem 0 0;
 
           > .MuiInputBase-root.MuiInput-root.MuiInput-underline.MuiInputBase-formControl.MuiInput-formControl {
-            margin-top: 1.05rem;
+            margin-top: 2.4rem;
+
+            > input.MuiInputBase-input.MuiInput-input {
+              font-size: 1.4rem;
+            }
           }
 
-          > .MuiInput-underline:before {
-            bottom: -0.7rem;
+          > label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiFormLabel-filled {
+            font-size: 1.2rem;
           }
         }
 
@@ -615,7 +628,7 @@ const OrderValidity: React.FC<Props> = ({
         <div>
           <div>
             Order starts:{' '}
-            <b>
+            <b onClick={handleShowConfig}>
               {' '}
               {/* Memoed valid from time */}
               {validFromDisplayTime}{' '}
@@ -629,7 +642,7 @@ const OrderValidity: React.FC<Props> = ({
             </b>
           </div>
           <div>
-            Order expires: <b>{validUntilDisplayTime}</b>
+            Order expires: <b onClick={handleShowConfig}>{validUntilDisplayTime}</b>
           </div>
         </div>
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
@@ -701,7 +714,9 @@ const OrderValidity: React.FC<Props> = ({
                 <InputBox>
                   <Input
                     type="number"
+                    className="movingLabel"
                     min={dateToBatchId() + BATCH_START_THRESHOLD}
+                    placeholder={(dateToBatchId() + BATCH_START_THRESHOLD).toString()}
                     step={1}
                     value={
                       validFromCustomBatchId ||
@@ -764,7 +779,9 @@ const OrderValidity: React.FC<Props> = ({
                 <InputBox>
                   <Input
                     type="number"
-                    min={dateToBatchId()}
+                    className="movingLabel"
+                    min={dateToBatchId() + BATCH_END_THRESHOLD}
+                    placeholder={(dateToBatchId() + BATCH_END_THRESHOLD).toString()}
                     step={1}
                     value={validUntilCustomBatchId || undefined}
                     onChange={handleValidUntilBatchIdSelect}

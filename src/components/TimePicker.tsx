@@ -124,6 +124,8 @@ const DateTimePickerWrapper = styled.div<{ $customDateSelected?: boolean }>`
         }
 
         > .MuiInput-formControl {
+          margin-top: 1.35rem !important;
+          
           > input {
             font-weight: bold;
           }
