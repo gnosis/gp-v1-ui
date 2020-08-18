@@ -283,7 +283,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
             }
 
             > input.movingLabel {
-              padding: 0.2rem 1rem 0 7.1rem;
+              padding: 0.2rem 1rem 0 5.6rem;
 
               &:focus {
                 padding: 0.2rem 1rem 0 1rem;
@@ -462,7 +462,7 @@ const OrderValidity: React.FC<Props> = ({
   const validUntilError = errors[validUntilInputId]
 
   const handleRelativeTimeSelect = useCallback(
-    function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
+    function (inputId: string, relativeTime: number | null): void {
       const relativeTimeToDate: number | null = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
 
       if (inputId === validFromInputId) {
@@ -727,7 +727,7 @@ const OrderValidity: React.FC<Props> = ({
                     value={validFromCustomBatchId || undefined}
                     onChange={handleValidFromBatchIdSelect}
                   />
-                  <small className="inputLabel">batchId </small>
+                  <small className="inputLabel">batch</small>
                 </InputBox>
               </InputContainer>
             </DateTimePickerWrapper>
@@ -789,7 +789,7 @@ const OrderValidity: React.FC<Props> = ({
                     value={validUntilCustomBatchId || undefined}
                     onChange={handleValidUntilBatchIdSelect}
                   />
-                  <small className="inputLabel">batchId </small>
+                  <small className="inputLabel">batch</small>
                 </InputBox>
               </InputContainer>
             </DateTimePickerWrapper>
