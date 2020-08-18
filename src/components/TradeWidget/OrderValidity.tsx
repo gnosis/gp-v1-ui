@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, Dispatch, SetStateAction, useEffect, useMemo } from 'react'
-import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 
@@ -439,7 +438,6 @@ const OrderValidity: React.FC<Props> = ({
   const { setValue, errors, register, watch, trigger } = formMethods
   const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
 
-  // const validFromDefault = validFromBatchId ? Date.parse(batchIdToDate(+validFromBatchId).toString()) : null
   const [validFromButton, setValidFromButton] = useSafeState<number | null>(
     isAsap ? null : validFromTimeMs ? Infinity : VALID_FROM_DEFAULT,
   )
@@ -468,15 +466,11 @@ const OrderValidity: React.FC<Props> = ({
       const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
 
       if (inputId === validFromInputId) {
-        batchedUpdates(() => {
-          setValidFromButton(relativeTime)
-          setValidFromCustomTime(relativeTimeToDate)
-        })
+        setValidFromButton(relativeTime)
+        setValidFromCustomTime(relativeTimeToDate)
       } else {
-        batchedUpdates(() => {
-          setValidUntilButton(relativeTime)
-          setValidUntilCustomTime(relativeTimeToDate)
-        })
+        setValidUntilButton(relativeTime)
+        setValidUntilCustomTime(relativeTimeToDate)
       }
     },
     [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
@@ -485,15 +479,11 @@ const OrderValidity: React.FC<Props> = ({
   const handleCustomTimeSelect = useCallback(
     function (inputId: string, time: number | null): void {
       if (inputId === validFromInputId) {
-        batchedUpdates(() => {
-          setValidFromCustomTime(time)
-          setValidFromButton(Infinity)
-        })
+        setValidFromCustomTime(time)
+        setValidFromButton(Infinity)
       } else {
-        batchedUpdates(() => {
-          setValidUntilCustomTime(time)
-          setValidUntilButton(Infinity)
-        })
+        setValidUntilCustomTime(time)
+        setValidUntilButton(Infinity)
       }
     },
     [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
