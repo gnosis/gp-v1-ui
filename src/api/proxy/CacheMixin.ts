@@ -26,7 +26,7 @@ export class CacheMixin {
    * @param toCache List of configs for methods to be cached
    */
   public injectCache<T>(instance: T, toCache: CacheOptions<T>[]): void {
-    toCache.forEach(cacheConfig => {
+    toCache.forEach((cacheConfig) => {
       const { method } = cacheConfig
       const methodName = method.toString()
 
@@ -62,7 +62,7 @@ export class CacheMixin {
       // store possibly a promise
       this.store(hash, value, ttl)
       Promise.resolve(value)
-        .then(val => {
+        .then((val) => {
           // store a value of resolved promise
           this.store(hash, val, ttl)
         })
@@ -123,15 +123,12 @@ export class CacheMixin {
     const hash = this.hash.bind(this)
     // array
     if (Array.isArray(obj)) {
-      return obj
-        .sort()
-        .map(hash)
-        .join('|')
+      return obj.sort().map(hash).join('|')
     }
     // obj
     return Object.keys(obj)
       .sort()
-      .map(key => `${key}:${hash(obj[key])}`)
+      .map((key) => `${key}:${hash(obj[key])}`)
       .join('|')
   }
 }

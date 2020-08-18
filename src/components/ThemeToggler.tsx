@@ -62,7 +62,7 @@ const ThemeToggler: React.FC = () => {
   return (
     <TogglerWrapper>
       Theme:{' '}
-      {toggleValues.map(value => (
+      {toggleValues.map((value) => (
         <ToggleLabel key={value} selected={value === active}>
           <input
             type="radio"

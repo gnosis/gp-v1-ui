@@ -24,12 +24,12 @@ export const useEthBalances = (): UseEthBalanceResult => {
     if (walletInfo.isConnected) {
       walletApi
         .getBalance()
-        .then(etherBalance => {
+        .then((etherBalance) => {
           logDebug('[useEthBalance] Wallet balance: %s ETH', formatSmart(etherBalance, DEFAULT_PRECISION))
           setEthBalance(etherBalance)
           setError(false)
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('[useEthBalance] Error loading ether balance', error)
           setError(true)
         })

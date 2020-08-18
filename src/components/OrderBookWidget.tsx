@@ -149,12 +149,12 @@ const processData = (
   // Convert RawPricePoint into PricePoint:
   //  Raw items use number (floats) and are given in "atoms"
   //  Normalized items use decimals (BigNumber) and are given in natural units
-  let pricePoints: PricePoint[] = rawPricePoints.map(pricePoint =>
+  let pricePoints: PricePoint[] = rawPricePoints.map((pricePoint) =>
     _toPricePoint(pricePoint, quoteTokenDecimals, baseTokenDecimals),
   )
 
   // Filter tiny orders
-  pricePoints = pricePoints.filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+  pricePoints = pricePoints.filter((pricePoint) => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
 
   // Convert the price points that can be represented in the graph (PricePointDetails)
   const { points } = pricePoints.reduce(
@@ -214,7 +214,7 @@ const processData = (
 
 function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetails, quoteToken: TokenDetails): void {
   logDebug('Order Book: ' + baseToken.symbol + '-' + quoteToken.symbol)
-  pricePoints.forEach(pricePoint => {
+  pricePoints.forEach((pricePoint) => {
     const isBid = pricePoint.type === Offer.Bid
     logDebug(
       `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseToken.symbol} at ${
@@ -246,7 +246,7 @@ const draw = (
     hops,
     networkId,
   })
-  chart.dataSource.adapter.add('parsedData', data => {
+  chart.dataSource.adapter.add('parsedData', (data) => {
     try {
       const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
       const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
@@ -304,7 +304,7 @@ const draw = (
   return chart
 }
 
-const OrderBookWidget: React.FC<OrderBookProps> = props => {
+const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 

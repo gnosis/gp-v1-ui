@@ -168,7 +168,7 @@ export const usePlaceOrder = (): Result => {
 
         const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
 
-        orders.forEach(order => {
+        orders.forEach((order) => {
           buyTokens.push(order.buyToken)
           sellTokens.push(order.sellToken)
 

@@ -61,7 +61,7 @@ function classifyOrders(
   const now = new Date()
   const isOrderActiveFn = ordersType === 'pendingOrders' ? isPendingOrderActive : isOrderActive
 
-  orders.forEach(order => {
+  orders.forEach((order) => {
     if (!isOrderActiveFn(order, now)) {
       state.closed[ordersType].push(order)
     } else {
@@ -92,7 +92,7 @@ function filterOrdersByDisplayType(
   return !displayOnly
     ? orders
     : orders.filter(
-        order =>
+        (order) =>
           (displayOnly === 'liquidity' && order.isUnlimited) || (displayOnly === 'regular' && !order.isUnlimited),
       )
 }
@@ -113,7 +113,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
       !displayOnly
         ? allTrades
         : allTrades.filter(
-            trade =>
+            (trade) =>
               (displayOnly === 'liquidity' && trade.type === 'liquidity') ||
               (displayOnly === 'regular' && trade.type != 'liquidity'),
           ),
@@ -162,10 +162,10 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     classifyOrders(filterOrdersByDisplayType(allOrders, displayOnly), classifiedOrders, 'orders')
     classifyOrders(filterOrdersByDisplayType(allPendingOrders, displayOnly), classifiedOrders, 'pendingOrders')
 
-    setClassifiedOrders(curr => {
+    setClassifiedOrders((curr) => {
       // copy markedForDeletion
       Object.keys(classifiedOrders).forEach(
-        type => (classifiedOrders[type].markedForDeletion = curr[type].markedForDeletion),
+        (type) => (classifiedOrders[type].markedForDeletion = curr[type].markedForDeletion),
       )
       return classifiedOrders
     })
@@ -179,7 +179,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const overBalanceOrders = useMemo(
     () =>
       new Set<string>(
-        displayedOrders.filter(order => order.remainingAmount.gt(order.sellTokenBalance)).map(order => order.id),
+        displayedOrders.filter((order) => order.remainingAmount.gt(order.sellTokenBalance)).map((order) => order.id),
       ),
     [displayedOrders],
   )
@@ -231,7 +231,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     (orderId: string, selectedTab: OrderTabs): (() => void) => (): void => {
       if (selectedTab === 'trades') return
 
-      setClassifiedOrders(curr => {
+      setClassifiedOrders((curr) => {
         // copy full state
         const state = { ...curr }
 
@@ -252,7 +252,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     ({ currentTarget: { checked } }: React.SyntheticEvent<HTMLInputElement>) => {
       if (selectedTab === 'trades') return
 
-      setClassifiedOrders(curr => {
+      setClassifiedOrders((curr) => {
         // copy full state
         const state = { ...curr }
 
@@ -260,7 +260,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
         // so it's ok to use them directly
         // without classifiedOrders[selectedTab]
         state[selectedTab].markedForDeletion = checked
-          ? new Set(filteredAndSortedOrders.concat(filteredAndSortedPendingOrders).map(order => order.id))
+          ? new Set(filteredAndSortedOrders.concat(filteredAndSortedPendingOrders).map((order) => order.id))
           : new Set()
         // on deselect, better deselect all filtered and unfiltered
         // to avoid cancelling not shown orders
@@ -285,13 +285,13 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
         unstable_batchedUpdates(() => {
           // reset selections
 
-          setClassifiedOrders(curr => {
+          setClassifiedOrders((curr) => {
             // copy full state
             const state = { ...curr }
 
             // remove checked orders
             state[selectedTab].orders = curr[selectedTab].orders.filter(
-              order => !curr[selectedTab].markedForDeletion.has(order.id),
+              (order) => !curr[selectedTab].markedForDeletion.has(order.id),
             )
             // clear orders to delete
             state[selectedTab].markedForDeletion = new Set<string>()
@@ -307,7 +307,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   )
 
   const settledAndNotRevertedTrades = useMemo(
-    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
+    () => trades.filter((trade) => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
     [trades],
   )
 
@@ -424,7 +424,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                         <th className="filled">Filled / Total</th>
                         <th
                           className="sortable"
-                          onClick={(): void => setSortTopic(prev => ({ ...prev, asc: !prev.asc }))}
+                          onClick={(): void => setSortTopic((prev) => ({ ...prev, asc: !prev.asc }))}
                         >
                           Expires <FontAwesomeIcon size="xs" icon={!sortTopic.asc ? faChevronDown : faChevronUp} />
                         </th>
@@ -432,7 +432,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredAndSortedPendingOrders.map(order => (
+                      {filteredAndSortedPendingOrders.map((order) => (
                         <OrderRow
                           key={order.id}
                           order={order}
@@ -444,7 +444,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           transactionHash={order.txHash}
                         />
                       ))}
-                      {filteredAndSortedOrders.map(order => (
+                      {filteredAndSortedOrders.map((order) => (
                         <OrderRow
                           key={order.id}
                           order={order}

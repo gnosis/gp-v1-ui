@@ -98,7 +98,7 @@ function createDepositApi(erc20Api: Erc20Api, injectedDependencies: DepositApiDe
 function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiDependencies): ExchangeApi {
   let exchangeApi
   if (process.env.MOCK_EXCHANGE === 'true') {
-    const tokens = [FEE_TOKEN, ...tokenList.map(token => token.address), TOKEN_8]
+    const tokens = [FEE_TOKEN, ...tokenList.map((token) => token.address), TOKEN_8]
     exchangeApi = new ExchangeApiMock({
       balanceStates: exchangeBalanceStates,
       erc20Api,

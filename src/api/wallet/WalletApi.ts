@@ -146,7 +146,7 @@ const subscribeToBlockchainUpdate = async ({
     return subscribeToWeb3Event({
       web3,
       callback: cb,
-      getter: web3 => web3.eth.getBlock('latest'),
+      getter: (web3) => web3.eth.getBlock('latest'),
       event: 'newBlockHeaders',
     })
   }
@@ -177,8 +177,8 @@ const subscribeToBlockchainUpdate = async ({
   if (!subs || !providerState) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-    const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
-      const unsubBlock = blockUpdate(blockHeader => {
+    const subscriptionHOC: BlockchainUpdatePromptCallback = (callback) => {
+      const unsubBlock = blockUpdate((blockHeader) => {
         blockchainPrompt = { ...blockchainPrompt, blockHeader }
         logDebug('[WalletApiImpl] New block:', blockHeader.number)
         callback(blockchainPrompt)
@@ -192,8 +192,8 @@ const subscribeToBlockchainUpdate = async ({
 
   const { onChainChanged: networkUpdate, onAccountsChanged: accountsUpdate } = subs
 
-  const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
-    const unsubNetwork = networkUpdate(chainId => {
+  const subscriptionHOC: BlockchainUpdatePromptCallback = (callback) => {
+    const unsubNetwork = networkUpdate((chainId) => {
       logDebug('[WalletApiImpl] chainId changed:', chainId)
       blockchainPrompt = { ...blockchainPrompt, chainId: +chainId }
       callback(blockchainPrompt)
@@ -204,7 +204,7 @@ const subscribeToBlockchainUpdate = async ({
       callback(blockchainPrompt)
     })
 
-    const unsubBlock = blockUpdate(async blockHeader => {
+    const unsubBlock = blockUpdate(async (blockHeader) => {
       // oftentimes on network change newBlockHeaders fires first
       // reaffirm correct id
       const chainId = await web3.eth.net.getId()
@@ -324,7 +324,7 @@ export class WalletApiImpl implements WalletApi {
       // hackaround
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
-      provider.handleReadRequests = async function(payload: unknown): Promise<unknown> {
+      provider.handleReadRequests = async function (payload: unknown): Promise<unknown> {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         if (!this.http) {
@@ -412,7 +412,7 @@ export class WalletApiImpl implements WalletApi {
       // inherited from web3-provider-engine
       // fires it only in versions <=beta.61
       provider.on?.('stop', handleDisconnect)
-      provider.on?.('stop', v => {
+      provider.on?.('stop', (v) => {
         logDebug('[WalletApiImpl] WC stopped', v)
       })
 
@@ -512,7 +512,7 @@ export class WalletApiImpl implements WalletApi {
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo): Command {
     // cancell possible promise if any
     let promiseIsStale = false
-    const cancellableCallback: OnChangeWalletInfo = newWalletInfo => {
+    const cancellableCallback: OnChangeWalletInfo = (newWalletInfo) => {
       promiseIsStale = true
       callback(newWalletInfo)
     }
@@ -520,7 +520,7 @@ export class WalletApiImpl implements WalletApi {
     // since walletInfo can only be gotten asynchronously
     // trigger callback as soon as it becomes available
     // unless there's been a newer WalletInfo since promise initialization
-    this.getWalletInfo().then(newWalletInfo => {
+    this.getWalletInfo().then((newWalletInfo) => {
       if (promiseIsStale) return
       callback(newWalletInfo)
     })
@@ -529,7 +529,7 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
-    this._listeners = this._listeners.filter(c => c !== callback)
+    this._listeners = this._listeners.filter((c) => c !== callback)
   }
 
   public getProviderInfo(): ProviderInfo | null {
@@ -602,21 +602,21 @@ export class WalletApiImpl implements WalletApi {
       logDebug('[WalletApiImpl] chainId changed:', blockchainUpdate.chainId)
     }
 
-    this._listeners.forEach(listener => listener(wInfoExtended))
+    this._listeners.forEach((listener) => listener(wInfoExtended))
   }
 
   private get _connected(): Promise<boolean> {
-    return this.getWalletInfo().then(walletInfo => walletInfo?.isConnected || false)
+    return this.getWalletInfo().then((walletInfo) => walletInfo?.isConnected || false)
   }
   private get _user(): Promise<string> {
-    return this.getWalletInfo().then(walletInfo => walletInfo.userAddress || '')
+    return this.getWalletInfo().then((walletInfo) => walletInfo.userAddress || '')
   }
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
-    return Promise.resolve(this._user).then(user => this._web3.eth.getBalance(user))
+    return Promise.resolve(this._user).then((user) => this._web3.eth.getBalance(user))
   }
   private get _networkId(): Promise<Network> {
-    return this.getWalletInfo().then(walletInfo => walletInfo.networkId || 0)
+    return this.getWalletInfo().then((walletInfo) => walletInfo.networkId || 0)
   }
 
   // new userPrint is generated when provider or screen size changes
