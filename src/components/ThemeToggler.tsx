@@ -5,9 +5,14 @@ import { MEDIA } from 'const'
 
 const APP_THEME = 'APP_THEME'
 
-const TogglerWrapper = styled.div`
+export const ThemeTogglerWrapper = styled.div`
   font-size: inherit;
   margin: 0 6rem 0 0;
+
+  > strong {
+    margin-right: 1rem;
+  }
+
   @media ${MEDIA.mobile} {
     margin: 2.4rem 0;
   }
@@ -22,7 +27,7 @@ const ToggleLabel = styled.label<{ selected: boolean }>`
 
   transition: all 0.2s ease-in-out;
 
-  &:nth-child(2) {
+  &:nth-child(3) {
     border-left: 0.0625rem solid var(--color-text-primary);
     border-right: 0.0625rem solid var(--color-text-primary);
   }
@@ -60,8 +65,8 @@ const ThemeToggler: React.FC = () => {
   }, [active])
 
   return (
-    <TogglerWrapper>
-      Theme:{' '}
+    <ThemeTogglerWrapper>
+      <strong>Theme:</strong>{' '}
       {toggleValues.map((value) => (
         <ToggleLabel key={value} selected={value === active}>
           <input
@@ -74,7 +79,7 @@ const ThemeToggler: React.FC = () => {
           {value}
         </ToggleLabel>
       ))}
-    </TogglerWrapper>
+    </ThemeTogglerWrapper>
   )
 }
 

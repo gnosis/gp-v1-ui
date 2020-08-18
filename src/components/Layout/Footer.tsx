@@ -7,9 +7,10 @@ import { depositApi } from 'api'
 
 // Assets
 import verified from 'assets/img/verified.svg'
+import builtOnGP from 'assets/img/builtOnGP.svg'
 
 // Components
-import ThemeToggler from 'components/ThemeToggler'
+import ThemeToggler, { ThemeTogglerWrapper } from 'components/ThemeToggler'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 // Hooks
@@ -28,29 +29,17 @@ const Wrapper = styled.footer`
   font-size: 1.3rem;
   color: var(--color-text-primary);
   letter-spacing: -0.03rem;
-  max-width: 85rem;
-  margin: 0 auto;
   line-height: 1;
+
+  width: 85%;
+  margin: 2rem auto;
+  padding: 0 0 2.4rem;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
     width: 100%;
     padding: 0 0 5.4rem;
-  }
-
-  .version {
-    font-size: inherit;
-    color: inherit;
-    > a {
-      text-decoration: none;
-      color: inherit;
-      text-decoration: underline;
-      transition: color 0.2s ease-in-out;
-    }
-
-    > a:hover {
-      color: var(--color-text-active);
-    }
+    margin: 0;
   }
 `
 
@@ -60,11 +49,17 @@ const FooterLinks = styled.div`
   justify-content: center;
   align-items: center;
   font-size: inherit;
-  margin: 0 6rem 0 0;
+  margin: 0 1rem;
+
+  white-space: nowrap;
+
+  > strong {
+    margin-right: 1rem;
+  }
 
   @media ${MEDIA.mobile} {
     width: 100%;
-    padding: 0 0 2.4rem;
+    padding: 0 0 1.4rem;
     margin: 0;
   }
 
@@ -74,7 +69,7 @@ const FooterLinks = styled.div`
     font-size: inherit;
     color: inherit;
     letter-spacing: -0.03rem;
-    margin: 0 1.6rem 0 0;
+    margin: 0 1rem 0 0;
   }
 
   > a:last-of-type {
@@ -82,17 +77,91 @@ const FooterLinks = styled.div`
   }
 `
 
+const BuiltOnGPWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+
+  &::before {
+    content: '';
+    background: url(${builtOnGP}) no-repeat center/contain;
+    height: 6.6rem;
+    width: 6.6rem;
+    display: block;
+    margin: 1rem;
+  }
+`
+
 const VerifiedContractLink = styled.div`
   display: flex;
-  width: 100%;
-  margin: 3rem auto;
+  width: auto;
+  margin: 0 1rem;
   justify-content: center;
   padding: 0;
+
+  > a {
+    height: fit-content;
+    margin: auto;
+    border-color: #29a745;
+    white-space: nowrap;
+  }
 
   > a:link,
   > a:visited {
     color: #29a745;
     transition: border-color 0.2s ease-in-out;
+  }
+`
+
+const SideContentWrapper = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  flex: 1 1 80%;
+  align-items: center;
+  justify-content: center;
+
+  > ${ThemeTogglerWrapper} {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 1 20rem;
+    margin: 2rem 0;
+    white-space: nowrap;
+  }
+
+  > div.innerWrapper {
+    display: flex;
+    flex-flow: row wrap;
+    flex: 0 1 59.6rem;
+    align-items: center;
+    justify-content: space-evenly;
+
+    width: 100%;
+    margin: 2rem 0;
+    white-space: nowrap;
+
+    > .version {
+      margin: 0 1rem;
+      font-size: inherit;
+      color: inherit;
+      white-space: nowrap;
+
+      > strong {
+        margin-right: 1rem;
+      }
+
+      > a {
+        text-decoration: none;
+        color: inherit;
+        text-decoration: underline;
+        transition: color 0.2s ease-in-out;
+      }
+
+      > a:hover {
+        color: var(--color-text-active);
+      }
+    }
   }
 `
 
@@ -135,39 +204,49 @@ const Footer: React.FC = () => {
 
   return (
     <Wrapper>
-      {/* DARK/LIGHT MODE TOGGLER */}
-      <ThemeToggler />
-      {/* LINKS */}
-      <FooterLinks>
-        <Link to="/about">About{APP_NAME_ABOUT}</Link>
-        <Link to="/faq">FAQ</Link>
-      </FooterLinks>
-      {/* VERSION */}
-      <div className="version">
-        Web{' '}
-        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
-          v{VERSION}
-        </a>{' '}
-        -{' '}
-        <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks">
-          App Id: {CONFIG.appId}
-        </a>{' '}
-        - Contracts{' '}
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
-        >
-          v{CONTRACT_VERSION}
-        </a>
-      </div>
       <VerifiedContractLink>
+        <BuiltOnGPWrapper />
         {contractAddress && networkId ? (
           <LinkWrapper type="contract" identifier={contractAddress} networkId={networkId} label={VerifiedText} />
         ) : (
           ''
         )}
       </VerifiedContractLink>
+      <SideContentWrapper>
+        {/* DARK/LIGHT MODE TOGGLER */}
+        <ThemeToggler />
+        <div className="innerWrapper">
+          {/* LINKS */}
+          <FooterLinks>
+            <strong>General information:</strong>
+            <Link to="/about">About{APP_NAME_ABOUT}</Link>
+            <Link to="/faq">FAQ</Link>
+          </FooterLinks>
+          {/* VERSION */}
+          <div className="version">
+            <strong>App information:</strong>
+            <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+              Web v{VERSION}
+            </a>{' '}
+            -{' '}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks"
+            >
+              App Id: {CONFIG.appId}
+            </a>{' '}
+            -{' '}
+            <a
+              target="_blank"
+              rel="noopener noreferrer"
+              href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
+            >
+              Contracts v{CONTRACT_VERSION}
+            </a>
+          </div>
+        </div>
+      </SideContentWrapper>
     </Wrapper>
   )
 }
