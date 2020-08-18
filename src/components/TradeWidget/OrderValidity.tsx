@@ -14,6 +14,9 @@ import { MEDIA, BATCH_TIME_IN_MS } from 'const'
 // components
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { DateTimePickerBase, DateTimePickerWrapper } from 'components/TimePicker'
+import { InputContainer } from 'components/Settings/WalletConnect'
+import { Input } from 'components/Input'
+import InputBox from 'components/InputBox'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
@@ -23,6 +26,8 @@ import useSafeState from 'hooks/useSafeState'
 import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { useDebounce } from 'hooks/useDebounce'
+
 import { BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
 
 const VALID_UNTIL_DEFAULT: number | null = 1440
@@ -30,7 +35,7 @@ const VALID_FROM_DEFAULT: number | null = null
 // now, 30min, 60min, 24h
 const ORDER_START_PRESETS = [null, 30, 60, 1440]
 // 5min, 30min, 24h, 7d
-const ORDER_EXPIRE_PRESETS = [5, 30, 1440, 10080, null]
+const ORDER_EXPIRE_PRESETS = [5, 1440, 10080, null]
 
 const relativeMinutesToDateMS = (minutes: number): number => Date.now() + minutes * 60000
 
@@ -189,7 +194,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 72rem;
   min-width: 30rem;
-  height: 40rem;
+  height: 49rem;
   padding: 0 0 2.4rem;
   border-radius: 0.8rem;
   display: flex;
@@ -262,17 +267,45 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
       > ${DateTimePickerWrapper} {
         padding: 0 1rem 1rem;
 
+        > ${InputContainer}, > .MuiFormControl-root {
+          margin: 0.6rem;
+          height: 4.4rem;
+        }
+
+        > ${InputContainer} {
+          > div {
+            height: 100%;
+            margin: 0;
+
+            > input {
+              padding: 0 1rem 0 6rem;
+            }
+            > small.inputLabel {
+              font-size: 1rem;
+              top: 1.7rem;
+            }
+          }
+        }
         > ${TimePickerPreset} {
           height: 3.8rem;
           margin: 0.6rem;
         }
 
         > .MuiFormControl-root {
-          margin: 0 0 0.6rem 0.6rem;
+          border-radius: 0.6rem 0.6rem 0 0;
+
+          > .MuiInputBase-root.MuiInput-root.MuiInput-underline.MuiInputBase-formControl.MuiInput-formControl {
+            margin-top: 1.05rem;
+          }
+
+          > .MuiInput-underline:before {
+            bottom: -0.7rem;
+          }
         }
 
-        > ${TimePickerPreset}, .MuiFormControl-root {
-          flex: 1 1 8rem;
+        > ${TimePickerPreset}, .MuiFormControl-root,
+        ${InputContainer} {
+          flex: 1 1 23%;
           font-size: 1.2rem;
         }
       }
@@ -375,6 +408,7 @@ const OrderValidity: React.FC<Props> = ({
   const { setValue, errors, register, watch, trigger } = formMethods
   const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
 
+  // const validFromDefault = validFromBatchId ? Date.parse(batchIdToDate(+validFromBatchId).toString()) : null
   const [validFromButton, setValidFromButton] = useSafeState<number | null>(
     isAsap ? null : validFromTimeMs ? Infinity : VALID_FROM_DEFAULT,
   )
@@ -388,8 +422,25 @@ const OrderValidity: React.FC<Props> = ({
     (validUntilTimeMs && +validUntilTimeMs) || null,
   )
 
+  const [validFromCustomBatchId, setValidFromCustomBatchId] = useSafeState<string | null>(
+    validFromCustomTime ? dateToBatchId(validFromCustomTime).toString() : null,
+  )
+  const [validUntilCustomBatchId, setValidUntilCustomBatchId] = useSafeState<string | null>(
+    validUntilCustomTime ? dateToBatchId(validUntilCustomTime).toString() : null,
+  )
+
   const validFromError = errors[validFromInputId]
   const validUntilError = errors[validUntilInputId]
+
+  const { value: debouncedValidFromBatchId } = useDebounce<number | null>(
+    validFromCustomBatchId ? +validFromCustomBatchId : null,
+    500,
+  )
+
+  const { value: debouncedValidUntilBatchId } = useDebounce<number | null>(
+    validUntilCustomBatchId ? +validUntilCustomBatchId : null,
+    500,
+  )
 
   const handleRelativeTimeSelect = useCallback(
     function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
@@ -410,19 +461,40 @@ const OrderValidity: React.FC<Props> = ({
     [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
   )
 
-  function handleCustomTimeSelect(inputId: string, time: number | null): void {
-    if (inputId === validFromInputId) {
-      batchedUpdates(() => {
-        setValidFromCustomTime(time)
-        setValidFromButton(Infinity)
-      })
-    } else {
-      batchedUpdates(() => {
-        setValidUntilCustomTime(time)
-        setValidUntilButton(Infinity)
-      })
-    }
-  }
+  const handleCustomTimeSelect = useCallback(
+    function (inputId: string, time: number | null): void {
+      if (inputId === validFromInputId) {
+        batchedUpdates(() => {
+          setValidFromCustomTime(time)
+          setValidFromButton(Infinity)
+        })
+      } else {
+        batchedUpdates(() => {
+          setValidUntilCustomTime(time)
+          setValidUntilButton(Infinity)
+        })
+      }
+    },
+    [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
+  )
+
+  const handleValidFromBatchIdSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      setValidFromCustomBatchId(e.target.value)
+      debouncedValidFromBatchId &&
+        handleCustomTimeSelect(validFromInputId, debouncedValidFromBatchId * BATCH_TIME_IN_MS)
+    },
+    [debouncedValidFromBatchId, handleCustomTimeSelect, setValidFromCustomBatchId, validFromInputId],
+  )
+
+  const handleValidUntilBatchIdSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      setValidUntilCustomBatchId(e.target.value)
+      debouncedValidUntilBatchId &&
+        handleCustomTimeSelect(validUntilInputId, debouncedValidUntilBatchId * BATCH_TIME_IN_MS)
+    },
+    [debouncedValidUntilBatchId, handleCustomTimeSelect, setValidUntilCustomBatchId, validUntilInputId],
+  )
 
   const handleShowConfig = useCallback(async (): Promise<void> => {
     let formValid = true
@@ -576,6 +648,7 @@ const OrderValidity: React.FC<Props> = ({
                 )}
               </span>
             </p>
+            {/* Relative Time picker */}
             <DateTimePickerWrapper $customDateSelected={validFromButton === Infinity}>
               {ORDER_START_PRESETS.map(time => (
                 <TimePickerPreset
@@ -591,6 +664,7 @@ const OrderValidity: React.FC<Props> = ({
                   {formatOrderValidityTimes(time, 'Now')}
                 </TimePickerPreset>
               ))}
+              {/* Calendar Picker */}
               <DateTimePickerBase
                 value={validFromCustomTime}
                 error={validFromError}
@@ -616,6 +690,22 @@ const OrderValidity: React.FC<Props> = ({
                   }
                 }}
               />
+              {/* BatchId input */}
+              <InputContainer>
+                <InputBox>
+                  <Input
+                    type="number"
+                    min={dateToBatchId() + BATCH_START_THRESHOLD}
+                    step={1}
+                    value={
+                      validFromCustomBatchId ||
+                      undefined /* validFromCustomTime ? dateToBatchId(validFromCustomTime) : undefined */
+                    }
+                    onChange={handleValidFromBatchIdSelect}
+                  />
+                  <small className="inputLabel">batchId </small>
+                </InputBox>
+              </InputContainer>
             </DateTimePickerWrapper>
           </OrderValidityBox>
           <OrderValidityBox>
@@ -663,6 +753,19 @@ const OrderValidity: React.FC<Props> = ({
                   }
                 }}
               />
+              {/* BatchId input */}
+              <InputContainer>
+                <InputBox>
+                  <Input
+                    type="number"
+                    min={dateToBatchId()}
+                    step={1}
+                    value={validUntilCustomBatchId || undefined}
+                    onChange={handleValidUntilBatchIdSelect}
+                  />
+                  <small className="inputLabel">batchId </small>
+                </InputBox>
+              </InputContainer>
             </DateTimePickerWrapper>
           </OrderValidityBox>
           {validFromError && (

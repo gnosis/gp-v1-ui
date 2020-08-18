@@ -144,7 +144,7 @@ const Disclaimer = styled.div`
   }
 `
 
-const InputContainer = styled.div`
+export const InputContainer = styled.div`
   small.inputLabel {
     position: absolute;
     left: 2.5%;
