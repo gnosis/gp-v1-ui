@@ -452,10 +452,10 @@ const OrderValidity: React.FC<Props> = ({
   )
 
   const [validFromCustomBatchId, setValidFromCustomBatchId] = useSafeState<number | null>(
-    validFromCustomTime ? dateToBatchId(validFromCustomTime) : null,
+    validFromTimeMs && +validFromTimeMs ? dateToBatchId(+validFromTimeMs) : null,
   )
   const [validUntilCustomBatchId, setValidUntilCustomBatchId] = useSafeState<number | null>(
-    validUntilCustomTime ? dateToBatchId(validUntilCustomTime) : null,
+    validUntilTimeMs && +validUntilTimeMs ? dateToBatchId(+validUntilTimeMs) : null,
   )
 
   const validFromError = errors[validFromInputId]
@@ -468,11 +468,11 @@ const OrderValidity: React.FC<Props> = ({
       if (inputId === validFromInputId) {
         setValidFromButton(relativeTime)
         setValidFromCustomTime(relativeTimeToDate)
-        setValidFromCustomBatchId(dateToBatchId(relativeTimeToDate))
+        setValidFromCustomBatchId(relativeTimeToDate ? dateToBatchId(relativeTimeToDate) : null)
       } else {
         setValidUntilButton(relativeTime)
         setValidUntilCustomTime(relativeTimeToDate)
-        setValidUntilCustomBatchId(dateToBatchId(relativeTimeToDate))
+        setValidUntilCustomBatchId(relativeTimeToDate ? dateToBatchId(relativeTimeToDate) : null)
       }
     },
     [
@@ -526,14 +526,14 @@ const OrderValidity: React.FC<Props> = ({
 
     if (showOrderConfig) {
       // as ms time
-      setValue(validUntilInputId, validUntilCustomTime?.toString() || null)
       setValue(validFromInputId, validFromCustomTime?.toString() || null)
+      setValue(validUntilInputId, validUntilCustomTime?.toString() || null)
 
+      // asynchronous trigger here without validation in setValue prevents flashing
       formValid = await trigger([validFromInputId, validUntilInputId])
     }
 
     formValid && setShowOrderConfig(showOrderConfig => !showOrderConfig)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     showOrderConfig,
     setShowOrderConfig,
@@ -721,10 +721,11 @@ const OrderValidity: React.FC<Props> = ({
                   <Input
                     type="number"
                     className="movingLabel"
-                    min={dateToBatchId() + BATCH_START_THRESHOLD}
+                    min={validFromCustomBatchId ? dateToBatchId() + BATCH_START_THRESHOLD : undefined}
+                    max={validUntilCustomBatchId ? validUntilCustomBatchId - BATCH_END_THRESHOLD : undefined}
                     placeholder={(dateToBatchId() + BATCH_START_THRESHOLD).toString()}
                     step={1}
-                    value={validFromCustomBatchId || undefined}
+                    value={validFromCustomBatchId || Infinity}
                     onChange={handleValidFromBatchIdSelect}
                   />
                   <small className="inputLabel">batch</small>
@@ -786,7 +787,7 @@ const OrderValidity: React.FC<Props> = ({
                     min={(validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD}
                     placeholder={((validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD).toString()}
                     step={1}
-                    value={validUntilCustomBatchId || undefined}
+                    value={validUntilCustomBatchId || Infinity}
                     onChange={handleValidUntilBatchIdSelect}
                   />
                   <small className="inputLabel">batch</small>
