@@ -117,9 +117,13 @@ const VerifiedContractLink = styled.div`
 const SideContentWrapper = styled.div`
   display: flex;
   flex-flow: row wrap;
-  flex: 1 1 80%;
+  flex: 0 1 80.4rem;
   align-items: center;
   justify-content: center;
+
+  @media ${MEDIA.mobile} {
+    flex: 0 1 auto;
+  }
 
   > ${ThemeTogglerWrapper} {
     display: flex;
