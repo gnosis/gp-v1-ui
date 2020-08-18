@@ -203,11 +203,11 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   align-content: flex-start;
 
   @media ${MEDIA.mobile} {
-    height: 42rem;
+    height: 70%;
   }
 
   @media ${MEDIA.xSmallDown} {
-    height: 52rem;
+    height: 100%;
   }
 
   > h4 {
@@ -254,6 +254,8 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
     ${FormMessage} {
       justify-content: center;
+      padding: 0 2rem;
+      margin: 0;
     }
 
     ${OrderValidityBox} {
@@ -306,6 +308,23 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
         ${InputContainer} {
           flex: 1 1 23%;
           font-size: 1.2rem;
+        }
+
+        @media ${MEDIA.mobile} {
+          > .MuiFormControl-root,
+          > ${InputContainer} {
+            flex: 1 1 100%;
+          }
+
+          > ${TimePickerPreset} {
+            flex: 1;
+          }
+        }
+
+        @media ${MEDIA.xSmallDown} {
+          > ${TimePickerPreset} {
+            flex: 1 1 15rem;
+          }
         }
       }
 
