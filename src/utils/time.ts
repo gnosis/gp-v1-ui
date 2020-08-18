@@ -10,7 +10,7 @@ export function getEpoch(): number {
   return Math.floor(Date.now() / 1000)
 }
 
-export const simpleIsDateCheck = (date?: Date | string | number): number =>
+export const simpleIsDateCheck = (date?: Date | string | number | null): number =>
   !date ? Date.now() : typeof date === 'string' || typeof date === 'number' ? +date : date.getTime()
 
 /**
@@ -23,7 +23,7 @@ export const simpleIsDateCheck = (date?: Date | string | number): number =>
  * @param date? Optional Date object to calculate the batchId from.
  *  Defaults to Date.now()
  */
-export function dateToBatchId(date?: Date | string | number): number {
+export function dateToBatchId(date?: Date | string | number | null): number {
   const timestamp = simpleIsDateCheck(date)
   const timestampInSeconds = Math.floor(timestamp / 1000)
   return Math.floor(timestampInSeconds / BATCH_TIME)

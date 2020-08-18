@@ -451,11 +451,11 @@ const OrderValidity: React.FC<Props> = ({
     (validUntilTimeMs && +validUntilTimeMs) || null,
   )
 
-  const [validFromCustomBatchId, setValidFromCustomBatchId] = useSafeState<string | null>(
-    validFromCustomTime ? dateToBatchId(validFromCustomTime).toString() : null,
+  const [validFromCustomBatchId, setValidFromCustomBatchId] = useSafeState<number | null>(
+    validFromCustomTime ? dateToBatchId(validFromCustomTime) : null,
   )
-  const [validUntilCustomBatchId, setValidUntilCustomBatchId] = useSafeState<string | null>(
-    validUntilCustomTime ? dateToBatchId(validUntilCustomTime).toString() : null,
+  const [validUntilCustomBatchId, setValidUntilCustomBatchId] = useSafeState<number | null>(
+    validUntilCustomTime ? dateToBatchId(validUntilCustomTime) : null,
   )
 
   const validFromError = errors[validFromInputId]
@@ -463,17 +463,27 @@ const OrderValidity: React.FC<Props> = ({
 
   const handleRelativeTimeSelect = useCallback(
     function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
-      const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
+      const relativeTimeToDate: number | null = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
 
       if (inputId === validFromInputId) {
         setValidFromButton(relativeTime)
         setValidFromCustomTime(relativeTimeToDate)
+        setValidFromCustomBatchId(dateToBatchId(relativeTimeToDate))
       } else {
         setValidUntilButton(relativeTime)
         setValidUntilCustomTime(relativeTimeToDate)
+        setValidUntilCustomBatchId(dateToBatchId(relativeTimeToDate))
       }
     },
-    [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
+    [
+      setValidFromButton,
+      setValidFromCustomBatchId,
+      setValidFromCustomTime,
+      setValidUntilButton,
+      setValidUntilCustomBatchId,
+      setValidUntilCustomTime,
+      validFromInputId,
+    ],
   )
 
   const handleCustomTimeSelect = useCallback(
@@ -481,28 +491,34 @@ const OrderValidity: React.FC<Props> = ({
       if (inputId === validFromInputId) {
         setValidFromCustomTime(time)
         setValidFromButton(Infinity)
+        setValidFromCustomBatchId(dateToBatchId(time))
       } else {
         setValidUntilCustomTime(time)
         setValidUntilButton(Infinity)
+        setValidUntilCustomBatchId(dateToBatchId(time))
       }
     },
-    [setValidFromButton, setValidFromCustomTime, setValidUntilButton, setValidUntilCustomTime, validFromInputId],
+    [
+      setValidFromButton,
+      setValidFromCustomBatchId,
+      setValidFromCustomTime,
+      setValidUntilButton,
+      setValidUntilCustomBatchId,
+      setValidUntilCustomTime,
+      validFromInputId,
+    ],
   )
 
   const handleValidFromBatchIdSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>): void => {
-      setValidFromCustomBatchId(e.target.value)
-      e.target.value && handleCustomTimeSelect(validFromInputId, +e.target.value * BATCH_TIME_IN_MS)
-    },
-    [handleCustomTimeSelect, setValidFromCustomBatchId, validFromInputId],
+    (e: React.ChangeEvent<HTMLInputElement>): void =>
+      handleCustomTimeSelect(validFromInputId, +e.target.value * BATCH_TIME_IN_MS),
+    [handleCustomTimeSelect, validFromInputId],
   )
 
   const handleValidUntilBatchIdSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>): void => {
-      setValidUntilCustomBatchId(e.target.value)
-      e.target.value && handleCustomTimeSelect(validUntilInputId, +e.target.value * BATCH_TIME_IN_MS)
-    },
-    [handleCustomTimeSelect, setValidUntilCustomBatchId, validUntilInputId],
+    (e: React.ChangeEvent<HTMLInputElement>): void =>
+      handleCustomTimeSelect(validUntilInputId, +e.target.value * BATCH_TIME_IN_MS),
+    [handleCustomTimeSelect, validUntilInputId],
   )
 
   const handleShowConfig = useCallback(async (): Promise<void> => {
@@ -708,10 +724,7 @@ const OrderValidity: React.FC<Props> = ({
                     min={dateToBatchId() + BATCH_START_THRESHOLD}
                     placeholder={(dateToBatchId() + BATCH_START_THRESHOLD).toString()}
                     step={1}
-                    value={
-                      validFromCustomBatchId ||
-                      undefined /* validFromCustomTime ? dateToBatchId(validFromCustomTime) : undefined */
-                    }
+                    value={validFromCustomBatchId || undefined}
                     onChange={handleValidFromBatchIdSelect}
                   />
                   <small className="inputLabel">batchId </small>
@@ -770,8 +783,8 @@ const OrderValidity: React.FC<Props> = ({
                   <Input
                     type="number"
                     className="movingLabel"
-                    min={dateToBatchId() + BATCH_END_THRESHOLD}
-                    placeholder={(dateToBatchId() + BATCH_END_THRESHOLD).toString()}
+                    min={(validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD}
+                    placeholder={((validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD).toString()}
                     step={1}
                     value={validUntilCustomBatchId || undefined}
                     onChange={handleValidUntilBatchIdSelect}
