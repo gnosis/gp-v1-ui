@@ -120,13 +120,16 @@ export const UserWalletToggler = styled(UserWalletItem)`
     transform: rotate(-90deg);
   }
 `
-
-export const EtherImage = styled.img`
+// no filter: invert(100%);
+// as it looks bad with most icons
+export const WalletImage = styled.img`
   width: 2.4rem;
   height: 2.4rem;
   object-fit: contain;
   margin: 0 0.5rem 0 0;
+`
 
+export const EtherImage = styled(WalletImage)`
   @media (prefers-color-scheme: dark) {
     body:not(.light-theme) & {
       filter: invert(100%);
@@ -219,6 +222,12 @@ export const NetworkTitle = styled.div`
   letter-spacing: 0.3rem;
   top: -0.6rem;
   white-space: nowrap;
+`
+
+export const WalletName = styled.div`
+  position: absolute;
+  top: 100%;
+  font-size: 1rem;
 `
 
 export const MonospaceAddress = styled.div`

@@ -47,7 +47,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
 
       const reversedOrders = orders
         // remove deleted orders
-        .filter(order => !isOrderDeleted(order))
+        .filter((order) => !isOrderDeleted(order))
         // default sorting order is ascending by order id
         // since we are starting from 0, reverse to have the latest on top
         .reverse()
@@ -98,7 +98,7 @@ export const reducer = (state: OrdersState, action: ReducerActionType): OrdersSt
       const { orders: currentOrders } = state
 
       // reverse new orders
-      const reversedNewOrders = newOrders.filter(order => !isOrderDeleted(order)).reverse()
+      const reversedNewOrders = newOrders.filter((order) => !isOrderDeleted(order)).reverse()
 
       // existing orders are older, so new orders come first
       const orders = reversedNewOrders.concat(currentOrders)

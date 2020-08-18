@@ -143,8 +143,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               {formatSmart(pendingWithdraw.amount, decimals)}
             </>
           ) : (
-                <>{withdrawing && spinner}0</>
-              )}
+            <>{withdrawing && spinner}0</>
+          )}
         </td>
         <td
           data-label="Wallet"
@@ -167,11 +167,11 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
               </li>
             </ul>
           ) : (
-              <>
-                {(claiming || depositing) && spinner}
-                {formatSmart(walletBalance, decimals)}
-              </>
-            )}
+            <>
+              {(claiming || depositing) && spinner}
+              {formatSmart(walletBalance, decimals)}
+            </>
+          )}
         </td>
         <td data-label="Actions">
           {!tokenDisabled &&
@@ -185,19 +185,19 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
                 <PlusSVG />
               </button>
             ) : (
-                <>
-                  <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
-                    {enabling ? (
-                      <>
-                        <Spinner />
+              <>
+                <button type="button" className="enableToken" onClick={onEnableToken} disabled={enabling}>
+                  {enabling ? (
+                    <>
+                      <Spinner />
                       Enabling
                     </>
-                    ) : (
-                        <>Enable Deposit</>
-                      )}
-                  </button>
-                </>
-              ))}
+                  ) : (
+                    <>Enable Deposit</>
+                  )}
+                </button>
+              </>
+            ))}
           {!totalExchangeBalance.isZero() && (
             <button
               type="button"

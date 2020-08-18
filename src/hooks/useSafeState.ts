@@ -4,7 +4,7 @@ interface UseSafeState {
   <S = undefined>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>]
 }
 
-const useSafeState: UseSafeState = initialState => {
+const useSafeState: UseSafeState = (initialState) => {
   const [state, setState] = useState(initialState)
 
   // can drop useRef, because we only need one closure
@@ -23,7 +23,7 @@ const useSafeState: UseSafeState = initialState => {
     }
   }, [])
 
-  const setSafeState = useCallback(newState => {
+  const setSafeState = useCallback((newState) => {
     // this is the same `mounted` as in useEffect
     // deps are the same ([]) so closure's outer scope is the same
     if (mounted) setState(newState)

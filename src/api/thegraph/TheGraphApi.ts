@@ -80,7 +80,7 @@ export class TheGraphApiImpl {
    * Price is returned in units by default. To return in WEI, set `inWei` to true.
    */
   public async getPrices({ networkId, tokenIds, inWei = false }: GetPricesParams): Promise<GetPricesResult> {
-    const tokens = tokenIds.map(tokenId => this.buildPartialPriceQuery(tokenId)).join('\n')
+    const tokens = tokenIds.map((tokenId) => this.buildPartialPriceQuery(tokenId)).join('\n')
     const queryString = `{${tokens}}`
 
     try {
