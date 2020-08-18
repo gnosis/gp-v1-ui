@@ -132,6 +132,10 @@ const SideContentWrapper = styled.div`
     flex: 0 1 20rem;
     margin: 2rem 0;
     white-space: nowrap;
+
+    > strong {
+      margin-right: 0.35rem;
+    }
   }
 
   > div.innerWrapper {
