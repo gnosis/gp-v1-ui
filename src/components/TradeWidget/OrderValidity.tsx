@@ -26,7 +26,6 @@ import useSafeState from 'hooks/useSafeState'
 import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
-import { useDebounce } from 'hooks/useDebounce'
 
 import { BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
 
@@ -432,16 +431,6 @@ const OrderValidity: React.FC<Props> = ({
   const validFromError = errors[validFromInputId]
   const validUntilError = errors[validUntilInputId]
 
-  const { value: debouncedValidFromBatchId } = useDebounce<number | null>(
-    validFromCustomBatchId ? +validFromCustomBatchId : null,
-    500,
-  )
-
-  const { value: debouncedValidUntilBatchId } = useDebounce<number | null>(
-    validUntilCustomBatchId ? +validUntilCustomBatchId : null,
-    500,
-  )
-
   const handleRelativeTimeSelect = useCallback(
     function handleRelativeTimeSelect(inputId: string, relativeTime: number | null): void {
       const relativeTimeToDate = relativeTime ? relativeMinutesToDateMS(relativeTime) : null
@@ -481,19 +470,17 @@ const OrderValidity: React.FC<Props> = ({
   const handleValidFromBatchIdSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       setValidFromCustomBatchId(e.target.value)
-      debouncedValidFromBatchId &&
-        handleCustomTimeSelect(validFromInputId, debouncedValidFromBatchId * BATCH_TIME_IN_MS)
+      e.target.value && handleCustomTimeSelect(validFromInputId, +e.target.value * BATCH_TIME_IN_MS)
     },
-    [debouncedValidFromBatchId, handleCustomTimeSelect, setValidFromCustomBatchId, validFromInputId],
+    [handleCustomTimeSelect, setValidFromCustomBatchId, validFromInputId],
   )
 
   const handleValidUntilBatchIdSelect = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
       setValidUntilCustomBatchId(e.target.value)
-      debouncedValidUntilBatchId &&
-        handleCustomTimeSelect(validUntilInputId, debouncedValidUntilBatchId * BATCH_TIME_IN_MS)
+      e.target.value && handleCustomTimeSelect(validUntilInputId, +e.target.value * BATCH_TIME_IN_MS)
     },
-    [debouncedValidUntilBatchId, handleCustomTimeSelect, setValidUntilCustomBatchId, validUntilInputId],
+    [handleCustomTimeSelect, setValidUntilCustomBatchId, validUntilInputId],
   )
 
   const handleShowConfig = useCallback(async (): Promise<void> => {
