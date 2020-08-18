@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { BATCH_TIME } from 'const'
 
 export function useTimeRemainingInBatch(batchesToCountdown?: number): number {
-  const [timeRemaining, setTimeRemaining] = useSafeState(getTimeRemainingInBatch({ batches: batchesToCountdown }))
+  const [timeRemaining, setTimeRemaining] = useSafeState(() => getTimeRemainingInBatch({ batches: batchesToCountdown }))
 
   useEffect(() => {
     let interval: null | NodeJS.Timeout = null
