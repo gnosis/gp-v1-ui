@@ -27,7 +27,6 @@ before_deploy:
       ipfs init;
       export IPFS_HASH=$(ipfs add dist/ -r --only-hash --quiet | tail -1);
       echo $IPFS_HASH > ipfs_hash.txt;
-      # compile release_notes_file
       LAST_RELEASE_TAG=$(curl https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases/latest 2>/dev/null | jq .name | sed 's/"//g')
       echo "Commits since $LAST_TAG:" > RELEASE_NOTES.md
       git log $LAST_RELEASE_TAG.. --oneline --decorate=0 | sed 's/^/- /' >> RELEASE_NOTES.md
