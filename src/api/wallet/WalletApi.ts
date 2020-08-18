@@ -4,6 +4,7 @@ import assert from 'assert'
 import { getDefaultProvider } from '..'
 
 import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile } from 'web3modal'
+import { IClientMeta } from '@walletconnect/types'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -16,6 +17,7 @@ import { composeProvider } from './composeProvider'
 import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
+import { getWCWalletIconURL } from './walletUtils'
 
 interface ProviderState {
   accounts: string[]
@@ -50,7 +52,7 @@ export interface WalletApi {
   getWalletInfo(): Promise<WalletInfo>
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
-  getProviderInfo(): ProviderInfo
+  getProviderInfo(): ProviderInfo | null
   blockchainState: BlockchainUpdatePrompt
   userPrintAsync: Promise<string>
   getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null>
@@ -63,7 +65,11 @@ export interface WalletInfo {
   blockNumber?: number
 }
 
-export type ProviderInfo = IProviderInfo
+export interface ProviderInfo extends IProviderInfo {
+  peerMeta?: IClientMeta
+  walletName: string
+  walletIcon: string
+}
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -246,6 +252,7 @@ export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
   private _web3: Web3
+  private _providerInfo: ProviderInfo | null = null
   public userPrintAsync: Promise<string> = Promise.resolve('')
   public blockchainState: BlockchainUpdatePrompt
 
@@ -347,6 +354,7 @@ export class WalletApiImpl implements WalletApi {
     }
 
     this._provider = provider
+    this._setProviderInfo()
 
     closeOpenWebSocketConnection(this._web3)
 
@@ -460,6 +468,7 @@ export class WalletApiImpl implements WalletApi {
 
     logDebug('[WalletApiImpl] Disconnected')
     await this._notifyListeners()
+    this._setProviderInfo()
   }
 
   public async getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null> {
@@ -523,8 +532,8 @@ export class WalletApiImpl implements WalletApi {
     this._listeners = this._listeners.filter(c => c !== callback)
   }
 
-  public getProviderInfo(): ProviderInfo {
-    return getProviderInfo(this._provider)
+  public getProviderInfo(): ProviderInfo | null {
+    return this._providerInfo
   }
 
   public async getWalletInfo(): Promise<WalletInfo> {
@@ -539,6 +548,32 @@ export class WalletApiImpl implements WalletApi {
   }
 
   /* ****************      Private Functions      **************** */
+
+  private _setProviderInfo(): void {
+    // this can get expensive depending on the number and complexity of checks in getProviderInfo
+    // so retrigger only on connect/disconnect
+    const providerInfo = getProviderInfo(this._provider)
+
+    if (!providerInfo) {
+      this._providerInfo = null
+      return
+    }
+
+    this._providerInfo = {
+      ...providerInfo,
+      walletIcon: providerInfo.logo,
+      walletName: providerInfo.name,
+    }
+
+    // not all WC wallets fill in peerMeat (Pillar doesn't)
+    if (isWalletConnectProvider(this._provider) && this._provider.wc.peerMeta) {
+      this._providerInfo.peerMeta = this._provider.wc.peerMeta
+      this._providerInfo.walletName = this._provider.wc.peerMeta.name
+
+      const WCWalletIcon = this._provider.wc.peerMeta.icons?.[0] || getWCWalletIconURL(this._providerInfo.walletName)
+      if (WCWalletIcon) this._providerInfo.walletIcon = WCWalletIcon
+    }
+  }
 
   private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
     let chainIdChanged = false
@@ -587,7 +622,10 @@ export class WalletApiImpl implements WalletApi {
   // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
   private async _generateAsyncUserPrint(): Promise<string> {
-    const { name: providerName } = this.getProviderInfo()
+    const providerInfo = this.getProviderInfo()
+    if (!providerInfo) return ''
+
+    const { name: providerName } = providerInfo
 
     const mobile = isMobile() ? 'mobile' : 'desktop'
 
