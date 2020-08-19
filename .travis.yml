@@ -30,7 +30,9 @@ before_deploy:
     fi
   # compile RELEASE_NOTES.md
   - if [[ $TRAVIS_TAG != "" ]]; then
-      LAST_RELEASE_TAG=$(curl https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases/latest 2>/dev/null | jq .name | sed 's/"//g');
+      echo "TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG";
+      LAST_RELEASE_TAG=$(curl https://api.github.com/repos/${TRAVIS_REPO_SLUG}/releases/latest 2>/dev/null | jq .name | sed 's/"//g');
+      echo "LAST_RELEASE_TAG=$LAST_RELEASE_TAG";
       echo "Commits since $LAST_TAG:" > RELEASE_NOTES.md;
       git log $LAST_RELEASE_TAG.. --oneline --decorate=0 | sed 's/^/- /' >> RELEASE_NOTES.md;
     fi
