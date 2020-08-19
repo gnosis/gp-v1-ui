@@ -16,7 +16,7 @@ import { ZERO_BIG_NUMBER } from 'const'
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
-import { adjustPrecision } from '@gnosis.pm/dex-js'
+import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -227,10 +227,19 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
     sellTokenAmount,
   })
 
-  const adjustedRecommendedAmount = useMemo(
-    () => (recommendedAmount ? adjustPrecision(recommendedAmount?.toString(), 2) : ''),
-    [recommendedAmount],
-  )
+  const { formattedAmount = '', amountInUSD = '' } = useMemo<{ formattedAmount?: string; amountInUSD?: string }>(() => {
+    if (!recommendedAmount || !roundedAmountInUSD) return {}
+
+    const parsedAmount = parseAmount(recommendedAmount.toString(10), sellToken.decimals)
+    const parseAmountInUSD = parseAmount(roundedAmountInUSD.toString(10), 1)
+
+    if (!parsedAmount || !parseAmountInUSD) return {}
+
+    const amountFull = formatAmount({ amount: parsedAmount, precision: sellToken.decimals, decimals: 2 })
+    const amountInUSD = formatAmount({ amount: parseAmountInUSD, precision: 1 })
+
+    return { formattedAmount: amountFull, amountInUSD }
+  }, [recommendedAmount, roundedAmountInUSD, sellToken.decimals])
 
   return (
     <TxMessageWrapper>
@@ -312,9 +321,9 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
             <p>
               This is a low volume order. We recommend selling at least{' '}
               <strong>
-                {adjustedRecommendedAmount} {symbolOrAddress(sellToken)}
+                {formattedAmount} {symbolOrAddress(sellToken)}
               </strong>{' '}
-              (approximately <strong>${roundedAmountInUSD?.toString(10)}</strong>) of the token.
+              (approximately <strong>${amountInUSD}</strong>) of the token.
             </p>
             <p>
               Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
