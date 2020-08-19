@@ -31,9 +31,9 @@ const Wrapper = styled.footer`
   letter-spacing: -0.03rem;
   line-height: 1;
 
-  width: 85%;
-  margin: 2rem auto;
-  padding: 0 0 2.4rem;
+  width: 100%;
+  margin: 0 0 4rem 0;
+  padding: 0 2rem;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
@@ -44,23 +44,8 @@ const Wrapper = styled.footer`
 `
 
 const FooterLinks = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  align-items: center;
-  font-size: inherit;
-  margin: 0 1rem;
-
-  white-space: nowrap;
-
-  > strong {
-    margin-right: 1rem;
-  }
-
-  @media ${MEDIA.mobile} {
-    width: 100%;
-    padding: 0 0 1.4rem;
-    margin: 0;
+  > a {
+    margin: 0 0.5rem;
   }
 
   > a:link,
@@ -69,11 +54,6 @@ const FooterLinks = styled.div`
     font-size: inherit;
     color: inherit;
     letter-spacing: -0.03rem;
-    margin: 0 1rem 0 0;
-  }
-
-  > a:last-of-type {
-    margin: 0;
   }
 `
 
@@ -95,14 +75,15 @@ const BuiltOnGPWrapper = styled.div`
 
 const VerifiedContractLink = styled.div`
   display: flex;
-  width: auto;
-  margin: 0 1rem;
+  flex: 1 1 100%;
   justify-content: center;
+
+  margin: 0 1rem;
   padding: 0;
 
   > a {
     height: fit-content;
-    margin: auto;
+    margin: auto 0;
     border-color: #29a745;
     white-space: nowrap;
   }
@@ -116,59 +97,74 @@ const VerifiedContractLink = styled.div`
 
 const SideContentWrapper = styled.div`
   display: flex;
-  flex-flow: row wrap;
-  flex: 0 1 80.4rem;
+  flex-flow: row wrap-reverse;
+  flex: 1 1 100%;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
 
-  @media ${MEDIA.mobile} {
-    flex: 0 1 auto;
-  }
+  margin: 0 2rem;
 
-  > ${ThemeTogglerWrapper} {
+  > ${ThemeTogglerWrapper}, > ${FooterLinks}, > .version {
     display: flex;
-    align-items: center;
+    flex-flow: row nowrap;
     justify-content: center;
-    flex: 0 1 20rem;
-    margin: 2rem 0;
+    align-items: center;
+    flex: 1 0 33%;
+    // min-width: 30rem;
+
+    font-size: inherit;
+    margin: 1.2rem 0;
     white-space: nowrap;
 
     > strong {
-      margin-right: 0.35rem;
+      margin-right: 1rem;
     }
   }
 
-  > div.innerWrapper {
-    display: flex;
-    flex-flow: row wrap;
-    flex: 0 1 59.6rem;
-    align-items: center;
-    justify-content: space-evenly;
+  > ${ThemeTogglerWrapper} {
+    order: 1;
+  }
 
-    width: 100%;
-    margin: 2rem 0;
-    white-space: nowrap;
+  > ${FooterLinks} {
+    order: 2;
+  }
+
+  > .version {
+    order: 3;
+    font-size: inherit;
+    color: inherit;
+
+    > a {
+      margin: 0 0.4rem;
+      text-decoration: none;
+      color: inherit;
+      text-decoration: underline;
+      transition: color 0.2s ease-in-out;
+    }
+
+    > a:hover {
+      color: var(--color-text-active);
+    }
+  }
+
+  @media only screen and (max-width: ${MEDIA.mediumScreenSmall}) {
+    > ${FooterLinks} {
+      order: 3;
+    }
+
+    > ${ThemeTogglerWrapper} {
+      order: 2;
+    }
 
     > .version {
-      margin: 0 1rem;
-      font-size: inherit;
-      color: inherit;
-      white-space: nowrap;
+      order: 1;
+    }
+  }
 
-      > strong {
-        margin-right: 1rem;
-      }
-
-      > a {
-        text-decoration: none;
-        color: inherit;
-        text-decoration: underline;
-        transition: color 0.2s ease-in-out;
-      }
-
-      > a:hover {
-        color: var(--color-text-active);
-      }
+  @media ${MEDIA.mobile} {
+    > ${FooterLinks}, > .version,
+    > ${ThemeTogglerWrapper} {
+      flex: 1 1 100%;
     }
   }
 `
@@ -223,36 +219,32 @@ const Footer: React.FC = () => {
       <SideContentWrapper>
         {/* DARK/LIGHT MODE TOGGLER */}
         <ThemeToggler />
-        <div className="innerWrapper">
-          {/* LINKS */}
-          <FooterLinks>
-            <strong>General information:</strong>
-            <Link to="/about">About{APP_NAME_ABOUT}</Link>
-            <Link to="/faq">FAQ</Link>
-          </FooterLinks>
-          {/* VERSION */}
-          <div className="version">
-            <strong>App information:</strong>
-            <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
-              Web v{VERSION}
-            </a>{' '}
-            -{' '}
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks"
-            >
-              App Id: {CONFIG.appId}
-            </a>{' '}
-            -{' '}
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
-            >
-              Contracts v{CONTRACT_VERSION}
-            </a>
-          </div>
+        {/* LINKS */}
+        <FooterLinks>
+          <Link to="/about">About{APP_NAME_ABOUT}</Link>
+          <Link to="/faq">FAQ</Link>
+        </FooterLinks>
+        {/* VERSION */}
+        <div className="version">
+          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+            Web: v{VERSION}
+          </a>{' '}
+          -{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks"
+          >
+            App Id: {CONFIG.appId}
+          </a>{' '}
+          -{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
+          >
+            Contracts: v{CONTRACT_VERSION}
+          </a>
         </div>
       </SideContentWrapper>
     </Wrapper>
