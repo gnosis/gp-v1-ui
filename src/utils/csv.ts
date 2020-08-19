@@ -42,9 +42,7 @@ export function toCsv<T, R extends CsvColumns>({ data, transformer }: ToCsvParam
   const transformed = transformer(firstDataItem)
   const headers = Object.keys(transformed).join(',')
   // Since we already got it, use first row
-  const firstRow = Object.values(transformed)
-    .map(escapeValue)
-    .join(',')
+  const firstRow = Object.values(transformed).map(escapeValue).join(',')
 
   return remainingData
     .reduce<string[]>(

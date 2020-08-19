@@ -31,7 +31,8 @@
     "suppressImplicitAnyIndexErrors": true,
     "types": [
       "jest",
-      "node"
+      "node",
+      "webpack-env"
     ],
     "baseUrl": ".",
     "paths": {
