@@ -203,12 +203,8 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 }
 
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {
-  // simple watch('sellToken') doesn't work
-  // as not every setValue causes rerender
-  const [, forceUpdate] = useSafeState({})
-
   const [orderHelpVisible, showOrderHelp] = useSafeState(false)
-  const { getValues, setValue } = useFormContext<TradeFormData>()
+  const { getValues } = useFormContext<TradeFormData>()
   const {
     price,
     priceInverse,
@@ -235,12 +231,6 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
     () => (recommendedAmount ? adjustPrecision(recommendedAmount?.toString(), 2) : ''),
     [recommendedAmount],
   )
-
-  const setRecommendedSellAmount = (): void => {
-    if (!adjustedRecommendedAmount) return
-    setValue('sellToken', adjustedRecommendedAmount, true)
-    forceUpdate({})
-  }
 
   return (
     <TxMessageWrapper>
@@ -321,11 +311,9 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
           <div>
             <p>
               This is a low volume order. We recommend selling at least{' '}
-              <a onClick={setRecommendedSellAmount}>
-                <strong>
-                  {adjustedRecommendedAmount} {symbolOrAddress(sellToken)}
-                </strong>
-              </a>{' '}
+              <strong>
+                {adjustedRecommendedAmount} {symbolOrAddress(sellToken)}
+              </strong>{' '}
               (approximately <strong>${roundedAmountInUSD?.toString(10)}</strong>) of the token.
             </p>
             <p>
