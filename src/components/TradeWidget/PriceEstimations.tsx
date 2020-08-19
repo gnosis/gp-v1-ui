@@ -109,6 +109,7 @@ const Wrapper = styled.div`
 interface SwapPriceProps
   extends Pick<PriceEstimationsProps, 'baseToken' | 'quoteToken' | 'isPriceInverted' | 'swapPrices'> {
   separator?: string
+  showOnlyQuoteToken?: boolean
 }
 
 export const SwapPrice: React.FC<SwapPriceProps> = ({
@@ -117,6 +118,7 @@ export const SwapPrice: React.FC<SwapPriceProps> = ({
   separator = '/',
   isPriceInverted,
   swapPrices,
+  showOnlyQuoteToken = false,
 }) => {
   const displayBaseToken = isPriceInverted ? quoteToken : baseToken
   const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
@@ -126,8 +128,12 @@ export const SwapPrice: React.FC<SwapPriceProps> = ({
   return (
     <div>
       <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
-      <div>{separator}</div>
-      <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
+      {!showOnlyQuoteToken && (
+        <>
+          <div>{separator}</div>
+          <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
+        </>
+      )}
       <SwapIcon swap={swapPrices} />
     </div>
   )
@@ -158,7 +164,7 @@ interface PriceEstimationsProps {
 }
 
 export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
-  const { amount, isPriceInverted, priceInputId, priceInverseInputId } = props
+  const { amount, baseToken, quoteToken, isPriceInverted, priceInputId, priceInverseInputId, swapPrices } = props
 
   const { setValue, triggerValidation } = useFormContext<TradeFormData>()
 
@@ -188,10 +194,7 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
         />
       </div>
       <div className="container">
-        <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
-        {amount && +amount != 0 && +amount != 1 && (
-          <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
-        )}
+        {amount && +amount != 0 && <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />}
       </div>
     </Wrapper>
   )
@@ -205,13 +208,8 @@ function formatPriceToPrecision(price: BigNumber): string {
   return price.toFixed(PRICE_ESTIMATION_PRECISION)
 }
 
-const HighlightedText = styled.span`
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-`
-
 const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = (props) => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices, swapPrices } = props
+  const { networkId, amount, baseToken, quoteToken, isPriceInverted, swapPrices, updatePrices } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
   const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
@@ -236,7 +234,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   return (
     <>
       <span>
-        <HighlightedText>{!isPriceInverted ? 'Selling' : 'Buying'}</HighlightedText>{' '}
+        <span>{!isPriceInverted ? 'Selling' : 'Buying'}</span>{' '}
         <strong>
           {+amount || '1'} {displayTokenSymbolOrLink(!isPriceInverted ? quoteToken : baseToken)}
         </strong>
@@ -254,6 +252,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         quoteToken={quoteToken}
         swapPrices={swapPrices}
         isPriceInverted={isPriceInverted}
+        showOnlyQuoteToken
       />
     </>
   )
