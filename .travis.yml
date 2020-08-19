@@ -30,11 +30,10 @@ before_deploy:
     fi
   # compile RELEASE_NOTES.md
   - if [[ $TRAVIS_TAG != "" ]]; then
-      echo "TRAVIS_REPO_SLUG=$TRAVIS_REPO_SLUG";
-      LAST_RELEASE_TAG=$(curl https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases 2>/dev/null | jq .[1].tag_name | sed 's/"//g');
-      echo "LAST_RELEASE_TAG=$LAST_RELEASE_TAG";
-      echo "Commits since $LAST_TAG:" > RELEASE_NOTES.md;
+      LAST_RELEASE_TAG=$(curl https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases/latest 2>/dev/null | jq .tag_name | sed 's/"//g');
+      echo "Commits since $LAST_RELEASE_TAG:" > RELEASE_NOTES.md;
       git log $LAST_RELEASE_TAG.. --oneline --decorate=0 | sed 's/^/- /' >> RELEASE_NOTES.md;
+      echo "RELEASE_NOTES file contains:";
       cat RELEASE_NOTES.md;
     fi
 after_success:
@@ -80,7 +79,7 @@ deploy:
   # add release_v*.zip file to tagged Releases on github
   - provider: releases
     api_key: $GITHUB_RELEASE_TAG_API_TOKEN
-    release_notes_file: RELEASE_NOTES.md
+    release_notes_file: ./RELEASE_NOTES.md
     file: 
       - web_$TRAVIS_TAG.zip
       - ipfs_hash.txt
