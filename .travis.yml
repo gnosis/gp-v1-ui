@@ -35,6 +35,7 @@ before_deploy:
       echo "LAST_RELEASE_TAG=$LAST_RELEASE_TAG";
       echo "Commits since $LAST_TAG:" > RELEASE_NOTES.md;
       git log $LAST_RELEASE_TAG.. --oneline --decorate=0 | sed 's/^/- /' >> RELEASE_NOTES.md;
+      cat RELEASE_NOTES.md;
     fi
 after_success:
   # Pull Request - Deploy it to a review environment
