@@ -14,6 +14,7 @@ import {
   formatSeconds,
   roundToNearestMinutes,
   addMinutes,
+  addYears,
 } from 'utils'
 import { MEDIA, BATCH_TIME_IN_MS } from 'const'
 
@@ -448,14 +449,14 @@ const OrderValidity: React.FC<Props> = ({
   const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = formValues
   // const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
 
-  const [validFromButton, setValidFromButton] = useSafeState<number | 'RELATIVE' | null>(
-    isAsap ? null : validFromTimeMs ? 'RELATIVE' : VALID_FROM_DEFAULT,
+  const [validFromButton, setValidFromButton] = useSafeState<number | 'CUSTOM_TIME' | null>(
+    isAsap ? null : validFromTimeMs ? 'CUSTOM_TIME' : VALID_FROM_DEFAULT,
   )
   const [validFromCustomTime, setValidFromCustomTime] = useSafeState<number | null>(
     (validFromTimeMs && +validFromTimeMs) || null,
   )
-  const [validUntilButton, setValidUntilButton] = useSafeState<number | 'RELATIVE' | null>(
-    isUnlimited ? null : validUntilTimeMs ? 'RELATIVE' : VALID_UNTIL_DEFAULT,
+  const [validUntilButton, setValidUntilButton] = useSafeState<number | 'CUSTOM_TIME' | null>(
+    isUnlimited ? null : validUntilTimeMs ? 'CUSTOM_TIME' : VALID_UNTIL_DEFAULT,
   )
   const [validUntilCustomTime, setValidUntilCustomTime] = useSafeState<number | null>(
     (validUntilTimeMs && +validUntilTimeMs) || null,
@@ -500,11 +501,11 @@ const OrderValidity: React.FC<Props> = ({
     function (inputId: string, time: number | null): void {
       if (inputId === validFromInputId) {
         setValidFromCustomTime(time)
-        setValidFromButton('RELATIVE')
+        setValidFromButton('CUSTOM_TIME')
         setValidFromCustomBatchId(dateToBatchId(time))
       } else {
         setValidUntilCustomTime(time)
-        setValidUntilButton('RELATIVE')
+        setValidUntilButton('CUSTOM_TIME')
         setValidUntilCustomBatchId(dateToBatchId(time))
       }
     },
@@ -614,16 +615,16 @@ const OrderValidity: React.FC<Props> = ({
     if (validUntilButton) {
       if (validFromButton) {
         // If a custom until time is chosen
-        if (validUntilButton !== 'RELATIVE') {
+        if (validUntilButton !== 'CUSTOM_TIME') {
           const adjustedValidUntilTime = validFromCustomTime! + validUntilButton * 60 * 1000
           setValidUntilCustomTime(adjustedValidUntilTime)
           // if a validUntil time is chosen but a relative validFrom time is selected
           // when a custom time is not null, neither is button
-        } else if (validFromButton !== 'RELATIVE') {
+        } else if (validFromButton !== 'CUSTOM_TIME') {
           const adjustedValidUntilTime = validUntilCustomTime! + validFromButton * 60 * 1000
           setValidUntilCustomTime(adjustedValidUntilTime)
         }
-      } else if (validUntilButton !== 'RELATIVE') {
+      } else if (validUntilButton !== 'CUSTOM_TIME') {
         // validFromButton = NOW aka null
         const adjustedValidUntilTime = Date.now() + validUntilButton * 60 * 1000
         setValidUntilCustomTime(adjustedValidUntilTime)
@@ -715,7 +716,7 @@ const OrderValidity: React.FC<Props> = ({
               </span>
             </p>
             {/* Relative Time picker */}
-            <DateTimePickerWrapper $customDateSelected={validFromButton === 'RELATIVE'}>
+            <DateTimePickerWrapper $customDateSelected={validFromButton === 'CUSTOM_TIME'}>
               {ORDER_START_PRESETS.map((time) => (
                 <TimePickerPreset
                   key={time || 'now'}
@@ -735,7 +736,16 @@ const OrderValidity: React.FC<Props> = ({
                 value={validFromCustomTime}
                 error={validFromError}
                 inputName={validFromInputId}
-                maxDateTime={validUntilButton === 'RELATIVE' ? validUntilCustomTime! - BATCH_TIME_IN_MS : null}
+                maxDateTime={
+                  // custom until time: use until time - batch threshold
+                  validUntilButton === 'CUSTOM_TIME'
+                    ? validUntilCustomTime! - BATCH_TIME_IN_MS
+                    : // else until is NEVER: make max 1 year
+                    !validUntilButton
+                    ? addYears(Date.now(), 1)
+                    : // else do nada brudi
+                      null
+                }
                 onClose={(): void => {
                   if (validFromCustomTime) {
                     // if from time selected is less than now + threshold, set to minimum time
@@ -778,7 +788,7 @@ const OrderValidity: React.FC<Props> = ({
             <p>
               <strong>Expire Time</strong>
             </p>
-            <DateTimePickerWrapper $customDateSelected={validUntilButton === 'RELATIVE'}>
+            <DateTimePickerWrapper $customDateSelected={validUntilButton === 'CUSTOM_TIME'}>
               {ORDER_EXPIRE_PRESETS.map((time) => (
                 <TimePickerPreset
                   key={time || 'never'}
@@ -798,6 +808,7 @@ const OrderValidity: React.FC<Props> = ({
                 error={validUntilError}
                 inputName={validUntilInputId}
                 minDateTime={(validFromCustomTime || Date.now()) + BATCH_TIME_IN_MS}
+                maxDate={addYears(Date.now(), 5)}
                 onClose={(): void => {
                   // prevent choosing values in the past relative to either Date.now or chosen start date
                   if (validUntilCustomTime) {

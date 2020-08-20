@@ -5,10 +5,11 @@ import {
   addMinutes,
   roundToNearestMinutes,
   formatDistanceStrict,
+  addYears,
 } from 'date-fns'
 import { BATCH_TIME, BATCH_TIME_IN_MS, BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
-export { formatDistanceStrict, format as formatDate, addMinutes, roundToNearestMinutes }
+export { formatDistanceStrict, format as formatDate, addMinutes, addYears, roundToNearestMinutes }
 export const DEFAULT_DATE_FORMAT = 'yyyy.MM.dd HH:mm'
 /**
  * Epoch in seconds
