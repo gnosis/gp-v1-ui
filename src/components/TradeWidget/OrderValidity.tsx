@@ -7,7 +7,14 @@ import { useFormContext } from 'react-hook-form'
 import cog from 'assets/img/cog.svg'
 
 // utils, const
-import { formatDistanceStrict, dateToBatchId, formatDateLocaleShortTime, formatSeconds } from 'utils'
+import {
+  formatDistanceStrict,
+  dateToBatchId,
+  formatDateLocaleShortTime,
+  formatSeconds,
+  roundToNearestMinutes,
+  addMinutes,
+} from 'utils'
 import { MEDIA, BATCH_TIME_IN_MS } from 'const'
 
 // components
@@ -35,7 +42,8 @@ const ORDER_START_PRESETS = [null, 30, 60, 1440]
 // 5min, 30min, 24h, 7d
 const ORDER_EXPIRE_PRESETS = [30, 1440, 10080, null]
 
-const relativeMinutesToDateMS = (minutes: number): number => Date.now() + minutes * 60000
+const relativeMinutesToDateMS = (minutes: number): number =>
+  roundToNearestMinutes(addMinutes(Date.now(), minutes), { nearestTo: 5 }).getTime()
 
 function getNumberOfBatchesLeftUntilNow(batchId: number): number {
   const nowAsBatchId = dateToBatchId()
