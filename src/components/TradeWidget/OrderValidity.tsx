@@ -26,7 +26,7 @@ import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 
-import { BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
+import schema, { BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
 
 const VALID_UNTIL_DEFAULT: number | null = 1440
 const VALID_FROM_DEFAULT: number | null = null
@@ -193,7 +193,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 72rem;
   min-width: 30rem;
-  height: 49rem;
+  height: 51rem;
   padding: 0 0 2.4rem;
   border-radius: 0.8rem;
   display: flex;
@@ -435,8 +435,10 @@ const OrderValidity: React.FC<Props> = ({
   const [showOrderConfig, setShowOrderConfig] = useSafeState(false)
 
   const formMethods = useFormContext<TradeFormData>()
-  const { setValue, errors, register, watch, trigger } = formMethods
-  const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
+  const { setValue, errors, register, watch, clearErrors, setError } = formMethods
+  const formValues = watch()
+  const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = formValues
+  // const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
 
   const [validFromButton, setValidFromButton] = useSafeState<number | 'RELATIVE' | null>(
     isAsap ? null : validFromTimeMs ? 'RELATIVE' : VALID_FROM_DEFAULT,
@@ -522,15 +524,37 @@ const OrderValidity: React.FC<Props> = ({
   )
 
   const handleShowConfig = useCallback(async (): Promise<void> => {
-    let formValid = true
+    let formValid = !errors[validFromInputId] && !errors[validUntilInputId]
 
     if (showOrderConfig) {
-      // as ms time
-      setValue(validFromInputId, validFromCustomTime?.toString() || null)
-      setValue(validUntilInputId, validUntilCustomTime?.toString() || null)
+      try {
+        const data = {
+          [validFromInputId]: validFromCustomTime?.toString(),
+          [validUntilInputId]: validUntilCustomTime?.toString(),
+        }
 
-      // asynchronous trigger here without validation in setValue prevents flashing
-      formValid = await trigger([validFromInputId, validUntilInputId])
+        const validationResult = schema.validate({
+          ...formValues,
+          ...data,
+        })
+
+        if (validationResult.error) throw validationResult
+
+        clearErrors([validFromInputId, validUntilInputId])
+        // as ms time
+        setValue(validFromInputId, data[validFromInputId] || null)
+        setValue(validUntilInputId, data[validUntilInputId] || null)
+      } catch (validationError) {
+        formValid = false
+
+        const {
+          error: {
+            details: [mainDetail],
+          },
+        } = validationError
+
+        setError(mainDetail.path[0], { type: 'manual', message: mainDetail.message })
+      }
     }
 
     formValid && setShowOrderConfig((showOrderConfig) => !showOrderConfig)
@@ -538,12 +562,12 @@ const OrderValidity: React.FC<Props> = ({
   }, [
     showOrderConfig,
     setShowOrderConfig,
-    validFromCustomTime,
-    validUntilCustomTime,
-    setValue,
-    trigger,
-    validUntilInputId,
     validFromInputId,
+    validUntilInputId,
+    formValues,
+    clearErrors,
+    setValue,
+    setError,
   ])
 
   // On any errors, show form
@@ -657,7 +681,15 @@ const OrderValidity: React.FC<Props> = ({
 
       <OrderValidityInputsWrapper $visible={showOrderConfig} onKeyPress={onModalEnter}>
         <h4>
-          Order settings <i onClick={(): void => setShowOrderConfig(!showOrderConfig)}>×</i>
+          Order settings{' '}
+          <i
+            onClick={(): void => {
+              clearErrors([validFromInputId, validUntilInputId])
+              setShowOrderConfig((isOpen) => !isOpen)
+            }}
+          >
+            ×
+          </i>
         </h4>
         <div>
           <OrderValidityBox>
