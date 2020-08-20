@@ -73,6 +73,9 @@ const Wrapper = styled.div`
       > ${EllipsisText} {
         display: inline-block;
         font-size: smaller;
+        width: 6ch;
+        text-align: right;
+        font-weight: bold;
       }
 
       // Separator
@@ -112,6 +115,12 @@ interface SwapPriceProps
   showOnlyQuoteToken?: boolean
 }
 
+const SwapPriceWrapper = styled.div`
+  div.separator {
+    margin: 0 0.4rem;
+  }
+`
+
 export const SwapPrice: React.FC<SwapPriceProps> = ({
   baseToken,
   quoteToken,
@@ -126,16 +135,16 @@ export const SwapPrice: React.FC<SwapPriceProps> = ({
   const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
 
   return (
-    <div>
+    <SwapPriceWrapper>
       <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
       {!showOnlyQuoteToken && (
         <>
-          <div>{separator}</div>
+          <div className="separator">{separator}</div>
           <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
         </>
       )}
       <SwapIcon swap={swapPrices} />
-    </div>
+    </SwapPriceWrapper>
   )
 }
 
@@ -194,7 +203,10 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
         />
       </div>
       <div className="container">
-        {amount && +amount != 0 && <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />}
+        <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
+        {amount && +amount != 0 && +amount != 1 && (
+          <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
+        )}
       </div>
     </Wrapper>
   )
@@ -234,9 +246,9 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   return (
     <>
       <span>
-        <span>{!isPriceInverted ? 'Selling' : 'Buying'}</span>{' '}
+        <span>Best ask for</span>{' '}
         <strong>
-          {+amount || '1'} {displayTokenSymbolOrLink(!isPriceInverted ? quoteToken : baseToken)}
+          {amount} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
         :
       </span>
