@@ -47,7 +47,7 @@ const schema = Joi.object({
     .min(Joi.ref('relativeTime', { adjust: (now) => now + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD }))
     .messages({
       [BASE]: 'Invalid time',
-      [DATE_MIN]: `Please select a time no less than ${
+      [DATE_MIN]: `Please select a time greater than ${
         (BATCH_TIME / 60) * BATCH_START_THRESHOLD
       } minutes in the future`,
       [MULTIPLE]: 'Time must be a multiple of 5',
