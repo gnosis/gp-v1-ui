@@ -65,7 +65,7 @@ export function useOrders(): Result {
           offset,
         })
 
-        const ordersPromises = ordersPreTokenDetails.map(async order => {
+        const ordersPromises = ordersPreTokenDetails.map(async (order) => {
           const [sellToken, buyToken] = await Promise.all([
             getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
             getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),

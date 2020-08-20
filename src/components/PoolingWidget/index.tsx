@@ -48,7 +48,7 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
 
 function setFullTokenMap(tokens: TokenDetails[]): Map<number, TokenDetails> {
   const tokenMap = new Map()
-  tokens.forEach(token => tokenMap.set(token.id, token))
+  tokens.forEach((token) => tokenMap.set(token.id, token))
   return tokenMap
 }
 
@@ -63,8 +63,8 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
   // The number of orders is equal to num_tokens * (num_tokens -1)
   const orders: MultipleOrdersOrder[] = []
 
-  tokens.forEach(buyToken =>
-    tokens.forEach(sellToken => {
+  tokens.forEach((buyToken) =>
+    tokens.forEach((sellToken) => {
       // We don't want to pair a token with itself
       if (buyToken !== sellToken) {
         // calculating buy/sell amounts
@@ -185,8 +185,8 @@ const PoolingInterface: React.FC = () => {
     if (step === 2) setSpread(Number(spreadValue))
   }, [setSpread, spreadValue, step])
 
-  const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
-  const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])
+  const prevStep = useCallback((): void => setStep((step) => (step === FIRST_STEP ? step : step - 1)), [setStep])
+  const nextStep = useCallback((): void => setStep((step) => (step === LAST_STEP ? step : step + 1)), [setStep])
 
   const { isSubmitting, setIsSubmitting, placeMultipleOrders } = usePlaceOrder()
 
@@ -332,7 +332,7 @@ const PoolingInterface: React.FC = () => {
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
           type="button"
-          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          onClick={(): void => setOrdersVisible((ordersVisible) => !ordersVisible)}
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}

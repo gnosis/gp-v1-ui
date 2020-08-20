@@ -291,7 +291,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </thead>
             <tbody>
               {displayedBalances && displayedBalances.length > 0 ? (
-                displayedBalances.map(tokenBalances => (
+                displayedBalances.map((tokenBalances) => (
                   <Row
                     key={tokenBalances.address}
                     ethBalance={ethBalance}
@@ -353,7 +353,7 @@ const DepositWidget: React.FC = () => {
   const [{ localTokens }] = useGlobalState()
 
   const balances = useMemo(() => {
-    return allBalances.filter(bal => !localTokens.disabled.has(bal.address))
+    return allBalances.filter((bal) => !localTokens.disabled.has(bal.address))
   }, [allBalances, localTokens.disabled])
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })

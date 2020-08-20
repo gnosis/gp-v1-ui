@@ -533,17 +533,9 @@ const OrderValidity: React.FC<Props> = ({
       formValid = await trigger([validFromInputId, validUntilInputId])
     }
 
-    formValid && setShowOrderConfig(showOrderConfig => !showOrderConfig)
-  }, [
-    showOrderConfig,
-    setShowOrderConfig,
-    setValue,
-    trigger,
-    validUntilInputId,
-    validUntilCustomTime,
-    validFromInputId,
-    validFromCustomTime,
-  ])
+    formValid && setShowOrderConfig((showOrderConfig) => !showOrderConfig)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showOrderConfig, setShowOrderConfig, setValue, trigger, validUntilInputId, validFromInputId])
 
   // On any errors, show form
   useEffect(() => {
@@ -675,7 +667,7 @@ const OrderValidity: React.FC<Props> = ({
             </p>
             {/* Relative Time picker */}
             <DateTimePickerWrapper $customDateSelected={validFromButton === Infinity}>
-              {ORDER_START_PRESETS.map(time => (
+              {ORDER_START_PRESETS.map((time) => (
                 <TimePickerPreset
                   key={time || 'now'}
                   disabled={isDisabled}
@@ -738,7 +730,7 @@ const OrderValidity: React.FC<Props> = ({
               <strong>Expire Time</strong>
             </p>
             <DateTimePickerWrapper $customDateSelected={validUntilButton === Infinity}>
-              {ORDER_EXPIRE_PRESETS.map(time => (
+              {ORDER_EXPIRE_PRESETS.map((time) => (
                 <TimePickerPreset
                   key={time || 'never'}
                   disabled={isDisabled}

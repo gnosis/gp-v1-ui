@@ -38,7 +38,7 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
         return
       }
 
-      provider.request(req).then(providerRes => {
+      provider.request(req).then((providerRes) => {
         Object.assign(res, providerRes)
         end()
       }, end)
@@ -98,7 +98,7 @@ export const composeProvider = <T extends Provider>(
 
   engine.push(
     createConditionalMiddleware<[]>(
-      req => req.method === 'eth_gasPrice',
+      (req) => req.method === 'eth_gasPrice',
       async (_req, res) => {
         const fetchedPrice = await fetchGasPrice()
 
@@ -125,7 +125,7 @@ export const composeProvider = <T extends Provider>(
 
     engine.push(
       createConditionalMiddleware(
-        req => req.method === 'eth_accounts',
+        (req) => req.method === 'eth_accounts',
         (_req, res) => {
           if (substituteAccount) {
             res.result = [substituteAccount]
@@ -144,8 +144,8 @@ export const composeProvider = <T extends Provider>(
 
   engine.push(
     createConditionalMiddleware<TransactionConfig[]>(
-      req => req.method === 'eth_sendTransaction',
-      async req => {
+      (req) => req.method === 'eth_sendTransaction',
+      async (req) => {
         const txConfig = req.params?.[0]
         // no parameters, which shouldn't happen
         if (!txConfig) return false
@@ -162,8 +162,8 @@ export const composeProvider = <T extends Provider>(
 
   engine.push(
     createConditionalMiddleware<TransactionConfig[]>(
-      req => req.method === 'eth_sendTransaction',
-      async req => {
+      (req) => req.method === 'eth_sendTransaction',
+      async (req) => {
         const txConfig = req.params?.[0]
         // no parameters, which shouldn't happen
         if (!txConfig) return false

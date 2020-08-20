@@ -124,7 +124,7 @@ const mainResolver = composeResolvers({
   walletconnect: wcResolver,
 })
 
-const resolver: FormResolver<SettingsFormData> = async data => {
+const resolver: FormResolver<SettingsFormData> = async (data) => {
   const results = mainResolver(data)
 
   // potentially allow for Setting sections other than WalletConnect

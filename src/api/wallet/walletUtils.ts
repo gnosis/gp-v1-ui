@@ -17,7 +17,7 @@ export const getWCWalletIconURL = (walletName: string): string | undefined => {
   // Trust Wallet Android -> trust wallet android
   const walletNameLowerCase = walletName.toLowerCase()
 
-  const walletIconFile = walletIconsFiles.find(file => {
+  const walletIconFile = walletIconsFiles.find((file) => {
     //"./trust-wallet.png" -> "trust wallet"
     const normalizedFileName = file
       .replace(/^\.\//, '') //remove "./"

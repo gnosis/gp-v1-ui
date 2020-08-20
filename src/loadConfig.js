@@ -21,7 +21,7 @@ function getCustomConfigFilePath() {
   const customPath = path.resolve(CUSTOM_FOLDER_PATH)
 
   const customConfig = SUPPORTED_EXTENSIONS.split('|')
-    .map(extension => path.join(customPath, `${CONFIG_FILE_OVERRIDE_NAME}.${extension}`))
+    .map((extension) => path.join(customPath, `${CONFIG_FILE_OVERRIDE_NAME}.${extension}`))
     .find(fs.existsSync)
 
   return customConfig

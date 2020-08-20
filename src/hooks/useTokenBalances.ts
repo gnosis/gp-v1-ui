@@ -83,14 +83,14 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   const contractAddress = depositApi.getContractAddress(networkId)
   assert(contractAddress, 'No valid contract address found. Stopping.')
 
-  const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map(token =>
+  const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map((token) =>
     fetchBalancesForToken(token, userAddress, contractAddress, networkId)
-      .then(balance => {
+      .then((balance) => {
         const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
         balanceCache[cacheKey] = balance
         return balance
       })
-      .catch(e => {
+      .catch((e) => {
         console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
 
         const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
@@ -120,15 +120,15 @@ export const useTokenBalances = (passOnParams: Partial<UseTokenListParams> = {})
   useEffect(() => {
     if (walletInfo.isConnected) {
       _getBalances(walletInfo, tokens)
-        .then(balances => {
+        .then((balances) => {
           logDebug(
             '[useTokenBalances] Wallet balances',
-            balances ? balances.map(b => formatSmart(b.walletBalance, b.decimals)) : null,
+            balances ? balances.map((b) => formatSmart(b.walletBalance, b.decimals)) : null,
           )
           setBalances(balances)
           setError(false)
         })
-        .catch(error => {
+        .catch((error) => {
           console.error('[useTokenBalances] Error loading token balances', error)
           setError(true)
         })

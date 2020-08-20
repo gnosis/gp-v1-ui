@@ -44,7 +44,7 @@ const schema = Joi.object({
     }),
   relativeTime: Joi.date().default(Date.now),
   validFrom: Joi.date()
-    .min(Joi.ref('relativeTime', { adjust: now => now + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD }))
+    .min(Joi.ref('relativeTime', { adjust: (now) => now + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD }))
     .messages({
       [BASE]: 'Invalid time',
       [DATE_MIN]: `Please select a time no less than ${
@@ -57,7 +57,7 @@ const schema = Joi.object({
     // otherwise if validFrom is null === NOW then validFrom is 5 min from Date.now()
     .when('validFrom', {
       is: Joi.date().required(),
-      then: Joi.date().min(Joi.ref('validFrom', { adjust: val => +val + BATCH_TIME_IN_MS * BATCH_END_THRESHOLD })),
+      then: Joi.date().min(Joi.ref('validFrom', { adjust: (val) => +val + BATCH_TIME_IN_MS * BATCH_END_THRESHOLD })),
       otherwise: Joi.date().min('now'),
     })
     .messages({

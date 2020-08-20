@@ -48,12 +48,12 @@ export function getTokensFactory(factoryParams: {
     if (maxRetries <= 0) {
       throw new Error(
         `[network:${networkId}] Max retries exceeded trying to fetch token ids for tokens ${tokens.map(
-          t => t.address,
+          (t) => t.address,
         )}`,
       )
     }
 
-    const promises = tokens.map(token => updateTokenIdOrIndicateFailure(networkId, token))
+    const promises = tokens.map((token) => updateTokenIdOrIndicateFailure(networkId, token))
 
     const results = await Promise.all(promises)
 
@@ -158,7 +158,7 @@ export function getTokensFactory(factoryParams: {
         // Remove tokens that are on the list but not registered on the contract neither on TCR
         .filter(({ address }) => addressesAndIds.has(address))
         // Map it with token address as key for easy access
-        .map(token => [token.address, token]),
+        .map((token) => [token.address, token]),
     )
 
     const promises: Promise<TokenFromErc20 | string>[] = []
@@ -180,7 +180,7 @@ export function getTokensFactory(factoryParams: {
     const partialTokens = await Promise.all(promises)
 
     // For all newly fetched tokens
-    partialTokens.forEach(partialToken => {
+    partialTokens.forEach((partialToken) => {
       if (typeof partialToken === 'string') {
         // We replaced potential null responses with original tokenAddress string for logging purposes
         logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)

@@ -426,7 +426,7 @@ const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, on
   useEffect(() => {
     if (tokenAddresses.length === 0) return
 
-    addTokensToList({ tokenAddresses, networkId }).then(newTokens => {
+    addTokensToList({ tokenAddresses, networkId }).then((newTokens) => {
       if (newTokens.length > 0) {
         onTokensAdded(newTokens)
       }
@@ -441,7 +441,7 @@ const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networ
   const tokenAddresses: string[] = []
   const addedSet = new Set()
 
-  addresses.forEach(address => {
+  addresses.forEach((address) => {
     if (
       address &&
       !addedSet.has(address) &&
@@ -546,7 +546,7 @@ const TradeWidget: React.FC = () => {
 
   const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
 
-  const swapPrices = (): void => setPriceShown(oldPrice => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
+  const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
@@ -1065,7 +1065,7 @@ const TradeWidget: React.FC = () => {
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
           type="button"
-          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          onClick={(): void => setOrdersVisible((ordersVisible) => !ordersVisible)}
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}

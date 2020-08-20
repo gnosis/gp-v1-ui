@@ -30,3 +30,17 @@ export const calcMinTradableAmountInOwl = ({
   const minFee = minEconomicalViableFeeInOwl.multipliedBy(BUFFER_MULTIPLIER).dividedBy(SUBSIDIZE_FACTOR)
   return minFee.multipliedBy(FEE_FACTOR * SETTLEMENT_FACTOR)
 }
+
+export const ROUND_TO_NUMBER = 250 // 1234 -> 1250 $
+
+export const roundToNext = (amount: BigNumber | number, roundTo: number = ROUND_TO_NUMBER): BigNumber => {
+  const amountBN = BigNumber.isBigNumber(amount) ? amount : new BigNumber(amount)
+
+  const remainder = amountBN.modulo(roundTo)
+
+  if (remainder.isZero()) return amountBN
+
+  const wholePart = amountBN.minus(remainder)
+
+  return wholePart.plus(roundTo)
+}
