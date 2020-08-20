@@ -438,14 +438,14 @@ const OrderValidity: React.FC<Props> = ({
   const { setValue, errors, register, watch, trigger } = formMethods
   const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
 
-  const [validFromButton, setValidFromButton] = useSafeState<number | null>(
-    isAsap ? null : validFromTimeMs ? Infinity : VALID_FROM_DEFAULT,
+  const [validFromButton, setValidFromButton] = useSafeState<number | 'RELATIVE' | null>(
+    isAsap ? null : validFromTimeMs ? 'RELATIVE' : VALID_FROM_DEFAULT,
   )
   const [validFromCustomTime, setValidFromCustomTime] = useSafeState<number | null>(
     (validFromTimeMs && +validFromTimeMs) || null,
   )
-  const [validUntilButton, setValidUntilButton] = useSafeState<number | null>(
-    isUnlimited ? null : validUntilTimeMs ? Infinity : VALID_UNTIL_DEFAULT,
+  const [validUntilButton, setValidUntilButton] = useSafeState<number | 'RELATIVE' | null>(
+    isUnlimited ? null : validUntilTimeMs ? 'RELATIVE' : VALID_UNTIL_DEFAULT,
   )
   const [validUntilCustomTime, setValidUntilCustomTime] = useSafeState<number | null>(
     (validUntilTimeMs && +validUntilTimeMs) || null,
@@ -490,11 +490,11 @@ const OrderValidity: React.FC<Props> = ({
     function (inputId: string, time: number | null): void {
       if (inputId === validFromInputId) {
         setValidFromCustomTime(time)
-        setValidFromButton(Infinity)
+        setValidFromButton('RELATIVE')
         setValidFromCustomBatchId(dateToBatchId(time))
       } else {
         setValidUntilCustomTime(time)
-        setValidUntilButton(Infinity)
+        setValidUntilButton('RELATIVE')
         setValidUntilCustomBatchId(dateToBatchId(time))
       }
     },
@@ -535,7 +535,16 @@ const OrderValidity: React.FC<Props> = ({
 
     formValid && setShowOrderConfig((showOrderConfig) => !showOrderConfig)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showOrderConfig, setShowOrderConfig, setValue, trigger, validUntilInputId, validFromInputId])
+  }, [
+    showOrderConfig,
+    setShowOrderConfig,
+    validFromCustomTime,
+    validUntilCustomTime,
+    setValue,
+    trigger,
+    validUntilInputId,
+    validFromInputId,
+  ])
 
   // On any errors, show form
   useEffect(() => {
@@ -573,16 +582,16 @@ const OrderValidity: React.FC<Props> = ({
     if (validUntilButton) {
       if (validFromButton) {
         // If a custom until time is chosen
-        if (validUntilButton !== Infinity) {
+        if (validUntilButton !== 'RELATIVE') {
           const adjustedValidUntilTime = validFromCustomTime! + validUntilButton * 60 * 1000
           setValidUntilCustomTime(adjustedValidUntilTime)
           // if a validUntil time is chosen but a relative validFrom time is selected
           // when a custom time is not null, neither is button
-        } else if (validFromButton !== Infinity) {
+        } else if (validFromButton !== 'RELATIVE') {
           const adjustedValidUntilTime = validUntilCustomTime! + validFromButton * 60 * 1000
           setValidUntilCustomTime(adjustedValidUntilTime)
         }
-      } else if (validUntilButton !== Infinity) {
+      } else if (validUntilButton !== 'RELATIVE') {
         // validFromButton = NOW aka null
         const adjustedValidUntilTime = Date.now() + validUntilButton * 60 * 1000
         setValidUntilCustomTime(adjustedValidUntilTime)
@@ -666,7 +675,7 @@ const OrderValidity: React.FC<Props> = ({
               </span>
             </p>
             {/* Relative Time picker */}
-            <DateTimePickerWrapper $customDateSelected={validFromButton === Infinity}>
+            <DateTimePickerWrapper $customDateSelected={validFromButton === 'RELATIVE'}>
               {ORDER_START_PRESETS.map((time) => (
                 <TimePickerPreset
                   key={time || 'now'}
@@ -686,7 +695,7 @@ const OrderValidity: React.FC<Props> = ({
                 value={validFromCustomTime}
                 error={validFromError}
                 inputName={validFromInputId}
-                maxDateTime={validUntilButton === Infinity ? validUntilCustomTime! - BATCH_TIME_IN_MS : null}
+                maxDateTime={validUntilButton === 'RELATIVE' ? validUntilCustomTime! - BATCH_TIME_IN_MS : null}
                 onClose={(): void => {
                   if (validFromCustomTime) {
                     // if from time selected is less than now + threshold, set to minimum time
@@ -717,7 +726,7 @@ const OrderValidity: React.FC<Props> = ({
                     max={validUntilCustomBatchId ? validUntilCustomBatchId - BATCH_END_THRESHOLD : undefined}
                     placeholder={(dateToBatchId() + BATCH_START_THRESHOLD).toString()}
                     step={1}
-                    value={validFromCustomBatchId || Infinity}
+                    value={validFromCustomBatchId || undefined}
                     onChange={handleValidFromBatchIdSelect}
                   />
                   <small className="inputLabel">batch</small>
@@ -729,7 +738,7 @@ const OrderValidity: React.FC<Props> = ({
             <p>
               <strong>Expire Time</strong>
             </p>
-            <DateTimePickerWrapper $customDateSelected={validUntilButton === Infinity}>
+            <DateTimePickerWrapper $customDateSelected={validUntilButton === 'RELATIVE'}>
               {ORDER_EXPIRE_PRESETS.map((time) => (
                 <TimePickerPreset
                   key={time || 'never'}
@@ -779,7 +788,7 @@ const OrderValidity: React.FC<Props> = ({
                     min={(validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD}
                     placeholder={((validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD).toString()}
                     step={1}
-                    value={validUntilCustomBatchId || Infinity}
+                    value={validUntilCustomBatchId || undefined}
                     onChange={handleValidUntilBatchIdSelect}
                   />
                   <small className="inputLabel">batch</small>
