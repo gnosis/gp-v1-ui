@@ -23,11 +23,11 @@ before_deploy:
       pushd dist;
       zip -r  $OLDPWD/web_$TRAVIS_TAG.zip *;
       popd;
-      npm install -g ipfs;
-      jsipfs init;
-      jsipfs --version;
-      jsipfs add dist/ -r --only-hash;
-      export IPFS_HASH=$(jsipfs add dist/ -r --only-hash --quiet | tail -1);
+      node --version;
+      npx jsipfs init;
+      npx jsipfs --version;
+      npx jsipfs add dist/ -r --only-hash;
+      export IPFS_HASH=$(npx jsipfs add dist/ -r --only-hash --quiet | tail -1);
       echo "IPFS hash $IPFS_HASH";
       echo $IPFS_HASH > ipfs_hash.txt;
     fi
