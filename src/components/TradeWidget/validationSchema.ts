@@ -15,9 +15,9 @@ const validitySchema = Joi.object({
     .min(Joi.ref('relativeTime', { adjust: (now) => now + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD }))
     .messages({
       [BASE]: 'Invalid time',
-      [DATE_MIN]: `Please select a time greater than ${
+      [DATE_MIN]: `Select a time no less than ${
         (BATCH_TIME / 60) * BATCH_START_THRESHOLD
-      } minutes in the future`,
+      } minutes in the future, or select "Now" to place your order as soon as possible`,
       [MULTIPLE]: 'Time must be a multiple of 5',
     }),
   validUntil: Joi.date()
@@ -30,9 +30,9 @@ const validitySchema = Joi.object({
     })
     .messages({
       [BASE]: 'Invalid time',
-      [DATE_MIN]: `Expiration time must at least ${
+      [DATE_MIN]: `Select a time at least ${
         (BATCH_TIME / 60) * BATCH_END_THRESHOLD
-      } minutes later than selected starting time`,
+      } minutes later than your selected starting time`,
       [MULTIPLE]: 'Time must be a multiple of 5',
     }),
 })

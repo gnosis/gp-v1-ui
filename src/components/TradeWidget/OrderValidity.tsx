@@ -202,7 +202,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 72rem;
   min-width: 30rem;
-  height: 51rem;
+  height: 53rem;
   padding: 0 0 2.4rem;
   border-radius: 0.8rem;
   display: flex;
@@ -262,7 +262,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     height: calc(100% - 8.8rem);
 
     ${FormMessage} {
-      justify-content: center;
+      justify-content: flex-start;
       padding: 0 2rem;
       margin: 0;
     }
