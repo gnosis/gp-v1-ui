@@ -23,8 +23,9 @@ before_deploy:
       pushd dist;
       zip -r  $OLDPWD/web_$TRAVIS_TAG.zip *;
       popd;
-      npx ipfs init;
-      export IPFS_HASH=$(npx ipfs add dist/ -r --only-hash --quiet | tail -1);
+      sudo apt-get -y install ipfs;
+      ipfs init;
+      export IPFS_HASH=$(ipfs add dist/ -r --only-hash --quiet | tail -1);
       echo $IPFS_HASH > ipfs_hash.txt;
     fi
   # compile RELEASE_NOTES.md
