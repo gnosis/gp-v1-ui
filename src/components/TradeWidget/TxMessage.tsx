@@ -238,7 +238,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
 
   const setRecommendedSellAmount = (): void => {
     if (!adjustedRecommendedAmount) return
-    setValue('sellToken', adjustedRecommendedAmount, true)
+    setValue('sellToken', adjustedRecommendedAmount, { shouldValidate: true })
     forceUpdate({})
   }
 
