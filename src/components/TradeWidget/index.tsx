@@ -20,7 +20,7 @@ import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
 
 // utils
-import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, logDebug } from 'utils'
+import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, logDebug, batchIdToDate } from 'utils'
 
 // api
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
@@ -833,7 +833,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: undefined,
-                  validUntil: isNever ? undefined : validFromWithBatchID.toString(),
+                  validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
             },
@@ -872,8 +872,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: validFrom.toString(),
-                  validUntil: isNever ? undefined : validUntil.toString(),
+                  validFrom: batchIdToDate(validFromWithBatchID).getTime().toString(),
+                  validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
             },
