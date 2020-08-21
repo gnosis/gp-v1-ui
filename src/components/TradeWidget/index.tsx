@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
-import { useForm, FormProvider, SubmitHandler } from 'react-hook-form'
+import { useForm, useWatch, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
 import styled from 'styled-components'
 import { toast } from 'toastify'
@@ -479,42 +479,42 @@ const chooseTokenWithFallback = ({
 }
 
 function buildUrl(params: {
-  sell: string
-  price: string
-  from: string
-  expires: string
+  sell?: string
+  price?: string
+  from?: string | null
+  expires?: string | null
   sellToken: TokenDetails
   buyToken: TokenDetails
 }): string {
   const { sell, price, from, expires, sellToken, buyToken } = params
 
   const searchQuery = buildSearchQuery({
-    sell,
-    price,
-    from,
-    expires,
+    sell: sell || '',
+    price: price || '',
+    from: from || '',
+    expires: expires || '',
   })
 
   return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
 }
 
-const calculateValidityTimes = (timeSelected: string | null): string | null => {
-  if (!timeSelected || Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD > +timeSelected) return null
+const calculateValidityTimes = (timeSelected: string | null): string => {
+  if (!timeSelected || Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD > +timeSelected) return ''
 
   return timeSelected.toString()
 }
+
+const sellInputId: TradeFormTokenId = 'sellToken'
+const receiveInputId: TradeFormTokenId = 'receiveToken'
+const priceInputId: TradeFormTokenId = 'price'
+const priceInverseInputId: TradeFormTokenId = 'priceInverse'
+const validFromId: TradeFormTokenId = 'validFrom'
+const validUntilId: TradeFormTokenId = 'validUntil'
 
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
   const [{ trade }, dispatch] = useGlobalState()
-
-  const sellInputId: TradeFormTokenId = 'sellToken'
-  const receiveInputId: TradeFormTokenId = 'receiveToken'
-  const priceInputId: TradeFormTokenId = 'price'
-  const priceInverseInputId: TradeFormTokenId = 'priceInverse'
-  const validFromId: TradeFormTokenId = 'validFrom'
-  const validUntilId: TradeFormTokenId = 'validUntil'
 
   // get all token balances but deprecated
   const { balances, tokens: tokenList } = useTokenBalances({ excludeDeprecated: true })
@@ -618,7 +618,7 @@ const TradeWidget: React.FC = () => {
     defaultValues: defaultFormValues,
     resolver: validationResolver,
   })
-  const { handleSubmit, reset, watch, setValue, trigger, formState } = methods
+  const { control, handleSubmit, reset, setValue, trigger, formState } = methods
 
   const {
     sellToken: sellValue,
@@ -626,7 +626,10 @@ const TradeWidget: React.FC = () => {
     validUntil: validUntilValue,
     price: priceValue,
     priceInverse: priceInverseValue,
-  } = watch([priceInputId, priceInverseInputId, sellInputId, validFromId, validUntilId])
+  } = useWatch({
+    control,
+    defaultValue: defaultFormValues,
+  })
 
   // Avoid querying for a new price at every input change
   const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
@@ -647,14 +650,14 @@ const TradeWidget: React.FC = () => {
 
   // Update receive amount
   useEffect(() => {
-    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
-  }, [priceValue, priceInverseValue, setValue, receiveInputId, sellValue])
+    priceValue && sellValue && setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+  }, [priceValue, priceInverseValue, setValue, sellValue])
 
   const url = buildUrl({
     sell: sellValue,
     price: priceValue,
-    from: validFromValue?.toString() || '',
-    expires: validUntilValue?.toString() || '',
+    from: validFromValue,
+    expires: validUntilValue,
     sellToken: sellToken,
     buyToken: receiveToken,
   })
@@ -829,8 +832,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: null,
-                  validUntil: isNever ? null : validFromWithBatchID.toString(),
+                  validFrom: undefined,
+                  validUntil: isNever ? undefined : validFromWithBatchID.toString(),
                 },
               )
             },
@@ -870,7 +873,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: validFrom.toString(),
-                  validUntil: isNever ? null : validUntil.toString(),
+                  validUntil: isNever ? undefined : validUntil.toString(),
                 },
               )
             },

@@ -64,7 +64,7 @@ interface PriceEstimationsProps {
   networkId: number
   baseToken: TokenDetails
   quoteToken: TokenDetails
-  amount: string
+  amount?: string
   isPriceInverted: boolean
   priceInputId: string
   priceInverseInputId: string
@@ -136,7 +136,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
 
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
-    amount,
+    amount: amount || '0',
     baseTokenId,
     baseTokenDecimals,
     quoteTokenId,
@@ -164,7 +164,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         <HighlightedText>Onchain orderbook price</HighlightedText> <HelpTooltip tooltip={OnchainOrderbookTooltip} /> for
         selling{' '}
         <strong>
-          {+amount || '1'} {displayTokenSymbolOrLink(quoteToken)}
+          {(amount && +amount) || '1'} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
         :
       </span>

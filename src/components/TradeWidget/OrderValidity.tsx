@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useCallback, Dispatch, SetStateAction, useEffect, useMemo } from 'react'
 import styled from 'styled-components'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 
 // assets
 import cog from 'assets/img/cog.svg'
@@ -26,7 +26,7 @@ import { Input } from 'components/Input'
 import InputBox from 'components/InputBox'
 
 // TradeWidget: subcomponents
-import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
+import { TradeFormTokenId, TradeFormData, DEFAULT_FORM_STATE } from 'components/TradeWidget'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
@@ -34,19 +34,19 @@ import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 
-import schema, { BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
+import { validitySchema, BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
 
-const VALID_UNTIL_DEFAULT: number | null = 1440
-const VALID_FROM_DEFAULT: number | null = null
 // now, 30min, 60min, 24h
 const ORDER_START_PRESETS = [null, 30, 60, 1440]
 // 5min, 30min, 24h, 7d
 const ORDER_EXPIRE_PRESETS = [30, 1440, 10080, null]
+const VALID_UNTIL_RELATIVE_DEFAULT = ORDER_EXPIRE_PRESETS[2]
+const VALID_FROM_RELATIVE_DEFAULT = ORDER_START_PRESETS[0]
 
 const relativeMinutesToDateMS = (minutes: number): number =>
   roundToNearestMinutes(addMinutes(Date.now(), minutes), { nearestTo: 5 }).getTime()
 
-function getNumberOfBatchesLeftUntilNow(batchId: number): number {
+export function getNumberOfBatchesLeftUntilNow(batchId: number): number {
   const nowAsBatchId = dateToBatchId()
   const batchDifference = batchId - nowAsBatchId
 
@@ -443,25 +443,28 @@ const OrderValidity: React.FC<Props> = ({
 }) => {
   const [showOrderConfig, setShowOrderConfig] = useSafeState(false)
 
-  const formMethods = useFormContext<TradeFormData>()
-  const { setValue, errors, register, watch, clearErrors, setError } = formMethods
-  const formValues = watch()
-  const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = formValues
-  // const { validFrom: validFromTimeMs, validUntil: validUntilTimeMs } = watch([validFromInputId, validUntilInputId])
+  const { control, setValue, errors, register, clearErrors, setError } = useFormContext<TradeFormData>()
+  const { [validFromInputId]: validFromTimeMs, [validUntilInputId]: validUntilTimeMs } = useWatch({
+    name: [validFromInputId, validUntilInputId],
+    control,
+    defaultValue: {
+      [validFromInputId]: DEFAULT_FORM_STATE.validFrom,
+      [validUntilInputId]: DEFAULT_FORM_STATE.validUntil,
+    },
+  })
 
   const [validFromButton, setValidFromButton] = useSafeState<number | 'CUSTOM_TIME' | null>(
-    isAsap ? null : validFromTimeMs ? 'CUSTOM_TIME' : VALID_FROM_DEFAULT,
+    isAsap ? null : validFromTimeMs ? 'CUSTOM_TIME' : VALID_FROM_RELATIVE_DEFAULT,
+  )
+  const [validUntilButton, setValidUntilButton] = useSafeState<number | 'CUSTOM_TIME' | null>(
+    isUnlimited ? null : validUntilTimeMs ? 'CUSTOM_TIME' : VALID_UNTIL_RELATIVE_DEFAULT,
   )
   const [validFromCustomTime, setValidFromCustomTime] = useSafeState<number | null>(
     (validFromTimeMs && +validFromTimeMs) || null,
   )
-  const [validUntilButton, setValidUntilButton] = useSafeState<number | 'CUSTOM_TIME' | null>(
-    isUnlimited ? null : validUntilTimeMs ? 'CUSTOM_TIME' : VALID_UNTIL_DEFAULT,
-  )
   const [validUntilCustomTime, setValidUntilCustomTime] = useSafeState<number | null>(
     (validUntilTimeMs && +validUntilTimeMs) || null,
   )
-
   const [validFromCustomBatchId, setValidFromCustomBatchId] = useSafeState<number | null>(
     validFromTimeMs && +validFromTimeMs ? dateToBatchId(+validFromTimeMs) : null,
   )
@@ -541,11 +544,7 @@ const OrderValidity: React.FC<Props> = ({
           [validFromInputId]: validFromCustomTime?.toString(),
           [validUntilInputId]: validUntilCustomTime?.toString(),
         }
-
-        const validationResult = schema.validate({
-          ...formValues,
-          ...data,
-        })
+        const validationResult = validitySchema.validate(data)
 
         if (validationResult.error) throw validationResult
 
@@ -567,13 +566,13 @@ const OrderValidity: React.FC<Props> = ({
     }
 
     formValid && setShowOrderConfig((showOrderConfig) => !showOrderConfig)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     showOrderConfig,
     setShowOrderConfig,
+    validFromCustomTime,
+    validUntilCustomTime,
     validFromInputId,
     validUntilInputId,
-    formValues,
     clearErrors,
     setValue,
     setError,
