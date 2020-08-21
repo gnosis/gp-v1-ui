@@ -31,7 +31,7 @@ before_deploy:
   # compile RELEASE_NOTES.md
   - if [[ $TRAVIS_TAG != "" ]]; then
       LAST_RELEASE_TAG=$(curl https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases/latest 2>/dev/null | jq .tag_name | sed 's/"//g');
-      echo -e "IPFS hash: $IPFS_HASH\n" > RELEASE_NOTES.md;
+      echo -e "IPFS hash:: $IPFS_HASH\n" > RELEASE_NOTES.md;
       echo "Commits since $LAST_RELEASE_TAG:" >> RELEASE_NOTES.md;
       git log $LAST_RELEASE_TAG.. --oneline --decorate=0 | sed 's/^/- /' >> RELEASE_NOTES.md;
       echo "RELEASE_NOTES file contains:";
