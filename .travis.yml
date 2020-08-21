@@ -25,10 +25,12 @@ before_deploy:
       popd;
       npm install -g ipfs;
       jsipfs init;
+      jsipfs daemon &;
       jsipfs --version;
       jsipfs add dist/ -r --only-hash;
       export IPFS_HASH=$(jsipfs add dist/ -r --only-hash --quiet | tail -1);
       echo "IPFS hash $IPFS_HASH";
+      jsipfs shutdown;
       echo $IPFS_HASH > ipfs_hash.txt;
     fi
   # compile RELEASE_NOTES.md
