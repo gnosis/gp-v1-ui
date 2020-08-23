@@ -53,7 +53,7 @@ export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown
   }
 }
 
-export const NUMBER_VALIDATION_KEYS = {
+export const VALIDATOR_ERROR_KEYS = {
   REF: 'any.ref',
   BASE: 'number.base',
   UNSAFE: 'number.unsafe',
@@ -65,4 +65,5 @@ export const NUMBER_VALIDATION_KEYS = {
   MULTIPLE: 'number.multiple',
   INTEGER: 'number.integer',
   DATE_MIN: 'date.min',
+  DATE_MAX: 'date.max',
 }
