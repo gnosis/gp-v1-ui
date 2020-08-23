@@ -10,7 +10,7 @@ import joi from 'joi'
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { Receipt } from 'types'
 import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
-import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
+import { maxAmountsForSpread, resolverFactory, VALIDATOR_ERROR_KEYS } from 'utils'
 
 // components
 import OrdersWidget from 'components/OrdersWidget'
@@ -129,10 +129,10 @@ const validationSchema = joi.object({
     .precision(INPUT_PRECISION_SIZE)
     .required()
     .messages({
-      [NUMBER_VALIDATION_KEYS.REQUIRED]: 'Invalid spread amount',
-      [NUMBER_VALIDATION_KEYS.UNSAFE]: 'Invalid spread amount',
-      [NUMBER_VALIDATION_KEYS.LESS]: 'Spread must be between 0 and 100',
-      [NUMBER_VALIDATION_KEYS.GREATER]: 'Spread must be between 0 and 100',
+      [VALIDATOR_ERROR_KEYS.REQUIRED]: 'Invalid spread amount',
+      [VALIDATOR_ERROR_KEYS.UNSAFE]: 'Invalid spread amount',
+      [VALIDATOR_ERROR_KEYS.LESS]: 'Spread must be between 0 and 100',
+      [VALIDATOR_ERROR_KEYS.GREATER]: 'Spread must be between 0 and 100',
     }),
 })
 
