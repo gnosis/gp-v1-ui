@@ -35,6 +35,7 @@ import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 
 import { validitySchema, BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
+import useNoScroll from 'hooks/useNoScroll'
 
 // now, 30min, 60min, 24h
 const ORDER_START_PRESETS = [null, 30, 60, 1440]
@@ -202,7 +203,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
   max-width: 72rem;
   min-width: 30rem;
-  height: 53rem;
+  height: 54.5rem;
   padding: 0 0 2.4rem;
   border-radius: 0.8rem;
   display: flex;
@@ -212,7 +213,7 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   align-content: flex-start;
 
   @media ${MEDIA.mobile} {
-    height: 70%;
+    height: 76%;
   }
 
   @media ${MEDIA.xSmallDown} {
@@ -260,10 +261,12 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
   > div {
     width: 100%;
     height: calc(100% - 8.8rem);
+    overflow-y: auto;
+    padding-bottom: 1rem;
 
     ${FormMessage} {
       justify-content: flex-start;
-      padding: 0 2rem;
+      padding: 0.2rem 2rem;
       margin: 0;
     }
 
@@ -632,6 +635,9 @@ const OrderValidity: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValidUntilCustomTime, validFromButton, validUntilButton])
 
+  // prevent body scroll when open modal
+  useNoScroll(showOrderConfig)
+
   const validFromDisplayTime = useMemo(
     () =>
       validFromTimeMs
@@ -772,7 +778,11 @@ const OrderValidity: React.FC<Props> = ({
                     type="number"
                     className="movingLabel"
                     min={validFromCustomBatchId ? dateToBatchId() + BATCH_START_THRESHOLD : undefined}
-                    max={validUntilCustomBatchId ? validUntilCustomBatchId - BATCH_END_THRESHOLD : undefined}
+                    max={
+                      validUntilCustomBatchId
+                        ? validUntilCustomBatchId - BATCH_END_THRESHOLD
+                        : dateToBatchId(addYears(Date.now(), 1))
+                    }
                     placeholder={(dateToBatchId() + BATCH_START_THRESHOLD).toString()}
                     step={1}
                     value={validFromCustomBatchId || undefined}
@@ -835,7 +845,10 @@ const OrderValidity: React.FC<Props> = ({
                   <Input
                     type="number"
                     className="movingLabel"
+                    // Minimum time = to selected validFrom batch id or if set to now, use date now + threshold
                     min={(validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD}
+                    // Maximum time = to selected validFrom batch id or date now + 5 years
+                    max={dateToBatchId(addYears(validFromCustomTime || Date.now(), 5))}
                     placeholder={((validFromCustomBatchId || dateToBatchId()) + BATCH_END_THRESHOLD).toString()}
                     step={1}
                     value={validUntilCustomBatchId || undefined}
