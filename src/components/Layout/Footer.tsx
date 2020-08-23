@@ -109,8 +109,7 @@ const SideContentWrapper = styled.div`
     flex-flow: row nowrap;
     justify-content: center;
     align-items: center;
-    flex: 1 0 33%;
-    // min-width: 30rem;
+    flex: 1 0;
 
     font-size: inherit;
     margin: 1.2rem 0;
@@ -148,8 +147,14 @@ const SideContentWrapper = styled.div`
   }
 
   @media only screen and (max-width: ${MEDIA.mediumScreenSmall}) {
+    > ${FooterLinks}, > .version,
+    > ${ThemeTogglerWrapper} {
+      flex: 1 1 100%;
+    }
+
     > ${FooterLinks} {
       order: 3;
+      margin: 4rem 0;
     }
 
     > ${ThemeTogglerWrapper} {
@@ -158,13 +163,6 @@ const SideContentWrapper = styled.div`
 
     > .version {
       order: 1;
-    }
-  }
-
-  @media ${MEDIA.mobile} {
-    > ${FooterLinks}, > .version,
-    > ${ThemeTogglerWrapper} {
-      flex: 1 1 100%;
     }
   }
 `
