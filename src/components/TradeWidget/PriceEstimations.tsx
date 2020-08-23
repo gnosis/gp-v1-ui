@@ -196,8 +196,8 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
       <div>
         <strong>Price Suggestions</strong> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
         <SwapPrice
-          baseToken={baseToken}
-          quoteToken={quoteToken}
+          baseToken={quoteToken}
+          quoteToken={baseToken}
           swapPrices={swapPrices}
           isPriceInverted={isPriceInverted}
         />
