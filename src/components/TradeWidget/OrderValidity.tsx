@@ -777,7 +777,7 @@ const OrderValidity: React.FC<Props> = ({
                   <Input
                     type="number"
                     className="movingLabel"
-                    min={validFromCustomBatchId ? dateToBatchId() + BATCH_START_THRESHOLD : undefined}
+                    min={dateToBatchId() + BATCH_START_THRESHOLD}
                     max={
                       validUntilCustomBatchId
                         ? validUntilCustomBatchId - BATCH_END_THRESHOLD
