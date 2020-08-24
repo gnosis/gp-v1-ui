@@ -29,6 +29,7 @@ import {
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
+import useNoScroll from 'hooks/useNoScroll'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
@@ -52,6 +53,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
 
   // providerInfo is cached, so ok to re-get on render
   const { walletName, walletIcon } = walletApi.getProviderInfo() || {}
+
+  useNoScroll(showWallet)
 
   /***************************** */
   // EVENT HANDLERS

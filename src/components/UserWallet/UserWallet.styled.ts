@@ -56,12 +56,13 @@ const WalletButton = styled.button`
   font-size: 1.5rem;
   margin: 1.2rem 0;
   padding: 1rem 2rem;
-  width: calc(100% - 1rem);
+  width: calc(100% - 5rem);
   white-space: nowrap;
 `
 
 export const EtherscanButton = styled(WalletButton)`
-  background: var(--color-background-CTA);
+  background: transparent;
+  color: var(--color-text-primary);
   > a,
   > a:link,
   > a:visited {
@@ -77,11 +78,13 @@ export const EtherscanButton = styled(WalletButton)`
 export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
   background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
   color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
+  font-size: ${(props): string | false => !props.$loggedIn && '1.2rem'};
   margin: 0;
   font-family: var(--font-mono);
   letter-spacing: 0;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0;
+  flex: 1;
 
   &:hover {
     background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
@@ -92,6 +95,10 @@ export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
   > a {
     width: 100%;
     font-size: inherit;
+  }
+
+  @media ${MEDIA.mobile} {
+    padding: ${(props): string | false => !props.$loggedIn && '0'};
   }
 `
 
@@ -148,6 +155,10 @@ export const WalletImage = styled.img`
   height: 2.4rem;
   object-fit: contain;
   margin: 0 0.5rem 0 0;
+
+  @media ${MEDIA.xSmallDown} {
+    display: none;
+  }
 `
 
 export const EtherImage = styled(WalletImage)`
@@ -196,16 +207,16 @@ export const UserWalletSlideWrapper = styled.div`
   @media ${MEDIA.mobile} {
     width: 100%;
     position: fixed;
-    left: 0;
-    bottom: 0;
-    top: initial;
+    // left: 0;
+    // bottom: 0;
+    top: 0;
     box-sizing: border-box;
-    box-shadow: 0 -90vh 0 100vw rgba(47, 62, 78, 0.5);
+    box-shadow: 0 90vh 0 100vw rgba(47, 62, 78, 0.5);
     border-radius: 1.2rem;
     padding: 0 0 2.4rem;
 
     > ${UserWalletItem} {
-      padding: 0 0 5rem 0;
+      // padding: 0 0 5rem 0;
     }
   }
 
