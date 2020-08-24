@@ -5,9 +5,10 @@ import { MEDIA } from 'const'
 
 const APP_THEME = 'APP_THEME'
 
-const TogglerWrapper = styled.div`
+export const ThemeTogglerWrapper = styled.div`
   font-size: inherit;
   margin: 0 6rem 0 0;
+
   @media ${MEDIA.mobile} {
     margin: 2.4rem 0;
   }
@@ -60,8 +61,7 @@ const ThemeToggler: React.FC = () => {
   }, [active])
 
   return (
-    <TogglerWrapper>
-      Theme:{' '}
+    <ThemeTogglerWrapper>
       {toggleValues.map((value) => (
         <ToggleLabel key={value} selected={value === active}>
           <input
@@ -74,7 +74,7 @@ const ThemeToggler: React.FC = () => {
           {value}
         </ToggleLabel>
       ))}
-    </TogglerWrapper>
+    </ThemeTogglerWrapper>
   )
 }
 
