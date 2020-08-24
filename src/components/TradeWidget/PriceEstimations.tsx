@@ -116,6 +116,7 @@ interface SwapPriceProps
 }
 
 const SwapPriceWrapper = styled.div`
+  cursor: pointer;
   div.separator {
     margin: 0 0.4rem;
   }
@@ -135,7 +136,7 @@ export const SwapPrice: React.FC<SwapPriceProps> = ({
   const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
 
   return (
-    <SwapPriceWrapper>
+    <SwapPriceWrapper onClick={swapPrices}>
       <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
       {!showOnlyQuoteToken && (
         <>
@@ -143,7 +144,7 @@ export const SwapPrice: React.FC<SwapPriceProps> = ({
           <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
         </>
       )}
-      <SwapIcon swap={swapPrices} />
+      <SwapIcon />
     </SwapPriceWrapper>
   )
 }
@@ -250,7 +251,6 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
         <strong>
           {amount} {displayTokenSymbolOrLink(quoteToken)}
         </strong>
-        :
       </span>
       <button
         type="button"
