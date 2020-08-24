@@ -15,7 +15,7 @@ const useIsWalletConnected = (): {
       'api'
     )
       .then(({ walletApi }) => walletApi.isConnected())
-      .then(isConnected => {
+      .then((isConnected) => {
         setIsConnected(isConnected)
         setPending(false)
       })

@@ -7,42 +7,36 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronUp, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 
 const CardRowDrawer = styled.tr`
+  position: fixed;
+  z-index: 1050;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  margin: auto;
-  box-shadow: 0 100vh 0 999vw rgba(47, 62, 78, 0.5);
-  z-index: 9998;
-  width: 50rem;
-  height: 50rem;
+  width: 100%;
+  height: 100%;
   border-radius: 0.6rem;
-  background: var(--color-background-pageWrapper);
-
-  @media ${MEDIA.mobile} {
-    width: 100%;
-    bottom: 0;
-    top: initial;
-    height: 100vh;
-    overflow-y: scroll;
-  }
+  background: var(--color-background-modali);
 
   // Inner td wrapper
   > td {
     position: relative;
-    background: transparent;
+    z-index: 9999;
+    background: var(--color-background-pageWrapper);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.14);
-    border-radius: 6px;
+    border-radius: var(--border-radius);
     margin: 0;
-    width: 100%;
-    height: 100%;
+    width: 50rem;
+    height: 50rem;
     border: 0;
 
     @media ${MEDIA.mobile} {
+      width: 100%;
+      bottom: 0;
+      top: initial;
+      height: 100vh;
+      overflow-y: scroll;
       box-shadow: none;
     }
 

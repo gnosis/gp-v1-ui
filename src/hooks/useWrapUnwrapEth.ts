@@ -70,7 +70,7 @@ export const useWrapUnwrapEth = (): Result => {
         ...baseParams,
         amount,
         setLoadingFlag: setWrappingEth,
-        execute: params => wethApi.deposit(params),
+        execute: (params) => wethApi.deposit(params),
         txOptionalParams,
       })
     },
@@ -84,7 +84,7 @@ export const useWrapUnwrapEth = (): Result => {
         ...baseParams,
         amount,
         setLoadingFlag: setUnwrappingWeth,
-        execute: params => wethApi.withdraw(params),
+        execute: (params) => wethApi.withdraw(params),
         txOptionalParams,
       })
     },

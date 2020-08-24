@@ -20,7 +20,7 @@ export interface TokenSelectorProps {
 const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, selectedTokensMap, tokens }) => {
   return (
     <TokenSelectorWrapper>
-      {tokens.map(tokenDetails => {
+      {tokens.map((tokenDetails) => {
         const { name, symbol, address, id, image } = tokenDetails
         return (
           <TokenBox

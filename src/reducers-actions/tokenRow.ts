@@ -10,6 +10,7 @@ export const enum ActionTypes {
   SET_HIGHLIGHTED_AND_CLAIMING = 'highlighted_and_claiming',
   SET_HIGHLIGHTED_AND_DEPOSITING = 'highlighted_and_depositing',
   SET_HIGHLIGHTED_AND_WITHDRAWING = 'highlighted_and_withdrawing',
+  SET_IMMATURE_CLAIM = 'immatureClaim',
 }
 
 type TokenRowActions = Actions<ActionTypes, string>
@@ -59,6 +60,11 @@ export const setHighlightAndWithdrawing = (payload: string): TokenRowActions => 
   payload,
 })
 
+export const setImmatureClaim = (payload: string): TokenRowActions => ({
+  type: ActionTypes.SET_IMMATURE_CLAIM,
+  payload,
+})
+
 export interface TokenLocalState {
   [ActionTypes.SET_ENABLING]: Set<string>
   [ActionTypes.SET_ENABLED]: Set<string>
@@ -66,6 +72,7 @@ export interface TokenLocalState {
   [ActionTypes.SET_CLAIMING]: Set<string>
   [ActionTypes.SET_DEPOSITING]: Set<string>
   [ActionTypes.SET_WITHDRAWING]: Set<string>
+  [ActionTypes.SET_IMMATURE_CLAIM]: Set<string>
 }
 
 export const TokenRowInitialState: TokenLocalState = {
@@ -75,6 +82,7 @@ export const TokenRowInitialState: TokenLocalState = {
   claiming: new Set(),
   depositing: new Set(),
   withdrawing: new Set(),
+  immatureClaim: new Set(),
 }
 
 function getRemainingType(type: ActionTypes.SET_HIGHLIGHTED_AND_CLAIMING): ActionTypes.SET_CLAIMING
@@ -110,7 +118,8 @@ export const reducer = (state: TokenLocalState, action: TokenRowActions): TokenL
     case ActionTypes.SET_CLAIMING:
     case ActionTypes.SET_DEPOSITING:
     case ActionTypes.SET_WITHDRAWING:
-    case ActionTypes.SET_HIGHLIGHTED: {
+    case ActionTypes.SET_HIGHLIGHTED:
+    case ActionTypes.SET_IMMATURE_CLAIM: {
       const newSet = new Set(state[type])
       return {
         ...state,

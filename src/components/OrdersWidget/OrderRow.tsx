@@ -31,7 +31,7 @@ import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { EllipsisText } from 'components/Layout'
 
-const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = props => {
+const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
   return (
     <>
@@ -278,7 +278,7 @@ interface Props {
   isPendingOrder?: boolean
 }
 
-const OrderRow: React.FC<Props> = props => {
+const OrderRow: React.FC<Props> = (props) => {
   const {
     order,
     networkId,

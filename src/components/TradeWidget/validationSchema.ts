@@ -15,9 +15,7 @@ export default Joi.object({
       [REQUIRED]: 'Invalid sell amount',
       [GREATER]: 'Invalid sell amount',
     }),
-  receiveToken: Joi.number()
-    .unsafe()
-    .optional(),
+  receiveToken: Joi.number().unsafe().optional(),
   price: Joi.number()
     // allow unsafe JS numbers
     .unsafe()

@@ -22,7 +22,7 @@ const ToggleBase: React.FC<ToggleProps> = ({ className, width, height, ...props 
 const defaultSize: ToggleSize = { width: '2.8em', height: '1em' }
 
 // don't pass on theme object, it'll get spread over input anyway
-const ToggleStyled = styled(ToggleBase).attrs(props => ({ ...defaultSize, ...props, theme: undefined }))<ToggleSize>`
+const ToggleStyled = styled(ToggleBase).attrs((props) => ({ ...defaultSize, ...props, theme: undefined }))<ToggleSize>`
   --span-width: ${(props): string => props.width};
   --span-height: ${(props): string => props.height};
   /* easier to set vars once, than copy the whole func into each calc() */

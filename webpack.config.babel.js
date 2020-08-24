@@ -10,6 +10,7 @@ import path from 'path'
 
 import dotenv from 'dotenv'
 import loadConfig from './src/loadConfig'
+import overrideEnvConfig from './src/overrideEnvConfig'
 
 // Setup env vars
 dotenv.config()
@@ -17,7 +18,7 @@ dotenv.config()
 const isProduction = process.env.NODE_ENV == 'production'
 
 const baseUrl = isProduction ? '' : '/'
-const config = loadConfig()
+const config = overrideEnvConfig(loadConfig())
 const { name: appName } = config
 
 module.exports = ({ stats = false } = {}) => ({
@@ -177,7 +178,12 @@ module.exports = ({ stats = false } = {}) => ({
       MOCK_WEB3: process.env.MOCK || 'false',
       // AUTOCONNECT: only applies for mock implementation
       AUTOCONNECT: 'true',
-      PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || 'develop',
+      PRICE_ESTIMATOR_URL: process.env.PRICE_ESTIMATOR_URL || (isProduction && 'production') || 'develop',
+      APP_ID: null,
+      INFURA_ID: null,
+      WALLET_CONNECT_BRIDGE: null,
+      ETH_NODE_URL: null,
+      LIQUIDITY_TOKEN_LIST: null,
     }),
     new ForkTsCheckerWebpackPlugin({ silent: stats }),
     // define inside one plugin instance

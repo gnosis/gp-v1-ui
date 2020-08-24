@@ -62,7 +62,7 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
-export const TradeRow: React.FC<TradeRowProps> = params => {
+export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const { trade, networkId } = params
   const {
     buyToken,

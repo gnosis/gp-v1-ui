@@ -1,16 +1,32 @@
 #######################################################################################
 ##                                  DEFAULT CONFIG                                   ##
 #######################################################################################
-# - Defines the default configuration
-# - **WARNING**: Do not modify this file
-#   - For custom config create a new file "custom/config.yaml"
-#   - You can override in the custom file any config that is defined here
-#   - For redefining components, or for more information, follow the instructions in ./README.md
+# Defines the default configuration
+#   🚫 WARNING 🚫: Do not modify this file
+#       - For custom config create a new file "custom/config.yaml"
+#       - You can override in the custom file any config that is defined here
+#       - For redefining components, or for more information, follow the instructions in ./README.md
+#   ⚙️Read more here:
+#       https://github.com/gnosis/dex-react/wiki/Config
 
+# App Id
+#   Identify the app. The IDs range from 1 until 256
+#   Every transaction sent to the blockchain will include the ID and some basic analytic info
+#
+#   ⚠️IMPORTANT: The ID must be unique per App/Client of Gnosis Protocol:
+#       https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
+#   More information about forking the web:
+#       https://github.com/gnosis/dex-react/wiki/Fork-project
+#
+#appId: 1
+
+# Name of the app
 name: Gnosis Protocol Web
 
+# Logo used for the favicon
 logoPath: './src/assets/img/logo.svg'
 
+# HTML template
 templatePath: './src/html/index.html'
 
 # Whitelisted tokens from Gnosis Contract retrieved from a smart contract
@@ -89,7 +105,7 @@ disabledTokens:
       description: This token is disabled for trading and depositing. SNX will be deprecated and replaced by another token at the end of July 2020.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED
       url: https://docs.synthetix.io/integrations/guide/#proxy-deprecation
-      
+
     - address: '0x45804880De22913dAFE09f4980848ECE6EcbAf78'
       name: Paxos Gold
       symbol: PAXG

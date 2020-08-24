@@ -41,7 +41,7 @@ const About: React.FC = () => {
   return (
     <AboutWrapper>
       <h1>About {CONFIG.name}</h1>
-      <p>
+      <div>
         <strong>{CONFIG.name}</strong> is an Open Source interface for{' '}
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">
           Gnosis Protocol
@@ -58,7 +58,7 @@ const About: React.FC = () => {
           </a>
           .
         </div>
-      </p>
+      </div>
       <p>
         <strong>Gnosis Protocol</strong> is a fully permissionless DEX that enables ring trades to maximize liquidity.
         <a target="_blank" rel="noopener noreferrer" href="https://docs.gnosis.io/protocol">

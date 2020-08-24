@@ -71,10 +71,10 @@ interface PriceEstimationsProps {
   swapPrices: () => void
 }
 
-export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
+export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
   const { amount, isPriceInverted, priceInputId, priceInverseInputId } = props
 
-  const { setValue } = useFormContext<TradeFormData>()
+  const { setValue, triggerValidation } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => (): void => {
@@ -85,8 +85,9 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = props => {
         setValue(priceInverseInputId, price)
         setValue(priceInputId, invertedPrice)
       }
+      triggerValidation()
     },
-    [isPriceInverted, setValue, priceInputId, priceInverseInputId],
+    [isPriceInverted, triggerValidation, setValue, priceInputId, priceInverseInputId],
   )
 
   return (
@@ -128,7 +129,7 @@ const HighlightedText = styled.span`
   text-decoration-style: dotted;
 `
 
-const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = props => {
+const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = (props) => {
   const { networkId, amount, baseToken, quoteToken, isPriceInverted, updatePrices, swapPrices } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
   const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken

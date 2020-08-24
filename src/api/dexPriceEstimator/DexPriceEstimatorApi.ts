@@ -57,7 +57,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
 
   public constructor(params: DexPriceEstimatorParams) {
-    params.forEach(endpoint => {
+    params.forEach((endpoint) => {
       this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(
         process.env.PRICE_ESTIMATOR_URL === 'production'
           ? endpoint.url_production

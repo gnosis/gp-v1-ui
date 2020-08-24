@@ -6,8 +6,16 @@ import {
   ExchangeContractConfig,
 } from 'types/config'
 import { Network } from 'types'
+import { MAX_APP_ID } from 'const'
 
 describe('Test config defaults', () => {
+  it('appId', () => {
+    expect(CONFIG.appId).toEqual(expect.any(Number))
+    expect(Number.isInteger(CONFIG.appId)).toBe(true)
+    expect(CONFIG.appId).toBeGreaterThanOrEqual(1)
+    expect(CONFIG.appId).toBeLessThanOrEqual(MAX_APP_ID)
+  })
+
   it('name', () => {
     expect(CONFIG.name).toEqual('Gnosis Protocol Web')
   })

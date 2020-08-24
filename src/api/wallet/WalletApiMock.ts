@@ -58,6 +58,10 @@ export class WalletApiMock implements WalletApi {
     return this.connect()
   }
 
+  public async getGasPrice(): Promise<null> {
+    return null
+  }
+
   public async getAddress(): Promise<string> {
     assert(this._connected, 'The wallet is not connected')
 
@@ -78,19 +82,21 @@ export class WalletApiMock implements WalletApi {
 
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo): Command {
     this._listeners.push(callback)
-    this.getWalletInfo().then(walletInfo => callback(walletInfo))
+    this.getWalletInfo().then((walletInfo) => callback(walletInfo))
 
     return (): void => this.removeOnChangeWalletInfo(callback)
   }
 
   public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
-    this._listeners = this._listeners.filter(c => c !== callback)
+    this._listeners = this._listeners.filter((c) => c !== callback)
   }
 
   public getProviderInfo(): ProviderInfo {
     return {
       id: '',
       name: 'MockProvider',
+      walletName: 'MockWallet',
+      walletIcon: '',
       type: 'mock',
       logo: '',
       check: '',
@@ -122,7 +128,7 @@ export class WalletApiMock implements WalletApi {
 
   private async _notifyListeners(): Promise<void> {
     const walletInfo: WalletInfo = await this.getWalletInfo()
-    this._listeners.forEach(listener => listener(walletInfo))
+    this._listeners.forEach((listener) => listener(walletInfo))
   }
 }
 

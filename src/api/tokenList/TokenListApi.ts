@@ -10,7 +10,7 @@ const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails)
     token.override = tokenOverride
     token.disabled = true
     // override only keys present in both token and tokenOverride
-    Object.keys(token).forEach(key => {
+    Object.keys(token).forEach((key) => {
       if (tokenOverride[key] !== undefined) token[key] = tokenOverride[key]
     })
   }
@@ -69,7 +69,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     this._tokensByNetwork = {}
     this._tokenAddressNetworkSet = new Set<string>()
 
-    networkIds.forEach(networkId => {
+    networkIds.forEach((networkId) => {
       // initial value
       const tokenList = TokenListApiImpl.mergeTokenLists(
         // load first the local lists, as they might be more up to date
@@ -105,7 +105,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
 
     lists
       .reduce((acc, l) => acc.concat(l), [])
-      .forEach(token => {
+      .forEach((token) => {
         if (!seenAddresses.has(token.address.toLowerCase())) {
           seenAddresses.add(token.address.toLowerCase())
           result.push(token)
@@ -135,7 +135,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
 
   public addTokens({ tokens, networkId }: AddTokensParams): void {
     const addedTokens: TokenDetails[] = []
-    tokens.forEach(token => {
+    tokens.forEach((token) => {
       const key = TokenListApiImpl.constructAddressNetworkKey({ tokenAddress: token.address, networkId })
 
       if (this._tokenAddressNetworkSet.has(key)) return

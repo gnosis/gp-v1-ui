@@ -21,7 +21,7 @@ async function getDetailedPendingOrders({
   networkId: number
   setFn: React.Dispatch<React.SetStateAction<DetailedPendingOrder[]>>
 }): Promise<void> {
-  const ordersPromises = orders.map(async order => {
+  const ordersPromises = orders.map(async (order) => {
     const [sellToken, buyToken] = await Promise.all([
       getTokenFromExchangeById({ tokenId: order.sellTokenId, networkId }),
       getTokenFromExchangeById({ tokenId: order.buyTokenId, networkId }),
@@ -76,7 +76,7 @@ function usePendingOrders(): DetailedPendingOrder[] {
           // Mined TransactionRceipt WILL have the above props filled
           // null indicates dropped tx
           const transactionStatusArray = await Promise.all(
-            blockTransactionsFilteredPendingOrders.map(order => web3.eth.getTransaction(order.txHash)),
+            blockTransactionsFilteredPendingOrders.map((order) => web3.eth.getTransaction(order.txHash)),
           )
 
           // Remove orders that are NULL and/or orders that have a blockNumber (indicating mined status)

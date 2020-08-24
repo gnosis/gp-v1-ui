@@ -80,15 +80,54 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
             letter-spacing: 0;
             line-height: 1.2;
             flex-flow: row nowrap;
-          }
-        }
 
-        &[data-label='Token'] > div {
-          word-break: break-word;
+            > div {
+              word-break: break-word;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
 
-          > b {
-            display: block;
-            color: var(--color-text-primary);
+              > strong {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                justify-content: flex-start;
+              }
+
+              > b {
+                display: block;
+                color: var(--color-text-primary);
+              }
+            }
+
+            @media ${MEDIA.mobile} {
+              > img {
+                margin: 0 0 0 1rem;
+                order: 1;
+              }
+              > div {
+                order: 0;
+                text-align: right;
+                white-space: normal;
+
+                > strong {
+                  justify-content: flex-end;
+                  > a,
+                  > img {
+                    order: 0;
+                    margin-right: 0.4rem;
+                    margin-left: 0;
+
+                    > img {
+                      margin: 0;
+                    }
+                  }
+                  > span {
+                    order: 1;
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -171,7 +210,7 @@ const NoTokensMessage = styled.tr`
 interface BalanceDisplayProps extends TokenLocalState {
   enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
-  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void | React.ReactText>
   ethBalance: BN | null
   balances: TokenBalanceDetails[]
   error: boolean
@@ -181,6 +220,7 @@ interface BalanceDisplayProps extends TokenLocalState {
     claimable: boolean,
     onTxHash: (hash: string) => void,
   ): Promise<void>
+  hasTokensToShow?: boolean
 }
 
 const customFilterFnFactory = (searchTxt: string) => (token: TokenBalanceDetails): boolean => {
@@ -210,7 +250,9 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   highlighted,
   enabling,
   enabled,
+  immatureClaim,
   requestWithdrawConfirmation,
+  hasTokensToShow = false,
 }) => {
   const windowSpecs = useWindowSizes()
 
@@ -256,7 +298,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
 
   return (
     <StandaloneCardWrapper>
-      <BalancesWidget $columns="minmax(13.2rem,0.8fr) repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
+      <BalancesWidget $columns="20rem repeat(2,minmax(10rem,1fr)) minmax(14.5rem, 1fr) minmax(13.8rem, 0.8fr)">
         <FilterTools
           className="filterToolsBar"
           resultName="tokens"
@@ -288,7 +330,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </thead>
             <tbody>
               {displayedBalances && displayedBalances.length > 0 ? (
-                displayedBalances.map(tokenBalances => (
+                displayedBalances.map((tokenBalances) => (
                   <Row
                     key={tokenBalances.address}
                     ethBalance={ethBalance}
@@ -305,17 +347,18 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
                         onTxHash,
                       )
                     }}
-                    onClaim={(): Promise<void> => claimToken(tokenBalances.address)}
+                    onClaim={(): Promise<void | React.ReactText> => claimToken(tokenBalances.address)}
                     claiming={claiming.has(tokenBalances.address)}
                     withdrawing={withdrawing.has(tokenBalances.address)}
                     depositing={depositing.has(tokenBalances.address)}
                     highlighted={highlighted.has(tokenBalances.address)}
                     enabling={enabling.has(tokenBalances.address)}
                     enabled={enabled.has(tokenBalances.address)}
+                    immatureClaim={immatureClaim.has(tokenBalances.address)}
                     {...windowSpecs}
                   />
                 ))
-              ) : balances.length === 0 ? (
+              ) : balances.length === 0 && hasTokensToShow ? (
                 <NoTokensMessage>
                   <td>
                     All tokens disabled. Enable some in <a onClick={toggleModal}>Manage Tokens</a>
@@ -349,7 +392,7 @@ const DepositWidget: React.FC = () => {
   const [{ localTokens }] = useGlobalState()
 
   const balances = useMemo(() => {
-    return allBalances.filter(bal => !localTokens.disabled.has(bal.address))
+    return allBalances.filter((bal) => !localTokens.disabled.has(bal.address))
   }, [allBalances, localTokens.disabled])
 
   const { requestWithdrawToken, ...restActions } = useRowActions({ balances })
@@ -401,6 +444,7 @@ const DepositWidget: React.FC = () => {
       <BalancesDisplayMemoed
         ethBalance={ethBalance}
         balances={balances}
+        hasTokensToShow={allBalances.length > 0}
         error={error}
         {...restActions}
         requestWithdrawConfirmation={requestWithdrawConfirmation}

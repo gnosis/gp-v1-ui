@@ -37,7 +37,11 @@ export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
 
 export const MINIMUM_ALLOWANCE_DECIMALS = 10
 
-export const APP_NAME = 'fuse'
+// Max App Id: Read more here:
+//    https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
+export const MAX_APP_ID = 255
+
+export const APP_NAME = 'Gnosis Protocol Web'
 
 export const ETHER_PNG =
   'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
@@ -152,7 +156,7 @@ export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
 export const TRADES_LOCAL_STORAGE_KEY = 'TRADES_PER_ACCOUNT'
 
 const LIQUIDITY_TOKEN_LIST_VALUES = process.env.LIQUIDITY_TOKEN_LIST || 'USDT,TUSD,USDC,PAX,GUSD,DAI,sUSD'
-export const LIQUIDITY_TOKEN_LIST = new Set(LIQUIDITY_TOKEN_LIST_VALUES.split(',').map(symbol => symbol.trim()))
+export const LIQUIDITY_TOKEN_LIST = new Set(LIQUIDITY_TOKEN_LIST_VALUES.split(',').map((symbol) => symbol.trim()))
 export const INPUT_PRECISION_SIZE = 6
 export const VALID_UNTIL_DEFAULT = '2880'
 export const VALID_FROM_DEFAULT = '30'

@@ -147,7 +147,7 @@ interface InnerTradesWidgetProps {
   isTab?: boolean
 }
 
-export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
+export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
   const { isTab, trades } = props
 
   const { networkId, userAddress } = useWalletConnection()
@@ -204,7 +204,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
         </tr>
       </thead>
       <tbody>
-        {trades.map(trade => (
+        {trades.map((trade) => (
           <TradeRow key={trade.id} trade={trade} networkId={networkId} />
         ))}
       </tbody>

@@ -7,8 +7,14 @@ export interface Flag<T extends string> {
 }
 
 // OUR specific flags
+const FIXED_SENTINEL = 'dec0de'
+
 // lowercase hex value to be appended to tx.data
-const SENTINEL = 'dec0de'
+const SENTINEL = FIXED_SENTINEL + Number(CONFIG.appId).toString(16).padStart(2, '0')
+
+if (!/^[0-9a-f]+$/.test(SENTINEL)) {
+  throw new Error(`SENTINEL isn't valid. Expected lowercase hex value, got ${SENTINEL}`)
+}
 
 type DxFlagName = 'provider' | 'mobile' | 'browser' | 'screenSize'
 
@@ -129,7 +135,7 @@ export const encoderFactory = <T extends string>({ sentinel = '', flags }: Encod
     return (
       sentinel +
       flagsWithMaps
-        .map(flag => {
+        .map((flag) => {
           const detectedValue = flagValues[flag.name]
           // if detected as a value not already in flags.values, default to 0 index
           const flagValueIndex = flag.map[detectedValue] ?? 0
@@ -165,7 +171,7 @@ export const decoderFactory = <T extends string>({
 }: DecoderFactoryInput<T>): Decoder<T> => {
   if (flags.length === 0) throw new Error('Flags array must not be empty')
 
-  const pattern = prefix + sentinel + flags.map(flag => `(\\d{${flag.meaningfulDigits}})`).join('') + postfix
+  const pattern = prefix + sentinel + flags.map((flag) => `(\\d{${flag.meaningfulDigits}})`).join('') + postfix
   const regexp = new RegExp(pattern)
 
   return (code): DecodedFlags<T> | null => {

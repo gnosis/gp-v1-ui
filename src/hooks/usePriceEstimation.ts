@@ -112,3 +112,43 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
 
   return { priceEstimation, isPriceLoading }
 }
+
+interface PriceInOwlParams {
+  networkId: number
+  tokenId: number
+  tokenDecimals?: number
+}
+
+const estimationInOwlDefaults = {
+  baseTokenId: 0,
+  baseTokenDecimals: 18,
+  amount: '',
+}
+
+export function usePriceEstimationInOwl(params: PriceInOwlParams): Result {
+  const { networkId, tokenId: quoteTokenId, tokenDecimals: quoteTokenDecimals } = params
+
+  const getPriceParams: SlippageParams = {
+    ...estimationInOwlDefaults,
+    networkId,
+    quoteTokenId,
+    quoteTokenDecimals,
+  }
+
+  return usePriceEstimationWithSlippage(getPriceParams)
+}
+
+const WETHestimationInOWLDefaults = {
+  ...estimationInOwlDefaults,
+  quoteTokenId: 1,
+  quoteTokenDecimals: 18,
+}
+
+export function useWETHPriceInOwl(networkId: number): Result {
+  const getPriceParams: SlippageParams = {
+    ...WETHestimationInOWLDefaults,
+    networkId,
+  }
+
+  return usePriceEstimationWithSlippage(getPriceParams)
+}

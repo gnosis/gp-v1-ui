@@ -41,6 +41,7 @@ export interface DepositApi {
   getBalance(params: GetBalanceParams): Promise<BN>
   getPendingDeposit(params: GetPendingDepositParams): Promise<PendingFlux>
   getPendingWithdraw(params: GetPendingWithdrawParams): Promise<PendingFlux>
+  getLastCreditBatchId(params: GetPendingDepositParams): Promise<number>
 
   deposit(params: DepositParams): Promise<Receipt>
   requestWithdraw(params: RequestWithdrawParams): Promise<Receipt>
@@ -85,6 +86,16 @@ export class DepositApiImpl implements DepositApi {
     const contract = await this._getContract(networkId)
     const batchId = await contract.methods.getCurrentBatchId().call()
     return +batchId
+  }
+
+  public async getLastCreditBatchId({
+    userAddress,
+    tokenAddress,
+    networkId,
+  }: GetPendingDepositParams): Promise<number> {
+    const contract = await this._getContract(networkId)
+    const lastCreditBatchId = await contract.methods.lastCreditBatchId(userAddress, tokenAddress).call()
+    return +lastCreditBatchId
   }
 
   public async getSecondsRemainingInBatch(networkId: number): Promise<number> {

@@ -284,7 +284,7 @@ const OrderValidity: React.FC<Props> = ({
       })
     }
 
-    setShowOrderConfig(showOrderConfig => !showOrderConfig)
+    setShowOrderConfig((showOrderConfig) => !showOrderConfig)
   }, [
     setAsap,
     setShowOrderConfig,
@@ -339,7 +339,7 @@ const OrderValidity: React.FC<Props> = ({
 
   function handleUnlimitedClick(): void {
     const reffedInput = validUntilRef.current!
-    setUnlimited(isUnlimited => !isUnlimited)
+    setUnlimited((isUnlimited) => !isUnlimited)
     if (!isUnlimited) {
       return setValue(validUntilInputId, undefined, true)
     }
@@ -350,7 +350,7 @@ const OrderValidity: React.FC<Props> = ({
   }
   function handleASAPClick(): void {
     const reffedInput = validFromRef.current!
-    setAsap(isAsap => !isAsap)
+    setAsap((isAsap) => !isAsap)
     if (!isAsap) {
       return setValue(validFromInputId, undefined, true)
     }

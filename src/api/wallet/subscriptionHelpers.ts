@@ -48,7 +48,7 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
         web3.eth.subscribe(event as any, detectValidSubCb)) as Subscription<Event2Data[T]>
 
     sub
-      .on('connected', id => {
+      .on('connected', (id) => {
         // called with subscription id
         // if subscribtion was created successfully
         logDebug('[subscriptionHelpers] Subscription id for', event, id)
@@ -57,7 +57,7 @@ const createWeb3Subscription = <T extends SubscribeEvent>({
       // immediate reject on error
       // some providers don't trigger it, only trigger error in callback
       .on('error', reject)
-  }).then(sub => {
+  }).then((sub) => {
     sub.on('data', callback)
     return (): void => {
       sub.unsubscribe()
@@ -128,7 +128,7 @@ const checkIfBlockChangedFactory = (web3: Web3): (() => Promise<ChangedBlockStat
 export const subscribeToWeb3Event = <T extends SubscribeEvent>(options: SubscribeParamsAlt<T>): Command => {
   const { web3, callback, getter, interval } = options
   // first checks if possible to get native subscribtion (provider supports the event)
-  const subscriptionPromise = createWeb3Subscription(options).catch(error => {
+  const subscriptionPromise = createWeb3Subscription(options).catch((error) => {
     // if subscription isn't supported
     logDebug('[subscriptionHelpers] Error subscribing to', options.event, 'event:', error)
 
@@ -138,7 +138,7 @@ export const subscribeToWeb3Event = <T extends SubscribeEvent>(options: Subscrib
       interval,
       // factory condition to keep internal state
       condition: checkIfBlockChangedFactory(web3),
-      callback: blockNumber => {
+      callback: (blockNumber) => {
         // only called if condition returns true
         logDebug('[subscriptionHelpers] polled new block', blockNumber)
         getter(web3).then(callback)
@@ -147,6 +147,6 @@ export const subscribeToWeb3Event = <T extends SubscribeEvent>(options: Subscrib
   })
 
   return (): void => {
-    subscriptionPromise.then(unsubscribe => unsubscribe())
+    subscriptionPromise.then((unsubscribe) => unsubscribe())
   }
 }

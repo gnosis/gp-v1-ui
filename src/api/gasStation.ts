@@ -5,7 +5,9 @@ const GAS_STATIONS = {
   4: 'https://safe-relay.staging.gnosisdev.com/api/v1/gas-station/',
 }
 
-const GAS_PRICE_LEVEL: Exclude<keyof GasStationResponse, 'lastUpdate'> = 'standard'
+export type GasPriceLevel = Exclude<keyof GasStationResponse, 'lastUpdate'>
+
+const GAS_PRICE_LEVEL: GasPriceLevel = 'standard'
 
 let cacheKey = ''
 let cachedGasPrice: string
@@ -26,7 +28,9 @@ interface GasStationResponse {
   fastest: string
 }
 
-const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string | undefined> => {
+const fetchGasPriceFactory = (walletApi: WalletApi) => async (
+  gasPriceLevel: GasPriceLevel = GAS_PRICE_LEVEL,
+): Promise<string | undefined> => {
   const { blockchainState } = walletApi
 
   if (!blockchainState) return undefined
@@ -47,7 +51,7 @@ const fetchGasPriceFactory = (walletApi: WalletApi) => async (): Promise<string 
     const response = await fetch(gasStationURL)
     const json: GasStationResponse = await response.json()
 
-    const gasPrice = json[GAS_PRICE_LEVEL]
+    const gasPrice = json[gasPriceLevel]
     if (gasPrice) {
       cacheKey = key
       cachedGasPrice = gasPrice
