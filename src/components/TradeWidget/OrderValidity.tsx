@@ -588,23 +588,6 @@ const OrderValidity: React.FC<Props> = ({
     }
   }, [validFromError, validUntilError, setShowOrderConfig, showOrderConfig])
 
-  const onModalEnter: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
-    (e): void => {
-      if (e.key !== 'Enter') return
-      // prevents focus stealing by Sell Input
-      e.preventDefault()
-
-      // same as click on Set Order Params button
-      // only works when inputs are valid
-      if (!!validUntilError || !!validFromError) {
-        return
-      }
-
-      handleShowConfig()
-    },
-    [handleShowConfig, validFromError, validUntilError],
-  )
-
   // check differences in batches between now and current batch
   // used below to start countdown if difference is 3 batches or less
   const timeRemainingInBatch = useTimeRemainingInBatch(
@@ -693,7 +676,7 @@ const OrderValidity: React.FC<Props> = ({
         <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
       </div>
 
-      <OrderValidityInputsWrapper $visible={showOrderConfig} onKeyPress={onModalEnter}>
+      <OrderValidityInputsWrapper $visible={showOrderConfig}>
         <h4>
           Order settings{' '}
           <i

@@ -41,7 +41,7 @@ const DateTimePickerBase: React.FC<DateTimePickerBase> = ({
       dateAdapter={memoizedDateAdapter}
       disablePast
       minutesStep={BATCH_TIME / 60}
-      inputFormat="yyyy/MM/dd HH:mm a"
+      // inputFormat="yyyy/MM/dd HH:mm"
       ampm={false}
       minDateTime={minDateTime}
       renderInput={(props): JSX.Element => (
