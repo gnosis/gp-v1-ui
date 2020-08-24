@@ -34,47 +34,47 @@ describe('calcMinTradableAmountInOwl', () => {
         Object {
           "ethPrice": 100,
           "gasPrice": 1,
-          "minAmountInOwl": "2.16",
+          "minAmountInOwl": "21.6",
         },
         Object {
           "ethPrice": 380,
           "gasPrice": 1,
-          "minAmountInOwl": "8.208",
+          "minAmountInOwl": "82.08",
         },
         Object {
           "ethPrice": 801,
           "gasPrice": 1,
-          "minAmountInOwl": "17.3016",
+          "minAmountInOwl": "173.016",
         },
         Object {
           "ethPrice": 100,
           "gasPrice": 50,
-          "minAmountInOwl": "108",
+          "minAmountInOwl": "1080",
         },
         Object {
           "ethPrice": 380,
           "gasPrice": 50,
-          "minAmountInOwl": "410.4",
+          "minAmountInOwl": "4104",
         },
         Object {
           "ethPrice": 801,
           "gasPrice": 50,
-          "minAmountInOwl": "865.08",
+          "minAmountInOwl": "8650.8",
         },
         Object {
           "ethPrice": 100,
           "gasPrice": 120,
-          "minAmountInOwl": "259.2",
+          "minAmountInOwl": "2592",
         },
         Object {
           "ethPrice": 380,
           "gasPrice": 120,
-          "minAmountInOwl": "984.96",
+          "minAmountInOwl": "9849.6",
         },
         Object {
           "ethPrice": 801,
           "gasPrice": 120,
-          "minAmountInOwl": "2076.192",
+          "minAmountInOwl": "20761.92",
         },
       ]
     `)
