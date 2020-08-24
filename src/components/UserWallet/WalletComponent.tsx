@@ -5,7 +5,7 @@ import QRCode from 'qrcode.react'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -177,7 +177,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                 />
               </CopyToClipboard>
             </MonospaceAddress>
-            <QRCode className="QRCode" value={userAddress} renderAs="svg" />
+            <QRCode className="QRCode" value={userAddress} renderAs="svg" size={150} />
             {/* Etherscan Link */}
             {/* TODO: add network specific */}
             <EtherscanButton>
@@ -187,7 +187,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                 identifier={userAddress}
                 label={
                   <>
-                    <FontAwesomeIcon icon={faSearch} /> <span>View on Etherscan</span>
+                    <FontAwesomeIcon icon={faExternalLinkAlt} /> <span>View on Etherscan</span>
                   </>
                 }
               />

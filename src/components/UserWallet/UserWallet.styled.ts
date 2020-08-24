@@ -12,7 +12,10 @@ export const UserWalletWrapper = styled.div`
   position: relative;
 
   .QRCode {
-    margin: 4rem auto;
+    border: 2rem solid #fff;
+    border-radius: var(--border-radius);
+    box-sizing: content-box;
+    margin: 1rem auto;
   }
 `
 
@@ -51,8 +54,10 @@ const WalletButton = styled.button`
   border-radius: 3rem;
   color: var(--color-text-CTA);
   font-size: 1.5rem;
-  margin: 2rem 0;
+  margin: 1.2rem 0;
   padding: 1rem 2rem;
+  width: calc(100% - 1rem);
+  white-space: nowrap;
 `
 
 export const EtherscanButton = styled(WalletButton)`
@@ -111,10 +116,6 @@ export const UserAddress = styled.div`
   @media ${MEDIA.mobile} {
     font-size: 1.3rem;
   }
-`
-
-export const QRCode = styled.div`
-  margin: 0 0 0 auto;
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`
@@ -188,7 +189,7 @@ export const UserWalletSlideWrapper = styled.div`
   box-sizing: border-box;
   z-index: 10;
   flex-flow: column wrap;
-  top: 100%;
+  top: calc(100% + 0.7rem);
   margin: 1rem 0 0;
   box-shadow: var(--box-shadow-wrapper);
 
@@ -202,6 +203,10 @@ export const UserWalletSlideWrapper = styled.div`
     box-shadow: 0 -90vh 0 100vw rgba(47, 62, 78, 0.5);
     border-radius: 1.2rem;
     padding: 0 0 2.4rem;
+
+    > ${UserWalletItem} {
+      padding: 0 0 5rem 0;
+    }
   }
 
   > button {
