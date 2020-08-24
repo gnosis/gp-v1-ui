@@ -52,6 +52,15 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
       }
     }
 
+    > .filterClear {
+      position: absolute;
+      top: 32%;
+      right: 2rem;
+      cursor: pointer;
+      font-size: small;
+      text-decoration: underline;
+    }
+
     > input {
       margin: 0;
       max-width: 100%;
@@ -63,7 +72,8 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;
       font-weight: var(--font-weight-normal);
-      padding: 0 1.6rem 0 4.8rem;
+      // accommodate clearFilter
+      padding: 0 10.4rem 0 4.8rem;
       outline: 0;
 
       @media ${MEDIA.mobile} {
@@ -110,6 +120,7 @@ interface Props {
   searchValue: string
   showFilter: boolean
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
+  clearFilters?: () => void
 }
 
 const FilterTools: React.FC<Props> = ({
@@ -121,6 +132,7 @@ const FilterTools: React.FC<Props> = ({
   searchValue,
   showFilter,
   handleSearch,
+  clearFilters,
 }) => (
   <BalanceTools className={className} $css={customStyles}>
     <label className="balances-searchTokens">
@@ -130,6 +142,11 @@ const FilterTools: React.FC<Props> = ({
         value={searchValue}
         onChange={handleSearch}
       />
+      {!!clearFilters && !!searchValue && (
+        <span className="filterClear" onClick={clearFilters}>
+          clear filters
+        </span>
+      )}
       {showFilter && (
         <FormMessage id="filterLabel">
           Filter: Showing {dataLength} {dataLength === 1 ? 'result' : resultName}

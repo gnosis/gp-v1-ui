@@ -201,7 +201,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const {
     filteredData: filteredAndSortedOrders,
     search,
-    handlers: { handleSearch: handleSearchingOrders },
+    handlers: { handleSearch: handleSearchingOrders, clearFilters: clearOrdersFilters },
   } = useDataFilter({
     data: sortedOrders,
     filterFnFactory: filterOrdersFn,
@@ -210,7 +210,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   // FILTER PENDING ORDERS
   const {
     filteredData: filteredAndSortedPendingOrders,
-    handlers: { handleSearch: handleSearchingPendingOrders },
+    handlers: { handleSearch: handleSearchingPendingOrders, clearFilters: clearPendingOrdersFilters },
   } = useDataFilter<DetailedPendingOrder>({
     data: displayedPendingOrders,
     filterFnFactory: filterOrdersFn,
@@ -305,11 +305,17 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
 
   const {
     filteredData: filteredTrades,
-    handlers: { handleSearch: handleTradesSearch },
+    handlers: { handleSearch: handleTradesSearch, clearFilters: clearTradesFilters },
   } = useDataFilter<Trade>({
     data: settledAndNotRevertedTrades,
     filterFnFactory: filterTradesFn,
   })
+
+  const handleCompleteFilterClear = useCallback(() => {
+    clearTradesFilters()
+    clearPendingOrdersFilters()
+    clearOrdersFilters()
+  }, [clearOrdersFilters, clearPendingOrdersFilters, clearTradesFilters])
 
   const handleCompleteSearch = useCallback(
     (e): void => {
@@ -355,6 +361,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               resultName={tabSpecificResultName}
               searchValue={search}
               handleSearch={handleCompleteSearch}
+              clearFilters={handleCompleteFilterClear}
               showFilter={!!search}
               dataLength={tabSpecificDataLength}
             >

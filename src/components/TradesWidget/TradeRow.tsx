@@ -15,6 +15,9 @@ import { MEDIA } from 'const'
 import { EllipsisText } from 'components/Layout'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
+  td[data-label='Order ID'] {
+    cursor: pointer;
+  }
   @media ${MEDIA.mobile} {
     &&&&& {
       display: flex;
