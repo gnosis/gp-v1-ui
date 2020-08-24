@@ -12,7 +12,7 @@ export const UserWalletWrapper = styled.div`
   position: relative;
 
   .QRCode {
-    margin: 0 auto;
+    margin: 4rem auto;
   }
 `
 
@@ -45,13 +45,48 @@ export const UserWalletItem = styled.div`
   > a > svg {
     margin: 0 0.5rem 0 0;
   }
+`
 
-  .etherscanLink {
-    padding: 1.6rem 0;
+const WalletButton = styled.button`
+  border-radius: 3rem;
+  color: var(--color-text-CTA);
+  font-size: 1.5rem;
+  margin: 2rem 0;
+  padding: 1rem 2rem;
+`
 
-    @media ${MEDIA.mobile} {
-      padding: 2.4rem 0;
+export const EtherscanButton = styled(WalletButton)`
+  background: var(--color-background-CTA);
+  > a,
+  > a:link,
+  > a:visited {
+    color: inherit;
+    text-decoration: none;
+
+    > span {
+      text-decoration: underline;
     }
+  }
+`
+
+export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
+  background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
+  color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+
+  &:hover {
+    background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
+    color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
+    filter: grayscale(1);
+  }
+
+  > a {
+    width: 100%;
+    font-size: inherit;
   }
 `
 
@@ -61,24 +96,9 @@ export const ConnectWallet = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;
+
   > svg {
     margin: 0 0.5rem 0 0;
-  }
-`
-
-export const LogInOutButton = styled.div`
-  margin: 0;
-  font-family: var(--font-mono);
-  letter-spacing: 0;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  letter-spacing: 0;
-  font-size: 1.2rem;
-  padding: 0;
-
-  > a {
-    width: 100%;
-    font-size: inherit;
   }
 `
 
@@ -161,7 +181,7 @@ export const UserWalletSlideWrapper = styled.div`
   background: inherit;
   left: 0;
   background: var(--color-background-pageWrapper);
-  width: 19.8rem;
+  width: 37rem;
   display: flex;
   border-radius: 0.6rem;
   padding: 1.6rem;

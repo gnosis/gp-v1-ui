@@ -5,7 +5,7 @@ import QRCode from 'qrcode.react'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faSearch } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -20,10 +20,10 @@ import {
   UserWalletSlideWrapper,
   CopyDiv,
   MonospaceAddress,
-  ConnectWallet,
   LogInOutButton,
   WalletName,
   WalletImage,
+  EtherscanButton,
 } from './UserWallet.styled'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -106,15 +106,15 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     } else {
       onClick = connectWallet
       content = (
-        <ConnectWallet className="connectWallet">
+        <>
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
-        </ConnectWallet>
+        </>
       )
     }
 
     return (
-      <LogInOutButton>
+      <LogInOutButton $loggedIn={isConnected}>
         <a onClick={onClick} className={props.className}>
           {content}
         </a>
@@ -180,12 +180,18 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
             <QRCode className="QRCode" value={userAddress} renderAs="svg" />
             {/* Etherscan Link */}
             {/* TODO: add network specific */}
-            <EtherscanLink
-              className="etherscanLink"
-              type="address"
-              identifier={userAddress}
-              label="View on Etherscan"
-            />
+            <EtherscanButton>
+              <EtherscanLink
+                className="etherscanLink"
+                type="address"
+                identifier={userAddress}
+                label={
+                  <>
+                    <FontAwesomeIcon icon={faSearch} /> <span>View on Etherscan</span>
+                  </>
+                }
+              />
+            </EtherscanButton>
             {/* Log In/Out Button */}
             {renderLogInOutButton()}
           </UserWalletItem>
