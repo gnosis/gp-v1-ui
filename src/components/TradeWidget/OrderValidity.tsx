@@ -569,6 +569,7 @@ const OrderValidity: React.FC<Props> = ({
     }
 
     formValid && setShowOrderConfig((showOrderConfig) => !showOrderConfig)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     showOrderConfig,
     setShowOrderConfig,
