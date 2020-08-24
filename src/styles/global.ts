@@ -1146,6 +1146,15 @@ const GlobalStyles = createGlobalStyle`
       fill: var(--color-text-CTA);
     }
 
+    label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated.MuiInputLabel-shrink.MuiFormLabel-filled,
+    input.MuiInputBase-input.MuiInput-input,
+    p.MuiFormHelperText-root.MuiFormHelperText-filled,
+    p.MuiFormHelperText-root,
+    label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated {
+      color: var(--color-text-primary);
+      font-size: larger;
+    }
+
     h6.MuiTypography-root.MuiPickersCalendarHeader-monthText.MuiTypography-subtitle1.MuiTypography-alignCenter, 
     h6.MuiTypography-root.MuiTypography-subtitle1.MuiTypography-alignCenter, 
     button.MuiPickersYear-yearButton,
@@ -1168,6 +1177,7 @@ const GlobalStyles = createGlobalStyle`
     input {
       &.MuiInputBase-input.MuiInput-input {
         font-size: 1.2rem;
+        color: var(--color-text-primary);
       }
     }
 
