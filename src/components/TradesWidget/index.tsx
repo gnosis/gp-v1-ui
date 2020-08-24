@@ -143,12 +143,13 @@ function csvTransformer(trade: Trade): CsvColumns {
 const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
 
 interface InnerTradesWidgetProps {
+  onOrderIdClick: (e: React.ChangeEvent<HTMLInputElement>) => void
   trades: Trade[]
   isTab?: boolean
 }
 
 export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
-  const { isTab, trades } = props
+  const { isTab, trades, onOrderIdClick } = props
 
   const { networkId, userAddress } = useWalletConnection()
 
@@ -170,12 +171,11 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $columns={`1fr 3rem 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
+      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem 5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
     >
       <thead>
         <tr>
           <th>Date</th>
-          <th>ID#</th>
           <th>Market</th>
           <th>
             <SplitHeaderTitle>
@@ -190,6 +190,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
             </SplitHeaderTitle>
           </th>
           <th>Type</th>
+          <th>Order ID</th>
           <th>
             <CsvButtonContainer>
               <span>Tx</span>
@@ -205,7 +206,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
       </thead>
       <tbody>
         {trades.map((trade) => (
-          <TradeRow key={trade.id} trade={trade} networkId={networkId} />
+          <TradeRow key={trade.id} trade={trade} networkId={networkId} onOrderIdClick={onOrderIdClick} />
         ))}
       </tbody>
     </CardTable>
@@ -238,7 +239,7 @@ export const TradesWidget: React.FC = () => {
           showFilter={!!search}
           dataLength={filteredData.length}
         />
-        <InnerTradesWidget trades={filteredData} />
+        <InnerTradesWidget trades={filteredData} onOrderIdClick={handleSearch} />
       </OverflowContainer>
     </StandaloneCardWrapper>
   )

@@ -276,6 +276,7 @@ interface Props {
   toggleMarkedForDeletion?: () => void
   disabled: boolean
   isPendingOrder?: boolean
+  onOrderIdClick: (e: Pick<React.BaseSyntheticEvent<HTMLInputElement>, 'target'>) => void
 }
 
 const OrderRow: React.FC<Props> = (props) => {
@@ -289,6 +290,7 @@ const OrderRow: React.FC<Props> = (props) => {
     disabled,
     isPendingOrder,
     isOverBalance,
+    onOrderIdClick,
   } = props
 
   // Fetching buy and sell tokens
@@ -310,7 +312,15 @@ const OrderRow: React.FC<Props> = (props) => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
-        <td>
+        <td
+          onClick={(): void =>
+            onOrderIdClick({
+              target: {
+                value: order.id,
+              },
+            })
+          }
+        >
           <EllipsisText title={order.id}>{order.id}</EllipsisText>
         </td>
         <Market sellToken={sellToken} buyToken={buyToken} />

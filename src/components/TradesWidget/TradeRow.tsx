@@ -33,6 +33,7 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
 interface TradeRowProps {
   trade: Trade
   networkId?: number
+  onOrderIdClick: (e: Pick<React.BaseSyntheticEvent<HTMLInputElement>, 'target'>) => void
 }
 
 const TypePill = styled.span<{
@@ -63,7 +64,7 @@ const TypePill = styled.span<{
 `
 
 export const TradeRow: React.FC<TradeRowProps> = (params) => {
-  const { trade, networkId } = params
+  const { trade, networkId, onOrderIdClick } = params
   const {
     buyToken,
     sellToken,
@@ -113,7 +114,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <EllipsisText title={orderId}>{orderId}</EllipsisText>
       <td data-label="Market" className="showResponsive">
         {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
       </td>
@@ -144,6 +144,9 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
+      </td>
+      <td data-label="Order ID" onClick={(): void => onOrderIdClick({ target: { value: orderId } })}>
+        <EllipsisText title={orderId}>{orderId}</EllipsisText>
       </td>
       <td data-label="View on Etherscan">
         <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
