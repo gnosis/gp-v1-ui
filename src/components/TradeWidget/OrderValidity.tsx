@@ -599,22 +599,25 @@ const OrderValidity: React.FC<Props> = ({
   // as validUntil is always relative to validFrom
   useEffect(() => {
     if (validUntilButton) {
+      let adjustedValidUntilTime: number | undefined
+      const MIN_MS = 60 * 1000
       if (validFromButton) {
         // If a custom until time is chosen
         if (validUntilButton !== 'CUSTOM_TIME') {
-          const adjustedValidUntilTime = validFromCustomTime! + validUntilButton * 60 * 1000
-          setValidUntilCustomTime(adjustedValidUntilTime)
+          adjustedValidUntilTime = validFromCustomTime! + validUntilButton * MIN_MS
+
           // if a validUntil time is chosen but a relative validFrom time is selected
           // when a custom time is not null, neither is button
         } else if (validFromButton !== 'CUSTOM_TIME') {
-          const adjustedValidUntilTime = validUntilCustomTime! + validFromButton * 60 * 1000
-          setValidUntilCustomTime(adjustedValidUntilTime)
+          adjustedValidUntilTime = validUntilCustomTime! + validFromButton * MIN_MS
         }
       } else if (validUntilButton !== 'CUSTOM_TIME') {
         // validFromButton = NOW aka null
-        const adjustedValidUntilTime = Date.now() + validUntilButton * 60 * 1000
-        setValidUntilCustomTime(adjustedValidUntilTime)
+        adjustedValidUntilTime = Date.now() + validUntilButton * MIN_MS
       }
+
+      adjustedValidUntilTime &&
+        setValidUntilCustomTime(roundToNearestMinutes(adjustedValidUntilTime, { nearestTo: 5 }).getTime())
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setValidUntilCustomTime, validFromButton, validUntilButton])

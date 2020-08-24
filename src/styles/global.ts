@@ -1152,7 +1152,7 @@ const GlobalStyles = createGlobalStyle`
     p.MuiFormHelperText-root,
     label.MuiFormLabel-root.MuiInputLabel-root.MuiInputLabel-formControl.MuiInputLabel-animated {
       color: var(--color-text-primary);
-      font-size: larger;
+      font-size: 1.3rem;
     }
 
     h6.MuiTypography-root.MuiPickersCalendarHeader-monthText.MuiTypography-subtitle1.MuiTypography-alignCenter, 
@@ -1173,14 +1173,7 @@ const GlobalStyles = createGlobalStyle`
         color: var(--color-text-CTA);
       }
     }
-
-    input {
-      &.MuiInputBase-input.MuiInput-input {
-        font-size: 1.2rem;
-        color: var(--color-text-primary);
-      }
-    }
-
+    
     button {
       &.Mui-selected.MuiTab-fullWidth:hover {
         background: var(--color-background-modali);
