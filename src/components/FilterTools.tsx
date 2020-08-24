@@ -125,7 +125,7 @@ const FilterTools: React.FC<Props> = ({
   <BalanceTools className={className} $css={customStyles}>
     <label className="balances-searchTokens">
       <input
-        placeholder="Search token by Name, Symbol or Address"
+        placeholder="Search data by Order ID or token by Name, Symbol or Address"
         type="text"
         value={searchValue}
         onChange={handleSearch}
