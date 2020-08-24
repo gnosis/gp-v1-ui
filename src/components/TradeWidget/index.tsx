@@ -617,7 +617,7 @@ const TradeWidget: React.FC = () => {
     defaultValues: defaultFormValues,
     validationResolver,
   })
-  const { handleSubmit, reset, watch, setValue, formState } = methods
+  const { handleSubmit, reset, watch, setValue, formState, triggerValidation } = methods
 
   const priceValue = watch(priceInputId)
   const priceInverseValue = watch(priceInverseInputId)
@@ -687,7 +687,8 @@ const TradeWidget: React.FC = () => {
   const resetPrices = useCallback((): void => {
     setValue(priceInputId, '0')
     setValue(priceInverseInputId, '0')
-  }, [setValue])
+    triggerValidation([priceInputId, priceInverseInputId])
+  }, [setValue, triggerValidation])
 
   const swapTokens = useCallback((): void => {
     setSellToken(receiveTokenBalance)
@@ -880,6 +881,7 @@ const TradeWidget: React.FC = () => {
   )
 
   async function onSubmit(data: FieldValues): Promise<void> {
+    console.log('Submitting data', data)
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     const price = data[priceInputId]
