@@ -693,7 +693,8 @@ const TradeWidget: React.FC = () => {
   const resetPrices = useCallback((): void => {
     setValue(priceInputId, '0')
     setValue(priceInverseInputId, '0')
-  }, [setValue])
+    trigger([priceInputId, priceInverseInputId])
+  }, [setValue, trigger])
 
   const swapTokens = useCallback((): void => {
     setSellToken(receiveTokenBalance)
