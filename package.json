@@ -18,7 +18,7 @@
     "test-coverage": "MOCK=true jest --coverage && cat ./coverage/lcov.info | coveralls",
     "verify": "npm run lint && npm run test",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "BROWSER=NONE start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },
   "husky": {
