@@ -394,6 +394,20 @@ export interface TradeFormData {
 
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
+// TESTING
+const NULL_BALANCE_TOKEN = {
+  exchangeBalance: ZERO,
+  totalExchangeBalance: ZERO,
+  pendingDeposit: { amount: ZERO, batchId: 0 },
+  pendingWithdraw: { amount: ZERO, batchId: 0 },
+  walletBalance: ZERO,
+  claimable: false,
+  enabled: false,
+  highlighted: false,
+  enabling: false,
+  claiming: false,
+}
+
 export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   sellToken: '0',
   receiveToken: '0',
@@ -658,28 +672,14 @@ const TradeWidget: React.FC = () => {
   // Updates page URL with parameters from context
   useURLParams(url, true)
 
-  // TESTING
-  const NULL_BALANCE_TOKEN = {
-    exchangeBalance: ZERO,
-    totalExchangeBalance: ZERO,
-    pendingDeposit: { amount: ZERO, batchId: 0 },
-    pendingWithdraw: { amount: ZERO, batchId: 0 },
-    walletBalance: ZERO,
-    claimable: false,
-    enabled: false,
-    highlighted: false,
-    enabling: false,
-    claiming: false,
-  }
-
   const sellTokenBalance = useMemo(
     () => getToken('symbol', sellToken.symbol, balances) || { ...sellToken, ...NULL_BALANCE_TOKEN },
-    [NULL_BALANCE_TOKEN, balances, sellToken],
+    [balances, sellToken],
   )
 
   const receiveTokenBalance = useMemo(
     () => getToken('symbol', receiveToken.symbol, balances) || { ...receiveToken, ...NULL_BALANCE_TOKEN },
-    [NULL_BALANCE_TOKEN, balances, receiveToken],
+    [balances, receiveToken],
   )
 
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()

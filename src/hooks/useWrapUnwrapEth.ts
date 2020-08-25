@@ -56,11 +56,14 @@ export const useWrapUnwrapEth = (): Result => {
   const { userAddress, isConnected, networkId } = useWalletConnection()
   const [wrappingEth, setWrappingEth] = useSafeState(false)
   const [unwrappingWeth, setUnwrappingWeth] = useSafeState(false)
-  const baseParams = {
-    userAddress,
-    networkId,
-    isConnected,
-  }
+  const baseParams = useMemo(
+    () => ({
+      userAddress,
+      networkId,
+      isConnected,
+    }),
+    [isConnected, networkId, userAddress],
+  )
 
   const wrapEth = useMemo(
     () => async (amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> => {
