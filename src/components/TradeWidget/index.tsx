@@ -63,6 +63,7 @@ import { useConnectWallet } from 'hooks/useConnectWallet'
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
+import usePrioritiseTokensForPrice from 'hooks/usePrioritiseTokensForPrice'
 
 import { DevTool } from 'HookFormDevtool'
 import { ButtonWrapper } from 'hooks/useSubmitTxModal'
@@ -955,6 +956,8 @@ const TradeWidget: React.FC = () => {
 
   const onConfirm = handleSubmit(onSubmit)
 
+  const { baseToken, quoteToken } = usePrioritiseTokensForPrice({ buyToken: receiveToken, sellToken })
+
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
@@ -993,16 +996,16 @@ const TradeWidget: React.FC = () => {
           <Price
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            sellToken={sellToken}
-            receiveToken={receiveToken}
+            sellToken={quoteToken}
+            receiveToken={baseToken}
             tabIndex={1}
             swapPrices={swapPrices}
             priceShown={priceShown}
           />
           <PriceEstimations
             networkId={networkIdOrDefault}
-            baseToken={receiveToken}
-            quoteToken={sellToken}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
             amount={debouncedSellValue}
             isPriceInverted={priceShown === 'INVERSE'}
             priceInputId={priceInputId}

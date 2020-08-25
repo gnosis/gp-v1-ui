@@ -196,7 +196,9 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
     <Wrapper>
       <div>
         <strong>Price Suggestions</strong> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
+        {/* Only on responsive, shows market pair e.g WETH/DAI */}
         <SwapPrice
+          // invert as is market representation  e.g WETH/DAI to say DAI per WETH
           baseToken={quoteToken}
           quoteToken={baseToken}
           swapPrices={swapPrices}
@@ -261,6 +263,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
       >
         {isPriceLoading ? <Spinner /> : displayPrice}
       </button>
+      {/* Shows only ONE correct quoted token e.g DAI */}
       <SwapPrice
         baseToken={baseToken}
         quoteToken={quoteToken}
