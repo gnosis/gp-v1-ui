@@ -15,8 +15,7 @@ import { OrderBookBtn } from 'components/OrderBookBtn'
 import { TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
-import { SwapIcon } from 'components/TradeWidget/SwapIcon'
-import { EllipsisText } from 'components/Layout'
+import { SwapPrice } from './PriceEstimations'
 
 const Wrapper = styled.div`
   display: flex;
@@ -242,16 +241,13 @@ const Price: React.FC<Props> = ({
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <div>
-            <EllipsisText as="small" title={receiveToken.symbol}>
-              {receiveToken.symbol}
-            </EllipsisText>
-            <small>per</small>
-            <EllipsisText as="small" title={sellToken.symbol}>
-              {sellToken.symbol}
-            </EllipsisText>
-            <SwapIcon swap={swapPrices} />
-          </div>
+          <SwapPrice
+            baseToken={sellToken}
+            quoteToken={receiveToken}
+            isPriceInverted={true}
+            separator="per"
+            swapPrices={swapPrices}
+          />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
@@ -268,16 +264,13 @@ const Price: React.FC<Props> = ({
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <div>
-            <EllipsisText as="small" title={sellToken.symbol}>
-              {sellToken.symbol}
-            </EllipsisText>
-            <small>per</small>
-            <EllipsisText as="small" title={receiveToken.symbol}>
-              {receiveToken.symbol}
-            </EllipsisText>
-            <SwapIcon swap={swapPrices} />
-          </div>
+          <SwapPrice
+            baseToken={sellToken}
+            quoteToken={receiveToken}
+            isPriceInverted={false}
+            separator="per"
+            swapPrices={swapPrices}
+          />
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
       </PriceInputBox>

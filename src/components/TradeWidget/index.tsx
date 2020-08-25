@@ -500,7 +500,7 @@ function buildUrl(params: {
     expires,
   })
 
-  return `/trade/${encodeTokenSymbol(sellToken)}-${encodeTokenSymbol(buyToken)}?${searchQuery}`
+  return `/trade/${encodeTokenSymbol(buyToken)}-${encodeTokenSymbol(sellToken)}?${searchQuery}`
 }
 
 const TradeWidget: React.FC = () => {
@@ -543,7 +543,7 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
 
   const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
