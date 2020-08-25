@@ -20,7 +20,7 @@ function getNetworkCorrectStableCoinList(
   const map: Map<string, number> = new Map()
   stablecoinList.forEach(({ priority, addresses }) => {
     if (addresses[networkId] && addresses[networkId].length) {
-      addresses[networkId].forEach<string[]>((address: string) => map.set(address, priority))
+      addresses[networkId].forEach<string[]>((address: string) => map.set(address.toLowerCase(), priority))
     }
   })
 
@@ -34,20 +34,21 @@ export const useTokenList = ({
 }: UseTokenListParams): TokenDetails[] => {
   // sync get tokenList
   const unfilteredTokens = networkId === undefined ? EMPTY_ARRAY : getTokens(networkId)
-  const stablecoinMap = getNetworkCorrectStableCoinList(networkId, stablecoinList)
 
   const tokens = useMemo(() => {
     if (!excludeDeprecated) return unfilteredTokens
 
+    const stablecoinMap = getNetworkCorrectStableCoinList(networkId, stablecoinList)
     const filteredTokens = unfilteredTokens.filter((token) => !token.disabled)
+
     // no networkId or map is empty as network id returns no tokens
     if (!stablecoinMap?.size) return filteredTokens
 
     // check token list against map and set prio
     return filteredTokens.map<TokenDetails>((token) =>
-      Object.assign({}, token, { priority: stablecoinMap.get(token.address) }),
+      Object.assign({}, token, { priority: stablecoinMap.get(token.address.toLowerCase()) }),
     )
-  }, [stablecoinMap, excludeDeprecated, unfilteredTokens])
+  }, [excludeDeprecated, unfilteredTokens, networkId, stablecoinList])
 
   // force update with a new value each time
   const [, forceUpdate] = useSafeState({})
