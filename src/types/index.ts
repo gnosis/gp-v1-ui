@@ -28,6 +28,7 @@ export interface TokenDetails extends MinimalTokenDetails {
   image?: string
   disabled?: boolean
   override?: TokenOverride
+  priority?: number
 }
 
 export interface TokenBalanceDetails extends TokenDetails {
