@@ -29,11 +29,12 @@ export default ({ sellToken, buyToken }: HookProps): HookReturn => {
 
     const sellIsStable = quote.priority === 1 || quote.priority === 2
     const buyIsVolatile = !base.priority
+    const buyIsWeth = base.priority === 3
     const sellIsWeth = quote.priority === 3
 
     // Volatile/stable -> Always stable as quote
     // volatile/WETH -> WETH as quote token
-    if ((buyIsVolatile && sellIsStable) || (buyIsVolatile && sellIsWeth)) {
+    if ((sellIsStable || sellIsWeth) && (buyIsVolatile || buyIsWeth)) {
       base = sellToken
       quote = buyToken
     }
