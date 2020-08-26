@@ -206,7 +206,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
     }
 
     fetchApiData()
-  }, [baseToken, quoteToken, networkId, hops, setApiData, setError])
+  }, [baseToken, quoteToken, networkId, hops, batchId, setApiData, setError])
 
   if (error) return <OrderBookWrapper>{error.message}</OrderBookWrapper>
 
