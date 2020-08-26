@@ -12,6 +12,20 @@ export default {
     label: { control: 'text' },
     networkId: { control: { type: 'inline-radio', options: Object.values(Network).filter(Number.isInteger) } },
   },
+  decorators: [
+    (Story): JSX.Element => (
+      <div
+        onClick={(e): void => {
+          const target = e.target as HTMLAnchorElement
+          if (target.tagName !== 'A') return
+          e.preventDefault()
+          alert(`Link to ${target.href} clicked`)
+        }}
+      >
+        <Story />
+      </div>
+    ),
+  ],
 } as Meta
 
 const Template: Story<EtherscanLinkProps> = (args) => <EtherscanLink {...args} />
