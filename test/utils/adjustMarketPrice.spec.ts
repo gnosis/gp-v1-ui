@@ -25,6 +25,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: receiveToken,
       // USDT
       quoteToken: sellToken,
+      wasInverted: false,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -47,6 +48,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: receiveToken,
       // TUSD
       quoteToken: sellToken,
+      wasInverted: false,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -69,6 +71,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: sellToken,
       // USDT
       quoteToken: receiveToken,
+      wasInverted: true,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -91,6 +94,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: receiveToken,
       // USDT
       quoteToken: sellToken,
+      wasInverted: false,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -113,6 +117,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: sellToken,
       // USDT
       quoteToken: receiveToken,
+      wasInverted: true,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -135,6 +140,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: sellToken,
       // WETH
       quoteToken: receiveToken,
+      wasInverted: true,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -157,6 +163,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: receiveToken,
       // WETH
       quoteToken: sellToken,
+      wasInverted: false,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
@@ -179,6 +186,7 @@ describe('Check market and check base/quote token priorities', () => {
       baseToken: receiveToken,
       // FAKE
       quoteToken: sellToken,
+      wasInverted: false,
     }
 
     expect(adjustedMarket).toEqual(expectedData)
