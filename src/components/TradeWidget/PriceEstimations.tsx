@@ -247,10 +247,12 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
   return (
     <>
       <span>
-        <span>Best ask for</span>{' '}
-        <strong>
-          {amount} {displayTokenSymbolOrLink(quoteToken)}
-        </strong>
+        <span>Best ask</span>{' '}
+        {amount && (
+          <strong>
+            ({amount} {displayTokenSymbolOrLink(quoteToken)})
+          </strong>
+        )}
       </span>
       <button
         type="button"
