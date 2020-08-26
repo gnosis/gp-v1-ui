@@ -83,6 +83,7 @@ const OrderBook: React.FC = () => {
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
   const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())
+  const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
 
   const tokensLoaded = tokenList.length !== 0
   useEffect(() => {
@@ -128,9 +129,32 @@ const OrderBook: React.FC = () => {
             />
           </InputBox>
         </span>
+        <span>
+          <InputBox>
+            <label>BatchId</label>
+            <Input
+              value={batchId}
+              type="string"
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => {
+                const batchIdValue = e.target.value
+                if (batchIdValue && !isNaN(Number(batchIdValue))) {
+                  setBatchId(Number(batchIdValue))
+                } else {
+                  setBatchId(undefined)
+                }
+              }}
+            />
+          </InputBox>
+        </span>
       </OrderBookWrapper>
 
-      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} hops={+hops} />
+      <OrderBookWidget
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        networkId={networkIdOrDefault}
+        hops={+hops}
+        batchId={batchId}
+      />
     </OrderBookPage>
   )
 }

@@ -23,6 +23,7 @@ interface OrderBookProps {
   quoteToken: TokenDetails
   networkId: number
   hops?: number
+  batchId?: number
 }
 
 const Wrapper = styled.div`
@@ -230,6 +231,7 @@ const draw = (
   quoteToken: TokenDetails,
   networkId: number,
   hops?: number,
+  batchId?: number,
 ): am4charts.XYChart => {
   const baseTokenLabel = safeTokenName(baseToken)
   const quoteTokenLabel = safeTokenName(quoteToken)
@@ -244,6 +246,7 @@ const draw = (
     baseTokenId: baseToken.id,
     quoteTokenId: quoteToken.id,
     hops,
+    batchId,
     networkId,
   })
   chart.dataSource.adapter.add('parsedData', data => {
@@ -305,15 +308,15 @@ const draw = (
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken, networkId, hops } = props
+  const { baseToken, quoteToken, networkId, hops, batchId } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!mountPoint.current) return
-    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops)
+    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops, batchId)
 
     return (): void => chart.dispose()
-  }, [baseToken, quoteToken, networkId, hops])
+  }, [baseToken, quoteToken, networkId, hops, batchId])
 
   return (
     <Wrapper ref={mountPoint}>
