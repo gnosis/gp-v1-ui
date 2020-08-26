@@ -14,6 +14,7 @@ import InputBox from 'components/InputBox'
 const OrderBookPage = styled(ContentPage)`
   padding: 2.4rem 0rem;
   min-height: initial;
+  max-width: initial;
 `
 
 const OrderBookWrapper = styled.div`
