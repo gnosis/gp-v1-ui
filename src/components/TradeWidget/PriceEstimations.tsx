@@ -130,20 +130,20 @@ export const SwapPrice: React.FC<SwapPriceProps> = ({
   swapPrices,
   showOnlyQuoteToken = false,
 }) => {
-  const displayBaseToken = isPriceInverted ? quoteToken : baseToken
-  const displayQuoteToken = !isPriceInverted ? quoteToken : baseToken
+  const displayBaseToken = !isPriceInverted ? quoteToken : baseToken
+  const displayQuoteToken = isPriceInverted ? quoteToken : baseToken
   const displayBtName = displayTokenSymbolOrLink(displayBaseToken)
   const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
 
   return (
     <SwapPriceWrapper onClick={swapPrices}>
-      <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
       {!showOnlyQuoteToken && (
         <>
+          <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
           <div className="separator">{separator}</div>
-          <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
         </>
       )}
+      <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
       <SwapIcon />
     </SwapPriceWrapper>
   )

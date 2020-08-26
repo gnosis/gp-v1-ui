@@ -543,7 +543,7 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
 
   const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
