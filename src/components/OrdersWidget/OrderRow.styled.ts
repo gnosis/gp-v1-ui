@@ -48,8 +48,11 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
     }
   }
 
-  td[data-label='Order ID'] {
-    cursor: pointer;
+  td {
+    &[data-label='Order ID'],
+    &[data-label='Market'] {
+      cursor: pointer;
+    }
   }
 
   @media ${MEDIA.mobile} {

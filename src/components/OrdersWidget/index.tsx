@@ -392,7 +392,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
             {selectedTab === 'trades' ? (
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
-                  <InnerTradesWidget isTab trades={filteredTrades} onOrderIdClick={handleCompleteSearch} />
+                  <InnerTradesWidget isTab trades={filteredTrades} onCellClick={handleCompleteSearch} />
                 </CardWidgetWrapper>
               </div>
             ) : ordersCount > 0 ? (
@@ -438,7 +438,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           disabled={deleting}
                           isPendingOrder
                           transactionHash={order.txHash}
-                          onOrderIdClick={handleCompleteSearch}
+                          onCellClick={handleCompleteSearch}
                         />
                       ))}
                       {filteredAndSortedOrders.map((order) => (
@@ -451,7 +451,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id, selectedTab)}
                           pending={deleting && markedForDeletion.has(order.id)}
                           disabled={deleting}
-                          onOrderIdClick={handleCompleteSearch}
+                          onCellClick={handleCompleteSearch}
                         />
                       ))}
                     </tbody>
