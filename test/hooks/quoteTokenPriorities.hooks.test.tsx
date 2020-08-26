@@ -97,7 +97,11 @@ const expectedData = [
 ]
 
 const TestScrollComponent: React.FC<{}> = () => {
-  const tokenList = useTokenList({ networkId: 1, stablecoinList: mockStablecoinList, excludeDeprecated: true })
+  const tokenList = useTokenList({
+    networkId: 1,
+    quoteTokenPrioritiesList: mockStablecoinList,
+    excludeDeprecated: true,
+  })
 
   const [WETH, USDT, TUSD, USDC] = tokenList
   return (

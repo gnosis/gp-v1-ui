@@ -1,9 +1,11 @@
+import { Network } from 'types'
+
 export default [
   {
     // USD coins
     priority: 1,
     addresses: {
-      1: [
+      [Network.Mainnet]: [
         '0xdac17f958d2ee523a2206206994597c13d831ec7', // USDT
         '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', // USDC
         '0x6b175474e89094c44da98b954eedeac495271d0f', // DAI
@@ -20,7 +22,7 @@ export default [
         '0x9a48bd0ec040ea4f1d3147c025cd4076a2e71e3e', // USD++
       ],
       // Rinkeby
-      4: [
+      [Network.Rinkeby]: [
         '0xa9881E6459CA05d7D7C95374463928369cD7a90C', // USDT
         '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b', // USDC
         '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa', // DAI
@@ -35,7 +37,7 @@ export default [
     // non-USD stablecoins
     priority: 2,
     addresses: {
-      1: [
+      [Network.Mainnet]: [
         '0xdb25f211ab05b1c97d595516f45794528a807ad8', // EURS
         '0x2c537e5624e4af88a7ae4060c022609376c8d0eb', // TRYB
         '0xc9a2c4868f0f96faaa739b59934dc9cb304112ec', // GBP
@@ -44,18 +46,18 @@ export default [
         '0x1fc31488f28ac846588ffa201cde0669168471bd', // UAX
       ],
       // Rinkeby
-      4: [],
+      [Network.Rinkeby]: [],
     },
   },
   {
     // WETH
     priority: 3,
     addresses: {
-      1: [
+      [Network.Mainnet]: [
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
       ],
       // Rinkeby
-      4: [
+      [Network.Rinkeby]: [
         '0xc778417E063141139Fce010982780140Aa0cD5Ab', // WETH
       ],
     },
