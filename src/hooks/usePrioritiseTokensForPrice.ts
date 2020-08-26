@@ -10,39 +10,39 @@ interface HookReturn {
 
 interface HookProps {
   sellToken: TokenDetails
-  buyToken: TokenDetails
+  receiveToken: TokenDetails
 }
 
-export default ({ sellToken, buyToken }: HookProps): HookReturn => {
-  // baseToken = buyToken
+export default ({ sellToken, receiveToken }: HookProps): HookReturn => {
+  // baseToken = receiveToken
   // quoteToken = sellToken
   // baseToken/quoteToken
-  const [baseToken, setBaseToken] = useSafeState(buyToken)
+  const [baseToken, setBaseToken] = useSafeState(receiveToken)
   const [quoteToken, setQuoteToken] = useSafeState(sellToken)
 
   useEffect(() => {
     // use defaults if no tokens or both are volatile (non-priority) tokens
-    if (!sellToken || !buyToken || (!sellToken.priority && !buyToken.priority)) return
+    if (!sellToken || !receiveToken || (!sellToken.priority && !receiveToken.priority)) return
 
-    let base = buyToken
+    let base = receiveToken
     let quote = sellToken
 
-    const sellIsStable = quote.priority === 1 || quote.priority === 2
-    const buyIsVolatile = !base.priority
     const buyIsWeth = base.priority === 3
     const sellIsWeth = quote.priority === 3
+    const sellIsStable = quote.priority === 1 || quote.priority === 2
+    const buyIsVolatile = !base.priority
 
     // Volatile/stable -> Always stable as quote
     // volatile/WETH -> WETH as quote token
     if ((sellIsStable || sellIsWeth) && (buyIsVolatile || buyIsWeth)) {
       base = sellToken
-      quote = buyToken
+      quote = receiveToken
     }
     // stable/stable -> As user inputs, respecting base/quote system
     // volatile/volatile -> As user inputs
     setBaseToken(base)
     setQuoteToken(quote)
-  }, [baseToken, buyToken, sellToken, setBaseToken, setQuoteToken])
+  }, [baseToken, receiveToken, sellToken, setBaseToken, setQuoteToken])
 
   return {
     baseToken,
