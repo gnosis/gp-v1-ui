@@ -6,7 +6,7 @@ import { EtherscanLink, EtherscanLinkProps } from 'components/EtherscanLink'
 import { Network } from 'types'
 
 export default {
-  title: 'Example/EtherscanLink',
+  title: 'Mesa/EtherscanLink',
   component: EtherscanLink,
   argTypes: {
     label: { control: 'text' },
