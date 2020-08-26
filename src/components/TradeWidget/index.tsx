@@ -558,10 +558,6 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
-
-  const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
-
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
     [receiveInputId]: '',
@@ -587,6 +583,13 @@ const TradeWidget: React.FC = () => {
       defaultTokenSymbol: 'USDC',
     }),
   )
+
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
+  const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
+
+  // Hook checks tokens traded and follows new stablecoin/weth priority pricing model
+  // see https://github.com/gnosis/dex-react/issues/1273
+  const showInverted = usePrioritiseTokensForPrice({ receiveToken, sellToken, isInverse: priceShown === 'INVERSE' })
 
   useEffect(() => {
     //  when switching networks
@@ -956,8 +959,6 @@ const TradeWidget: React.FC = () => {
 
   const onConfirm = handleSubmit(onSubmit)
 
-  const { baseToken, quoteToken } = usePrioritiseTokensForPrice({ buyToken: receiveToken, sellToken })
-
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
@@ -996,18 +997,18 @@ const TradeWidget: React.FC = () => {
           <Price
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            sellToken={quoteToken}
-            receiveToken={baseToken}
+            sellToken={sellToken}
+            receiveToken={receiveToken}
             tabIndex={1}
             swapPrices={swapPrices}
             priceShown={priceShown}
           />
           <PriceEstimations
             networkId={networkIdOrDefault}
-            baseToken={baseToken}
-            quoteToken={quoteToken}
+            baseToken={receiveToken}
+            quoteToken={sellToken}
             amount={debouncedSellValue}
-            isPriceInverted={priceShown === 'INVERSE'}
+            isPriceInverted={showInverted}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
             swapPrices={swapPrices}
