@@ -3,19 +3,23 @@ import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
 import BigNumber from 'bignumber.js'
 
-import { TokenDetails, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
-
+// Hooks
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
-import { PRICE_ESTIMATION_PRECISION, MEDIA } from 'const'
+// Utils/Const
 import { displayTokenSymbolOrLink } from 'utils/display'
+import { PRICE_ESTIMATION_PRECISION, MEDIA } from 'const'
 
+// Types
+import { TokenDetails } from 'types'
+import { safeTokenName, invertPrice } from '@gnosis.pm/dex-js'
+
+// Components
 import Spinner from 'components/Spinner'
-
+import { EllipsisText } from 'components/Layout'
 import { TradeFormData } from 'components/TradeWidget'
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
-import { EllipsisText } from 'components/Layout'
 
 const Wrapper = styled.div`
   > div {
