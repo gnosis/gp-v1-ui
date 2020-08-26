@@ -64,6 +64,7 @@ const OrderBookWrapper = styled.div`
 
     input {
       padding: 0 1rem;
+      max-width: 8em;
     }
 
     label {
@@ -135,7 +136,8 @@ const OrderBook: React.FC = () => {
             <label>BatchId</label>
             <Input
               value={batchId}
-              type="string"
+              type="number"
+              min="0"
               onChange={(e: ChangeEvent<HTMLInputElement>): void => {
                 const batchIdValue = e.target.value
                 if (batchIdValue && !isNaN(Number(batchIdValue))) {
