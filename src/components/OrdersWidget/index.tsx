@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback, useEffect, useRef } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
@@ -326,6 +326,16 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     [handleSearchingOrders, handleSearchingPendingOrders, handleTradesSearch],
   )
 
+  const filterInputRef = useRef<HTMLInputElement>(null)
+  const focusFilterInput: () => void | undefined = () => filterInputRef?.current?.focus()
+  const handleCellClickAndFilterFocus = useCallback(
+    (e): void => {
+      focusFilterInput && focusFilterInput()
+      handleCompleteSearch(e)
+    },
+    [handleCompleteSearch],
+  )
+
   const { tabSpecificResultName, tabSpecificDataLength } = useMemo(
     () => ({
       tabSpecificResultName: selectedTab === 'trades' ? 'trades' : 'orders',
@@ -357,6 +367,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
+              customRef={filterInputRef}
               className="widgetFilterTools"
               resultName={tabSpecificResultName}
               searchValue={search}
@@ -392,7 +403,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
             {selectedTab === 'trades' ? (
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
-                  <InnerTradesWidget isTab trades={filteredTrades} onCellClick={handleCompleteSearch} />
+                  <InnerTradesWidget isTab trades={filteredTrades} onCellClick={handleCellClickAndFilterFocus} />
                 </CardWidgetWrapper>
               </div>
             ) : ordersCount > 0 ? (
@@ -438,7 +449,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           disabled={deleting}
                           isPendingOrder
                           transactionHash={order.txHash}
-                          onCellClick={handleCompleteSearch}
+                          onCellClick={handleCellClickAndFilterFocus}
                         />
                       ))}
                       {filteredAndSortedOrders.map((order) => (
@@ -451,7 +462,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id, selectedTab)}
                           pending={deleting && markedForDeletion.has(order.id)}
                           disabled={deleting}
-                          onCellClick={handleCompleteSearch}
+                          onCellClick={handleCellClickAndFilterFocus}
                         />
                       ))}
                     </tbody>

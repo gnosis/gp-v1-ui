@@ -6,6 +6,7 @@ import FormMessage from './TradeWidget/FormMessage'
 import searchIcon from 'assets/img/search.svg'
 // Misc
 import { MEDIA } from 'const'
+import useSafeState from 'hooks/useSafeState'
 
 export const BalanceTools = styled.div<{ $css?: string | false }>`
   display: flex;
@@ -16,6 +17,31 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
   box-sizing: border-box;
   align-items: center;
   order: 0;
+
+  .focusAnimation {
+    animation-duration: 0.5s;
+    animation-name: focusAnimation;
+  }
+
+  @keyframes focusAnimation {
+    from {
+      background-color: var(--color-background-input);
+      color: var(--color-text-primary);
+      border-color: var(--color-button-primary);
+    }
+
+    50% {
+      background-color: var(--color-background-balance-button-hover);
+      color: var(--color-background-pageWrapper);
+      border-color: var(--color-button-primary);
+    }
+
+    to {
+      background-color: var(--color-background-input);
+      color: var(--color-text-primary);
+      border-color: var(--color-button-primary);
+    }
+  }
 
   ${FormMessage} {
     color: var(--color-text-primary);
@@ -119,6 +145,7 @@ interface Props {
   resultName?: string
   searchValue: string
   showFilter: boolean
+  customRef?: React.Ref<HTMLInputElement>
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
   clearFilters?: () => void
 }
@@ -131,30 +158,38 @@ const FilterTools: React.FC<Props> = ({
   resultName = 'results',
   searchValue,
   showFilter,
+  customRef,
   handleSearch,
   clearFilters,
-}) => (
-  <BalanceTools className={className} $css={customStyles}>
-    <label className="balances-searchTokens">
-      <input
-        placeholder="Search data by Order ID or token by Name, Symbol or Address"
-        type="text"
-        value={searchValue}
-        onChange={handleSearch}
-      />
-      {!!clearFilters && !!searchValue && (
-        <span className="filterClear" onClick={clearFilters}>
-          clear filters
-        </span>
-      )}
-      {showFilter && (
-        <FormMessage id="filterLabel">
-          Filter: Showing {dataLength} {dataLength === 1 ? 'result' : resultName}
-        </FormMessage>
-      )}
-    </label>
-    <>{children}</>
-  </BalanceTools>
-)
+}) => {
+  const [isFocused, setFocus] = useSafeState(false)
+  return (
+    <BalanceTools className={className} $css={customStyles}>
+      <label className="balances-searchTokens">
+        <input
+          className={isFocused ? 'focusAnimation' : ''}
+          ref={customRef}
+          placeholder="Search data by Order ID or token by Name, Symbol or Address"
+          type="text"
+          value={searchValue}
+          onChange={handleSearch}
+          onFocusCapture={(): void => setFocus(true)}
+          onBlur={(): void => setFocus(false)}
+        />
+        {!!clearFilters && !!searchValue && (
+          <span className="filterClear" onClick={clearFilters}>
+            clear filters
+          </span>
+        )}
+        {showFilter && (
+          <FormMessage id="filterLabel">
+            Filter: Showing {dataLength} {dataLength === 1 ? 'result' : resultName}
+          </FormMessage>
+        )}
+      </label>
+      <>{children}</>
+    </BalanceTools>
+  )
+}
 
 export default FilterTools
