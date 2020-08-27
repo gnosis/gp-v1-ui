@@ -963,13 +963,6 @@ const TradeWidget: React.FC = () => {
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
-          {/* TODO: remove before pushing */}
-          <small>
-            {receiveToken.symbol}/{sellToken.symbol} {wasPriorityAdjusted ? '[ADJUSTED]' : '[UNADJUSTED]'} ==&gt;{' '}
-            {baseToken.symbol}/{quoteToken.symbol}
-            <br />
-            PRICE SHOWING: [{priceShown}]
-          </small>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             autoFocus
