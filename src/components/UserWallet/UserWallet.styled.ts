@@ -56,7 +56,7 @@ const WalletButton = styled.button`
   font-size: 1.5rem;
   margin: 1.2rem 0;
   padding: 1rem 2rem;
-  width: calc(100% - 5rem);
+  width: calc(100% - 4rem);
   white-space: nowrap;
 `
 
@@ -72,6 +72,11 @@ export const EtherscanButton = styled(WalletButton)`
     > span {
       text-decoration: underline;
     }
+  }
+
+  &:hover {
+    color: var(--color-text-primary);
+    background: none;
   }
 `
 
@@ -193,10 +198,10 @@ export const UserWalletSlideWrapper = styled.div`
   background: inherit;
   left: 0;
   background: var(--color-background-pageWrapper);
-  width: 37rem;
+  width: 31rem;
   display: flex;
   border-radius: 0.6rem;
-  padding: 1.6rem;
+  padding: 2.6rem 1.6rem;
   box-sizing: border-box;
   z-index: 10;
   flex-flow: column wrap;
@@ -207,13 +212,11 @@ export const UserWalletSlideWrapper = styled.div`
   @media ${MEDIA.mobile} {
     width: 100%;
     position: fixed;
-    // left: 0;
-    // bottom: 0;
     top: 0;
     box-sizing: border-box;
     box-shadow: 0 90vh 0 100vw rgba(47, 62, 78, 0.5);
     border-radius: 1.2rem;
-    padding: 0 0 2.4rem;
+    padding: 0 0 3rem;
 
     > ${UserWalletItem} {
       // padding: 0 0 5rem 0;
@@ -267,21 +270,22 @@ export const WalletName = styled.div`
 `
 
 export const MonospaceAddress = styled.div`
+  cursor: pointer;
   margin: 0 0 1.6rem;
   font-family: var(--font-mono);
   font-size: 1.2rem;
   font-weight: var(--font-weight-normal);
   word-break: break-all;
   line-height: 1.4;
+  text-align: center;
+  width: 90%;
 
   @media ${MEDIA.mobile} {
     border: solid 0.1rem var(--color-background-banner);
     border-radius: 0.6rem 0.6rem 0 0;
     padding: 1rem;
     box-sizing: border-box;
-    width: 100%;
     width: calc(100% - 3.2rem);
-    text-align: center;
   }
 
   > b {

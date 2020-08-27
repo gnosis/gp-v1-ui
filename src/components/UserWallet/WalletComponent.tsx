@@ -103,7 +103,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       content = (
         <>
           <FontAwesomeIcon icon={faSignOutAlt} />
-          <strong> Log Out</strong>
+          <strong> Disconnect Wallet</strong>
         </>
       )
     } else {
@@ -167,7 +167,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
               ''
             )}
             {/* // Address and copy button */}
-            <MonospaceAddress>
+            <MonospaceAddress onClick={handleCopyToClipBoard}>
               <b>{userAddress && userAddress.substring(0, 6)}</b>
               {userAddress.substring(6, userAddress.length - 4)}
               <b>{userAddress.slice(-4)}</b>
