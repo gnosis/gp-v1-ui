@@ -16,7 +16,7 @@ const CardRowDrawer = styled.tr`
   left: 0;
   width: 100%;
   height: 100%;
-  border-radius: 0.6rem;
+  /* border-radius: 0.6rem; */
   background: var(--color-background-modali);
 
   // Inner td wrapper
@@ -25,7 +25,7 @@ const CardRowDrawer = styled.tr`
     z-index: 9999;
     background: var(--color-background-pageWrapper);
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.14);
-    border-radius: var(--border-radius);
+    /* border-radius: var(--border-radius); */
     margin: 0;
     width: 50rem;
     height: 50rem;
@@ -188,7 +188,7 @@ export const CardTable = styled.table<{
   display: grid;
   flex: 1;
   width: 100%;
-  padding-bottom: 2rem;
+  // padding-bottom: 2rem;
 
   .checked {
     margin: 0;
@@ -269,7 +269,7 @@ export const CardTable = styled.table<{
       th {
         color: inherit;
         line-height: 1.2;
-        height: 4rem;
+        // height: 4rem;
 
         &.sortable {
           cursor: pointer;
@@ -292,7 +292,8 @@ export const CardTable = styled.table<{
     font-weight: var(--font-weight-regular);
     color: var(--color-text-primary);
     
-    letter-spacing: -0.085rem;
+    // letter-spacing: -0.085rem;
+    letter-spacing: 0;
     line-height: 1.2;
 
     tr:not(.cardRowDrawer) {
@@ -334,10 +335,8 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
-
   width: 100%;
   margin: 0 auto;
-
   border-radius: 0.6rem;
   font-size: 1.6rem;
   line-height: 1;
@@ -386,8 +385,9 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
 
       tr:not(.cardRowDrawer) {
         &:last-child {
-          border-bottom: 0.1rem solid rgba(159, 180, 201, 0.5);
-          border-radius: var(--border-radius);
+          /* border-bottom: 0.1rem solid rgba(159, 180, 201, 0.5); */
+          /* border-radius: var(--border-radius); */
+          border-bottom: 0;
         }
 
         td {

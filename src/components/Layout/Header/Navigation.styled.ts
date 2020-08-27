@@ -4,17 +4,18 @@ import { MEDIA } from 'const'
 export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolean }>`
   display: flex;
   order: 1;
-  flex: 1 1 100%;
   margin: auto;
   align-items: center;
-  justify-content: center;
+  flex: 1 1 auto;
+  justify-content: flex-start;
 
   @media ${MEDIA.mobile} {
     flex-flow: row wrap;
     background: #dde4ed;
     border-radius: 15rem;
     width: 100%;
-    margin: 0 auto;
+    margin: 2.4rem auto 0;
+    order: 3;
     justify-content: space-between;
   }
 
@@ -26,13 +27,16 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
     text-decoration: none;
     transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
     font-weight: var(--font-weight-bold);
-    font-size: 2.1rem;
-    padding: 0 4rem;
+    /* font-size: 2.1rem; */
+    /* padding: 0 4rem; */
     border-radius: 15rem;
     letter-spacing: 0;
     text-align: center;
     box-sizing: border-box;
-    height: 5.4rem;
+    /* height: 5.4rem; */
+    height: 4.2rem;
+    font-size: 1.8rem;
+    padding: 0 2.4rem;
     line-height: 1;
     display: flex;
     justify-content: center;
@@ -42,9 +46,8 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
       color: rgba(78, 106, 133, 0.75);
       margin: 0;
       padding: 0;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       width: 100%;
-      height: 4rem;
     }
 
     &:hover {
@@ -66,7 +69,8 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
 export const OrderedNavLinkDiv = styled.span`
   display: flex;
   align-items: center;
-  flex: 1 1 auto;
+  /* flex: 1 1 auto; */
+  flex: 0;
 
   // Hide 'ORDERS' tab on desktop/tablet (until we decide to show it for all devices...)
   &:nth-of-type(3) {
@@ -82,7 +86,8 @@ export const OrderedNavLinkDiv = styled.span`
   }
 
   &:not(:last-of-type) {
-    margin: 0 1.6rem 0 0;
+    /* margin: 0 1.6rem 0 0; */
+    margin: 0;
     @media ${MEDIA.mobile} {
       margin: 0;
     }

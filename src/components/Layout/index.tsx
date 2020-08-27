@@ -15,9 +15,9 @@ import LegalBanner from 'components/LegalBanner'
 export const EllipsisText = styled.div<{ $maxWidth?: string }>`
   font-size: inherit;
   max-width: ${({ $maxWidth = '6ch' }): string => $maxWidth};
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
+  /* text-overflow: ellipsis;
+  overflow: hidden; */
+  /* white-space: nowrap; */
 `
 
 const Wrapper = styled.div`
@@ -27,8 +27,10 @@ const Wrapper = styled.div`
   flex-flow: column wrap;
 
   main {
-    flex: 0 1 auto;
-    margin: 2.4rem auto 5rem;
+    /* flex: 0 1 auto; */
+    /* margin: 2.4rem auto 5rem; */
+    flex: 1 1 auto;
+    margin: 0 2.4rem;
     width: auto;
     display: flex;
     flex-flow: row wrap;

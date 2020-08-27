@@ -20,14 +20,18 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
   ${FormMessage} {
     color: var(--color-text-primary);
     background: var(--color-background-validation-warning);
-    font-size: x-small;
+    /* font-size: x-small; */
+    font-size: small;
     margin: 0;
-    position: absolute;
+    /* position: absolute;
     bottom: 0;
-    left: 0;
+    left: 0; */
     width: max-content;
-    padding: 0.1rem 1.6rem 0.1rem 0.5rem;
-    border-radius: 0 1.6rem 0rem 0rem;
+    /* padding: 0.1rem 1.6rem 0.1rem 0.5rem; */
+    padding: 1.3rem 1.6rem;
+    box-sizing: border-box;
+    /* border-radius: 0 1.6rem 0rem 0rem; */
+    border-radius: 0;
   }
 
   // label + search input
@@ -35,8 +39,9 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
     position: relative;
     display: flex;
     width: 100%;
-    height: 4rem;
-    margin: 1.2rem;
+    height: 100%;
+    /* margin: 1.2rem; */
+    margin: 0;
 
     @media ${MEDIA.mobile} {
       height: 4.6rem;
@@ -55,10 +60,11 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
     > input {
       margin: 0;
       max-width: 100%;
-      background: var(--color-background-input) url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
+      background: url(${searchIcon}) no-repeat left 1.6rem center/1.6rem;
       border-radius: 0.6rem 0.6rem 0 0;
       border: 0;
       font-size: 1.4rem;
+      min-height: 5.2rem;
       line-height: 1;
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;

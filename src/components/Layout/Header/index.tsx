@@ -37,14 +37,20 @@ const TopWrapper = styled.div`
 
   @media ${MEDIA.mobile} {
     justify-content: space-between;
+    flex-flow: row wrap;
   }
 `
 
 const CountDownStyled = styled.div`
   display: flex;
   flex-flow: column;
-  order 2;
-  min-width: 15rem;
+  /* order 2; */
+  order: 1;
+  
+    @media ${MEDIA.mobile} {
+      order: 2;
+      padding: 1.2rem 0 0;
+    }
 
  > div {
   display: flex;
@@ -53,14 +59,14 @@ const CountDownStyled = styled.div`
   color: var(--color-text-primary);
   min-width: 16rem;
   letter-spacing: 0;
-  margin: 0.5rem 0;
+  margin: 0.3rem 0;
   align-items: baseline;
 
-  @media ${MEDIA.mobile} {
+  /* @media ${MEDIA.mobile} {
     flex-flow: row wrap;
     line-height: 1.2;
     width: auto;
-  }
+  } */
 
   > strong {
     color: var(--color-text-active);
@@ -114,18 +120,18 @@ const Header: React.FC<HeaderProps> = ({ navigation: initialState }: HeaderProps
           {CONFIG.name}
         </NavLink> */}
         <TopWrapper>
+          {/* HEADER LINKS */}
+          <NavigationLinks
+            navigation={navigationArray}
+            responsive={isResponsive}
+            handleOpenNav={handleOpenNav}
+            showNav={openNav}
+          />
           {/* USER WALLET */}
           <UserWallet />
           {/* Global Batch Countdown */}
           <BatchCountDown />
         </TopWrapper>
-        {/* HEADER LINKS */}
-        <NavigationLinks
-          navigation={navigationArray}
-          responsive={isResponsive}
-          handleOpenNav={handleOpenNav}
-          showNav={openNav}
-        />
       </nav>
     </HeaderWrapper>
   )

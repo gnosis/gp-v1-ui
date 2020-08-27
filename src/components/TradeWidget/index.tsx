@@ -87,7 +87,7 @@ export const WrappedWidget = styled(Widget)`
   min-width: 0;
   margin: 0 auto;
   width: auto;
-  flex-flow: row nowrap;
+  flex-flow: column wrap;
   display: flex;
   background: var(--color-background-pageWrapper);
   border-radius: 0.6rem;
@@ -122,12 +122,15 @@ export const WrappedWidget = styled(Widget)`
 const WrappedForm = styled.form`
   display: flex;
   flex-flow: column nowrap;
-  flex: 1 0 42rem;
+  /* flex: 1 0 42rem; */
+  flex: 1 1 auto;
   max-width: 50rem;
-  padding: 1.6rem;
+  width: 100%;
   box-sizing: border-box;
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
   opacity: 1;
+  padding: 1.6rem 1.6rem 3.2rem;
+  box-sizing: border-box;
 
   .react-select__control:focus-within,
   input[type='checkbox']:focus,
@@ -136,9 +139,10 @@ const WrappedForm = styled.form`
   }
 
   @media ${MEDIA.tablet} {
-    max-width: initial;
+    /* max-width: initial;
     flex: 1 1 50%;
-    padding: 1.6rem 1.6rem 3.2rem;
+    padding: 1.6rem 1.6rem 3.2rem; */
+    max-width: 40rem;
   }
 
   @media ${MEDIA.mobile} {
@@ -243,6 +247,25 @@ const SubmitButton = styled.button`
   }
 `
 
+const TradeParentWrapper = styled.div`
+  display: flex;
+  width: 100%;
+
+  @media ${MEDIA.mobile} {
+    flex-flow: column wrap;
+  }
+`
+
+const OrderBookPlaceholder = styled.div`
+  display: flex;
+  width: 100%;
+  border-left: 0.1rem solid var(--color-background-banner);
+
+  @media ${MEDIA.mobile} {
+    border: 0;
+  }
+`
+
 export const ExpandableOrdersPanel = styled.div`
   overflow: hidden;
   display: flex;
@@ -251,7 +274,7 @@ export const ExpandableOrdersPanel = styled.div`
   min-width: 50vw;
   max-width: 100%;
   background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
-  border-radius: 0 0.6rem 0.6rem 0;
+  border-radius: 0 0 0.6rem .6rem;
   box-sizing: border-box;
   transition: flex 0.2s ease-in-out;
   align-items: flex-start;
@@ -260,7 +283,6 @@ export const ExpandableOrdersPanel = styled.div`
   @media ${MEDIA.tablet} {
     flex: 1 1 50%;
     min-width: initial;
-    border-radius: 0;
   }
 
   // Connect Wallet banner in the orders panel
@@ -271,8 +293,9 @@ export const ExpandableOrdersPanel = styled.div`
 
   // Orders widget when inside the ExpandableOrdersPanel
   ${OrdersWrapper} {
-    width: calc(100% - 1.6rem);
-    height: 90%;
+    /* width: calc(100% - 1.6rem); */
+    width: 100%;
+    height: auto;
     background: transparent;
     box-shadow: none;
     border-radius: 0;
@@ -288,22 +311,23 @@ export const ExpandableOrdersPanel = styled.div`
     // Search Filter
     .widgetFilterTools {
       > .balances-searchTokens {
-        height: 3.6rem;
-        margin: 0.8rem;
+        /* height: 3.6rem;
+        margin: 0.8rem; */
+        height: 100%;
       }
     }
 
     .widgetCardWrapper {
       thead,
       tbody {
-        font-size: 1.1rem;
+        /* font-size: 1.1rem; */
 
         > tr {
-          padding: 0 1.4rem;
+          /* padding: 0 1.4rem; */
 
-          @media ${MEDIA.mobile} {
+          /* @media ${MEDIA.mobile} {
             padding: 1.4rem;
-          }
+          } */
         }
       }
     }
@@ -341,11 +365,11 @@ export const ExpandableOrdersPanel = styled.div`
       }
     }
 
-    @media ${MEDIA.tablet} {
+    /* @media ${MEDIA.tablet} {
       width: 100%;
       border-radius: 0;
       margin: 2.4rem auto 0;
-    }
+    } */
 
     @media ${MEDIA.mobile} {
       display: none;
@@ -610,7 +634,8 @@ const TradeWidget: React.FC = () => {
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
 
-  const [ordersVisible, setOrdersVisible] = useState(true)
+  // const [ordersVisible, setOrdersVisible] = useState(true)
+  const [ordersVisible] = useState(true)
 
   const methods = useForm<TradeFormData>({
     mode: 'onChange',
@@ -960,100 +985,102 @@ const TradeWidget: React.FC = () => {
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
-        <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
-          {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
-          <TokenRow
-            autoFocus
-            selectedToken={sellToken}
-            tokens={tokens}
-            balance={sellTokenBalance}
-            selectLabel="Sell"
-            onSelectChange={onSelectChangeSellToken}
-            inputId={sellInputId}
-            isDisabled={isSubmitting}
-            validateMaxAmount
-            tabIndex={1}
-            readOnly={false}
-            userConnected={!!(userAddress && networkId)}
-          />
-          <IconWrapper onClick={swapTokens}>
-            <SwitcherSVG />
-          </IconWrapper>
-          <TokenRow
-            selectedToken={receiveTokenBalance}
-            tokens={tokens}
-            balance={receiveTokenBalance}
-            selectLabel="Receive at least"
-            onSelectChange={onSelectChangeReceiveToken}
-            inputId={receiveInputId}
-            isDisabled={isSubmitting}
-            tabIndex={1}
-            readOnly
-          />
-          <Price
-            priceInputId={priceInputId}
-            priceInverseInputId={priceInverseInputId}
-            sellToken={sellToken}
-            receiveToken={receiveToken}
-            tabIndex={1}
-            swapPrices={swapPrices}
-            priceShown={priceShown}
-          />
-          <PriceEstimations
-            networkId={networkIdOrDefault}
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            amount={debouncedSellValue}
-            isPriceInverted={priceShown === 'INVERSE'}
-            priceInputId={priceInputId}
-            priceInverseInputId={priceInverseInputId}
-            swapPrices={swapPrices}
-          />
-          <OrderValidity
-            validFromInputId={validFromId}
-            validUntilInputId={validUntilId}
-            isDisabled={isSubmitting}
-            isAsap={asap}
-            isUnlimited={unlimited}
-            setAsap={setAsap}
-            setUnlimited={setUnlimited}
-            tabIndex={1}
-          />
-          <p>This order might be partially filled.</p>
-          <ButtonWrapper
-            onConfirm={onConfirm}
-            message={(): React.ReactNode => (
-              <ConfirmationModalWrapper>
-                <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
-              </ConfirmationModalWrapper>
-            )}
-          >
-            <SubmitButton
-              data-text="This order might be partially filled."
-              type="submit"
-              disabled={isSubmitting}
+        <TradeParentWrapper>
+          <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
+            {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
+            <TokenRow
+              autoFocus
+              selectedToken={sellToken}
+              tokens={tokens}
+              balance={sellTokenBalance}
+              selectLabel="Sell"
+              onSelectChange={onSelectChangeSellToken}
+              inputId={sellInputId}
+              isDisabled={isSubmitting}
+              validateMaxAmount
               tabIndex={1}
-              onClick={(e): void => {
-                // don't show Submit Confirm modal for invalid form
-                if (!formState.isValid) e.stopPropagation()
-              }}
+              readOnly={false}
+              userConnected={!!(userAddress && networkId)}
+            />
+            <IconWrapper onClick={swapTokens}>
+              <SwitcherSVG />
+            </IconWrapper>
+            <TokenRow
+              selectedToken={receiveTokenBalance}
+              tokens={tokens}
+              balance={receiveTokenBalance}
+              selectLabel="Receive at least"
+              onSelectChange={onSelectChangeReceiveToken}
+              inputId={receiveInputId}
+              isDisabled={isSubmitting}
+              tabIndex={1}
+              readOnly
+            />
+            <Price
+              priceInputId={priceInputId}
+              priceInverseInputId={priceInverseInputId}
+              sellToken={sellToken}
+              receiveToken={receiveToken}
+              tabIndex={1}
+              swapPrices={swapPrices}
+              priceShown={priceShown}
+            />
+            <PriceEstimations
+              networkId={networkIdOrDefault}
+              baseToken={receiveToken}
+              quoteToken={sellToken}
+              amount={debouncedSellValue}
+              isPriceInverted={priceShown === 'INVERSE'}
+              priceInputId={priceInputId}
+              priceInverseInputId={priceInverseInputId}
+              swapPrices={swapPrices}
+            />
+            <OrderValidity
+              validFromInputId={validFromId}
+              validUntilInputId={validUntilId}
+              isDisabled={isSubmitting}
+              isAsap={asap}
+              isUnlimited={unlimited}
+              setAsap={setAsap}
+              setUnlimited={setUnlimited}
+              tabIndex={1}
+            />
+            <p>This order might be partially filled.</p>
+            <ButtonWrapper
+              onConfirm={onConfirm}
+              message={(): React.ReactNode => (
+                <ConfirmationModalWrapper>
+                  <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
+                </ConfirmationModalWrapper>
+              )}
             >
-              {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
-              {sameToken ? 'Please select different tokens' : 'Submit limit order'}
-            </SubmitButton>
-          </ButtonWrapper>
-        </WrappedForm>
+              <SubmitButton
+                data-text="This order might be partially filled."
+                type="submit"
+                disabled={isSubmitting}
+                tabIndex={1}
+                onClick={(e): void => {
+                  // don't show Submit Confirm modal for invalid form
+                  if (!formState.isValid) e.stopPropagation()
+                }}
+              >
+                {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
+                {sameToken ? 'Please select different tokens' : 'Submit limit order'}
+              </SubmitButton>
+            </ButtonWrapper>
+          </WrappedForm>
+          <OrderBookPlaceholder>-Add the order book component here -</OrderBookPlaceholder>
+        </TradeParentWrapper>
       </FormContext>
       <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <OrdersToggler
+        {/* <OrdersToggler
           type="button"
           onClick={(): void => setOrdersVisible((ordersVisible) => !ordersVisible)}
           $isOpen={ordersVisible}
-        />
+        /> */}
         {/* Actual orders content */}
         <div className="innerWidgetContainer">
-          <h5>Your orders</h5>
           <OrdersWidget displayOnly="regular" />
         </div>
       </ExpandableOrdersPanel>

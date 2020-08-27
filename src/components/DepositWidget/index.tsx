@@ -42,7 +42,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
   height: 100%;
 
   > .filterToolsBar {
-    height: 10%;
+    min-height: 5.2rem;
   }
 
   > ${CardTable} {
@@ -54,7 +54,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
       font-size: 1.3rem;
 
       > tr:not(.cardRowDrawer) {
-        min-height: 6.3rem;
+        /* min-height: 6.3rem; */
         > td,
         > th {
           justify-content: flex-end;
@@ -63,11 +63,11 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
       }
     }
 
-    > thead {
+    /* > thead {
       > tr:not(.cardRowDrawer) {
         padding: 0.8rem 3rem;
       }
-    }
+    } */
 
     > tbody {
       overflow-y: auto;
@@ -83,9 +83,9 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
 
             > div {
               word-break: break-word;
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              /* white-space: nowrap; */
+              /* overflow: hidden;
+              text-overflow: ellipsis; */
 
               > strong {
                 display: flex;

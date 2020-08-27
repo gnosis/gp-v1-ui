@@ -14,7 +14,7 @@ import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'ut
 
 // components
 import OrdersWidget from 'components/OrdersWidget'
-import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
+import { ExpandableOrdersPanel } from 'components/TradeWidget'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
@@ -147,7 +147,7 @@ const PoolingInterface: React.FC = () => {
   const [txReceipt, setTxReceipt] = useSafeState<Receipt | undefined>(undefined)
   const [txError, setTxError] = useSafeState(undefined)
 
-  const [ordersVisible, setOrdersVisible] = useSafeState(true)
+  const [ordersVisible] = useSafeState(true)
 
   const { networkId, networkIdOrDefault, userAddress } = useWalletConnection()
   // Get all the tokens for the current network
@@ -330,11 +330,11 @@ const PoolingInterface: React.FC = () => {
       </FormContext>
       <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
-        <OrdersToggler
+        {/* <OrdersToggler
           type="button"
           onClick={(): void => setOrdersVisible((ordersVisible) => !ordersVisible)}
           $isOpen={ordersVisible}
-        />
+        /> */}
         {/* Actual orders content */}
         <OrdersWidget displayOnly="liquidity" />
       </ExpandableOrdersPanel>

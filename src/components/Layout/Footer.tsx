@@ -32,7 +32,7 @@ const Wrapper = styled.footer`
   line-height: 1;
 
   width: 100%;
-  margin: 0 0 4rem 0;
+  margin: 4rem 0;
   padding: 0 2rem;
 
   @media ${MEDIA.mobile} {

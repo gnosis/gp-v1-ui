@@ -1,4 +1,5 @@
 import React, { useMemo, useCallback, useEffect } from 'react'
+import styled from 'styled-components'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
@@ -33,6 +34,9 @@ import FilterTools from 'components/FilterTools'
 import { useDeleteOrders } from 'components/OrdersWidget/useDeleteOrders'
 import OrderRow from 'components/OrdersWidget/OrderRow'
 import { OrdersWrapper, ButtonWithIcon, OrdersForm } from 'components/OrdersWidget/OrdersWidget.styled'
+
+// Misc
+import { MEDIA } from 'const'
 
 type OrderTabs = 'active' | 'closed' | 'trades'
 type FilteredOrdersStateKeys = Exclude<OrderTabs, 'trades'>
@@ -347,6 +351,15 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     classifiedOrders[selectedTab]?.orders?.length > 0 && markedForDeletion.size === displayedOrders.length
   )
 
+  const FilterToolsWrapper = styled.div`
+    display: flex;
+    width: 100%;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: column wrap;
+    }
+  `
+
   return (
     <OrdersWrapper>
       {!isConnected ? (
@@ -362,28 +375,30 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
       {(!noOrders || !noTrades) && networkId && (
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
-            <FilterTools
-              className="widgetFilterTools"
-              resultName={tabSpecificResultName}
-              searchValue={tabSpecficSearch}
-              handleSearch={handleTabSpecificSearch}
-              showFilter={!!tabSpecficSearch}
-              dataLength={tabSpecificDataLength}
-            >
-              {selectedTab !== 'trades' && (
-                <label className="checked">
-                  <small>Cancel All Orders:</small>
-                  <input
-                    type="checkbox"
-                    onChange={toggleSelectAll}
-                    checked={markedForDeletionChecked}
-                    disabled={deleting}
-                  />
-                </label>
-              )}
-            </FilterTools>
-            {/* ORDERS TABS: ACTIVE/TRADES/CLOSED */}
-            <Tabs<OrderTabs> {...tabsProps} />
+            <FilterToolsWrapper>
+              <FilterTools
+                className="widgetFilterTools"
+                resultName={tabSpecificResultName}
+                searchValue={tabSpecficSearch}
+                handleSearch={handleTabSpecificSearch}
+                showFilter={!!tabSpecficSearch}
+                dataLength={tabSpecificDataLength}
+              >
+                {selectedTab !== 'trades' && (
+                  <label className="checked">
+                    <small>Cancel All Orders:</small>
+                    <input
+                      type="checkbox"
+                      onChange={toggleSelectAll}
+                      checked={markedForDeletionChecked}
+                      disabled={deleting}
+                    />
+                  </label>
+                )}
+              </FilterTools>
+              {/* ORDERS TABS: ACTIVE/TRADES/CLOSED */}
+              <Tabs<OrderTabs> {...tabsProps} />
+            </FilterToolsWrapper>
 
             {/* DELETE ORDERS ROW */}
             <div className="deleteContainer" data-disabled={markedForDeletion.size === 0 || deleting}>
@@ -405,7 +420,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
                   <CardTable
-                    $columns="3.2rem minmax(8.6rem, 0.3fr) repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(8.6rem, 0.3fr)"
+                    $columns="3.2rem minmax(8.6rem,0.3fr) repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(9rem,0.3fr)"
                     $gap="0 0.6rem"
                     $rowSeparation="0"
                   >

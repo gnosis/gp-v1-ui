@@ -43,7 +43,8 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
     flex-flow: column nowrap;
     padding: 2rem;
     min-width: 51.4rem;
-    max-width: 75rem;
+    /* max-width: 75rem; */
+    margin: 0 auto;
 
     > h2 {
       margin: 1rem auto 2.4rem;
@@ -60,7 +61,7 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
     > form {
       min-width: 100%;
       max-width: 100%;
-      padding: 2rem 4rem;
+      padding: 2rem 2.4rem;
     }
   }
 

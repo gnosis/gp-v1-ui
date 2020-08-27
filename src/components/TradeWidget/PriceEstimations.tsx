@@ -63,7 +63,8 @@ const Wrapper = styled.div`
     font-size: 1.25rem;
     align-items: center;
     line-height: 1.4;
-    padding: 0 0.8rem;
+    /* padding: 0 0.8rem; */
+    padding: 0;
 
     > div {
       display: flex;

@@ -69,7 +69,8 @@ const Wrapper = styled.div`
       background: transparent;
       align-items: center;
       flex-flow: row wrap;
-      padding: 0 0.8rem;
+      /* padding: 0 0.8rem; */
+      padding: 0 0.8rem 0 0;
 
       > b {
         color: #218dff;
