@@ -156,13 +156,14 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
 `
 
 interface Props {
-  sellToken: TokenDetails
-  receiveToken: TokenDetails
+  quoteToken: TokenDetails
+  baseToken: TokenDetails
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
   swapPrices: () => void
-  priceShown: 'INVERSE' | 'DIRECT'
+  isPriceInverted: boolean
+  wasPriorityAdjusted: boolean
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -176,13 +177,14 @@ export function invertPriceFromString(priceValue: string): string {
 }
 
 const Price: React.FC<Props> = ({
-  sellToken,
-  receiveToken,
+  wasPriorityAdjusted,
+  baseToken,
+  quoteToken,
   priceInputId,
   priceInverseInputId,
   tabIndex,
   swapPrices,
-  priceShown,
+  isPriceInverted,
 }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
@@ -225,10 +227,10 @@ const Price: React.FC<Props> = ({
   return (
     <Wrapper>
       <strong>
-        Limit Price <OrderBookBtn baseToken={receiveToken} quoteToken={sellToken} />
+        Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={priceShown !== 'DIRECT'}>
+      <PriceInputBox hidden={(isPriceInverted && wasPriorityAdjusted) || (!isPriceInverted && !wasPriorityAdjusted)}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -242,16 +244,16 @@ const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <SwapPrice
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            isPriceInverted={true}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
+            isPriceInverted={wasPriorityAdjusted}
             separator="per"
             swapPrices={swapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={priceShown !== 'INVERSE'}>
+      <PriceInputBox hidden={(!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)}>
         <label>
           <input
             name={priceInverseInputId}
@@ -265,9 +267,9 @@ const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <SwapPrice
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            isPriceInverted={false}
+            baseToken={quoteToken}
+            quoteToken={baseToken}
+            isPriceInverted={wasPriorityAdjusted}
             separator="per"
             swapPrices={swapPrices}
           />
