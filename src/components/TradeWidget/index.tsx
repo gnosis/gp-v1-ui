@@ -558,8 +558,7 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = trade.validFrom || validFromParam
   const defaultValidUntil = trade.validUntil || validUntilParam
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
-
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
   const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
   const defaultFormValues: TradeFormData = {
@@ -587,6 +586,8 @@ const TradeWidget: React.FC = () => {
       defaultTokenSymbol: 'USDC',
     }),
   )
+
+  const { baseToken, quoteToken, wasPriorityAdjusted } = usePrioritiseTokensForPrice({ receiveToken, sellToken })
 
   useEffect(() => {
     //  when switching networks
@@ -956,14 +957,19 @@ const TradeWidget: React.FC = () => {
 
   const onConfirm = handleSubmit(onSubmit)
 
-  const { baseToken, quoteToken } = usePrioritiseTokensForPrice({ buyToken: receiveToken, sellToken })
-
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
+          {/* TODO: remove before pushing */}
+          <small>
+            {receiveToken.symbol}/{sellToken.symbol} {wasPriorityAdjusted ? '[ADJUSTED]' : '[UNADJUSTED]'} ==&gt;{' '}
+            {baseToken.symbol}/{quoteToken.symbol}
+            <br />
+            PRICE SHOWING: [{priceShown}]
+          </small>
           {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
           <TokenRow
             autoFocus
@@ -996,21 +1002,26 @@ const TradeWidget: React.FC = () => {
           <Price
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            sellToken={quoteToken}
-            receiveToken={baseToken}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
             tabIndex={1}
             swapPrices={swapPrices}
-            priceShown={priceShown}
+            isPriceInverted={priceShown === 'INVERSE'}
+            wasPriorityAdjusted
           />
           <PriceEstimations
             networkId={networkIdOrDefault}
             baseToken={baseToken}
             quoteToken={quoteToken}
+            // need reference to this always
+            // as quoteToken/baseToken can be changed
+            sellToken={sellToken}
             amount={debouncedSellValue}
-            isPriceInverted={priceShown === 'INVERSE'}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
             swapPrices={swapPrices}
+            isPriceInverted={priceShown === 'INVERSE'}
+            wasPriorityAdjusted
           />
           <OrderValidity
             validFromInputId={validFromId}
