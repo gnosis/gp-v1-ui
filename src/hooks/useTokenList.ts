@@ -3,22 +3,22 @@ import { TokenDetails } from 'types'
 import useSafeState from './useSafeState'
 import { getTokens, subscribeToTokenList } from 'services'
 import { EMPTY_ARRAY } from 'const'
-import stablecoins from 'data/stablecoinList'
+import quoteTokenPriorities from 'data/quoteTokenPriorities'
 
 export interface UseTokenListParams {
   networkId?: number
   excludeDeprecated?: boolean
-  stablecoinList?: typeof stablecoins
+  quoteTokenPrioritiesList?: typeof quoteTokenPriorities
 }
 
 function getNetworkCorrectStableCoinList(
   networkId: number | undefined,
-  stablecoinList: typeof stablecoins,
+  quoteTokenPrioritiesList: typeof quoteTokenPriorities,
 ): Map<string, number> | null {
   if (!networkId) return null
 
   const map: Map<string, number> = new Map()
-  stablecoinList.forEach(({ priority, addresses }) => {
+  quoteTokenPrioritiesList.forEach(({ priority, addresses }) => {
     if (addresses[networkId] && addresses[networkId].length) {
       addresses[networkId].forEach<string[]>((address: string) => map.set(address.toLowerCase(), priority))
     }
@@ -29,7 +29,7 @@ function getNetworkCorrectStableCoinList(
 
 export const useTokenList = ({
   networkId,
-  stablecoinList = stablecoins,
+  quoteTokenPrioritiesList = quoteTokenPriorities,
   excludeDeprecated,
 }: UseTokenListParams): TokenDetails[] => {
   // sync get tokenList
@@ -38,7 +38,7 @@ export const useTokenList = ({
   const tokens = useMemo(() => {
     if (!excludeDeprecated) return unfilteredTokens
 
-    const stablecoinMap = getNetworkCorrectStableCoinList(networkId, stablecoinList)
+    const stablecoinMap = getNetworkCorrectStableCoinList(networkId, quoteTokenPrioritiesList)
     const filteredTokens = unfilteredTokens.filter((token) => !token.disabled)
 
     // no networkId or map is empty as network id returns no tokens
@@ -48,7 +48,7 @@ export const useTokenList = ({
     return filteredTokens.map<TokenDetails>((token) =>
       Object.assign({}, token, { priority: stablecoinMap.get(token.address.toLowerCase()) }),
     )
-  }, [excludeDeprecated, unfilteredTokens, networkId, stablecoinList])
+  }, [excludeDeprecated, unfilteredTokens, networkId, quoteTokenPrioritiesList])
 
   // force update with a new value each time
   const [, forceUpdate] = useSafeState({})

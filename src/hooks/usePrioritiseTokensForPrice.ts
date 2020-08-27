@@ -6,7 +6,7 @@ import { TokenDetails } from 'types'
 interface HookReturn {
   baseToken: TokenDetails
   quoteToken: TokenDetails
-  wasInverted: boolean
+  wasPriorityAdjusted: boolean
 }
 
 interface HookProps {
@@ -17,13 +17,13 @@ interface HookProps {
 interface SmartTokenStruct {
   baseToken: TokenDetails
   quoteToken: TokenDetails
-  wasInverted: boolean
+  wasPriorityAdjusted: boolean
 }
 
 export function checkMarketAndSmartAdjust({ sellToken, receiveToken }: HookProps): SmartTokenStruct {
   let baseToken = receiveToken
   let quoteToken = sellToken
-  let wasInverted = false
+  let wasPriorityAdjusted = false
 
   // Prio: 1    - STABLE USD
   // Prio: 2    - STABLE EUR
@@ -36,13 +36,13 @@ export function checkMarketAndSmartAdjust({ sellToken, receiveToken }: HookProps
   if (basePrio < quotePrio) {
     baseToken = sellToken
     quoteToken = receiveToken
-    wasInverted = true
+    wasPriorityAdjusted = true
   }
 
   return {
     baseToken,
     quoteToken,
-    wasInverted,
+    wasPriorityAdjusted,
   }
 }
 
@@ -52,19 +52,19 @@ export default ({ sellToken, receiveToken }: HookProps): HookReturn => {
   // baseToken/quoteToken
   const [baseToken, setBaseToken] = useSafeState(receiveToken)
   const [quoteToken, setQuoteToken] = useSafeState(sellToken)
-  const [wasInverted, setWasInverted] = useSafeState(false)
+  const [wasPriorityAdjusted, setWasInverted] = useSafeState(false)
 
   useEffect(() => {
-    const { baseToken, quoteToken, wasInverted } = checkMarketAndSmartAdjust({ sellToken, receiveToken })
+    const { baseToken, quoteToken, wasPriorityAdjusted } = checkMarketAndSmartAdjust({ sellToken, receiveToken })
 
     setBaseToken(baseToken)
     setQuoteToken(quoteToken)
-    setWasInverted(wasInverted)
+    setWasInverted(wasPriorityAdjusted)
   }, [baseToken, quoteToken, receiveToken, sellToken, setBaseToken, setQuoteToken, setWasInverted])
 
   return {
     baseToken,
     quoteToken,
-    wasInverted,
+    wasPriorityAdjusted,
   }
 }
