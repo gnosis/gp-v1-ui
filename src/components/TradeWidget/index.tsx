@@ -1007,7 +1007,7 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
             swapPrices={swapPrices}
             isPriceInverted={priceShown === 'INVERSE'}
-            wasPriorityAdjusted
+            wasPriorityAdjusted={wasPriorityAdjusted}
           />
           <PriceEstimations
             networkId={networkIdOrDefault}
@@ -1021,7 +1021,7 @@ const TradeWidget: React.FC = () => {
             priceInverseInputId={priceInverseInputId}
             swapPrices={swapPrices}
             isPriceInverted={priceShown === 'INVERSE'}
-            wasPriorityAdjusted
+            wasPriorityAdjusted={wasPriorityAdjusted}
           />
           <OrderValidity
             validFromInputId={validFromId}
