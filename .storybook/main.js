@@ -7,11 +7,11 @@ const custom = require("../webpack.config.js")();
 const customPlugins = custom.plugins.filter(pl => pl instanceof EnvironmentPlugin || pl instanceof DefinePlugin)
 
 module.exports = {
-  "stories": [
+  stories: [
     "../src/**/*.stories.mdx",
     "../src/**/*.stories.@(js|jsx|ts|tsx)"
   ],
-  "addons": [
+  addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials"
   ],
