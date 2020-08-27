@@ -227,20 +227,20 @@ export const TradesWidget: React.FC = () => {
   return !isConnected ? (
     <ConnectWalletBanner />
   ) : (
-    <StandaloneCardWrapper>
-      <OverflowContainer>
-        <FilterTools
-          className="widgetFilterTools"
-          resultName="trades"
-          searchValue={search}
-          handleSearch={handleSearch}
-          showFilter={!!search}
-          dataLength={filteredData.length}
-        />
-        <InnerTradesWidget trades={filteredData} />
-      </OverflowContainer>
-    </StandaloneCardWrapper>
-  )
+      <StandaloneCardWrapper>
+        <OverflowContainer>
+          <FilterTools
+            className="widgetFilterTools"
+            resultName="trades"
+            searchValue={search}
+            handleSearch={handleSearch}
+            showFilter={!!search}
+            dataLength={filteredData.length}
+          />
+          <InnerTradesWidget trades={filteredData} />
+        </OverflowContainer>
+      </StandaloneCardWrapper>
+    )
 }
 
 export default TradesWidget

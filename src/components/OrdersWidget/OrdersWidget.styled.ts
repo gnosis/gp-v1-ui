@@ -64,6 +64,7 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
                 margin: auto;
               }
             }
+            
           }
         }
       }
@@ -149,12 +150,13 @@ export const OrdersForm = styled.div`
       display: flex;
       flex-flow: row nowrap;
       width: 100%;
-      margin: 0 0 -0.1rem;
+      /* margin: 0 0 -0.1rem; */
+      margin: 0;
       align-items: center;
 
       > button {
         font-weight: var(--font-weight-bold);
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         color: var(--color-text-secondary);
         letter-spacing: 0;
         text-align: center;
@@ -169,8 +171,8 @@ export const OrdersForm = styled.div`
         justify-content: center;
         transition: border 0.2s ease-in-out;
         align-items: center;
-        border-bottom: 0.3rem solid transparent;
-        min-height: 6.4rem;
+        border-bottom: 0.2rem solid transparent;
+        min-height: 5.2rem;
 
         > i {
           height: 1.8rem;
@@ -212,7 +214,7 @@ export const OrdersForm = styled.div`
       }
 
       > button.selected {
-        border-bottom: 0.3rem solid var(--color-text-active);
+        border-bottom: 0.2rem solid var(--color-text-active);
         color: var(--color-text-active);
       }
 

@@ -84,7 +84,7 @@ export const LogInOutButton = styled.div`
 
 export const UserAddress = styled.div`
   font-weight: var(--font-weight-bold);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   color: var(--color-text-primary);
   letter-spacing: 0;
 
@@ -159,7 +159,7 @@ export const CopyDiv = styled.div`
 export const UserWalletSlideWrapper = styled.div`
   position: absolute;
   background: inherit;
-  left: 0;
+  right: 0;
   background: var(--color-background-pageWrapper);
   width: 19.8rem;
   display: flex;
@@ -169,7 +169,7 @@ export const UserWalletSlideWrapper = styled.div`
   z-index: 10;
   flex-flow: column wrap;
   top: 100%;
-  margin: 1rem 0 0;
+  margin: 2rem 0 0;
   box-shadow: var(--box-shadow-wrapper);
 
   @media ${MEDIA.mobile} {
@@ -228,6 +228,7 @@ export const WalletName = styled.div`
   position: absolute;
   top: 100%;
   font-size: 1rem;
+  font-weight: lighter;
 `
 
 export const MonospaceAddress = styled.div`

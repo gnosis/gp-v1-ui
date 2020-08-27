@@ -27,8 +27,8 @@ const OptionWrapper = styled.div`
   min-height: 5.6rem;
   transition: background 0.2s ease-in-out;
   cursor: pointer;
-
-  flex: 50% 0 0;
+  flex: 1 1 50%;
+  align-self: normal;
 
   :hover {
     background: rgba(33, 141, 255, 0.1);
@@ -235,8 +235,8 @@ const ManageTokensContainer: React.FC = () => {
             />
           </SearchItemWrapper>
         ) : (
-          <TokenList tokens={filteredTokens} disabledTokens={tokensDisabledState} onToggleToken={toggleTokenState} />
-        )}
+            <TokenList tokens={filteredTokens} disabledTokens={tokensDisabledState} onToggleToken={toggleTokenState} />
+          )}
       </TokenListWrapper>
       <Modali.Modal {...modalProps} />
     </div>

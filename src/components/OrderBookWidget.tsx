@@ -218,7 +218,7 @@ function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetai
     const isBid = pricePoint.type === Offer.Bid
     logDebug(
       `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseToken.symbol} at ${
-        pricePoint.priceFormatted
+      pricePoint.priceFormatted
       } ${quoteToken.symbol}`,
     )
   })

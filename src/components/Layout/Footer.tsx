@@ -32,7 +32,7 @@ const Wrapper = styled.footer`
   line-height: 1;
 
   width: 100%;
-  margin: 0 0 4rem 0;
+  margin: 4rem 0;
   padding: 0 2rem;
 
   @media ${MEDIA.mobile} {
@@ -211,8 +211,8 @@ const Footer: React.FC = () => {
         {contractAddress && networkId ? (
           <LinkWrapper type="contract" identifier={contractAddress} networkId={networkId} label={VerifiedText} />
         ) : (
-          ''
-        )}
+            ''
+          )}
       </VerifiedContractLink>
       <SideContentWrapper>
         {/* DARK/LIGHT MODE TOGGLER */}
