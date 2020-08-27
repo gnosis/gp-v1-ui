@@ -5,7 +5,7 @@ import QRCode from 'qrcode.react'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSignOutAlt, faSignInAlt, faCopy, faCheck } from '@fortawesome/free-solid-svg-icons'
+import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { EtherscanLink } from 'components/EtherscanLink'
@@ -20,15 +20,16 @@ import {
   UserWalletSlideWrapper,
   CopyDiv,
   MonospaceAddress,
-  ConnectWallet,
   LogInOutButton,
   WalletName,
   WalletImage,
+  EtherscanButton,
 } from './UserWallet.styled'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import useSafeState from 'hooks/useSafeState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
+import useNoScroll from 'hooks/useNoScroll'
 
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
@@ -52,6 +53,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
 
   // providerInfo is cached, so ok to re-get on render
   const { walletName, walletIcon } = walletApi.getProviderInfo() || {}
+
+  useNoScroll(showWallet)
 
   /***************************** */
   // EVENT HANDLERS
@@ -100,21 +103,21 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       content = (
         <>
           <FontAwesomeIcon icon={faSignOutAlt} />
-          <strong> Log Out</strong>
+          <strong> Disconnect Wallet</strong>
         </>
       )
     } else {
       onClick = connectWallet
       content = (
-        <ConnectWallet className="connectWallet">
+        <>
           <FontAwesomeIcon icon={faSignInAlt} />
           <strong> Connect Wallet</strong>
-        </ConnectWallet>
+        </>
       )
     }
 
     return (
-      <LogInOutButton>
+      <LogInOutButton $loggedIn={isConnected}>
         <a onClick={onClick} className={props.className}>
           {content}
         </a>
@@ -164,7 +167,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
               ''
             )}
             {/* // Address and copy button */}
-            <MonospaceAddress>
+            <MonospaceAddress onClick={handleCopyToClipBoard}>
               <b>{userAddress && userAddress.substring(0, 6)}</b>
               {userAddress.substring(6, userAddress.length - 4)}
               <b>{userAddress.slice(-4)}</b>
@@ -177,15 +180,21 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                 />
               </CopyToClipboard>
             </MonospaceAddress>
-            <QRCode className="QRCode" value={userAddress} renderAs="svg" />
+            <QRCode className="QRCode" value={userAddress} renderAs="svg" size={150} />
             {/* Etherscan Link */}
             {/* TODO: add network specific */}
-            <EtherscanLink
-              className="etherscanLink"
-              type="address"
-              identifier={userAddress}
-              label="View on Etherscan"
-            />
+            <EtherscanButton>
+              <EtherscanLink
+                className="etherscanLink"
+                type="address"
+                identifier={userAddress}
+                label={
+                  <>
+                    <FontAwesomeIcon icon={faExternalLinkAlt} /> <span>View on Etherscan</span>
+                  </>
+                }
+              />
+            </EtherscanButton>
             {/* Log In/Out Button */}
             {renderLogInOutButton()}
           </UserWalletItem>

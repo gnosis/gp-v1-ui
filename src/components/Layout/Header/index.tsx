@@ -44,6 +44,7 @@ const CountDownStyled = styled.div`
   display: flex;
   flex-flow: column;
   order 2;
+  min-width: 15rem;
 
  > div {
   display: flex;
@@ -88,10 +89,10 @@ const BatchCountDown: React.FC = () => {
   return (
     <CountDownStyled>
       <div>
-        Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
+        Next batch: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
       </div>
       <div>
-        Current batch: <strong>{dateToBatchId()}</strong>
+        Batch: <strong>{dateToBatchId()}</strong>
         &nbsp;
         <HelpTooltip tooltip={DevdocTooltip} />
       </div>
