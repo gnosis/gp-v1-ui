@@ -97,6 +97,9 @@ function filterOrdersByDisplayType(
       )
 }
 
+// inputFOcus on filter timeout
+let inputTimeout: NodeJS.Timeout | undefined
+
 const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const { orders: allOrders, pendingOrders: allPendingOrders, forceOrdersRefresh } = useOrders()
   // this page is behind login wall so networkId should always be set
@@ -327,11 +330,13 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   )
 
   const filterInputRef = useRef<HTMLInputElement>(null)
-  const focusFilterInput: () => void | undefined = () => filterInputRef?.current?.focus()
+  const focusFilterInput: () => boolean | undefined = () => filterInputRef?.current?.classList?.toggle('focusAnimation')
   const handleCellClickAndFilterFocus = useCallback(
     (e): void => {
-      focusFilterInput && focusFilterInput()
+      inputTimeout && clearTimeout(inputTimeout)
+      focusFilterInput()
       handleCompleteSearch(e)
+      inputTimeout = setTimeout(focusFilterInput, 1)
     },
     [handleCompleteSearch],
   )

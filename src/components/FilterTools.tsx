@@ -6,7 +6,6 @@ import FormMessage from './TradeWidget/FormMessage'
 import searchIcon from 'assets/img/search.svg'
 // Misc
 import { MEDIA } from 'const'
-import useSafeState from 'hooks/useSafeState'
 
 export const BalanceTools = styled.div<{ $css?: string | false }>`
   display: flex;
@@ -162,19 +161,15 @@ const FilterTools: React.FC<Props> = ({
   handleSearch,
   clearFilters,
 }) => {
-  const [isFocused, setFocus] = useSafeState(false)
   return (
     <BalanceTools className={className} $css={customStyles}>
       <label className="balances-searchTokens">
         <input
-          className={isFocused ? 'focusAnimation' : ''}
           ref={customRef}
           placeholder="Search data by Order ID or token by Name, Symbol or Address"
           type="text"
           value={searchValue}
           onChange={handleSearch}
-          onFocusCapture={(): void => setFocus(true)}
-          onBlur={(): void => setFocus(false)}
         />
         {!!clearFilters && !!searchValue && (
           <span className="filterClear" onClick={clearFilters}>
