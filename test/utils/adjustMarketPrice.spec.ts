@@ -1,194 +1,118 @@
 import { checkMarketAndSmartAdjust } from 'hooks/usePrioritiseTokensForPrice'
 import tokenList from '../data/tokenList'
+import { TokenDetails } from 'types'
 
 // QUOTE gives price
 //     BASE/QUOTE
 // e.g WETH/TUSD
 
+interface Params {
+  quoteToken: TokenDetails
+  baseToken: TokenDetails
+}
+
+function assertMarket(expected: Params & { wasPriorityAdjusted: boolean }, { quoteToken, baseToken }: Params): void {
+  // Run through checkMarketFn
+  const adjustedMarket = checkMarketAndSmartAdjust({ sellToken: quoteToken, receiveToken: baseToken })
+
+  expect(adjustedMarket).toEqual(expected)
+}
+
 describe('Check market and check base/quote token priorities', () => {
   const [WETH, TUSD, USDT, , , , , FAKE] = tokenList
+  WETH.priority = 3
+  TUSD.priority = 1
+  USDT.priority = 1
+  FAKE.priority = Number.MAX_SAFE_INTEGER
 
-  test('STABLE/STABLE => return with no change', () => {
-    // QUOTE
-    const sellToken = TUSD
-    // BASE
-    const receiveToken = USDT
-
-    sellToken.priority = 1
-    receiveToken.priority = 1
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
+  test('STABLE/STABLE => return with no change USDT/TUSD', () => {
     const expectedData = {
-      // TUSD
-      baseToken: receiveToken,
-      // USDT
-      quoteToken: sellToken,
+      baseToken: USDT,
+      quoteToken: TUSD,
       wasPriorityAdjusted: false,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    // Expected, Given Market
+    assertMarket(expectedData, { quoteToken: TUSD, baseToken: USDT })
+  })
+
+  test('STABLE/STABLE => return with no change TUSD/USDT', () => {
+    const expectedData = {
+      baseToken: TUSD,
+      quoteToken: USDT,
+      wasPriorityAdjusted: false,
+    }
+
+    assertMarket(expectedData, { baseToken: TUSD, quoteToken: USDT })
   })
 
   test('WETH/STABLE => Price in STABLE', () => {
-    // QUOTE
-    const sellToken = TUSD
-    // BASE
-    const receiveToken = WETH
-
-    sellToken.priority = 1
-    receiveToken.priority = 3
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // WETH
-      baseToken: receiveToken,
-      // TUSD
-      quoteToken: sellToken,
+      baseToken: WETH,
+      quoteToken: TUSD,
       wasPriorityAdjusted: false,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: WETH, quoteToken: TUSD })
   })
 
   test('STABLE/WETH => Price in STABLE', () => {
-    // QUOTE
-    const sellToken = WETH
-    // BASE
-    const receiveToken = USDT
-
-    sellToken.priority = 3
-    receiveToken.priority = 1
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // WETH
-      baseToken: sellToken,
-      // USDT
-      quoteToken: receiveToken,
+      baseToken: WETH,
+      quoteToken: USDT,
       wasPriorityAdjusted: true,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: USDT, quoteToken: WETH })
   })
 
   test('VOLATILE/STABLE => Price in STABLE', () => {
-    // QUOTE
-    const sellToken = USDT
-    // BASE
-    const receiveToken = FAKE
-
-    sellToken.priority = 1
-    receiveToken.priority = undefined
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // FAKE
-      baseToken: receiveToken,
-      // USDT
-      quoteToken: sellToken,
+      baseToken: FAKE,
+      quoteToken: USDT,
       wasPriorityAdjusted: false,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: FAKE, quoteToken: USDT })
   })
 
   test('STABLE/VOLATILE => Price in STABLE', () => {
-    // QUOTE
-    const sellToken = FAKE
-    // BASE
-    const receiveToken = USDT
-
-    sellToken.priority = undefined
-    receiveToken.priority = 1
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // FAKE
-      baseToken: sellToken,
-      // USDT
-      quoteToken: receiveToken,
+      baseToken: FAKE,
+      quoteToken: USDT,
       wasPriorityAdjusted: true,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: USDT, quoteToken: FAKE })
   })
 
   test('WETH/VOLATILE => Price in WETH', () => {
-    // QUOTE
-    const sellToken = FAKE
-    // BASE
-    const receiveToken = WETH
-
-    sellToken.priority = undefined
-    receiveToken.priority = 3
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // FAKE
-      baseToken: sellToken,
-      // WETH
-      quoteToken: receiveToken,
+      baseToken: FAKE,
+      quoteToken: WETH,
       wasPriorityAdjusted: true,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: WETH, quoteToken: FAKE })
   })
 
   test('VOLATILE/WETH => Price in WETH', () => {
-    // QUOTE
-    const sellToken = WETH
-    // BASE
-    const receiveToken = FAKE
-
-    sellToken.priority = 3
-    receiveToken.priority = undefined
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // FAKE
-      baseToken: receiveToken,
-      // WETH
-      quoteToken: sellToken,
+      baseToken: FAKE,
+      quoteToken: WETH,
       wasPriorityAdjusted: false,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: FAKE, quoteToken: WETH })
   })
 
   test('VOLATILE/VOLATILE => no change', () => {
-    // QUOTE
-    const sellToken = FAKE
-    // BASE
-    const receiveToken = FAKE
-
-    sellToken.priority = undefined
-    receiveToken.priority = undefined
-
-    // Run through checkMarketFn
-    const adjustedMarket = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
     const expectedData = {
-      // FAKE
-      baseToken: receiveToken,
-      // FAKE
-      quoteToken: sellToken,
+      baseToken: FAKE,
+      quoteToken: FAKE,
       wasPriorityAdjusted: false,
     }
 
-    expect(adjustedMarket).toEqual(expectedData)
+    assertMarket(expectedData, { baseToken: FAKE, quoteToken: FAKE })
   })
 })
