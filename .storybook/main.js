@@ -6,16 +6,33 @@ const custom = require("../webpack.config.js")();
 // to inline CONFIG and other env vars
 const customPlugins = custom.plugins.filter(pl => pl instanceof EnvironmentPlugin || pl instanceof DefinePlugin)
 
+const replaceRulesForFile = ({ filename, baseRules, customRules }) => {
+  // get rules that would trigger for filename
+  const customRulesForFilename = customRules.filter(rule => rule.test.test(filename))
+
+  // if no rules found, don't modify baseRules
+  if (customRulesForFilename.length === 0) return baseRules
+
+  // baseRules without rules for filename + custom rules for filename
+  return baseRules.filter(rule => !rule.test.test(filename)).concat(customRulesForFilename)
+}
+
 module.exports = {
-  "stories": [
+  stories: [
     "../src/**/*.stories.mdx",
     "../src/**/*.stories.@(js|jsx|ts|tsx)"
   ],
-  "addons": [
+  addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials"
   ],
   webpackFinal: (config) => {
+    const rulesWithMarkdown = replaceRulesForFile({
+      filename: 'file.md',
+      baseRules: config.module.rules,
+      customRules: custom.module.rules,
+    })
+
     return {
       ...config,
       module: {
@@ -23,6 +40,7 @@ module.exports = {
         // enable rules override sparingly
         // only if storybook can't transpile something
         // rules: custom.module.rules,
+        rules: rulesWithMarkdown,
       },
       resolve: {
         ...config.resolve,
