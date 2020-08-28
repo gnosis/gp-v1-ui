@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { SizeProp } from '@fortawesome/fontawesome-svg-core'
 
-interface SpinnerProps {
+export interface SpinnerProps {
   spin?: boolean
   style?: React.CSSProperties
   size?: SizeProp
