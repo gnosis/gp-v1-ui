@@ -23,13 +23,10 @@ export const HeaderWrapper = styled.header`
   }
 
   ${UserWalletWrapper} {
-    /* order: 1; */
     margin: 2.4rem 0 3.2rem 3.2rem;
     order: 2;
-    /* margin: 3.2rem 3rem 3.2rem 0; */
 
     @media ${MEDIA.mobile} {
-      /* margin: 2rem 1rem 2rem 0; */
       margin: 0;
       order: 1;
     }
