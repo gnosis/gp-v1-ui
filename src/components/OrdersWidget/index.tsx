@@ -333,10 +333,14 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const focusFilterInput: () => boolean | undefined = () => filterInputRef?.current?.classList?.toggle('focusAnimation')
   const handleCellClickAndFilterFocus = useCallback(
     (e): void => {
+      // prevents multiple timeouts chaining
       inputTimeout && clearTimeout(inputTimeout)
+      // Toggle animation class
       focusFilterInput()
+      // fill in filter bar with filter text
       handleCompleteSearch(e)
-      inputTimeout = setTimeout(focusFilterInput, 1)
+      // wait for animation to finish and toggle off class
+      inputTimeout = setTimeout(focusFilterInput, 300)
     },
     [handleCompleteSearch],
   )
