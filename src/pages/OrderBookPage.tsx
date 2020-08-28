@@ -1,6 +1,6 @@
 import React, { useEffect, ChangeEvent } from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
-import OrderBookWidget from 'components/OrderBookWidget'
+import { OrderBook } from 'components/OrderBook'
 import TokenSelector from 'components/TokenSelector'
 import { useTokenList } from 'hooks/useTokenList'
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -11,7 +11,7 @@ import { Input } from 'components/Input'
 import { MEDIA, ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 import InputBox from 'components/InputBox'
 
-const OrderBookPage = styled(ContentPage)`
+const OrderBookPageWrapper = styled(ContentPage)`
   padding: 2.4rem 0rem;
   min-height: initial;
 `
@@ -76,7 +76,7 @@ const OrderBookWrapper = styled.div`
   }
 `
 
-const OrderBook: React.FC = () => {
+export const OrderBookPage: React.FC = () => {
   const { networkIdOrDefault } = useWalletConnection()
   // get all tokens
   const tokenList = useTokenList({ networkId: networkIdOrDefault })
@@ -102,7 +102,7 @@ const OrderBook: React.FC = () => {
   }
 
   return (
-    <OrderBookPage>
+    <OrderBookPageWrapper>
       <OrderBookWrapper>
         <h1>Order book</h1>
         <span>
@@ -130,9 +130,9 @@ const OrderBook: React.FC = () => {
         </span>
       </OrderBookWrapper>
 
-      <OrderBookWidget baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} hops={+hops} />
-    </OrderBookPage>
+      <OrderBook baseToken={baseToken} quoteToken={quoteToken} networkId={networkIdOrDefault} hops={+hops} />
+    </OrderBookPageWrapper>
   )
 }
 
-export default OrderBook
+export default OrderBookPage
