@@ -2,12 +2,10 @@
 import { Meta } from '@storybook/react/types-6-0'
 
 import About from 'pages/About'
-import { PageDecorator } from 'storybook/PageDecorator'
 
 export default {
   title: 'Pages/About',
   component: About,
-  decorators: [PageDecorator],
 } as Meta
 
 export const Primary = About
