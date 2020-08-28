@@ -1,6 +1,15 @@
 import { Network } from 'types'
 
-export default [
+interface QuoteTokenPriorityObject {
+  priority: number | undefined
+  addresses: {
+    [network: number]: string[]
+  }
+}
+
+type QuoteTokenPriorityList = QuoteTokenPriorityObject[]
+
+const quoteTokenPriorityList: QuoteTokenPriorityList = [
   {
     // USD coins
     priority: 1,
@@ -34,8 +43,17 @@ export default [
     },
   },
   {
-    // non-USD stablecoins
+    // OWL
     priority: 2,
+    addresses: {
+      [Network.Mainnet]: ['0x1a5f9352af8af974bfc03399e3767df6370d82e4'], // OWL
+      // Rinkeby
+      [Network.Rinkeby]: [],
+    },
+  },
+  {
+    // non-USD stablecoins
+    priority: 3,
     addresses: {
       [Network.Mainnet]: [
         '0xdb25f211ab05b1c97d595516f45794528a807ad8', // EURS
@@ -51,7 +69,7 @@ export default [
   },
   {
     // WETH
-    priority: 3,
+    priority: 4,
     addresses: {
       [Network.Mainnet]: [
         '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2', // WETH
@@ -63,3 +81,5 @@ export default [
     },
   },
 ]
+
+export default quoteTokenPriorityList
