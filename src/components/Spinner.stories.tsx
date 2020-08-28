@@ -16,19 +16,19 @@ export const Default = Template.bind({})
 export const DoNotSpin = Template.bind({})
 DoNotSpin.args = {
   spin: false,
-} as SpinnerProps
+}
 
-export const StyleRed = Template.bind({})
+export const StyleRed = Template.bind({}) as typeof Template
 StyleRed.args = {
   style: { color: 'red' },
-} as SpinnerProps
+}
 
 export const SizeBig = Template.bind({})
 SizeBig.args = {
   size: '3x',
-} as SpinnerProps
+}
 
 export const Skull = Template.bind({})
 Skull.args = {
   icon: faSkull,
-} as SpinnerProps
+}
