@@ -404,7 +404,6 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     font-weight: var(--font-weight-bold);
     text-transform: uppercase;
     font-size: 1.4rem;
-    margin: 0 auto;
     outline: 0;
     height: 3.6rem;
     box-sizing: border-box;
@@ -582,6 +581,11 @@ const OrderValidity: React.FC<Props> = ({
     setError,
   ])
 
+  const handleCancel = useCallback((): void => {
+    clearErrors([validFromInputId, validUntilInputId])
+    setShowOrderConfig(false)
+  }, [clearErrors, setShowOrderConfig, validFromInputId, validUntilInputId])
+
   // On any errors, show form
   useEffect(() => {
     if ((validFromError || validUntilError) && !showOrderConfig) {
@@ -682,15 +686,7 @@ const OrderValidity: React.FC<Props> = ({
 
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
         <h4>
-          Order settings{' '}
-          <i
-            onClick={(): void => {
-              clearErrors([validFromInputId, validUntilInputId])
-              setShowOrderConfig((isOpen) => !isOpen)
-            }}
-          >
-            ×
-          </i>
+          Order settings <i onClick={handleCancel}>×</i>
         </h4>
         <div>
           <OrderValidityBox>
@@ -858,6 +854,9 @@ const OrderValidity: React.FC<Props> = ({
           )}
         </div>
         <span>
+          <button className="cancel" type="button" onClick={handleCancel}>
+            Cancel
+          </button>
           <button type="button" onClick={handleShowConfig} tabIndex={tabIndex}>
             Set order parameters
           </button>

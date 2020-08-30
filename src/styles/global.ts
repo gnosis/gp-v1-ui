@@ -98,6 +98,16 @@ const GlobalStyles = createGlobalStyle`
       color: var(--color-text-button-hover);
     }
 
+    &.cancel {
+      background: transparent;
+      color: var(--color-text-active);
+
+      &:hover {
+        background-color: var(--color-background-button-hover);
+        color: var(--color-text-button-hover);
+      } 
+    }
+
     &:disabled,
     &[disabled]{
       &:hover {
