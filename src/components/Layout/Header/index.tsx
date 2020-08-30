@@ -27,13 +27,12 @@ export interface HeaderProps {
   }[]
 }
 
-const BatchNumberWrapper = styled.span`
+export const BatchNumberWrapper = styled.span`
   &&&&& {
     display: inline-flex;
     font-family: var(--font-mono);
     font-size: 1.2rem;
     color: var(--color-text-primary);
-    min-width: 16rem;
     letter-spacing: 0;
 
     @media ${MEDIA.mobile} {
@@ -70,6 +69,7 @@ const CountDownStyled = styled.div`
   > ${BatchNumberWrapper} {
     margin: 0.5rem 0;
     align-items: baseline;
+    min-width: 16rem;
   }
 `
 

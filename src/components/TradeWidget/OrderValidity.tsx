@@ -33,6 +33,7 @@ import useSafeState from 'hooks/useSafeState'
 import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { StrongSubHeader } from 'components/SectionHeaders'
 
 import { validitySchema, BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
 import useNoScroll from 'hooks/useNoScroll'
@@ -89,13 +90,14 @@ const Wrapper = styled.div`
   justify-content: flex-start;
   align-items: flex-start;
   width: 100%;
-  flex-flow: row wrap;
+  flex-flow: column nowrap;
   border-bottom: 0.1rem solid var(--color-background-banner);
 
-  > div:first-child {
+  > div.innerWrapper {
     width: 100%;
     display: flex;
     align-items: center;
+    padding: 0 0.8rem;
 
     > div {
       width: 100%;
@@ -112,16 +114,23 @@ const Wrapper = styled.div`
       flex-flow: row wrap;
       padding: 1rem 0;
       line-height: 1.3;
+      width: calc(100% - 8rem);
+
+      @media ${MEDIA.xSmallDown} {
+        width: min-content;
+      }
 
       > div {
         display: grid;
-        grid-template-columns: 9rem auto;
+        grid-template-columns: 7.8rem auto;
         width: 100%;
+        font-size: 1.2rem;
 
         > b {
           color: #218dff;
           cursor: pointer;
           margin: 0 0.4rem;
+          min-width: 11.5rem;
 
           // tooltip svg
           > span {
@@ -138,18 +147,26 @@ const Wrapper = styled.div`
       }
     }
 
+    > a {
+      color: rgb(33, 141, 255);
+      font-size: 1.2rem;
+
+      @media ${MEDIA.xSmallDown} {
+        display: none;
+      }
+    }
+
     > button {
+      display: none;
       content: '';
       background: url(${cog}) no-repeat center/contain;
       width: 1.8rem;
       height: 1.8rem;
       margin-left: auto;
-      opacity: 0.5;
-      transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+      opacity: 1;
 
-      &:hover {
-        opacity: 1;
-        transform: rotate(90deg);
+      @media ${MEDIA.xSmallDown} {
+        display: block;
       }
     }
   }
@@ -660,7 +677,8 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <div>
+      <StrongSubHeader>Order Validity</StrongSubHeader>
+      <div className="innerWrapper">
         <div>
           <div>
             Order starts:{' '}
@@ -681,9 +699,13 @@ const OrderValidity: React.FC<Props> = ({
             Order expires: <b onClick={handleShowConfig}>{validUntilDisplayTime}</b>
           </div>
         </div>
-        <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} />
+        {/* <button type="button" tabIndex={tabIndex} onClick={handleShowConfig} /> */}
+        <a tabIndex={tabIndex} onClick={handleShowConfig}>
+          [+] Customise
+        </a>
+        <button tabIndex={tabIndex} onClick={handleShowConfig} />
       </div>
-
+      {/* MODAL */}
       <OrderValidityInputsWrapper $visible={showOrderConfig}>
         <h4>
           Order settings <i onClick={handleCancel}>×</i>
