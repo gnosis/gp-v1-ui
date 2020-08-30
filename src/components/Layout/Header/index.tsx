@@ -64,6 +64,7 @@ const CountDownStyled = styled.div`
 
   > strong {
     color: var(--color-text-active);
+    margin-left: 0.3rem;
   }
  }
 `
