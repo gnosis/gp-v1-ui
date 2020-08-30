@@ -83,7 +83,6 @@ export const EtherscanButton = styled(WalletButton)`
 export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
   background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
   color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
-  font-size: ${(props): string | false => !props.$loggedIn && '1.2rem'};
   margin: 0;
   font-family: var(--font-mono);
   letter-spacing: 0;
@@ -103,6 +102,7 @@ export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
   }
 
   @media ${MEDIA.mobile} {
+    font-size: ${(props): string | false => !props.$loggedIn && '1.2rem'};
     padding: ${(props): string | false => !props.$loggedIn && '0'};
   }
 `
@@ -217,10 +217,6 @@ export const UserWalletSlideWrapper = styled.div`
     box-shadow: 0 90vh 0 100vw rgba(47, 62, 78, 0.5);
     border-radius: 1.2rem;
     padding: 0 0 3rem;
-
-    > ${UserWalletItem} {
-      // padding: 0 0 5rem 0;
-    }
   }
 
   > button {
