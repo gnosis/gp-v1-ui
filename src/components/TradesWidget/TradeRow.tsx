@@ -25,6 +25,11 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   @media ${MEDIA.mobile} {
     &&&&& {
       display: flex;
+
+      td[data-label='Order ID'] {
+        order: -2;
+      }
+
       td[data-label='Market'] {
         order: -1;
         border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
