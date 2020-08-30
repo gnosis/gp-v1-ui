@@ -24,6 +24,8 @@ import { DateTimePickerBase, DateTimePickerWrapper } from 'components/TimePicker
 import { InputContainer } from 'components/Settings/WalletConnect'
 import { Input } from 'components/Input'
 import InputBox from 'components/InputBox'
+import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { StrongSubHeader } from 'components/SectionHeaders'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData, DEFAULT_FORM_STATE } from 'components/TradeWidget'
@@ -32,11 +34,9 @@ import { TradeFormTokenId, TradeFormData, DEFAULT_FORM_STATE } from 'components/
 import useSafeState from 'hooks/useSafeState'
 import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
-import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
-import { StrongSubHeader } from 'components/SectionHeaders'
+import useNoScroll from 'hooks/useNoScroll'
 
 import { validitySchema, BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './validationSchema'
-import useNoScroll from 'hooks/useNoScroll'
 
 // now, 30min, 60min, 24h
 const ORDER_START_PRESETS = [null, 30, 60, 1440]
@@ -141,7 +141,7 @@ const Wrapper = styled.div`
           > .BatchNumberWrapper {
             color: var(--color-text-primary);
             font-weight: 400;
-            margin: 0;
+            margin: 0 0 0 0.3rem;
           }
         }
       }
