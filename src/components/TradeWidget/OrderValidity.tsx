@@ -42,7 +42,7 @@ import { validitySchema, BATCH_START_THRESHOLD, BATCH_END_THRESHOLD } from './va
 const ORDER_START_PRESETS = [null, 30, 60, 1440]
 // 5min, 30min, 24h, 7d
 const ORDER_EXPIRE_PRESETS = [30, 1440, 10080, null]
-const VALID_UNTIL_RELATIVE_DEFAULT = ORDER_EXPIRE_PRESETS[2]
+const VALID_UNTIL_RELATIVE_DEFAULT = ORDER_EXPIRE_PRESETS[3]
 const VALID_FROM_RELATIVE_DEFAULT = ORDER_START_PRESETS[0]
 
 const relativeMinutesToDateMS = (minutes: number): number =>
@@ -89,6 +89,7 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  margin: 1rem 0;
   width: 100%;
   flex-flow: column nowrap;
   border-bottom: 0.1rem solid var(--color-background-banner);
@@ -130,7 +131,7 @@ const Wrapper = styled.div`
           color: #218dff;
           cursor: pointer;
           margin: 0 0.4rem;
-          min-width: 11.5rem;
+          min-width: 12rem;
 
           // tooltip svg
           > span {
@@ -174,7 +175,13 @@ const Wrapper = styled.div`
 
 const OrderValidityBox = styled.div`
   width: 94%;
-  margin: auto;
+  margin: 1rem auto;
+  padding: 0.3rem 1.6rem;
+  border-radius: var(--border-radius);
+
+  &.error {
+    background: #ffd8d6;
+  }
 `
 
 const TimePickerPreset = styled.button<{ $selected?: boolean }>`
@@ -288,12 +295,6 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
     }
 
     ${OrderValidityBox} {
-      padding: 0 0.8rem;
-
-      @media ${MEDIA.mobile} {
-        padding: 0 1.6rem;
-      }
-
       > ${DateTimePickerWrapper} {
         padding: 0 1rem 1rem;
 
@@ -393,6 +394,13 @@ const OrderValidityInputsWrapper = styled.div<{ $visible: boolean }>`
 
           > strong {
             color: var(--color-text-active);
+          }
+
+          &.resetAll {
+            color: var(--color-text-active);
+            margin-left: auto;
+            cursor: pointer;
+            text-decoration: underline;
           }
         }
       }
@@ -603,6 +611,12 @@ const OrderValidity: React.FC<Props> = ({
     setShowOrderConfig(false)
   }, [clearErrors, setShowOrderConfig, validFromInputId, validUntilInputId])
 
+  const handleReset = useCallback((): void => {
+    clearErrors([validFromInputId, validUntilInputId])
+    handleRelativeTimeSelect(validFromInputId, VALID_FROM_RELATIVE_DEFAULT)
+    handleRelativeTimeSelect(validUntilInputId, VALID_UNTIL_RELATIVE_DEFAULT)
+  }, [clearErrors, handleRelativeTimeSelect, validFromInputId, validUntilInputId])
+
   // On any errors, show form
   useEffect(() => {
     if ((validFromError || validUntilError) && !showOrderConfig) {
@@ -677,7 +691,7 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <StrongSubHeader>Order Validity</StrongSubHeader>
+      <StrongSubHeader>Order Validity Settings</StrongSubHeader>
       <div className="innerWrapper">
         <div>
           <div>
@@ -711,7 +725,7 @@ const OrderValidity: React.FC<Props> = ({
           Order settings <i onClick={handleCancel}>×</i>
         </h4>
         <div>
-          <OrderValidityBox>
+          <OrderValidityBox className={validFromError ? 'error' : ''}>
             <p>
               <strong>Start Time</strong>
               <span>
@@ -723,6 +737,9 @@ const OrderValidity: React.FC<Props> = ({
                 ) : (
                   ': Now'
                 )}
+              </span>
+              <span onClick={handleReset} className="resetAll">
+                Reset All
               </span>
             </p>
             {/* Relative Time picker */}
@@ -798,7 +815,7 @@ const OrderValidity: React.FC<Props> = ({
               </InputContainer>
             </DateTimePickerWrapper>
           </OrderValidityBox>
-          <OrderValidityBox>
+          <OrderValidityBox className={validUntilError ? 'error' : ''}>
             <p>
               <strong>Expire Time</strong>
             </p>
