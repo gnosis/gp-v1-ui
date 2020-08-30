@@ -65,6 +65,7 @@ const CountDownStyled = styled.div`
   display: flex;
   flex-flow: column;
   order 2;
+  min-width: 15rem;
 
   > ${BatchNumberWrapper} {
     margin: 0.5rem 0;
@@ -90,7 +91,7 @@ export const DevdocTooltip = (
 
 export const BatchNumberWithHelp: React.FC<{ batchId?: number | null; title?: string }> = ({
   batchId,
-  title = 'Current batch: ',
+  title = 'Batch: ',
 }) => (
   <BatchNumberWrapper className="BatchNumberWrapper">
     {title}
@@ -105,7 +106,7 @@ const BatchCountDown: React.FC = () => {
   return (
     <CountDownStyled>
       <BatchNumberWrapper>
-        Next batch in: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
+        Next batch: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
       </BatchNumberWrapper>
       <BatchNumberWithHelp />
     </CountDownStyled>

@@ -12,7 +12,10 @@ export const UserWalletWrapper = styled.div`
   position: relative;
 
   .QRCode {
-    margin: 0 auto;
+    border: 2rem solid #fff;
+    border-radius: var(--border-radius);
+    box-sizing: content-box;
+    margin: 1rem auto;
   }
 `
 
@@ -45,13 +48,62 @@ export const UserWalletItem = styled.div`
   > a > svg {
     margin: 0 0.5rem 0 0;
   }
+`
 
-  .etherscanLink {
-    padding: 1.6rem 0;
+const WalletButton = styled.button`
+  border-radius: 3rem;
+  color: var(--color-text-CTA);
+  font-size: 1.5rem;
+  margin: 1.2rem 0;
+  padding: 1rem 2rem;
+  width: calc(100% - 4rem);
+  white-space: nowrap;
+`
 
-    @media ${MEDIA.mobile} {
-      padding: 2.4rem 0;
+export const EtherscanButton = styled(WalletButton)`
+  background: transparent;
+  color: var(--color-text-primary);
+  > a,
+  > a:link,
+  > a:visited {
+    color: inherit;
+    text-decoration: none;
+
+    > span {
+      text-decoration: underline;
     }
+  }
+
+  &:hover {
+    color: var(--color-text-primary);
+    background: none;
+  }
+`
+
+export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
+  background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
+  color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
+  font-size: ${(props): string | false => !props.$loggedIn && '1.2rem'};
+  margin: 0;
+  font-family: var(--font-mono);
+  letter-spacing: 0;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0;
+  flex: 1;
+
+  &:hover {
+    background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
+    color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
+    filter: grayscale(1);
+  }
+
+  > a {
+    width: 100%;
+    font-size: inherit;
+  }
+
+  @media ${MEDIA.mobile} {
+    padding: ${(props): string | false => !props.$loggedIn && '0'};
   }
 `
 
@@ -61,24 +113,9 @@ export const ConnectWallet = styled.div`
   display: flex;
   flex-flow: row nowrap;
   margin: 0;
+
   > svg {
     margin: 0 0.5rem 0 0;
-  }
-`
-
-export const LogInOutButton = styled.div`
-  margin: 0;
-  font-family: var(--font-mono);
-  letter-spacing: 0;
-  font-weight: var(--font-weight-bold);
-  color: var(--color-text-primary);
-  letter-spacing: 0;
-  font-size: 1.2rem;
-  padding: 0;
-
-  > a {
-    width: 100%;
-    font-size: inherit;
   }
 `
 
@@ -91,10 +128,6 @@ export const UserAddress = styled.div`
   @media ${MEDIA.mobile} {
     font-size: 1.3rem;
   }
-`
-
-export const QRCode = styled.div`
-  margin: 0 0 0 auto;
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`
@@ -127,6 +160,10 @@ export const WalletImage = styled.img`
   height: 2.4rem;
   object-fit: contain;
   margin: 0 0.5rem 0 0;
+
+  @media ${MEDIA.xSmallDown} {
+    display: none;
+  }
 `
 
 export const EtherImage = styled(WalletImage)`
@@ -161,27 +198,29 @@ export const UserWalletSlideWrapper = styled.div`
   background: inherit;
   left: 0;
   background: var(--color-background-pageWrapper);
-  width: 19.8rem;
+  width: 31rem;
   display: flex;
   border-radius: 0.6rem;
-  padding: 1.6rem;
+  padding: 2.6rem 1.6rem;
   box-sizing: border-box;
   z-index: 10;
   flex-flow: column wrap;
-  top: 100%;
+  top: calc(100% + 0.7rem);
   margin: 1rem 0 0;
   box-shadow: var(--box-shadow-wrapper);
 
   @media ${MEDIA.mobile} {
     width: 100%;
     position: fixed;
-    left: 0;
-    bottom: 0;
-    top: initial;
+    top: 0;
     box-sizing: border-box;
-    box-shadow: 0 -90vh 0 100vw rgba(47, 62, 78, 0.5);
+    box-shadow: 0 90vh 0 100vw rgba(47, 62, 78, 0.5);
     border-radius: 1.2rem;
-    padding: 0 0 2.4rem;
+    padding: 0 0 3rem;
+
+    > ${UserWalletItem} {
+      // padding: 0 0 5rem 0;
+    }
   }
 
   > button {
@@ -231,21 +270,22 @@ export const WalletName = styled.div`
 `
 
 export const MonospaceAddress = styled.div`
+  cursor: pointer;
   margin: 0 0 1.6rem;
   font-family: var(--font-mono);
   font-size: 1.2rem;
   font-weight: var(--font-weight-normal);
   word-break: break-all;
   line-height: 1.4;
+  text-align: center;
+  width: 90%;
 
   @media ${MEDIA.mobile} {
     border: solid 0.1rem var(--color-background-banner);
     border-radius: 0.6rem 0.6rem 0 0;
     padding: 1rem;
     box-sizing: border-box;
-    width: 100%;
     width: calc(100% - 3.2rem);
-    text-align: center;
   }
 
   > b {
