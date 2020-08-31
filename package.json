@@ -17,7 +17,11 @@
     "test": "MOCK=true jest",
     "test-coverage": "MOCK=true jest --coverage && cat ./coverage/lcov.info | coveralls",
     "verify": "npm run lint && npm run test",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\""
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "storybook": "BROWSER=NONE start-storybook -p 6006",
+    "build-storybook": "build-storybook",
+    "docs": "start-storybook --docs",
+    "build-docs": "build-storybook --docs"
   },
   "husky": {
     "hooks": {
@@ -74,6 +78,10 @@
     "@babel/register": "^7.8.3",
     "@fortawesome/fontawesome-common-types": "^0.2.26",
     "@hookform/devtools": "^2.0.3",
+    "@storybook/addon-actions": "^6.0.20",
+    "@storybook/addon-essentials": "^6.0.20",
+    "@storybook/addon-links": "^6.0.20",
+    "@storybook/react": "^6.0.20",
     "@types/bn.js": "^4.11.6",
     "@types/combine-reducers": "^1.0.0",
     "@types/enzyme": "^3.10.4",
@@ -122,6 +130,7 @@
     "preload-webpack-plugin": "^3.0.0-beta.4",
     "prettier": "^2.0.5",
     "react-dev-utils": "^10.0.0",
+    "react-is": "^16.13.1",
     "react-test-renderer": "^16.12.0",
     "rimraf": "^3.0.1",
     "style-loader": "^1.1.3",
