@@ -38,5 +38,6 @@
     "paths": {
       "*": ["custom/*", "src/*"]
     }
-  }
+  },
+  "include": ["src/**/*", ".storybook/**/*"]
 }

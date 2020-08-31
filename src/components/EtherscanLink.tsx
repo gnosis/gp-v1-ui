@@ -6,10 +6,25 @@ import { Network } from 'types'
 type EtherscanLinkType = 'tx' | 'address' | 'contract' | 'token' | 'event'
 
 export interface EtherscanLinkProps {
+  /**
+   * type of EtherscanLink
+   */
   type: EtherscanLinkType
+  /**
+   * address or transaction or other hash
+   */
   identifier: string
+  /**
+   * network number | chain id
+   */
   networkId?: number
+  /**
+   * label to replace textContent generated from indentifier
+   */
   label?: string | ReactElement | void
+  /**
+   * className to pass on to <a/>
+   */
   className?: string // to allow subclassing styles with styled-components
 }
 
