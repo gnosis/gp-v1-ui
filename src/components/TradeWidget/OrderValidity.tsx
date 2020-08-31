@@ -691,7 +691,7 @@ const OrderValidity: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <StrongSubHeader>Order Validity Settings</StrongSubHeader>
+      <StrongSubHeader>Advanced Settings</StrongSubHeader>
       <div className="innerWrapper">
         <div>
           <div>
