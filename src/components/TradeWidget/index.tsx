@@ -504,6 +504,19 @@ const calculateValidityTimes = (timeSelected: string | null): string => {
   return timeSelected.toString()
 }
 
+const NULL_BALANCE_TOKEN = {
+  exchangeBalance: ZERO,
+  totalExchangeBalance: ZERO,
+  pendingDeposit: { amount: ZERO, batchId: 0 },
+  pendingWithdraw: { amount: ZERO, batchId: 0 },
+  walletBalance: ZERO,
+  claimable: false,
+  enabled: false,
+  highlighted: false,
+  enabling: false,
+  claiming: false,
+}
+
 const sellInputId: TradeFormTokenId = 'sellToken'
 const receiveInputId: TradeFormTokenId = 'receiveToken'
 const priceInputId: TradeFormTokenId = 'price'
@@ -630,7 +643,6 @@ const TradeWidget: React.FC = () => {
     control,
     defaultValue: defaultFormValues,
   })
-
   // Avoid querying for a new price at every input change
   const { value: debouncedSellValue } = useDebounce(sellValue, PRICE_ESTIMATION_DEBOUNCE_TIME)
 
@@ -664,28 +676,14 @@ const TradeWidget: React.FC = () => {
   // Updates page URL with parameters from context
   useURLParams(url, true)
 
-  // TESTING
-  const NULL_BALANCE_TOKEN = {
-    exchangeBalance: ZERO,
-    totalExchangeBalance: ZERO,
-    pendingDeposit: { amount: ZERO, batchId: 0 },
-    pendingWithdraw: { amount: ZERO, batchId: 0 },
-    walletBalance: ZERO,
-    claimable: false,
-    enabled: false,
-    highlighted: false,
-    enabling: false,
-    claiming: false,
-  }
-
   const sellTokenBalance = useMemo(
     () => getToken('symbol', sellToken.symbol, balances) || { ...sellToken, ...NULL_BALANCE_TOKEN },
-    [NULL_BALANCE_TOKEN, balances, sellToken],
+    [balances, sellToken],
   )
 
   const receiveTokenBalance = useMemo(
     () => getToken('symbol', receiveToken.symbol, balances) || { ...receiveToken, ...NULL_BALANCE_TOKEN },
-    [NULL_BALANCE_TOKEN, balances, receiveToken],
+    [balances, receiveToken],
   )
 
   const { placeOrder, placeMultipleOrders, isSubmitting, setIsSubmitting } = usePlaceOrder()
@@ -1055,7 +1053,6 @@ const TradeWidget: React.FC = () => {
               onClick={async (e): Promise<boolean> => {
                 // don't show Submit Confirm modal for invalid form
                 if (!formState.isValid) e.stopPropagation()
-
                 return trigger()
               }}
             >
