@@ -7,6 +7,7 @@ import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 
 import { dexPriceEstimatorApi } from 'api'
+import { RawApiData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 import { getNetworkFromId, safeTokenName, formatSmart, logDebug } from 'utils'
 
@@ -65,17 +66,6 @@ const Wrapper = styled.div`
 enum Offer {
   Bid,
   Ask,
-}
-
-/**
- * Price point as defined in the API
- * Both price and volume are numbers (floats)
- *
- * The price and volume are expressed in atoms
- */
-interface RawPricePoint {
-  price: number
-  volume: number
 }
 
 /**
@@ -229,7 +219,7 @@ const draw = (
   baseToken: TokenDetails,
   quoteToken: TokenDetails,
   networkId: number,
-  hops?: number,
+  // hops?: number,
 ): am4charts.XYChart => {
   const baseTokenLabel = safeTokenName(baseToken)
   const quoteTokenLabel = safeTokenName(quoteToken)
@@ -240,29 +230,30 @@ const draw = (
   const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
   // Add data
-  chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
-    baseTokenId: baseToken.id,
-    quoteTokenId: quoteToken.id,
-    hops,
-    networkId,
-  })
-  chart.dataSource.adapter.add('parsedData', (data) => {
-    try {
-      const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
-      const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
-      const pricePoints = bids.concat(asks)
+  // chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
+  //   baseTokenId: baseToken.id,
+  //   quoteTokenId: quoteToken.id,
+  //   hops,
+  //   networkId,
+  // })
+  // chart.dataSource.adapter.add('parsedData', (data) => {
+  //   console.log('PARSED DATA', data)
+  //   try {
+  //     const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
+  //     const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
+  //     const pricePoints = bids.concat(asks)
 
-      // Sort points by price
-      pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
+  //     // Sort points by price
+  //     pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
 
-      _printOrderBook(pricePoints, baseToken, quoteToken)
+  //     _printOrderBook(pricePoints, baseToken, quoteToken)
 
-      return pricePoints
-    } catch (error) {
-      console.error('Error processing data', error)
-      return []
-    }
-  })
+  //     return pricePoints
+  //   } catch (error) {
+  //     console.error('Error processing data', error)
+  //     return []
+  //   }
+  // })
 
   // Colors
   const colors = {
@@ -304,13 +295,69 @@ const draw = (
   return chart
 }
 
+interface AddDataParams {
+  chart: am4charts.XYChart
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+  hops?: number
+  networkId: number
+}
+
+interface ProcessRawDataParams {
+  data: RawApiData
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+}
+
+const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDataParams): PricePointDetails[] => {
+  try {
+    const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
+    const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
+    const pricePoints = bids.concat(asks)
+
+    // Sort points by price
+    pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
+
+    _printOrderBook(pricePoints, baseToken, quoteToken)
+
+    return pricePoints
+  } catch (error) {
+    console.error('Error processing data', error)
+    return []
+  }
+}
+
+const addData = async ({ chart, baseToken, quoteToken, hops, networkId }: AddDataParams): void => {
+  try {
+    const rawData = await dexPriceEstimatorApi.getOrderBookData({
+      baseTokenId: baseToken.id,
+      quoteTokenId: quoteToken.id,
+      hops,
+      networkId,
+    })
+    console.log('ORDERBOOK RAW DATA', rawData)
+
+    chart.data = processRawApiData({ data: rawData, baseToken, quoteToken })
+  } catch (error) {
+    console.error('Error populating orderbook with data', error)
+  }
+}
+
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!mountPoint.current) return
-    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops)
+    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId)
+
+    addData({
+      chart,
+      baseToken,
+      quoteToken,
+      hops,
+      networkId,
+    })
 
     return (): void => chart.dispose()
   }, [baseToken, quoteToken, networkId, hops])
