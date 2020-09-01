@@ -4,6 +4,11 @@ import { DexPriceEstimatorParams } from 'api/dexPriceEstimator/DexPriceEstimator
 import { ContractDeploymentBlock } from 'api/exchange/ExchangeApi'
 import { Network } from 'types'
 
+export interface TokenSelection {
+  sellToken: string
+  receiveToken: string
+}
+
 export interface MultiTcrConfig {
   type: 'multi-tcr'
   config: Omit<MultiTcrApiParams, 'web3'>
@@ -61,6 +66,7 @@ export interface Config {
   name: string
   logoPath: string
   templatePath: string
+  initialTokenSelection: TokenSelection
   tcr: MultiTcrConfig | NoTcrConfig
   dexPriceEstimator: DexPriceEstimatorConfig
   theGraphApi: TheGraphApiConfig
