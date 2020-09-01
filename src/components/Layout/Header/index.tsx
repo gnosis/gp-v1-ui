@@ -67,9 +67,26 @@ const CountDownStyled = styled.div`
   min-width: 15rem;
 
   > ${BatchNumberWrapper} {
+    min-width: 16rem;
+    display: flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    min-width: 16rem;
+    letter-spacing: 0;
     margin: 0.5rem 0;
     align-items: baseline;
-    min-width: 16rem;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
+
+    > strong {
+      color: var(--color-text-active);
+      margin-left: 0.3rem;
+    }
   }
 `
 
