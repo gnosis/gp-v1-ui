@@ -425,6 +425,8 @@ interface TokensAdderProps {
   onTokensAdded: (newTokens: TokenDetails[]) => void
 }
 
+const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
+
 const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, onTokensAdded }) => {
   const { addTokensToList, modalProps } = useBetterAddTokenModal({ focused: true })
 
@@ -465,7 +467,7 @@ interface ChooseTokenInput {
   tokens: TokenDetails[]
   token: TokenDetails | null
   tokenSymbolFromUrl?: string
-  defaultTokenSymbol: 'DAI' | 'USDC'
+  defaultTokenSymbol: string
 }
 
 const chooseTokenWithFallback = ({
@@ -561,7 +563,7 @@ const TradeWidget: React.FC = () => {
       token: trade.sellToken,
       tokens,
       tokenSymbolFromUrl: sellTokenSymbol,
-      defaultTokenSymbol: 'DAI',
+      defaultTokenSymbol: initialSellToken,
     }),
   )
   const [receiveToken, setReceiveToken] = useState(() =>
@@ -569,7 +571,7 @@ const TradeWidget: React.FC = () => {
       token: trade.buyToken,
       tokens,
       tokenSymbolFromUrl: receiveTokenSymbol,
-      defaultTokenSymbol: 'USDC',
+      defaultTokenSymbol: initialReceiveToken,
     }),
   )
 
@@ -586,7 +588,7 @@ const TradeWidget: React.FC = () => {
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
         tokenSymbolFromUrl: sellTokenSymbol, // from url params
-        defaultTokenSymbol: 'DAI', // default sellToken
+        defaultTokenSymbol: initialSellToken, // default sellToken
       })
       setSellToken(sellTokenOrFallback)
     }
@@ -598,7 +600,7 @@ const TradeWidget: React.FC = () => {
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault),
         tokenSymbolFromUrl: receiveTokenSymbol,
-        defaultTokenSymbol: 'USDC', // default buyToken
+        defaultTokenSymbol: initialReceiveToken, // default buyToken
       })
       setReceiveToken(buyTokenOrFallback)
     }
