@@ -633,6 +633,10 @@ const TradeWidget: React.FC = () => {
   })
   const { control, handleSubmit, reset, setValue, trigger, formState } = methods
 
+  // invoke before return
+  // as formState is Proxied
+  const { isValid } = formState
+
   const {
     sellToken: sellValue,
     validFrom: validFromValue,
@@ -1051,8 +1055,8 @@ const TradeWidget: React.FC = () => {
               disabled={isSubmitting}
               tabIndex={1}
               onClick={async (e): Promise<boolean> => {
-                // don't show Submit Confirm modal for invalid form
-                if (!formState.isValid) e.stopPropagation()
+                if (!isValid) e.stopPropagation()
+
                 return trigger()
               }}
             >
