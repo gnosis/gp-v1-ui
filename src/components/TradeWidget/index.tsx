@@ -209,14 +209,13 @@ const IconWrapper = styled.a`
   }
 `
 
-const WarningLabel = styled.code`
-  background: var(--color-error);
-  border-radius: var(--border-radius);
-  font-weight: bolder;
-  margin: 0 auto 0.9375rem;
-  padding: 6;
-  text-align: center;
-  width: 75%;
+const WarningLabel = styled(FormMessage)`
+  &&&&& {
+    color: ghostwhite;
+    background: var(--color-button-danger);
+    justify-content: center;
+    font-weight: bolder;
+  }
 `
 
 const SubmitButton = styled.button`
@@ -963,7 +962,12 @@ const TradeWidget: React.FC = () => {
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
         <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
-          {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
+          {sameToken && (
+            <>
+              <WarningLabel className="warning">Tokens cannot be the same! </WarningLabel>
+              <br />
+            </>
+          )}
           <TokenRow
             autoFocus
             selectedToken={sellToken}
@@ -1033,7 +1037,7 @@ const TradeWidget: React.FC = () => {
             <SubmitButton
               data-text="This order might be partially filled."
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || sameToken}
               tabIndex={1}
               onClick={(e): void => {
                 // don't show Submit Confirm modal for invalid form
@@ -1041,7 +1045,7 @@ const TradeWidget: React.FC = () => {
               }}
             >
               {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
-              {sameToken ? 'Please select different tokens' : 'Submit limit order'}
+              {sameToken ? 'Select different tokens' : 'Submit limit order'}
             </SubmitButton>
           </ButtonWrapper>
         </WrappedForm>
