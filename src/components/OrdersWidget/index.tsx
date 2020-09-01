@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useEffect } from 'react'
+import React, { useMemo, useCallback, useEffect, useRef } from 'react'
 // eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
@@ -96,6 +96,9 @@ function filterOrdersByDisplayType(
           (displayOnly === 'liquidity' && order.isUnlimited) || (displayOnly === 'regular' && !order.isUnlimited),
       )
 }
+
+// inputFOcus on filter timeout
+let inputTimeout: NodeJS.Timeout | undefined
 
 const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const { orders: allOrders, pendingOrders: allPendingOrders, forceOrdersRefresh } = useOrders()
@@ -201,7 +204,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   const {
     filteredData: filteredAndSortedOrders,
     search,
-    handlers: { handleSearch: handleSearchingOrders },
+    handlers: { handleSearch: handleSearchingOrders, clearFilters: clearOrdersFilters },
   } = useDataFilter({
     data: sortedOrders,
     filterFnFactory: filterOrdersFn,
@@ -210,19 +213,11 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
   // FILTER PENDING ORDERS
   const {
     filteredData: filteredAndSortedPendingOrders,
-    handlers: { handleSearch: handleSearchingPendingOrders },
+    handlers: { handleSearch: handleSearchingPendingOrders, clearFilters: clearPendingOrdersFilters },
   } = useDataFilter<DetailedPendingOrder>({
     data: displayedPendingOrders,
     filterFnFactory: filterOrdersFn,
   })
-
-  const handleBothOrderTypeSearch = useCallback(
-    (e): void => {
-      handleSearchingOrders(e)
-      handleSearchingPendingOrders(e)
-    },
-    [handleSearchingOrders, handleSearchingPendingOrders],
-  )
 
   // =========================================
   // =========================================
@@ -313,34 +308,52 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
 
   const {
     filteredData: filteredTrades,
-    search: tradesSearch,
-    handlers: { handleSearch: handleTradesSearch },
+    handlers: { handleSearch: handleTradesSearch, clearFilters: clearTradesFilters },
   } = useDataFilter<Trade>({
     data: settledAndNotRevertedTrades,
     filterFnFactory: filterTradesFn,
   })
 
-  const { handleTabSpecificSearch, tabSpecficSearch, tabSpecificResultName, tabSpecificDataLength } = useMemo(
+  const handleCompleteFilterClear = useCallback(() => {
+    clearTradesFilters()
+    clearPendingOrdersFilters()
+    clearOrdersFilters()
+  }, [clearOrdersFilters, clearPendingOrdersFilters, clearTradesFilters])
+
+  const handleCompleteSearch = useCallback(
+    (e): void => {
+      handleSearchingOrders(e)
+      handleSearchingPendingOrders(e)
+      handleTradesSearch(e)
+    },
+    [handleSearchingOrders, handleSearchingPendingOrders, handleTradesSearch],
+  )
+
+  const filterInputRef = useRef<HTMLInputElement>(null)
+  const focusFilterInput: () => boolean | undefined = () => filterInputRef?.current?.classList?.toggle('focusAnimation')
+  const handleCellClickAndFilterFocus = useCallback(
+    (e): void => {
+      // prevents multiple timeouts chaining
+      inputTimeout && clearTimeout(inputTimeout)
+      // Toggle animation class
+      focusFilterInput()
+      // fill in filter bar with filter text
+      handleCompleteSearch(e)
+      // wait for animation to finish and toggle off class
+      inputTimeout = setTimeout(focusFilterInput, 300)
+    },
+    [handleCompleteSearch],
+  )
+
+  const { tabSpecificResultName, tabSpecificDataLength } = useMemo(
     () => ({
-      handleTabSpecificSearch: (e: React.ChangeEvent<HTMLInputElement>): void =>
-        selectedTab === 'trades' ? handleTradesSearch(e) : handleBothOrderTypeSearch(e),
-      tabSpecficSearch: selectedTab === 'trades' ? tradesSearch : search,
       tabSpecificResultName: selectedTab === 'trades' ? 'trades' : 'orders',
       tabSpecificDataLength:
         selectedTab === 'trades'
           ? filteredTrades.length
           : displayedPendingOrders.length + filteredAndSortedOrders.length,
     }),
-    [
-      selectedTab,
-      tradesSearch,
-      search,
-      filteredTrades.length,
-      displayedPendingOrders.length,
-      filteredAndSortedOrders.length,
-      handleTradesSearch,
-      handleBothOrderTypeSearch,
-    ],
+    [selectedTab, filteredTrades.length, displayedPendingOrders.length, filteredAndSortedOrders.length],
   )
 
   const markedForDeletionChecked = !!(
@@ -363,11 +376,13 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
         <OrdersForm>
           <form action="submit" onSubmit={onSubmit}>
             <FilterTools
+              customRef={filterInputRef}
               className="widgetFilterTools"
               resultName={tabSpecificResultName}
-              searchValue={tabSpecficSearch}
-              handleSearch={handleTabSpecificSearch}
-              showFilter={!!tabSpecficSearch}
+              searchValue={search}
+              handleSearch={handleCompleteSearch}
+              clearFilters={handleCompleteFilterClear}
+              showFilter={!!search}
               dataLength={tabSpecificDataLength}
             >
               {selectedTab !== 'trades' && (
@@ -397,7 +412,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
             {selectedTab === 'trades' ? (
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
-                  <InnerTradesWidget isTab trades={filteredTrades} />
+                  <InnerTradesWidget isTab trades={filteredTrades} onCellClick={handleCellClickAndFilterFocus} />
                 </CardWidgetWrapper>
               </div>
             ) : ordersCount > 0 ? (
@@ -405,7 +420,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
                   <CardTable
-                    $columns="3.2rem minmax(8.6rem, 0.3fr) repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(8.6rem, 0.3fr)"
+                    $columns="3.2rem 5.5rem minmax(8.6rem, 0.3fr) repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(8.6rem, 0.3fr)"
                     $gap="0 0.6rem"
                     $rowSeparation="0"
                   >
@@ -419,6 +434,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                             disabled={deleting}
                           />
                         </th>
+                        <th>Order ID</th>
                         <th>Market</th>
                         <th>Limit price</th>
                         <th className="filled">Filled / Total</th>
@@ -442,6 +458,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           disabled={deleting}
                           isPendingOrder
                           transactionHash={order.txHash}
+                          onCellClick={handleCellClickAndFilterFocus}
                         />
                       ))}
                       {filteredAndSortedOrders.map((order) => (
@@ -454,6 +471,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                           toggleMarkedForDeletion={toggleMarkForDeletionFactory(order.id, selectedTab)}
                           pending={deleting && markedForDeletion.has(order.id)}
                           disabled={deleting}
+                          onCellClick={handleCellClickAndFilterFocus}
                         />
                       ))}
                     </tbody>
