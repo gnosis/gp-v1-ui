@@ -72,10 +72,10 @@ const FAQ = React.lazy(() =>
     'pages/FAQ'
   ),
 )
-const OrderBook = React.lazy(() =>
+const OrderBookPage = React.lazy(() =>
   import(
     /* webpackChunkName: "OrderBook_chunk"*/
-    'pages/OrderBook'
+    'pages/OrderBookPage'
   ),
 )
 const Settings = React.lazy(() =>
@@ -107,7 +107,7 @@ const App: React.FC = () => (
             <PrivateRoute path="/wallet" exact component={Wallet} />
             <Route path="/about" exact component={About} />
             <Route path="/faq" exact component={FAQ} />
-            <Route path="/book" exact component={OrderBook} />
+            <Route path="/book" exact component={OrderBookPage} />
             <Route path="/connect-wallet" exact component={ConnectWallet} />
             <Route path="/trades" exact component={Trades} />
             <Route path="/settings" exact component={Settings} />

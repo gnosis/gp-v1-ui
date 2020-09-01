@@ -18,7 +18,7 @@ import { DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 
-interface OrderBookProps {
+export interface OrderBookProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   networkId: number
@@ -304,7 +304,7 @@ const draw = (
   return chart
 }
 
-const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
+export const OrderBook: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops } = props
   const mountPoint = useRef<HTMLDivElement>(null)
 
@@ -323,4 +323,4 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   )
 }
 
-export default OrderBookWidget
+export default OrderBook

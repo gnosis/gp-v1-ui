@@ -8,9 +8,6 @@ import { TokenDetails } from 'types'
 import { parseBigNumber } from 'utils'
 import { DEFAULT_PRECISION, MEDIA } from 'const'
 
-// Components
-import { OrderBookBtn } from 'components/OrderBookBtn'
-
 // TradeWidget: subcomponents
 import { TradeFormData } from 'components/TradeWidget'
 import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
@@ -224,9 +221,7 @@ const Price: React.FC<Props> = ({
 
   return (
     <Wrapper>
-      <strong>
-        Limit Price <OrderBookBtn baseToken={receiveToken} quoteToken={sellToken} />
-      </strong>
+      <strong>Limit Price</strong>
       {/* using display: none to hide to avoid hook-form reregister */}
       <PriceInputBox hidden={priceShown !== 'DIRECT'}>
         <label>

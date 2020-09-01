@@ -42,6 +42,7 @@ import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
 import { Wrapper } from 'components/ConnectWalletBanner'
 import { Spinner } from 'components/Spinner'
+import { OrderBook } from 'components/OrderBook'
 
 // TradeWidget: subcomponents
 import TokenRow from 'components/TradeWidget/TokenRow'
@@ -256,7 +257,7 @@ const TradeParentWrapper = styled.div`
   }
 `
 
-const OrderBookPlaceholder = styled.div`
+const OrderBookWrapper = styled.div`
   display: flex;
   width: 100%;
   border-left: 0.1rem solid var(--color-background-banner);
@@ -1069,7 +1070,9 @@ const TradeWidget: React.FC = () => {
               </SubmitButton>
             </ButtonWrapper>
           </WrappedForm>
-          <OrderBookPlaceholder>-Add the order book component here -</OrderBookPlaceholder>
+          <OrderBookWrapper>
+            <OrderBook baseToken={receiveToken} quoteToken={sellToken} networkId={networkIdOrDefault} />
+          </OrderBookWrapper>
         </TradeParentWrapper>
       </FormContext>
       <ExpandableOrdersPanel>
