@@ -82,7 +82,7 @@ const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
   }
 `
 
-export const WrappedWidget = styled(Widget)`
+export const Wrapper = styled(Widget)`
   height: 100%;
   overflow-x: visible;
   min-width: 0;
@@ -257,7 +257,7 @@ const TradeParentWrapper = styled.div`
   }
 `
 
-const OrderBookPlaceholder = styled.div`
+const WrappedOrderBook = styled.div`
   display: flex;
   width: 100%;
   border-left: 0.1rem solid var(--color-background-banner);
@@ -982,9 +982,9 @@ const TradeWidget: React.FC = () => {
   const onConfirm = handleSubmit(onSubmit)
 
   return (
-    <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
+    <Wrapper className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
-      {/* Toggle Class 'expanded' on WrappedWidget on click of the <ExpandableOrdersPanel> <button> */}
+      {/* Toggle Class 'expanded' on Wrapper on click of the <ExpandableOrdersPanel> <button> */}
       <FormContext {...methods}>
         <TradeParentWrapper>
           <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
@@ -1070,9 +1070,9 @@ const TradeWidget: React.FC = () => {
               </SubmitButton>
             </ButtonWrapper>
           </WrappedForm>
-          <OrderBookPlaceholder>
+          <WrappedOrderBook>
             <OrderBook baseToken={receiveToken} quoteToken={sellToken} networkId={networkIdOrDefault} />
-          </OrderBookPlaceholder>
+          </WrappedOrderBook>
         </TradeParentWrapper>
       </FormContext>
       <ExpandableOrdersPanel>
@@ -1089,7 +1089,7 @@ const TradeWidget: React.FC = () => {
       </ExpandableOrdersPanel>
       {/* React Forms DevTool debugger */}
       {process.env.NODE_ENV === 'development' && <DevTool control={methods.control} />}
-    </WrappedWidget>
+    </Wrapper>
   )
 }
 
