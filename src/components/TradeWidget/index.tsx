@@ -115,6 +115,9 @@ const priceInverseInputId: TradeFormTokenId = 'priceInverse'
 const validFromId: TradeFormTokenId = 'validFrom'
 const validUntilId: TradeFormTokenId = 'validUntil'
 
+// Grab CONFIG tokens
+const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
+
 const TradeWidget: React.FC = () => {
   const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
   const { connectWallet } = useConnectWallet()
@@ -166,7 +169,7 @@ const TradeWidget: React.FC = () => {
       token: trade.sellToken,
       tokens,
       tokenSymbolFromUrl: sellTokenSymbol,
-      defaultTokenSymbol: 'DAI',
+      defaultTokenSymbol: initialSellToken,
     }),
   )
   const [receiveToken, setReceiveToken] = useState(() =>
@@ -174,7 +177,7 @@ const TradeWidget: React.FC = () => {
       token: trade.buyToken,
       tokens,
       tokenSymbolFromUrl: receiveTokenSymbol,
-      defaultTokenSymbol: 'USDC',
+      defaultTokenSymbol: initialReceiveToken,
     }),
   )
 
@@ -191,7 +194,7 @@ const TradeWidget: React.FC = () => {
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
         tokenSymbolFromUrl: sellTokenSymbol, // from url params
-        defaultTokenSymbol: 'DAI', // default sellToken
+        defaultTokenSymbol: initialSellToken, // default sellToken
       })
       setSellToken(sellTokenOrFallback)
     }
@@ -203,7 +206,7 @@ const TradeWidget: React.FC = () => {
           : null,
         tokens: tokenListApi.getTokens(networkIdOrDefault),
         tokenSymbolFromUrl: receiveTokenSymbol,
-        defaultTokenSymbol: 'USDC', // default buyToken
+        defaultTokenSymbol: initialReceiveToken, // default buyToken
       })
       setReceiveToken(buyTokenOrFallback)
     }

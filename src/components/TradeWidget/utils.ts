@@ -46,7 +46,7 @@ interface ChooseTokenInput {
   tokens: TokenDetails[]
   token: TokenDetails | null
   tokenSymbolFromUrl?: string
-  defaultTokenSymbol: 'DAI' | 'USDC'
+  defaultTokenSymbol: string
 }
 
 export const chooseTokenWithFallback = ({
