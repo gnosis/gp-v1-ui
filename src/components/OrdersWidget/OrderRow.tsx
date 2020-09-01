@@ -29,6 +29,7 @@ import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
+import { EllipsisText } from 'components/Layout'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
@@ -59,13 +60,29 @@ const DeleteOrder: React.FC<Pick<
 interface MarketProps {
   sellToken: TokenDetails
   buyToken: TokenDetails
+  onCellClick: (e: Pick<React.BaseSyntheticEvent<HTMLInputElement>, 'target'>) => void
 }
 
-const Market: React.FC<MarketProps> = ({ sellToken, buyToken }) => (
-  <td data-label="Market">
-    {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
-  </td>
-)
+const Market: React.FC<MarketProps> = ({ sellToken, buyToken, onCellClick }) => {
+  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
+    buyToken,
+    sellToken,
+  ])
+  return (
+    <td
+      data-label="Market"
+      onClick={(): void =>
+        onCellClick({
+          target: {
+            value: market,
+          },
+        })
+      }
+    >
+      {market}
+    </td>
+  )
+}
 
 interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
   buyToken: TokenDetails
@@ -139,6 +156,21 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = (
 
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
+
+const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { orderId: string }> = ({ orderId, onCellClick }) => (
+  <td
+    data-label="Order ID"
+    onClick={(): void =>
+      onCellClick({
+        target: {
+          value: orderId,
+        },
+      })
+    }
+  >
+    <EllipsisText title={orderId}>{orderId}</EllipsisText>
+  </td>
+)
 
 const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash' | 'isPendingOrder'>> = ({
   order,
@@ -275,6 +307,7 @@ interface Props {
   toggleMarkedForDeletion?: () => void
   disabled: boolean
   isPendingOrder?: boolean
+  onCellClick: (e: Pick<React.BaseSyntheticEvent<HTMLInputElement>, 'target'>) => void
 }
 
 const OrderRow: React.FC<Props> = (props) => {
@@ -288,6 +321,7 @@ const OrderRow: React.FC<Props> = (props) => {
     disabled,
     isPendingOrder,
     isOverBalance,
+    onCellClick,
   } = props
 
   // Fetching buy and sell tokens
@@ -309,7 +343,8 @@ const OrderRow: React.FC<Props> = (props) => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
-        <Market sellToken={sellToken} buyToken={buyToken} />
+        <OrderID orderId={order.id} onCellClick={onCellClick} />
+        <Market sellToken={sellToken} buyToken={buyToken} onCellClick={onCellClick} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
