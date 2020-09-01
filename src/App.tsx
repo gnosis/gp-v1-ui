@@ -4,6 +4,7 @@ import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 import Console from './Console'
+import { encodeSymbol } from '@gnosis.pm/dex-js'
 
 // SCSS
 import GlobalStyles from 'styles/global'
@@ -99,7 +100,7 @@ function getInitialUrl(): string {
   const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
   assertNonNull(initialSellToken, 'sellToken is required in the initialTokenSelection config')
   assertNonNull(initialReceiveToken, 'receiveToken is required in the initialTokenSelection config')
-  return '/trade/' + initialSellToken + '-' + initialReceiveToken + '?sell=0&price=0'
+  return '/trade/' + encodeSymbol(initialSellToken) + '-' + encodeSymbol(initialReceiveToken) + '?sell=0&price=0'
 }
 
 const initialUrl = getInitialUrl()
