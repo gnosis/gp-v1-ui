@@ -2,379 +2,88 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import { unstable_batchedUpdates as batchUpdateState } from 'react-dom'
 import { useForm, useWatch, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
-import styled from 'styled-components'
 import { toast } from 'toastify'
-import Modali from 'modali'
 import BN from 'bn.js'
-import { isAddress } from 'web3-utils'
 
-import { encodeTokenSymbol, decodeSymbol } from '@gnosis.pm/dex-js'
+import { decodeSymbol } from '@gnosis.pm/dex-js'
 
 // assets
 import { SwitcherSVG } from 'assets/img/SVG'
-import arrow from 'assets/img/arrow.svg'
 
 // const, types
-import { ZERO, BATCH_TIME_IN_MS } from 'const'
-import { MEDIA, PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
+import { ZERO } from 'const'
+import { PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network } from 'types'
 
 // utils
-import { getToken, parseAmount, parseBigNumber, dateToBatchId, resolverFactory, logDebug, batchIdToDate } from 'utils'
+import { getToken, parseAmount, dateToBatchId, resolverFactory, logDebug, batchIdToDate } from 'utils'
+import {
+  calculateValidityTimes,
+  chooseTokenWithFallback,
+  calculateReceiveAmount,
+  buildUrl,
+  preprocessTokenAddressesToAdd,
+} from 'components/TradeWidget/utils'
 
 // api
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { tokenListApi } from 'api'
 
 // components
-import Widget from 'components/Layout/Widget'
+
 import OrdersWidget from 'components/OrdersWidget'
-import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
 import { TxNotification } from 'components/TxNotification'
-import { Wrapper } from 'components/ConnectWalletBanner'
 import { Spinner } from 'components/Spinner'
+import { TxMessage } from './TxMessage'
 
 // TradeWidget: subcomponents
+import {
+  WrappedWidget,
+  WrappedForm,
+  WarningLabel,
+  IconWrapper,
+  ConfirmationModalWrapper,
+  SubmitButton,
+  ExpandableOrdersPanel,
+  OrdersToggler,
+} from './TradeWidget.styled'
+import TokensAdder from './TokenAdder'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
-import FormMessage from 'components/TradeWidget/FormMessage'
 import { PriceEstimations } from 'components/TradeWidget/PriceEstimations'
-import validationSchema, { BATCH_START_THRESHOLD } from 'components/TradeWidget/validationSchema'
 import Price, { invertPriceFromString } from 'components/TradeWidget/Price'
 
-// hooks and reducers
+// hooks
 import useURLParams from 'hooks/useURLParams'
 import { useTokenBalances } from 'hooks/useTokenBalances'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder } from 'hooks/usePlaceOrder'
-import { useQuery, buildSearchQuery } from 'hooks/useQuery'
+import { useQuery } from 'hooks/useQuery'
 import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
-import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
+import { DevTool } from 'HookFormDevtool'
+import { ButtonWrapper } from 'hooks/useSubmitTxModal'
+
+// Reducers
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 import { updateTradeState } from 'reducers-actions/trade'
 
-import { DevTool } from 'HookFormDevtool'
-import { ButtonWrapper } from 'hooks/useSubmitTxModal'
-import { TxMessage } from './TxMessage'
-import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
+// Validation
+import validationSchema from 'components/TradeWidget/validationSchema'
 
-const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
-  padding: 0;
-
-  .intro-text {
-    margin: 0 0 1rem 0;
-  }
-
-  .message {
-    margin: 1rem;
-  }
-`
-
-export const WrappedWidget = styled(Widget)`
-  height: 100%;
-  overflow-x: visible;
-  min-width: 0;
-  margin: 0 auto;
-  width: auto;
-  flex-flow: row nowrap;
-  display: flex;
-  background: var(--color-background-pageWrapper);
-  border-radius: 0.6rem;
-  margin: 0 auto;
-  font-size: 1.6rem;
-  line-height: 1;
-
-  &.expanded {
-    width: calc(50vw + 50rem);
-
-    > form {
-      width: 0;
-      min-width: 0;
-      overflow: hidden;
-      flex: none;
-      padding: 0;
-      opacity: 0;
-    }
-  }
-
-  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
-    flex-flow: column wrap;
-    height: auto;
-    width: 100%;
-  }
-
-  @media ${MEDIA.tablet} {
-    min-width: 90vw;
-  }
-`
-
-const WrappedForm = styled.form`
-  display: flex;
-  flex-flow: column nowrap;
-  flex: 1 0 42rem;
-  max-width: 50rem;
-  padding: 1.6rem;
-  box-sizing: border-box;
-  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
-  opacity: 1;
-
-  .react-select__control:focus-within,
-  input[type='checkbox']:focus,
-  button:focus {
-    outline: 1px dotted gray;
-  }
-
-  @media ${MEDIA.tablet} {
-    max-width: initial;
-    flex: 1 1 50%;
-    padding: 1.6rem 1.6rem 3.2rem;
-  }
-
-  @media ${MEDIA.mobile} {
-    width: 100%;
-    flex: 1 1 100%;
-    max-width: 100%;
-  }
-
-  > div {
-    @media ${MEDIA.mobile} {
-      width: 100%;
-    }
-  }
-
-  > p {
-    font-size: 1.3rem;
-    color: var(--color-text-primary);
-    letter-spacing: 0;
-    text-align: center;
-    margin: 1.6rem 0 0;
-  }
-
-  ${FormMessage} {
-    font-size: 1.3rem;
-    line-height: 1.2;
-    margin: 0.5rem 0 0;
-    flex-flow: row wrap;
-    justify-content: flex-start;
-
-    overflow-y: auto;
-
-    @media ${MEDIA.mediumUp} {
-      max-height: 11rem;
-    }
-
-    > b {
-      margin: 0.3rem;
-    }
-
-    > i {
-      margin: 0;
-      font-style: normal;
-      width: 100%;
-
-      > strong {
-        margin: 0.3rem 0 0.3rem 0.3rem;
-        font-size: 1.3rem;
-        word-break: break-all;
-
-        > span {
-          word-break: break-word;
-        }
-      }
-    }
-
-    > .btn {
-      margin: 0.3rem 0;
-    }
-  }
-`
-// Switcharoo arrows
-const IconWrapper = styled.a`
-  margin: 1rem auto;
-
-  > svg {
-    fill: var(--color-svg-switcher);
-    transition: opacity 0.2s ease-in-out;
-    opacity: 0.5;
-    &:hover {
-      opacity: 1;
-    }
-  }
-`
-
-const WarningLabel = styled.code`
-  background: var(--color-error);
-  border-radius: var(--border-radius);
-  font-weight: bolder;
-  margin: 0 auto 0.9375rem;
-  padding: 6;
-  text-align: center;
-  width: 75%;
-`
-
-const SubmitButton = styled.button`
-  background-color: var(--color-background-CTA);
-  color: var(--color-text-CTA);
-  border-radius: 3rem;
-  font-family: var(--font-default);
-  font-size: 1.6rem;
-  letter-spacing: 0.1rem;
-  text-align: center;
-  text-transform: uppercase;
-  padding: 1rem 2rem;
-  box-sizing: border-box;
-  line-height: 1;
-  width: 100%;
-  font-weight: var(--font-weight-bold);
-  height: 4.6rem;
-  margin: 1rem auto 0;
-  max-width: 32rem;
-
-  @media ${MEDIA.mobile} {
-    font-size: 1.3rem;
-    margin: 1rem auto 1.6rem;
-  }
-`
-
-export const ExpandableOrdersPanel = styled.div`
-  overflow: hidden;
-  display: flex;
-  flex-flow: column wrap;
-  flex: 1;
-  min-width: 50vw;
-  max-width: 100%;
-  background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
-  border-radius: 0 0.6rem 0.6rem 0;
-  box-sizing: border-box;
-  transition: flex 0.2s ease-in-out;
-  align-items: flex-start;
-  align-content: flex-start;
-
-  @media ${MEDIA.tablet} {
-    flex: 1 1 50%;
-    min-width: initial;
-    border-radius: 0;
-  }
-
-  // Connect Wallet banner in the orders panel
-  ${Wrapper} {
-    background: transparent;
-    box-shadow: none;
-  }
-
-  // Orders widget when inside the ExpandableOrdersPanel
-  ${OrdersWrapper} {
-    width: calc(100% - 1.6rem);
-    height: 90%;
-    background: transparent;
-    box-shadow: none;
-    border-radius: 0;
-
-    @media ${MEDIA.desktop} {
-      min-width: initial;
-    }
-
-    @media ${MEDIA.tablet}, ${MEDIA.mobile} {
-      width: 100%;
-    }
-
-    // Search Filter
-    .widgetFilterTools {
-      > .balances-searchTokens {
-        height: 3.6rem;
-        margin: 0.8rem;
-      }
-    }
-
-    .widgetCardWrapper {
-      thead,
-      tbody {
-        font-size: 1.1rem;
-
-        > tr {
-          padding: 0 1.4rem;
-
-          @media ${MEDIA.mobile} {
-            padding: 1.4rem;
-          }
-        }
-      }
-    }
-  }
-
-  > div.innerWidgetContainer {
-    height: 100%;
-    width: 100%;
-    box-sizing: border-box;
-    display: flex;
-    flex-flow: column nowrap;
-    border-radius: 0 0.6rem 0.6rem 0;
-
-    > h5 {
-      display: flex;
-      flex: 0 0 5rem;
-      align-items: center;
-      justify-content: center;
-      height: 10%;
-      width: 100%;
-      margin: 0;
-      padding: 0;
-
-      font-weight: var(--font-weight-bold);
-      font-size: 1.6rem;
-      color: var(--color-text-primary);
-      letter-spacing: 0.03rem;
-      text-align: center;
-
-      > a {
-        font-size: 1.3rem;
-        font-weight: var(--font-weight-normal);
-        color: var(--color-text-active);
-        text-decoration: underline;
-      }
-    }
-
-    @media ${MEDIA.tablet} {
-      width: 100%;
-      border-radius: 0;
-      margin: 2.4rem auto 0;
-    }
-
-    @media ${MEDIA.mobile} {
-      display: none;
-    }
-  }
-`
-
-export const OrdersToggler = styled.button<{ $isOpen?: boolean }>`
-  width: 1.6rem;
-  height: 100%;
-  border-right: 0.1rem solid rgba(159, 180, 201, 0.5);
-  background: var(--color-background);
-  padding: 0;
-  margin: 0;
-  outline: 0;
-
-  @media ${MEDIA.tablet}, ${MEDIA.mobile} {
-    display: none;
-  }
-
-  &::before {
-    display: block;
-    content: ' ';
-    background: url(${arrow}) no-repeat center/contain;
-    height: 1.2rem;
-    width: 100%;
-    margin: 0;
-    transform: rotate(${({ $isOpen }): number => ($isOpen ? 0.5 : 0)}turn);
-  }
-
-  &:hover {
-    background-color: var(--color-background-banner);
-  }
-`
+const NULL_BALANCE_TOKEN = {
+  exchangeBalance: ZERO,
+  totalExchangeBalance: ZERO,
+  pendingDeposit: { amount: ZERO, batchId: 0 },
+  pendingWithdraw: { amount: ZERO, batchId: 0 },
+  walletBalance: ZERO,
+  claimable: false,
+  enabled: false,
+  highlighted: false,
+  enabling: false,
+  claiming: false,
+}
 
 export type TradeFormTokenId = keyof TradeFormData
 
@@ -397,124 +106,6 @@ export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
   validFrom: null,
   // Do not expire (never)
   validUntil: null,
-}
-
-function calculateReceiveAmount(priceValue: string, sellValue: string): string {
-  let receiveAmount = ''
-  if (priceValue && sellValue) {
-    const sellAmount = parseBigNumber(sellValue)
-    const price = parseBigNumber(priceValue)
-
-    if (sellAmount && price) {
-      const receiveBigNumber = sellAmount.multipliedBy(price)
-      receiveAmount = receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : receiveBigNumber.toString(10)
-    }
-  }
-
-  return receiveAmount
-}
-
-interface TokensAdderProps {
-  tokenAddresses: string[]
-  networkId: number
-  onTokensAdded: (newTokens: TokenDetails[]) => void
-}
-
-const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, onTokensAdded }) => {
-  const { addTokensToList, modalProps } = useBetterAddTokenModal({ focused: true })
-
-  useEffect(() => {
-    if (tokenAddresses.length === 0) return
-
-    addTokensToList({ tokenAddresses, networkId }).then((newTokens) => {
-      if (newTokens.length > 0) {
-        onTokensAdded(newTokens)
-      }
-    })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // no deps, so that we only open modal once on mount
-
-  return tokenAddresses.length > 0 ? <Modali.Modal {...modalProps} /> : null
-}
-
-const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networkId: number): string[] => {
-  const tokenAddresses: string[] = []
-  const addedSet = new Set()
-
-  addresses.forEach((address) => {
-    if (
-      address &&
-      !addedSet.has(address) &&
-      !tokenListApi.hasToken({ tokenAddress: address, networkId }) &&
-      isAddress(address.toLowerCase())
-    ) {
-      tokenAddresses.push(address)
-      addedSet.add(address)
-    }
-  })
-
-  return tokenAddresses
-}
-
-interface ChooseTokenInput {
-  tokens: TokenDetails[]
-  token: TokenDetails | null
-  tokenSymbolFromUrl?: string
-  defaultTokenSymbol: 'DAI' | 'USDC'
-}
-
-const chooseTokenWithFallback = ({
-  tokens,
-  token,
-  tokenSymbolFromUrl,
-  defaultTokenSymbol,
-}: ChooseTokenInput): TokenDetails => {
-  return (
-    token ||
-    (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())
-      ? getToken('address', tokenSymbolFromUrl, tokens)
-      : getToken('symbol', tokenSymbolFromUrl, tokens)) ||
-    (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
-  )
-}
-
-function buildUrl(params: {
-  sell?: string
-  price?: string
-  from?: string | null
-  expires?: string | null
-  sellToken: TokenDetails
-  buyToken: TokenDetails
-}): string {
-  const { sell, price, from, expires, sellToken, buyToken } = params
-
-  const searchQuery = buildSearchQuery({
-    sell: sell || '',
-    price: price || '',
-    from: from || '',
-    expires: expires || '',
-  })
-
-  return `/trade/${encodeTokenSymbol(buyToken)}-${encodeTokenSymbol(sellToken)}?${searchQuery}`
-}
-
-const calculateValidityTimes = (timeSelected: string | null): string => {
-  if (!timeSelected || Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD > +timeSelected) return ''
-
-  return timeSelected.toString()
-}
-
-const NULL_BALANCE_TOKEN = {
-  exchangeBalance: ZERO,
-  totalExchangeBalance: ZERO,
-  pendingDeposit: { amount: ZERO, batchId: 0 },
-  pendingWithdraw: { amount: ZERO, batchId: 0 },
-  walletBalance: ZERO,
-  claimable: false,
-  enabled: false,
-  highlighted: false,
-  enabling: false,
-  claiming: false,
 }
 
 const sellInputId: TradeFormTokenId = 'sellToken'

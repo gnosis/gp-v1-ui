@@ -14,7 +14,7 @@ import { maxAmountsForSpread, resolverFactory, VALIDATOR_ERROR_KEYS } from 'util
 
 // components
 import OrdersWidget from 'components/OrdersWidget'
-import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
+import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget/TradeWidget.styled'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
