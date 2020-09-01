@@ -257,7 +257,7 @@ const TradeParentWrapper = styled.div`
   }
 `
 
-const OrderBookPlaceholder = styled.div`
+const OrderBookWrapper = styled.div`
   display: flex;
   width: 100%;
   border-left: 0.1rem solid var(--color-background-banner);
@@ -1070,9 +1070,9 @@ const TradeWidget: React.FC = () => {
               </SubmitButton>
             </ButtonWrapper>
           </WrappedForm>
-          <OrderBookPlaceholder>
+          <OrderBookWrapper>
             <OrderBook baseToken={receiveToken} quoteToken={sellToken} networkId={networkIdOrDefault} />
-          </OrderBookPlaceholder>
+          </OrderBookWrapper>
         </TradeParentWrapper>
       </FormContext>
       <ExpandableOrdersPanel>
