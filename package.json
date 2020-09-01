@@ -21,7 +21,8 @@
     "storybook": "BROWSER=NONE start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "docs": "start-storybook --docs",
-    "build-docs": "build-storybook --docs"
+    "build-docs": "build-storybook --docs",
+    "chromatic": "chromatic"
   },
   "husky": {
     "hooks": {
@@ -99,6 +100,7 @@
     "babel-loader": "^8.0.6",
     "babel-plugin-styled-components": "^1.10.7",
     "babel-plugin-transform-imports": "^2.0.0",
+    "chromatic": "^5.1.0",
     "console-feed": "^3.0.0",
     "coveralls": "^3.0.9",
     "css-loader": "^3.4.2",
