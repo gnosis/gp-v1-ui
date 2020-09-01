@@ -241,7 +241,6 @@ const Footer: React.FC = () => {
           <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
             Web: v{VERSION}
           </a>{' '}
-          {/* -{' '} */}
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -249,7 +248,6 @@ const Footer: React.FC = () => {
           >
             App Id: {CONFIG.appId}
           </a>{' '}
-          {/* -{' '} */}
           <a
             target="_blank"
             rel="noopener noreferrer"
