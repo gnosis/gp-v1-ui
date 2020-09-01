@@ -95,7 +95,6 @@ import { assertNonNull } from 'utils'
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
 
 function getInitialUrl(): string {
-  // Validate tha
   assertNonNull(CONFIG.initialTokenSelection, 'initialTokenSelection config is required')
   const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
   assertNonNull(initialSellToken, 'sellToken is required in the initialTokenSelection config')
