@@ -221,7 +221,7 @@ const TradeWidget: React.FC = () => {
   const [ordersVisible, setOrdersVisible] = useState(true)
 
   const methods = useForm<TradeFormData>({
-    mode: 'onChange',
+    mode: 'all',
     defaultValues: defaultFormValues,
     resolver: validationResolver,
   })
@@ -648,10 +648,11 @@ const TradeWidget: React.FC = () => {
               type="button"
               disabled={isSubmitting}
               tabIndex={1}
-              onClick={async (e): Promise<boolean> => {
-                if (!isValid) e.stopPropagation()
-
-                return trigger()
+              onClick={(e): void => {
+                if (!isValid) {
+                  e.stopPropagation()
+                  trigger()
+                }
               }}
             >
               {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
