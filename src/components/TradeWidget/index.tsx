@@ -328,7 +328,7 @@ const TradeWidget: React.FC = () => {
         priceDenominator,
         networkId,
         userAddress,
-        validFromWithBatchID,
+        validFromWithBatchId,
         validUntilWithBatchID,
         expiresNever,
       },
@@ -353,8 +353,8 @@ const TradeWidget: React.FC = () => {
         user: userAddress,
         remainingAmount: priceDenominator,
         sellTokenBalance: ZERO,
-        validFrom: validFromWithBatchID,
-        //  when expiresNever == true, validUntilWithBatchID == validFromWithBatchID
+        validFrom: validFromWithBatchId,
+        //  when expiresNever == true, validUntilWithBatchID == validFromWithBatchId
         validUntil: expiresNever ? 0 : validUntilWithBatchID,
         txHash,
         isUnlimited: false,
@@ -393,10 +393,10 @@ const TradeWidget: React.FC = () => {
       setIsSubmitting(true)
 
       // TODO: Review this logic. This should be calculated in the same place where we send the tx
-      const validFromWithBatchID = validFrom
+      const validFromWithBatchId = validFrom
       const validUntilWithBatchID = validUntil
 
-      const isASAP = validFromWithBatchID === 0
+      const isASAP = validFromWithBatchId === 0
       const isNever = validUntilWithBatchID === 0
 
       // ASAP ORDER
@@ -421,7 +421,7 @@ const TradeWidget: React.FC = () => {
                   networkId,
                   userAddress,
                   sellToken,
-                  validFromWithBatchID,
+                  validFromWithBatchId,
                   validUntilWithBatchID,
                   expiresNever: isNever,
                 },
@@ -461,7 +461,7 @@ const TradeWidget: React.FC = () => {
                   priceDenominator: sellAmount,
                   networkId,
                   userAddress,
-                  validFromWithBatchID,
+                  validFromWithBatchId,
                   validUntilWithBatchID,
                   expiresNever: isNever,
                 },
@@ -469,7 +469,7 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: batchIdToDate(validFromWithBatchID).getTime().toString(),
+                  validFrom: batchIdToDate(validFromWithBatchId).getTime().toString(),
                   validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
