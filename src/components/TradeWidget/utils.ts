@@ -84,7 +84,7 @@ export function buildUrl(params: {
   return `/trade/${encodeTokenSymbol(buyToken)}-${encodeTokenSymbol(sellToken)}?${searchQuery}`
 }
 
-export const calculateValidityTimes = (timeSelected: string | null): string => {
+export const calculateValidityTimes = (timeSelected?: string | null): string => {
   if (!timeSelected || Date.now() + BATCH_TIME_IN_MS * BATCH_START_THRESHOLD > +timeSelected) return ''
 
   return timeSelected.toString()
