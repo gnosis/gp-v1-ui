@@ -152,14 +152,13 @@ export const IconWrapper = styled.a`
   }
 `
 
-export const WarningLabel = styled.code`
-  background: var(--color-error);
-  border-radius: var(--border-radius);
-  font-weight: bolder;
-  margin: 0 auto 0.9375rem;
-  padding: 6;
-  text-align: center;
-  width: 75%;
+export const WarningLabel = styled(FormMessage)`
+  &&&&& {
+    color: ghostwhite;
+    background: var(--color-button-danger);
+    justify-content: center;
+    font-weight: bolder;
+  }
 `
 
 export const SubmitButton = styled.button`

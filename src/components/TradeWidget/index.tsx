@@ -576,7 +576,12 @@ const TradeWidget: React.FC = () => {
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormProvider {...methods}>
         <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
-          {sameToken && <WarningLabel>Tokens cannot be the same!</WarningLabel>}
+          {sameToken && (
+            <>
+              <WarningLabel className="warning">Tokens cannot be the same! </WarningLabel>
+              <br />
+            </>
+          )}
           <TokenRow
             autoFocus
             selectedToken={sellToken}
@@ -645,8 +650,8 @@ const TradeWidget: React.FC = () => {
           >
             <SubmitButton
               data-text="This order might be partially filled."
-              type="button"
-              disabled={isSubmitting}
+              type="submit"
+              disabled={isSubmitting || sameToken}
               tabIndex={1}
               onClick={(e): void => {
                 if (!isValid) {
@@ -656,7 +661,7 @@ const TradeWidget: React.FC = () => {
               }}
             >
               {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
-              {sameToken ? 'Please select different tokens' : 'Submit limit order'}
+              {sameToken ? 'Select different tokens' : 'Submit limit order'}
             </SubmitButton>
           </ButtonWrapper>
         </WrappedForm>
