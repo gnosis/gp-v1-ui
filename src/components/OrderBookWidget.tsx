@@ -5,7 +5,7 @@ import { RawApiData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 import useSafeState from 'hooks/useSafeState'
 
-import OrderBookChart, { OrderBookChartProps } from './OrderBookChart'
+import OrderBookChart, { OrderBookChartProps, Wrapper as OrderBookWrapper } from './OrderBookChart'
 
 interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
   hops?: number
@@ -13,7 +13,10 @@ interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
 
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops } = props
+  console.log('Widget props', props)
   const [apiData, setApiData] = useSafeState<RawApiData | null>(null)
+  const [error, setError] = useSafeState<Error | null>(null)
+
   // sync resetting ApiData to avoid old data on new labels flash
   // and layout changes
   useMemo(() => {
@@ -36,11 +39,14 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
         setApiData(rawData)
       } catch (error) {
         console.error('Error populating orderbook with data', error)
+        setError(error)
       }
     }
 
     fetchApiData()
-  }, [baseToken, quoteToken, networkId, hops, setApiData])
+  }, [baseToken, quoteToken, networkId, hops, setApiData, setError])
+
+  if (error) return <OrderBookWrapper>{error.message}</OrderBookWrapper>
 
   return <OrderBookChart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} data={apiData} />
 }
