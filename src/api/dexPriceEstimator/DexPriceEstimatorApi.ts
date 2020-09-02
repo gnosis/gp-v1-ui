@@ -136,12 +136,12 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       const res = await fetch(url)
       return await res.json()
     } catch (error) {
-      console.error(e)
+      console.error(error)
 
       const { baseTokenId, quoteTokenId } = params
 
       throw new Error(
-        `Failed to query orderbook data for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${e.message}`,
+        `Failed to query orderbook data for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${error.message}`,
       )
     }
   }
