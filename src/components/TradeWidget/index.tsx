@@ -50,7 +50,7 @@ import TokensAdder from './TokenAdder'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
 import { PriceEstimations } from 'components/TradeWidget/PriceEstimations'
-import Price, { invertPriceFromString } from 'components/TradeWidget/Price'
+import Price, { invertPriceFromString } from 'components/trade/Price'
 
 // hooks
 import useURLParams from 'hooks/useURLParams'
