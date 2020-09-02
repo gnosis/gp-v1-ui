@@ -213,19 +213,10 @@ function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetai
   })
 }
 
-const draw = (
-  chartElement: HTMLElement,
-  baseToken: TokenDetails,
-  quoteToken: TokenDetails,
-  networkId: number,
-): am4charts.XYChart => {
-  const baseTokenLabel = safeTokenName(baseToken)
-  const quoteTokenLabel = safeTokenName(quoteToken)
-  const market = baseTokenLabel + '-' + quoteTokenLabel
+const createChart = (chartElement: HTMLElement): am4charts.XYChart => {
   am4core.useTheme(am4themesSpiritedaway)
   am4core.options.autoSetClassName = true
   const chart = am4core.create(chartElement, am4charts.XYChart)
-  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
 
   // Colors
   const colors = {
@@ -236,10 +227,8 @@ const draw = (
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
   xAxis.dataFields.category = 'priceNumber'
-  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
 
-  const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
-  yAxis.title.text = baseTokenLabel
+  chart.yAxes.push(new am4charts.ValueAxis())
 
   // Create series
   const bidSeries = chart.series.push(new am4charts.StepLineSeries())
@@ -250,7 +239,6 @@ const draw = (
   bidSeries.fill = bidSeries.stroke
   bidSeries.startLocation = 0.5
   bidSeries.fillOpacity = 0.1
-  bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 
   const askSeries = chart.series.push(new am4charts.StepLineSeries())
   askSeries.dataFields.categoryX = 'priceNumber'
@@ -260,11 +248,36 @@ const draw = (
   askSeries.fill = askSeries.stroke
   askSeries.fillOpacity = 0.1
   askSeries.startLocation = 0.5
-  askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 
   // Add cursor
   chart.cursor = new am4charts.XYCursor()
   return chart
+}
+
+interface DrawLabelsParams {
+  chart: am4charts.XYChart
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+  networkId: number
+}
+
+const drawLabels = ({ chart, baseToken, quoteToken, networkId }: DrawLabelsParams): void => {
+  const baseTokenLabel = safeTokenName(baseToken)
+  const quoteTokenLabel = safeTokenName(quoteToken)
+  const market = baseTokenLabel + '-' + quoteTokenLabel
+
+  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
+
+  const [xAxis] = chart.xAxes
+  const [yAxis] = chart.yAxes
+
+  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+  yAxis.title.text = baseTokenLabel
+
+  const [bidSeries, askSeries] = chart.series
+
+  bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+  askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 }
 
 interface ProcessRawDataParams {
@@ -293,18 +306,33 @@ const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDataParams
 
 const OrderBookWidget: React.FC<OrderBookChartProps> = (props) => {
   const { baseToken, quoteToken, networkId, data } = props
+  console.log('props', props)
   const mountPoint = useRef<HTMLDivElement>(null)
+  const chartRef = useRef<am4charts.XYChart | null>(null)
 
   useEffect(() => {
     if (!mountPoint.current) return
-    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId)
+    const chart = createChart(mountPoint.current)
+    chartRef.current = chart
 
-    if (!data) return
-
-    chart.data = processRawApiData({ data, baseToken, quoteToken })
-
+    // dispose on mount only
     return (): void => chart.dispose()
-  }, [data, baseToken, quoteToken, networkId])
+  }, [])
+
+  useEffect(() => {
+    if (!chartRef.current || !data) return
+
+    // go on with the update when data is ready
+    drawLabels({
+      chart: chartRef.current,
+      baseToken,
+      quoteToken,
+      networkId,
+    })
+
+    chartRef.current.data = processRawApiData({ data, baseToken, quoteToken })
+    console.log('WILL DISPLAY NEW DATA', chartRef.current.data)
+  }, [baseToken, networkId, quoteToken, data])
 
   return (
     <Wrapper ref={mountPoint}>

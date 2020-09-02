@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useMemo } from 'react'
 
 import { dexPriceEstimatorApi } from 'api'
 import { RawApiData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
@@ -14,10 +14,16 @@ interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops } = props
   const [apiData, setApiData] = useSafeState<RawApiData | null>(null)
+  // sync resetting ApiData to avoid old data on new labels flash
+  // and layout changes
+  useMemo(() => {
+    setApiData(null)
+    setError(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseToken, quoteToken, networkId, hops])
 
   useEffect(() => {
     const fetchApiData = async (): Promise<void> => {
-      setApiData(null)
       try {
         const rawData = await dexPriceEstimatorApi.getOrderBookData({
           baseTokenId: baseToken.id,
