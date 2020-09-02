@@ -1,21 +1,19 @@
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
 import { useFormContext } from 'react-hook-form'
-import BigNumber from 'bignumber.js'
 
-import { TokenDetails, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
+import { TokenDetails } from '@gnosis.pm/dex-js'
 
-import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-
-import { PRICE_ESTIMATION_PRECISION, MEDIA } from 'const'
-import { displayTokenSymbolOrLink } from 'utils/display'
-
-import Spinner from 'components/common/Spinner'
+import { MEDIA } from 'const'
 
 import { TradeFormData } from 'components/TradeWidget'
-import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
-import { EllipsisText } from 'components/Layout'
+
+import { SwapPrice } from 'components/common/SwapPrice'
+import { EllipsisText } from 'components/common/EllipsisText'
+
+import { OnchainOrderbookPriceEstimation } from 'components/trade/OnchainOrderbookPriceEstimation'
 
 const Wrapper = styled.div`
   > div {
@@ -109,46 +107,6 @@ const Wrapper = styled.div`
   }
 `
 
-interface SwapPriceProps
-  extends Pick<PriceEstimationsProps, 'baseToken' | 'quoteToken' | 'isPriceInverted' | 'swapPrices'> {
-  separator?: string
-  showOnlyQuoteToken?: boolean
-}
-
-const SwapPriceWrapper = styled.div`
-  cursor: pointer;
-  div.separator {
-    margin: 0 0.4rem;
-  }
-`
-
-export const SwapPrice: React.FC<SwapPriceProps> = ({
-  baseToken,
-  quoteToken,
-  separator = '/',
-  isPriceInverted,
-  swapPrices,
-  showOnlyQuoteToken = false,
-}) => {
-  const displayBaseToken = !isPriceInverted ? quoteToken : baseToken
-  const displayQuoteToken = isPriceInverted ? quoteToken : baseToken
-  const displayBtName = displayTokenSymbolOrLink(displayBaseToken)
-  const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
-
-  return (
-    <SwapPriceWrapper onClick={swapPrices}>
-      {!showOnlyQuoteToken && (
-        <>
-          <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>
-          <div className="separator">{separator}</div>
-        </>
-      )}
-      <EllipsisText title={safeTokenName(displayQuoteToken)}>{displayQtName}</EllipsisText>
-      <SwapIcon />
-    </SwapPriceWrapper>
-  )
-}
-
 const OnchainOrderbookTooltip = (
   <HelpTooltipContainer>
     Based on existing Onchain orders, taking into account possible ring trades. <br />
@@ -162,7 +120,7 @@ const OnchainOrderbookTooltip = (
   </HelpTooltipContainer>
 )
 
-interface PriceEstimationsProps {
+export interface Props {
   networkId: number
   baseToken: TokenDetails
   quoteToken: TokenDetails
@@ -173,7 +131,7 @@ interface PriceEstimationsProps {
   swapPrices: () => void
 }
 
-export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
+export const PriceEstimations: React.FC<Props> = (props) => {
   const { amount, baseToken, quoteToken, isPriceInverted, priceInputId, priceInverseInputId, swapPrices } = props
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
@@ -210,64 +168,5 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
         )}
       </div>
     </Wrapper>
-  )
-}
-
-interface OnchainOrderbookPriceEstimationProps extends Omit<PriceEstimationsProps, 'inputId'> {
-  updatePrices: (price: string, invertedPrice: string) => () => void
-}
-
-function formatPriceToPrecision(price: BigNumber): string {
-  return price.toFixed(PRICE_ESTIMATION_PRECISION)
-}
-
-const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationProps> = (props) => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, swapPrices, updatePrices } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
-
-  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
-    networkId,
-    amount: amount || '0',
-    baseTokenId,
-    baseTokenDecimals,
-    quoteTokenId,
-    quoteTokenDecimals,
-  })
-
-  let price = 'N/A'
-  let invertedPrice = 'N/A'
-
-  if (priceEstimation) {
-    price = formatPriceToPrecision(isPriceInverted ? invertPrice(priceEstimation) : priceEstimation)
-    invertedPrice = formatPriceToPrecision(!isPriceInverted ? invertPrice(priceEstimation) : priceEstimation)
-  }
-  const displayPrice = price === 'Infinity' || invertedPrice === 'Infinity' ? 'N/A' : price
-
-  return (
-    <>
-      <span>
-        <span>Best ask</span>{' '}
-        {amount && (
-          <strong>
-            ({amount} {displayTokenSymbolOrLink(quoteToken)})
-          </strong>
-        )}
-      </span>
-      <button
-        type="button"
-        disabled={isPriceLoading || displayPrice === 'N/A'}
-        onClick={updatePrices(price, invertedPrice)}
-      >
-        {isPriceLoading ? <Spinner /> : displayPrice}
-      </button>
-      <SwapPrice
-        baseToken={baseToken}
-        quoteToken={quoteToken}
-        swapPrices={swapPrices}
-        isPriceInverted={isPriceInverted}
-        showOnlyQuoteToken
-      />
-    </>
   )
 }

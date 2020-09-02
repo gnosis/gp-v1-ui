@@ -7,12 +7,13 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
 import { EtherscanLink } from 'components/common/EtherscanLink'
+import { EllipsisText } from 'components/common/EllipsisText'
+
 import { FoldableRowWrapper } from 'components/Layout/Card'
 
 import { isTradeSettled, divideBN, formatPercentage } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { MEDIA } from 'const'
-import { EllipsisText } from 'components/Layout'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   td {

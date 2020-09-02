@@ -13,6 +13,9 @@ import { EtherscanLink } from 'components/common/EtherscanLink'
 import { Spinner } from 'components/common/Spinner'
 import { StatusCountdown } from 'components/StatusCountdown'
 
+// Common
+import { EllipsisText } from 'components/common/EllipsisText'
+
 // hooks
 import useSafeState from 'hooks/useSafeState'
 
@@ -29,7 +32,6 @@ import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { EllipsisText } from 'components/Layout'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
