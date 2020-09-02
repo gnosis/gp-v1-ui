@@ -1,5 +1,4 @@
 import styled from 'styled-components'
-import FormMessage from './FormMessage'
 import Widget from 'components/Layout/Widget'
 import { Wrapper } from 'components/ConnectWalletBanner'
 import { OrdersWrapper } from 'components/OrdersWidget/OrdersWidget.styled'
@@ -7,6 +6,7 @@ import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
 
 import { MEDIA } from 'const'
 import arrow from 'assets/img/arrow.svg'
+import { FormMessage } from 'components/atoms/FormMessage'
 
 export const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
   padding: 0;
