@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 // Components
-import { FormMessage } from 'components/atoms/FormMessage'
+import { FormMessage } from 'components/common/FormMessage'
 // Assets
 import searchIcon from 'assets/img/search.svg'
 // Misc
