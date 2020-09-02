@@ -165,6 +165,20 @@ const SideContentWrapper = styled.div`
       order: 1;
     }
   }
+
+  @media ${MEDIA.xSmallDown} {
+    > .version {
+      flex-flow: column nowrap;
+
+      > a {
+        margin: 0.5rem 0;
+
+        &:first-child {
+          order: 5;
+        }
+      }
+    }
+  }
 `
 
 const LinkWrapper = styled(EtherscanLink)`
@@ -227,7 +241,6 @@ const Footer: React.FC = () => {
           <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
             Web: v{VERSION}
           </a>{' '}
-          -{' '}
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -235,7 +248,6 @@ const Footer: React.FC = () => {
           >
             App Id: {CONFIG.appId}
           </a>{' '}
-          -{' '}
           <a
             target="_blank"
             rel="noopener noreferrer"

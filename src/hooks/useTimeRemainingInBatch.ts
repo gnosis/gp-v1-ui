@@ -3,17 +3,17 @@ import { getTimeRemainingInBatch } from 'utils'
 import { useEffect, useRef } from 'react'
 import { BATCH_TIME } from 'const'
 
-export function useTimeRemainingInBatch(): number {
-  const [timeRemaining, setTimeRemaining] = useSafeState(getTimeRemainingInBatch())
+export function useTimeRemainingInBatch(batchesToCountdown?: number): number {
+  const [timeRemaining, setTimeRemaining] = useSafeState(() => getTimeRemainingInBatch({ batches: batchesToCountdown }))
 
   useEffect(() => {
     let interval: null | NodeJS.Timeout = null
 
     function updateImmediatelyAndStartInterval(): void {
       // update once
-      setTimeRemaining(getTimeRemainingInBatch())
+      setTimeRemaining(getTimeRemainingInBatch({ batches: batchesToCountdown }))
       // update every second from now on
-      interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch()), 1000)
+      interval = setInterval(() => setTimeRemaining(getTimeRemainingInBatch({ batches: batchesToCountdown })), 1000)
     }
 
     // timeout to start the timer exactly at second mark
@@ -31,7 +31,7 @@ export function useTimeRemainingInBatch(): number {
       // `clearInterval` works for both interval AND timeouts
       if (interval) clearInterval(interval)
     }
-  }, [setTimeRemaining])
+  }, [setTimeRemaining, batchesToCountdown])
 
   return timeRemaining
 }

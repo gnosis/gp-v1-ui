@@ -1,13 +1,25 @@
-import { formatDistanceToNow, addMinutes, formatDistanceStrict } from 'date-fns'
-
+import {
+  format,
+  formatDistance,
+  formatDistanceToNow,
+  addMinutes,
+  roundToNearestMinutes,
+  formatDistanceStrict,
+  addYears,
+} from 'date-fns'
 import { BATCH_TIME, BATCH_TIME_IN_MS, BATCH_SUBMISSION_CLOSE_TIME } from 'const'
 
+export { formatDistanceStrict, format as formatDate, addMinutes, addYears, roundToNearestMinutes }
+export const DEFAULT_DATE_FORMAT = 'yyyy.MM.dd HH:mm'
 /**
  * Epoch in seconds
  */
 export function getEpoch(): number {
   return Math.floor(Date.now() / 1000)
 }
+
+export const simpleIsDateCheck = (date?: Date | string | number | null): number =>
+  !date ? Date.now() : typeof date === 'string' || typeof date === 'number' ? +date : date.getTime()
 
 /**
  * Calculates the batchId. Either current batchId based on current Epoch
@@ -19,8 +31,8 @@ export function getEpoch(): number {
  * @param date? Optional Date object to calculate the batchId from.
  *  Defaults to Date.now()
  */
-export function dateToBatchId(date?: Date | string | number): number {
-  const timestamp = !date ? Date.now() : typeof date === 'string' || typeof date === 'number' ? +date : date.getTime()
+export function dateToBatchId(date?: Date | string | number | null): number {
+  const timestamp = simpleIsDateCheck(date)
   const timestampInSeconds = Math.floor(timestamp / 1000)
   return Math.floor(timestampInSeconds / BATCH_TIME)
 }
@@ -30,10 +42,28 @@ export function batchIdToDate(batchId: number): Date {
   return new Date(timestamp)
 }
 
+export const formatRelativeBatchId = (
+  newBatchId: string | number,
+  baseBatchId: string | number,
+  strict?: boolean,
+): string => {
+  const newDate = batchIdToDate(+newBatchId)
+  const baseDate = batchIdToDate(+baseBatchId)
+
+  return strict ? formatDistanceStrict(newDate, baseDate) : formatDistance(newDate, baseDate)
+}
+
 export function formatDateFromBatchId(batchId: number, options?: { strict?: boolean; addSuffix?: boolean }): string {
   const { strict = false, addSuffix = true } = options || {}
   const date = batchIdToDate(batchId)
   return strict ? formatDistanceStrict(date, new Date(), { addSuffix }) : formatDistanceToNow(date, { addSuffix })
+}
+
+export function formatDateLocaleShortTime(dateMs: number): string {
+  const localeDate = new Date(dateMs).toLocaleDateString()
+  const time = format(dateMs, 'HH:mm')
+
+  return localeDate + ' ' + time
 }
 
 /**
@@ -53,10 +83,10 @@ export function calculateSettlingTimestamp(batchId: number): number {
  *
  * @param inMilliseconds  Optional parameter indicating time unit. Defaults to false == in seconds
  */
-export function getTimeRemainingInBatch(params?: { inMilliseconds: boolean }): number {
-  const { inMilliseconds = false } = params || {}
-
-  const timeRemainingInMs = BATCH_TIME_IN_MS - (Date.now() % BATCH_TIME_IN_MS)
+export function getTimeRemainingInBatch(params?: { batches?: number; inMilliseconds?: boolean }): number {
+  const { inMilliseconds = false, batches = 1 } = params || {}
+  const calculatedBatchTimeMs = BATCH_TIME_IN_MS * batches
+  const timeRemainingInMs = calculatedBatchTimeMs - (Date.now() % BATCH_TIME_IN_MS)
 
   return inMilliseconds ? timeRemainingInMs : Math.floor(timeRemainingInMs / 1000)
 }

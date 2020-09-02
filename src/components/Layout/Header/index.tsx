@@ -27,6 +27,26 @@ export interface HeaderProps {
   }[]
 }
 
+export const BatchNumberWrapper = styled.span`
+  &&&&& {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    letter-spacing: 0;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
+
+    > strong {
+      color: var(--color-text-active);
+    }
+  }
+`
+
 const TopWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
@@ -46,30 +66,31 @@ const CountDownStyled = styled.div`
   order 2;
   min-width: 15rem;
 
- > div {
-  display: flex;
-  font-family: var(--font-mono);
-  font-size: 1.2rem;
-  color: var(--color-text-primary);
-  min-width: 16rem;
-  letter-spacing: 0;
-  margin: 0.5rem 0;
-  align-items: baseline;
+  > ${BatchNumberWrapper} {
+    min-width: 16rem;
+    display: flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    min-width: 16rem;
+    letter-spacing: 0;
+    margin: 0.5rem 0;
+    align-items: baseline;
 
-  @media ${MEDIA.mobile} {
-    flex-flow: row wrap;
-    line-height: 1.2;
-    width: auto;
-  }
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
 
-  > strong {
-    color: var(--color-text-active);
-    margin-left: 0.3rem;
+    > strong {
+      color: var(--color-text-active);
+      margin-left: 0.3rem;
+    }
   }
- }
 `
 
-const DevdocTooltip = (
+export const DevdocTooltip = (
   <HelpTooltipContainer>
     <p>
       On Gnosis Protocol, orders placed on-chain are not immediately executed, but rather collected and aggregated to be
@@ -85,18 +106,26 @@ const DevdocTooltip = (
   </HelpTooltipContainer>
 )
 
+export const BatchNumberWithHelp: React.FC<{ batchId?: number | null; title?: string }> = ({
+  batchId,
+  title = 'Batch: ',
+}) => (
+  <BatchNumberWrapper className="BatchNumberWrapper">
+    {title}
+    <strong>{batchId || dateToBatchId()}</strong>
+    &nbsp;
+    <HelpTooltip tooltip={DevdocTooltip} />
+  </BatchNumberWrapper>
+)
+
 const BatchCountDown: React.FC = () => {
   const timeRemainingInBatch = useTimeRemainingInBatch()
   return (
     <CountDownStyled>
-      <div>
+      <BatchNumberWrapper>
         Next batch: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
-      </div>
-      <div>
-        Batch: <strong>{dateToBatchId()}</strong>
-        &nbsp;
-        <HelpTooltip tooltip={DevdocTooltip} />
-      </div>
+      </BatchNumberWrapper>
+      <BatchNumberWithHelp />
     </CountDownStyled>
   )
 }

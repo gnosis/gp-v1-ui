@@ -1,9 +1,11 @@
 import React from 'react'
-import Joi from '@hapi/joi'
-import { FormContextValues, ErrorMessage, FieldErrors } from 'react-hook-form'
+import Joi from 'joi'
+import { UseFormMethods } from 'react-hook-form'
+import { FieldErrors } from 'react-hook-form/dist/types/form'
+import { ErrorMessage } from '@hookform/error-message'
 import styled from 'styled-components'
 
-import { Resolver, SettingsFormData } from 'pages/Settings'
+import { SettingsFormData, CustomResolverResult } from 'pages/Settings'
 import { InputBox } from 'components/InputBox'
 import { Input } from 'components/Input'
 
@@ -34,14 +36,14 @@ const WCSettingsSchema = Joi.object({
 // bridge is optional
 // infuraId and rpc are optional and exclusive
 
-// validates only walletconnect slice of form data
-export const wcResolver: Resolver<SettingsFormData, 'walletconnect'> = (
-  data: WCOptions,
-): {
+/* {
   values: WCOptions | null
-  errors: FieldErrors<WCOptions> | null
+  errors: DeepMap<SettingsFormData, FieldError> | (EmptyObject & DeepMap<SettingsFormData, FieldError>)
   name: 'walletconnect'
-} => {
+} */
+
+// validates only walletconnect slice of form data
+export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData> => {
   const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
@@ -67,12 +69,12 @@ export const wcResolver: Resolver<SettingsFormData, 'walletconnect'> = (
             [currentError.path[0]]: currentError,
           }
         }, {})
-      : null,
+      : {},
   }
 }
 
 interface WCSettingsProps {
-  register: FormContextValues['register']
+  register: UseFormMethods['register']
   errors: FieldErrors<SettingsFormData>
 }
 
@@ -142,14 +144,16 @@ const Disclaimer = styled.div`
   }
 `
 
-const InputContainer = styled.div`
+export const InputContainer = styled.div`
   small.inputLabel {
     position: absolute;
-    left: 2.5%;
-    top: 1.9rem;
+    left: 4%;
+    top: 35%;
     font-size: 1.2rem;
 
-    transition: all 0.2s ease-in-out;
+    transition-property: top, left, font-size;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
   }
 
   ${InputBox} {
@@ -157,18 +161,20 @@ const InputContainer = styled.div`
 
     > input {
       padding: 0 1rem;
-      transition: all 0.2s ease-in-out;
+      transition-property: top, left, font-size, opacity, padding;
+      transition-duration: 0.2s;
+      transition-timing-function: ease-in-out;
 
-      &.rpcUrl {
-        padding: 0 1rem 0 7.5rem;
+      &.movingLabel {
+        padding: 0 1rem 0 8.2rem;
 
         &:focus {
-          padding: 0 1rem;
+          padding: 1rem 1rem 0 1rem;
         }
 
         &:focus ~ small.inputLabel {
-          top: 0.3rem;
-          left: 1.3%;
+          top: 0.5rem;
+          left: 1.7%;
           font-size: 0.8rem;
         }
       }
@@ -215,7 +221,7 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
                 <InputBox>
                   <Input
                     type="text"
-                    className="rpcUrl"
+                    className="movingLabel"
                     name="walletconnect.rpc.mainnet"
                     ref={register}
                     placeholder="https://mainnet.node_url"
@@ -227,7 +233,7 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
                 <InputBox>
                   <Input
                     type="text"
-                    className="rpcUrl"
+                    className="movingLabel"
                     name="walletconnect.rpc.rinkeby"
                     ref={register}
                     placeholder="https://rinkeby.node_url"

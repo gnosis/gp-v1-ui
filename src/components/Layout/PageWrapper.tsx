@@ -62,7 +62,7 @@ export const StandaloneCardWrapper = styled.div`
   }
 `
 export const PageWrapper = styled.section`
-  height: 73rem;
+  height: 75rem;
   min-width: 85rem;
   max-width: 100%;
 

@@ -5,7 +5,7 @@ import { MEDIA } from 'const'
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
 // components
-import { WrappedWidget } from 'components/TradeWidget'
+import { WrappedWidget } from 'components/TradeWidget/TradeWidget.styled'
 
 export const StepDescriptionWrapper = styled.div`
   width: 50%;

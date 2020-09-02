@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react'
-import { useForm, ValidationResolver, FieldErrors } from 'react-hook-form'
-import { DevTool } from 'HookFormDevtool'
+import { useForm, Resolver as FormResolver } from 'react-hook-form'
 import styled from 'styled-components'
+import { DevTool } from 'HookFormDevtool'
 
 import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
 import { useHistory } from 'react-router'
 import { WCSettings, wcResolver } from 'components/Settings/WalletConnect'
 import { ContentPage } from 'components/Layout/PageWrapper'
+import { FieldErrors, ResolverResult } from 'react-hook-form/dist/types/form'
 
 const SettingsButtonSubmit = styled.button`
   height: 3.6rem;
@@ -51,17 +52,15 @@ const SettingsWrapper = styled(ContentPage)`
 `
 
 export interface SettingsFormData {
-  walletconnect: WCOptions
+  walletconnect: WCOptions | {}
 }
 
-export interface ResolverResult<T extends SettingsFormData, K extends keyof T = keyof T> {
-  values: T[K] | null
-  errors: FieldErrors<T[K]> | null
+export type CustomResolverResult<T extends SettingsFormData, K extends keyof T = keyof T> = ResolverResult<T> & {
   name: K
 }
 
-export interface Resolver<T extends SettingsFormData, K extends keyof T = keyof T> {
-  (data: T[K]): ResolverResult<T>
+export interface SliceResolver<T extends SettingsFormData, K extends keyof T = keyof T> {
+  (data: T[K]): CustomResolverResult<T>
 }
 
 const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
@@ -112,8 +111,8 @@ const composeValuesErrors = <T extends SettingsFormData, K extends keyof T>(
   }
 }
 
-const composeResolvers = (resolvers: { [K in keyof SettingsFormData]: Resolver<SettingsFormData, K> }) => {
-  return (data: SettingsFormData): ResolverResult<SettingsFormData>[] => {
+const composeResolvers = (resolvers: { [K in keyof SettingsFormData]: SliceResolver<SettingsFormData, K> }) => {
+  return (data: SettingsFormData): CustomResolverResult<SettingsFormData>[] => {
     return Object.keys(data).map((key: keyof SettingsFormData) => {
       const resolver = resolvers[key]
       return resolver(data[key])
@@ -125,7 +124,7 @@ const mainResolver = composeResolvers({
   walletconnect: wcResolver,
 })
 
-const resolver: ValidationResolver<SettingsFormData> = (data) => {
+const resolver: FormResolver<SettingsFormData> = async (data) => {
   const results = mainResolver(data)
 
   // potentially allow for Setting sections other than WalletConnect
@@ -147,7 +146,7 @@ const Settings: React.FC = () => {
   const defaultValues = useMemo(getDefaultSettings, [])
 
   const { register, handleSubmit, errors, control } = useForm<SettingsFormData>({
-    validationResolver: resolver,
+    resolver,
     defaultValues,
   })
 
