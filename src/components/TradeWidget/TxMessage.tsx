@@ -158,6 +158,13 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
   return useMemo(() => {
+    if (priceEstimation !== null && priceEstimation.isZero()) {
+      // no price data for token
+      logDebug('No priceEstimation data for', sellToken.symbol, 'in OWL')
+
+      return { isLoading: false, isLowVolume: false }
+    }
+
     if (
       isPriceLoading ||
       isWETHPriceLoading ||
