@@ -1,20 +1,18 @@
 import React from 'react'
-import styled from 'styled-components'
 
 // utils, const
 import { formatSeconds, dateToBatchId } from 'utils'
-import { MEDIA } from 'const'
 
 // Components
 import UserWallet from 'components/UserWallet'
 
 // Header: Subcomponents
 import { NavigationLinks } from 'components/Layout/Header/Navigation'
-import { HeaderWrapper } from 'components/Layout/Header/Header.styled'
-import useNavigation from 'components/Layout/Header/useNavigation'
-import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
+import { HeaderWrapper, BatchNumberWrapper, CountDownStyled, TopWrapper } from 'components/Layout/Header/Header.styled'
 
 // hooks
+import useNavigation from 'components/Layout/Header/useNavigation'
+import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
@@ -26,69 +24,6 @@ export interface HeaderProps {
     withPastLocation?: boolean
   }[]
 }
-
-export const BatchNumberWrapper = styled.span`
-  &&&&& {
-    display: inline-flex;
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
-    color: var(--color-text-primary);
-    letter-spacing: 0;
-
-    @media ${MEDIA.mobile} {
-      flex-flow: row wrap;
-      line-height: 1.2;
-      width: auto;
-    }
-
-    > strong {
-      color: var(--color-text-active);
-    }
-  }
-`
-
-const TopWrapper = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  width: 100%;
-  margin: 0 auto;
-  justify-content: center;
-  align-items: center;
-
-  @media ${MEDIA.mobile} {
-    justify-content: space-between;
-  }
-`
-
-const CountDownStyled = styled.div`
-  display: flex;
-  flex-flow: column;
-  order 2;
-  min-width: 15rem;
-
-  > ${BatchNumberWrapper} {
-    min-width: 16rem;
-    display: flex;
-    font-family: var(--font-mono);
-    font-size: 1.2rem;
-    color: var(--color-text-primary);
-    min-width: 16rem;
-    letter-spacing: 0;
-    margin: 0.5rem 0;
-    align-items: baseline;
-
-    @media ${MEDIA.mobile} {
-      flex-flow: row wrap;
-      line-height: 1.2;
-      width: auto;
-    }
-
-    > strong {
-      color: var(--color-text-active);
-      margin-left: 0.3rem;
-    }
-  }
-`
 
 export const DevdocTooltip = (
   <HelpTooltipContainer>
