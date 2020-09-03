@@ -24,6 +24,7 @@ export const HeaderWrapper = styled.header`
   ${UserWalletWrapper} {
     order: 1;
     margin: 3.2rem 3rem 3.2rem 0;
+    width: auto;
 
     @media ${MEDIA.mobile} {
       margin: 2rem 1rem 2rem 0;

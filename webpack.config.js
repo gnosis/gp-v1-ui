@@ -1,16 +1,16 @@
-import HtmlWebPackPlugin from 'html-webpack-plugin'
-import webpack from 'webpack'
-import InlineChunkHtmlPlugin from 'react-dev-utils/InlineChunkHtmlPlugin'
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin'
-import PreloadWebpackPlugin from 'preload-webpack-plugin'
-import FaviconsWebpackPlugin from 'favicons-webpack-plugin'
-import markdownIt from 'markdown-it'
-import linkAttributes from 'markdown-it-link-attributes'
-import path from 'path'
+const HtmlWebPackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
+const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const PreloadWebpackPlugin = require('preload-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
+const markdownIt = require('markdown-it')
+const linkAttributes = require('markdown-it-link-attributes')
+const path = require('path')
 
-import dotenv from 'dotenv'
-import loadConfig from './src/loadConfig'
-import overrideEnvConfig from './src/overrideEnvConfig'
+const dotenv = require('dotenv')
+const loadConfig = require('./src/loadConfig')
+const overrideEnvConfig = require('./src/overrideEnvConfig')
 
 // Setup env vars
 dotenv.config()
@@ -117,7 +117,7 @@ module.exports = ({ stats = false } = {}) => ({
   },
   // drop unused deps
   // https://www.amcharts.com/docs/v4/getting-started/integrations/using-webpack/#Large_file_sizes
-  externals: function(context, request, callback) {
+  externals: function (context, request, callback) {
     if (/xlsx|canvg|pdfmake/.test(request)) {
       return callback(null, 'commonjs ' + request)
     }

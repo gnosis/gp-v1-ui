@@ -167,7 +167,7 @@ interface PriceEstimationsProps {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   sellToken: TokenDetails
-  amount: string
+  amount?: string
   isPriceInverted: boolean
   priceInputId: string
   priceInverseInputId: string
@@ -187,7 +187,7 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
     swapPrices,
   } = props
 
-  const { setValue, triggerValidation } = useFormContext<TradeFormData>()
+  const { setValue, trigger } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => (): void => {
@@ -208,9 +208,9 @@ export const PriceEstimations: React.FC<PriceEstimationsProps> = (props) => {
           setValue(priceInverseInputId, price)
         }
       }
-      triggerValidation()
+      trigger()
     },
-    [wasPriorityAdjusted, triggerValidation, isPriceInverted, setValue, priceInputId, priceInverseInputId],
+    [wasPriorityAdjusted, trigger, isPriceInverted, setValue, priceInputId, priceInverseInputId],
   )
 
   return (
@@ -261,7 +261,7 @@ const OnchainOrderbookPriceEstimation: React.FC<OnchainOrderbookPriceEstimationP
 
   const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
-    amount,
+    amount: amount || '0',
     baseTokenId,
     baseTokenDecimals,
     quoteTokenId,

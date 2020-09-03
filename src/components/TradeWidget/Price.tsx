@@ -196,7 +196,7 @@ const Price: React.FC<Props> = ({
     (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
       const priceInverseValue = invertPriceFromString(priceValue)
-      setValue(inverseInputId, priceInverseValue, true)
+      setValue(inverseInputId, priceInverseValue, { shouldValidate: true })
     },
     [setValue],
   )

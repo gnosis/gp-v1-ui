@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { formatTimeInHours, logDebug } from 'utils'
+import { logDebug, formatDateLocaleShortTime } from 'utils'
 import { useFormContext } from 'react-hook-form'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
@@ -158,6 +158,13 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
   return useMemo(() => {
+    if (priceEstimation !== null && priceEstimation.isZero()) {
+      // no price data for token
+      logDebug('No priceEstimation data for', sellToken.symbol, 'in OWL')
+
+      return { isLoading: false, isLowVolume: false }
+    }
+
     if (
       isPriceLoading ||
       isWETHPriceLoading ||
@@ -309,10 +316,10 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
           <strong>Order Validity Details</strong> <HelpTooltip tooltip={<OrderValidityTooltip />} />
         </div>
         <div>
-          Starts: <span>{formatTimeInHours(validFrom || 0, 'Now')}</span>
+          Starts: <span>{validFrom ? formatDateLocaleShortTime(+validFrom) : 'Now'}</span>
         </div>
         <div>
-          Expires: <span>{formatTimeInHours(validUntil || 0, 'Never')}</span>
+          Expires: <span>{validUntil ? formatDateLocaleShortTime(+validUntil) : 'Never'}</span>
         </div>
       </div>
       {!isLoading && isLowVolume && (

@@ -17,6 +17,31 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
   align-items: center;
   order: 0;
 
+  .focusAnimation {
+    animation-duration: 0.5s;
+    animation-name: focusAnimation;
+  }
+
+  @keyframes focusAnimation {
+    from {
+      background-color: var(--color-background-input);
+      color: var(--color-text-primary);
+      border-color: var(--color-button-primary);
+    }
+
+    50% {
+      background-color: var(--color-background-balance-button-hover);
+      color: var(--color-background-pageWrapper);
+      border-color: var(--color-button-primary);
+    }
+
+    to {
+      background-color: var(--color-background-input);
+      color: var(--color-text-primary);
+      border-color: var(--color-button-primary);
+    }
+  }
+
   ${FormMessage} {
     color: var(--color-text-primary);
     background: var(--color-background-validation-warning);
@@ -52,6 +77,15 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
       }
     }
 
+    > .filterClear {
+      position: absolute;
+      top: 32%;
+      right: 2rem;
+      cursor: pointer;
+      font-size: small;
+      text-decoration: underline;
+    }
+
     > input {
       margin: 0;
       max-width: 100%;
@@ -63,7 +97,8 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;
       font-weight: var(--font-weight-normal);
-      padding: 0 1.6rem 0 4.8rem;
+      // accommodate clearFilter
+      padding: 0 10.4rem 0 4.8rem;
       outline: 0;
 
       @media ${MEDIA.mobile} {
@@ -109,7 +144,9 @@ interface Props {
   resultName?: string
   searchValue: string
   showFilter: boolean
+  customRef?: React.Ref<HTMLInputElement>
   handleSearch: (e: React.ChangeEvent<HTMLInputElement>) => void
+  clearFilters?: () => void
 }
 
 const FilterTools: React.FC<Props> = ({
@@ -120,24 +157,34 @@ const FilterTools: React.FC<Props> = ({
   resultName = 'results',
   searchValue,
   showFilter,
+  customRef,
   handleSearch,
-}) => (
-  <BalanceTools className={className} $css={customStyles}>
-    <label className="balances-searchTokens">
-      <input
-        placeholder="Search token by Name, Symbol or Address"
-        type="text"
-        value={searchValue}
-        onChange={handleSearch}
-      />
-      {showFilter && (
-        <FormMessage id="filterLabel">
-          Filter: Showing {dataLength} {dataLength === 1 ? 'result' : resultName}
-        </FormMessage>
-      )}
-    </label>
-    <>{children}</>
-  </BalanceTools>
-)
+  clearFilters,
+}) => {
+  return (
+    <BalanceTools className={className} $css={customStyles}>
+      <label className="balances-searchTokens">
+        <input
+          ref={customRef}
+          placeholder="Search data by Order ID or token by Name, Symbol or Address"
+          type="text"
+          value={searchValue}
+          onChange={handleSearch}
+        />
+        {!!clearFilters && !!searchValue && (
+          <span className="filterClear" onClick={clearFilters}>
+            clear filters
+          </span>
+        )}
+        {showFilter && (
+          <FormMessage id="filterLabel">
+            Filter: Showing {dataLength} {dataLength === 1 ? 'result' : resultName}
+          </FormMessage>
+        )}
+      </label>
+      <>{children}</>
+    </BalanceTools>
+  )
+}
 
 export default FilterTools

@@ -235,7 +235,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           setValue(
             INPUT_ID_AMOUNT,
             formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION, isLocaleAware: false }),
-            true,
+            { shouldValidate: true },
           )
         }
       >
