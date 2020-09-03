@@ -650,7 +650,7 @@ const TradeWidget: React.FC = () => {
           >
             <SubmitButton
               data-text="This order might be partially filled."
-              type="submit"
+              type="button"
               disabled={isSubmitting || sameToken}
               tabIndex={1}
               onClick={(e): void => {
