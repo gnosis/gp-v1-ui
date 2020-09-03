@@ -15,7 +15,6 @@ export default {
   title: 'Components/OrderBookChart',
   component: OrderBookChart,
   argTypes: {
-    label: { control: 'text' },
     networkId: { control: { type: 'inline-radio', options: networkIds } },
   },
   decorators: [
@@ -41,15 +40,31 @@ const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
 )
 
 const defaultParams: Omit<OrderBookChartProps, 'data'> = {
-  baseToken: tokenList.find((token) => token.symbol === 'DAI') || tokenList[0],
-  quoteToken: tokenList.find((token) => token.symbol === 'USDC') || tokenList[1],
+  baseToken: {
+    id: 1,
+    name: 'Base Token',
+    symbol: 'BASE',
+    address: '0x1',
+    decimals: 18,
+  },
+  quoteToken: {
+    id: 2,
+    name: 'Quote Token',
+    symbol: 'QUOTE',
+    address: '0x2',
+    decimals: 18,
+  },
   networkId: defaultNetworkId,
 }
 
 export const USDC_DAI = Template.bind({})
+const DAI = tokenList.find((token) => token.symbol === 'DAI')
+const USDC = tokenList.find((token) => token.symbol === 'USDC')
 USDC_DAI.args = {
   ...defaultParams,
-  data: processRawApiData({ data: realData, ...defaultParams }),
+  baseToken: DAI || tokenList[0],
+  quoteToken: USDC || tokenList[1],
+  data: processRawApiData({ data: realData, baseToken: DAI || tokenList[0], quoteToken: USDC || tokenList[1] }),
 }
 
 interface NormalizedData extends RawApiData {
