@@ -61,8 +61,6 @@ export default {
     quoteToken: {
       control: { type: 'select', options: configTokenSymbols },
     },
-    name: { control: null },
-    description: { control: null },
     data: { control: null },
   },
   decorators: [(Story): JSX.Element => <div style={{ height: '97vh' }}>{Story()}</div>],
@@ -209,7 +207,16 @@ const buildSampleStory = (data: SampleData): Story<SampleProps> => {
     ...data,
   }
 
+  Story.argTypes = {
+    name: { control: null },
+    description: { control: null },
+  }
+
   Story.storyName = data.name
+
+  Story.parameters = {
+    docs: { disable: true },
+  }
 
   return Story
 }
