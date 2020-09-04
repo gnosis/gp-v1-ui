@@ -148,7 +148,6 @@ const drawLabels = ({ chart, baseToken, quoteToken, networkId }: DrawLabelsParam
 
 const OrderBookChart: React.FC<OrderBookChartProps> = (props) => {
   const { baseToken, quoteToken, networkId, data } = props
-  console.log('props', props)
   const mountPoint = useRef<HTMLDivElement>(null)
   const chartRef = useRef<am4charts.XYChart | null>(null)
 
@@ -173,7 +172,6 @@ const OrderBookChart: React.FC<OrderBookChartProps> = (props) => {
     })
 
     chartRef.current.data = data
-    console.log('WILL DISPLAY NEW DATA', chartRef.current.data)
   }, [baseToken, networkId, quoteToken, data])
 
   return (

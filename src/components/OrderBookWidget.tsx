@@ -73,9 +73,7 @@ const processData = (
   )
 
   // Filter tiny orders
-  console.log('pricePoints', pricePoints)
   pricePoints = pricePoints.filter((pricePoint) => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
-  console.log('pricePoints', pricePoints)
 
   // Convert the price points that can be represented in the graph (PricePointDetails)
   const { points } = pricePoints.reduce(
@@ -152,12 +150,9 @@ interface ProcessRawDataParams {
 }
 
 export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDataParams): PricePointDetails[] => {
-  console.log('data', data)
   try {
     const bids = processData(data.bids, baseToken.decimals, quoteToken.decimals, Offer.Bid)
-    console.log('bids', bids)
     const asks = processData(data.asks, baseToken.decimals, quoteToken.decimals, Offer.Ask)
-    console.log('asks', asks)
     const pricePoints = bids.concat(asks)
 
     // Sort points by price
@@ -178,7 +173,6 @@ interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
 
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops } = props
-  console.log('Widget props', props)
   const [apiData, setApiData] = useSafeState<PricePointDetails[]>([])
   const [error, setError] = useSafeState<Error | null>(null)
 
@@ -199,7 +193,6 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
           hops,
           networkId,
         })
-        console.log('ORDERBOOK RAW DATA', rawData)
 
         const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
 
