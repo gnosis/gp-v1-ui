@@ -189,104 +189,48 @@ const defaultSampleParams = {
   quoteToken: 'QUOTE',
 }
 
-export const LiquidMarket = SampleTemplate.bind({})
-LiquidMarket.args = {
-  ...defaultSampleParams,
-  ...liquidMarket,
+const buildSampleStory = (data: SampleData): Story<SampleProps> => {
+  const Story = SampleTemplate.bind({})
+  Story.args = {
+    ...defaultSampleParams,
+    ...data,
+  }
+
+  Story.storyName = data.name
+
+  return Story
 }
 
-export const LiquidMarketBigSpread = SampleTemplate.bind({})
-LiquidMarketBigSpread.args = {
-  ...defaultSampleParams,
-  ...liquidMarketBigSpread,
-}
+export const LiquidMarket = buildSampleStory(liquidMarket)
 
-export const LiquidMarketWhenPricesFall20 = SampleTemplate.bind({})
-LiquidMarketWhenPricesFall20.args = {
-  ...defaultSampleParams,
-  ...liquidMarketWhenPricesFall20,
-}
+export const LiquidMarketBigSpread = buildSampleStory(liquidMarketBigSpread)
 
-export const LiquidMarketWhenPricesFall40 = SampleTemplate.bind({})
-LiquidMarketWhenPricesFall40.args = {
-  ...defaultSampleParams,
-  ...liquidMarketWhenPricesFall40,
-}
+export const LiquidMarketWhenPricesFall20 = buildSampleStory(liquidMarketWhenPricesFall20)
 
-export const LiquidMarketWhenPricesFall60 = SampleTemplate.bind({})
-LiquidMarketWhenPricesFall60.args = {
-  ...defaultSampleParams,
-  ...liquidMarketWhenPricesFall60,
-}
+export const LiquidMarketWhenPricesFall40 = buildSampleStory(liquidMarketWhenPricesFall40)
 
-export const LowVolumeOverlap = SampleTemplate.bind({})
-LowVolumeOverlap.args = {
-  ...defaultSampleParams,
-  ...lowVolumeOverlap,
-}
+export const LiquidMarketWhenPricesFall60 = buildSampleStory(liquidMarketWhenPricesFall60)
 
-export const HighVolumeOverlap = SampleTemplate.bind({})
-HighVolumeOverlap.args = {
-  ...defaultSampleParams,
-  ...highVolumeOverlap,
-}
+export const LowVolumeOverlap = buildSampleStory(lowVolumeOverlap)
 
-export const LowVolumeOverlapWithBigPriceDifference = SampleTemplate.bind({})
-LowVolumeOverlapWithBigPriceDifference.args = {
-  ...defaultSampleParams,
-  ...lowVolumeOverlapWithBigPriceDifference,
-}
+export const HighVolumeOverlap = buildSampleStory(highVolumeOverlap)
 
-export const HighVolumeOverlapWithBigPriceDifference = SampleTemplate.bind({})
-HighVolumeOverlapWithBigPriceDifference.args = {
-  ...defaultSampleParams,
-  ...highVolumeOverlapWithBigPriceDifference,
-}
+export const LowVolumeOverlapWithBigPriceDifference = buildSampleStory(lowVolumeOverlapWithBigPriceDifference)
 
-export const SpreadIsAlmostNonExistent = SampleTemplate.bind({})
-SpreadIsAlmostNonExistent.args = {
-  ...defaultSampleParams,
-  ...spreadIsAlmostNonExistent,
-}
+export const HighVolumeOverlapWithBigPriceDifference = buildSampleStory(highVolumeOverlapWithBigPriceDifference)
 
-export const BidsLiquidAsksIlliquid = SampleTemplate.bind({})
-BidsLiquidAsksIlliquid.args = {
-  ...defaultSampleParams,
-  ...bidsLiquidAsksIlliquid,
-}
+export const SpreadIsAlmostNonExistent = buildSampleStory(spreadIsAlmostNonExistent)
 
-export const AsksLiquidBidsIlliquid = SampleTemplate.bind({})
-AsksLiquidBidsIlliquid.args = {
-  ...defaultSampleParams,
-  ...asksLiquidBidsIlliquid,
-}
+export const BidsLiquidAsksIlliquid = buildSampleStory(bidsLiquidAsksIlliquid)
 
-export const AsksLiquidInTheEdgesBidsIlliquid = SampleTemplate.bind({})
-AsksLiquidInTheEdgesBidsIlliquid.args = {
-  ...defaultSampleParams,
-  ...asksLiquidInTheEdgesBidsIlliquid,
-}
+export const AsksLiquidBidsIlliquid = buildSampleStory(asksLiquidBidsIlliquid)
 
-export const BidsLiquidInTheEdgesAsksIlliquid = SampleTemplate.bind({})
-BidsLiquidInTheEdgesAsksIlliquid.args = {
-  ...defaultSampleParams,
-  ...bidsLiquidInTheEdgesAsksIlliquid,
-}
+export const AsksLiquidInTheEdgesBidsIlliquid = buildSampleStory(asksLiquidInTheEdgesBidsIlliquid)
 
-export const NoBids = SampleTemplate.bind({})
-NoBids.args = {
-  ...defaultSampleParams,
-  ...noBids,
-}
+export const BidsLiquidInTheEdgesAsksIlliquid = buildSampleStory(bidsLiquidInTheEdgesAsksIlliquid)
 
-export const NoAsks = SampleTemplate.bind({})
-NoAsks.args = {
-  ...defaultSampleParams,
-  ...noAsks,
-}
+export const NoBids = buildSampleStory(noBids)
 
-export const NoBidsAndNoAsks = SampleTemplate.bind({})
-NoBidsAndNoAsks.args = {
-  ...defaultSampleParams,
-  ...noBidsAndNoAsks,
-}
+export const NoAsks = buildSampleStory(noAsks)
+
+export const NoBidsAndNoAsks = buildSampleStory(noBidsAndNoAsks)
