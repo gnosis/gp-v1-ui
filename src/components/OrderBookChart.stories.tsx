@@ -183,10 +183,110 @@ const SampleTemplate: Story<SampleProps> = ({
   )
 }
 
-export const LiquidMarket = SampleTemplate.bind({})
-LiquidMarket.args = {
+const defaultSampleParams = {
   ...defaultParams,
   baseToken: 'BASE',
   quoteToken: 'QUOTE',
+}
+
+export const LiquidMarket = SampleTemplate.bind({})
+LiquidMarket.args = {
+  ...defaultSampleParams,
   ...liquidMarket,
+}
+
+export const LiquidMarketBigSpread = SampleTemplate.bind({})
+LiquidMarketBigSpread.args = {
+  ...defaultSampleParams,
+  ...liquidMarketBigSpread,
+}
+
+export const LiquidMarketWhenPricesFall20 = SampleTemplate.bind({})
+LiquidMarketWhenPricesFall20.args = {
+  ...defaultSampleParams,
+  ...liquidMarketWhenPricesFall20,
+}
+
+export const LiquidMarketWhenPricesFall40 = SampleTemplate.bind({})
+LiquidMarketWhenPricesFall40.args = {
+  ...defaultSampleParams,
+  ...liquidMarketWhenPricesFall40,
+}
+
+export const LiquidMarketWhenPricesFall60 = SampleTemplate.bind({})
+LiquidMarketWhenPricesFall60.args = {
+  ...defaultSampleParams,
+  ...liquidMarketWhenPricesFall60,
+}
+
+export const LowVolumeOverlap = SampleTemplate.bind({})
+LowVolumeOverlap.args = {
+  ...defaultSampleParams,
+  ...lowVolumeOverlap,
+}
+
+export const HighVolumeOverlap = SampleTemplate.bind({})
+HighVolumeOverlap.args = {
+  ...defaultSampleParams,
+  ...highVolumeOverlap,
+}
+
+export const LowVolumeOverlapWithBigPriceDifference = SampleTemplate.bind({})
+LowVolumeOverlapWithBigPriceDifference.args = {
+  ...defaultSampleParams,
+  ...lowVolumeOverlapWithBigPriceDifference,
+}
+
+export const HighVolumeOverlapWithBigPriceDifference = SampleTemplate.bind({})
+HighVolumeOverlapWithBigPriceDifference.args = {
+  ...defaultSampleParams,
+  ...highVolumeOverlapWithBigPriceDifference,
+}
+
+export const SpreadIsAlmostNonExistent = SampleTemplate.bind({})
+SpreadIsAlmostNonExistent.args = {
+  ...defaultSampleParams,
+  ...spreadIsAlmostNonExistent,
+}
+
+export const BidsLiquidAsksIlliquid = SampleTemplate.bind({})
+BidsLiquidAsksIlliquid.args = {
+  ...defaultSampleParams,
+  ...bidsLiquidAsksIlliquid,
+}
+
+export const AsksLiquidBidsIlliquid = SampleTemplate.bind({})
+AsksLiquidBidsIlliquid.args = {
+  ...defaultSampleParams,
+  ...asksLiquidBidsIlliquid,
+}
+
+export const AsksLiquidInTheEdgesBidsIlliquid = SampleTemplate.bind({})
+AsksLiquidInTheEdgesBidsIlliquid.args = {
+  ...defaultSampleParams,
+  ...asksLiquidInTheEdgesBidsIlliquid,
+}
+
+export const BidsLiquidInTheEdgesAsksIlliquid = SampleTemplate.bind({})
+BidsLiquidInTheEdgesAsksIlliquid.args = {
+  ...defaultSampleParams,
+  ...bidsLiquidInTheEdgesAsksIlliquid,
+}
+
+export const NoBids = SampleTemplate.bind({})
+NoBids.args = {
+  ...defaultSampleParams,
+  ...noBids,
+}
+
+export const NoAsks = SampleTemplate.bind({})
+NoAsks.args = {
+  ...defaultSampleParams,
+  ...noAsks,
+}
+
+export const NoBidsAndNoAsks = SampleTemplate.bind({})
+NoBidsAndNoAsks.args = {
+  ...defaultSampleParams,
+  ...noBidsAndNoAsks,
 }
