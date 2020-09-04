@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
 
@@ -9,24 +9,9 @@ import sampleDataSet from 'storybook/orderbookSamples'
 import { processRawApiData } from './OrderBookWidget'
 import { RawApiData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
+type SampleData = typeof sampleDataSet[0]
+
 const networkIds = Object.values(Network).filter(Number.isInteger)
-
-export default {
-  title: 'Components/OrderBookChart',
-  component: OrderBookChart,
-  argTypes: {
-    networkId: { control: { type: 'inline-radio', options: networkIds } },
-  },
-  decorators: [
-    (Story): JSX.Element => (
-      <div style={{ height: '97vh' }}>
-        <Story />
-      </div>
-    ),
-  ],
-} as Meta
-
-const Template: Story<OrderBookChartProps> = (args) => <OrderBookChart {...args} />
 
 const defaultNetworkId = Network.Mainnet
 const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
@@ -57,6 +42,30 @@ const defaultParams: Omit<OrderBookChartProps, 'data'> = {
   networkId: defaultNetworkId,
 }
 
+const configTokenSymbols = [defaultParams.baseToken, defaultParams.quoteToken, ...tokenList].map(
+  (token) => token.symbol || token.address,
+)
+
+export default {
+  title: 'Components/OrderBookChart',
+  component: OrderBookChart,
+  argTypes: {
+    networkId: { control: { type: 'inline-radio', options: networkIds } },
+    baseToken: {
+      control: { type: 'select', options: configTokenSymbols },
+    },
+    quoteToken: {
+      control: { type: 'select', options: configTokenSymbols },
+    },
+    name: { control: null },
+    description: { control: null },
+    data: { control: null },
+  },
+  decorators: [(Story): JSX.Element => <div style={{ height: '97vh' }}>{Story()}</div>],
+} as Meta
+
+const Template: Story<OrderBookChartProps> = (args) => <OrderBookChart {...args} />
+
 export const USDC_DAI = Template.bind({})
 const DAI = tokenList.find((token) => token.symbol === 'DAI')
 const USDC = tokenList.find((token) => token.symbol === 'USDC')
@@ -66,24 +75,22 @@ USDC_DAI.args = {
   quoteToken: USDC || tokenList[1],
   data: processRawApiData({ data: realData, baseToken: DAI || tokenList[0], quoteToken: USDC || tokenList[1] }),
 }
-
-interface NormalizedData extends RawApiData {
-  name: string
-  description?: string
+USDC_DAI.argTypes = {
+  baseToken: { control: null },
+  quoteToken: { control: null },
+  data: { control: null },
 }
 
 interface ProduceOrderBookArgsParams {
-  sampleData: typeof sampleDataSet[0]
+  sampleData: Pick<SampleData, 'asks' | 'bids'>
   orderbookProps: Omit<OrderBookChartProps, 'data'>
 }
 
-const produceOrderBookArgs = ({ sampleData, orderbookProps }: ProduceOrderBookArgsParams): OrderBookChartProps => {
+const produceOrderBookProps = ({ sampleData, orderbookProps }: ProduceOrderBookArgsParams): OrderBookChartProps => {
   const { baseToken, quoteToken } = orderbookProps
 
-  const { name, description, asks = [], bids = [] } = sampleData
-  const normalizedRawData: NormalizedData = {
-    name,
-    description,
+  const { asks = [], bids = [] } = sampleData
+  const normalizedRawData: RawApiData = {
     asks: asks.map(({ amount, price }) => ({
       volume: amount * 10 ** baseToken.decimals,
       price,
@@ -96,15 +103,11 @@ const produceOrderBookArgs = ({ sampleData, orderbookProps }: ProduceOrderBookAr
 
   console.log('normalizedRawData', normalizedRawData)
 
-  const processedData = {
-    description,
-    name,
-    data: processRawApiData({ data: normalizedRawData, baseToken, quoteToken }),
-  }
+  const processedData = processRawApiData({ data: normalizedRawData, baseToken, quoteToken })
 
   console.log('processedData', processedData)
 
-  return { ...orderbookProps, ...processedData }
+  return { ...orderbookProps, data: processedData }
 }
 
 const [
@@ -127,8 +130,63 @@ const [
   noBidsAndNoAsks,
 ] = sampleDataSet
 
-export const LiquidMarket = Template.bind({})
-LiquidMarket.args = produceOrderBookArgs({
-  sampleData: liquidMarket,
-  orderbookProps: defaultParams,
-})
+type SampleProps = SampleData & {
+  baseToken: string
+  quoteToken: string
+  networkId: number
+}
+
+const SampleTemplate: Story<SampleProps> = ({
+  name,
+  description,
+  asks,
+  bids,
+  networkId,
+  baseToken: baseTokenSymbol,
+  quoteToken: quoteTokenSymbol,
+}) => {
+  const baseToken = useMemo(() => {
+    return (
+      tokenList.find((token) => token.symbol === baseTokenSymbol || token.address === baseTokenSymbol) ||
+      defaultParams.baseToken
+    )
+  }, [baseTokenSymbol])
+
+  const quoteToken = useMemo(
+    () =>
+      tokenList.find((token) => token.symbol === quoteTokenSymbol || token.address === quoteTokenSymbol) ||
+      defaultParams.quoteToken,
+    [quoteTokenSymbol],
+  )
+
+  const props = useMemo(
+    () =>
+      produceOrderBookProps({
+        sampleData: { asks, bids },
+        orderbookProps: {
+          baseToken,
+          quoteToken,
+          networkId: networkId,
+        },
+      }),
+    [networkId, baseToken, quoteToken, asks, bids],
+  )
+
+  return (
+    <div style={{ height: '95%' }}>
+      <details style={{ lineHeight: 1.5 }}>
+        <summary>{name}</summary>
+        {description}
+      </details>
+      <OrderBookChart {...props} />
+    </div>
+  )
+}
+
+export const LiquidMarket = SampleTemplate.bind({})
+LiquidMarket.args = {
+  ...defaultParams,
+  baseToken: 'BASE',
+  quoteToken: 'QUOTE',
+  ...liquidMarket,
+}
