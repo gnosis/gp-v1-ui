@@ -134,6 +134,11 @@ disabledTokens:
     - address: '0xFC4B8ED459e00e5400be803A9BB3954234FD50e3'
   4: [] # Rinkeby
 
+# Initial token selection for the sell token and buy token
+initialTokenSelection:
+  sellToken: DAI
+  receiveToken: USDC
+
 # Initial Token List
 #   List of token loaded by default
 #   This list is used while the app loads the TCR (if the TCR setting is used)

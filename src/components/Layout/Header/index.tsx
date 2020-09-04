@@ -1,20 +1,18 @@
 import React from 'react'
-import styled from 'styled-components'
 
 // utils, const
 import { formatSeconds, dateToBatchId } from 'utils'
-import { MEDIA } from 'const'
 
 // Components
 import UserWallet from 'components/UserWallet'
 
 // Header: Subcomponents
 import { NavigationLinks } from 'components/Layout/Header/Navigation'
-import { HeaderWrapper } from 'components/Layout/Header/Header.styled'
-import useNavigation from 'components/Layout/Header/useNavigation'
-import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
+import { HeaderWrapper, BatchNumberWrapper, CountDownStyled, TopWrapper } from 'components/Layout/Header/Header.styled'
 
 // hooks
+import useNavigation from 'components/Layout/Header/useNavigation'
+import useOpenCloseNav from 'components/Layout/Header/useOpenCloseNav'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
@@ -27,49 +25,7 @@ export interface HeaderProps {
   }[]
 }
 
-const TopWrapper = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  width: 100%;
-  margin: 0 auto;
-  justify-content: center;
-  align-items: center;
-
-  @media ${MEDIA.mobile} {
-    justify-content: space-between;
-  }
-`
-
-const CountDownStyled = styled.div`
-  display: flex;
-  flex-flow: column;
-  order 2;
-  min-width: 15rem;
-
- > div {
-  display: flex;
-  font-family: var(--font-mono);
-  font-size: 1.2rem;
-  color: var(--color-text-primary);
-  min-width: 16rem;
-  letter-spacing: 0;
-  margin: 0.5rem 0;
-  align-items: baseline;
-
-  @media ${MEDIA.mobile} {
-    flex-flow: row wrap;
-    line-height: 1.2;
-    width: auto;
-  }
-
-  > strong {
-    color: var(--color-text-active);
-    margin-left: 0.3rem;
-  }
- }
-`
-
-const DevdocTooltip = (
+export const DevdocTooltip = (
   <HelpTooltipContainer>
     <p>
       On Gnosis Protocol, orders placed on-chain are not immediately executed, but rather collected and aggregated to be
@@ -85,18 +41,26 @@ const DevdocTooltip = (
   </HelpTooltipContainer>
 )
 
+export const BatchNumberWithHelp: React.FC<{ batchId?: number | null; title?: string }> = ({
+  batchId,
+  title = 'Batch: ',
+}) => (
+  <BatchNumberWrapper className="BatchNumberWrapper">
+    {title}
+    <strong>{batchId || dateToBatchId()}</strong>
+    &nbsp;
+    <HelpTooltip tooltip={DevdocTooltip} />
+  </BatchNumberWrapper>
+)
+
 const BatchCountDown: React.FC = () => {
   const timeRemainingInBatch = useTimeRemainingInBatch()
   return (
     <CountDownStyled>
-      <div>
+      <BatchNumberWrapper>
         Next batch: <strong>{formatSeconds(timeRemainingInBatch)}</strong>
-      </div>
-      <div>
-        Batch: <strong>{dateToBatchId()}</strong>
-        &nbsp;
-        <HelpTooltip tooltip={DevdocTooltip} />
-      </div>
+      </BatchNumberWrapper>
+      <BatchNumberWithHelp />
     </CountDownStyled>
   )
 }

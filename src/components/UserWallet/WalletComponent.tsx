@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useCallback } from 'react'
 import { RouteComponentProps, useRouteMatch } from 'react-router'
 import CopyToClipboard from 'react-copy-to-clipboard'
