@@ -14,6 +14,7 @@ type SampleData = typeof sampleDataSet[0]
 const networkIds = Object.values(Network).filter(Number.isInteger)
 
 const defaultNetworkId = Network.Mainnet
+// All Default Tokens
 const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
   ({ id, name, symbol, addressByNetwork, decimals = 18 }) => ({
     id,
@@ -24,6 +25,8 @@ const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
   }),
 )
 
+// Default params to be used as initial values
+// and when there's no Token found for symbol
 const defaultParams: Omit<OrderBookChartProps, 'data'> = {
   baseToken: {
     id: 1,
@@ -42,6 +45,7 @@ const defaultParams: Omit<OrderBookChartProps, 'data'> = {
   networkId: defaultNetworkId,
 }
 
+// Token symbols to use in control selector
 const configTokenSymbols = [defaultParams.baseToken, defaultParams.quoteToken, ...tokenList].map(
   (token) => token.symbol || token.address,
 )
@@ -64,11 +68,15 @@ export default {
   decorators: [(Story): JSX.Element => <div style={{ height: '97vh' }}>{Story()}</div>],
 } as Meta
 
-const Template: Story<OrderBookChartProps> = (args) => <OrderBookChart {...args} />
+//-------------------REAL-DATA------------------
 
-export const USDC_DAI = Template.bind({})
+// Template for real data
+// fetched from price-estimation service
+const RealTemplate: Story<OrderBookChartProps> = (args) => <OrderBookChart {...args} />
+
 const DAI = tokenList.find((token) => token.symbol === 'DAI')
 const USDC = tokenList.find((token) => token.symbol === 'USDC')
+export const USDC_DAI = RealTemplate.bind({})
 USDC_DAI.args = {
   ...defaultParams,
   baseToken: DAI || tokenList[0],
@@ -81,17 +89,22 @@ USDC_DAI.argTypes = {
   data: { control: null },
 }
 
+//-------------------SAMPLE-DATA------------------
+
 interface ProduceOrderBookArgsParams {
   sampleData: Pick<SampleData, 'asks' | 'bids'>
   orderbookProps: Omit<OrderBookChartProps, 'data'>
 }
-
+// normalizing sample data
+// because real data is slightly more complex
 const produceOrderBookProps = ({ sampleData, orderbookProps }: ProduceOrderBookArgsParams): OrderBookChartProps => {
   const { baseToken, quoteToken } = orderbookProps
 
   const { asks = [], bids = [] } = sampleData
   const normalizedRawData: RawApiData = {
     asks: asks.map(({ amount, price }) => ({
+      // turn small numbers into wei or decimal-aware units
+      // otherwise get filtered as too small by src/components/OrderBookWidget.tsx#L77
       volume: amount * 10 ** baseToken.decimals,
       price,
     })),
@@ -101,15 +114,12 @@ const produceOrderBookProps = ({ sampleData, orderbookProps }: ProduceOrderBookA
     })),
   }
 
-  console.log('normalizedRawData', normalizedRawData)
-
   const processedData = processRawApiData({ data: normalizedRawData, baseToken, quoteToken })
-
-  console.log('processedData', processedData)
 
   return { ...orderbookProps, data: processedData }
 }
 
+// data samples
 const [
   liquidMarket,
   liquidMarketBigSpread,
@@ -136,6 +146,8 @@ type SampleProps = SampleData & {
   networkId: number
 }
 
+// preprocessing template
+// does what OrderBookWidget does for real data
 const SampleTemplate: Story<SampleProps> = ({
   name,
   description,
@@ -189,6 +201,7 @@ const defaultSampleParams = {
   quoteToken: 'QUOTE',
 }
 
+// generic builder for Sample Stories
 const buildSampleStory = (data: SampleData): Story<SampleProps> => {
   const Story = SampleTemplate.bind({})
   Story.args = {
