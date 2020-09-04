@@ -11,9 +11,21 @@ import { getNetworkFromId, safeTokenName } from 'utils'
 import { TokenDetails, Network } from 'types'
 
 export interface OrderBookChartProps {
+  /**
+   * Base Token for Y-axis
+   */
   baseToken: TokenDetails
+  /**
+   * Quote Token for X-axis
+   */
   quoteToken: TokenDetails
+  /**
+   * current network id
+   */
   networkId: number
+  /**
+   * price/volume data with asks and bids
+   */
   data: PricePointDetails[]
 }
 
