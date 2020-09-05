@@ -9,9 +9,9 @@ import { tokenListApi } from 'api'
 import { TokenFromExchange } from 'services/factories'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
-import { EtherscanLink } from 'components/atoms/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 import { useWalletConnection } from './useWalletConnection'
-import Spinner from 'components/atoms/Spinner'
+import Spinner from 'components/common/Spinner'
 
 interface ExtraProps {
   focused: boolean

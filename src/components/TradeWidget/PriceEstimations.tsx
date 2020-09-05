@@ -10,7 +10,7 @@ import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { PRICE_ESTIMATION_PRECISION, MEDIA } from 'const'
 import { displayTokenSymbolOrLink } from 'utils/display'
 
-import Spinner from 'components/atoms/Spinner'
+import Spinner from 'components/common/Spinner'
 
 import { TradeFormData } from 'components/TradeWidget'
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'

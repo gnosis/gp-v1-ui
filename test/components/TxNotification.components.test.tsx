@@ -4,7 +4,7 @@ import { shallow } from 'enzyme'
 import { TxNotification } from 'components/TxNotification'
 
 import { TX_HASH } from '../data'
-import { EtherscanLink } from 'components/atoms/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 describe('<TxNotification />', () => {
   it('renders with link component', () => {
