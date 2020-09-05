@@ -2,10 +2,9 @@ import React from 'react'
 import styled from 'styled-components'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { EllipsisText } from 'components/common/EllipsisText'
-import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimations'
 
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
-import { safeTokenName } from '@gnosis.pm/dex-js'
+import { safeTokenName, TokenDetails } from '@gnosis.pm/dex-js'
 
 const SwapPriceWrapper = styled.div`
   cursor: pointer;
@@ -13,10 +12,13 @@ const SwapPriceWrapper = styled.div`
     margin: 0 0.4rem;
   }
 `
-export interface Props
-  extends Pick<PriceEstimationsProps, 'baseToken' | 'quoteToken' | 'isPriceInverted' | 'swapPrices'> {
+export interface Props {
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+  isPriceInverted: boolean
   separator?: string
   showOnlyQuoteToken?: boolean
+  onSwapPrices: () => void
 }
 
 export const SwapPrice: React.FC<Props> = ({
@@ -24,8 +26,8 @@ export const SwapPrice: React.FC<Props> = ({
   quoteToken,
   separator = '/',
   isPriceInverted,
-  swapPrices,
   showOnlyQuoteToken = false,
+  onSwapPrices,
 }) => {
   const displayBaseToken = !isPriceInverted ? quoteToken : baseToken
   const displayQuoteToken = isPriceInverted ? quoteToken : baseToken
@@ -33,7 +35,7 @@ export const SwapPrice: React.FC<Props> = ({
   const displayQtName = displayTokenSymbolOrLink(displayQuoteToken)
 
   return (
-    <SwapPriceWrapper onClick={swapPrices}>
+    <SwapPriceWrapper onClick={onSwapPrices}>
       {!showOnlyQuoteToken && (
         <>
           <EllipsisText title={safeTokenName(displayBaseToken)}>{displayBtName}</EllipsisText>

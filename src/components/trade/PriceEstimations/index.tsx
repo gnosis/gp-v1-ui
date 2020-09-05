@@ -13,7 +13,10 @@ import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
 
-import { OnchainOrderbookPriceEstimation } from 'components/trade/PriceEstimations/PriceEstimation'
+import { PriceEstimation, Props as PriceEstimationProps } from 'components/trade/PriceEstimations/PriceEstimation'
+
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+import BigNumber from 'bignumber.js'
 
 const Wrapper = styled.div`
   > div {
@@ -128,11 +131,22 @@ export interface Props {
   isPriceInverted: boolean
   priceInputId: string
   priceInverseInputId: string
-  swapPrices: () => void
+  onSwapPrices: () => void
 }
 
 export const PriceEstimations: React.FC<Props> = (props) => {
-  const { amount, baseToken, quoteToken, isPriceInverted, priceInputId, priceInverseInputId, swapPrices } = props
+  const {
+    networkId,
+    amount,
+    baseToken,
+    quoteToken,
+    isPriceInverted,
+    priceInputId,
+    priceInverseInputId,
+    onSwapPrices,
+  } = props
+  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
+  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
@@ -150,6 +164,23 @@ export const PriceEstimations: React.FC<Props> = (props) => {
     [isPriceInverted, trigger, setValue, priceInputId, priceInverseInputId],
   )
 
+  const { priceEstimation: limitPrice, isPriceLoading: limitPriceLoading } = usePriceEstimationWithSlippage({
+    networkId,
+    amount: amount || '0',
+    baseTokenId,
+    baseTokenDecimals,
+    quoteTokenId,
+    quoteTokenDecimals,
+  })
+
+  const priceEstimationCommonPros = {
+    baseToken,
+    quoteToken,
+    isPriceInverted,
+    onSwapPrices,
+    onClickPrice: updatePrices,
+  }
+
   return (
     <Wrapper>
       <div>
@@ -157,14 +188,25 @@ export const PriceEstimations: React.FC<Props> = (props) => {
         <SwapPrice
           baseToken={quoteToken}
           quoteToken={baseToken}
-          swapPrices={swapPrices}
+          onSwapPrices={onSwapPrices}
           isPriceInverted={isPriceInverted}
         />
       </div>
       <div className="container">
-        <OnchainOrderbookPriceEstimation label="Best ask" {...props} amount="" updatePrices={updatePrices} />
+        <PriceEstimation
+          label="Best ask"
+          price={new BigNumber('3.2345')}
+          loading={false}
+          {...priceEstimationCommonPros}
+        />
         {amount && +amount != 0 && +amount != 1 && (
-          <OnchainOrderbookPriceEstimation label="Fill price" {...props} updatePrices={updatePrices} />
+          <PriceEstimation
+            label="Fill price"
+            amount={amount}
+            price={limitPrice}
+            loading={limitPriceLoading}
+            {...priceEstimationCommonPros}
+          />
         )}
       </div>
     </Wrapper>

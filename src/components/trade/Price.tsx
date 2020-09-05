@@ -164,7 +164,7 @@ export interface Props {
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
-  swapPrices: () => void
+  onSwapPrices: () => void
   priceShown: 'INVERSE' | 'DIRECT'
 }
 
@@ -184,7 +184,7 @@ export const Price: React.FC<Props> = ({
   priceInputId,
   priceInverseInputId,
   tabIndex,
-  swapPrices,
+  onSwapPrices,
   priceShown,
 }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
@@ -249,7 +249,7 @@ export const Price: React.FC<Props> = ({
             quoteToken={sellToken}
             isPriceInverted={true}
             separator="per"
-            swapPrices={swapPrices}
+            onSwapPrices={onSwapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
@@ -272,7 +272,7 @@ export const Price: React.FC<Props> = ({
             quoteToken={sellToken}
             isPriceInverted={false}
             separator="per"
-            swapPrices={swapPrices}
+            onSwapPrices={onSwapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />

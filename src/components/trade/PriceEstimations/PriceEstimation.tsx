@@ -2,47 +2,65 @@ import React from 'react'
 import BigNumber from 'bignumber.js'
 
 import { PRICE_ESTIMATION_PRECISION } from 'const'
-import { invertPrice } from '@gnosis.pm/dex-js'
+import { invertPrice, TokenDetails } from '@gnosis.pm/dex-js'
 
 import { displayTokenSymbolOrLink } from 'utils/display'
+
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
 
-import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimations'
-
-import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-
-export interface Props extends Omit<PriceEstimationsProps, 'inputId'> {
+export interface Props {
   label: string
-  updatePrices: (price: string, invertedPrice: string) => () => void
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+  amount?: string
+  price: BigNumber | null
+  isPriceInverted: boolean
+  loading: boolean
+  onClickPrice: (price: string, invertedPrice: string) => () => void
+  onSwapPrices: () => void
+}
+
+interface FormattedPrices {
+  priceFormatted: string
+  invertedPriceFormatted: string
 }
 
 function formatPriceToPrecision(price: BigNumber): string {
   return price.toFixed(PRICE_ESTIMATION_PRECISION)
 }
 
-export const OnchainOrderbookPriceEstimation: React.FC<Props> = (props) => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, swapPrices, updatePrices, label } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
+function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): FormattedPrices {
+  if (price) {
+    const invertedPriceFormattedAux = formatPriceToPrecision(invertPrice(price))
+    const priceFormattedAux = formatPriceToPrecision(price)
 
-  const { priceEstimation, isPriceLoading } = usePriceEstimationWithSlippage({
-    networkId,
-    amount: amount || '0',
-    baseTokenId,
-    baseTokenDecimals,
-    quoteTokenId,
-    quoteTokenDecimals,
-  })
-
-  let price = 'N/A'
-  let invertedPrice = 'N/A'
-
-  if (priceEstimation) {
-    price = formatPriceToPrecision(isPriceInverted ? invertPrice(priceEstimation) : priceEstimation)
-    invertedPrice = formatPriceToPrecision(!isPriceInverted ? invertPrice(priceEstimation) : priceEstimation)
+    if (isPriceInverted) {
+      // Price is inverted
+      return {
+        priceFormatted: invertedPriceFormattedAux,
+        invertedPriceFormatted: priceFormattedAux,
+      }
+    } else {
+      // Price is not inverted
+      return {
+        priceFormatted: priceFormattedAux,
+        invertedPriceFormatted: invertedPriceFormattedAux,
+      }
+    }
+  } else {
+    return {
+      priceFormatted: 'N/A',
+      invertedPriceFormatted: 'N/A',
+    }
   }
-  const displayPrice = price === 'Infinity' || invertedPrice === 'Infinity' ? 'N/A' : price
+}
+
+export const PriceEstimation: React.FC<Props> = (props) => {
+  const { label, isPriceInverted, price, loading, amount, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
+
+  const { priceFormatted, invertedPriceFormatted } = getPriceFormatted(price, isPriceInverted)
+  const displayPrice = priceFormatted === 'Infinity' || invertedPriceFormatted === 'Infinity' ? 'N/A' : priceFormatted
 
   return (
     <>
@@ -56,15 +74,15 @@ export const OnchainOrderbookPriceEstimation: React.FC<Props> = (props) => {
       </span>
       <button
         type="button"
-        disabled={isPriceLoading || displayPrice === 'N/A'}
-        onClick={updatePrices(price, invertedPrice)}
+        disabled={loading || displayPrice === 'N/A'}
+        onClick={onClickPrice(priceFormatted, invertedPriceFormatted)}
       >
-        {isPriceLoading ? <Spinner /> : displayPrice}
+        {loading ? <Spinner /> : displayPrice}
       </button>
       <SwapPrice
         baseToken={baseToken}
         quoteToken={quoteToken}
-        swapPrices={swapPrices}
+        onSwapPrices={onSwapPrices}
         isPriceInverted={isPriceInverted}
         showOnlyQuoteToken
       />
