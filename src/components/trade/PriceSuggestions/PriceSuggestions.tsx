@@ -131,7 +131,7 @@ export interface Props {
   fillPriceLoading: boolean
 
   // events
-  onClickPrice: (price: string, invertedPrice: string) => () => void
+  onClickPrice: (price: string, invertedPrice: string) => void
   onSwapPrices: () => void
 }
 
