@@ -13,7 +13,7 @@ import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
 
-import { OnchainOrderbookPriceEstimation } from 'components/trade/OnchainOrderbookPriceEstimation'
+import { OnchainOrderbookPriceEstimation } from 'components/trade/PriceEstimations/PriceEstimation'
 
 const Wrapper = styled.div`
   > div {

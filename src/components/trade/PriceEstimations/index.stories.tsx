@@ -4,10 +4,10 @@ import { useForm, FormProvider } from 'react-hook-form'
 
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Meta, Story } from '@storybook/react/types-6-0'
-import { OnchainOrderbookPriceEstimation, Props } from './OnchainOrderbookPriceEstimation'
+import { PriceEstimations, Props } from '.'
 
 export default {
-  title: 'Trade/OnchainOrderbookPriceEstimation',
+  title: 'Trade/PriceEstimations',
 } as Meta
 
 const Template: Story<Props> = (props) => {
@@ -15,7 +15,7 @@ const Template: Story<Props> = (props) => {
   return (
     <FormProvider {...methods}>
       <form>
-        <OnchainOrderbookPriceEstimation {...props} />
+        <PriceEstimations {...props} />
       </form>
     </FormProvider>
   )

@@ -8,7 +8,7 @@ import { displayTokenSymbolOrLink } from 'utils/display'
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
 
-import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimations/PriceEstimations'
+import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimations'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 

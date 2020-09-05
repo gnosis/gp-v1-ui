@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { EllipsisText } from 'components/common/EllipsisText'
-import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimations/PriceEstimations'
+import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimations'
 
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 import { safeTokenName } from '@gnosis.pm/dex-js'
