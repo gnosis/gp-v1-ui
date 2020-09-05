@@ -13,10 +13,9 @@ import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
 
-import { PriceEstimation, Props as PriceEstimationProps } from 'components/trade/PriceEstimations/PriceEstimation'
+import { PriceEstimation } from 'components/trade/PriceEstimations/PriceEstimation'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-import BigNumber from 'bignumber.js'
 
 const Wrapper = styled.div`
   > div {
@@ -173,6 +172,16 @@ export const PriceEstimations: React.FC<Props> = (props) => {
     quoteTokenDecimals,
   })
 
+  // TODO: Use best ask price instead
+  const { priceEstimation: bestAskPrice, isPriceLoading: bestAskPriceLoading } = usePriceEstimationWithSlippage({
+    networkId,
+    amount: '0',
+    baseTokenId,
+    baseTokenDecimals,
+    quoteTokenId,
+    quoteTokenDecimals,
+  })
+
   const priceEstimationCommonPros = {
     baseToken,
     quoteToken,
@@ -195,8 +204,8 @@ export const PriceEstimations: React.FC<Props> = (props) => {
       <div className="container">
         <PriceEstimation
           label="Best ask"
-          price={new BigNumber('3.2345')}
-          loading={false}
+          price={bestAskPrice}
+          loading={bestAskPriceLoading}
           {...priceEstimationCommonPros}
         />
         {amount && +amount != 0 && +amount != 1 && (
