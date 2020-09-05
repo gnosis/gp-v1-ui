@@ -49,7 +49,7 @@ import {
 import TokensAdder from './TokenAdder'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
-import { PriceEstimations } from 'components/trade/PriceEstimations'
+import { PriceEstimations } from 'components/trade/PriceEstimations/PriceEstimations'
 import Price, { invertPriceFromString } from 'components/trade/Price'
 
 // hooks
