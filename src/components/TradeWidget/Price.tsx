@@ -13,7 +13,8 @@ import { OrderBookBtn } from 'components/OrderBookBtn'
 
 // TradeWidget: subcomponents
 import { TradeFormData } from 'components/TradeWidget'
-import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { FormInputError } from 'components/atoms/FormInputError'
+import { FormMessage } from 'components/atoms/FormMessage'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 import { SwapPrice } from './PriceEstimations'
 
