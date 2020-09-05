@@ -7,7 +7,7 @@ import { MEDIA } from 'const'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
-import { PriceEstimation } from 'components/trade/PriceEstimations/PriceEstimation'
+import { PriceSuggestion } from 'components/trade/PriceSuggestions/PriceSuggestion'
 import BigNumber from 'bignumber.js'
 
 const Wrapper = styled.div`
@@ -135,7 +135,7 @@ export interface Props {
   onSwapPrices: () => void
 }
 
-export const PriceEstimations: React.FC<Props> = (props) => {
+export const PriceSuggestions: React.FC<Props> = (props) => {
   const {
     amount,
     baseToken,
@@ -149,7 +149,7 @@ export const PriceEstimations: React.FC<Props> = (props) => {
     onSwapPrices,
   } = props
 
-  const priceEstimationCommonPros = {
+  const commonProps = {
     baseToken,
     quoteToken,
     isPriceInverted,
@@ -169,19 +169,14 @@ export const PriceEstimations: React.FC<Props> = (props) => {
         />
       </div>
       <div className="container">
-        <PriceEstimation
-          label="Best ask"
-          price={bestAskPrice}
-          loading={bestAskPriceLoading}
-          {...priceEstimationCommonPros}
-        />
+        <PriceSuggestion label="Best ask" price={bestAskPrice} loading={bestAskPriceLoading} {...commonProps} />
         {amount && +amount != 0 && +amount != 1 && (
-          <PriceEstimation
+          <PriceSuggestion
             label="Fill price"
             amount={amount}
             price={fillPrice}
             loading={fillPriceLoading}
-            {...priceEstimationCommonPros}
+            {...commonProps}
           />
         )}
       </div>

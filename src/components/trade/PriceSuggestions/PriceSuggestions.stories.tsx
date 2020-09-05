@@ -3,12 +3,12 @@ import { useForm, FormProvider } from 'react-hook-form'
 
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Meta, Story } from '@storybook/react/types-6-0'
-import { PriceEstimations, Props } from './PriceEstimations'
+import { PriceSuggestions, Props } from './PriceSuggestions'
 import { Frame } from 'components/common/Frame'
 import BigNumber from 'bignumber.js'
 
 export default {
-  title: 'Trade/PriceEstimations',
+  title: 'Trade/PriceSuggestions',
 } as Meta
 
 const GNO = {
@@ -40,7 +40,7 @@ const Template: Story<Partial<Props>> = (props) => {
     <Frame style={{ maxWidth: '50rem' }}>
       <FormProvider {...methods}>
         <form>
-          <PriceEstimations
+          <PriceSuggestions
             {...defaultProps}
             isPriceInverted={isPriceInverted}
             onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}

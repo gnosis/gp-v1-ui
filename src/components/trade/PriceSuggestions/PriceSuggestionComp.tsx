@@ -4,15 +4,16 @@ import { useFormContext } from 'react-hook-form'
 import { TradeFormData } from 'components/TradeWidget'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-import { PriceEstimations, Props as PriceEstimationsProps } from '/components/trade/PriceEstimations/PriceEstimations'
+import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
 
-interface Props extends PriceEstimationsProps {
+interface Props
+  extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
   networkId: number
   priceInputId: string
   priceInverseInputId: string
 }
 
-export const PriceEstimationsComp: React.FC<Props> = (props) => {
+export const PriceSuggestionsComp: React.FC<Props> = (props) => {
   const {
     networkId,
     amount,
@@ -62,7 +63,7 @@ export const PriceEstimationsComp: React.FC<Props> = (props) => {
   })
 
   return (
-    <PriceEstimations
+    <PriceSuggestions
       // Market
       baseToken={baseToken}
       quoteToken={quoteToken}
