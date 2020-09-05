@@ -13,6 +13,7 @@ import { Props as PriceEstimationsProps } from 'components/trade/PriceEstimation
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
 export interface Props extends Omit<PriceEstimationsProps, 'inputId'> {
+  label: string
   updatePrices: (price: string, invertedPrice: string) => () => void
 }
 
@@ -21,7 +22,7 @@ function formatPriceToPrecision(price: BigNumber): string {
 }
 
 export const OnchainOrderbookPriceEstimation: React.FC<Props> = (props) => {
-  const { networkId, amount, baseToken, quoteToken, isPriceInverted, swapPrices, updatePrices } = props
+  const { networkId, amount, baseToken, quoteToken, isPriceInverted, swapPrices, updatePrices, label } = props
   const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
   const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
@@ -46,7 +47,7 @@ export const OnchainOrderbookPriceEstimation: React.FC<Props> = (props) => {
   return (
     <>
       <span>
-        <span>Best ask</span>{' '}
+        <span>{label}</span>{' '}
         {amount && (
           <strong>
             ({amount} {displayTokenSymbolOrLink(quoteToken)})

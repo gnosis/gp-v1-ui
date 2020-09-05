@@ -162,9 +162,9 @@ export const PriceEstimations: React.FC<Props> = (props) => {
         />
       </div>
       <div className="container">
-        <OnchainOrderbookPriceEstimation {...props} amount="" updatePrices={updatePrices} />
+        <OnchainOrderbookPriceEstimation label="Best ask" {...props} amount="" updatePrices={updatePrices} />
         {amount && +amount != 0 && +amount != 1 && (
-          <OnchainOrderbookPriceEstimation {...props} updatePrices={updatePrices} />
+          <OnchainOrderbookPriceEstimation label="Fill price" {...props} updatePrices={updatePrices} />
         )}
       </div>
     </Wrapper>
