@@ -34,8 +34,7 @@ import { tokenListApi } from 'api'
 
 import OrdersWidget from 'components/OrdersWidget'
 import { TxNotification } from 'components/TxNotification'
-import { Spinner } from 'components/Spinner'
-import { TxMessage } from './TxMessage'
+import { Spinner } from 'components/common/Spinner'
 
 // TradeWidget: subcomponents
 import {
@@ -72,6 +71,7 @@ import { updateTradeState } from 'reducers-actions/trade'
 
 // Validation
 import validationSchema from 'components/TradeWidget/validationSchema'
+import { TxMessage } from 'components/TradeWidget/TxMessage'
 
 const NULL_BALANCE_TOKEN = {
   exchangeBalance: ZERO,

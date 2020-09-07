@@ -14,7 +14,7 @@ import { TokenBalanceDetails, Command } from 'types'
 // Components
 import TokenImg from 'components/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
-import { Spinner } from 'components/Spinner'
+import { Spinner } from 'components/common/Spinner'
 
 // DepositWidget: subcomponents
 import Form from 'components/DepositWidget/Form'

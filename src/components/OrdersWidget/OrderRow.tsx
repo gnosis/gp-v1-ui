@@ -9,8 +9,8 @@ import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@
 import alertIcon from 'assets/img/alert.svg'
 
 // components
-import { EtherscanLink } from 'components/EtherscanLink'
-import { Spinner } from 'components/Spinner'
+import { EtherscanLink } from 'components/common/EtherscanLink'
+import { Spinner } from 'components/common/Spinner'
 import { StatusCountdown } from 'components/StatusCountdown'
 
 // hooks

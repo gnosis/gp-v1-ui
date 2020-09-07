@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
 // componet
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 // PoolingWidget: subcomponent
 import { HighlightDiv } from 'components/PoolingWidget/PoolingWidget.styled'

@@ -6,7 +6,7 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 import { FoldableRowWrapper } from 'components/Layout/Card'
 
 import { isTradeSettled, divideBN, formatPercentage } from 'utils'
