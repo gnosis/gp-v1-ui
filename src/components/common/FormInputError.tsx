@@ -1,39 +1,22 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { FormMessage } from 'components/common/FormMessage'
 
-const Wrapper = styled.div<{ $margin?: string; $padding?: string }>`
-  margin: ${({ $margin = '0' }): string => $margin};
-  padding: ${({ $padding = '0' }): string => $padding};
+const Wrapper = styled.div`
+  margin: 0.5rem 0;
+  padding: 0;
 `
 
 export interface Props {
   errorMessage?: string
-  schemaError?: boolean
-  visibilityHidden?: boolean
-  wrapperMargin?: string
 }
 
-export const FormInputError: React.FC<Props> = ({
-  errorMessage,
-  visibilityHidden = true,
-  wrapperMargin = '0.5rem 0',
-}) => {
-  const message = useMemo(() => {
-    if (errorMessage) {
-      return errorMessage
-    } else {
-      if (visibilityHidden) {
-        return 'Stop using developer tools! :D'
-      }
-
-      return null
-    }
-  }, [errorMessage, visibilityHidden])
+export const FormInputError: React.FC<Props> = ({ errorMessage }) => {
+  const message = errorMessage ? errorMessage : 'Stop using developer tools! :D'
 
   return (
-    <Wrapper $margin={wrapperMargin}>
+    <Wrapper>
       <FormMessage className={errorMessage ? 'error' : 'hidden'}>{message}</FormMessage>
     </Wrapper>
   )
