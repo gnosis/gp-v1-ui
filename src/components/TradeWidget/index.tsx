@@ -4,6 +4,7 @@ import { useForm, useWatch, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { toast } from 'toastify'
 import BN from 'bn.js'
+import Modali from 'modali'
 
 import { decodeSymbol } from '@gnosis.pm/dex-js'
 
@@ -62,7 +63,7 @@ import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import { DevTool } from 'HookFormDevtool'
-import { ButtonWrapper } from 'hooks/useSubmitTxModal'
+import { useSubmitTxModal } from 'hooks/useSubmitTxModal'
 
 // Reducers
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
@@ -221,15 +222,11 @@ const TradeWidget: React.FC = () => {
   const [ordersVisible, setOrdersVisible] = useState(true)
 
   const methods = useForm<TradeFormData>({
-    mode: 'all',
+    mode: 'onChange',
     defaultValues: defaultFormValues,
     resolver: validationResolver,
   })
-  const { control, handleSubmit, reset, setValue, trigger, formState } = methods
-
-  // invoke before return
-  // as formState is Proxied
-  const { isValid } = formState
+  const { control, handleSubmit, reset, setValue, trigger } = methods
 
   const {
     sellToken: sellValue,
@@ -569,13 +566,23 @@ const TradeWidget: React.FC = () => {
   }
 
   const onConfirm = handleSubmit(onSubmit)
+  const { toggleModal, modalProps } = useSubmitTxModal({
+    onConfirm,
+    message: function SubmitModalMessage() {
+      return (
+        <ConfirmationModalWrapper>
+          <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
+        </ConfirmationModalWrapper>
+      )
+    },
+  })
 
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormProvider {...methods}>
-        <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
+        <WrappedForm onSubmit={(e): void => e.preventDefault()} autoComplete="off" noValidate>
           {sameToken && (
             <>
               <WarningLabel className="warning">Tokens cannot be the same! </WarningLabel>
@@ -640,30 +647,22 @@ const TradeWidget: React.FC = () => {
             tabIndex={1}
           />
           <p>This order might be partially filled.</p>
-          <ButtonWrapper
-            onConfirm={onConfirm}
-            message={(): React.ReactNode => (
-              <ConfirmationModalWrapper>
-                <TxMessage networkId={networkIdOrDefault} sellToken={sellToken} receiveToken={receiveToken} />
-              </ConfirmationModalWrapper>
-            )}
+
+          <SubmitButton
+            data-text="This order might be partially filled."
+            type="button"
+            disabled={isSubmitting || sameToken}
+            tabIndex={1}
+            onClick={async (): Promise<void> => {
+              const formValid = await trigger()
+
+              if (formValid) toggleModal()
+            }}
           >
-            <SubmitButton
-              data-text="This order might be partially filled."
-              type="submit"
-              disabled={isSubmitting || sameToken}
-              tabIndex={1}
-              onClick={(e): void => {
-                if (!isValid) {
-                  e.stopPropagation()
-                  trigger()
-                }
-              }}
-            >
-              {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
-              {sameToken ? 'Select different tokens' : 'Submit limit order'}
-            </SubmitButton>
-          </ButtonWrapper>
+            {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
+            {sameToken ? 'Select different tokens' : 'Submit limit order'}
+          </SubmitButton>
+          <Modali.Modal {...modalProps} />
         </WrappedForm>
       </FormProvider>
       <ExpandableOrdersPanel>
