@@ -6,6 +6,8 @@ export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
   getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
+  getSubsidizeFactorUrl(networkId: number): string
+  getSubsidizeFactor(networkId: number): Promise<number>
 }
 
 interface GetPriceParams {
@@ -72,6 +74,9 @@ export type DexPriceEstimatorParams = PriceEstimatorEndpoint[]
 function getDexPriceEstimatorUrl(baseUlr: string): string {
   return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
 }
+
+// when price-estimation service doesn't return anything
+export const DEFAULT_SUBSIDIZE_FACTOR = 1 // no subsidy
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
@@ -143,6 +148,29 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       throw new Error(
         `Failed to query orderbook data for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${error.message}`,
       )
+    }
+  }
+
+  public getSubsidizeFactorUrl(networkId: number): string {
+    const baseUrl = this._getBaseUrl(networkId)
+    return `${baseUrl}subsidize_factor`
+  }
+
+  public async getSubsidizeFactor(networkId: number): Promise<number> {
+    // TODO: use endpoint when available
+    return DEFAULT_SUBSIDIZE_FACTOR
+
+    try {
+      const url = this.getSubsidizeFactorUrl(networkId)
+      const res = await fetch(url)
+      const { factor } = await res.json()
+
+      return factor
+    } catch (error) {
+      console.error(error)
+
+      throw new Error('Error fetching subsidize factor')
+      return DEFAULT_SUBSIDIZE_FACTOR
     }
   }
 
