@@ -248,7 +248,6 @@ export const Price: React.FC<Props> = ({
             baseToken={receiveToken}
             quoteToken={sellToken}
             isPriceInverted={true}
-            separator="per"
             onSwapPrices={onSwapPrices}
           />
         </label>
@@ -271,7 +270,6 @@ export const Price: React.FC<Props> = ({
             baseToken={receiveToken}
             quoteToken={sellToken}
             isPriceInverted={false}
-            separator="per"
             onSwapPrices={onSwapPrices}
           />
         </label>
