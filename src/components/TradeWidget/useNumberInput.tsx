@@ -50,8 +50,16 @@ export function useNumberInput(params: Params): Result {
   )
 
   const onKeyPress = useCallback(
-    (event: React.KeyboardEvent<HTMLInputElement>): void =>
-      event.key === 'Enter' ? removeExcessZeros(event) : preventInvalidChars(event),
+    (event: React.KeyboardEvent<HTMLInputElement>): void => {
+      if (event.key === 'Enter') {
+        // we don't want enter to submit le form
+        event.preventDefault()
+
+        return removeExcessZeros(event)
+      }
+
+      return preventInvalidChars(event)
+    },
     [removeExcessZeros],
   )
 
