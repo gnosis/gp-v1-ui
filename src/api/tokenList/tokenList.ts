@@ -2,9 +2,9 @@ import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
 
 import { getImageUrl } from 'utils'
-import { tokenList } from '@gnosis.pm/dex-js'
+import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
 
-export function getTokensByNetwork(networkId: number): TokenDetails[] {
+export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsConfig[]): TokenDetails[] {
   // Return token details
   const tokenDetails: TokenDetails[] = tokenList.reduce((acc: TokenDetails[], token) => {
     const address = token.addressByNetwork[networkId]
@@ -22,5 +22,3 @@ export function getTokensByNetwork(networkId: number): TokenDetails[] {
 
   return tokenDetails
 }
-
-export default tokenList

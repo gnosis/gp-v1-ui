@@ -183,7 +183,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
   }: PlaceValidFromOrdersParams): Promise<Receipt> {
     const length = buyTokens.length
     assert(
-      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every(el => el.length === length),
+      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every((el) => el.length === length),
       'Parameters length do not match',
     )
     assert(length > 0, 'At least one order required')
@@ -213,7 +213,7 @@ export class ExchangeApiMock extends DepositApiMock implements ExchangeApi {
     this._initOrders(userAddress)
     const batchId = await this.getCurrentBatchId()
 
-    orderIds.forEach(orderId => {
+    orderIds.forEach((orderId) => {
       if (this.orders[userAddress][orderId]) {
         this.orders[userAddress][orderId].validUntil = batchId - 1
       }

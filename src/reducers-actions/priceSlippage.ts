@@ -8,7 +8,7 @@ type PriceSlippagePayload = string
 
 type PriceSlippageState = PriceSlippagePayload
 
-const setPriceSlippage: ActionCreator<PriceSlippageActions, PriceSlippagePayload> = payload => ({
+const setPriceSlippage: ActionCreator<PriceSlippageActions, PriceSlippagePayload> = (payload) => ({
   type: ActionsList[0],
   payload,
 })

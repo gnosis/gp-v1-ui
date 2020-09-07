@@ -79,7 +79,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     if (validatorActive) {
       // Verify on every amount change
       const errorMsg = _validateForm(totalAmount, amountInput, decimals)
-      setErrors(oldErrors => ({
+      setErrors((oldErrors) => ({
         ...oldErrors,
         amountInput: errorMsg || '',
       }))

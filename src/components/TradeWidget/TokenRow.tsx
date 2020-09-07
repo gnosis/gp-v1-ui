@@ -171,7 +171,6 @@ const TokenRow: React.FC<Props> = ({
   userConnected = true,
   autoFocus,
 }) => {
-  const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
 
@@ -223,7 +222,7 @@ const TokenRow: React.FC<Props> = ({
         <i>
           Sell amount exceeds your balance by:{' '}
           <strong>
-            {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}
+            {formatSmart({ amount: overMax, precision: selectedToken.decimals })} <span>{selectedToken.symbol}</span>
           </strong>
         </i>
       </FormMessage>
@@ -240,7 +239,7 @@ const TokenRow: React.FC<Props> = ({
         thousandSeparator: false,
         isLocaleAware: false,
       }),
-      true,
+      { shouldValidate: true },
     )
   }
 
@@ -295,25 +294,18 @@ const TokenRow: React.FC<Props> = ({
           {editableAndConnected && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
-            {readOnly ? (
-              <FormMessage className={balanceClassName}>
-                {' '}
-                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
-              </FormMessage>
-            ) : (
-              <FormMessage className={balanceClassName}>
-                {' '}
-                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
-                {validateMaxAmount && (
-                  <>
-                    <TooltipWrapper tooltip="Fill maximum">
-                      <a onClick={useMax}>max</a>
-                    </TooltipWrapper>
-                    <i aria-label="Tooltip"></i>
-                  </>
-                )}
-              </FormMessage>
-            )}
+            <FormMessage className={balanceClassName}>
+              {' '}
+              {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
+              {!readOnly && validateMaxAmount && (
+                <>
+                  <TooltipWrapper tooltip="Fill maximum">
+                    <a onClick={useMax}>max</a>
+                  </TooltipWrapper>
+                  <i aria-label="Tooltip"></i>
+                </>
+              )}
+            </FormMessage>
             &nbsp;
             <HelpTooltip tooltip={BalanceTooltip} />
           </span>
@@ -326,7 +318,7 @@ const TokenRow: React.FC<Props> = ({
           placeholder="0"
           name={inputId}
           type="text"
-          disabled={isEditable}
+          disabled={isDisabled}
           readOnly={readOnly}
           required
           ref={inputRef}

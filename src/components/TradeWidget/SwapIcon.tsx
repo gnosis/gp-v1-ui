@@ -9,10 +9,10 @@ const Wrapper = styled.span`
 `
 
 interface Props {
-  swap: () => void
+  swap?: () => void | null
 }
 
-export const SwapIcon: React.FC<Props> = ({ swap }) => {
+export const SwapIcon: React.FC<Props> = ({ swap = (): null => null }) => {
   return (
     <Wrapper onClick={swap}>
       <FontAwesomeIcon icon={faRetweet} />

@@ -16,9 +16,9 @@ interface WarningProps {
 
 const WarningImage = styled.img`
   &&&&& {
-    width: 1.2em;
+    width: 1em;
     height: auto;
-    margin-left: 1em;
+    margin-left: 0.4em;
   }
 `
 

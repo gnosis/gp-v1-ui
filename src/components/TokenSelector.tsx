@@ -270,7 +270,7 @@ interface Props {
   tabIndex?: number
 }
 
-const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = e => {
+const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
   if (e.key === 'Enter') {
     e.preventDefault()
   }
@@ -278,7 +278,7 @@ const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = e => {
 
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(
-    () => tokens.map(token => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
+    () => tokens.map((token) => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
     [tokens],
   )
 

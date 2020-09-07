@@ -7,9 +7,10 @@ import { depositApi } from 'api'
 
 // Assets
 import verified from 'assets/img/verified.svg'
+import builtOnGP from 'assets/img/builtOnGP.svg'
 
 // Components
-import ThemeToggler from 'components/ThemeToggler'
+import ThemeToggler, { ThemeTogglerWrapper } from 'components/ThemeToggler'
 import { EtherscanLink } from 'components/EtherscanLink'
 
 // Hooks
@@ -28,20 +29,112 @@ const Wrapper = styled.footer`
   font-size: 1.3rem;
   color: var(--color-text-primary);
   letter-spacing: -0.03rem;
-  max-width: 85rem;
-  margin: 0 auto;
   line-height: 1;
+
+  width: 100%;
+  margin: 0 0 4rem 0;
+  padding: 0 2rem;
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
     width: 100%;
     padding: 0 0 5.4rem;
+    margin: 0;
+  }
+`
+
+const FooterLinks = styled.div`
+  > a {
+    margin: 0 0.5rem;
   }
 
-  .version {
+  > a:link,
+  > a:visited {
+    font-family: var(--font-weight-normal);
     font-size: inherit;
     color: inherit;
+    letter-spacing: -0.03rem;
+  }
+`
+
+const BuiltOnGPWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 0;
+
+  &::before {
+    content: '';
+    background: url(${builtOnGP}) no-repeat center/contain;
+    height: 6.6rem;
+    width: 6.6rem;
+    display: block;
+    margin: 1rem;
+  }
+`
+
+const VerifiedContractLink = styled.div`
+  display: flex;
+  flex: 1 1 100%;
+  justify-content: center;
+
+  margin: 0 1rem;
+  padding: 0;
+
+  > a {
+    height: fit-content;
+    margin: auto 0;
+    border-color: #29a745;
+    white-space: nowrap;
+  }
+
+  > a:link,
+  > a:visited {
+    color: #29a745;
+    transition: border-color 0.2s ease-in-out;
+  }
+`
+
+const SideContentWrapper = styled.div`
+  display: flex;
+  flex-flow: row wrap-reverse;
+  flex: 1 1 100%;
+  align-items: center;
+  justify-content: space-around;
+
+  margin: 0 2rem;
+
+  > ${ThemeTogglerWrapper}, > ${FooterLinks}, > .version {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0;
+
+    font-size: inherit;
+    margin: 1.2rem 0;
+    white-space: nowrap;
+
+    > strong {
+      margin-right: 1rem;
+    }
+  }
+
+  > ${ThemeTogglerWrapper} {
+    order: 1;
+  }
+
+  > ${FooterLinks} {
+    order: 2;
+  }
+
+  > .version {
+    order: 3;
+    font-size: inherit;
+    color: inherit;
+
     > a {
+      margin: 0 0.4rem;
       text-decoration: none;
       color: inherit;
       text-decoration: underline;
@@ -52,47 +145,39 @@ const Wrapper = styled.footer`
       color: var(--color-text-active);
     }
   }
-`
 
-const FooterLinks = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  align-items: center;
-  font-size: inherit;
-  margin: 0 6rem 0 0;
+  @media only screen and (max-width: ${MEDIA.mediumScreenSmall}) {
+    > ${FooterLinks}, > .version,
+    > ${ThemeTogglerWrapper} {
+      flex: 1 1 100%;
+    }
 
-  @media ${MEDIA.mobile} {
-    width: 100%;
-    padding: 0 0 2.4rem;
-    margin: 0;
+    > ${FooterLinks} {
+      order: 3;
+      margin: 4rem 0;
+    }
+
+    > ${ThemeTogglerWrapper} {
+      order: 2;
+    }
+
+    > .version {
+      order: 1;
+    }
   }
 
-  > a:link,
-  > a:visited {
-    font-family: var(--font-weight-normal);
-    font-size: inherit;
-    color: inherit;
-    letter-spacing: -0.03rem;
-    margin: 0 1.6rem 0 0;
-  }
+  @media ${MEDIA.xSmallDown} {
+    > .version {
+      flex-flow: column nowrap;
 
-  > a:last-of-type {
-    margin: 0;
-  }
-`
+      > a {
+        margin: 0.5rem 0;
 
-const VerifiedContractLink = styled.div`
-  display: flex;
-  width: 100%;
-  margin: 3rem auto;
-  justify-content: center;
-  padding: 0;
-
-  > a:link,
-  > a:visited {
-    color: #29a745;
-    transition: border-color 0.2s ease-in-out;
+        &:first-child {
+          order: 5;
+        }
+      }
+    }
   }
 `
 
@@ -135,39 +220,43 @@ const Footer: React.FC = () => {
 
   return (
     <Wrapper>
-      {/* DARK/LIGHT MODE TOGGLER */}
-      <ThemeToggler />
-      {/* LINKS */}
-      <FooterLinks>
-        <Link to="/about">About{APP_NAME_ABOUT}</Link>
-        <Link to="/faq">FAQ</Link>
-      </FooterLinks>
-      {/* VERSION */}
-      <div className="version">
-        Web{' '}
-        <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
-          v{VERSION}
-        </a>{' '}
-        -{' '}
-        <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks">
-          App Id: {CONFIG.appId}
-        </a>{' '}
-        - Contracts{' '}
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
-        >
-          v{CONTRACT_VERSION}
-        </a>
-      </div>
       <VerifiedContractLink>
+        <BuiltOnGPWrapper />
         {contractAddress && networkId ? (
           <LinkWrapper type="contract" identifier={contractAddress} networkId={networkId} label={VerifiedText} />
         ) : (
           ''
         )}
       </VerifiedContractLink>
+      <SideContentWrapper>
+        {/* DARK/LIGHT MODE TOGGLER */}
+        <ThemeToggler />
+        {/* LINKS */}
+        <FooterLinks>
+          <Link to="/about">About{APP_NAME_ABOUT}</Link>
+          <Link to="/faq">FAQ</Link>
+        </FooterLinks>
+        {/* VERSION */}
+        <div className="version">
+          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+            Web: v{VERSION}
+          </a>{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks"
+          >
+            App Id: {CONFIG.appId}
+          </a>{' '}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href={'https://github.com/gnosis/dex-contracts/tree/v' + CONTRACT_VERSION}
+          >
+            Contracts: v{CONTRACT_VERSION}
+          </a>
+        </div>
+      </SideContentWrapper>
     </Wrapper>
   )
 }

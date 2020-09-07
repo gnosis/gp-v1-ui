@@ -175,7 +175,7 @@ const generateMessage = ({
     case TokenFromExchange.NOT_IN_TOKEN_LIST:
       if (!token || !('id' in token)) return <>{defaultText}</>
 
-      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async e => {
+      const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
         // prevent react-select reaction
         e.preventDefault()
         const [newToken] = await addTokensToList({ networkId, tokens: [token] }, reason)
@@ -238,7 +238,7 @@ export const SearchItem: React.FC<SearchItemProps> = ({ value, defaultText, netw
     }
 
     promise
-      .then(result => {
+      .then((result) => {
         // cache result
         fetchedCache.set(result, cacheKey)
         //bust promised cache

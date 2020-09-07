@@ -201,7 +201,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
   const { ethBalance } = useEthBalances()
   const { balances } = useTokenBalances()
-  const wethBalanceDetails = balances.find(token => token.addressMainnet === WETH_ADDRESS_MAINNET)
+  const wethBalanceDetails = balances.find((token) => token.addressMainnet === WETH_ADDRESS_MAINNET)
   const wethBalance = wethBalanceDetails?.walletBalance
 
   const { register, errors, handleSubmit, setValue, watch } = useForm<WrapEtherFormData>({
@@ -235,7 +235,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
           setValue(
             INPUT_ID_AMOUNT,
             formatAmountFull({ amount: balance, precision: DEFAULT_PRECISION, isLocaleAware: false }),
-            true,
+            { shouldValidate: true },
           )
         }
       >
@@ -350,7 +350,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
           wrapUnwrapPromise
             .then(() => toast.success(successMessage))
-            .catch(error => {
+            .catch((error) => {
               console.error(errorMessage, error)
               toast.error(errorMessage)
             })

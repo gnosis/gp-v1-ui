@@ -4,17 +4,17 @@ import { unstable_batchedUpdates as batchedUpdates } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { toast } from 'toastify'
 import styled from 'styled-components'
-import joi from '@hapi/joi'
+import joi from 'joi'
 
 // const, type, utils
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { Receipt } from 'types'
 import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
-import { maxAmountsForSpread, resolverFactory, NUMBER_VALIDATION_KEYS } from 'utils'
+import { maxAmountsForSpread, resolverFactory, VALIDATOR_ERROR_KEYS } from 'utils'
 
 // components
 import OrdersWidget from 'components/OrdersWidget'
-import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget'
+import { ExpandableOrdersPanel, OrdersToggler } from 'components/TradeWidget/TradeWidget.styled'
 
 // PoolingWidget: subcomponents
 import ProgressBar from 'components/PoolingWidget/ProgressBar'
@@ -27,7 +27,7 @@ import { PoolingInterfaceWrapper } from 'components/PoolingWidget/PoolingWidget.
 import useSafeState from 'hooks/useSafeState'
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { usePlaceOrder, MultipleOrdersOrder } from 'hooks/usePlaceOrder'
-import { useForm, FormContext } from 'react-hook-form'
+import { useForm, FormProvider } from 'react-hook-form'
 import useGlobalState from 'hooks/useGlobalState'
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
 
@@ -48,7 +48,7 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
 
 function setFullTokenMap(tokens: TokenDetails[]): Map<number, TokenDetails> {
   const tokenMap = new Map()
-  tokens.forEach(token => tokenMap.set(token.id, token))
+  tokens.forEach((token) => tokenMap.set(token.id, token))
   return tokenMap
 }
 
@@ -63,8 +63,8 @@ export function createOrderParams(tokens: TokenDetails[], spread: number): Multi
   // The number of orders is equal to num_tokens * (num_tokens -1)
   const orders: MultipleOrdersOrder[] = []
 
-  tokens.forEach(buyToken =>
-    tokens.forEach(sellToken => {
+  tokens.forEach((buyToken) =>
+    tokens.forEach((sellToken) => {
       // We don't want to pair a token with itself
       if (buyToken !== sellToken) {
         // calculating buy/sell amounts
@@ -129,10 +129,10 @@ const validationSchema = joi.object({
     .precision(INPUT_PRECISION_SIZE)
     .required()
     .messages({
-      [NUMBER_VALIDATION_KEYS.REQUIRED]: 'Invalid spread amount',
-      [NUMBER_VALIDATION_KEYS.UNSAFE]: 'Invalid spread amount',
-      [NUMBER_VALIDATION_KEYS.LESS]: 'Spread must be between 0 and 100',
-      [NUMBER_VALIDATION_KEYS.GREATER]: 'Spread must be between 0 and 100',
+      [VALIDATOR_ERROR_KEYS.REQUIRED]: 'Invalid spread amount',
+      [VALIDATOR_ERROR_KEYS.UNSAFE]: 'Invalid spread amount',
+      [VALIDATOR_ERROR_KEYS.LESS]: 'Spread must be between 0 and 100',
+      [VALIDATOR_ERROR_KEYS.GREATER]: 'Spread must be between 0 and 100',
     }),
 })
 
@@ -174,7 +174,7 @@ const PoolingInterface: React.FC = () => {
       spread: spread.toString(),
     },
     mode: 'onChange',
-    validationResolver,
+    resolver: validationResolver,
   })
   const { handleSubmit, watch } = methods
   // Watch input and set defaultValue to state spread
@@ -185,8 +185,8 @@ const PoolingInterface: React.FC = () => {
     if (step === 2) setSpread(Number(spreadValue))
   }, [setSpread, spreadValue, step])
 
-  const prevStep = useCallback((): void => setStep(step => (step === FIRST_STEP ? step : step - 1)), [setStep])
-  const nextStep = useCallback((): void => setStep(step => (step === LAST_STEP ? step : step + 1)), [setStep])
+  const prevStep = useCallback((): void => setStep((step) => (step === FIRST_STEP ? step : step - 1)), [setStep])
+  const nextStep = useCallback((): void => setStep((step) => (step === LAST_STEP ? step : step + 1)), [setStep])
 
   const { isSubmitting, setIsSubmitting, placeMultipleOrders } = usePlaceOrder()
 
@@ -293,7 +293,7 @@ const PoolingInterface: React.FC = () => {
   )
   return (
     <PoolingInterfaceWrapper className={ordersVisible ? '' : 'expanded'}>
-      <FormContext {...methods}>
+      <FormProvider {...methods}>
         <form onSubmit={handleSubmit(sendTransaction)} noValidate>
           <h2>New Liquidity Order</h2>
           <ProgressBar step={step} stepArray={['Select Tokens', 'Define Spread & Review']} />
@@ -327,12 +327,12 @@ const PoolingInterface: React.FC = () => {
             {...restProps}
           />
         </form>
-      </FormContext>
+      </FormProvider>
       <ExpandableOrdersPanel>
         {/* Toggle panel visibility (arrow) */}
         <OrdersToggler
           type="button"
-          onClick={(): void => setOrdersVisible(ordersVisible => !ordersVisible)}
+          onClick={(): void => setOrdersVisible((ordersVisible) => !ordersVisible)}
           $isOpen={ordersVisible}
         />
         {/* Actual orders content */}

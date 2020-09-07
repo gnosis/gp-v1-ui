@@ -36,7 +36,7 @@ export const usePastLocation = (to: LocationTo): LocationTo => {
   }, [to, location])
 }
 
-const LinkWithPastLocation: React.FC<LinkProps> = props => {
+const LinkWithPastLocation: React.FC<LinkProps> = (props) => {
   const to = usePastLocation(props.to)
 
   return <NavLink {...props} to={to} />

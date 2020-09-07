@@ -5,6 +5,7 @@ import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
+  getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
 }
 
 interface GetPriceParams {
@@ -20,6 +21,25 @@ interface OrderBookParams {
   baseTokenId: number
   quoteTokenId: number
   hops?: number
+}
+
+/**
+ * Price point as defined in the API
+ * Both price and volume are numbers (floats)
+ *
+ * The price and volume are expressed in atoms
+ */
+export interface RawPricePoint {
+  price: number
+  volume: number
+}
+
+/**
+ * DATA returned from api as JSON
+ */
+export interface OrderBookData {
+  asks: RawPricePoint[]
+  bids: RawPricePoint[]
 }
 
 interface Token {
@@ -57,7 +77,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
 
   public constructor(params: DexPriceEstimatorParams) {
-    params.forEach(endpoint => {
+    params.forEach((endpoint) => {
       this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(
         process.env.PRICE_ESTIMATOR_URL === 'production'
           ? endpoint.url_production
@@ -107,6 +127,23 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     const baseUrl = this._getBaseUrl(networkId)
 
     return `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+  }
+
+  public async getOrderBookData(params: OrderBookParams): Promise<OrderBookData> {
+    try {
+      const url = await this.getOrderBookUrl(params)
+
+      const res = await fetch(url)
+      return await res.json()
+    } catch (error) {
+      console.error(error)
+
+      const { baseTokenId, quoteTokenId } = params
+
+      throw new Error(
+        `Failed to query orderbook data for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${error.message}`,
+      )
+    }
   }
 
   private parsePricesResponse(

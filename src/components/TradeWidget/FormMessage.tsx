@@ -6,7 +6,7 @@ export const FormMessageWrapper = styled.div<{ $margin?: string; $padding?: stri
   padding: ${({ $padding = '0' }): string => $padding};
 `
 
-const FormMessage = styled.div.attrs<{ className?: string }>(props => ({
+const FormMessage = styled.div.attrs<{ className?: string }>((props) => ({
   className: props.className ? undefined : 'error',
 }))`
   display: flex;

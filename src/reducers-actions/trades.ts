@@ -95,7 +95,7 @@ function groupByRevertKey<T extends EventWithBlockInfo>(
   const seenIds = seenTradeIds || new Set<string>()
   const newIds = new Set<string>()
 
-  list.forEach(item => {
+  list.forEach((item) => {
     // Avoid duplicate entries
     if (seenIds.has(item.id) || newIds.has(item.id)) {
       return
@@ -206,10 +206,10 @@ function applyRevertsToTrades(
   // Transform groups into a single list
   const newTrades = flattenMapOfLists(tradesByRevertKey)
     // Remove old trades that were used only to help matching possible reverts to new trades
-    .filter(trade => trade && newTradeIds.has(trade.id))
+    .filter((trade) => trade && newTradeIds.has(trade.id))
 
   // Merge existing and new set of ids
-  seenIds?.forEach(id => id && newTradeIds.add(id))
+  seenIds?.forEach((id) => id && newTradeIds.add(id))
 
   return {
     trades: newTrades,
@@ -253,9 +253,9 @@ function reviver(key: string, value: unknown): unknown {
 function serialize(state: TradesState): SerializableTradesState {
   const serialized = {}
 
-  Object.keys(state).forEach(accountKey => {
+  Object.keys(state).forEach((accountKey) => {
     serialized[accountKey] = { ...state[accountKey], tradeIds: [], pendingTrades: [] }
-    state[accountKey].tradeIds?.forEach(id => serialized[accountKey].tradeIds.push(id))
+    state[accountKey].tradeIds?.forEach((id) => serialized[accountKey].tradeIds.push(id))
     state[accountKey].pendingTrades?.forEach((value, key) => serialized[accountKey].pendingTrades.push([key, value]))
   })
 
@@ -265,14 +265,14 @@ function serialize(state: TradesState): SerializableTradesState {
 function deserialize(state: SerializableTradesState): TradesState {
   const parsedState = {}
 
-  Object.keys(state).forEach(accountKey => {
+  Object.keys(state).forEach((accountKey) => {
     parsedState[accountKey] = {
       ...state[accountKey],
       tradeIds: new Set<string>(),
       pendingTrades: new Map<string, Trade[]>(),
     }
-    state[accountKey].tradeIds?.forEach(id => parsedState[accountKey].tradeIds.add(id))
-    state[accountKey].pendingTrades?.forEach(tuple => parsedState[accountKey].pendingTrades.set(...tuple))
+    state[accountKey].tradeIds?.forEach((id) => parsedState[accountKey].tradeIds.add(id))
+    state[accountKey].pendingTrades?.forEach((tuple) => parsedState[accountKey].pendingTrades.set(...tuple))
   })
 
   return parsedState
