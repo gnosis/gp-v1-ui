@@ -582,7 +582,7 @@ const TradeWidget: React.FC = () => {
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormProvider {...methods}>
-        <WrappedForm onSubmit={onConfirm} autoComplete="off" noValidate>
+        <WrappedForm onSubmit={(e): void => e.preventDefault()} autoComplete="off" noValidate>
           {sameToken && (
             <>
               <WarningLabel className="warning">Tokens cannot be the same! </WarningLabel>
