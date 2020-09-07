@@ -58,6 +58,10 @@ const WalletButton = styled.button`
   padding: 1rem 2rem;
   width: calc(100% - 4rem);
   white-space: nowrap;
+
+  @media ${MEDIA.mobile} {
+    width: auto;
+  }
 `
 
 export const EtherscanButton = styled(WalletButton)`
