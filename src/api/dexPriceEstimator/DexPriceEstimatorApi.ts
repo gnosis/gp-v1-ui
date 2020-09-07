@@ -169,7 +169,6 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     } catch (error) {
       console.error(error)
 
-      throw new Error('Error fetching subsidize factor')
       return DEFAULT_SUBSIDIZE_FACTOR
     }
   }
