@@ -6,6 +6,7 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 
 export default {
   title: 'Common/FormInputError',
+  component: FormInputError,
 } as Meta
 
 const Template: Story<Props> = (args) => <FormInputError {...args} />
