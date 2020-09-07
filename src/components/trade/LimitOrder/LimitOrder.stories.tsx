@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Meta, Story } from '@storybook/react/types-6-0'
@@ -24,18 +24,21 @@ const DAI = {
 }
 
 const defaultProps = {
-  sellToken: GNO,
-  receiveToken: DAI,
+  sellToken: DAI,
+  receiveToken: GNO,
   limitPrice: new BigNumber('55.247234'),
   amount: '100',
-  isPriceInverted: false,
 }
 
 const Template: Story<Partial<Props>> = (props) => {
+  const [isPriceInverted, setIsPriceInverted] = useState<boolean>(false)
+
   return (
     <LimitOrder
+      isPriceInverted={isPriceInverted}
       onSwapPrices={(): void => {
         console.log('[LimitOrder.story] Swap Prices')
+        setIsPriceInverted(!isPriceInverted)
       }}
       onSelectedPrice={(price): void => console.log('[LimitOrder.story] On selected price', price)}
       onSubmitLimitOrder={(data): void => console.log('[LimitOrder.story] Submit Limit Order', data)}
