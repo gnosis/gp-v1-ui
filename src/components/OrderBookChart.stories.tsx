@@ -7,7 +7,7 @@ import { Network, TokenDetails } from 'types'
 import realData from 'storybook/USDC-DAI_OrderBook_sample.json'
 import sampleDataSet from 'storybook/orderbookSamples'
 import { processRawApiData } from './OrderBookWidget'
-import { RawApiData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
+import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 type SampleData = typeof sampleDataSet[0]
 
@@ -46,7 +46,7 @@ const defaultParams: Omit<OrderBookChartProps, 'data'> = {
 }
 
 // Token symbols to use in control selector
-const configTokenSymbols = [defaultParams.baseToken, defaultParams.quoteToken, ...tokenList].map(
+const tokenSymbols = [defaultParams.baseToken, defaultParams.quoteToken, ...tokenList].map(
   (token) => token.symbol || token.address,
 )
 
@@ -56,10 +56,10 @@ export default {
   argTypes: {
     networkId: { control: { type: 'inline-radio', options: networkIds } },
     baseToken: {
-      control: { type: 'select', options: configTokenSymbols },
+      control: { type: 'select', options: tokenSymbols },
     },
     quoteToken: {
-      control: { type: 'select', options: configTokenSymbols },
+      control: { type: 'select', options: tokenSymbols },
     },
     data: { control: null },
   },
@@ -99,7 +99,7 @@ const produceOrderBookProps = ({ sampleData, orderbookProps }: ProduceOrderBookA
   const { baseToken, quoteToken } = orderbookProps
 
   const { asks = [], bids = [] } = sampleData
-  const normalizedRawData: RawApiData = {
+  const normalizedRawData: OrderBookData = {
     asks: asks.map(({ amount, price }) => ({
       // turn small numbers into wei or decimal-aware units
       // otherwise get filtered as too small by src/components/OrderBookWidget.tsx#L77

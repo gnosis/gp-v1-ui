@@ -5,7 +5,7 @@ import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
-  getOrderBookData(params: OrderBookParams): Promise<RawApiData>
+  getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
 }
 
 interface GetPriceParams {
@@ -37,7 +37,7 @@ export interface RawPricePoint {
 /**
  * DATA returned from api as JSON
  */
-export interface RawApiData {
+export interface OrderBookData {
   asks: RawPricePoint[]
   bids: RawPricePoint[]
 }
@@ -129,7 +129,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     return `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
   }
 
-  public async getOrderBookData(params: OrderBookParams): Promise<RawApiData> {
+  public async getOrderBookData(params: OrderBookParams): Promise<OrderBookData> {
     try {
       const url = await this.getOrderBookUrl(params)
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from 'react'
 
 import { dexPriceEstimatorApi } from 'api'
-import { RawApiData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
+import { OrderBookData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 import useSafeState from 'hooks/useSafeState'
 
@@ -144,7 +144,7 @@ function _printOrderBook(pricePoints: PricePointDetails[], baseTokenSymbol = '',
 }
 
 interface ProcessRawDataParams {
-  data: RawApiData
+  data: OrderBookData
   baseToken: Pick<TokenDetails, 'decimals' | 'symbol'>
   quoteToken: Pick<TokenDetails, 'decimals' | 'symbol'>
 }
