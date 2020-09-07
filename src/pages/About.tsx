@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { ContentPage } from 'components/Layout/PageWrapper'
 import addressesByNetwork from 'api/deposit/batchExchangeAddresses'
 import { getNetworkFromId } from '@gnosis.pm/dex-js'
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/atoms/EtherscanLink'
 
 export const AboutWrapper = styled(ContentPage)`
   line-height: 2.2rem;
