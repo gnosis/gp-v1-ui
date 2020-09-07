@@ -15,6 +15,7 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
+import { useSubsidizeFactor } from 'hooks/useSubsidizeFactor'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 
@@ -157,6 +158,8 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
+  const subsidizeFactor = useSubsidizeFactor(networkId)
+
   return useMemo(() => {
     if (priceEstimation !== null && priceEstimation.isZero()) {
       // no price data for token
@@ -170,7 +173,8 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       isWETHPriceLoading ||
       priceEstimation === null ||
       wethPriceInOwl === null ||
-      gasPrice === null
+      gasPrice === null ||
+      subsidizeFactor === null
     ) {
       return { isLoading: true }
     }
@@ -178,7 +182,11 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
     logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
     logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
 
-    const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
+    const minTradableAmountInOwl = calcMinTradableAmountInOwl({
+      gasPrice,
+      ethPriceInOwl: wethPriceInOwl,
+      subsidizeFactor,
+    })
 
     const minTradableAmountInOwlRoundedUp = roundToNext(minTradableAmountInOwl)
 
@@ -206,7 +214,16 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       roundedUpTo: ROUND_TO_NUMBER,
       roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp,
     }
-  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
+  }, [
+    isPriceLoading,
+    priceEstimation,
+    sellToken.symbol,
+    sellTokenAmount,
+    gasPrice,
+    isWETHPriceLoading,
+    wethPriceInOwl,
+    subsidizeFactor,
+  ])
 }
 
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {
