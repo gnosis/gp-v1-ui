@@ -28,8 +28,8 @@ import { StrongSubHeader } from 'components/SectionHeaders'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData, DEFAULT_FORM_STATE } from 'components/TradeWidget'
-import { FormInputError } from 'components/atoms/FormInputError'
-import { FormMessage } from 'components/atoms/FormMessage'
+import { FormInputError } from 'components/common/FormInputError'
+import { FormMessage } from 'components/common/FormMessage'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'

@@ -6,7 +6,7 @@ import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
 
 import { MEDIA } from 'const'
 import arrow from 'assets/img/arrow.svg'
-import { FormMessage } from 'components/atoms/FormMessage'
+import { FormMessage } from 'components/common/FormMessage'
 
 export const ConfirmationModalWrapper = styled(WalletDrawerInnerWrapper)`
   padding: 0;

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
-import { FormMessage } from 'components/atoms/FormMessage'
+import { FormMessage } from 'components/common/FormMessage'
 
 const Wrapper = styled.div<{ $margin?: string; $padding?: string }>`
   margin: ${({ $margin = '0' }): string => $margin};

@@ -2,13 +2,13 @@ import React from 'react'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
 
-import { EtherscanLink, EtherscanLinkProps } from 'components/atoms/EtherscanLink'
+import { EtherscanLink, EtherscanLinkProps } from 'components/common/EtherscanLink'
 import { Network } from 'types'
 
 const networkIds = Object.values(Network).filter(Number.isInteger)
 
 export default {
-  title: 'Atoms/EtherscanLink',
+  title: 'Common/EtherscanLink',
   component: EtherscanLink,
   argTypes: {
     label: { control: 'text' },

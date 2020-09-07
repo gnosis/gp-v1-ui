@@ -33,7 +33,7 @@ import { tokenListApi } from 'api'
 
 import OrdersWidget from 'components/OrdersWidget'
 import { TxNotification } from 'components/TxNotification'
-import { Spinner } from 'components/atoms/Spinner'
+import { Spinner } from 'components/common/Spinner'
 
 // TradeWidget: subcomponents
 import {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { render } from 'enzyme'
 
-import { EtherscanLink } from 'components/atoms/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 import { TX_HASH, USER_1, CONTRACT, TOKEN_1 } from '../data'
 import { abbreviateString } from 'utils'
 import { Network } from 'types'
