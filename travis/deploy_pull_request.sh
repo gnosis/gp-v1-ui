@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+set -e
 
 function deploy_pull_request {
   REVIEW_ENVIRONMENT_DOMAIN='review.gnosisdev.com'
