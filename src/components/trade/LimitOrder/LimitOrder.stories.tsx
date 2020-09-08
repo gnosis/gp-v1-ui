@@ -25,7 +25,7 @@ const Template: Story<Partial<Props>> = (props) => {
       isPriceInverted={isPriceInverted}
       onSwapPrices={(): void => {
         console.log('[LimitOrder.story] Swap Prices')
-        setIsPriceInverted(!isPriceInverted)
+        setIsPriceInverted((inverted) => !inverted)
       }}
       onSelectedPrice={(price): void => console.log('[LimitOrder.story] On selected price', price)}
       onSubmitLimitOrder={(data): void => console.log('[LimitOrder.story] Submit Limit Order', data)}
