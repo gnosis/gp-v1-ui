@@ -29,7 +29,7 @@ export interface OrderBookChartProps {
   data: PricePointDetails[]
 }
 
-export const Wrapper = styled.div`
+const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   /* min-height: 40rem; */
@@ -65,6 +65,12 @@ export const Wrapper = styled.div`
     fill: var(--color-text-primary);
   }
 `
+
+interface OrderBookErrorProps {
+  error: Error
+}
+
+export const OrderBookError: React.FC<OrderBookErrorProps> = ({ error }) => <Wrapper>{error.message}</Wrapper>
 
 export enum Offer {
   Bid,

@@ -5,12 +5,7 @@ import { OrderBookData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEsti
 
 import useSafeState from 'hooks/useSafeState'
 
-import OrderBookChart, {
-  OrderBookChartProps,
-  Wrapper as OrderBookWrapper,
-  PricePointDetails,
-  Offer,
-} from './OrderBookChart'
+import OrderBookChart, { OrderBookChartProps, OrderBookError, PricePointDetails, Offer } from './OrderBookChart'
 import { TokenDetails } from 'types'
 import { formatSmart, logDebug } from 'utils'
 import BigNumber from 'bignumber.js'
@@ -167,7 +162,7 @@ export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDat
   }
 }
 
-interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
+export interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
   hops?: number
 }
 
@@ -206,7 +201,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
     fetchApiData()
   }, [baseToken, quoteToken, networkId, hops, setApiData, setError])
 
-  if (error) return <OrderBookWrapper>{error.message}</OrderBookWrapper>
+  if (error) return <OrderBookError error={error} />
 
   return <OrderBookChart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} data={apiData} />
 }
