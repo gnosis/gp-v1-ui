@@ -111,7 +111,7 @@ const NetworkRadioOptions = Object.entries(Network).reduce<Record<string, string
   return acc
 }, {})
 
-const stories = storiesOf('OrderBook/Samples', module)
+const stories = storiesOf('OrderBook/Sample Data', module)
 stories.addDecorator((Story) => <div style={{ height: '95vh' }}>{Story()}</div>)
 stories.addDecorator(withKnobs)
 stories.addParameters({
