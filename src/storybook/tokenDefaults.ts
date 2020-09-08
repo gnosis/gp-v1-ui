@@ -2,6 +2,14 @@ import { Network, TokenDetails } from 'types'
 
 export const networkIds = Object.values(Network).filter(Number.isInteger) as Network[]
 
+type NetworkMap = Record<keyof typeof Network, Network>
+
+export const networkMap = Object.entries(Network).reduce<NetworkMap>((acc, [key, val]) => {
+  if (!Number.isInteger(val) || typeof val !== 'number') return acc
+  acc[key] = val
+  return acc
+}, {} as NetworkMap)
+
 export const defaultNetworkId = Network.Mainnet
 
 // All Default Tokens
@@ -17,7 +25,7 @@ export const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
 
 // Default params to be used as initial values
 // and when there's no Token found for symbol
-export const defaultBaseToken: TokenDetails = {
+export const defaultBaseToken: Required<Pick<TokenDetails, 'id' | 'name' | 'symbol' | 'address' | 'decimals'>> = {
   id: 1,
   name: 'Base Token',
   symbol: 'BASE',
@@ -25,7 +33,7 @@ export const defaultBaseToken: TokenDetails = {
   decimals: 18,
 }
 
-export const defaultQuoteToken: TokenDetails = {
+export const defaultQuoteToken: Required<Pick<TokenDetails, 'id' | 'name' | 'symbol' | 'address' | 'decimals'>> = {
   id: 2,
   name: 'Quote Token',
   symbol: 'QUOTE',
@@ -34,9 +42,10 @@ export const defaultQuoteToken: TokenDetails = {
 }
 
 // Token symbols to use in control selector
-export const tokenSymbols = [defaultBaseToken, defaultQuoteToken, ...tokenList].map(
-  (token) => token.symbol || token.address,
-)
+export const tokenSymbols = tokenList.map((token) => token.symbol || token.address)
+
+// Token symbols to use in control selector + default base & quote
+export const tokenSymbolsWithDefaults = [defaultBaseToken.symbol, defaultQuoteToken.symbol, ...tokenSymbols]
 
 // searches for Token by symbol or address
 // accepts default in case none found

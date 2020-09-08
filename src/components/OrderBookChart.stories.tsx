@@ -6,11 +6,11 @@ import OrderBookChart, { OrderBookChartProps } from './OrderBookChart'
 import USDCxDAIdata from 'storybook/USDC-DAI_OrderBook_sample.json'
 import { processRawApiData } from './OrderBookWidget'
 import {
-  networkIds,
   defaultNetworkId,
   defaultBaseToken,
   defaultQuoteToken,
   findTokenBySymbolOrAddress,
+  networkMap,
 } from 'storybook/tokenDefaults'
 
 const defaultParams: Omit<OrderBookChartProps, 'data'> = {
@@ -23,7 +23,7 @@ export default {
   title: 'OrderBook/Real Data',
   component: OrderBookChart,
   argTypes: {
-    networkId: { control: { type: 'inline-radio', options: networkIds } },
+    networkId: { control: { type: 'inline-radio', options: networkMap } },
     baseToken: { control: null },
     quoteToken: { control: null },
     data: { control: null },
