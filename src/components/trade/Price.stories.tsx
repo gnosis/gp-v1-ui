@@ -5,6 +5,7 @@ import { useForm, FormProvider } from 'react-hook-form'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { Price, Props } from './Price'
+import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Trade/Price',
@@ -24,18 +25,8 @@ const Template: Story<Props> = (props) => {
 
 export const Basic = Template.bind({})
 Basic.args = {
-  sellToken: {
-    id: 1,
-    address: '0x1',
-    symbol: 'GNO',
-    decimals: 18,
-  },
-  receiveToken: {
-    id: 2,
-    address: '0x2',
-    symbol: 'DAI',
-    decimals: 18,
-  },
+  sellToken: GNO,
+  receiveToken: DAI,
 }
 
 // // FIXME: It looks like it allows to use this component with no argument, but then it fails to render

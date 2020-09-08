@@ -7,21 +7,13 @@ import { PriceSuggestions, Props } from './PriceSuggestions'
 import { Frame } from 'components/common/Frame'
 import BigNumber from 'bignumber.js'
 
+import { GNO, DAI } from 'storybook/tokens'
+
 export default {
   title: 'Trade/PriceSuggestions',
   component: PriceSuggestions,
 } as Meta
 
-const GNO = {
-  id: 1,
-  address: '0x1',
-  symbol: 'GNO',
-}
-const DAI = {
-  id: 2,
-  address: '0x2',
-  symbol: 'DAI',
-}
 const defaultProps = {
   baseToken: GNO,
   quoteToken: DAI,

@@ -4,25 +4,12 @@ import React, { useState } from 'react'
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { LimitOrder, Props } from './LimitOrder'
 import BigNumber from 'bignumber.js'
+import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Trade/LimitOrder',
   component: LimitOrder,
 } as Meta
-
-const GNO = {
-  id: 1,
-  address: '0x1',
-  symbol: 'GNO',
-  decimals: 18,
-}
-
-const DAI = {
-  id: 2,
-  address: '0x2',
-  symbol: 'DAI',
-  decimals: 18,
-}
 
 const defaultProps = {
   sellToken: DAI,
@@ -32,14 +19,14 @@ const defaultProps = {
 }
 
 const Template: Story<Partial<Props>> = (props) => {
-  const [isPriceInverted, setIsPriceInverted] = useState<boolean>(false)
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
 
   return (
     <LimitOrder
       isPriceInverted={isPriceInverted}
       onSwapPrices={(): void => {
         console.log('[LimitOrder.story] Swap Prices')
-        setIsPriceInverted(!isPriceInverted)
+        setIsPriceInverted((inverted) => !inverted)
       }}
       onSelectedPrice={(price): void => console.log('[LimitOrder.story] On selected price', price)}
       onSubmitLimitOrder={(data): void => console.log('[LimitOrder.story] Submit Limit Order', data)}
