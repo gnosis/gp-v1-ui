@@ -11,7 +11,8 @@ export const decorators: BaseDecorators<JSX.Element> = [
   (Story) => (
     <>
       <GlobalStyles />
-      <Story />
+      {/* TODO: change to <Story/> when https://github.com/storybookjs/storybook/issues/12255 is fixed */}
+      {Story()}
     </>
   ),
 ];

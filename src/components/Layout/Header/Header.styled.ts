@@ -47,3 +47,67 @@ export const HeaderWrapper = styled.header`
     margin: 0;
   }
 `
+
+export const BatchNumberWrapper = styled.span`
+  &&&&& {
+    display: inline-flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    letter-spacing: 0;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
+
+    > strong {
+      color: var(--color-text-active);
+    }
+  }
+`
+
+export const TopWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 1rem;
+  justify-content: center;
+  align-items: center;
+
+  @media ${MEDIA.mobile} {
+    justify-content: space-between;
+  }
+`
+
+export const CountDownStyled = styled.div`
+  display: flex;
+  flex-flow: column;
+  order 2;
+  min-width: 15rem;
+
+  > ${BatchNumberWrapper} {
+    min-width: 16rem;
+    display: flex;
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    color: var(--color-text-primary);
+    min-width: 16rem;
+    letter-spacing: 0;
+    margin: 0.5rem 0;
+    align-items: baseline;
+
+    @media ${MEDIA.mobile} {
+      flex-flow: row wrap;
+      line-height: 1.2;
+      width: auto;
+    }
+
+    > strong {
+      color: var(--color-text-active);
+      margin-left: 0.3rem;
+    }
+  }
+`

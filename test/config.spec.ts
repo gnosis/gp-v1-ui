@@ -121,4 +121,27 @@ describe('Test config defaults', () => {
     if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
     if (disabledOnRinkeby.length) expect(disabledOnRinkeby).toEqual(disabledTokensArray)
   })
+
+  it('initialTokenSelection', () => {
+    expect(CONFIG.initialTokenSelection).toEqual(
+      expect.objectContaining({
+        sellToken: expect.any(String),
+        receiveToken: expect.any(String),
+      }),
+    )
+  })
+
+  it('initialTokenList', () => {
+    CONFIG.initialTokenList.map((token) =>
+      expect(token).toEqual(
+        expect.objectContaining({
+          id: expect.any(Number),
+          name: expect.any(String),
+          symbol: expect.any(String),
+          decimals: expect.any(Number),
+          addressByNetwork: expect.any(Object),
+        }),
+      ),
+    )
+  })
 })

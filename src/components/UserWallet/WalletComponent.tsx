@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 // components
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 import {
   UserWalletItem,
@@ -35,7 +35,7 @@ import useNoScroll from 'hooks/useNoScroll'
 import { abbreviateString, getNetworkFromId } from 'utils'
 // TODO: probably not do this
 import WalletImg from 'assets/img/eth-network.svg'
-import { Spinner } from 'components/Spinner'
+import { Spinner } from 'components/common/Spinner'
 import { walletApi } from 'api'
 
 interface UserWalletProps extends RouteComponentProps {
