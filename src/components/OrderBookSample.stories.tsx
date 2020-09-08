@@ -3,45 +3,19 @@ import { storiesOf } from '@storybook/react'
 import { withKnobs, select, object, optionsKnob } from '@storybook/addon-knobs'
 
 import OrderBookChart, { OrderBookChartProps } from './OrderBookChart'
-import { Network, TokenDetails } from 'types'
+import { Network } from 'types'
 import sampleDataSet from 'storybook/orderbookSamples'
 import { processRawApiData } from './OrderBookWidget'
 import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
+import {
+  defaultBaseToken,
+  defaultQuoteToken,
+  tokenSymbols,
+  defaultNetworkId,
+  findTokenBySymbolOrAddress,
+} from 'storybook/tokenDefaults'
 
 type SampleData = typeof sampleDataSet[0]
-
-const defaultNetworkId = Network.Mainnet
-// All Default Tokens
-const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
-  ({ id, name, symbol, addressByNetwork, decimals = 18 }) => ({
-    id,
-    name,
-    symbol,
-    address: addressByNetwork[defaultNetworkId] || '0x',
-    decimals: decimals,
-  }),
-)
-
-// Default params to be used as initial values
-// and when there's no Token found for symbol
-const defaultBaseToken = {
-  id: 1,
-  name: 'Base Token',
-  symbol: 'BASE',
-  address: '0x1',
-  decimals: 18,
-}
-
-const defaultQuoteToken = {
-  id: 2,
-  name: 'Quote Token',
-  symbol: 'QUOTE',
-  address: '0x2',
-  decimals: 18,
-}
-
-// Token symbols to use in control selector
-const tokenSymbols = [defaultBaseToken, defaultQuoteToken, ...tokenList].map((token) => token.symbol || token.address)
 
 interface ProduceOrderBookArgsParams {
   sampleData: Pick<SampleData, 'asks' | 'bids'>
@@ -85,22 +59,16 @@ const SampleTemplate: React.FC<SampleProps> = ({
   asks,
   bids,
   networkId,
-  baseToken: baseTokenSymbol,
-  quoteToken: quoteTokenSymbol,
+  baseToken: baseTokenSymbolOrAddress,
+  quoteToken: quoteTokenSymbolOrAddress,
 }) => {
-  const baseToken = useMemo(() => {
-    return (
-      tokenList.find((token) => token.symbol === baseTokenSymbol || token.address === baseTokenSymbol) ||
-      defaultBaseToken
-    )
-  }, [baseTokenSymbol])
+  const baseToken = useMemo(() => findTokenBySymbolOrAddress(baseTokenSymbolOrAddress, defaultBaseToken), [
+    baseTokenSymbolOrAddress,
+  ])
 
-  const quoteToken = useMemo(
-    () =>
-      tokenList.find((token) => token.symbol === quoteTokenSymbol || token.address === quoteTokenSymbol) ||
-      defaultQuoteToken,
-    [quoteTokenSymbol],
-  )
+  const quoteToken = useMemo(() => findTokenBySymbolOrAddress(quoteTokenSymbolOrAddress, defaultQuoteToken), [
+    quoteTokenSymbolOrAddress,
+  ])
 
   const props = useMemo(
     () =>
@@ -159,7 +127,7 @@ sampleDataSet.forEach(({ name, description = '', asks = [], bids = [] }) => {
       bids={object('bids', bids)}
       baseToken={select('baseToken', tokenSymbols, tokenSymbols[0])}
       quoteToken={select('quoteToken', tokenSymbols, tokenSymbols[1])}
-      networkId={+optionsKnob('networkId', NetworkRadioOptions, String(Network.Mainnet), { display: 'inline-radio' })}
+      networkId={+optionsKnob('networkId', NetworkRadioOptions, String(defaultNetworkId), { display: 'inline-radio' })}
     />
   ))
 })
