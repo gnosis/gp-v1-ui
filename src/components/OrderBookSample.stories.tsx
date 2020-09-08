@@ -54,14 +54,14 @@ const produceOrderBookProps = ({ sampleData, orderbookProps }: ProduceOrderBookA
 
   const { asks = [], bids = [] } = sampleData
   const normalizedRawData: OrderBookData = {
-    asks: asks.map(({ amount, price }) => ({
+    asks: asks.map(({ volume, price }) => ({
       // turn small numbers into wei or decimal-aware units
       // otherwise get filtered as too small by src/components/OrderBookWidget.tsx#L77
-      volume: amount * 10 ** baseToken.decimals,
+      volume: volume * 10 ** baseToken.decimals,
       price,
     })),
-    bids: bids.map(({ amount, price }) => ({
-      volume: amount * 10 ** quoteToken.decimals,
+    bids: bids.map(({ volume, price }) => ({
+      volume: volume * 10 ** quoteToken.decimals,
       price,
     })),
   }
