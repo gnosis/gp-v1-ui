@@ -11,6 +11,7 @@ import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Trade/PriceSuggestions',
+  component: PriceSuggestions,
 } as Meta
 
 const defaultProps = {
