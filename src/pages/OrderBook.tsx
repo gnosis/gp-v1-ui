@@ -85,7 +85,7 @@ const OrderBook: React.FC = () => {
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
   const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())
-  const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
+  const [batchId, setBatchId] = useSafeState<number | undefined>('')
 
   const tokensLoaded = tokenList.length !== 0
   useEffect(() => {
