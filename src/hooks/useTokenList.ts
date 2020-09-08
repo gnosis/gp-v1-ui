@@ -20,11 +20,32 @@ function getNetworkCorrectStableCoinList(
   const map: Map<string, number> = new Map()
   quoteTokenPrioritiesList.forEach(({ priority, addresses }) => {
     if (addresses[networkId] && addresses[networkId].length) {
-      addresses[networkId].forEach((address: string) => map.set(address.toLowerCase(), priority))
+      addresses[networkId].forEach((address: string) =>
+        map.set(address.toLowerCase(), priority || Number.MAX_SAFE_INTEGER),
+      )
     }
   })
 
   return map
+}
+
+export function mapPrioritiesToTokenList({
+  tokenList,
+  networkId,
+  quoteTokenPrioritiesList = quoteTokenPriorities,
+}: {
+  tokenList: TokenDetails[]
+  networkId?: number
+  quoteTokenPrioritiesList?: typeof quoteTokenPriorities
+}): TokenDetails[] {
+  if (!networkId) return tokenList
+  const stablecoinMap = getNetworkCorrectStableCoinList(networkId, quoteTokenPrioritiesList)
+  // no networkId or map is empty as network id returns no tokens
+  if (!stablecoinMap?.size) return tokenList
+
+  return tokenList.map<TokenDetails>((token) =>
+    Object.assign({}, token, { priority: stablecoinMap.get(token.address.toLowerCase()) }),
+  )
 }
 
 export const useTokenList = ({
@@ -38,16 +59,10 @@ export const useTokenList = ({
   const tokens = useMemo(() => {
     if (!excludeDeprecated) return unfilteredTokens
 
-    const stablecoinMap = getNetworkCorrectStableCoinList(networkId, quoteTokenPrioritiesList)
     const filteredTokens = unfilteredTokens.filter((token) => !token.disabled)
 
-    // no networkId or map is empty as network id returns no tokens
-    if (!stablecoinMap?.size) return filteredTokens
-
     // check token list against map and set prio
-    return filteredTokens.map<TokenDetails>((token) =>
-      Object.assign({}, token, { priority: stablecoinMap.get(token.address.toLowerCase()) }),
-    )
+    return mapPrioritiesToTokenList({ tokenList: filteredTokens, networkId, quoteTokenPrioritiesList })
   }, [excludeDeprecated, unfilteredTokens, networkId, quoteTokenPrioritiesList])
 
   // force update with a new value each time
