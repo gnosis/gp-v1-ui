@@ -6,6 +6,7 @@ import { SwapPrice, Props } from './SwapPrice'
 
 export default {
   title: 'Common/SwapPrice',
+  component: SwapPrice,
 } as Meta
 
 const Template: Story<Props> = (props) => <SwapPrice {...props} />

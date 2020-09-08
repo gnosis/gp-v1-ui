@@ -8,6 +8,7 @@ import { Price, Props } from './Price'
 
 export default {
   title: 'Trade/Price',
+  component: Price,
 } as Meta
 
 const Template: Story<Props> = (props) => {

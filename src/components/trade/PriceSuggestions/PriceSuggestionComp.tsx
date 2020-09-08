@@ -30,7 +30,7 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
-    (price: string, invertedPrice) => (): void => {
+    (price: string, invertedPrice) => {
       if (!isPriceInverted) {
         setValue(priceInputId, price)
         setValue(priceInverseInputId, invertedPrice)

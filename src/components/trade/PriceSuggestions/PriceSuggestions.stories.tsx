@@ -9,7 +9,7 @@ import BigNumber from 'bignumber.js'
 
 export default {
   title: 'Trade/PriceSuggestions',
-  components: PriceSuggestions,
+  component: PriceSuggestions,
 } as Meta
 
 const GNO = {

@@ -17,7 +17,7 @@ export interface Props {
   price: BigNumber | null
   isPriceInverted: boolean
   loading: boolean
-  onClickPrice: (price: string, invertedPrice: string) => () => void
+  onClickPrice: (price: string, invertedPrice: string) => void
   onSwapPrices: () => void
 }
 
@@ -75,7 +75,7 @@ export const PriceSuggestion: React.FC<Props> = (props) => {
       <button
         type="button"
         disabled={loading || displayPrice === 'N/A'}
-        onClick={onClickPrice(priceFormatted, invertedPriceFormatted)}
+        onClick={(): void => onClickPrice(priceFormatted, invertedPriceFormatted)}
       >
         {loading ? <Spinner /> : displayPrice}
       </button>
@@ -84,7 +84,6 @@ export const PriceSuggestion: React.FC<Props> = (props) => {
         quoteToken={quoteToken}
         onSwapPrices={onSwapPrices}
         isPriceInverted={isPriceInverted}
-        showOnlyQuoteToken
       />
     </>
   )
