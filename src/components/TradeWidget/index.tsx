@@ -50,8 +50,8 @@ import {
 import TokensAdder from './TokenAdder'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
-import { PriceEstimations } from 'components/TradeWidget/PriceEstimations'
-import Price, { invertPriceFromString } from 'components/TradeWidget/Price'
+import { PriceSuggestionsComp as PriceSuggestions } from 'components/trade/PriceSuggestions'
+import Price, { invertPriceFromString } from 'components/trade/Price'
 
 // hooks
 import useURLParams from 'hooks/useURLParams'
@@ -623,10 +623,10 @@ const TradeWidget: React.FC = () => {
             sellToken={sellToken}
             receiveToken={receiveToken}
             tabIndex={1}
-            swapPrices={swapPrices}
+            onSwapPrices={swapPrices}
             priceShown={priceShown}
           />
-          <PriceEstimations
+          <PriceSuggestions
             networkId={networkIdOrDefault}
             baseToken={receiveToken}
             quoteToken={sellToken}
@@ -634,7 +634,7 @@ const TradeWidget: React.FC = () => {
             isPriceInverted={priceShown === 'INVERSE'}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            swapPrices={swapPrices}
+            onSwapPrices={swapPrices}
           />
           <OrderValidity
             validFromInputId={validFromId}
