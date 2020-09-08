@@ -169,10 +169,11 @@ export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDat
 
 interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
   hops?: number
+  batchId?: number
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
-  const { baseToken, quoteToken, networkId, hops } = props
+  const { baseToken, quoteToken, networkId, hops, batchId } = props
   const [apiData, setApiData] = useSafeState<PricePointDetails[]>([])
   const [error, setError] = useSafeState<Error | null>(null)
 
@@ -192,6 +193,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
           quoteTokenId: quoteToken.id,
           hops,
           networkId,
+          batchId,
         })
 
         const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
@@ -204,7 +206,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
     }
 
     fetchApiData()
-  }, [baseToken, quoteToken, networkId, hops, setApiData, setError])
+  }, [baseToken, quoteToken, networkId, hops, batchId, setApiData, setError])
 
   if (error) return <OrderBookWrapper>{error.message}</OrderBookWrapper>
 
