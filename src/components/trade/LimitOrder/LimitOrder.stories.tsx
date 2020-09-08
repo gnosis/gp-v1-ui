@@ -4,24 +4,11 @@ import React, { useState } from 'react'
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { LimitOrder, Props } from './LimitOrder'
 import BigNumber from 'bignumber.js'
+import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Trade/LimitOrder',
 } as Meta
-
-const GNO = {
-  id: 1,
-  address: '0x1',
-  symbol: 'GNO',
-  decimals: 18,
-}
-
-const DAI = {
-  id: 2,
-  address: '0x2',
-  symbol: 'DAI',
-  decimals: 18,
-}
 
 const defaultProps = {
   sellToken: DAI,
