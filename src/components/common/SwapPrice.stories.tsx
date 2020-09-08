@@ -7,6 +7,7 @@ import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Common/SwapPrice',
+  component: SwapPrice,
 } as Meta
 
 const Template: Story<Props> = (props) => <SwapPrice {...props} />
@@ -17,7 +18,3 @@ Basic.args = {
   quoteToken: DAI,
   isPriceInverted: true,
 }
-
-// FIXME: It looks like it allows to use this component with no argument, but then it fails to render
-export const NoArgs = Template.bind({})
-NoArgs.args = {}

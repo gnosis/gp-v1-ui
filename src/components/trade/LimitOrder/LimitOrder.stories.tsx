@@ -8,6 +8,7 @@ import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Trade/LimitOrder',
+  component: LimitOrder,
 } as Meta
 
 const defaultProps = {
