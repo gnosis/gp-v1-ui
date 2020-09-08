@@ -21,7 +21,7 @@ interface GetByAddressParams {
   tokenAddress: string
 }
 
-export const enum TokenFromExchange {
+export enum TokenFromExchange {
   FROM_TOKEN_LIST = 'FROM TOKEN LIST',
   NOT_REGISTERED_ON_CONTRACT = 'NOT REGISTERED ON CONTRACT',
   NOT_IN_TOKEN_LIST = 'NOT IN TOKEN LIST',

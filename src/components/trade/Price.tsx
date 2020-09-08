@@ -11,12 +11,14 @@ import { DEFAULT_PRECISION, MEDIA } from 'const'
 // Components
 import { OrderBookBtn } from 'components/OrderBookBtn'
 
-// TradeWidget: subcomponents
-import { TradeFormData } from 'components/TradeWidget'
+// Common
 import { FormInputError } from 'components/common/FormInputError'
 import { FormMessage } from 'components/common/FormMessage'
+
+// TradeWidget: subcomponents
+import { TradeFormData } from 'components/TradeWidget'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
-import { SwapPrice } from './PriceEstimations'
+import { SwapPrice } from 'components/common/SwapPrice'
 
 const Wrapper = styled.div`
   display: flex;
@@ -60,7 +62,7 @@ const Wrapper = styled.div`
   }
 `
 
-export const PriceInputBox = styled.div<{ hidden?: boolean }>`
+const PriceInputBox = styled.div<{ hidden?: boolean }>`
   display: ${(props): string => (props.hidden ? 'none' : 'flex')};
   flex-flow: column nowrap;
   margin: 0;
@@ -156,15 +158,14 @@ export const PriceInputBox = styled.div<{ hidden?: boolean }>`
   }
 `
 
-interface Props {
-  quoteToken: TokenDetails
-  baseToken: TokenDetails
+export interface Props {
+  sellToken: TokenDetails
+  receiveToken: TokenDetails
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
-  swapPrices: () => void
-  isPriceInverted: boolean
-  wasPriorityAdjusted: boolean
+  onSwapPrices: () => void
+  priceShown: 'INVERSE' | 'DIRECT'
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -177,15 +178,14 @@ export function invertPriceFromString(priceValue: string): string {
   return invertedPrice.isFinite() ? invertedPrice.toString(10) : '0'
 }
 
-const Price: React.FC<Props> = ({
-  wasPriorityAdjusted,
-  baseToken,
-  quoteToken,
+export const Price: React.FC<Props> = ({
+  sellToken,
+  receiveToken,
   priceInputId,
   priceInverseInputId,
   tabIndex,
-  swapPrices,
-  isPriceInverted,
+  onSwapPrices,
+  priceShown,
 }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
@@ -268,11 +268,11 @@ const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <SwapPrice
-            baseToken={quoteToken}
-            quoteToken={baseToken}
-            isPriceInverted={wasPriorityAdjusted}
+            baseToken={receiveToken}
+            quoteToken={sellToken}
+            isPriceInverted={false}
             separator="per"
-            swapPrices={swapPrices}
+            onSwapPrices={onSwapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
