@@ -7,6 +7,7 @@ import BigNumber from 'bignumber.js'
 
 export default {
   title: 'Trade/LimitOrder',
+  component: LimitOrder,
 } as Meta
 
 const GNO = {
