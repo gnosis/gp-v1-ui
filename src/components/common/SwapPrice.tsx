@@ -7,16 +7,17 @@ import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 import { safeTokenName, TokenDetails } from '@gnosis.pm/dex-js'
 
 const SwapPriceWrapper = styled.div`
+  display: inline-block;
   cursor: pointer;
-  div.separator {
-    margin: 0 0.4rem;
+
+  ${EllipsisText} {
+    display: inline-block;
   }
 `
 export interface Props {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   isPriceInverted: boolean
-  separator?: SVGAnimatedString
   onSwapPrices: () => void
 }
 
