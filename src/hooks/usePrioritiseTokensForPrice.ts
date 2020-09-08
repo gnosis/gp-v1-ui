@@ -1,6 +1,5 @@
-import { useEffect } from 'react'
+import { useMemo } from 'react'
 
-import useSafeState from './useSafeState'
 import { TokenDetails } from 'types'
 
 interface HookProps {
@@ -44,21 +43,8 @@ export default ({ sellToken, receiveToken }: HookProps): SmartTokenStruct => {
   // baseToken = receiveToken
   // quoteToken = sellToken
   // baseToken/quoteToken
-  const [baseToken, setBaseToken] = useSafeState(receiveToken)
-  const [quoteToken, setQuoteToken] = useSafeState(sellToken)
-  const [wasPriorityAdjusted, setWasInverted] = useSafeState(false)
 
-  useEffect(() => {
-    const { baseToken, quoteToken, wasPriorityAdjusted } = checkMarketAndSmartAdjust({ sellToken, receiveToken })
-
-    setBaseToken(baseToken)
-    setQuoteToken(quoteToken)
-    setWasInverted(wasPriorityAdjusted)
-  }, [baseToken, quoteToken, receiveToken, sellToken, setBaseToken, setQuoteToken, setWasInverted])
-
-  return {
-    baseToken,
-    quoteToken,
-    wasPriorityAdjusted,
-  }
+  return useMemo(() => {
+    return checkMarketAndSmartAdjust({ sellToken, receiveToken })
+  }, [receiveToken, sellToken])
 }
