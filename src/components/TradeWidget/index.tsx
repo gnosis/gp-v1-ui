@@ -63,6 +63,7 @@ import { useDebounce } from 'hooks/useDebounce'
 import useGlobalState from 'hooks/useGlobalState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import usePrioritiseTokensForPrice from 'hooks/usePrioritiseTokensForPrice'
+import { mapPrioritiesToTokenList } from 'hooks/useTokenList'
 
 import { DevTool } from 'HookFormDevtool'
 import { useSubmitTxModal } from 'hooks/useSubmitTxModal'
@@ -187,38 +188,37 @@ const TradeWidget: React.FC = () => {
   const { baseToken, quoteToken, wasPriorityAdjusted } = usePrioritiseTokensForPrice({ receiveToken, sellToken })
 
   useEffect(() => {
-    //  when switching networks
+    // when switching networks
     // trade stays filled with last tokens
     // which may not be available on the new network
     if (trade.sellToken) {
+      const hasToken = tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
       // check if it should be different
       const sellTokenOrFallback = chooseTokenWithFallback({
         // don't consider token from trade from wrong network valid
-        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
-          ? trade.sellToken
-          : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
+        token: hasToken ? trade.sellToken : null,
+        tokens: mapPrioritiesToTokenList({ networkId, tokenList: tokenListApi.getTokens(networkIdOrDefault) }), // get immediate new tokens
         tokenSymbolFromUrl: sellTokenSymbol, // from url params
         defaultTokenSymbol: initialSellToken, // default sellToken
       })
+
       setSellToken(sellTokenOrFallback)
     }
 
     if (trade.buyToken) {
+      const hasToken = tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
       const buyTokenOrFallback = chooseTokenWithFallback({
-        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
-          ? trade.buyToken
-          : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault),
+        token: hasToken ? trade.buyToken : null,
+        tokens: mapPrioritiesToTokenList({ networkId, tokenList: tokenListApi.getTokens(networkIdOrDefault) }),
         tokenSymbolFromUrl: receiveTokenSymbol,
         defaultTokenSymbol: initialReceiveToken, // default buyToken
       })
       setReceiveToken(buyTokenOrFallback)
     }
+    // don't need to depend on more than network as everything else updates together
+    // also avoids excessive setStates
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkIdOrDefault])
-  // don't need to depend on more than network as everything else updates together
-  // also avoids excessive setStates
 
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
@@ -593,6 +593,11 @@ const TradeWidget: React.FC = () => {
             {baseToken.symbol}/{quoteToken.symbol}
             <br />
             PRICE SHOWING: [{priceShown}]
+            <br />
+            [BASE PRIO]: {baseToken.priority}
+            <br />
+            [QUOTE PRIO]: {quoteToken.priority}
+            {}
           </small>
           {sameToken && (
             <>
