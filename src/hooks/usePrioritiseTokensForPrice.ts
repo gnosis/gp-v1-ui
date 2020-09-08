@@ -3,12 +3,6 @@ import { useEffect } from 'react'
 import useSafeState from './useSafeState'
 import { TokenDetails } from 'types'
 
-interface HookReturn {
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
-  wasPriorityAdjusted: boolean
-}
-
 interface HookProps {
   sellToken: TokenDetails
   receiveToken: TokenDetails
@@ -25,12 +19,12 @@ export function checkMarketAndSmartAdjust({ sellToken, receiveToken }: HookProps
   let quoteToken = sellToken
   let wasPriorityAdjusted = false
 
-  // Prio: 1    - STABLE USD
-  // Prio: 2    - STABLE EUR
-  // Prio: 3    - WETH
-  // Prio: 99   - VOLATILE
-  const basePrio = baseToken.priority || 99
-  const quotePrio = quoteToken.priority || 99
+  // Prio: 1                  - STABLE USD
+  // Prio: 2                  - STABLE EUR
+  // Prio: 3                  - WETH
+  // Prio: MAX_SAFE_INTEGER   - VOLATILE
+  const basePrio = baseToken.priority || Number.MAX_SAFE_INTEGER
+  const quotePrio = quoteToken.priority || Number.MAX_SAFE_INTEGER
 
   // Receive token has priority = make price point
   if (basePrio < quotePrio) {
@@ -46,7 +40,7 @@ export function checkMarketAndSmartAdjust({ sellToken, receiveToken }: HookProps
   }
 }
 
-export default ({ sellToken, receiveToken }: HookProps): HookReturn => {
+export default ({ sellToken, receiveToken }: HookProps): SmartTokenStruct => {
   // baseToken = receiveToken
   // quoteToken = sellToken
   // baseToken/quoteToken

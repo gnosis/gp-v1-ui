@@ -20,9 +20,7 @@ function getNetworkCorrectStableCoinList(
   const map: Map<string, number> = new Map()
   quoteTokenPrioritiesList.forEach(({ priority, addresses }) => {
     if (addresses[networkId] && addresses[networkId].length) {
-      addresses[networkId].forEach((address: string) =>
-        map.set(address.toLowerCase(), priority || Number.MAX_SAFE_INTEGER),
-      )
+      addresses[networkId].forEach((address: string) => map.set(address.toLowerCase(), priority))
     }
   })
 
