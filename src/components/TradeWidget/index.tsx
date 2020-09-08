@@ -638,9 +638,11 @@ const TradeWidget: React.FC = () => {
             priceInverseInputId={priceInverseInputId}
             baseToken={baseToken}
             quoteToken={quoteToken}
-            tabIndex={1}
+            receiveToken={receiveToken}
+            sellToken={sellToken}
             onSwapPrices={swapPrices}
-            priceShown={priceShown}
+            isPriceInverted={priceShown === 'INVERSE'}
+            tabIndex={1}
           />
           <PriceSuggestions
             networkId={networkIdOrDefault}
@@ -648,10 +650,12 @@ const TradeWidget: React.FC = () => {
             quoteToken={quoteToken}
             // need reference to this always
             // as quoteToken/baseToken can be changed
+            receiveToken={receiveToken}
             sellToken={sellToken}
             amount={debouncedSellValue}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
+            isPriceInverted={priceShown === 'INVERSE'}
             onSwapPrices={swapPrices}
           />
           <OrderValidity

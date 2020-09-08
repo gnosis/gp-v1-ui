@@ -16,7 +16,6 @@ export interface Props {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   isPriceInverted: boolean
-  separator?: SVGAnimatedString
   onSwapPrices: () => void
 }
 

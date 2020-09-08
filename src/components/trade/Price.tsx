@@ -161,11 +161,13 @@ const PriceInputBox = styled.div<{ hidden?: boolean }>`
 export interface Props {
   sellToken: TokenDetails
   receiveToken: TokenDetails
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
   onSwapPrices: () => void
-  priceShown: 'INVERSE' | 'DIRECT'
+  isPriceInverted: boolean
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -181,11 +183,13 @@ export function invertPriceFromString(priceValue: string): string {
 export const Price: React.FC<Props> = ({
   sellToken,
   receiveToken,
+  baseToken,
+  quoteToken,
   priceInputId,
   priceInverseInputId,
   tabIndex,
   onSwapPrices,
-  priceShown,
+  isPriceInverted,
 }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
@@ -231,7 +235,7 @@ export const Price: React.FC<Props> = ({
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={(isPriceInverted && wasPriorityAdjusted) || (!isPriceInverted && !wasPriorityAdjusted)}>
+      <PriceInputBox hidden={isPriceInverted}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -247,14 +251,13 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={baseToken}
             quoteToken={quoteToken}
-            isPriceInverted={wasPriorityAdjusted}
-            separator="per"
-            swapPrices={swapPrices}
+            isPriceInverted={false}
+            onSwapPrices={onSwapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={(!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)}>
+      <PriceInputBox hidden={!isPriceInverted}>
         <label>
           <input
             name={priceInverseInputId}
@@ -270,8 +273,7 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={receiveToken}
             quoteToken={sellToken}
-            isPriceInverted={false}
-            separator="per"
+            isPriceInverted={true}
             onSwapPrices={onSwapPrices}
           />
         </label>

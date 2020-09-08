@@ -5,9 +5,12 @@ import { TradeFormData } from 'components/TradeWidget'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+import { TokenDetails } from 'types'
 
 interface Props
   extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
+  receiveToken: TokenDetails
+  sellToken: TokenDetails
   networkId: number
   priceInputId: string
   priceInverseInputId: string
@@ -19,13 +22,15 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
+    receiveToken,
+    sellToken,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
     onSwapPrices,
   } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
+  const { id: baseTokenId, decimals: baseTokenDecimals } = receiveToken
+  const { id: quoteTokenId, decimals: quoteTokenDecimals } = sellToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
