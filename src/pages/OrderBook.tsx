@@ -85,7 +85,7 @@ const OrderBook: React.FC = () => {
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
   const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())
-  const [batchId, setBatchId] = useSafeState<number | undefined>('')
+  const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
 
   const tokensLoaded = tokenList.length !== 0
   useEffect(() => {
@@ -135,7 +135,7 @@ const OrderBook: React.FC = () => {
           <InputBox>
             <label>BatchId</label>
             <Input
-              value={batchId}
+              value={batchId || ''}
               type="number"
               min="0"
               onChange={(e: ChangeEvent<HTMLInputElement>): void => {
