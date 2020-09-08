@@ -1,4 +1,4 @@
-import React, { useEffect, ChangeEvent } from 'react'
+import React, { useEffect, ChangeEvent, useMemo } from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
 import OrderBookWidget from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
@@ -97,6 +97,20 @@ const OrderBook: React.FC = () => {
     }
   }, [baseToken, quoteToken, setBaseToken, setQuoteToken, tokenList, tokensLoaded])
 
+  const { onBaseChange, onQuoteChange } = useMemo(
+    () => ({
+      onBaseChange: (newBaseToken: TokenDetails): void => {
+        if (newBaseToken.address === quoteToken?.address) setQuoteToken(baseToken)
+        setBaseToken(newBaseToken)
+      },
+      onQuoteChange: (newQuoteToken: TokenDetails): void => {
+        if (newQuoteToken.address === baseToken?.address) setBaseToken(quoteToken)
+        setQuoteToken(newQuoteToken)
+      },
+    }),
+    [baseToken, quoteToken, setBaseToken, setQuoteToken],
+  )
+
   if (!tokensLoaded || baseToken === null || quoteToken === null) {
     return null
   }
@@ -106,10 +120,10 @@ const OrderBook: React.FC = () => {
       <OrderBookWrapper>
         <h1>Order book</h1>
         <span>
-          <p>Bid</p> <TokenSelector tokens={tokenList} selected={baseToken} onChange={setBaseToken} />
+          <p>Bid</p> <TokenSelector tokens={tokenList} selected={baseToken} onChange={onBaseChange} />
         </span>
         <span>
-          <TokenSelector tokens={tokenList} selected={quoteToken} onChange={setQuoteToken} /> <p>Ask</p>
+          <TokenSelector tokens={tokenList} selected={quoteToken} onChange={onQuoteChange} /> <p>Ask</p>
         </span>
         <span>
           <InputBox>
