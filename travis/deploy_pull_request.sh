@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+set -x
 
 function deploy_pull_request {
   REVIEW_ENVIRONMENT_DOMAIN='review.gnosisdev.com'
@@ -42,7 +43,7 @@ function publish_pull_request_urls_in_github {
   * **📚 [Storybook](${REVIEW_FEATURE_URL}/storybook/)**: Component stories\""
 
     echo "PRaul not detected, commenting URL to repo"
-    curl -H "Authorization: token ${GITHUB_GNOSIS_INFO_API_TOKEN}" --request POST ${GITHUB_PR_COMMENTS} --data $REVIEW_FEATURE_MESSAGE
+    curl -H "Authorization: token ${GITHUB_GNOSIS_INFO_API_TOKEN}" --request POST ${GITHUB_PR_COMMENTS} --data "$REVIEW_FEATURE_MESSAGE"
   fi
 }
 
