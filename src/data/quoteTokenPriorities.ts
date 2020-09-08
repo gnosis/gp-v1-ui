@@ -48,7 +48,7 @@ const quoteTokenPriorityList: QuoteTokenPriorityList = [
     addresses: {
       [Network.Mainnet]: ['0x1a5f9352af8af974bfc03399e3767df6370d82e4'], // OWL
       // Rinkeby
-      [Network.Rinkeby]: [],
+      [Network.Rinkeby]: ['0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d'],
     },
   },
   {
