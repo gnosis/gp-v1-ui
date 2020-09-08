@@ -18,7 +18,7 @@ const defaultProps = {
 }
 
 const Template: Story<Partial<Props>> = (props) => {
-  const [isPriceInverted, setIsPriceInverted] = useState<boolean>(false)
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
 
   return (
     <LimitOrder
