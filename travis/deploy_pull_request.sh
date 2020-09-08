@@ -35,14 +35,14 @@ function publish_pull_request_urls_in_github {
   if [ "$IS_COMMENT_PRESENT" = "true" ]
   then
     echo "PRaul already active - skipping"
-  else  
-  read -r -d '' REVIEW_FEATURE_MESSAGE << EOM
-Travis automatic deployment:
-  * **🎩 [Dapp]($REVIEW_FEATURE_URL)**: Testing web app
-  * **📚 [Storybook](${REVIEW_FEATURE_URL}/storybook/)**: Component stories
-EOM
+  else
+    REVIEW_FEATURE_MESSAGE="\
+{\"body\": \"Travis automatic deployment:\\n \
+  * **🎩 [Dapp]($REVIEW_FEATURE_URL)**: Testing web app\\n \
+  * **📚 [Storybook](${REVIEW_FEATURE_URL}/storybook/)**: Component stories\""
+
     echo "PRaul not detected, commenting URL to repo"
-    curl -H "Authorization: token ${GITHUB_GNOSIS_INFO_API_TOKEN}" --request POST ${GITHUB_PR_COMMENTS} --data '{"body":"'${REVIEW_FEATURE_MESSAGE}'"}'
+    curl -H "Authorization: token ${GITHUB_GNOSIS_INFO_API_TOKEN}" --request POST ${GITHUB_PR_COMMENTS} --data $REVIEW_FEATURE_MESSAGE
   fi
 }
 
