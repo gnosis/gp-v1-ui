@@ -24,11 +24,12 @@ import { DateTimePickerBase, DateTimePickerWrapper } from 'components/TimePicker
 import { InputContainer } from 'components/Settings/WalletConnect'
 import { Input } from 'components/Input'
 import InputBox from 'components/InputBox'
-import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
 import { StrongSubHeader } from 'components/SectionHeaders'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData, DEFAULT_FORM_STATE } from 'components/TradeWidget'
+import { FormInputError } from 'components/common/FormInputError'
+import { FormMessage } from 'components/common/FormMessage'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'

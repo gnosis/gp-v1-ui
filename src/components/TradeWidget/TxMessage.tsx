@@ -5,9 +5,11 @@ import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { TradeFormData } from '.'
 import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
+
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
+import { EllipsisText } from 'components/common/EllipsisText'
+
 import useSafeState from 'hooks/useSafeState'
-import { EllipsisText } from 'components/Layout'
 import { SwapIcon } from './SwapIcon'
 import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
 import BigNumber from 'bignumber.js'

@@ -11,7 +11,7 @@ import builtOnGP from 'assets/img/builtOnGP.svg'
 
 // Components
 import ThemeToggler, { ThemeTogglerWrapper } from 'components/ThemeToggler'
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 // Hooks
 import { useWalletConnection } from 'hooks/useWalletConnection'
