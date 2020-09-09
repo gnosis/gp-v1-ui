@@ -8,6 +8,8 @@ export interface DexPriceEstimatorApi {
   getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
   getSubsidizeFactorUrl(networkId: number): string
   getSubsidizeFactor(networkId: number): Promise<number>
+  getMinOrderAmounInOWLURL(networkId: number): string
+  getMinOrderAmounInOWL(networkId: number): Promise<BigNumber>
 }
 
 interface GetPriceParams {
@@ -77,6 +79,7 @@ function getDexPriceEstimatorUrl(baseUlr: string): string {
 
 // when price-estimation service doesn't return anything
 export const DEFAULT_SUBSIDIZE_FACTOR = 1 // no subsidy
+export const DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS = new BigNumber(2500)
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
@@ -148,6 +151,26 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       throw new Error(
         `Failed to query orderbook data for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${error.message}`,
       )
+    }
+  }
+
+  public getMinOrderAmounInOWLURL(networkId: number): string {
+    const baseUrl = this._getBaseUrl(networkId)
+    return `${baseUrl}minimum-order-size-owl`
+  }
+
+  public async getMinOrderAmounInOWL(networkId: number): Promise<BigNumber> {
+    try {
+      const url = this.getMinOrderAmounInOWLURL(networkId)
+      const res = await fetch(url)
+      // not res.json() because backend returns "8738236863863283268688" big number of OWL in atoms
+      const minAmount = await res.text()
+
+      return new BigNumber(minAmount).div(1e18)
+    } catch (error) {
+      console.error(error)
+
+      return DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS
     }
   }
 
