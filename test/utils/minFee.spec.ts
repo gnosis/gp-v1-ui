@@ -1,7 +1,7 @@
 import BigNumber from 'bignumber.js'
-
 import { calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
-import { DEFAULT_SUBSIDIZE_FACTOR } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
+
+const DEFAULT_SUBSIDIZE_FACTOR = 1
 
 describe('calcMinTradableAmountInOwl', () => {
   const samples = {
