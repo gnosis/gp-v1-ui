@@ -84,7 +84,7 @@ const OrderBook: React.FC = () => {
   const tokenList = useTokenList({ networkId: networkIdOrDefault })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
-  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())
+  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT)
   const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
 
   const tokensLoaded = tokenList.length !== 0
@@ -138,8 +138,8 @@ const OrderBook: React.FC = () => {
               max={ORDER_BOOK_HOPS_MAX.toString()}
               onChange={(e: ChangeEvent<HTMLInputElement>): void => {
                 const hopsValue = e.target.value
-                if (hopsValue && !isNaN(Number(hopsValue))) {
-                  setHops(hopsValue)
+                if (hopsValue && !Number.isNaN(Number(hopsValue))) {
+                  setHops(Number(hopsValue))
                 }
               }}
             />
@@ -154,7 +154,7 @@ const OrderBook: React.FC = () => {
               min="0"
               onChange={(e: ChangeEvent<HTMLInputElement>): void => {
                 const batchIdValue = e.target.value
-                if (batchIdValue && !isNaN(Number(batchIdValue))) {
+                if (batchIdValue && !Number.isNaN(Number(batchIdValue))) {
                   setBatchId(Number(batchIdValue))
                 } else {
                   setBatchId(undefined)
@@ -169,7 +169,7 @@ const OrderBook: React.FC = () => {
         baseToken={baseToken}
         quoteToken={quoteToken}
         networkId={networkIdOrDefault}
-        hops={+hops}
+        hops={hops}
         batchId={batchId}
       />
     </OrderBookPage>
