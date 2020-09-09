@@ -21,6 +21,7 @@ interface OrderBookParams {
   baseTokenId: number
   quoteTokenId: number
   hops?: number
+  batchId?: number
 }
 
 /**
@@ -120,13 +121,17 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   }
 
   public getOrderBookUrl(params: OrderBookParams): string {
-    const { networkId, baseTokenId, quoteTokenId, hops = ORDER_BOOK_HOPS_DEFAULT } = params
+    const { networkId, baseTokenId, quoteTokenId, hops = ORDER_BOOK_HOPS_DEFAULT, batchId } = params
     assert(hops >= 0, 'Hops should be positive')
     assert(hops <= ORDER_BOOK_HOPS_MAX, 'Hops should be not be greater than ' + ORDER_BOOK_HOPS_MAX)
 
     const baseUrl = this._getBaseUrl(networkId)
 
-    return `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+    let url = `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+    if (batchId) {
+      url += `&batchId=${batchId}`
+    }
+    return url
   }
 
   public async getOrderBookData(params: OrderBookParams): Promise<OrderBookData> {
