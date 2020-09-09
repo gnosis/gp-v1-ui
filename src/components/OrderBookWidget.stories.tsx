@@ -40,6 +40,13 @@ export default {
         options: Array.from({ length: ORDER_BOOK_HOPS_MAX + 1 }, (_, index) => index),
       },
     },
+    batchId: {
+      control: {
+        type: 'number',
+        min: 0,
+        step: 1,
+      },
+    },
   },
   decorators: [(Story): JSX.Element => <div style={{ height: '95vh' }}>{Story()}</div>],
 } as Meta
