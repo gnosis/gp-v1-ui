@@ -23,9 +23,11 @@ export const tokenList: TokenDetails[] = CONFIG.initialTokenList.map(
   }),
 )
 
+type DefaultTokenDetails = Required<Pick<TokenDetails, 'id' | 'name' | 'symbol' | 'address' | 'decimals'>>
+
 // Default params to be used as initial values
 // and when there's no Token found for symbol
-export const defaultBaseToken: Required<Pick<TokenDetails, 'id' | 'name' | 'symbol' | 'address' | 'decimals'>> = {
+export const defaultBaseToken: DefaultTokenDetails = {
   id: 1,
   name: 'Base Token',
   symbol: 'BASE',
@@ -33,7 +35,7 @@ export const defaultBaseToken: Required<Pick<TokenDetails, 'id' | 'name' | 'symb
   decimals: 18,
 }
 
-export const defaultQuoteToken: Required<Pick<TokenDetails, 'id' | 'name' | 'symbol' | 'address' | 'decimals'>> = {
+export const defaultQuoteToken: DefaultTokenDetails = {
   id: 2,
   name: 'Quote Token',
   symbol: 'QUOTE',
