@@ -9,8 +9,9 @@ import OrderBookChart, { OrderBookChartProps, OrderBookError, PricePointDetails,
 import { TokenDetails } from 'types'
 import { formatSmart, logDebug } from 'utils'
 import BigNumber from 'bignumber.js'
-import { TEN_BIG_NUMBER, DEFAULT_PRECISION, ZERO_BIG_NUMBER } from 'const'
+import { TEN_BIG_NUMBER, DEFAULT_PRECISION, ZERO_BIG_NUMBER, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME } from 'const'
 import BN from 'bn.js'
+import { useDebounce } from 'hooks/useDebounce'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 
@@ -172,13 +173,15 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const [apiData, setApiData] = useSafeState<PricePointDetails[] | null>(null)
   const [error, setError] = useSafeState<Error | null>(null)
 
+  const { value: debouncedBatchId } = useDebounce(batchId, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME)
+
   // sync resetting ApiData to avoid old data on new labels flash
   // and layout changes
   useMemo(() => {
     setApiData(null)
     setError(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseToken, quoteToken, networkId, hops])
+  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId])
 
   useEffect(() => {
     const fetchApiData = async (): Promise<void> => {
@@ -188,7 +191,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
           quoteTokenId: quoteToken.id,
           hops,
           networkId,
-          batchId,
+          batchId: debouncedBatchId,
         })
 
         const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
@@ -201,7 +204,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
     }
 
     fetchApiData()
-  }, [baseToken, quoteToken, networkId, hops, batchId, setApiData, setError])
+  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
 
   if (error) return <OrderBookError error={error} />
 
