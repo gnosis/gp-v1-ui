@@ -184,6 +184,9 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   }, [baseToken, quoteToken, networkId, hops, debouncedBatchId])
 
   useEffect(() => {
+    // handle stale fetches resolving out of order
+    let cancelled = false
+
     const fetchApiData = async (): Promise<void> => {
       try {
         const rawData = await dexPriceEstimatorApi.getOrderBookData({
@@ -194,16 +197,23 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
           batchId: debouncedBatchId,
         })
 
+        if (cancelled) return
+
         const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
 
         setApiData(processedData)
       } catch (error) {
+        if (cancelled) return
         console.error('Error populating orderbook with data', error)
         setError(error)
       }
     }
 
     fetchApiData()
+
+    return (): void => {
+      cancelled = true
+    }
   }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
 
   if (error) return <OrderBookError error={error} />
