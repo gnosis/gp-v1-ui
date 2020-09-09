@@ -169,13 +169,13 @@ export interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
 
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops, batchId } = props
-  const [apiData, setApiData] = useSafeState<PricePointDetails[]>([])
+  const [apiData, setApiData] = useSafeState<PricePointDetails[] | null>(null)
   const [error, setError] = useSafeState<Error | null>(null)
 
   // sync resetting ApiData to avoid old data on new labels flash
   // and layout changes
   useMemo(() => {
-    setApiData([])
+    setApiData(null)
     setError(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [baseToken, quoteToken, networkId, hops])

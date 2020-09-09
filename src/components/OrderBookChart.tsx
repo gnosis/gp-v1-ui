@@ -26,7 +26,7 @@ export interface OrderBookChartProps {
   /**
    * price/volume data with asks and bids
    */
-  data: PricePointDetails[]
+  data: PricePointDetails[] | null
 }
 
 const Wrapper = styled.div`
@@ -179,7 +179,12 @@ const OrderBookChart: React.FC<OrderBookChartProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    if (!chartRef.current || data.length === 0) return
+    if (!chartRef.current || data === null) return
+
+    if (data.length === 0) {
+      chartRef.current.data = []
+      return
+    }
 
     // go on with the update when data is ready
     drawLabels({
