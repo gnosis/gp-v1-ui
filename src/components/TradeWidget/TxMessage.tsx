@@ -15,8 +15,8 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
-import { useSubsidizeFactor } from 'hooks/useSubsidizeFactor'
-import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
+import { useMinTradableAmountInOWL } from 'hooks/useMinTradableAmountInOWL'
+import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 
 interface TxMessageProps {
@@ -158,7 +158,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
-  const subsidizeFactor = useSubsidizeFactor(networkId)
+  const minTradableAmountInOwl = useMinTradableAmountInOWL(networkId)
 
   return useMemo(() => {
     if (priceEstimation !== null && priceEstimation.isZero()) {
@@ -174,19 +174,13 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       priceEstimation === null ||
       wethPriceInOwl === null ||
       gasPrice === null ||
-      subsidizeFactor === null
+      minTradableAmountInOwl === null
     ) {
       return { isLoading: true }
     }
 
     logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
     logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
-
-    const minTradableAmountInOwl = calcMinTradableAmountInOwl({
-      gasPrice,
-      ethPriceInOwl: wethPriceInOwl,
-      subsidizeFactor,
-    })
 
     const minTradableAmountInOwlRoundedUp = roundToNext(minTradableAmountInOwl)
 
@@ -201,6 +195,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       isLowVolume,
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
+      minAmountInOWL: minTradableAmountInOwl.toString(10),
       gasPrice,
       roundedUpAmount: roundedUpAmount.toString(10),
       roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp.toString(10),
@@ -222,7 +217,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
     gasPrice,
     isWETHPriceLoading,
     wethPriceInOwl,
-    subsidizeFactor,
+    minTradableAmountInOwl,
   ])
 }
 
