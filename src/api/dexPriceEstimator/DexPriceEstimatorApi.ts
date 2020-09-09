@@ -6,8 +6,6 @@ export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
   getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
-  getSubsidizeFactorUrl(networkId: number): string
-  getSubsidizeFactor(networkId: number): Promise<number>
   getMinOrderAmounInOWLURL(networkId: number): string
   getMinOrderAmounInOWL(networkId: number): Promise<BigNumber>
 }
@@ -78,7 +76,6 @@ function getDexPriceEstimatorUrl(baseUlr: string): string {
 }
 
 // when price-estimation service doesn't return anything
-export const DEFAULT_SUBSIDIZE_FACTOR = 1 // no subsidy
 export const DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS = new BigNumber(2500)
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
@@ -171,28 +168,6 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       console.error(error)
 
       return DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS
-    }
-  }
-
-  public getSubsidizeFactorUrl(networkId: number): string {
-    const baseUrl = this._getBaseUrl(networkId)
-    return `${baseUrl}subsidize_factor`
-  }
-
-  public async getSubsidizeFactor(networkId: number): Promise<number> {
-    // TODO: use endpoint when available
-    return DEFAULT_SUBSIDIZE_FACTOR
-
-    try {
-      const url = this.getSubsidizeFactorUrl(networkId)
-      const res = await fetch(url)
-      const { factor } = await res.json()
-
-      return factor
-    } catch (error) {
-      console.error(error)
-
-      return DEFAULT_SUBSIDIZE_FACTOR
     }
   }
 
