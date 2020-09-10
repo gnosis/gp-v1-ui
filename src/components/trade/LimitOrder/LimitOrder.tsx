@@ -99,6 +99,7 @@ export const LimitOrder: React.FC<Props> = (props: Props) => {
               baseToken={receiveToken}
               quoteToken={sellToken}
               isPriceInverted={isPriceInverted}
+              wasPriorityAdjusted={false}
               // Amount
               amount={amountCurrent}
               // Prices

@@ -1,7 +1,7 @@
 import { Network } from 'types'
 
 interface QuoteTokenPriorityObject {
-  priority: number | undefined
+  priority: number
   addresses: {
     [network: number]: string[]
   }

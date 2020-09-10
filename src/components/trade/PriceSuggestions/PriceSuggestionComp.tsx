@@ -25,14 +25,16 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
+    receiveToken,
+    sellToken,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
     wasPriorityAdjusted,
     onSwapPrices,
   } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = wasPriorityAdjusted ? quoteToken : baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = wasPriorityAdjusted ? baseToken : quoteToken
+  const { id: baseTokenId, decimals: baseTokenDecimals } = receiveToken
+  const { id: quoteTokenId, decimals: quoteTokenDecimals } = sellToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
