@@ -166,8 +166,9 @@ export interface Props {
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
-  onSwapPrices: () => void
   isPriceInverted: boolean
+  wasPriorityAdjusted: boolean
+  onSwapPrices: () => void
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -181,15 +182,16 @@ export function invertPriceFromString(priceValue: string): string {
 }
 
 export const Price: React.FC<Props> = ({
-  sellToken,
-  receiveToken,
+  // sellToken,
+  // receiveToken,
   baseToken,
   quoteToken,
   priceInputId,
   priceInverseInputId,
   tabIndex,
-  onSwapPrices,
   isPriceInverted,
+  wasPriorityAdjusted,
+  onSwapPrices,
 }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
@@ -235,7 +237,7 @@ export const Price: React.FC<Props> = ({
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={isPriceInverted}>
+      <PriceInputBox hidden={(isPriceInverted && wasPriorityAdjusted) || (!isPriceInverted && !wasPriorityAdjusted)}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -251,13 +253,13 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={baseToken}
             quoteToken={quoteToken}
-            isPriceInverted={false}
+            isPriceInverted={!wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={!isPriceInverted}>
+      <PriceInputBox hidden={(!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)}>
         <label>
           <input
             name={priceInverseInputId}
@@ -271,9 +273,9 @@ export const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <SwapPrice
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            isPriceInverted={true}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
+            isPriceInverted={wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
           />
         </label>

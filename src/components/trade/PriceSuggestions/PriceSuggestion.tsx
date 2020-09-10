@@ -16,6 +16,7 @@ export interface Props {
   amount?: string
   price: BigNumber | null
   isPriceInverted: boolean
+  wasPriorityAdjusted: boolean
   loading: boolean
   onClickPrice: (price: string, invertedPrice: string) => void
   onSwapPrices: () => void
@@ -57,10 +58,26 @@ function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): F
 }
 
 export const PriceSuggestion: React.FC<Props> = (props) => {
-  const { label, isPriceInverted, price, loading, amount, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
+  const {
+    label,
+    isPriceInverted,
+    wasPriorityAdjusted,
+    price,
+    loading,
+    amount,
+    baseToken,
+    quoteToken,
+    onSwapPrices,
+    onClickPrice,
+  } = props
 
   const { priceFormatted, invertedPriceFormatted } = getPriceFormatted(price, isPriceInverted)
-  const displayPrice = priceFormatted === 'Infinity' || invertedPriceFormatted === 'Infinity' ? 'N/A' : priceFormatted
+  const displayPrice =
+    priceFormatted === 'Infinity' || invertedPriceFormatted === 'Infinity'
+      ? 'N/A'
+      : !wasPriorityAdjusted
+      ? invertedPriceFormatted
+      : priceFormatted
 
   return (
     <>

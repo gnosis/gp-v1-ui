@@ -120,6 +120,7 @@ export interface Props {
   baseToken: TokenDetails
   quoteToken: TokenDetails
   isPriceInverted: boolean
+  wasPriorityAdjusted: boolean
 
   // Order Size
   amount?: string
@@ -141,6 +142,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
     baseToken,
     quoteToken,
     isPriceInverted,
+    wasPriorityAdjusted,
     bestAskPrice,
     bestAskPriceLoading,
     fillPrice,
@@ -153,6 +155,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
     baseToken,
     quoteToken,
     isPriceInverted,
+    wasPriorityAdjusted,
     onClickPrice,
     onSwapPrices,
   }

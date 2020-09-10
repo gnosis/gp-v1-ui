@@ -642,6 +642,7 @@ const TradeWidget: React.FC = () => {
             sellToken={sellToken}
             onSwapPrices={swapPrices}
             isPriceInverted={priceShown === 'INVERSE'}
+            wasPriorityAdjusted={wasPriorityAdjusted}
             tabIndex={1}
           />
           <PriceSuggestions
@@ -656,6 +657,7 @@ const TradeWidget: React.FC = () => {
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
             isPriceInverted={priceShown === 'INVERSE'}
+            wasPriorityAdjusted={wasPriorityAdjusted}
             onSwapPrices={swapPrices}
           />
           <OrderValidity

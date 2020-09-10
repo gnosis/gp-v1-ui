@@ -8,7 +8,10 @@ import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggest
 import { TokenDetails } from 'types'
 
 interface Props
-  extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
+  extends Pick<
+    PriceSuggestionsProps,
+    'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices' | 'wasPriorityAdjusted'
+  > {
   receiveToken: TokenDetails
   sellToken: TokenDetails
   networkId: number
@@ -22,30 +25,39 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
-    receiveToken,
-    sellToken,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
+    wasPriorityAdjusted,
     onSwapPrices,
   } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = receiveToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = sellToken
+  const { id: baseTokenId, decimals: baseTokenDecimals } = wasPriorityAdjusted ? quoteToken : baseToken
+  const { id: quoteTokenId, decimals: quoteTokenDecimals } = wasPriorityAdjusted ? baseToken : quoteToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => {
-      if (!isPriceInverted) {
-        setValue(priceInputId, price)
-        setValue(priceInverseInputId, invertedPrice)
+      if (wasPriorityAdjusted) {
+        if (!isPriceInverted) {
+          setValue(priceInputId, price)
+          setValue(priceInverseInputId, invertedPrice)
+        } else {
+          setValue(priceInverseInputId, price)
+          setValue(priceInputId, invertedPrice)
+        }
       } else {
-        setValue(priceInverseInputId, price)
-        setValue(priceInputId, invertedPrice)
+        if (!isPriceInverted) {
+          setValue(priceInverseInputId, invertedPrice)
+          setValue(priceInputId, price)
+        } else {
+          setValue(priceInputId, invertedPrice)
+          setValue(priceInverseInputId, price)
+        }
       }
       trigger()
     },
-    [isPriceInverted, trigger, setValue, priceInputId, priceInverseInputId],
+    [wasPriorityAdjusted, trigger, isPriceInverted, setValue, priceInputId, priceInverseInputId],
   )
 
   const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
@@ -73,6 +85,7 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
       baseToken={baseToken}
       quoteToken={quoteToken}
       isPriceInverted={isPriceInverted}
+      wasPriorityAdjusted={wasPriorityAdjusted}
       // Order size
       amount={amount}
       // Prices
