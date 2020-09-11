@@ -9,7 +9,7 @@ import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 import { EtherscanLink } from 'components/common/EtherscanLink'
 import { EllipsisText } from 'components/common/EllipsisText'
 
-import { FoldableRowWrapper } from 'components/Layout/Card'
+import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 
 import { isTradeSettled, divideBN, formatPercentage } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'

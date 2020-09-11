@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { FoldableRowWrapper } from 'components/Layout/Card'
+import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 import { MEDIA } from 'const'
 
 export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`

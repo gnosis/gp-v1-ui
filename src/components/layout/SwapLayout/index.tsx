@@ -8,8 +8,8 @@ import { faSkull } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Layout: Subcomponents
-import Header from 'components/Layout/Header'
-import Footer from 'components/Layout/Footer'
+import Header from 'components/layout/SwapLayout/Header'
+import Footer from 'components/layout/SwapLayout/Footer'
 import LegalBanner from 'components/LegalBanner'
 
 const Wrapper = styled.div`
@@ -73,7 +73,7 @@ const navigation = [
   },
 ]
 
-const Layout: React.FC = ({ children }) => (
+export const SwapLayout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner>
       <p>
@@ -87,4 +87,4 @@ const Layout: React.FC = ({ children }) => (
   </Wrapper>
 )
 
-export default Layout
+export default SwapLayout

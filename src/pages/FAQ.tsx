@@ -1,5 +1,5 @@
 import React from 'react'
-import { ContentPage } from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/layout'
 import { react as FaqContent } from 'assets/md/FAQ.md'
 
 const FAQ: React.FC = () => (
