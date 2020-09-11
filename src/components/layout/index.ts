@@ -1,2 +1,2 @@
 export { SwapLayout } from './SwapLayout/index'
-export * from './PageWrapper'
+export * from './PageWrappers'

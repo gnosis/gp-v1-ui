@@ -13,7 +13,7 @@ import { TokenBalanceDetails } from 'types'
 import ErrorMsg from 'components/ErrorMsg'
 import FilterTools from 'components/FilterTools'
 import { CardTable, CardWidgetWrapper } from 'components/layout/SwapLayout/Card'
-import { StandaloneCardWrapper } from 'components/layout/PageWrapper'
+import { StandaloneCardWrapper } from 'components/layout/PageWrappers'
 
 // DepositWidget: subcomponents
 import { Row } from 'components/DepositWidget/Row'
