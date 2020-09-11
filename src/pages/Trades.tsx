@@ -1,6 +1,6 @@
 import React from 'react'
 import TradesPage from 'components/TradesWidget'
-import { PageWrapper } from 'components/Layout/PageWrapper'
+import { PageWrapper } from 'components/layout'
 
 const Trades: React.FC = () => (
   <PageWrapper>

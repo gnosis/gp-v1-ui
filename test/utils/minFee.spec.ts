@@ -1,6 +1,7 @@
 import BigNumber from 'bignumber.js'
-
 import { calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
+
+const DEFAULT_SUBSIDIZE_FACTOR = 1
 
 describe('calcMinTradableAmountInOwl', () => {
   const samples = {
@@ -18,6 +19,7 @@ describe('calcMinTradableAmountInOwl', () => {
         const minAmountInOwl = calcMinTradableAmountInOwl({
           gasPrice: gasPrice * Gwei,
           ethPriceInOwl: new BigNumber(ethPrice),
+          subsidizeFactor: DEFAULT_SUBSIDIZE_FACTOR,
         })
 
         results.push({

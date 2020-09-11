@@ -1,2 +1,2 @@
 export { PriceSuggestions } from './PriceSuggestions'
-export { PriceSuggestionsComp } from './PriceSuggestionComp'
+export { PriceSuggestionWidget } from './PriceSuggestionWidget'

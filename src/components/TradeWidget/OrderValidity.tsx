@@ -33,7 +33,7 @@ import { FormMessage } from 'components/common/FormMessage'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
-import { DevdocTooltip, BatchNumberWithHelp } from 'components/Layout/Header'
+import { DevdocTooltip, BatchNumberWithHelp } from 'components/layout/SwapLayout/Header'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import useNoScroll from 'hooks/useNoScroll'
 

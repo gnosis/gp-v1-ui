@@ -25,7 +25,7 @@ import { DetailedAuctionElement, DetailedPendingOrder, Trade } from 'api/exchang
 
 // Components
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
-import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
+import { CardTable, CardWidgetWrapper } from 'components/layout/SwapLayout/Card'
 import { InnerTradesWidget } from 'components/TradesWidget'
 import FilterTools from 'components/FilterTools'
 
