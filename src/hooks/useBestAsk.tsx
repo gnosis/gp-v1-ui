@@ -11,12 +11,12 @@ interface BestAskParams {
 
 interface HookReturn {
   bestAskPrice: BigNumber | null
-  bestAskPriceLoading: boolean
+  isBestAskLoading: boolean
 }
 
 function useBestAsk(params: BestAskParams): HookReturn {
   const [bestAskPrice, setBestAskPrice] = useSafeState<BigNumber | null>(null)
-  const [bestAskPriceLoading, setBestAskPriceLoading] = useSafeState<boolean>(false)
+  const [isBestAskLoading, setBestAskPriceLoading] = useSafeState<boolean>(false)
   const { networkId, baseTokenId, quoteTokenId } = params
 
   useEffect(() => {
@@ -53,7 +53,7 @@ function useBestAsk(params: BestAskParams): HookReturn {
 
   return {
     bestAskPrice,
-    bestAskPriceLoading,
+    isBestAskLoading,
   }
 }
 
