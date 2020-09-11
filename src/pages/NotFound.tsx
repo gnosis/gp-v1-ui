@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { ContentPage } from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/SwapLayout/PageWrapper'
 
 const NotFound: React.FC = () => (
   <ContentPage>

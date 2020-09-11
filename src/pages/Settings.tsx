@@ -7,7 +7,7 @@ import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
 import { useHistory } from 'react-router'
 import { WCSettings, wcResolver } from 'components/Settings/WalletConnect'
-import { ContentPage } from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/SwapLayout/PageWrapper'
 import { FieldErrors, ResolverResult } from 'react-hook-form/dist/types/form'
 
 const SettingsButtonSubmit = styled.button`

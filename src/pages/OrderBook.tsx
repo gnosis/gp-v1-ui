@@ -1,5 +1,5 @@
 import React, { useEffect, ChangeEvent, useMemo } from 'react'
-import { ContentPage } from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/SwapLayout/PageWrapper'
 import OrderBookWidget from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 import { useTokenList } from 'hooks/useTokenList'

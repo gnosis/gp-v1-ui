@@ -7,10 +7,10 @@ import styled from 'styled-components'
 import { formatPrice, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
-import { CardTable } from 'components/Layout/Card'
+import { CardTable } from 'components/SwapLayout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
-import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
+import { StandaloneCardWrapper } from 'components/SwapLayout/PageWrapper'
 import { TradeRow } from 'components/TradesWidget/TradeRow'
 import { BalancesWidget } from 'components/DepositWidget'
 
