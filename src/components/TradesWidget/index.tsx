@@ -10,7 +10,7 @@ import FilterTools from 'components/FilterTools'
 import { CardTable } from 'components/layout/SwapLayout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
-import { StandaloneCardWrapper } from 'components/layout/SwapLayout/PageWrapper'
+import { StandaloneCardWrapper } from 'components/layout'
 import { TradeRow } from 'components/TradesWidget/TradeRow'
 import { BalancesWidget } from 'components/DepositWidget'
 

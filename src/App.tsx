@@ -10,7 +10,7 @@ import { encodeSymbol } from '@gnosis.pm/dex-js'
 import GlobalStyles from 'styles/global'
 
 // Main layout
-import { SwapLayout } from 'components/layout/SwapLayout'
+import { SwapLayout } from 'components/layout'
 
 // Pages
 const About = React.lazy(() =>

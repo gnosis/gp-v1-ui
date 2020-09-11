@@ -1,5 +1,5 @@
 import React from 'react'
-import { PageWrapper } from 'components/layout/SwapLayout/PageWrapper'
+import { PageWrapper } from 'components/layout/PageWrapper'
 import DepositWidget from 'components/DepositWidget'
 
 const Deposit: React.FC = () => (
