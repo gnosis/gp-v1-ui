@@ -5,17 +5,13 @@ import { OrderBookData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEsti
 
 import useSafeState from 'hooks/useSafeState'
 
-import OrderBookChart, {
-  OrderBookChartProps,
-  Wrapper as OrderBookWrapper,
-  PricePointDetails,
-  Offer,
-} from './OrderBookChart'
+import OrderBookChart, { OrderBookChartProps, OrderBookError, PricePointDetails, Offer } from './OrderBookChart'
 import { TokenDetails } from 'types'
 import { formatSmart, logDebug } from 'utils'
 import BigNumber from 'bignumber.js'
-import { TEN_BIG_NUMBER, DEFAULT_PRECISION, ZERO_BIG_NUMBER } from 'const'
+import { TEN_BIG_NUMBER, DEFAULT_PRECISION, ZERO_BIG_NUMBER, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME } from 'const'
 import BN from 'bn.js'
+import { useDebounce } from 'hooks/useDebounce'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 
@@ -167,25 +163,30 @@ export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDat
   }
 }
 
-interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
+export interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
   hops?: number
   batchId?: number
 }
 
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops, batchId } = props
-  const [apiData, setApiData] = useSafeState<PricePointDetails[]>([])
+  const [apiData, setApiData] = useSafeState<PricePointDetails[] | null>(null)
   const [error, setError] = useSafeState<Error | null>(null)
+
+  const { value: debouncedBatchId } = useDebounce(batchId, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME)
 
   // sync resetting ApiData to avoid old data on new labels flash
   // and layout changes
   useMemo(() => {
-    setApiData([])
+    setApiData(null)
     setError(null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseToken, quoteToken, networkId, hops])
+  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId])
 
   useEffect(() => {
+    // handle stale fetches resolving out of order
+    let cancelled = false
+
     const fetchApiData = async (): Promise<void> => {
       try {
         const rawData = await dexPriceEstimatorApi.getOrderBookData({
@@ -193,22 +194,29 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
           quoteTokenId: quoteToken.id,
           hops,
           networkId,
-          batchId,
+          batchId: debouncedBatchId,
         })
+
+        if (cancelled) return
 
         const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
 
         setApiData(processedData)
       } catch (error) {
+        if (cancelled) return
         console.error('Error populating orderbook with data', error)
         setError(error)
       }
     }
 
     fetchApiData()
-  }, [baseToken, quoteToken, networkId, hops, batchId, setApiData, setError])
 
-  if (error) return <OrderBookWrapper>{error.message}</OrderBookWrapper>
+    return (): void => {
+      cancelled = true
+    }
+  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
+
+  if (error) return <OrderBookError error={error} />
 
   return <OrderBookChart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} data={apiData} />
 }

@@ -10,7 +10,7 @@ import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 import {
   defaultBaseToken,
   defaultQuoteToken,
-  tokenSymbols,
+  tokenSymbolsWithDefaults,
   defaultNetworkId,
   findTokenBySymbolOrAddress,
 } from 'storybook/tokenDefaults'
@@ -125,8 +125,8 @@ sampleDataSet.forEach(({ name, description = '', asks = [], bids = [] }) => {
       description={description}
       asks={object('asks', asks)}
       bids={object('bids', bids)}
-      baseToken={select('baseToken', tokenSymbols, tokenSymbols[0])}
-      quoteToken={select('quoteToken', tokenSymbols, tokenSymbols[1])}
+      baseToken={select('baseToken', tokenSymbolsWithDefaults, tokenSymbolsWithDefaults[0])}
+      quoteToken={select('quoteToken', tokenSymbolsWithDefaults, tokenSymbolsWithDefaults[1])}
       networkId={+optionsKnob('networkId', NetworkRadioOptions, String(defaultNetworkId), { display: 'inline-radio' })}
     />
   ))

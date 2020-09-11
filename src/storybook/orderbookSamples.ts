@@ -240,8 +240,8 @@ export default [
     ],
   },
   {
-    name: 'Liquid market when prices fall 60%',
-    description: 'The market has low volumes near the current price, it has high volumes when price drops around 60%',
+    name: 'Liquid market with very high volume and high price in the asks',
+    description: 'Self explanatory',
     bids: [
       {
         volume: 5,
@@ -370,7 +370,7 @@ export default [
         price: 170.1,
       },
       {
-        volume: 180,
+        volume: 1800000,
         price: 175.1,
       },
     ],

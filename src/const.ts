@@ -68,6 +68,8 @@ export const PRICE_ESTIMATION_PRECISION = 5
 // The prices on the contract will update at max once every batch, which is 5min long
 export const PRICES_CACHE_TIME = 60 // in seconds
 
+export const ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME = 200
+
 export const MEDIA = {
   MOBILE_LARGE_PX: 500,
   tinyScreen: '320px',
