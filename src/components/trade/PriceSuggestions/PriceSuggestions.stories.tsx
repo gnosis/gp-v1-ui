@@ -17,6 +17,7 @@ export default {
 const defaultProps = {
   baseToken: GNO,
   quoteToken: DAI,
+  sellToken: DAI,
   fillPrice: new BigNumber('55.13245672'),
   fillPriceLoading: false,
   bestAskPrice: new BigNumber('51.153236'),
