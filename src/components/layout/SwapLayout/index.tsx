@@ -73,7 +73,7 @@ const navigation = [
   },
 ]
 
-const Layout: React.FC = ({ children }) => (
+export const SwapLayout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner>
       <p>
@@ -87,4 +87,4 @@ const Layout: React.FC = ({ children }) => (
   </Wrapper>
 )
 
-export default Layout
+export default SwapLayout
