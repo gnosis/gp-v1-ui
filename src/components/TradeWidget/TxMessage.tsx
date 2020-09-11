@@ -17,7 +17,7 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
-import { useMinTradableAmountInOWL } from 'hooks/useMinTradableAmountInOWL'
+import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 
@@ -160,7 +160,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
-  const minTradableAmountInOwl = useMinTradableAmountInOWL(networkId)
+  const minTradableAmountInOwl = useMinTradableAmountInOwl(networkId)
 
   return useMemo(() => {
     if (priceEstimation !== null && priceEstimation.isZero()) {

@@ -6,7 +6,7 @@ export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
   getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
-  getMinOrderAmounInOWLURL(networkId: number): string
+  getMinOrderAmounInOWLUrl(networkId: number): string
   getMinOrderAmounInOWL(networkId: number): Promise<BigNumber>
 }
 
@@ -156,14 +156,14 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
   }
 
-  public getMinOrderAmounInOWLURL(networkId: number): string {
+  public getMinOrderAmounInOWLUrl(networkId: number): string {
     const baseUrl = this._getBaseUrl(networkId)
     return `${baseUrl}minimum-order-size-owl`
   }
 
   public async getMinOrderAmounInOWL(networkId: number): Promise<BigNumber> {
     try {
-      const url = this.getMinOrderAmounInOWLURL(networkId)
+      const url = this.getMinOrderAmounInOWLUrl(networkId)
       const res = await fetch(url)
       // not res.json() because backend returns "8738236863863283268688" big number of OWL in atoms
       const minAmount = await res.text()
