@@ -131,7 +131,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     } = params
 
     // Query format: markets/7-1/estimated-best-ask-price?unit=baseunits&roundingBuffer=enabled
-    const queryString = `markets/${baseTokenId}-${quoteTokenId}/estimated-best-ask-price?unit=baseunits&roundingBuffer=enabled`
+    const queryString = `markets/${baseTokenId}-${quoteTokenId}/estimated-best-ask-price`
 
     try {
       const response = await this.query<number>(networkId, queryString)
