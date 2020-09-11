@@ -4,6 +4,7 @@ import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
+  getBestAsk(params: GetBestAskParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
   getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
 }
@@ -15,6 +16,8 @@ interface GetPriceParams {
   amountInUnits?: BigNumber | string
   inWei?: boolean
 }
+
+type GetBestAskParams = Omit<GetPriceParams, 'amountInUnits' | 'inWei'>
 
 interface OrderBookParams {
   networkId: number
@@ -116,6 +119,32 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       console.error(e)
       throw new Error(
         `Failed to query price for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${e.message}`,
+      )
+    }
+  }
+
+  public async getBestAsk(params: GetBestAskParams): Promise<BigNumber | null> {
+    const {
+      networkId,
+      baseToken: { id: baseTokenId },
+      quoteToken: { id: quoteTokenId },
+    } = params
+
+    // Query format: markets/7-1/estimated-best-ask-price?unit=baseunits&roundingBuffer=enabled
+    const queryString = `markets/${baseTokenId}-${quoteTokenId}/estimated-best-ask-price`
+
+    try {
+      const response = await this.query<number>(networkId, queryString)
+
+      if (response === null) {
+        return response
+      }
+
+      return new BigNumber(response)
+    } catch (e) {
+      console.error(e)
+      throw new Error(
+        `Failed to query best ask for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${e.message}`,
       )
     }
   }

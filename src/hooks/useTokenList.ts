@@ -38,7 +38,6 @@ export function mapPrioritiesToTokenList({
 }): TokenDetails[] {
   if (!networkId) return tokenList
   const stablecoinMap = getNetworkCorrectStableCoinList(networkId, quoteTokenPrioritiesList)
-  console.debug('stablecoinMap', stablecoinMap)
   // no networkId or map is empty as network id returns no tokens
   if (!stablecoinMap?.size) return tokenList
 
