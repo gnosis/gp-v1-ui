@@ -50,7 +50,7 @@ import {
 import TokensAdder from './TokenAdder'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
-import { PriceSuggestionsComp as PriceSuggestions } from 'components/trade/PriceSuggestions'
+import { PriceSuggestionWidget as PriceSuggestions } from 'components/trade/PriceSuggestions'
 import Price, { invertPriceFromString } from 'components/trade/Price'
 
 // hooks
