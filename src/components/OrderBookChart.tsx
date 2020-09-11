@@ -26,10 +26,10 @@ export interface OrderBookChartProps {
   /**
    * price/volume data with asks and bids
    */
-  data: PricePointDetails[]
+  data: PricePointDetails[] | null
 }
 
-export const Wrapper = styled.div`
+const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   /* min-height: 40rem; */
@@ -65,6 +65,12 @@ export const Wrapper = styled.div`
     fill: var(--color-text-primary);
   }
 `
+
+interface OrderBookErrorProps {
+  error: Error
+}
+
+export const OrderBookError: React.FC<OrderBookErrorProps> = ({ error }) => <Wrapper>{error.message}</Wrapper>
 
 export enum Offer {
   Bid,
@@ -173,7 +179,12 @@ const OrderBookChart: React.FC<OrderBookChartProps> = (props) => {
   }, [])
 
   useEffect(() => {
-    if (!chartRef.current || data.length === 0) return
+    if (!chartRef.current || data === null) return
+
+    if (data.length === 0) {
+      chartRef.current.data = []
+      return
+    }
 
     // go on with the update when data is ready
     drawLabels({
