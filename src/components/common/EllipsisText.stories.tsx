@@ -6,6 +6,7 @@ import { EllipsisText, Props } from 'components/common/EllipsisText'
 
 export default {
   title: 'Common/EllipsisText',
+  component: EllipsisText,
 } as Meta
 
 const Template: Story<Props> = (args) => (
