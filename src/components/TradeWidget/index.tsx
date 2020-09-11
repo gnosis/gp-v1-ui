@@ -270,7 +270,6 @@ const TradeWidget: React.FC = () => {
         tokenSymbolFromUrl: sellTokenSymbol, // from url params
         defaultTokenSymbol: initialSellToken, // default sellToken
       })
-      console.debug('SELL TOKEN::', sellTokenOrFallback)
       setSellToken(sellTokenOrFallback)
     }
 
