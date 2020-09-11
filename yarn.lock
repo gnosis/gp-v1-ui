@@ -2641,6 +2641,31 @@
     regenerator-runtime "^0.13.3"
     ts-dedent "^1.1.1"
 
+"@storybook/addon-knobs@^6.0.21":
+  version "6.0.21"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-knobs/-/addon-knobs-6.0.21.tgz#421076f7880ce1b4804266766122aebcee9b023c"
+  integrity sha512-QHcdL08wGzw67Igpow3wCHWq0WfG5E/q7EFwOwTvr4X3s8VBjuauVdWolcX1/N+z2U7m31rcD6tcMBMPjUibmw==
+  dependencies:
+    "@storybook/addons" "6.0.21"
+    "@storybook/api" "6.0.21"
+    "@storybook/channels" "6.0.21"
+    "@storybook/client-api" "6.0.21"
+    "@storybook/components" "6.0.21"
+    "@storybook/core-events" "6.0.21"
+    "@storybook/theming" "6.0.21"
+    copy-to-clipboard "^3.0.8"
+    core-js "^3.0.1"
+    escape-html "^1.0.3"
+    fast-deep-equal "^3.1.1"
+    global "^4.3.2"
+    lodash "^4.17.15"
+    prop-types "^15.7.2"
+    qs "^6.6.0"
+    react-color "^2.17.0"
+    react-lifecycles-compat "^3.0.4"
+    react-select "^3.0.8"
+    regenerator-runtime "^0.13.3"
+
 "@storybook/addon-links@^6.0.21":
   version "6.0.21"
   resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-6.0.21.tgz#6d4497933d560615617eaffeacec00ad8a788b01"
@@ -7756,7 +7781,7 @@ escalade@^3.0.1:
   resolved "https://registry.yarnpkg.com/escalade/-/escalade-3.0.2.tgz#6a580d70edb87880f22b4c91d0d56078df6962c4"
   integrity sha512-gPYAU37hYCUhW5euPeR+Y74F7BL+IBsV93j5cvGriSaD1aG6MGsqsV1yamRdrWrb2j3aiZvb0X+UBOWpx3JWtQ==
 
-escape-html@~1.0.3:
+escape-html@^1.0.3, escape-html@~1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
   integrity sha1-Aljq5NPQwJdN4cFpGI7wBR0dGYg=

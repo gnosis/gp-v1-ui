@@ -139,6 +139,11 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       const url = await this.getOrderBookUrl(params)
 
       const res = await fetch(url)
+      if (!res.ok) {
+        // backend returns {"message":"invalid url query"}
+        // for bad requests
+        throw await res.json()
+      }
       return await res.json()
     } catch (error) {
       console.error(error)

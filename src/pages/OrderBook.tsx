@@ -1,4 +1,4 @@
-import React, { useEffect, ChangeEvent } from 'react'
+import React, { useEffect, ChangeEvent, useMemo } from 'react'
 import { ContentPage } from 'components/Layout/PageWrapper'
 import OrderBookWidget from 'components/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
@@ -84,7 +84,7 @@ const OrderBook: React.FC = () => {
   const tokenList = useTokenList({ networkId: networkIdOrDefault })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
-  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT.toString())
+  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT)
   const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
 
   const tokensLoaded = tokenList.length !== 0
@@ -100,6 +100,20 @@ const OrderBook: React.FC = () => {
     }
   }, [baseToken, quoteToken, setBaseToken, setQuoteToken, tokenList, tokensLoaded])
 
+  const { onBaseChange, onQuoteChange } = useMemo(
+    () => ({
+      onBaseChange: (newBaseToken: TokenDetails): void => {
+        if (newBaseToken.address === quoteToken?.address) setQuoteToken(baseToken)
+        setBaseToken(newBaseToken)
+      },
+      onQuoteChange: (newQuoteToken: TokenDetails): void => {
+        if (newQuoteToken.address === baseToken?.address) setBaseToken(quoteToken)
+        setQuoteToken(newQuoteToken)
+      },
+    }),
+    [baseToken, quoteToken, setBaseToken, setQuoteToken],
+  )
+
   if (!tokensLoaded || baseToken === null || quoteToken === null) {
     return null
   }
@@ -109,10 +123,10 @@ const OrderBook: React.FC = () => {
       <OrderBookWrapper>
         <h1>Order book</h1>
         <span>
-          <p>Bid</p> <TokenSelector tokens={tokenList} selected={baseToken} onChange={setBaseToken} />
+          <p>Bid</p> <TokenSelector tokens={tokenList} selected={baseToken} onChange={onBaseChange} />
         </span>
         <span>
-          <TokenSelector tokens={tokenList} selected={quoteToken} onChange={setQuoteToken} /> <p>Ask</p>
+          <TokenSelector tokens={tokenList} selected={quoteToken} onChange={onQuoteChange} /> <p>Ask</p>
         </span>
         <span>
           <InputBox>
@@ -124,8 +138,8 @@ const OrderBook: React.FC = () => {
               max={ORDER_BOOK_HOPS_MAX.toString()}
               onChange={(e: ChangeEvent<HTMLInputElement>): void => {
                 const hopsValue = e.target.value
-                if (hopsValue && !isNaN(Number(hopsValue))) {
-                  setHops(hopsValue)
+                if (hopsValue && !Number.isNaN(Number(hopsValue))) {
+                  setHops(Number(hopsValue))
                 }
               }}
             />
@@ -140,7 +154,7 @@ const OrderBook: React.FC = () => {
               min="0"
               onChange={(e: ChangeEvent<HTMLInputElement>): void => {
                 const batchIdValue = e.target.value
-                if (batchIdValue && !isNaN(Number(batchIdValue))) {
+                if (batchIdValue && !Number.isNaN(Number(batchIdValue))) {
                   setBatchId(Number(batchIdValue))
                 } else {
                   setBatchId(undefined)
@@ -155,7 +169,7 @@ const OrderBook: React.FC = () => {
         baseToken={baseToken}
         quoteToken={quoteToken}
         networkId={networkIdOrDefault}
-        hops={+hops}
+        hops={hops}
         batchId={batchId}
       />
     </OrderBookPage>
