@@ -31,9 +31,15 @@ export const LastTrades: React.FC<Props> = (props) => {
 
   return (
     <Wrapper>
-      <h4>SIZE - PRICE - TIME</h4>
-      <hr />
-      <div>{lastTrades}</div>
+      {lastTrades.length === 0 ? (
+        <div>No items</div>
+      ) : (
+        <>
+          <h4>SIZE - PRICE - TIME</h4>
+          <hr />
+          <div>{lastTrades}</div>
+        </>
+      )}
     </Wrapper>
   )
 }

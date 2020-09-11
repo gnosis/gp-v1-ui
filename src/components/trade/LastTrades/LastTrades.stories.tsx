@@ -42,4 +42,7 @@ export default {
 
 const Template: Story<Partial<Props>> = (args) => <LastTrades quoteToken={DAI} trades={lastTrades} {...args} />
 
-export const NoNetwork = Template.bind({})
+export const Basic = Template.bind({})
+
+export const NoItems = Template.bind({})
+NoItems.args = { trades: [] }
