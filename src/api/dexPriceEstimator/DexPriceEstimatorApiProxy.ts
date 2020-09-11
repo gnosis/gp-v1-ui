@@ -10,6 +10,9 @@ export class DexPriceEstimatorApiProxy extends DexPriceEstimatorApiImpl {
 
     this.cache = new CacheMixin()
 
-    this.cache.injectCache<DexPriceEstimatorApi>(this, [{ method: 'getPrice', ttl: PRICES_CACHE_TIME }])
+    this.cache.injectCache<DexPriceEstimatorApi>(this, [
+      { method: 'getPrice', ttl: PRICES_CACHE_TIME },
+      { method: 'getMinOrderAmounInOWL', ttl: PRICES_CACHE_TIME },
+    ])
   }
 }
