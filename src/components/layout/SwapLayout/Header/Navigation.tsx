@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 import LinkWithPastLocation from 'components/LinkWithPastLocation'
 
 // Header: subcomponents
-import { OrderedNavLinkDiv, NavLinksWrapper } from 'components/Layout/Header/Navigation.styled'
+import { OrderedNavLinkDiv, NavLinksWrapper } from 'components/layout/SwapLayout/Header/Navigation.styled'
 
 export interface HeaderNavLinksInterface {
   label: string

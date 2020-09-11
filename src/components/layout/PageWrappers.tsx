@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { CardWidgetWrapper } from './Card'
+import { CardWidgetWrapper } from './SwapLayout/Card'
 import { MEDIA } from 'const'
 
 export const ContentPage = styled.div`
