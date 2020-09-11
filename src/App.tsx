@@ -10,7 +10,7 @@ import { encodeSymbol } from '@gnosis.pm/dex-js'
 import GlobalStyles from 'styles/global'
 
 // Main layout
-import Layout from 'components/Layout'
+import { SwapLayout } from 'components/layout'
 
 // Pages
 const About = React.lazy(() =>
@@ -110,7 +110,7 @@ const App: React.FC = () => (
   <>
     <GlobalStyles />
     <Router basename={process.env.BASE_URL}>
-      <Layout>
+      <SwapLayout>
         <React.Suspense fallback={null}>
           <Switch>
             <PrivateRoute path="/orders" exact component={Orders} />
@@ -127,7 +127,7 @@ const App: React.FC = () => (
             <Route component={NotFound} />
           </Switch>
         </React.Suspense>
-      </Layout>
+      </SwapLayout>
     </Router>
     {process.env.NODE_ENV === 'development' && <Console />}
   </>

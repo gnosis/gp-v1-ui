@@ -8,7 +8,7 @@ import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 
 // Components
-import { CardDrawer } from 'components/Layout/Card'
+import { CardDrawer } from 'components/layout/SwapLayout/Card'
 import { Spinner } from 'components/common/Spinner'
 
 // DepositWidget: subcomponents
