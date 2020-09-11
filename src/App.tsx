@@ -127,7 +127,7 @@ const App: React.FC = () => (
           <TradingLayout>
             <React.Suspense fallback={null}>
               <Switch>
-                <Route path="" exact component={Trading} />
+                <Route path="/v2" exact component={Trading} />
                 <Route component={NotFound2} />
               </Switch>
             </React.Suspense>
