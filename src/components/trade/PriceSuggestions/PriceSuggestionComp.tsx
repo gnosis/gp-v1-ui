@@ -4,8 +4,11 @@ import { useFormContext } from 'react-hook-form'
 import { TradeFormData } from 'components/TradeWidget'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+import useBestAsk from 'hooks/useBestAsk'
+
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
 import { TokenDetails } from 'types'
+import { invertPrice } from '@gnosis.pm/dex-js'
 
 interface Props
   extends Pick<
@@ -71,14 +74,10 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
     quoteTokenDecimals,
   })
 
-  // TODO: Use best ask price instead
-  const { priceEstimation: bestAskPrice, isPriceLoading: bestAskPriceLoading } = usePriceEstimationWithSlippage({
+  const { bestAskPrice, isBestAskLoading } = useBestAsk({
     networkId,
-    amount: '0',
     baseTokenId,
-    baseTokenDecimals,
     quoteTokenId,
-    quoteTokenDecimals,
   })
 
   return (
@@ -94,8 +93,8 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
       // Prices
       fillPrice={limitPrice}
       fillPriceLoading={fillPriceLoading}
-      bestAskPrice={bestAskPrice}
-      bestAskPriceLoading={bestAskPriceLoading}
+      bestAskPrice={bestAskPrice && invertPrice(bestAskPrice)}
+      bestAskPriceLoading={isBestAskLoading}
       // Events
       onClickPrice={updatePrices}
       onSwapPrices={onSwapPrices}
