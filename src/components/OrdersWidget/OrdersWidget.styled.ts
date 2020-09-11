@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
 import { CardWidgetWrapper } from 'components/layout/SwapLayout/Card'
-import { StandaloneCardWrapper } from 'components/layout/PageWrappers'
+import { StandaloneCardWrapper } from 'components/layout'
 
 // OrdersWidget outside wrapper
 export const OrdersWrapper = styled(StandaloneCardWrapper)`

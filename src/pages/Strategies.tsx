@@ -1,6 +1,6 @@
 import React from 'react'
 import PoolingWidget from 'components/PoolingWidget'
-import { PageWrapper } from 'components/layout/PageWrappers'
+import { PageWrapper } from 'components/layout'
 
 const Strategies: React.FC = () => (
   <PageWrapper>

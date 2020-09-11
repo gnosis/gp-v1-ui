@@ -1,6 +1,6 @@
 import React from 'react'
 import OrdersWidget from 'components/OrdersWidget'
-import { PageWrapper } from 'components/layout/PageWrappers'
+import { PageWrapper } from 'components/layout'
 
 const Orders: React.FC = () => (
   <PageWrapper>
