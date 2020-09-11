@@ -6,9 +6,6 @@ import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
 
-// SCSS
-import GlobalStyles from 'styles/global'
-
 // Main layout
 import { SwapLayout, TradingLayout } from 'components/layout'
 
@@ -135,7 +132,6 @@ const App: React.FC = () => (
         </Route>
         <Route>
           <SwapLayout>
-            <GlobalStyles />
             <React.Suspense fallback={null}>
               <Switch>
                 <PrivateRoute path="/orders" exact component={Orders} />
