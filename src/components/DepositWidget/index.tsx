@@ -12,8 +12,8 @@ import { TokenBalanceDetails } from 'types'
 // Components
 import ErrorMsg from 'components/ErrorMsg'
 import FilterTools from 'components/FilterTools'
-import { CardTable, CardWidgetWrapper } from 'components/SwapLayout/Card'
-import { StandaloneCardWrapper } from 'components/SwapLayout/PageWrapper'
+import { CardTable, CardWidgetWrapper } from 'components/layout/SwapLayout/Card'
+import { StandaloneCardWrapper } from 'components/layout/SwapLayout/PageWrapper'
 
 // DepositWidget: subcomponents
 import { Row } from 'components/DepositWidget/Row'

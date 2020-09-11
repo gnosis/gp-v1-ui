@@ -7,17 +7,17 @@ import { formatSeconds, dateToBatchId } from 'utils'
 import UserWallet from 'components/UserWallet'
 
 // Header: Subcomponents
-import { NavigationLinks } from 'components/SwapLayout/Header/Navigation'
+import { NavigationLinks } from 'components/layout/SwapLayout/Header/Navigation'
 import {
   HeaderWrapper,
   BatchNumberWrapper,
   CountDownStyled,
   TopWrapper,
-} from 'components/SwapLayout/Header/Header.styled'
+} from 'components/layout/SwapLayout/Header/Header.styled'
 
 // hooks
-import useNavigation from 'components/SwapLayout/Header/useNavigation'
-import useOpenCloseNav from 'components/SwapLayout/Header/useOpenCloseNav'
+import useNavigation from 'components/layout/SwapLayout/Header/useNavigation'
+import useOpenCloseNav from 'components/layout/SwapLayout/Header/useOpenCloseNav'
 import { useTimeRemainingInBatch } from 'hooks/useTimeRemainingInBatch'
 import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 
