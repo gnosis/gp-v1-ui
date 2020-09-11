@@ -13,6 +13,7 @@ export interface Props {
   label: string
   baseToken: TokenDetails
   quoteToken: TokenDetails
+  sellToken: TokenDetails
   amount?: string
   price: BigNumber | null
   isPriceInverted: boolean
@@ -65,6 +66,7 @@ export const PriceSuggestion: React.FC<Props> = (props) => {
     price,
     loading,
     amount,
+    sellToken,
     baseToken,
     quoteToken,
     onSwapPrices,
@@ -85,7 +87,7 @@ export const PriceSuggestion: React.FC<Props> = (props) => {
         <span>{label}</span>{' '}
         {amount && (
           <strong>
-            ({amount} {displayTokenSymbolOrLink(quoteToken)})
+            ({amount} {displayTokenSymbolOrLink(sellToken)})
           </strong>
         )}
       </span>

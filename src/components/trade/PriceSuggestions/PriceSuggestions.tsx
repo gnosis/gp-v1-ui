@@ -119,6 +119,7 @@ export interface Props {
   // Market
   baseToken: TokenDetails
   quoteToken: TokenDetails
+  sellToken: TokenDetails
   isPriceInverted: boolean
   wasPriorityAdjusted: boolean
 
@@ -141,6 +142,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
+    sellToken,
     isPriceInverted,
     wasPriorityAdjusted,
     bestAskPrice,
@@ -154,6 +156,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
   const commonProps = {
     baseToken,
     quoteToken,
+    sellToken,
     isPriceInverted,
     wasPriorityAdjusted,
     onClickPrice,

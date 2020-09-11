@@ -86,6 +86,7 @@ export const PriceSuggestionsComp: React.FC<Props> = (props) => {
       // Market
       baseToken={baseToken}
       quoteToken={quoteToken}
+      sellToken={sellToken}
       isPriceInverted={isPriceInverted}
       wasPriorityAdjusted={wasPriorityAdjusted}
       // Order size
