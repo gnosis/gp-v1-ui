@@ -121,7 +121,6 @@ const initialUrl = getInitialUrl()
 // App
 const App: React.FC = () => (
   <>
-    <GlobalStyles />
     <Router basename={process.env.BASE_URL}>
       <Switch>
         <Route path="/v2">
@@ -136,6 +135,7 @@ const App: React.FC = () => (
         </Route>
         <Route>
           <SwapLayout>
+            <GlobalStyles />
             <React.Suspense fallback={null}>
               <Switch>
                 <PrivateRoute path="/orders" exact component={Orders} />
