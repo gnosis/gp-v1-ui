@@ -5,6 +5,7 @@ import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
+import GlobalStyles from 'styles/global'
 
 // Main layout
 import { SwapLayout, TradingLayout } from 'components/layout'
@@ -124,7 +125,7 @@ const App: React.FC = () => (
           <TradingLayout>
             <React.Suspense fallback={null}>
               <Switch>
-                <Route path="" exact component={Trading} />
+                <Route path="/v2" exact component={Trading} />
                 <Route component={NotFound2} />
               </Switch>
             </React.Suspense>
@@ -132,6 +133,7 @@ const App: React.FC = () => (
         </Route>
         <Route>
           <SwapLayout>
+            <GlobalStyles />
             <React.Suspense fallback={null}>
               <Switch>
                 <PrivateRoute path="/orders" exact component={Orders} />

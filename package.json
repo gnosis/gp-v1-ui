@@ -8,8 +8,7 @@
     "node": "12"
   },
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --mode development --hot",
-    "start:browserstack": "yarn start --host 0.0.0.0 --disable-host-check",
+    "start": "NODE_ENV=development webpack-dev-server --mode development --hot --host 0.0.0.0 --disable-host-check",
     "mock": "MOCK=true yarn start",
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
     "lint": "eslint src --ext .ts,.tsx,.js",
