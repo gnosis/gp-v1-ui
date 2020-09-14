@@ -3,5 +3,5 @@ import React from 'react'
 import { MemoryRouter } from 'react-router'
 
 export const RouterDecorator = (DecoratedStory: () => JSX.Element): JSX.Element => (
-  <MemoryRouter initialEntries={['/']}>{DecoratedStory()}</MemoryRouter>
+  <MemoryRouter>{DecoratedStory()}</MemoryRouter>
 )
