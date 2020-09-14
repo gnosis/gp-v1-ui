@@ -40,9 +40,20 @@ export default {
   decorators: [CenteredAndFramed],
 } as Meta
 
-const Template: Story<Partial<Props>> = (args) => <LastTrades quoteToken={DAI} trades={lastTrades} {...args} />
+const Template: Story<Partial<Props>> = (args) => (
+  <LastTrades quoteToken={DAI} trades={lastTrades} loading={false} {...args} />
+)
 
 export const Basic = Template.bind({})
 
 export const NoItems = Template.bind({})
 NoItems.args = { trades: [] }
+
+export const Loading = Template.bind({})
+Loading.args = { trades: [], loading: true }
+
+export const ErrorLoading = Template.bind({})
+ErrorLoading.args = {
+  trades: [],
+  error: new Error('Boom 💥!'),
+}
