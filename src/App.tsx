@@ -5,8 +5,6 @@ import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
-
-// SCSS
 import GlobalStyles from 'styles/global'
 
 // Main layout
