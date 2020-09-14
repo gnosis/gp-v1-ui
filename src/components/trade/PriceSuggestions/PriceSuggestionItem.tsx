@@ -56,7 +56,7 @@ function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): F
   }
 }
 
-export const PriceSuggestion: React.FC<Props> = (props) => {
+export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const { label, isPriceInverted, price, loading, amount, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
 
   const { priceFormatted, invertedPriceFormatted } = getPriceFormatted(price, isPriceInverted)

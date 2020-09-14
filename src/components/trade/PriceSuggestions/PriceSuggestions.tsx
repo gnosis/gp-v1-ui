@@ -7,7 +7,7 @@ import { MEDIA } from 'const'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
-import { PriceSuggestion } from 'components/trade/PriceSuggestions/PriceSuggestion'
+import { PriceSuggestionItem } from 'components/trade/PriceSuggestions/PriceSuggestionItem'
 import BigNumber from 'bignumber.js'
 
 const Wrapper = styled.div`
@@ -169,9 +169,9 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
         />
       </div>
       <div className="container">
-        <PriceSuggestion label="Best ask" price={bestAskPrice} loading={bestAskPriceLoading} {...commonProps} />
+        <PriceSuggestionItem label="Best ask" price={bestAskPrice} loading={bestAskPriceLoading} {...commonProps} />
         {amount && +amount != 0 && +amount != 1 && (
-          <PriceSuggestion
+          <PriceSuggestionItem
             label="Fill price"
             amount={amount}
             price={fillPrice}

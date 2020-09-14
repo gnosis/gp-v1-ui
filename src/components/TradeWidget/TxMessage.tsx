@@ -17,7 +17,8 @@ import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
-import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
+import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
+import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 
 interface TxMessageProps {
@@ -159,6 +160,8 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
+  const minTradableAmountInOwl = useMinTradableAmountInOwl(networkId)
+
   return useMemo(() => {
     if (priceEstimation !== null && priceEstimation.isZero()) {
       // no price data for token
@@ -172,15 +175,14 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       isWETHPriceLoading ||
       priceEstimation === null ||
       wethPriceInOwl === null ||
-      gasPrice === null
+      gasPrice === null ||
+      minTradableAmountInOwl === null
     ) {
       return { isLoading: true }
     }
 
     logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
     logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
-
-    const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
 
     const minTradableAmountInOwlRoundedUp = roundToNext(minTradableAmountInOwl)
 
@@ -195,6 +197,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       isLowVolume,
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
+      minAmountInOWL: minTradableAmountInOwl.toString(10),
       gasPrice,
       roundedUpAmount: roundedUpAmount.toString(10),
       roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp.toString(10),
@@ -208,7 +211,16 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       roundedUpTo: ROUND_TO_NUMBER,
       roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp,
     }
-  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
+  }, [
+    isPriceLoading,
+    priceEstimation,
+    sellToken.symbol,
+    sellTokenAmount,
+    gasPrice,
+    isWETHPriceLoading,
+    wethPriceInOwl,
+    minTradableAmountInOwl,
+  ])
 }
 
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {

@@ -13,7 +13,7 @@ interface Props
   priceInverseInputId: string
 }
 
-export const PriceSuggestionsComp: React.FC<Props> = (props) => {
+export const PriceSuggestionWidget: React.FC<Props> = (props) => {
   const {
     networkId,
     amount,
