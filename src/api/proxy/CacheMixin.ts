@@ -62,10 +62,6 @@ export class CacheMixin {
       // store possibly a promise
       this.store(hash, value, ttl)
       Promise.resolve(value)
-        .then((val) => {
-          // store a value of resolved promise
-          this.store(hash, val, ttl)
-        })
         // don't cache errors
         .catch(() => {
           // remove failed promise from store
