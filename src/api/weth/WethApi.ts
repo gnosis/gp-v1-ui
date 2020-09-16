@@ -54,6 +54,7 @@ export class WethApiImpl implements WethApi {
     const { networkId, amount, userAddress, txOptionalParams } = params
     const contract = await this._getContract(networkId)
 
+    logDebug('[WethApi] deposit:', { from: userAddress, value: amount })
     const tx = contract.methods.deposit().send({ from: userAddress, value: amount })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -69,6 +70,7 @@ export class WethApiImpl implements WethApi {
     const { networkId, amount, userAddress, txOptionalParams } = params
     const contract = await this._getContract(networkId)
 
+    logDebug('[WethApi] withdraw:', amount)
     const tx = contract.methods.withdraw(amount).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
