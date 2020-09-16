@@ -5,7 +5,7 @@ import erc20Abi from '@gnosis.pm/dex-js/build/contracts/abi/Erc20.json'
 
 import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'
-import { toBN } from 'utils'
+import { logDebug, toBN } from 'utils'
 
 import ERC20_DETAILS from 'api/erc20/erc20Details.json'
 
@@ -165,6 +165,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
+    logDebug('[Erc20Api] allowance:', { userAddress, spenderAddress })
     const result = await erc20.methods.allowance(userAddress, spenderAddress).call()
 
     return toBN(result)
@@ -179,6 +180,8 @@ export class Erc20ApiImpl implements Erc20Api {
     txOptionalParams,
   }: ApproveParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
+
+    logDebug('[Erc20Api] approve:', { spenderAddress, amount: amount.toString() })
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
@@ -201,6 +204,8 @@ export class Erc20ApiImpl implements Erc20Api {
     txOptionalParams,
   }: TransferParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
+
+    logDebug('[Erc20Api] transfer:', { toAddress, amount: amount.toString() })
 
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
@@ -225,6 +230,7 @@ export class Erc20ApiImpl implements Erc20Api {
   }: TransferFromParams): Promise<Receipt> {
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
 
+    logDebug('[Erc20Api] transferFrom:', { userAddress, toAddress, amount: amount.toString() })
     const tx = erc20.methods.transferFrom(userAddress, toAddress, amount.toString()).send({
       from: fromAddress,
     })
