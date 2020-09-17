@@ -74,36 +74,47 @@ const OrderValidityTooltip: React.FC = () => (
   </HelpTooltipContainer>
 )
 
-interface SimpleDisplayPriceProps extends Omit<TxMessageProps, 'networkId'> {
+interface SimpleDisplayPriceProps {
   price: string
   priceInverse: string
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
 }
 
 export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   price,
   priceInverse,
-  sellToken,
-  receiveToken,
+  baseToken,
+  quoteToken,
 }) => {
-  // true = direct
-  // false = indirect
-  const [showPrice, setShowPrice] = useSafeState(true)
-  const swapPrices = (): void => setShowPrice((state) => !state)
+  const [isDirect, setIsDirect] = useSafeState(true)
+  const swapPrices = (): void => setIsDirect((state) => !state)
 
-  const displaySellToken = displayTokenSymbolOrLink(sellToken)
-  const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
-  const sellTokenTitle = symbolOrAddress(sellToken)
-  const receiveTokenTitle = symbolOrAddress(receiveToken)
+  let actualBaseToken, actualQuoteToken, actualBaseTokenTitle, actualQuoteTokenTitle, actualPrice
+  if (isDirect) {
+    actualPrice = price
+    actualBaseToken = displayTokenSymbolOrLink(baseToken)
+    actualQuoteToken = displayTokenSymbolOrLink(quoteToken)
+    actualBaseTokenTitle = symbolOrAddress(baseToken)
+    actualQuoteTokenTitle = symbolOrAddress(quoteToken)
+  } else {
+    // Price is inversed
+    actualPrice = priceInverse
+    actualBaseToken = displayTokenSymbolOrLink(quoteToken)
+    actualQuoteToken = displayTokenSymbolOrLink(baseToken)
+    actualBaseTokenTitle = symbolOrAddress(quoteToken)
+    actualQuoteTokenTitle = symbolOrAddress(baseToken)
+  }
 
   return (
     <div>
-      <span>{showPrice ? priceInverse : price}</span>{' '}
-      <EllipsisText as="strong" title={showPrice ? sellTokenTitle : receiveTokenTitle}>
-        {showPrice ? displaySellToken : displayReceiveToken}
+      <span>{actualPrice}</span>{' '}
+      <EllipsisText as="strong" title={actualQuoteTokenTitle}>
+        {actualQuoteToken}
       </EllipsisText>
       <small> per </small>
-      <EllipsisText as="strong" title={showPrice ? receiveTokenTitle : sellTokenTitle}>
-        {showPrice ? displayReceiveToken : displaySellToken}
+      <EllipsisText as="strong" title={actualBaseTokenTitle}>
+        {actualBaseToken}
       </EllipsisText>
       <SwapIcon swap={swapPrices} />
     </div>
@@ -317,12 +328,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         <div className="sectionTitle">
           <strong>Prices</strong>
         </div>
-        <SimpleDisplayPrice
-          receiveToken={receiveToken}
-          sellToken={sellToken}
-          price={price}
-          priceInverse={priceInverse}
-        />
+        <SimpleDisplayPrice baseToken={receiveToken} quoteToken={sellToken} price={price} priceInverse={priceInverse} />
 
         {/* Order Validity */}
 
