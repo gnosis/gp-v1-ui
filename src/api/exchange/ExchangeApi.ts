@@ -358,6 +358,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[ExchangeApi] addToken:', tokenAddress)
     const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -383,7 +384,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const contract = await this._getContract(networkId)
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    logDebug('[ExchangeApi] placeOrder:', {
+      buyTokenId,
+      sellTokenId,
+      validUntil,
+      buyAmount: buyAmount.toString(),
+      sellAmount: sellAmount.toString(),
+    })
     const tx = contract.methods
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
       .send({ from: userAddress })
@@ -425,6 +432,14 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const buyAmountsStr = buyAmounts.map(String)
     const sellAmountsStr = sellAmounts.map(String)
 
+    logDebug('[ExchangeApi] placeValidFromOrders:', {
+      buyTokens,
+      sellTokens,
+      validFroms,
+      validUntils,
+      buyAmountsStr,
+      sellAmountsStr,
+    })
     const tx = contract.methods
       .placeValidFromOrders(buyTokens, sellTokens, validFroms, validUntils, buyAmountsStr, sellAmountsStr)
       .send({ from: userAddress })
@@ -453,6 +468,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams,
   }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[ExchangeApi] cancelOrders:', orderIds)
     const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
