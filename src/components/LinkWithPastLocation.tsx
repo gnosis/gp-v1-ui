@@ -14,9 +14,12 @@ const constructLocationObject = (to: Exclude<LocationTo, Function>, location: Lo
       state: { from: location },
     }
 
+  const state: { from?: Location } = typeof to.state === 'object' ? { ...to.state } : {}
+  state.from = location
+
   return {
     ...to,
-    state: { ...to.state, from: location },
+    state,
   }
 }
 
