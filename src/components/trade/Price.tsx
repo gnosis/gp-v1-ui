@@ -225,6 +225,7 @@ export const Price: React.FC<Props> = ({
     inputId: priceInverseInputId,
     precision: DEFAULT_PRECISION,
   })
+  const isDirect = priceShown === 'DIRECT'
 
   return (
     <Wrapper>
@@ -232,7 +233,7 @@ export const Price: React.FC<Props> = ({
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={priceShown === 'DIRECT'}>
+      <PriceInputBox hidden={!isDirect}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -254,7 +255,7 @@ export const Price: React.FC<Props> = ({
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={priceShown === 'INVERSE'}>
+      <PriceInputBox hidden={isDirect}>
         <label>
           <input
             name={priceInverseInputId}
