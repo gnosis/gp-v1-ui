@@ -49,6 +49,66 @@ export interface PlaceOrderResult {
   receipt?: Receipt
 }
 
+interface PlaceValidFromOrders {
+  networkId: number
+  orders: MultipleOrdersOrder[]
+  userAddress: string
+  txOptionalParams: TxOptionalParams
+}
+
+async function placeValidFromOrdersTx(placeOrderParams: PlaceValidFromOrders): Promise<Receipt> {
+  const { networkId, orders, userAddress, txOptionalParams } = placeOrderParams
+
+  // Calculate validFrom/validTo for the orders
+  let asapBatchId: number
+  const ordersWithDefaults = await Promise.all(
+    orders.map(async (order) => {
+      // Valid from, is the one specified or ASAP
+      let validFrom
+      if (!order.validFrom) {
+        // Asap, if no validFrom is specified
+        if (!asapBatchId) {
+          // Calculate asapBatchId (if it's not previously calculated)
+          const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
+          asapBatchId = currentBatchId + BATCHES_TO_WAIT
+        }
+
+        validFrom = asapBatchId
+      } else {
+        // Use the specified validFrom
+        validFrom = order.validFrom
+      }
+
+      // if not set, order is valid forever
+      const validUntil = order.validUntil || MAX_BATCH_ID
+
+      return {
+        ...order,
+        validFrom,
+        validUntil,
+      }
+    }),
+  )
+
+  const { buyAmounts, sellAmounts, validFroms, validUntils, sellTokens, buyTokens } = toPlaceValidFromOrdersParams(
+    ordersWithDefaults,
+  )
+
+  const params = {
+    userAddress,
+    networkId,
+    buyTokens,
+    sellTokens,
+    validFroms,
+    validUntils,
+    buyAmounts,
+    sellAmounts,
+    txOptionalParams,
+  }
+
+  return exchangeApi.placeValidFromOrders(params)
+}
+
 export const usePlaceOrder = (): Result => {
   const [isSubmitting, setIsSubmitting] = useSafeState(false)
 
@@ -159,60 +219,14 @@ export const usePlaceOrder = (): Result => {
       }
       logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
-      // Calculate validFrom/validTo for the orders
       try {
-        let asapBatchId: number
-        const ordersWithDefaults = await Promise.all(
-          orders.map(async (order) => {
-            // Valid from, is the one specified or ASAP
-            let validFrom
-            if (!order.validFrom) {
-              // Asap, if no validFrom is specified
-              if (!asapBatchId) {
-                // Calculate asapBatchId (if it's not previously calculated)
-                const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
-                asapBatchId = currentBatchId + BATCHES_TO_WAIT
-              }
-
-              validFrom = asapBatchId
-            } else {
-              // Use the specified validFrom
-              validFrom = order.validFrom
-            }
-
-            // if not set, order is valid forever
-            const validUntil = order.validUntil || MAX_BATCH_ID
-
-            return {
-              ...order,
-              validFrom,
-              validUntil,
-            }
-          }),
-        )
-
-        const {
-          buyAmounts,
-          sellAmounts,
-          validFroms,
-          validUntils,
-          sellTokens,
-          buyTokens,
-        } = toPlaceValidFromOrdersParams(ordersWithDefaults)
-
-        const params = {
+        // Send transaction
+        const receipt = await placeValidFromOrdersTx({
+          orders,
           userAddress,
           networkId,
-          buyTokens,
-          sellTokens,
-          validFroms,
-          validUntils,
-          buyAmounts,
-          sellAmounts,
           txOptionalParams: txOptionalParams || defaultTxOptionalParams,
-        }
-
-        const receipt = await exchangeApi.placeValidFromOrders(params)
+        })
 
         logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
         // placeMultipleOrders is the only way to use validFrom
