@@ -189,9 +189,9 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   ): BigNumber {
     const baseAmountInUnits = new BigNumber(baseAmountInAtoms).dividedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals))
 
-    const price = baseAmountInUnits.dividedBy(quoteAmountInUnits)
+    const price = quoteAmountInUnits.dividedBy(baseAmountInUnits)
 
-    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals)) : price
+    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(quoteAmountInUnits)) : price
   }
 
   private async query<T>(networkId: number, queryString: string): Promise<T | null> {
