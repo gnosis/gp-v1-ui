@@ -112,7 +112,7 @@ module.exports = ({ stats = false } = {}) => ({
       'react-dom': '@hot-loader/react-dom',
       'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
     },
-    modules: ['custom', 'src', 'node_modules'],
+    modules: [path.resolve(__dirname, 'custom'), path.resolve(__dirname, 'src'), 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
   },
   // drop unused deps
