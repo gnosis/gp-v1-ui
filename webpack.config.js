@@ -111,6 +111,7 @@ module.exports = ({ stats = false } = {}) => ({
     alias: {
       'react-dom': '@hot-loader/react-dom',
       'bn.js': path.resolve(__dirname, 'node_modules/bn.js'),
+      'react-inspector': path.resolve(__dirname, 'node_modules/react-inspector'),
     },
     modules: [path.resolve(__dirname, 'custom'), path.resolve(__dirname, 'src'), 'node_modules'],
     extensions: ['.ts', '.tsx', '.js'],
