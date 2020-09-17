@@ -32,7 +32,7 @@ export const calcMinTradableAmountInOwl = ({
   return minFee.multipliedBy(FEE_FACTOR * SETTLEMENT_FACTOR)
 }
 
-export const ROUND_TO_NUMBER = 250 // 1234 -> 1250 $
+export const ROUND_TO_NUMBER = 100 // 1234 -> 1300$
 
 export const roundToNext = (amount: BigNumber | number, roundTo: number = ROUND_TO_NUMBER): BigNumber => {
   const amountBN = BigNumber.isBigNumber(amount) ? amount : new BigNumber(amount)
