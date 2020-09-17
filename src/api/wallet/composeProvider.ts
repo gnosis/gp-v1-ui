@@ -169,12 +169,17 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth.estimateGas(txConfig)
+          const gasLimit = await web3.eth.estimateGas(txConfig).catch((error) => {
+            console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
+            throw error
+          })
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
           txConfig.gas = numberToHex(gasLimit)
         } else {
           logDebug('[composeProvider] Gas Limit: ' + txConfig.gas)
         }
+
+        logDebug('[composeProvider] Sending transaction', txConfig)
 
         // don't mark as handled
         // pass modified tx on
