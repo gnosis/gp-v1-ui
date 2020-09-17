@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { MEDIA } from 'const'
 
 // Assets
-import { faSkull } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Layout: Subcomponents
@@ -77,8 +77,8 @@ export const SwapLayout: React.FC = ({ children }) => (
   <Wrapper>
     <LegalBanner>
       <p>
-        <FontAwesomeIcon icon={faSkull} style={{ marginRight: '0.3rem' }} /> This project is in beta. Use at your own
-        risk.
+        <FontAwesomeIcon icon={faExclamationTriangle} style={{ marginRight: '0.3rem' }} /> This project is in beta. Use
+        at your own risk.
       </p>
     </LegalBanner>
     <Header navigation={navigation} />
