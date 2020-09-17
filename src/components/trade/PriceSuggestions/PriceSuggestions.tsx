@@ -66,7 +66,6 @@ const Wrapper = styled.div`
       > ${EllipsisText} {
         display: inline-block;
         font-size: smaller;
-        width: 6ch;
         text-align: right;
         font-weight: bold;
       }
@@ -166,6 +165,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
           baseToken={quoteToken}
           onSwapPrices={onSwapPrices}
           isPriceInverted={isPriceInverted}
+          showBaseToken={false}
         />
       </div>
       <div className="container">
