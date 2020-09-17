@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'toastify'
 
-import { MAX_BATCH_ID } from '@gnosis.pm/dex-js'
+import { MAX_BATCH_ID, toPlaceValidFromOrdersParams } from '@gnosis.pm/dex-js'
 
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
@@ -159,30 +159,46 @@ export const usePlaceOrder = (): Result => {
       }
       logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
+      // Calculate validFrom/validTo for the orders
       try {
-        const buyTokens: number[] = []
-        const sellTokens: number[] = []
+        let asapBatchId: number
+        const ordersWithDefaults = await Promise.all(
+          orders.map(async (order) => {
+            // Valid from, is the one specified or ASAP
+            let validFrom
+            if (!order.validFrom) {
+              // Asap, if no validFrom is specified
+              if (!asapBatchId) {
+                // Calculate asapBatchId (if it's not previously calculated)
+                const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
+                asapBatchId = currentBatchId + BATCHES_TO_WAIT
+              }
 
-        const validFroms: number[] = []
-        const validUntils: number[] = []
+              validFrom = asapBatchId
+            } else {
+              // Use the specified validFrom
+              validFrom = order.validFrom
+            }
 
-        const buyAmounts: BN[] = []
-        const sellAmounts: BN[] = []
+            // if not set, order is valid forever
+            const validUntil = order.validUntil || MAX_BATCH_ID
 
-        // const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
+            return {
+              ...order,
+              validFrom,
+              validUntil,
+            }
+          }),
+        )
 
-        orders.forEach((order) => {
-          buyTokens.push(order.buyToken)
-          sellTokens.push(order.sellToken)
-
-          // if not set, order is valid from placement + wait period
-          validFroms.push(order.validFrom || BATCHES_TO_WAIT)
-          // if not set, order is valid forever
-          validUntils.push(order.validUntil || MAX_BATCH_ID)
-
-          buyAmounts.push(order.buyAmount)
-          sellAmounts.push(order.sellAmount)
-        })
+        const {
+          buyAmounts,
+          sellAmounts,
+          validFroms,
+          validUntils,
+          sellTokens,
+          buyTokens,
+        } = toPlaceValidFromOrdersParams(ordersWithDefaults)
 
         const params = {
           userAddress,
