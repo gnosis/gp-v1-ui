@@ -620,8 +620,8 @@ const TradeWidget: React.FC = () => {
           <Price
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            sellToken={sellToken}
-            receiveToken={receiveToken}
+            baseToken={receiveToken}
+            quoteToken={sellToken}
             tabIndex={1}
             onSwapPrices={swapPrices}
             priceShown={priceShown}
