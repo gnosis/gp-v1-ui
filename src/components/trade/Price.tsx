@@ -231,7 +231,7 @@ export const Price: React.FC<Props> = ({
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={priceShown !== 'DIRECT'}>
+      <PriceInputBox hidden={priceShown === 'DIRECT'}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -248,7 +248,7 @@ export const Price: React.FC<Props> = ({
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={priceShown !== 'INVERSE'}>
+      <PriceInputBox hidden={priceShown === 'INVERSE'}>
         <label>
           <input
             name={priceInverseInputId}
