@@ -245,7 +245,12 @@ export const Price: React.FC<Props> = ({
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <SwapPrice baseToken={baseToken} quoteToken={quoteToken} isPriceInverted={true} onSwapPrices={onSwapPrices} />
+          <SwapPrice
+            baseToken={baseToken}
+            quoteToken={quoteToken}
+            isPriceInverted={false}
+            onSwapPrices={onSwapPrices}
+          />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
@@ -262,12 +267,7 @@ export const Price: React.FC<Props> = ({
             onFocus={(e): void => e.target.select()}
             tabIndex={tabIndex}
           />
-          <SwapPrice
-            baseToken={baseToken}
-            quoteToken={quoteToken}
-            isPriceInverted={false}
-            onSwapPrices={onSwapPrices}
-          />
+          <SwapPrice baseToken={baseToken} quoteToken={quoteToken} isPriceInverted={true} onSwapPrices={onSwapPrices} />
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />
       </PriceInputBox>

@@ -482,6 +482,7 @@ const TradeWidget: React.FC = () => {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     const price = data[priceInputId]
+
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
