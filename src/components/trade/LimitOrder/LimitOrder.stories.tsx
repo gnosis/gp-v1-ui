@@ -37,7 +37,6 @@ const Template: Story<Partial<Props>> = (props) => {
 }
 
 export const Basic = Template.bind({})
-Basic.args = {}
 
 export const NoAmount = Template.bind({})
 NoAmount.args = {

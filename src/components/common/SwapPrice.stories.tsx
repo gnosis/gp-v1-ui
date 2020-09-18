@@ -30,9 +30,8 @@ const Template: Story<Partial<Props>> = (props) => {
 }
 
 export const Default = Template.bind({})
-Default.args = {} as Props
 
 export const ShowBaseToken = Template.bind({})
 ShowBaseToken.args = {
   showBaseToken: true,
-} as Props
+}
