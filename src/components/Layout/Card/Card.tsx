@@ -194,11 +194,11 @@ export const CardTable = styled.table<{
     margin: 0;
     outline: 0;
 
-    > input[type="checkbox"] {
+    > input[type='checkbox'] {
       margin: 0;
     }
   }
-  
+
   > thead {
     position: sticky;
     z-index: 2;
@@ -210,7 +210,8 @@ export const CardTable = styled.table<{
     font-weight: var(--font-weight-bold);
   }
 
-  > thead, > tbody {
+  > thead,
+  > tbody {
     > tr:not(.cardRowDrawer) {
       position: relative;
       display: grid;
@@ -221,7 +222,7 @@ export const CardTable = styled.table<{
       ${({ $gap }): string => ($gap ? `grid-gap: ${$gap};` : '')}
       align-items: ${({ $align = 'center' }): string => $align};
       justify-content: ${({ $justify = 'center' }): string => $justify};
-      border-bottom: .1rem solid rgba(159,180,201,0.50);
+      border-bottom: 0.1rem solid rgba(159, 180, 201, 0.5);
       border-radius: 0;
 
       min-height: 4rem;
@@ -236,14 +237,14 @@ export const CardTable = styled.table<{
       &:hover {
         background: var(--color-background-row-hover);
       }
-      
+
       &.highlight {
         background-color: var(--color-background-highlighted);
         border-bottom-color: #fbdf8f;
       }
 
       &.selected {
-        background-color: rgba(159,180,201,0.50);
+        background-color: rgba(159, 180, 201, 0.5);
       }
 
       // Separation between CELLS
@@ -257,8 +258,8 @@ export const CardTable = styled.table<{
         text-align: left;
       }
     }
-  }  
-  
+  }
+
   // Table Header
   thead {
     // No styling for table header
@@ -278,25 +279,24 @@ export const CardTable = styled.table<{
         > svg {
           margin: 0 0 0.04rem 0.2rem;
         }
-      } 
+      }
     }
   }
-  
+
   tbody {
     flex: 1;
     display: flex;
     flex-flow: nowrap column;
-    
+
     font-size: 1.1rem;
     font-family: var(--font-mono);
     font-weight: var(--font-weight-regular);
     color: var(--color-text-primary);
-    
+
     letter-spacing: -0.085rem;
     line-height: 1.2;
 
     tr:not(.cardRowDrawer) {
-
       td {
         // td.status
         &.status {
@@ -304,13 +304,13 @@ export const CardTable = styled.table<{
           align-items: flex-start;
 
           > .lowBalance {
-            color: #B27800;
+            color: #b27800;
             display: flex;
             align-items: center;
             margin: 0.2rem 0;
             font-size: smaller;
             width: 100%;
-        
+
             > img {
               margin: 0 0 0.2rem 0.45rem;
             }
@@ -322,7 +322,6 @@ export const CardTable = styled.table<{
           }
         }
       }
-
     }
   }
 
