@@ -5,17 +5,11 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 import OrderBookChart, { OrderBookChartProps } from './OrderBookChart'
 import USDCxDAIdata from 'storybook/USDC-DAI_OrderBook_sample.json'
 import { processRawApiData } from './OrderBookWidget'
-import {
-  defaultNetworkId,
-  defaultBaseToken,
-  defaultQuoteToken,
-  findTokenBySymbolOrAddress,
-  networkMap,
-} from 'storybook/tokenDefaults'
+import { defaultNetworkId, baseTokenDefault, quoteTokenDefault, networkMap, findTokenConfig } from 'storybook/data'
 
 const defaultParams: Omit<OrderBookChartProps, 'data'> = {
-  baseToken: defaultBaseToken,
-  quoteToken: defaultQuoteToken,
+  baseToken: baseTokenDefault,
+  quoteToken: quoteTokenDefault,
   networkId: defaultNetworkId,
 }
 
@@ -35,8 +29,8 @@ export default {
 // fetched from price-estimation service
 const RealTemplate: Story<OrderBookChartProps> = (args) => <OrderBookChart {...args} />
 
-const DAI = findTokenBySymbolOrAddress('DAI', defaultBaseToken)
-const USDC = findTokenBySymbolOrAddress('USDC', defaultQuoteToken)
+const DAI = findTokenConfig('DAI', baseTokenDefault)
+const USDC = findTokenConfig('USDC', quoteTokenDefault)
 export const USDC_DAI = RealTemplate.bind({})
 
 USDC_DAI.args = {
