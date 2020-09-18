@@ -31,4 +31,3 @@ Basic.args = {
 
 // // FIXME: It looks like it allows to use this component with no argument, but then it fails to render
 // export const NoArgs = Template.bind({})
-// NoArgs.args = {}

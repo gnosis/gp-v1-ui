@@ -12,4 +12,3 @@ export default {
 const Template: Story<Props> = (args) => <FormMessage {...args}>This is an example of a form message</FormMessage>
 
 export const Default = Template.bind({})
-Default.args = {}

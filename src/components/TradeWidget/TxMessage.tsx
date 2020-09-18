@@ -7,10 +7,8 @@ import { TradeFormData } from '.'
 import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
 
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
-import { EllipsisText } from 'components/common/EllipsisText'
 
 import useSafeState from 'hooks/useSafeState'
-import { SwapIcon } from './SwapIcon'
 import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
 import BigNumber from 'bignumber.js'
 import { ZERO_BIG_NUMBER } from 'const'
@@ -20,6 +18,7 @@ import { useGasPrice } from 'hooks/useGasPrice'
 import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
+import { SwapPrice } from 'components/common/SwapPrice'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -87,36 +86,19 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   baseToken,
   quoteToken,
 }) => {
-  const [isDirect, setIsDirect] = useSafeState(true)
-  const swapPrices = (): void => setIsDirect((state) => !state)
-
-  let actualBaseToken, actualQuoteToken, actualBaseTokenTitle, actualQuoteTokenTitle, actualPrice
-  if (isDirect) {
-    actualPrice = price
-    actualBaseToken = displayTokenSymbolOrLink(baseToken)
-    actualQuoteToken = displayTokenSymbolOrLink(quoteToken)
-    actualBaseTokenTitle = symbolOrAddress(baseToken)
-    actualQuoteTokenTitle = symbolOrAddress(quoteToken)
-  } else {
-    // Price is inversed
-    actualPrice = priceInverse
-    actualBaseToken = displayTokenSymbolOrLink(quoteToken)
-    actualQuoteToken = displayTokenSymbolOrLink(baseToken)
-    actualBaseTokenTitle = symbolOrAddress(quoteToken)
-    actualQuoteTokenTitle = symbolOrAddress(baseToken)
-  }
+  const [isPriceInverted, setPriceInverted] = useSafeState(false)
+  const swapPrices = (): void => setPriceInverted((state) => !state)
 
   return (
     <div>
-      <span>{actualPrice}</span>{' '}
-      <EllipsisText as="strong" title={actualQuoteTokenTitle}>
-        {actualQuoteToken}
-      </EllipsisText>
-      <small> per </small>
-      <EllipsisText as="strong" title={actualBaseTokenTitle}>
-        {actualBaseToken}
-      </EllipsisText>
-      <SwapIcon swap={swapPrices} />
+      <span>{isPriceInverted ? priceInverse : price}</span>{' '}
+      <SwapPrice
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        isPriceInverted={isPriceInverted}
+        onSwapPrices={swapPrices}
+        showBaseToken
+      />
     </div>
   )
 }
