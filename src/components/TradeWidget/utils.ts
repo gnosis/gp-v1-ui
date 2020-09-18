@@ -15,7 +15,7 @@ export function calculateReceiveAmount(priceValue: string, sellValue: string): s
     const price = parseBigNumber(priceValue)
 
     if (sellAmount && price) {
-      const receiveBigNumber = sellAmount.multipliedBy(price)
+      const receiveBigNumber = sellAmount.dividedBy(price)
       receiveAmount = receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : receiveBigNumber.toString(10)
     }
   }

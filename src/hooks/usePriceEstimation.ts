@@ -5,6 +5,7 @@ import useSafeState from './useSafeState'
 
 import { getPriceEstimation } from 'services'
 import { dexPriceEstimatorApi } from 'api'
+import { logDebug } from 'utils'
 
 interface Params {
   baseTokenId: number
@@ -80,6 +81,7 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
         }
 
         const price = await dexPriceEstimatorApi.getPrice(getPriceParams)
+        logDebug({ baseTokenId, quoteTokenId, amount, price: price?.toString() })
 
         if (!cancelled) {
           setPriceEstimation(price)

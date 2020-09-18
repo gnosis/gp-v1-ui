@@ -31,12 +31,12 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => {
-      if (!isPriceInverted) {
-        setValue(priceInputId, price)
-        setValue(priceInverseInputId, invertedPrice)
-      } else {
+      if (isPriceInverted) {
         setValue(priceInverseInputId, price)
         setValue(priceInputId, invertedPrice)
+      } else {
+        setValue(priceInputId, price)
+        setValue(priceInverseInputId, invertedPrice)
       }
       trigger()
     },
