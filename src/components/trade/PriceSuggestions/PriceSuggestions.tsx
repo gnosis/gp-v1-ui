@@ -165,7 +165,6 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
           baseToken={quoteToken}
           onSwapPrices={onSwapPrices}
           isPriceInverted={isPriceInverted}
-          showBaseToken={false}
         />
       </div>
       <div className="container">

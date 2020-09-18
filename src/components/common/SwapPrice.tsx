@@ -22,13 +22,13 @@ const SwapPriceWrapper = styled.div`
 export interface Props {
   baseToken: TokenDetails
   quoteToken: TokenDetails
-  showBaseToken: boolean
+  showBaseToken?: boolean
   isPriceInverted: boolean
   onSwapPrices: () => void
 }
 
 export const SwapPrice: React.FC<Props> = (props) => {
-  const { baseToken, quoteToken, isPriceInverted, showBaseToken, onSwapPrices } = props
+  const { baseToken, quoteToken, isPriceInverted, showBaseToken = false, onSwapPrices } = props
   let actualBaseToken, actualQuoteToken, actualBaseTokenTitle, actualQuoteTokenTitle
   if (isPriceInverted) {
     // Price is inversed

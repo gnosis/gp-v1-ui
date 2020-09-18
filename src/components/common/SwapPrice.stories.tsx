@@ -19,7 +19,6 @@ const Template: Story<Partial<Props>> = (props) => {
     <SwapPrice
       baseToken={GNO}
       quoteToken={DAI}
-      showBaseToken
       isPriceInverted={isPriceInverted}
       onSwapPrices={(): void => {
         console.log('[LimitOrder.story] Swap Prices')
@@ -30,10 +29,10 @@ const Template: Story<Partial<Props>> = (props) => {
   )
 }
 
-export const Basic = Template.bind({})
-Basic.args = {} as Props
+export const Default = Template.bind({})
+Default.args = {} as Props
 
-export const HideBaseToken = Template.bind({})
-HideBaseToken.args = {
-  showBaseToken: false,
+export const ShowBaseToken = Template.bind({})
+ShowBaseToken.args = {
+  showBaseToken: true,
 } as Props

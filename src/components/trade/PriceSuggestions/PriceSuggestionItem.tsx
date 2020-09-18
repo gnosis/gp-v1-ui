@@ -82,7 +82,6 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
       <SwapPrice
         baseToken={baseToken}
         quoteToken={quoteToken}
-        showBaseToken={false}
         onSwapPrices={onSwapPrices}
         isPriceInverted={isPriceInverted}
       />
