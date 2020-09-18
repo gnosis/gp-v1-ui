@@ -9,6 +9,7 @@ import { GNO, DAI } from 'storybook/tokens'
 
 export default {
   title: 'Trade/Price',
+  component: Price,
 } as Meta
 
 const Template: Story<Props> = (props) => {
@@ -24,8 +25,8 @@ const Template: Story<Props> = (props) => {
 
 export const Basic = Template.bind({})
 Basic.args = {
-  sellToken: GNO,
-  receiveToken: DAI,
+  quoteToken: GNO,
+  baseToken: DAI,
 }
 
 // // FIXME: It looks like it allows to use this component with no argument, but then it fails to render
