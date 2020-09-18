@@ -66,7 +66,6 @@ const Wrapper = styled.div`
       > ${EllipsisText} {
         display: inline-block;
         font-size: smaller;
-        width: 6ch;
         text-align: right;
         font-weight: bold;
       }

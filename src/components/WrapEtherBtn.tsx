@@ -375,7 +375,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 }
 
 export const WrapEtherBtn: React.FC<WrapEtherBtnProps> = (props: WrapEtherBtnProps) => (
-  <WrapUnwrapEtherBtn wrap={true} {...props} />
+  <WrapUnwrapEtherBtn wrap {...props} />
 )
 
 export const UnwrapEtherBtn: React.FC<WrapEtherBtnProps> = (props: WrapEtherBtnProps) => (

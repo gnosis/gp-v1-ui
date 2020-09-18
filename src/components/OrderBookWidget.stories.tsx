@@ -6,16 +6,16 @@ import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 import OrderBookWidget, { OrderBookProps } from './OrderBookWidget'
 import {
   defaultNetworkId,
-  defaultBaseToken,
-  defaultQuoteToken,
-  findTokenBySymbolOrAddress,
+  baseTokenDefault,
+  quoteTokenDefault,
+  findTokenConfig,
   networkMap,
-  tokenSymbols,
-} from 'storybook/tokenDefaults'
+  tokenConfigSymbols,
+} from 'storybook/data'
 
 const defaultParams: OrderBookProps = {
-  baseToken: defaultBaseToken,
-  quoteToken: defaultQuoteToken,
+  baseToken: baseTokenDefault,
+  quoteToken: quoteTokenDefault,
   networkId: defaultNetworkId,
   hops: ORDER_BOOK_HOPS_DEFAULT,
 }
@@ -31,8 +31,8 @@ export default {
   component: OrderBookWidget,
   argTypes: {
     networkId: { control: { type: 'inline-radio', options: availableNetworks } },
-    baseToken: { control: { type: 'select', options: tokenSymbols } },
-    quoteToken: { control: { type: 'select', options: tokenSymbols } },
+    baseToken: { control: { type: 'select', options: tokenConfigSymbols } },
+    quoteToken: { control: { type: 'select', options: tokenConfigSymbols } },
     hops: {
       control: {
         type: 'inline-radio',
@@ -63,13 +63,12 @@ interface TemplateProps extends Omit<OrderBookProps, 'baseToken' | 'quoteToken'>
  */
 const { sellToken: sellTokenSymbol, receiveToken: receiveTokenSymbol } = CONFIG.initialTokenSelection
 
-const initBaseToken = findTokenBySymbolOrAddress(sellTokenSymbol, defaultBaseToken)
-const initQuoteToken = findTokenBySymbolOrAddress(receiveTokenSymbol, defaultQuoteToken)
+const initBaseToken = findTokenConfig(sellTokenSymbol, baseTokenDefault)
+const initQuoteToken = findTokenConfig(receiveTokenSymbol, quoteTokenDefault)
 
 const Template: Story<TemplateProps> = ({ baseToken: baseTokenSymbol, quoteToken: quoteTokenSymbol, ...args }) => {
-  const baseToken = useMemo(() => findTokenBySymbolOrAddress(baseTokenSymbol, initBaseToken), [baseTokenSymbol])
-
-  const quoteToken = useMemo(() => findTokenBySymbolOrAddress(quoteTokenSymbol, initQuoteToken), [quoteTokenSymbol])
+  const baseToken = useMemo(() => findTokenConfig(baseTokenSymbol, initBaseToken), [baseTokenSymbol])
+  const quoteToken = useMemo(() => findTokenConfig(quoteTokenSymbol, initQuoteToken), [quoteTokenSymbol])
 
   return <OrderBookWidget {...args} baseToken={baseToken} quoteToken={quoteToken} />
 }
