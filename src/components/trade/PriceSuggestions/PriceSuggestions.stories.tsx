@@ -6,8 +6,7 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import { PriceSuggestions, Props } from './PriceSuggestions'
 import { Frame } from 'components/common/Frame'
 import BigNumber from 'bignumber.js'
-
-import { GNO, DAI } from 'storybook/tokens'
+import { DAI, GNO } from 'storybook/data'
 
 export default {
   title: 'Trade/PriceSuggestions',

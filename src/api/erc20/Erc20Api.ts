@@ -164,8 +164,6 @@ export class Erc20ApiImpl implements Erc20Api {
     if (!userAddress || !tokenAddress) return ZERO
 
     const erc20 = this._getERC20AtAddress(networkId, tokenAddress)
-
-    logDebug('[Erc20Api] allowance:', { userAddress, spenderAddress })
     const result = await erc20.methods.allowance(userAddress, spenderAddress).call()
 
     return toBN(result)
