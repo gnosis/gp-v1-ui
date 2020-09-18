@@ -19,7 +19,7 @@ const Template: Story<Partial<Props>> = (props) => {
     <SwapPrice
       baseToken={GNO}
       quoteToken={DAI}
-      showBaseToken={true}
+      showBaseToken
       isPriceInverted={isPriceInverted}
       onSwapPrices={(): void => {
         console.log('[LimitOrder.story] Swap Prices')

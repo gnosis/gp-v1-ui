@@ -97,7 +97,7 @@ export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
         quoteToken={quoteToken}
         isPriceInverted={isPriceInverted}
         onSwapPrices={swapPrices}
-        showBaseToken={true}
+        showBaseToken
       />
     </div>
   )

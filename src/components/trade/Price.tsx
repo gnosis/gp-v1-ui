@@ -250,7 +250,7 @@ export const Price: React.FC<Props> = ({
             baseToken={baseToken}
             quoteToken={quoteToken}
             isPriceInverted={false}
-            showBaseToken={true}
+            showBaseToken
             onSwapPrices={onSwapPrices}
           />
         </label>
@@ -273,7 +273,7 @@ export const Price: React.FC<Props> = ({
             baseToken={baseToken}
             quoteToken={quoteToken}
             isPriceInverted={true}
-            showBaseToken={true}
+            showBaseToken
             onSwapPrices={onSwapPrices}
           />
         </label>
