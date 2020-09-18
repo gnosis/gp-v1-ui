@@ -60,20 +60,21 @@ async function placeValidFromOrdersTx(placeOrderParams: PlaceValidFromOrders): P
   const { networkId, orders, userAddress, txOptionalParams } = placeOrderParams
 
   // Calculate validFrom/validTo for the orders
-  let asapBatchId: number
+  let asapBatchIdPromise: Promise<number>
   const ordersWithDefaults = await Promise.all(
     orders.map(async (order) => {
       // Valid from, is the one specified or ASAP
       let validFrom
       if (!order.validFrom) {
         // Asap, if no validFrom is specified
-        if (!asapBatchId) {
+        if (!asapBatchIdPromise) {
           // Calculate asapBatchId (if it's not previously calculated)
-          const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
-          asapBatchId = currentBatchId + BATCHES_TO_WAIT
+          asapBatchIdPromise = asapBatchIdPromise = exchangeApi
+            .getCurrentBatchId(networkId)
+            .then((currentBatchId) => currentBatchId + BATCHES_TO_WAIT)
         }
 
-        validFrom = asapBatchId
+        validFrom = await asapBatchIdPromise
       } else {
         // Use the specified validFrom
         validFrom = order.validFrom
