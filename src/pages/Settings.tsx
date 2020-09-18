@@ -7,7 +7,7 @@ import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
 import { useHistory } from 'react-router'
 import { WCSettings, wcResolver } from 'components/Settings/WalletConnect'
-import { ContentPage } from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/layout'
 
 const SettingsButtonSubmit = styled.button`
   height: 3.6rem;

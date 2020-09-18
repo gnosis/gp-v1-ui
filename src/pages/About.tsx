@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { ContentPage } from 'components/Layout/PageWrapper'
+import { ContentPage } from 'components/layout'
 import addressesByNetwork from 'api/deposit/batchExchangeAddresses'
 import { getNetworkFromId } from '@gnosis.pm/dex-js'
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 export const AboutWrapper = styled(ContentPage)`
   line-height: 2.2rem;

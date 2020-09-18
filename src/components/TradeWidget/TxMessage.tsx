@@ -5,18 +5,20 @@ import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { TradeFormData } from '.'
 import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
+
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
+
 import useSafeState from 'hooks/useSafeState'
-import { EllipsisText } from 'components/Layout'
-import { SwapIcon } from './SwapIcon'
 import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
 import BigNumber from 'bignumber.js'
 import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
 import { useGasPrice } from 'hooks/useGasPrice'
-import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, calcMinTradableAmountInOwl, roundToNext } from 'utils/minFee'
+import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
+import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
+import { SwapPrice } from 'components/common/SwapPrice'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -71,38 +73,32 @@ const OrderValidityTooltip: React.FC = () => (
   </HelpTooltipContainer>
 )
 
-interface SimpleDisplayPriceProps extends Omit<TxMessageProps, 'networkId'> {
+interface SimpleDisplayPriceProps {
   price: string
   priceInverse: string
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
 }
 
 export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   price,
   priceInverse,
-  sellToken,
-  receiveToken,
+  baseToken,
+  quoteToken,
 }) => {
-  // true = direct
-  // false = indirect
-  const [showPrice, setShowPrice] = useSafeState(true)
-  const swapPrices = (): void => setShowPrice((state) => !state)
-
-  const displaySellToken = displayTokenSymbolOrLink(sellToken)
-  const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
-  const sellTokenTitle = symbolOrAddress(sellToken)
-  const receiveTokenTitle = symbolOrAddress(receiveToken)
+  const [isPriceInverted, setPriceInverted] = useSafeState(false)
+  const swapPrices = (): void => setPriceInverted((state) => !state)
 
   return (
     <div>
-      <span>{showPrice ? priceInverse : price}</span>{' '}
-      <EllipsisText as="strong" title={showPrice ? sellTokenTitle : receiveTokenTitle}>
-        {showPrice ? displaySellToken : displayReceiveToken}
-      </EllipsisText>
-      <small> per </small>
-      <EllipsisText as="strong" title={showPrice ? receiveTokenTitle : sellTokenTitle}>
-        {showPrice ? displayReceiveToken : displaySellToken}
-      </EllipsisText>
-      <SwapIcon swap={swapPrices} />
+      <span>{isPriceInverted ? priceInverse : price}</span>{' '}
+      <SwapPrice
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        isPriceInverted={isPriceInverted}
+        onSwapPrices={swapPrices}
+        showBaseToken
+      />
     </div>
   )
 }
@@ -157,6 +153,8 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
 
   const gasPrice = useGasPrice({ defaultGasPrice: DEFAULT_GAS_PRICE, gasPriceLevel: 'fast' })
 
+  const minTradableAmountInOwl = useMinTradableAmountInOwl(networkId)
+
   return useMemo(() => {
     if (priceEstimation !== null && priceEstimation.isZero()) {
       // no price data for token
@@ -170,15 +168,14 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       isWETHPriceLoading ||
       priceEstimation === null ||
       wethPriceInOwl === null ||
-      gasPrice === null
+      gasPrice === null ||
+      minTradableAmountInOwl === null
     ) {
       return { isLoading: true }
     }
 
     logDebug('priceEstimation of', sellToken.symbol, 'in OWL', priceEstimation.toString(10))
     logDebug('WETH price in OWL', wethPriceInOwl.toString(10))
-
-    const minTradableAmountInOwl = calcMinTradableAmountInOwl({ gasPrice, ethPriceInOwl: wethPriceInOwl })
 
     const minTradableAmountInOwlRoundedUp = roundToNext(minTradableAmountInOwl)
 
@@ -193,6 +190,7 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       isLowVolume,
       difference: difference.toString(10),
       minAmount: minTradableAmountPerToken.toString(10),
+      minAmountInOWL: minTradableAmountInOwl.toString(10),
       gasPrice,
       roundedUpAmount: roundedUpAmount.toString(10),
       roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp.toString(10),
@@ -206,7 +204,16 @@ const useLowVolumeAmount = ({ sellToken, sellTokenAmount, networkId }: LowVolume
       roundedUpTo: ROUND_TO_NUMBER,
       roundedUpAmountInOwl: minTradableAmountInOwlRoundedUp,
     }
-  }, [isPriceLoading, priceEstimation, sellToken.symbol, sellTokenAmount, gasPrice, isWETHPriceLoading, wethPriceInOwl])
+  }, [
+    isPriceLoading,
+    priceEstimation,
+    sellToken.symbol,
+    sellTokenAmount,
+    gasPrice,
+    isWETHPriceLoading,
+    wethPriceInOwl,
+    minTradableAmountInOwl,
+  ])
 }
 
 export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, networkId }) => {
@@ -303,12 +310,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         <div className="sectionTitle">
           <strong>Prices</strong>
         </div>
-        <SimpleDisplayPrice
-          receiveToken={receiveToken}
-          sellToken={sellToken}
-          price={price}
-          priceInverse={priceInverse}
-        />
+        <SimpleDisplayPrice baseToken={receiveToken} quoteToken={sellToken} price={price} priceInverse={priceInverse} />
 
         {/* Order Validity */}
 

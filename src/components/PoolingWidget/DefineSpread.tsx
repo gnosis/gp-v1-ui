@@ -7,7 +7,7 @@ import { HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { Input } from 'components/Input'
 
 // TradeWidget: subcomponent
-import { FormInputError } from 'components/TradeWidget/FormMessage'
+import { FormInputError } from 'components/common/FormInputError'
 
 import { useFormContext, FieldError } from 'react-hook-form'
 

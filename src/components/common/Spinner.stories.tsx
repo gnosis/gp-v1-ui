@@ -5,7 +5,7 @@ import Spinner, { SpinnerProps } from './Spinner'
 import { faSkull } from '@fortawesome/free-solid-svg-icons'
 
 export default {
-  title: 'Components/Spinner',
+  title: 'Common/Spinner',
   component: Spinner,
 } as Meta
 
