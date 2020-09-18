@@ -94,7 +94,7 @@ async function placeValidFromOrdersTx(placeOrderParams: PlaceValidFromOrders): P
     ordersWithDefaults,
   )
 
-  const params = {
+  return exchangeApi.placeValidFromOrders({
     userAddress,
     networkId,
     buyTokens,
@@ -104,9 +104,7 @@ async function placeValidFromOrdersTx(placeOrderParams: PlaceValidFromOrders): P
     buyAmounts,
     sellAmounts,
     txOptionalParams,
-  }
-
-  return exchangeApi.placeValidFromOrders(params)
+  })
 }
 
 export const usePlaceOrder = (): Result => {
