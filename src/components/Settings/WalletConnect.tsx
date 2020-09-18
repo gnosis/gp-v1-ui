@@ -1,7 +1,6 @@
 import React from 'react'
 import Joi from 'joi'
-import { UseFormMethods } from 'react-hook-form'
-import { FieldErrors } from 'react-hook-form/dist/types/form'
+import { UseFormMethods, FieldErrors } from 'react-hook-form'
 import { ErrorMessage } from '@hookform/error-message'
 import styled from 'styled-components'
 
