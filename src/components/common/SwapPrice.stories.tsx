@@ -10,6 +10,11 @@ export default {
   title: 'Common/SwapPrice',
   component: SwapPrice,
   decorators: [CenteredAndFramed],
+  argTypes: {
+    isPriceInverted: {
+      control: null,
+    },
+  },
 } as Meta
 
 const Template: Story<Partial<Props>> = (props) => {
