@@ -1,4 +1,4 @@
-import { PricePointDetails, ZoomValues } from 'components/OrderBookChart/types'
+import { PricePointDetails, ZoomValues } from './types'
 import { logDebug } from 'utils'
 
 const ORDERBOOK_ONE_SIDED_MARKET_ZOOM_PERCENTAGE = 0.05 // %
@@ -31,7 +31,7 @@ export function calcUpperZoomY(
   lowerZoomX: number,
   upperZoomX: number,
 ): number {
-  const bidsVolume = bids.find(bid => lowerZoomX < bid.priceNumber)?.totalVolumeNumber || 0
+  const bidsVolume = bids.find((bid) => lowerZoomX < bid.priceNumber)?.totalVolumeNumber || 0
   let asksVolume = asks.length > 0 ? asks[0].totalVolumeNumber : 0
   asksVolume = asks.find((_ask, i) => upperZoomX <= asks[i + 1]?.priceNumber)?.totalVolumeNumber || asksVolume
   logDebug(`[Order Book] bidsVolume: ${bidsVolume}; asksVolume: ${asksVolume}`)
