@@ -163,6 +163,8 @@ export const INPUT_PRECISION_SIZE = 6
 
 export const WETH_ADDRESS_MAINNET = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
 export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+export const WETH_ADDRESS_XDAI = '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'
+
 export const ORDER_BOOK_HOPS_DEFAULT = 2
 export const ORDER_BOOK_HOPS_MAX = 2
 
@@ -210,5 +212,6 @@ export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTo
   {
     [Network.Mainnet]: {},
     [Network.Rinkeby]: {},
+    [Network.xDai]: {},
   },
 )
