@@ -51,37 +51,23 @@ const ModalWrapper = styled(ModalBodyWrapper)`
     flex-flow: row wrap;
     align-items: center;
     margin: 1.6rem 0 1rem;
+  }
 
-    &:first-of-type {
-      > p {
-        margin: 0 1rem 0 0;
-      }
+  > span:first-of-type::after {
+    content: '/';
+    margin: 0 1rem;
 
-      &::after {
-        content: '/';
-        margin: 0 0.6rem;
-        font-size: 2.2rem;
-        opacity: 0.4;
-
-        @media ${MEDIA.mobile} {
-          display: none;
-        }
-      }
+    @media ${MEDIA.mobile} {
+      display: none;
     }
+  }
 
-    &:last-of-type {
-      > p {
-        margin: 0 0 0 1rem;
-      }
-    }
+  > span:first-of-type > p {
+    margin: 0 1rem 0 0;
+  }
 
-    &.swapButtonContainer {
-      margin-left: 1rem;
-
-      > button {
-        border-radius: var(--border-radius);
-      }
-    }
+  > span:last-of-type > p {
+    margin: 0 0 0 1rem;
   }
 
   .amcharts-Sprite-group {
@@ -148,7 +134,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
       setQuoteToken(quoteTokenDefault)
     },
     large: true,
-    title: `${safeTokenName(baseToken)}/${safeTokenName(quoteToken)} Order Book${networkDescription}`,
+    title: `${safeTokenName(baseToken)}-${safeTokenName(quoteToken)} Order book${networkDescription}`,
     message: (
       <ModalWrapper>
         <span>
