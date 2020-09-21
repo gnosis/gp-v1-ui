@@ -4,7 +4,7 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 
 import OrderBookChart, { OrderBookChartProps } from './OrderBookChart'
 import USDCxDAIdata from 'storybook/USDC-DAI_OrderBook_sample.json'
-import { processRawApiData } from './OrderBookWidget'
+import { processRawApiData } from './dataProcessingFunctions'
 import { defaultNetworkId, baseTokenDefault, quoteTokenDefault, networkMap, findTokenConfig } from 'storybook/data'
 
 const defaultParams: Omit<OrderBookChartProps, 'data'> = {
