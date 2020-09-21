@@ -2,6 +2,10 @@ import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 
+import { getNetworkFromId, safeTokenName } from 'utils'
+
+import { TokenDetails, Network } from 'types'
+
 const ZOOM_BUTTON_CONTAINER_ID = 'zoomButtonContainer'
 
 export function disableGrip(grip: am4core.ResizeButton): void {
@@ -12,8 +16,16 @@ export function disableGrip(grip: am4core.ResizeButton): void {
   grip.background.disabled = true
 }
 
-export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
-  const chart = am4core.create(mountPoint, am4charts.XYChart)
+export const createChart = (chartElement: HTMLElement): am4charts.XYChart => {
+  am4core.useTheme(am4themesSpiritedaway)
+  am4core.options.autoSetClassName = true
+  const chart = am4core.create(chartElement, am4charts.XYChart)
+
+  // Colors
+  const colors = {
+    green: '#3d7542',
+    red: '#dc1235',
+  }
 
   // Create axes
   const xAxis = chart.xAxes.push(new am4charts.ValueAxis())
@@ -35,14 +47,9 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   yAxis.keepSelection = true
   yAxis.maxZoomFactor = 10 ** 18
 
-  // Colors
-  const colors = {
-    green: '#3d7542',
-    red: '#dc1235',
-  }
-
   // Create series
   const bidSeries = chart.series.push(new am4charts.StepLineSeries())
+  bidSeries.name = 'Bid Series'
   bidSeries.dataFields.valueX = 'priceNumber'
   bidSeries.dataFields.valueY = 'bidValueY'
   bidSeries.strokeWidth = 1
@@ -51,6 +58,7 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   bidSeries.fillOpacity = 0.1
 
   const askSeries = chart.series.push(new am4charts.StepLineSeries())
+  askSeries.name = 'Ask Series'
   askSeries.dataFields.valueX = 'priceNumber'
   askSeries.dataFields.valueY = 'askValueY'
   askSeries.strokeWidth = 1
@@ -62,10 +70,6 @@ export function createChart(mountPoint: HTMLDivElement): am4charts.XYChart {
   chart.cursor = new am4charts.XYCursor()
   // Make the cursor visible for Value series
   chart.cursor.snapToSeries = [bidSeries, askSeries]
-
-  // Theme-ing
-  am4core.useTheme(am4themesSpiritedaway)
-  am4core.options.autoSetClassName = true
 
   // Scrollbar
   const scrollbarX = new am4charts.XYChartScrollbar()
@@ -110,4 +114,30 @@ export function setLabel(optionalLabel: am4core.Optional<am4core.Label>, text: s
 
 export function getZoomButtonContainer(chart: am4charts.XYChart): am4core.Container | undefined {
   return Array.from(chart.plotContainer.children).find(({ id }) => id === ZOOM_BUTTON_CONTAINER_ID) as am4core.Container
+}
+
+export interface DrawLabelsParams {
+  chart: am4charts.XYChart
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+  networkId: number
+}
+
+export const drawLabels = ({ chart, baseToken, quoteToken, networkId }: DrawLabelsParams): void => {
+  const baseTokenLabel = safeTokenName(baseToken)
+  const quoteTokenLabel = safeTokenName(quoteToken)
+  const market = baseTokenLabel + '-' + quoteTokenLabel
+
+  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
+
+  const [xAxis] = chart.xAxes
+  const [yAxis] = chart.yAxes
+
+  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
+  yAxis.title.text = baseTokenLabel
+
+  const [bidSeries, askSeries] = chart.series
+
+  bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
+  askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
 }
