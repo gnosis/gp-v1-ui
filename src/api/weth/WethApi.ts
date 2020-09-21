@@ -31,7 +31,7 @@ function getWethAddressByNetwork(networkId: number): string {
       return WETH_ADDRESS_MAINNET
     case Network.Rinkeby:
       return WETH_ADDRESS_RINKEBY
-    case Network.Xdai:
+    case Network.xDai:
       return WETH_ADDRESS_XDAI
     default:
       throw new Error(`WethApi was not deployed to network ${networkId}`)
