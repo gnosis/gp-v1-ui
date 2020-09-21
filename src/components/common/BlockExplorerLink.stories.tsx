@@ -2,23 +2,23 @@ import React from 'react'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
 
-import { EtherscanLink, EtherscanLinkProps } from 'components/common/EtherscanLink'
+import { BlockExplorerLink, Props } from 'components/common/BlockExplorerLink'
 import { Network } from 'types'
 
 const networkIds = Object.values(Network).filter(Number.isInteger)
 
 export default {
-  title: 'Common/EtherscanLink',
-  component: EtherscanLink,
+  title: 'Common/BlockExplorerLink',
+  component: BlockExplorerLink,
   argTypes: {
     label: { control: 'text' },
     networkId: { control: { type: 'inline-radio', options: networkIds } },
   },
 } as Meta
 
-const Template: Story<EtherscanLinkProps> = (args) => <EtherscanLink {...args} />
+const Template: Story<Props> = (args) => <BlockExplorerLink {...args} />
 
-const defaultParams: EtherscanLinkProps = {
+const defaultParams: Props = {
   type: 'tx',
   identifier: '0x5f995094ff596cf1aa27e8ec84fab21c4ec6a512981b13c563a58c9172607c3d',
   networkId: Network.Mainnet,

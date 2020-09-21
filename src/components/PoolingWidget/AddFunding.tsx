@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
 // componet
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 // PoolingWidget: subcomponent
 import { HighlightDiv } from 'components/PoolingWidget/PoolingWidget.styled'
@@ -26,7 +26,7 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
       <span>
         You can check the transactions status on:{' '}
         <strong>
-          <EtherscanLink type="tx" identifier={txIdentifier} label={`https://etherscan.io/tx/${txIdentifier}`} />
+          <BlockExplorerLink type="tx" identifier={txIdentifier} useUrlAsLabel />
         </strong>
         <p>
           {txReceipt

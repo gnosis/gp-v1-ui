@@ -11,7 +11,7 @@ import builtOnGP from 'assets/img/builtOnGP.svg'
 
 // Components
 import ThemeToggler, { ThemeTogglerWrapper } from 'components/ThemeToggler'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 // Hooks
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -181,7 +181,7 @@ const SideContentWrapper = styled.div`
   }
 `
 
-const LinkWrapper = styled(EtherscanLink)`
+const LinkWrapper = styled(BlockExplorerLink)`
   margin: 0;
   text-align: center;
   border: 0.1rem solid #c5d3e0;

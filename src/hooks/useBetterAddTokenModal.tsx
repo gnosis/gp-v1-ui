@@ -9,7 +9,7 @@ import { tokenListApi } from 'api'
 import { TokenFromExchange } from 'services/factories'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { useWalletConnection } from './useWalletConnection'
 import Spinner from 'components/common/Spinner'
 
@@ -141,7 +141,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
             <strong>{token.symbol}</strong>
           </div>
           <div className="tokenName">{token.name}</div>
-          <EtherscanLink
+          <BlockExplorerLink
             className="tokenText"
             type="token"
             identifier={token.address}
@@ -180,7 +180,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
             <strong>{token.symbol}</strong>
           </div>
           <div className="tokenName">{token.name}</div>
-          <EtherscanLink
+          <BlockExplorerLink
             type="token"
             className="tokenText"
             identifier={token.address}
