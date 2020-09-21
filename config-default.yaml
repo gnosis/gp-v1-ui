@@ -53,6 +53,12 @@ dexPriceEstimator:
       url_production: https://dex-price-estimator.rinkeby.gnosis.io
       url_develop: https://price-estimate-rinkeby.dev.gnosisdev.com
 
+    - networkId: 100
+      # TODO: No production URL yet. For now, using DEV also in PRODUCTION
+      #url_production: https://dex-price-estimator.xdai.gnosis.io
+      url_production: https://price-estimate-xdai.dev.gnosisdev.com
+      url_develop: https://price-estimate-xdai.dev.gnosisdev.com
+      
 # Subgraph abstraction, used for getting the last price
 theGraphApi:
   type: 'the-graph' # choices: the-graph
