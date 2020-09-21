@@ -5,22 +5,19 @@ import { TEN_BIG_NUMBER, formatSmart, DEFAULT_PRECISION, ONE_BIG_NUMBER, ZERO_BI
 import { logDebug } from 'utils'
 import { TokenDetails } from 'types'
 
-import { RawPricePoint, PricePoint, Offer, PricePointDetails } from 'components/OrderBookChart/types'
+import { RawPricePoint, PricePoint, Offer, PricePointDetails } from './types'
+import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
 
-export function _toPricePoint(
-  pricePoint: RawPricePoint,
-  quoteTokenDecimals: number,
-  baseTokenDecimals: number,
-): PricePoint {
+function _toPricePoint(pricePoint: RawPricePoint, quoteTokenDecimals: number, baseTokenDecimals: number): PricePoint {
   return {
     price: new BigNumber(pricePoint.price).div(TEN_BIG_NUMBER.pow(quoteTokenDecimals - baseTokenDecimals)),
     volume: new BigNumber(pricePoint.volume).div(TEN_BIG_NUMBER.pow(baseTokenDecimals)),
   }
 }
 
-export function _formatSmartBigNumber(amount: BigNumber): string {
+function _formatSmartBigNumber(amount: BigNumber): string {
   return formatSmart({
     amount: new BN(
       amount
@@ -40,33 +37,24 @@ export function _formatSmartBigNumber(amount: BigNumber): string {
  * This method turns the raw data that the backend returns into data that can be displayed by the chart.
  * This involves aggregating the total volume and accounting for decimals
  */
-export function processData(
+const processData = (
   rawPricePoints: RawPricePoint[],
-  baseToken: TokenDetails,
-  quoteToken: TokenDetails,
+  baseTokenDecimals: number,
+  quoteTokenDecimals: number,
   type: Offer,
-  owlPrice: BigNumber | null,
-): PricePointDetails[] {
+): PricePointDetails[] => {
   const isBid = type == Offer.Bid
-  const quoteTokenDecimals = quoteToken.decimals
-  const baseTokenDecimals = baseToken.decimals
 
   // Convert RawPricePoint into PricePoint:
   //  Raw items use number (floats) and are given in "atoms"
   //  Normalized items use decimals (BigNumber) and are given in natural units
-  let pricePoints: PricePoint[] = rawPricePoints.map(pricePoint =>
+  let pricePoints: PricePoint[] = rawPricePoints.map((pricePoint) =>
     _toPricePoint(pricePoint, quoteTokenDecimals, baseTokenDecimals),
   )
 
   // Filter tiny orders
-  const minimumOrderVolume = !owlPrice // is there a price returned?
-    ? new BigNumber(SMALL_VOLUME_THRESHOLD) // No, use default dumb threshold
-    : owlPrice.eq(0) // Is price 0?
-    ? ONE_BIG_NUMBER // It's OWL itself, use 1
-    : owlPrice // Not OWL, use returned price
-
   pricePoints = pricePoints
-    .filter(pricePoint => pricePoint.volume.gt(minimumOrderVolume))
+    .filter((pricePoint) => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
     // sort by price according to type
     // bid orders must be inverted to calculate the descending total volume
     .sort(({ price: a }, { price: b }) => (isBid ? b.comparedTo(a) : a.comparedTo(b)))
@@ -128,18 +116,38 @@ export function processData(
   return isBid ? points.reverse() : points
 }
 
-export function _printOrderBook(
-  pricePoints: PricePointDetails[],
-  baseToken: TokenDetails,
-  quoteToken: TokenDetails,
-): void {
-  logDebug('[Order Book]: ' + baseToken.symbol + '-' + quoteToken.symbol)
-  pricePoints.forEach(pricePoint => {
+function _printOrderBook(pricePoints: PricePointDetails[], baseTokenSymbol = '', quoteTokenSymbol = ''): void {
+  logDebug('Order Book: ' + baseTokenSymbol + '-' + quoteTokenSymbol)
+  pricePoints.forEach((pricePoint) => {
     const isBid = pricePoint.type === Offer.Bid
     logDebug(
-      `[Order Book]\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseToken.symbol} at ${
+      `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseTokenSymbol} at ${
         pricePoint.priceFormatted
-      } ${quoteToken.symbol}\tinverted ${_formatSmartBigNumber(ONE_BIG_NUMBER.dividedBy(pricePoint.price))}`,
+      } ${quoteTokenSymbol}\tinverted ${_formatSmartBigNumber(ONE_BIG_NUMBER.dividedBy(pricePoint.price))}`,
     )
   })
+}
+
+interface ProcessRawDataParams {
+  data: OrderBookData
+  baseToken: Pick<TokenDetails, 'decimals' | 'symbol'>
+  quoteToken: Pick<TokenDetails, 'decimals' | 'symbol'>
+}
+
+export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDataParams): PricePointDetails[] => {
+  try {
+    const bids = processData(data.bids, baseToken.decimals, quoteToken.decimals, Offer.Bid)
+    const asks = processData(data.asks, baseToken.decimals, quoteToken.decimals, Offer.Ask)
+    const pricePoints = bids.concat(asks)
+
+    // Sort points by price
+    // pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
+
+    _printOrderBook(pricePoints, baseToken.symbol, quoteToken.symbol)
+
+    return pricePoints
+  } catch (error) {
+    console.error('Error processing data', error)
+    return []
+  }
 }
