@@ -244,7 +244,7 @@ const OrderBookChart: React.FC<OrderBookChartProps> = (props) => {
     })
 
     const seeAllButton = buttonContainer.createChild(am4core.Button)
-    setLabel(seeAllButton.label, 'NORGOTH')
+    setLabel(seeAllButton.label, 'Full')
     seeAllButton.events.on('hit', () => {
       xAxis.start = 0
       xAxis.end = 1
