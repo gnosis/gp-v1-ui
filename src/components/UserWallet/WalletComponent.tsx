@@ -32,11 +32,12 @@ import useSafeState from 'hooks/useSafeState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import useNoScroll from 'hooks/useNoScroll'
 
-import { abbreviateString, getNetworkFromId } from 'utils'
+import { abbreviateString } from 'utils'
 // TODO: probably not do this
 import WalletImg from 'assets/img/eth-network.svg'
 import { Spinner } from 'components/common/Spinner'
 import { walletApi } from 'api'
+import { getNetworkFromId } from '@gnosis.pm/dex-js'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string

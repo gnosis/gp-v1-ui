@@ -55,17 +55,23 @@ describe('Test config defaults', () => {
       config: [
         {
           networkId: 1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_production: 'https://dex-price-estimator.gnosis.io',
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-mainnet.dev.gnosisdev.com',
         },
         {
           networkId: 4,
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_production: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-rinkeby.dev.gnosisdev.com',
         },
         {
           networkId: 100,
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_production: 'https://price-estimate-xdai.dev.gnosisdev.com',
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-xdai.dev.gnosisdev.com',
         },
       ],
@@ -129,11 +135,12 @@ describe('Test config defaults', () => {
     const {
       [Network.Mainnet]: disabledOnMainnet,
       [Network.Rinkeby]: disabledOnRinkeby,
-      [Network.xDai]: disabledOnRinkeby,
+      [Network.xDai]: disabledOnXdai,
     } = CONFIG.disabledTokens
 
     if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
     if (disabledOnRinkeby.length) expect(disabledOnRinkeby).toEqual(disabledTokensArray)
+    if (disabledOnRinkeby.length) expect(disabledOnXdai).toEqual(disabledTokensArray)
   })
 
   it('initialTokenSelection', () => {
