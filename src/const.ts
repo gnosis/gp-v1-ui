@@ -149,10 +149,6 @@ if (process.env.ETH_NODE_URL) {
 export const ETH_NODE_URL = ethNodeUrl
 
 export const STORAGE_KEY_LAST_PROVIDER = 'lastProvider'
-export const STORAGE_PENDING_ORDER_TX_HASHES = {
-  1: 'STORAGE_PENDING_ORDER_TX_HASHES_1',
-  4: 'STORAGE_PENDING_ORDER_TX_HASHES_4',
-}
 export const STORAGE_KEY_DISABLED_TOKENS_ADDRESSES = 'disabledTokens'
 
 export const TRADES_LOCAL_STORAGE_KEY = 'TRADES_PER_ACCOUNT'
