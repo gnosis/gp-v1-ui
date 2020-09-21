@@ -90,6 +90,8 @@ exchangeContractConfig:
       blockNumber: 9340147
     - networkId: 4
       blockNumber: 5844678
+    - networkId: 100
+      blockNumber: 11948310
 
 # Wallet Connect
 walletConnect:
