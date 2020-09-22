@@ -199,6 +199,10 @@ export const composeProvider = <T extends Provider>(
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)
       }
+      // pretend we don't support provider.request yet
+      if (prop === 'request') {
+        return undefined
+      }
       // MMask or other provider handles it
       return Reflect.get(provider, prop, receiver)
     },
