@@ -3,12 +3,20 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 import { TokenImg2, Props } from './TokenImg2'
 import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
+import { Frame } from './Frame'
 
 const ADDRESS_GNO = '0x6810e776880C02933D47DB1b9fc05908e5386b96'
 const ADDRESS_WXDAI = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 
 export default {
   title: 'Common/TokenImg',
+  decorators: [
+    (DecoratedStory): JSX.Element => (
+      <div style={{ textAlign: 'center' }}>
+        <Frame style={{ display: 'inline-block', padding: 0 }}>{DecoratedStory()}</Frame>
+      </div>
+    ),
+  ],
   component: TokenImg2,
 } as Meta
 
