@@ -7,9 +7,9 @@ import { faClock, faPlus, faMinus, faBaby } from '@fortawesome/free-solid-svg-ic
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
 // const, utils, types
-import { ZERO, MEDIA, WETH_ADDRESS_MAINNET, WXDAI_ADDRESS_XDAI } from 'const'
-import { formatSmart, formatAmountFull } from 'utils'
-import { TokenBalanceDetails, Command, Network } from 'types'
+import { ZERO, MEDIA } from 'const'
+import { formatSmart, formatAmountFull, getIsWrappable, getNativeTokenName } from 'utils'
+import { TokenBalanceDetails, Command } from 'types'
 
 // Components
 import TokenImg from 'components/TokenImg'
@@ -99,8 +99,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
-  const isWrappable =
-    networkId === Network.xDai ? address === WXDAI_ADDRESS_XDAI : addressMainnet === WETH_ADDRESS_MAINNET
+
+  const isWrappable = getIsWrappable(networkId, address)
+  const { nativeToken, wrappedToken } = getNativeTokenName(networkId)
 
   return (
     <>
@@ -157,14 +158,14 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
             <ul>
               <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
                 <span>
-                  {ethBalance ? formatSmart(ethBalance, decimals) : '-'} <span>ETH</span>
+                  {ethBalance ? formatSmart(ethBalance, decimals) : '-'} <span>{nativeToken}</span>
                 </span>{' '}
                 <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
               <li title={formatAmountFull({ amount: walletBalance, precision: decimals }) || undefined}>
                 {(claiming || depositing) && spinner}
                 <span>
-                  {formatSmart(walletBalance, decimals)} <span>WETH</span>
+                  {formatSmart(walletBalance, decimals)} <span>{wrappedToken}</span>
                 </span>{' '}
                 <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
               </li>
