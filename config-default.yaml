@@ -179,7 +179,7 @@ initialTokenList:
     decimals: 18
     addressByNetwork:
       '1': '0x0000000000085d4780B73119b644AE5ecd22b376'
-      '4': '0x0000000000085d4780B73119b644AE5ecd22b376'      
+      '4': '0x0000000000085d4780B73119b644AE5ecd22b376'
 
   - id: 4
     name: USD Coin
