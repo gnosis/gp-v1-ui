@@ -13,7 +13,7 @@ import { TokenFromExchange } from 'services/factories'
 import { tokenListApi } from 'api'
 
 // components
-import { TokenImgWrapper } from 'components/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'

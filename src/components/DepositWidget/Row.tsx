@@ -12,7 +12,7 @@ import { formatSmart, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 
 // Components
-import TokenImg from 'components/TokenImg'
+import TokenImg from 'components/common/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
 import { Spinner } from 'components/common/Spinner'
 

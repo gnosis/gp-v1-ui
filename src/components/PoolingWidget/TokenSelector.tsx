@@ -1,7 +1,7 @@
 import React from 'react'
 
 // assets
-import TokenImg from 'components/TokenImg'
+import TokenImg from 'components/common/TokenImg'
 import checkIcon from 'assets/img/li-check.svg'
 
 // types

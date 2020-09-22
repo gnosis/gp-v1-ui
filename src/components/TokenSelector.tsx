@@ -15,7 +15,7 @@ import { formatSmart } from 'utils'
 import { tokenListApi } from 'api'
 
 // components
-import { TokenImgWrapper } from 'components/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 import { MenuList } from 'components/TokenSelectorComponents'
 import { SearchItem, OptionItem } from 'components/TokenOptionItem'
 
