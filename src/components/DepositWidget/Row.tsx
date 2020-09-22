@@ -7,9 +7,9 @@ import { faClock, faPlus, faMinus, faBaby } from '@fortawesome/free-solid-svg-ic
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
 // const, utils, types
-import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
+import { ZERO, MEDIA, WETH_ADDRESS_MAINNET, WXDAI_ADDRESS_XDAI } from 'const'
 import { formatSmart, formatAmountFull } from 'utils'
-import { TokenBalanceDetails, Command } from 'types'
+import { TokenBalanceDetails, Command, Network } from 'types'
 
 // Components
 import TokenImg from 'components/TokenImg'
@@ -27,6 +27,7 @@ import { TokenSymbol } from 'components/TokenSymbol'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
+  networkId: number
   ethBalance: BN | null
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
@@ -47,6 +48,7 @@ const ImmatureClaimTooltip: React.FC<{ displayName: string }> = ({ displayName }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
+    networkId,
     ethBalance,
     tokenBalances,
     onSubmitDeposit,
@@ -97,7 +99,8 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
-  const isWeth = addressMainnet === WETH_ADDRESS_MAINNET
+  const isWrappable =
+    networkId === Network.xDai ? address === WXDAI_ADDRESS_XDAI : addressMainnet === WETH_ADDRESS_MAINNET
 
   return (
     <>
@@ -148,9 +151,9 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td
           data-label="Wallet"
-          title={(!isWeth && formatAmountFull({ amount: walletBalance, precision: decimals })) || ''}
+          title={(!isWrappable && formatAmountFull({ amount: walletBalance, precision: decimals })) || ''}
         >
-          {isWeth ? (
+          {isWrappable ? (
             <ul>
               <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
                 <span>
