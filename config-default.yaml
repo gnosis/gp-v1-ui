@@ -291,7 +291,15 @@ initialTokenList:
     addressByNetwork:
       '1': '0x0ae055097c6d159879521c384f1d2123d1f195e6'
       '100': '0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e'      
-      
+
+  - id: 21
+    name: Wrapped xDAI
+    symbol: wxDAI
+    decimals: 18
+    addressByNetwork:
+      '100': '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
+        
+
   - id: 0
     name: OWL
     symbol: OWL
