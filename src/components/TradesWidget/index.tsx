@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faFileCsv } from '@fortawesome/free-solid-svg-icons'
 import styled from 'styled-components'
 
-import { formatPrice, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
+import { formatPrice, formatAmount, invertPrice, formatAmountFull, getNetworkFromId } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
 import { CardTable } from 'components/layout/SwapLayout/Card'
@@ -22,7 +22,7 @@ import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
 import { filterTradesFn } from 'utils/filter'
-import { getNetworkFromId, divideBN } from 'utils'
+import { divideBN } from 'utils'
 import { symbolOrAddress } from 'utils/display'
 
 const OverflowContainer = styled(BalancesWidget)`
