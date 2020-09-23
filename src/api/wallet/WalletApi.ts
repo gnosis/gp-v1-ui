@@ -4,6 +4,7 @@ import assert from 'assert'
 import { getDefaultProvider } from '..'
 
 import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile } from 'web3modal'
+import { IClientMeta } from '@walletconnect/types'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
@@ -13,9 +14,10 @@ import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 import { composeProvider } from './composeProvider'
-import fetchGasPriceFactory from 'api/gasStation'
+import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
 import { earmarkTxData } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
+import { getWCWalletIconURL } from './walletUtils'
 
 interface ProviderState {
   accounts: string[]
@@ -50,9 +52,10 @@ export interface WalletApi {
   getWalletInfo(): Promise<WalletInfo>
   addOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): Command
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
-  getProviderInfo(): ProviderInfo
+  getProviderInfo(): ProviderInfo | null
   blockchainState: BlockchainUpdatePrompt
   userPrintAsync: Promise<string>
+  getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null>
 }
 
 export interface WalletInfo {
@@ -62,7 +65,11 @@ export interface WalletInfo {
   blockNumber?: number
 }
 
-export type ProviderInfo = IProviderInfo
+export interface ProviderInfo extends IProviderInfo {
+  peerMeta?: IClientMeta
+  walletName: string
+  walletIcon: string
+}
 
 type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 
@@ -139,7 +146,7 @@ const subscribeToBlockchainUpdate = async ({
     return subscribeToWeb3Event({
       web3,
       callback: cb,
-      getter: web3 => web3.eth.getBlock('latest'),
+      getter: (web3) => web3.eth.getBlock('latest'),
       event: 'newBlockHeaders',
     })
   }
@@ -170,8 +177,8 @@ const subscribeToBlockchainUpdate = async ({
   if (!subs || !providerState) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-    const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
-      const unsubBlock = blockUpdate(blockHeader => {
+    const subscriptionHOC: BlockchainUpdatePromptCallback = (callback) => {
+      const unsubBlock = blockUpdate((blockHeader) => {
         blockchainPrompt = { ...blockchainPrompt, blockHeader }
         logDebug('[WalletApiImpl] New block:', blockHeader.number)
         callback(blockchainPrompt)
@@ -185,8 +192,8 @@ const subscribeToBlockchainUpdate = async ({
 
   const { onChainChanged: networkUpdate, onAccountsChanged: accountsUpdate } = subs
 
-  const subscriptionHOC: BlockchainUpdatePromptCallback = callback => {
-    const unsubNetwork = networkUpdate(chainId => {
+  const subscriptionHOC: BlockchainUpdatePromptCallback = (callback) => {
+    const unsubNetwork = networkUpdate((chainId) => {
       logDebug('[WalletApiImpl] chainId changed:', chainId)
       blockchainPrompt = { ...blockchainPrompt, chainId: +chainId }
       callback(blockchainPrompt)
@@ -197,7 +204,7 @@ const subscribeToBlockchainUpdate = async ({
       callback(blockchainPrompt)
     })
 
-    const unsubBlock = blockUpdate(async blockHeader => {
+    const unsubBlock = blockUpdate(async (blockHeader) => {
       // oftentimes on network change newBlockHeaders fires first
       // reaffirm correct id
       const chainId = await web3.eth.net.getId()
@@ -245,10 +252,12 @@ export class WalletApiImpl implements WalletApi {
   private _listeners: ((walletInfo: WalletInfo) => void)[]
   private _provider: Provider | null
   private _web3: Web3
+  private _providerInfo: ProviderInfo | null = null
   public userPrintAsync: Promise<string> = Promise.resolve('')
   public blockchainState: BlockchainUpdatePrompt
 
   private _unsubscribe: Command
+  private _fetchGasPrice: ReturnType<typeof fetchGasPriceFactory> = async () => undefined
 
   public constructor(web3: Web3) {
     this._listeners = []
@@ -315,7 +324,7 @@ export class WalletApiImpl implements WalletApi {
       // hackaround
       // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
-      provider.handleReadRequests = async function(payload: unknown): Promise<unknown> {
+      provider.handleReadRequests = async function (payload: unknown): Promise<unknown> {
         // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
         // @ts-ignore
         if (!this.http) {
@@ -345,10 +354,14 @@ export class WalletApiImpl implements WalletApi {
     }
 
     this._provider = provider
+    this._setProviderInfo()
 
     closeOpenWebSocketConnection(this._web3)
 
     const fetchGasPrice = fetchGasPriceFactory(this)
+
+    this._fetchGasPrice = fetchGasPrice
+
     const earmarkingFunction = async (data?: string): Promise<string> => earmarkTxData(data, await this.userPrintAsync)
 
     const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTxData: earmarkingFunction })
@@ -399,7 +412,7 @@ export class WalletApiImpl implements WalletApi {
       // inherited from web3-provider-engine
       // fires it only in versions <=beta.61
       provider.on?.('stop', handleDisconnect)
-      provider.on?.('stop', v => {
+      provider.on?.('stop', (v) => {
         logDebug('[WalletApiImpl] WC stopped', v)
       })
 
@@ -455,6 +468,27 @@ export class WalletApiImpl implements WalletApi {
 
     logDebug('[WalletApiImpl] Disconnected')
     await this._notifyListeners()
+    this._setProviderInfo()
+  }
+
+  public async getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null> {
+    // this never errors
+    // returns undefined if unable to fetch
+    let gasPrice = await this._fetchGasPrice(gasPriceLevel)
+
+    if (gasPrice) return +gasPrice
+    try {
+      // fallback to gasPrice from provider
+      // {"jsonrpc":"2.0","method":"eth_gasPrice"} call
+      gasPrice = await this._web3.eth.getGasPrice()
+
+      if (gasPrice) return +gasPrice
+    } catch (error) {
+      console.error('Error fetching gas price', error)
+    }
+
+    // unable to fetch
+    return null
   }
 
   public async getAddress(): Promise<string> {
@@ -478,7 +512,7 @@ export class WalletApiImpl implements WalletApi {
   public addOnChangeWalletInfo(callback: OnChangeWalletInfo): Command {
     // cancell possible promise if any
     let promiseIsStale = false
-    const cancellableCallback: OnChangeWalletInfo = newWalletInfo => {
+    const cancellableCallback: OnChangeWalletInfo = (newWalletInfo) => {
       promiseIsStale = true
       callback(newWalletInfo)
     }
@@ -486,7 +520,7 @@ export class WalletApiImpl implements WalletApi {
     // since walletInfo can only be gotten asynchronously
     // trigger callback as soon as it becomes available
     // unless there's been a newer WalletInfo since promise initialization
-    this.getWalletInfo().then(newWalletInfo => {
+    this.getWalletInfo().then((newWalletInfo) => {
       if (promiseIsStale) return
       callback(newWalletInfo)
     })
@@ -495,11 +529,11 @@ export class WalletApiImpl implements WalletApi {
   }
 
   public removeOnChangeWalletInfo(callback: OnChangeWalletInfo): void {
-    this._listeners = this._listeners.filter(c => c !== callback)
+    this._listeners = this._listeners.filter((c) => c !== callback)
   }
 
-  public getProviderInfo(): ProviderInfo {
-    return getProviderInfo(this._provider)
+  public getProviderInfo(): ProviderInfo | null {
+    return this._providerInfo
   }
 
   public async getWalletInfo(): Promise<WalletInfo> {
@@ -514,6 +548,32 @@ export class WalletApiImpl implements WalletApi {
   }
 
   /* ****************      Private Functions      **************** */
+
+  private _setProviderInfo(): void {
+    // this can get expensive depending on the number and complexity of checks in getProviderInfo
+    // so retrigger only on connect/disconnect
+    const providerInfo = getProviderInfo(this._provider)
+
+    if (!providerInfo) {
+      this._providerInfo = null
+      return
+    }
+
+    this._providerInfo = {
+      ...providerInfo,
+      walletIcon: providerInfo.logo,
+      walletName: providerInfo.name,
+    }
+
+    // not all WC wallets fill in peerMeat (Pillar doesn't)
+    if (isWalletConnectProvider(this._provider) && this._provider.wc.peerMeta) {
+      this._providerInfo.peerMeta = this._provider.wc.peerMeta
+      this._providerInfo.walletName = this._provider.wc.peerMeta.name
+
+      const WCWalletIcon = this._provider.wc.peerMeta.icons?.[0] || getWCWalletIconURL(this._providerInfo.walletName)
+      if (WCWalletIcon) this._providerInfo.walletIcon = WCWalletIcon
+    }
+  }
 
   private async _notifyListeners(blockchainUpdate?: BlockchainUpdatePrompt): Promise<void> {
     let chainIdChanged = false
@@ -542,27 +602,30 @@ export class WalletApiImpl implements WalletApi {
       logDebug('[WalletApiImpl] chainId changed:', blockchainUpdate.chainId)
     }
 
-    this._listeners.forEach(listener => listener(wInfoExtended))
+    this._listeners.forEach((listener) => listener(wInfoExtended))
   }
 
   private get _connected(): Promise<boolean> {
-    return this.getWalletInfo().then(walletInfo => walletInfo?.isConnected || false)
+    return this.getWalletInfo().then((walletInfo) => walletInfo?.isConnected || false)
   }
   private get _user(): Promise<string> {
-    return this.getWalletInfo().then(walletInfo => walletInfo.userAddress || '')
+    return this.getWalletInfo().then((walletInfo) => walletInfo.userAddress || '')
   }
   private get _balance(): Promise<string> {
     if (!this._web3) return Promise.resolve('0')
-    return Promise.resolve(this._user).then(user => this._web3.eth.getBalance(user))
+    return Promise.resolve(this._user).then((user) => this._web3.eth.getBalance(user))
   }
   private get _networkId(): Promise<Network> {
-    return this.getWalletInfo().then(walletInfo => walletInfo.networkId || 0)
+    return this.getWalletInfo().then((walletInfo) => walletInfo.networkId || 0)
   }
 
   // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
   private async _generateAsyncUserPrint(): Promise<string> {
-    const { name: providerName } = this.getProviderInfo()
+    const providerInfo = this.getProviderInfo()
+    if (!providerInfo) return ''
+
+    const { name: providerName } = providerInfo
 
     const mobile = isMobile() ? 'mobile' : 'desktop'
 

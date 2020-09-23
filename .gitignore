@@ -7,7 +7,8 @@ dist
 *.log
 coverage
 .env
-package-lock.json
 # yalc
 .yalc
 yalc.lock
+# storybook
+storybook-static

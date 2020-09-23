@@ -1,6 +1,6 @@
-import { ValidationError, ObjectSchema } from '@hapi/joi'
-import { ValidationResolver } from 'react-hook-form'
+import { ValidationError, ObjectSchema } from 'joi'
 import { validInputPattern } from 'utils'
+import { ResolverResult } from 'react-hook-form'
 
 export function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (
@@ -24,9 +24,9 @@ export function validatePositive(value: string, constraint = 0): true | string {
  * @param type [OPTIONAL] 'number' | undefined - sets casting use or straight FormData use
  */
 
-export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => (
+export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown>) => async (
   data: FormData,
-): ReturnType<ValidationResolver<FormData, {}>> => {
+): Promise<ResolverResult<FormData>> => {
   const castedData: Partial<FormData> = Object.keys(data).reduce((acc, key) => {
     acc[key] = data[key] || undefined
     return acc
@@ -53,7 +53,8 @@ export const resolverFactory = <FormData>(validationSchema: ObjectSchema<unknown
   }
 }
 
-export const NUMBER_VALIDATION_KEYS = {
+export const VALIDATOR_ERROR_KEYS = {
+  REF: 'any.ref',
   BASE: 'number.base',
   UNSAFE: 'number.unsafe',
   REQUIRED: 'any.required',
@@ -63,4 +64,6 @@ export const NUMBER_VALIDATION_KEYS = {
   MAX: 'number.max',
   MULTIPLE: 'number.multiple',
   INTEGER: 'number.integer',
+  DATE_MIN: 'date.min',
+  DATE_MAX: 'date.max',
 }

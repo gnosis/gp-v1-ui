@@ -4,7 +4,7 @@ import { components, MenuListComponentProps } from 'react-select'
 // Inspired by https://github.com/JedWatson/react-select/issues/3111#issuecomment-470911304
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const MenuList: ComponentType<MenuListComponentProps<any>> = props => {
+export const MenuList: ComponentType<MenuListComponentProps<any>> = (props) => {
   const {
     selectProps: { onKeyDown, onInputChange, onMenuInputFocus, inputValue, value },
     setValue,

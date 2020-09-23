@@ -42,11 +42,11 @@ function useDataFilter<T>({
 
   const handlers = useMemo(() => {
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>): void => setSearch(e.target.value)
-    const handleToggleFilter = (): void => setShowFilter(state => !state)
+    const handleToggleFilter = (): void => setShowFilter((state) => !state)
     const clearFilters = (): void => {
       setSearch('')
       setDebouncedSearch('')
-      setShowFilter(false)
+      setShowFilter(isSearchFilter)
     }
 
     return {
@@ -54,7 +54,7 @@ function useDataFilter<T>({
       handleToggleFilter,
       clearFilters,
     }
-  }, [setDebouncedSearch])
+  }, [setDebouncedSearch, isSearchFilter])
 
   const filteredData = useMemo(() => {
     const failsBasicSearchReq = !showFilter || (isSearchFilter && !debouncedSearch) || !data || data.length === 0

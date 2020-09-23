@@ -22,6 +22,7 @@ import {
   setHighlightAndDepositing,
   setHighlightAndWithdrawing,
   setEnabledAction,
+  setImmatureClaim,
 } from 'reducers-actions'
 
 const ON_ERROR_MESSAGE = 'No logged in user found. Please check wallet connectivity status and try again.'
@@ -34,7 +35,7 @@ interface Result extends TokenLocalState {
   enableToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   depositToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
   requestWithdrawToken: (amount: BN, tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
-  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void>
+  claimToken: (tokenAddress: string, onTxHash?: (hash: string) => void) => Promise<void | React.ReactText>
 }
 
 export const useRowActions = (params: Params): Result => {
@@ -149,13 +150,44 @@ export const useRowActions = (params: Params): Result => {
       }
     }
 
-    async function claimToken(tokenAddress: string, onTxHash?: (hash: string) => void): Promise<void> {
+    async function claimToken(
+      tokenAddress: string,
+      onTxHash?: (hash: string) => void,
+    ): Promise<void | React.ReactText> {
       try {
         assert(userAddress, ON_ERROR_MESSAGE)
         assert(networkId, ON_ERROR_MESSAGE)
-
         const token = getToken('address', tokenAddress, balances)
         assert(token, 'No token')
+
+        // highlight row after asserting tokenaddress exists
+        dispatch(setHighlightAndClaimingAction(tokenAddress))
+
+        const [lastCreditedBatchId, currentBatchId] = await Promise.all([
+          depositApi.getLastCreditBatchId({ userAddress, tokenAddress, networkId }),
+          depositApi.getCurrentBatchId(networkId),
+        ])
+
+        // Check if user is in immature claim state
+        // if so, show warning and set to global
+        // else if theyre not, but state exists, remove them
+        if (lastCreditedBatchId === currentBatchId) {
+          const isClaimImmature = state.immatureClaim.has(tokenAddress)
+          const immatureClaimWarning = `You cannot withdraw in this batch because you received ${token.symbol} in the previous batch and the protocol requires one additional batch for settling the received tokens.
+          Wait for the next batch (max 5 min) and try again.`
+
+          // user does NOT already have immature claim status on this token
+          if (!isClaimImmature) {
+            dispatch(setImmatureClaim(tokenAddress))
+          }
+
+          return toast.warn(immatureClaimWarning, { autoClose: false })
+          // user no longer is in block state
+          // but has global state blocked status
+          // REMOVE them
+        } else if (state.immatureClaim.has(tokenAddress)) {
+          dispatch(setImmatureClaim(tokenAddress))
+        }
 
         const { pendingWithdraw, symbol, decimals } = safeFilledToken<TokenBalanceDetails>(token)
 
@@ -165,8 +197,6 @@ export const useRowActions = (params: Params): Result => {
             precision: decimals,
           })} of ${symbol}`,
         )
-
-        dispatch(setHighlightAndClaimingAction(tokenAddress))
 
         const receipt = await depositApi.withdraw({
           userAddress,
@@ -191,7 +221,7 @@ export const useRowActions = (params: Params): Result => {
       requestWithdrawToken,
       claimToken,
     }
-  }, [balances, dispatch, networkId, userAddress])
+  }, [balances, dispatch, networkId, userAddress, state.immatureClaim])
 
   return useMemo(
     () => ({

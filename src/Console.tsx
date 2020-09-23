@@ -67,7 +67,7 @@ const ConsoleFrame: React.FC = () => {
   const input = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    const hookedConsole = Hook(window.console, (log: Message) => setLogs(logs => logs.concat(Decode(log))))
+    const hookedConsole = Hook(window.console, (log: Message) => setLogs((logs) => logs.concat(Decode(log))))
 
     return (): void => {
       Unhook(hookedConsole)
@@ -129,7 +129,7 @@ const ConsoleFrame: React.FC = () => {
             clear
           </button>
         )}
-        <button type="button" onClick={(): void => setShowConsole(on => !on)}>
+        <button type="button" onClick={(): void => setShowConsole((on) => !on)}>
           {showConsole ? 'x' : 'console'}
         </button>
       </ButtonGroup>

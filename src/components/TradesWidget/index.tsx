@@ -7,11 +7,12 @@ import styled from 'styled-components'
 import { formatPrice, formatAmount, invertPrice, formatAmountFull } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
-import { CardTable, CardWidgetWrapper } from 'components/Layout/Card'
+import { CardTable } from 'components/layout/SwapLayout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
-import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
+import { StandaloneCardWrapper } from 'components/layout'
 import { TradeRow } from 'components/TradesWidget/TradeRow'
+import { BalancesWidget } from 'components/DepositWidget'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
 import { useTrades } from 'hooks/useTrades'
@@ -21,9 +22,31 @@ import { Trade } from 'api/exchange/ExchangeApi'
 
 import { toCsv, CsvColumns } from 'utils/csv'
 import { filterTradesFn } from 'utils/filter'
-
-import { getNetworkFromId, isTradeSettled, isTradeReverted, divideBN } from 'utils'
+import { getNetworkFromId, divideBN } from 'utils'
 import { symbolOrAddress } from 'utils/display'
+
+const OverflowContainer = styled(BalancesWidget)`
+  > ${CardTable} {
+    > thead > tr:not(.cardRowDrawer) {
+      padding: 0.8rem 2rem 0.8rem 1.6rem;
+    }
+
+    > thead,
+    > tbody {
+      font-size: 1.3rem;
+
+      > tr:not(.cardRowDrawer) {
+        min-height: 4rem;
+        text-align: left;
+        > td,
+        > th {
+          justify-content: flex-start;
+          text-align: left;
+        }
+      }
+    }
+  }
+`
 
 const CsvButtonContainer = styled.div`
   display: flex;
@@ -120,27 +143,23 @@ function csvTransformer(trade: Trade): CsvColumns {
 const CSV_FILE_OPTIONS = { type: 'text/csv;charset=utf-8;' }
 
 interface InnerTradesWidgetProps {
+  onCellClick: (e: React.ChangeEvent<HTMLInputElement>) => void
   trades: Trade[]
   isTab?: boolean
 }
 
-export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
-  const { isTab, trades } = props
+export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
+  const { isTab, trades, onCellClick } = props
 
   const { networkId, userAddress } = useWalletConnection()
-
-  const filteredTrades = useMemo(
-    () => trades.filter(trade => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
-    [trades],
-  )
 
   const generateCsv = useCallback(
     () =>
       toCsv({
-        data: filteredTrades,
+        data: trades,
         transformer: csvTransformer,
       }),
-    [filteredTrades],
+    [trades],
   )
 
   const filename = useMemo(
@@ -152,7 +171,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
+      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem 5.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
     >
       <thead>
         <tr>
@@ -171,6 +190,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
             </SplitHeaderTitle>
           </th>
           <th>Type</th>
+          <th>Order ID</th>
           <th>
             <CsvButtonContainer>
               <span>Tx</span>
@@ -185,8 +205,8 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = props => {
         </tr>
       </thead>
       <tbody>
-        {filteredTrades.map(trade => (
-          <TradeRow key={trade.id} trade={trade} networkId={networkId} />
+        {trades.map((trade) => (
+          <TradeRow key={trade.id} trade={trade} networkId={networkId} onCellClick={onCellClick} />
         ))}
       </tbody>
     </CardTable>
@@ -210,7 +230,7 @@ export const TradesWidget: React.FC = () => {
     <ConnectWalletBanner />
   ) : (
     <StandaloneCardWrapper>
-      <CardWidgetWrapper>
+      <OverflowContainer>
         <FilterTools
           className="widgetFilterTools"
           resultName="trades"
@@ -219,8 +239,8 @@ export const TradesWidget: React.FC = () => {
           showFilter={!!search}
           dataLength={filteredData.length}
         />
-        <InnerTradesWidget trades={filteredData} />
-      </CardWidgetWrapper>
+        <InnerTradesWidget trades={filteredData} onCellClick={handleSearch} />
+      </OverflowContainer>
     </StandaloneCardWrapper>
   )
 }

@@ -23,9 +23,10 @@ export const CreateStrategyWrapper = styled.div`
   > strong {
     margin: 0 0 1rem 0;
     color: var(--color-text-primary);
+    text-decoration: underline dashed;
   }
   > p {
-    margin: 0 0 2.4rem;
+    margin: 0 0 1.8rem;
     font-size: inherit;
     line-height: inherit;
   }

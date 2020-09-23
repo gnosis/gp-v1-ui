@@ -1,9 +1,13 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
-import { CardWidgetWrapper } from 'components/Layout/Card'
-import { StandaloneCardWrapper } from 'components/Layout/PageWrapper'
+import { CardWidgetWrapper } from 'components/layout/SwapLayout/Card'
+import { StandaloneCardWrapper } from 'components/layout'
 
+// OrdersWidget outside wrapper
 export const OrdersWrapper = styled(StandaloneCardWrapper)`
+  height: 100%;
+  width: 100%;
+
   > h5 {
     width: 100%;
     margin: 0 auto;
@@ -16,6 +20,7 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
   }
 
   > div {
+    height: 100%;
     width: 100%;
     position: relative;
     display: flex;
@@ -37,15 +42,14 @@ export const OrdersWrapper = styled(StandaloneCardWrapper)`
     > table {
       > tbody {
         > tr.orderRowWrapper {
-          padding-right: 4.3rem;
-
           @media ${MEDIA.mobile} {
             display: flex;
+            padding-right: 4.3rem;
 
             > td.checked {
               position: absolute;
               right: 0;
-              height: calc(100% - 3.2rem);
+              height: calc(100% - 2.8rem);
               width: 3.3rem;
               padding: 0;
 
@@ -90,7 +94,7 @@ export const OrdersForm = styled.div`
   > form {
     display: flex;
     flex-flow: column nowrap;
-    height: 71rem;
+    height: 100%;
 
     @media ${MEDIA.tablet} {
       height: inherit;
@@ -220,7 +224,6 @@ export const OrdersForm = styled.div`
 
   .ordersContainer {
     display: grid;
-    padding: 0 0 5rem;
     box-sizing: border-box;
     overflow-y: auto;
 

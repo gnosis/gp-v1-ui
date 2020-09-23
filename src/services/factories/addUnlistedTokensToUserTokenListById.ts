@@ -28,7 +28,7 @@ function addUnlistedTokensToUserTokenListByIdFactory(
     if (networkId) {
       const tokensFromExchange = await Promise.all(
         // calls are already cached, so we don't get duplicate calls later in components
-        tokenIds.map(tokenId => getTokenFromExchangeById({ tokenId, networkId })),
+        tokenIds.map((tokenId) => getTokenFromExchangeById({ tokenId, networkId })),
       )
 
       // only unlisted tokens get added inside

@@ -9,9 +9,9 @@ import { tokenListApi } from 'api'
 import { TokenFromExchange } from 'services/factories'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 import { useWalletConnection } from './useWalletConnection'
-import Spinner from 'components/Spinner'
+import Spinner from 'components/common/Spinner'
 
 interface ExtraProps {
   focused: boolean
@@ -208,7 +208,7 @@ const generateMessage = ({ networkId, fetchResults }: GenerateMessageParams2): R
     )
   return (
     <>
-      {fetchResults.map(result => (
+      {fetchResults.map((result) => (
         <ExplainTokenReason key={result.tokenAddress} {...result} networkId={networkId} />
       ))}
     </>
@@ -336,7 +336,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
 
         setTokens(params.tokens)
         setFetchResults(
-          params.tokens.map(token => ({
+          params.tokens.map((token) => ({
             token,
             reason: defaultReason,
             tokenAddress: token.address,
@@ -365,7 +365,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
         // but not in USER_LIST
         // meaning they must have id
         const tokens = results
-          .map(result => result.token)
+          .map((result) => result.token)
           .filter((token): token is TokenDetails => !!token && 'id' in token)
 
         batchUpdates(() => {
@@ -374,7 +374,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
         })
       }
 
-      return deferred.promise.then(value => {
+      return deferred.promise.then((value) => {
         // close modal
         if (isShownRef.current) toggleRef.current()
 

@@ -28,7 +28,7 @@ interface SpreadInformationProps {
 }
 
 const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap, spread }) => {
-  const tokenSymbolsString = React.useMemo(() => Array.from(selectedTokensMap.values()).map(token => token.symbol), [
+  const tokenSymbolsString = React.useMemo(() => Array.from(selectedTokensMap.values()).map((token) => token.symbol), [
     selectedTokensMap,
   ])
 
@@ -36,13 +36,15 @@ const SpreadInformation: React.FC<SpreadInformationProps> = ({ selectedTokensMap
     <SpreadInformationWrapper>
       <strong>Sell Spread</strong>
       <p>
-        {tokenSymbolsString.join(', ')} for <b>at least</b> <br />
-        <i>${formatPartialNumber((1 + spread / 100).toFixed(INPUT_PRECISION_SIZE + 2))}</i>
+        {tokenSymbolsString.join(', ')} for:
+        <br />
+        <b>at least</b> <i>${formatPartialNumber((1 + spread / 100).toFixed(INPUT_PRECISION_SIZE + 2))}</i>
       </p>
       <strong>Buy Spread</strong>
       <p>
-        {tokenSymbolsString.join(', ')} for <b>at most</b> <br />
-        <i>${formatPartialNumber((1 - spread / 100).toFixed(INPUT_PRECISION_SIZE + 2))}</i>
+        {tokenSymbolsString.join(', ')} for:
+        <br />
+        <b>at most</b> <i>${formatPartialNumber((1 - spread / 100).toFixed(INPUT_PRECISION_SIZE + 2))}</i>
       </p>
     </SpreadInformationWrapper>
   )

@@ -14,9 +14,12 @@ const constructLocationObject = (to: Exclude<LocationTo, Function>, location: Lo
       state: { from: location },
     }
 
+  const state: { from?: Location } = typeof to.state === 'object' ? { ...to.state } : {}
+  state.from = location
+
   return {
     ...to,
-    state: { ...to.state, from: location },
+    state,
   }
 }
 
@@ -36,7 +39,7 @@ export const usePastLocation = (to: LocationTo): LocationTo => {
   }, [to, location])
 }
 
-const LinkWithPastLocation: React.FC<LinkProps> = props => {
+const LinkWithPastLocation: React.FC<LinkProps> = (props) => {
   const to = usePastLocation(props.to)
 
   return <NavLink {...props} to={to} />

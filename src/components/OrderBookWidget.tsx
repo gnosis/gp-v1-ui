@@ -1,82 +1,19 @@
-import React, { useEffect, useRef } from 'react'
-import BigNumber from 'bignumber.js'
-import styled from 'styled-components'
-
-import * as am4core from '@amcharts/amcharts4/core'
-import * as am4charts from '@amcharts/amcharts4/charts'
-import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
+import React, { useEffect, useMemo } from 'react'
 
 import { dexPriceEstimatorApi } from 'api'
+import { OrderBookData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
-import { getNetworkFromId, safeTokenName, formatSmart, logDebug } from 'utils'
+import useSafeState from 'hooks/useSafeState'
 
-import { TEN_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
-
-import { TokenDetails, Network } from 'types'
+import OrderBookChart, { OrderBookChartProps, OrderBookError, PricePointDetails, Offer } from './OrderBookChart'
+import { TokenDetails } from 'types'
+import { formatSmart, logDebug } from 'utils'
+import BigNumber from 'bignumber.js'
+import { TEN_BIG_NUMBER, DEFAULT_PRECISION, ZERO_BIG_NUMBER, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME } from 'const'
 import BN from 'bn.js'
-import { DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
+import { useDebounce } from 'hooks/useDebounce'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
-
-interface OrderBookProps {
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
-  networkId: number
-  hops?: number
-}
-
-const Wrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  /* min-height: 40rem; */
-  /* height: calc(100vh - 30rem); */
-  min-height: calc(100vh - 30rem);
-  text-align: center;
-  width: 100%;
-  height: 100%;
-  min-width: 100%;
-
-  .amcharts-Sprite-group {
-    font-size: 1rem;
-  }
-
-  .amcharts-Container .amcharts-Label {
-    text-transform: uppercase;
-    font-size: 1.2rem;
-  }
-
-  .amcharts-ZoomOutButton-group > .amcharts-RoundedRectangle-group {
-    fill: var(--color-text-active);
-    opacity: 0.6;
-    transition: 0.3s ease-in-out;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .amcharts-AxisLabel,
-  .amcharts-CategoryAxis .amcharts-Label-group > .amcharts-Label,
-  .amcharts-ValueAxis-group .amcharts-Label-group > .amcharts-Label {
-    fill: var(--color-text-primary);
-  }
-`
-
-enum Offer {
-  Bid,
-  Ask,
-}
-
-/**
- * Price point as defined in the API
- * Both price and volume are numbers (floats)
- *
- * The price and volume are expressed in atoms
- */
-interface RawPricePoint {
-  price: number
-  volume: number
-}
 
 /**
  * Normalized price point
@@ -87,26 +24,6 @@ interface RawPricePoint {
 interface PricePoint {
   price: BigNumber
   volume: BigNumber
-}
-
-/**
- * Price point data represented in the graph. Contains BigNumbers for operate with less errors and more precission
- * but for representation uses number as expected by the library
- */
-interface PricePointDetails {
-  // Basic data
-  type: Offer
-  volume: BigNumber // volume for the price point
-  totalVolume: BigNumber // cumulative volume
-  price: BigNumber
-
-  // Data for representation
-  priceNumber: number
-  priceFormatted: string
-  totalVolumeNumber: number
-  totalVolumeFormatted: string
-  askValueY: number | null
-  bidValueY: number | null
 }
 
 function _toPricePoint(pricePoint: RawPricePoint, quoteTokenDecimals: number, baseTokenDecimals: number): PricePoint {
@@ -138,23 +55,21 @@ function _formatSmartBigNumber(amount: BigNumber): string {
  */
 const processData = (
   rawPricePoints: RawPricePoint[],
-  baseToken: TokenDetails,
-  quoteToken: TokenDetails,
+  baseTokenDecimals: number,
+  quoteTokenDecimals: number,
   type: Offer,
 ): PricePointDetails[] => {
   const isBid = type == Offer.Bid
-  const quoteTokenDecimals = quoteToken.decimals
-  const baseTokenDecimals = baseToken.decimals
 
   // Convert RawPricePoint into PricePoint:
   //  Raw items use number (floats) and are given in "atoms"
   //  Normalized items use decimals (BigNumber) and are given in natural units
-  let pricePoints: PricePoint[] = rawPricePoints.map(pricePoint =>
+  let pricePoints: PricePoint[] = rawPricePoints.map((pricePoint) =>
     _toPricePoint(pricePoint, quoteTokenDecimals, baseTokenDecimals),
   )
 
   // Filter tiny orders
-  pricePoints = pricePoints.filter(pricePoint => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+  pricePoints = pricePoints.filter((pricePoint) => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
 
   // Convert the price points that can be represented in the graph (PricePointDetails)
   const { points } = pricePoints.reduce(
@@ -212,115 +127,98 @@ const processData = (
   return points
 }
 
-function _printOrderBook(pricePoints: PricePointDetails[], baseToken: TokenDetails, quoteToken: TokenDetails): void {
-  logDebug('Order Book: ' + baseToken.symbol + '-' + quoteToken.symbol)
-  pricePoints.forEach(pricePoint => {
+function _printOrderBook(pricePoints: PricePointDetails[], baseTokenSymbol = '', quoteTokenSymbol = ''): void {
+  logDebug('Order Book: ' + baseTokenSymbol + '-' + quoteTokenSymbol)
+  pricePoints.forEach((pricePoint) => {
     const isBid = pricePoint.type === Offer.Bid
     logDebug(
-      `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseToken.symbol} at ${
+      `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseTokenSymbol} at ${
         pricePoint.priceFormatted
-      } ${quoteToken.symbol}`,
+      } ${quoteTokenSymbol}`,
     )
   })
 }
 
-const draw = (
-  chartElement: HTMLElement,
-  baseToken: TokenDetails,
-  quoteToken: TokenDetails,
-  networkId: number,
-  hops?: number,
-): am4charts.XYChart => {
-  const baseTokenLabel = safeTokenName(baseToken)
-  const quoteTokenLabel = safeTokenName(quoteToken)
-  const market = baseTokenLabel + '-' + quoteTokenLabel
-  am4core.useTheme(am4themesSpiritedaway)
-  am4core.options.autoSetClassName = true
-  const chart = am4core.create(chartElement, am4charts.XYChart)
-  const networkDescription = networkId !== Network.Mainnet ? `${getNetworkFromId(networkId)} ` : ''
-
-  // Add data
-  chart.dataSource.url = dexPriceEstimatorApi.getOrderBookUrl({
-    baseTokenId: baseToken.id,
-    quoteTokenId: quoteToken.id,
-    hops,
-    networkId,
-  })
-  chart.dataSource.adapter.add('parsedData', data => {
-    try {
-      const bids = processData(data.bids, baseToken, quoteToken, Offer.Bid)
-      const asks = processData(data.asks, baseToken, quoteToken, Offer.Ask)
-      const pricePoints = bids.concat(asks)
-
-      // Sort points by price
-      pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
-
-      _printOrderBook(pricePoints, baseToken, quoteToken)
-
-      return pricePoints
-    } catch (error) {
-      console.error('Error processing data', error)
-      return []
-    }
-  })
-
-  // Colors
-  const colors = {
-    green: '#3d7542',
-    red: '#dc1235',
-  }
-
-  // Create axes
-  const xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
-  xAxis.dataFields.category = 'priceNumber'
-  xAxis.title.text = `${networkDescription} Price (${quoteTokenLabel})`
-
-  const yAxis = chart.yAxes.push(new am4charts.ValueAxis())
-  yAxis.title.text = baseTokenLabel
-
-  // Create series
-  const bidSeries = chart.series.push(new am4charts.StepLineSeries())
-  bidSeries.dataFields.categoryX = 'priceNumber'
-  bidSeries.dataFields.valueY = 'bidValueY'
-  bidSeries.strokeWidth = 1
-  bidSeries.stroke = am4core.color(colors.green)
-  bidSeries.fill = bidSeries.stroke
-  bidSeries.startLocation = 0.5
-  bidSeries.fillOpacity = 0.1
-  bidSeries.tooltipText = `[bold]${market}[/]\nBid Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-
-  const askSeries = chart.series.push(new am4charts.StepLineSeries())
-  askSeries.dataFields.categoryX = 'priceNumber'
-  askSeries.dataFields.valueY = 'askValueY'
-  askSeries.strokeWidth = 1
-  askSeries.stroke = am4core.color(colors.red)
-  askSeries.fill = askSeries.stroke
-  askSeries.fillOpacity = 0.1
-  askSeries.startLocation = 0.5
-  askSeries.tooltipText = `[bold]${market}[/]\nAsk Price: [bold]{priceFormatted}[/] ${quoteTokenLabel}\nVolume: [bold]{totalVolumeFormatted}[/] ${baseTokenLabel}`
-
-  // Add cursor
-  chart.cursor = new am4charts.XYCursor()
-  return chart
+interface ProcessRawDataParams {
+  data: OrderBookData
+  baseToken: Pick<TokenDetails, 'decimals' | 'symbol'>
+  quoteToken: Pick<TokenDetails, 'decimals' | 'symbol'>
 }
 
-const OrderBookWidget: React.FC<OrderBookProps> = props => {
-  const { baseToken, quoteToken, networkId, hops } = props
-  const mountPoint = useRef<HTMLDivElement>(null)
+export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDataParams): PricePointDetails[] => {
+  try {
+    const bids = processData(data.bids, baseToken.decimals, quoteToken.decimals, Offer.Bid)
+    const asks = processData(data.asks, baseToken.decimals, quoteToken.decimals, Offer.Ask)
+    const pricePoints = bids.concat(asks)
+
+    // Sort points by price
+    pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
+
+    _printOrderBook(pricePoints, baseToken.symbol, quoteToken.symbol)
+
+    return pricePoints
+  } catch (error) {
+    console.error('Error processing data', error)
+    return []
+  }
+}
+
+export interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
+  hops?: number
+  batchId?: number
+}
+
+const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
+  const { baseToken, quoteToken, networkId, hops, batchId } = props
+  const [apiData, setApiData] = useSafeState<PricePointDetails[] | null>(null)
+  const [error, setError] = useSafeState<Error | null>(null)
+
+  const { value: debouncedBatchId } = useDebounce(batchId, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME)
+
+  // sync resetting ApiData to avoid old data on new labels flash
+  // and layout changes
+  useMemo(() => {
+    setApiData(null)
+    setError(null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId])
 
   useEffect(() => {
-    if (!mountPoint.current) return
-    const chart = draw(mountPoint.current, baseToken, quoteToken, networkId, hops)
+    // handle stale fetches resolving out of order
+    let cancelled = false
 
-    return (): void => chart.dispose()
-  }, [baseToken, quoteToken, networkId, hops])
+    const fetchApiData = async (): Promise<void> => {
+      try {
+        const rawData = await dexPriceEstimatorApi.getOrderBookData({
+          baseTokenId: baseToken.id,
+          quoteTokenId: quoteToken.id,
+          hops,
+          networkId,
+          batchId: debouncedBatchId,
+        })
 
-  return (
-    <Wrapper ref={mountPoint}>
-      Show order book for token {safeTokenName(baseToken)} ({baseToken.id}) and {safeTokenName(baseToken)} (
-      {quoteToken.id})
-    </Wrapper>
-  )
+        if (cancelled) return
+
+        const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
+
+        setApiData(processedData)
+      } catch (error) {
+        if (cancelled) return
+        console.error('Error populating orderbook with data', error)
+        setError(error)
+      }
+    }
+
+    fetchApiData()
+
+    return (): void => {
+      cancelled = true
+    }
+  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
+
+  if (error) return <OrderBookError error={error} />
+
+  return <OrderBookChart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} data={apiData} />
 }
 
 export default OrderBookWidget

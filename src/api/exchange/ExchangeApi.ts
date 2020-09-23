@@ -246,7 +246,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const contract = await this._getContract(networkId)
 
     const orderPlacementEvents = await this.safeGetEvents(
-      options => contract.getPastEvents('OrderPlacement', options),
+      (options) => contract.getPastEvents('OrderPlacement', options),
       {
         // Indexed values: https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L97
         filter: { owner: userAddress, sellToken, buyToken },
@@ -258,7 +258,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     )
 
     // This list might be big, but there's no way around it at the moment
-    const orderPlacementEvent = orderPlacementEvents.find(event => event.returnValues.index === orderId)
+    const orderPlacementEvent = orderPlacementEvents.find((event) => event.returnValues.index === orderId)
 
     // Should exist and be unique
     assert(
@@ -358,6 +358,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[ExchangeApi] addToken:', tokenAddress)
     const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -383,7 +384,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const contract = await this._getContract(networkId)
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    logDebug('[ExchangeApi] placeOrder:', {
+      buyTokenId,
+      sellTokenId,
+      validUntil,
+      buyAmount: buyAmount.toString(),
+      sellAmount: sellAmount.toString(),
+    })
     const tx = contract.methods
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
       .send({ from: userAddress })
@@ -415,7 +422,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }: PlaceValidFromOrdersParams): Promise<Receipt> {
     const length = buyTokens.length
     assert(
-      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every(el => el.length === length),
+      [sellTokens, validFroms, validUntils, buyAmounts, sellAmounts].every((el) => el.length === length),
       'Parameters length do not match',
     )
     assert(length > 0, 'At least one order required')
@@ -425,6 +432,14 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const buyAmountsStr = buyAmounts.map(String)
     const sellAmountsStr = sellAmounts.map(String)
 
+    logDebug('[ExchangeApi] placeValidFromOrders:', {
+      buyTokens,
+      sellTokens,
+      validFroms,
+      validUntils,
+      buyAmountsStr,
+      sellAmountsStr,
+    })
     const tx = contract.methods
       .placeValidFromOrders(buyTokens, sellTokens, validFroms, validUntils, buyAmountsStr, sellAmountsStr)
       .send({ from: userAddress })
@@ -453,6 +468,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams,
   }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[ExchangeApi] cancelOrders:', orderIds)
     const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -488,7 +504,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // Defaults to 'latest'
     const toBlock = _toBlock ?? 'latest'
 
-    const events = await this.safeGetEvents(options => contract.getPastEvents(eventType, options), {
+    const events = await this.safeGetEvents((options) => contract.getPastEvents(eventType, options), {
       filter: { owner: userAddress },
       fromBlock,
       toBlock,
@@ -502,7 +518,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
       }`,
     )
 
-    return events.filter(event => !event['removed']).map(this.parseTradeEvent)
+    return events.filter((event) => !event['removed']).map(this.parseTradeEvent)
   }
 
   private async safeGetEvents<T>(

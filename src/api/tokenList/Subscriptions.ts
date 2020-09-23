@@ -18,11 +18,11 @@ export default class GenericSubscriptions<State> implements SubscriptionsInterfa
   }
 
   public unsubscribe(callback: SubscriptionCallback<State>): void {
-    this._subscriptions = this._subscriptions.filter(sub => sub !== callback)
+    this._subscriptions = this._subscriptions.filter((sub) => sub !== callback)
   }
 
   protected triggerSubscriptions(newState: State): void {
-    this._subscriptions.forEach(sub => sub(newState))
+    this._subscriptions.forEach((sub) => sub(newState))
   }
 
   public unsubscribeAll(): void {

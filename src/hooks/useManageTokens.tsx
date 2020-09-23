@@ -62,7 +62,7 @@ interface TokenListProps {
 const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTokens }) => {
   return (
     <>
-      {tokens.map(token => {
+      {tokens.map((token) => {
         const { name, symbol, image, address, disabled, override } = token
 
         const checked = !disabledTokens.has(address)
@@ -128,7 +128,7 @@ const SearchWrapper = styled.div`
 
 type SearchInputProps = React.InputHTMLAttributes<HTMLInputElement>
 
-const SearchInput: React.FC<SearchInputProps> = props => {
+const SearchInput: React.FC<SearchInputProps> = (props) => {
   return (
     <SearchWrapper>
       <input
@@ -201,7 +201,7 @@ const ManageTokensContainer: React.FC = () => {
   disabledTokensRef.current = tokensDisabledState
 
   const toggleTokenState = useCallback((address: string, enabled: boolean): void => {
-    setDisabledTokens(oldSet => {
+    setDisabledTokens((oldSet) => {
       const newDisabledSet = new Set(oldSet)
 
       if (enabled) newDisabledSet.delete(address)

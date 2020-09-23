@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 // component
 import { TooltipWrapper } from 'components/Tooltip'
-import { Spinner } from 'components/Spinner'
+import { Spinner } from 'components/common/Spinner'
 
 // PoolingWidget
 import { SubComponentProps } from 'components/PoolingWidget/SubComponents'

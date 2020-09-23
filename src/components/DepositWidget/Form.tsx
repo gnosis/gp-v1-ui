@@ -8,8 +8,8 @@ import { TokenBalanceDetails } from 'types'
 import { formatAmountFull, parseAmount, abbreviateString } from 'utils'
 
 // Components
-import { CardDrawer } from 'components/Layout/Card'
-import { Spinner } from 'components/Spinner'
+import { CardDrawer } from 'components/layout/SwapLayout/Card'
+import { Spinner } from 'components/common/Spinner'
 
 // DepositWidget: subcomponents
 import { WalletDrawerInnerWrapper } from 'components/DepositWidget/Form.styled'
@@ -79,7 +79,7 @@ export const Form: React.FC<FormProps> = (props: FormProps) => {
     if (validatorActive) {
       // Verify on every amount change
       const errorMsg = _validateForm(totalAmount, amountInput, decimals)
-      setErrors(oldErrors => ({
+      setErrors((oldErrors) => ({
         ...oldErrors,
         amountInput: errorMsg || '',
       }))

@@ -2,15 +2,16 @@ import { useCallback } from 'react'
 import BN from 'bn.js'
 import { toast } from 'toastify'
 
-import { MAX_BATCH_ID, BATCH_TIME } from '@gnosis.pm/dex-js'
+import { MAX_BATCH_ID, toPlaceValidFromOrdersParams } from '@gnosis.pm/dex-js'
 
 import { TokenDetails, Receipt, TxOptionalParams } from 'types'
 import { exchangeApi } from 'api'
 import { PlaceOrderParams as ExchangeApiPlaceOrderParams } from 'api/exchange/ExchangeApi'
-import { logDebug, formatTimeInHours } from 'utils'
+import { logDebug, formatDistanceStrict, formatDateLocaleShortTime, batchIdToDate } from 'utils'
 import { txOptionalParams as defaultTxOptionalParams } from 'utils/transaction'
 import { BATCHES_TO_WAIT } from 'const'
 import useSafeState from './useSafeState'
+import { getNumberOfBatchesLeftUntilNow } from 'components/TradeWidget/OrderValidity'
 
 interface ConnectionParams {
   userAddress: string
@@ -46,6 +47,65 @@ interface Result {
 export interface PlaceOrderResult {
   success: boolean
   receipt?: Receipt
+}
+
+interface PlaceValidFromOrders {
+  networkId: number
+  orders: MultipleOrdersOrder[]
+  userAddress: string
+  txOptionalParams: TxOptionalParams
+}
+
+async function placeValidFromOrdersTx(placeOrderParams: PlaceValidFromOrders): Promise<Receipt> {
+  const { networkId, orders, userAddress, txOptionalParams } = placeOrderParams
+
+  // Calculate validFrom/validTo for the orders
+  let asapBatchIdPromise: Promise<number>
+  const ordersWithDefaults = await Promise.all(
+    orders.map(async (order) => {
+      // Valid from, is the one specified or ASAP
+      let validFrom
+      if (!order.validFrom) {
+        // Asap, if no validFrom is specified
+        if (!asapBatchIdPromise) {
+          // Calculate asapBatchId (if it's not previously calculated)
+          asapBatchIdPromise = exchangeApi
+            .getCurrentBatchId(networkId)
+            .then((currentBatchId) => currentBatchId + BATCHES_TO_WAIT)
+        }
+
+        validFrom = await asapBatchIdPromise
+      } else {
+        // Use the specified validFrom
+        validFrom = order.validFrom
+      }
+
+      // if not set, order is valid forever
+      const validUntil = order.validUntil || MAX_BATCH_ID
+
+      return {
+        ...order,
+        validFrom,
+        validUntil,
+      }
+    }),
+  )
+
+  const { buyAmounts, sellAmounts, validFroms, validUntils, sellTokens, buyTokens } = toPlaceValidFromOrdersParams(
+    ordersWithDefaults,
+  )
+
+  return exchangeApi.placeValidFromOrders({
+    userAddress,
+    networkId,
+    buyTokens,
+    sellTokens,
+    validFroms,
+    validUntils,
+    buyAmounts,
+    sellAmounts,
+    txOptionalParams,
+  })
 }
 
 export const usePlaceOrder = (): Result => {
@@ -98,7 +158,7 @@ export const usePlaceOrder = (): Result => {
           userAddress,
           buyTokenId,
           sellTokenId,
-          validUntil: validUntil ? batchId + validUntil : MAX_BATCH_ID,
+          validUntil: validUntil || MAX_BATCH_ID,
           buyAmount,
           sellAmount,
           networkId,
@@ -112,11 +172,13 @@ export const usePlaceOrder = (): Result => {
           // Get batch time in minutes
           //  In reality, no need to ceil cause we know batch time is 300, but it was done to avoid relying on knowing
           //  the actual value of the constant
-          const validityInMinutes = Math.ceil((validUntil * BATCH_TIME) / 60)
           toast.success(
-            `Transaction mined! Successfully placed order valid in the next batch and expiring ${formatTimeInHours(
-              validityInMinutes,
-              'never',
+            `Transaction mined! Successfully placed order valid in the next batch and expiring ${formatDistanceStrict(
+              new Date(validUntil),
+              Date.now(),
+              {
+                addSuffix: true,
+              },
             )}`,
           )
         } else {
@@ -157,76 +219,64 @@ export const usePlaceOrder = (): Result => {
       logDebug(`[usePlaceOrder] Placing ${orders.length} orders at once`)
 
       try {
-        const buyTokens: number[] = []
-        const sellTokens: number[] = []
-
-        const validFroms: number[] = []
-        const validUntils: number[] = []
-
-        const buyAmounts: BN[] = []
-        const sellAmounts: BN[] = []
-
-        const currentBatchId = await exchangeApi.getCurrentBatchId(networkId)
-
-        orders.forEach(order => {
-          buyTokens.push(order.buyToken)
-          sellTokens.push(order.sellToken)
-
-          // if not set, order is valid from placement + wait period
-          validFroms.push(currentBatchId + (order.validFrom ? order.validFrom : BATCHES_TO_WAIT))
-          // if not set, order is valid forever
-          validUntils.push(order.validUntil ? currentBatchId + order.validUntil : MAX_BATCH_ID)
-
-          buyAmounts.push(order.buyAmount)
-          sellAmounts.push(order.sellAmount)
-        })
-
-        const params = {
+        // Send transaction
+        const receipt = await placeValidFromOrdersTx({
+          orders,
           userAddress,
           networkId,
-          buyTokens,
-          sellTokens,
-          validFroms,
-          validUntils,
-          buyAmounts,
-          sellAmounts,
           txOptionalParams: txOptionalParams || defaultTxOptionalParams,
-        }
-
-        const receipt = await exchangeApi.placeValidFromOrders(params)
+        })
 
         logDebug(`[usePlaceOrder] The transaction has been mined: ${receipt.transactionHash}`)
         // placeMultipleOrders is the only way to use validFrom
         // right now app doesn't support multiple orders with different validFrom times
         // Liquidity creates multiple orders but with same order times
         if (orders.length === 1) {
-          if (orders[0].validUntil && orders[0].validFrom) {
-            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
-            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+          const { validFrom } = orders[0]
+          const { validUntil } = orders[0]
+
+          if (validUntil && validFrom) {
+            const validFromAsDate = batchIdToDate(validFrom)
+            const validUntilAsDate = batchIdToDate(validUntil)
+
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
-                validityFromInMinutes,
-                'in the next batch',
-              )} and expiring ${formatTimeInHours(validityUntilInMinutes, 'never')}`,
+              `Transaction mined! Succesfully placed order valid ${
+                validFrom
+                  ? getNumberOfBatchesLeftUntilNow(validFrom) > 3
+                    ? formatDateLocaleShortTime(validFromAsDate.getTime())
+                    : formatDistanceStrict(new Date(validFromAsDate), Date.now(), {
+                        addSuffix: true,
+                      })
+                  : 'in the next batch'
+              } and expiring ${formatDistanceStrict(new Date(validUntilAsDate), Date.now(), {
+                addSuffix: true,
+              })}`,
             )
-          } else if (orders[0].validUntil) {
-            const validityUntilInMinutes = Math.ceil((orders[0].validUntil * BATCH_TIME) / 60)
+          } else if (validUntil) {
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid in the next batch and expiring ${formatTimeInHours(
-                validityUntilInMinutes,
-                'never',
+              `Transaction mined! Succesfully placed order valid in the next batch and expiring ${formatDistanceStrict(
+                batchIdToDate(validUntil),
+                Date.now(),
+                {
+                  addSuffix: true,
+                },
               )}`,
             )
-          } else if (orders[0].validFrom) {
-            const validityFromInMinutes = Math.ceil((orders[0].validFrom * BATCH_TIME) / 60)
+          } else if (validFrom) {
+            const validFromAsDate = batchIdToDate(validFrom)
             // TODO: link to orders page?
             toast.success(
-              `Transaction mined! Succesfully placed order valid ${formatTimeInHours(
-                validityFromInMinutes,
-                'in the next batch',
-              )} and never expiring`,
+              `Transaction mined! Succesfully placed order valid ${
+                validFrom
+                  ? getNumberOfBatchesLeftUntilNow(validFrom) > 3
+                    ? formatDateLocaleShortTime(validFromAsDate.getTime())
+                    : formatDistanceStrict(new Date(validFromAsDate), Date.now(), {
+                        addSuffix: true,
+                      })
+                  : 'in the next batch'
+              } and never expiring`,
             )
           }
         } else {
