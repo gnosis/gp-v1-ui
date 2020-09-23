@@ -119,10 +119,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     }
 
     return (
-      <LogInOutButton $loggedIn={isConnected}>
-        <a onClick={onClick} className={props.className}>
-          {content}
-        </a>
+      <LogInOutButton $loggedIn={isConnected} onClick={onClick}>
+        <a className={props.className}>{content}</a>
       </LogInOutButton>
     )
   }, [connectWallet, disconnectWallet, isConnected, loadingLabel, props.className])
