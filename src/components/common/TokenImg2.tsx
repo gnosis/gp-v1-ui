@@ -32,21 +32,45 @@ export interface WrapperProps {
   faded?: boolean
 }
 
+const tokensIconsRequire =
+  process.env.NODE_ENV === 'test'
+    ? // mock for jest
+      Object.assign(() => '', {
+        keys: () => [],
+        resolve: () => '',
+        id: '',
+      })
+    : require.context('assets/img/tokens', false)
+const tokensIconsFiles = tokensIconsRequire.keys()
+
 export const TokenImg2: React.FC<Props> = (props) => {
   const { address, addressMainnet, symbol, name, faded = false } = props
 
   // TODO: Probably a good idea to allow to see in etherscan (probably wrapping this in BlockExplorerLink component)
 
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
+  // return walletIconFile && tokensIconsRequire<{ default: string }>(walletIconFile).default
+
+  const iconFile = tokensIconsFiles.find(
+    (file) => file.includes(address) || (addressMainnet && file.includes(addressMainnet)),
+  )
+
+  const iconFileUrl = iconFile ? tokensIconsRequire(iconFile) : undefined
   const safeName = safeTokenName({ id: 0, address, addressMainnet, symbol, name })
   return (
     <Wrapper
       alt={safeName}
-      src={getImageUrl(addressMainnet || address)}
+      src={iconFileUrl || getImageUrl(addressMainnet || address)}
       onError={_loadFallbackTokenImage}
       faded={faded}
     />
   )
 }
+
+export const TokenImgWrapper = styled(TokenImg2)`
+  width: 2.4rem;
+  height: 2.4rem;
+  margin: 0 0.5rem 0 0;
+`
 
 export default TokenImg2

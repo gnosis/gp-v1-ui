@@ -1,7 +1,7 @@
 import React from 'react'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
-import { TokenImg2, Props } from './TokenImg2'
+import { TokenImg2, TokenImgWrapper, Props } from './TokenImg2'
 import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
 import { Frame } from './Frame'
 
@@ -54,3 +54,5 @@ Faded.args = {
   address: ADDRESS_GNO,
   faded: true,
 }
+
+export const Wrapper: Story = () => <TokenImgWrapper address={ADDRESS_GNO} />
