@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { FoldableRowWrapper } from 'components/Layout/Card'
+import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 import { MEDIA } from 'const'
 
 export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
@@ -48,6 +48,13 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
     }
   }
 
+  td {
+    &[data-label='Order ID'],
+    &[data-label='Market'] {
+      cursor: pointer;
+    }
+  }
+
   @media ${MEDIA.mobile} {
     &&&&& {
       td[data-label='Market'] {
@@ -58,16 +65,5 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
         border: none;
       }
     }
-  }
-`
-
-export const ResponsiveTitleRow = styled.td`
-  // force first
-  order: -1;
-
-  > div:first-of-type {
-    display: flex;
-    justify-content: center;
-    align-items: items;
   }
 `

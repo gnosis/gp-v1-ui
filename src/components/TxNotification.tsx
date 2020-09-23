@@ -1,5 +1,5 @@
 import React from 'react'
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 interface TxNotificationProps {
   txHash: string

@@ -4,6 +4,7 @@ import TokenListApiMock from 'api/tokenList/TokenListApiMock'
 import { TokenListApiImpl, TokenList } from 'api/tokenList/TokenListApi'
 import { tokenList as testTokenList } from '../../data'
 import SubscriptionBase from 'api/tokenList/Subscriptions'
+import { tokenList as initialTokenList } from '@gnosis.pm/dex-js'
 
 class GenericSubscriptions<T> extends SubscriptionBase<T> {
   // expose triggerSubscriptions for testing
@@ -17,7 +18,7 @@ let instanceReal: TokenList
 
 beforeEach(() => {
   instanceMock = new TokenListApiMock(testTokenList)
-  instanceReal = new TokenListApiImpl({ networkIds: [Network.Mainnet, Network.Rinkeby] })
+  instanceReal = new TokenListApiImpl({ networkIds: [Network.Mainnet, Network.Rinkeby], initialTokenList })
 })
 
 const NEW_TOKEN = {

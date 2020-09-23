@@ -56,11 +56,14 @@ export const useWrapUnwrapEth = (): Result => {
   const { userAddress, isConnected, networkId } = useWalletConnection()
   const [wrappingEth, setWrappingEth] = useSafeState(false)
   const [unwrappingWeth, setUnwrappingWeth] = useSafeState(false)
-  const baseParams = {
-    userAddress,
-    networkId,
-    isConnected,
-  }
+  const baseParams = useMemo(
+    () => ({
+      userAddress,
+      networkId,
+      isConnected,
+    }),
+    [isConnected, networkId, userAddress],
+  )
 
   const wrapEth = useMemo(
     () => async (amount: string, txOptionalParams: TxOptionalParams): Promise<Receipt> => {
@@ -70,7 +73,7 @@ export const useWrapUnwrapEth = (): Result => {
         ...baseParams,
         amount,
         setLoadingFlag: setWrappingEth,
-        execute: params => wethApi.deposit(params),
+        execute: (params) => wethApi.deposit(params),
         txOptionalParams,
       })
     },
@@ -84,7 +87,7 @@ export const useWrapUnwrapEth = (): Result => {
         ...baseParams,
         amount,
         setLoadingFlag: setUnwrappingWeth,
-        execute: params => wethApi.withdraw(params),
+        execute: (params) => wethApi.withdraw(params),
         txOptionalParams,
       })
     },

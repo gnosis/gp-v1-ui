@@ -7,7 +7,7 @@ export const DefineSpreadWrapper = styled(InputBox)`
   height: auto;
 
   > strong {
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.3rem 0;
     color: var(--color-text-primary);
   }
 
@@ -27,12 +27,14 @@ export const SpreadInformationWrapper = styled.div`
   display: flex;
   flex-flow: column wrap;
   width: 100%;
+
   > strong {
     margin: 0 0 1rem 0;
     color: var(--color-text-primary);
+    text-decoration: underline dashed;
   }
   > p {
-    margin: 0 0 2.4rem;
+    margin: 0 0 1.2rem;
     font-size: inherit;
     line-height: inherit;
   }

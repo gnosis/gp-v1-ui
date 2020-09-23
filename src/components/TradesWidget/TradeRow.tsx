@@ -6,17 +6,31 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
-import { EtherscanLink } from 'components/EtherscanLink'
-import { FoldableRowWrapper } from 'components/Layout/Card'
+import { EtherscanLink } from 'components/common/EtherscanLink'
+import { EllipsisText } from 'components/common/EllipsisText'
+
+import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 
 import { isTradeSettled, divideBN, formatPercentage } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { MEDIA } from 'const'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
+  td {
+    &[data-label='Order ID'],
+    &[data-label='Market'] {
+      cursor: pointer;
+    }
+  }
+
   @media ${MEDIA.mobile} {
     &&&&& {
       display: flex;
+
+      td[data-label='Order ID'] {
+        order: -2;
+      }
+
       td[data-label='Market'] {
         order: -1;
         border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);
@@ -32,6 +46,7 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
 interface TradeRowProps {
   trade: Trade
   networkId?: number
+  onCellClick: (e: Pick<React.BaseSyntheticEvent<HTMLInputElement>, 'target'>) => void
 }
 
 const TypePill = styled.span<{
@@ -61,8 +76,8 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
-export const TradeRow: React.FC<TradeRowProps> = params => {
-  const { trade, networkId } = params
+export const TradeRow: React.FC<TradeRowProps> = (params) => {
+  const { trade, networkId, onCellClick } = params
   const {
     buyToken,
     sellToken,
@@ -106,14 +121,27 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
     }
   }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
+  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
+    buyToken,
+    sellToken,
+  ])
+
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <td data-label="Market" className="showResponsive">
-        {displayTokenSymbolOrLink(buyToken)}/{displayTokenSymbolOrLink(sellToken)}
+      <td
+        data-label="Market"
+        className="showResponsive"
+        onClick={(): void =>
+          onCellClick({
+            target: { value: market },
+          })
+        }
+      >
+        {market}
       </td>
       <td
         data-label="Limit Price / Fill Price"
@@ -142,6 +170,9 @@ export const TradeRow: React.FC<TradeRowProps> = params => {
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
+      </td>
+      <td data-label="Order ID" onClick={(): void => onCellClick({ target: { value: orderId } })}>
+        <EllipsisText title={orderId}>{orderId}</EllipsisText>
       </td>
       <td data-label="View on Etherscan">
         <EtherscanLink type="event" identifier={txHash} networkId={networkId} />

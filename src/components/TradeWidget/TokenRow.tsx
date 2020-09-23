@@ -14,12 +14,13 @@ import Form from 'components/DepositWidget/Form'
 import { TooltipWrapper, HelpTooltipContainer, HelpTooltip } from 'components/Tooltip'
 import { InputBox } from 'components/InputBox'
 import { Input } from 'components/Input'
-import { Spinner } from 'components/Spinner'
+import { Spinner } from 'components/common/Spinner'
 import { WrapEtherBtn } from 'components/WrapEtherBtn'
 
 // TradeWidget: subcomponents
 import { TradeFormTokenId, TradeFormData } from 'components/TradeWidget'
-import FormMessage, { FormInputError } from 'components/TradeWidget/FormMessage'
+import { FormInputError } from 'components/common/FormInputError'
+import { FormMessage } from 'components/common/FormMessage'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 
 // Hooks
@@ -171,7 +172,6 @@ const TokenRow: React.FC<Props> = ({
   userConnected = true,
   autoFocus,
 }) => {
-  const isEditable = isDisabled || readOnly
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
 
@@ -211,20 +211,21 @@ const TokenRow: React.FC<Props> = ({
     <FormInputError errorMessage={error.message as string} />
   ) : (
     overMax.gt(ZERO) && (
-      <FormMessage className="warning">
+      <FormMessage className="warning tradeWarning">
         <i>
           Have you already deposited <b>{selectedToken.symbol}</b> into the exchange wallet?{' '}
         </i>
-        <i>Sell amount exceeds your balance by</i>
-        <strong>
-          {formatSmart({ amount: overMax, precision: selectedToken.decimals })} {selectedToken.symbol}.
-        </strong>
         {editableAndConnected && !tokenDisabled && (
           <div className="btn" onClick={(): void => showForm('deposit')}>
             + Deposit {selectedToken.symbol}
           </div>
         )}
-        {/* This creates a standing order. <a href="#">Read more</a>. */}
+        <i>
+          Sell amount exceeds your balance by:{' '}
+          <strong>
+            {formatSmart({ amount: overMax, precision: selectedToken.decimals })} <span>{selectedToken.symbol}</span>
+          </strong>
+        </i>
       </FormMessage>
     )
   )
@@ -239,7 +240,7 @@ const TokenRow: React.FC<Props> = ({
         thousandSeparator: false,
         isLocaleAware: false,
       }),
-      true,
+      { shouldValidate: true },
     )
   }
 
@@ -294,25 +295,18 @@ const TokenRow: React.FC<Props> = ({
           {editableAndConnected && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
           <span>
             Balance:
-            {readOnly ? (
-              <FormMessage className={balanceClassName}>
-                {' '}
-                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
-              </FormMessage>
-            ) : (
-              <FormMessage className={balanceClassName}>
-                {' '}
-                {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
-                {validateMaxAmount && (
-                  <>
-                    <TooltipWrapper tooltip="Fill maximum">
-                      <a onClick={useMax}>max</a>
-                    </TooltipWrapper>
-                    <i aria-label="Tooltip"></i>
-                  </>
-                )}
-              </FormMessage>
-            )}
+            <FormMessage className={balanceClassName}>
+              {' '}
+              {balance ? formatSmart(balance.totalExchangeBalance, balance.decimals) : '0'}
+              {!readOnly && validateMaxAmount && (
+                <>
+                  <TooltipWrapper tooltip="Fill maximum">
+                    <a onClick={useMax}>max</a>
+                  </TooltipWrapper>
+                  <i aria-label="Tooltip"></i>
+                </>
+              )}
+            </FormMessage>
             &nbsp;
             <HelpTooltip tooltip={BalanceTooltip} />
           </span>
@@ -325,7 +319,7 @@ const TokenRow: React.FC<Props> = ({
           placeholder="0"
           name={inputId}
           type="text"
-          disabled={isEditable}
+          disabled={isDisabled}
           readOnly={readOnly}
           required
           ref={inputRef}

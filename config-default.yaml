@@ -1,16 +1,32 @@
 #######################################################################################
 ##                                  DEFAULT CONFIG                                   ##
 #######################################################################################
-# - Defines the default configuration
-# - **WARNING**: Do not modify this file
-#   - For custom config create a new file "custom/config.yaml"
-#   - You can override in the custom file any config that is defined here
-#   - For redefining components, or for more information, follow the instructions in ./README.md
+# Defines the default configuration
+#   🚫 WARNING 🚫: Do not modify this file
+#       - For custom config create a new file "custom/config.yaml"
+#       - You can override in the custom file any config that is defined here
+#       - For redefining components, or for more information, follow the instructions in ./README.md
+#   ⚙️Read more here:
+#       https://github.com/gnosis/dex-react/wiki/Config
 
+# App Id
+#   Identify the app. The IDs range from 1 until 256
+#   Every transaction sent to the blockchain will include the ID and some basic analytic info
+#
+#   ⚠️IMPORTANT: The ID must be unique per App/Client of Gnosis Protocol:
+#       https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
+#   More information about forking the web:
+#       https://github.com/gnosis/dex-react/wiki/Fork-project
+#
+#appId: 1
+
+# Name of the app
 name: Gnosis Protocol Web
 
+# Logo used for the favicon
 logoPath: './src/assets/img/logo.svg'
 
+# HTML template
 templatePath: './src/html/index.html'
 
 # Whitelisted tokens from Gnosis Contract retrieved from a smart contract
@@ -89,7 +105,7 @@ disabledTokens:
       description: This token is disabled for trading and depositing. SNX will be deprecated and replaced by another token at the end of July 2020.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED
       url: https://docs.synthetix.io/integrations/guide/#proxy-deprecation
-      
+
     - address: '0x45804880De22913dAFE09f4980848ECE6EcbAf78'
       name: Paxos Gold
       symbol: PAXG
@@ -117,3 +133,143 @@ disabledTokens:
     - address: '0x6Fb0855c404E09c47C3fBCA25f08d4E41f9F062f'
     - address: '0xFC4B8ED459e00e5400be803A9BB3954234FD50e3'
   4: [] # Rinkeby
+
+# Initial token selection for the sell token and buy token
+initialTokenSelection:
+  sellToken: DAI
+  receiveToken: USDC
+
+# Initial Token List
+#   List of token loaded by default
+#   This list is used while the app loads the TCR (if the TCR setting is used)
+initialTokenList:
+  - id: 1
+    name: Wrapped Ether
+    symbol: WETH
+    decimals: 18
+    addressByNetwork:
+      '1': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
+      '4': '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+
+  - id: 2
+    name: Tether USD
+    symbol: USDT
+    decimals: 6
+    addressByNetwork:
+      '1': '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+      '4': '0xa9881E6459CA05d7D7C95374463928369cD7a90C'
+
+  - id: 3
+    name: TrueUSD
+    symbol: TUSD
+    decimals: 18
+    addressByNetwork:
+      '1': '0x0000000000085d4780B73119b644AE5ecd22b376'
+      '4': '0x0000000000085d4780B73119b644AE5ecd22b376'
+
+  - id: 4
+    name: USD Coin
+    symbol: USDC
+    decimals: 6
+    addressByNetwork:
+      '1': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
+      '4': '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b'
+
+  - id: 5
+    name: Paxos Standard
+    symbol: PAX
+    decimals: 18
+    addressByNetwork:
+      '1': '0x8E870D67F660D95d5be530380D0eC0bd388289E1'
+      '4': '0xBD6A9921504fae42EaD2024F43305A8ED3890F6f'
+
+  - id: 6
+    name: Gemini dollar
+    symbol: GUSD
+    decimals: 2
+    addressByNetwork:
+      '1': '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd'
+      '4': '0x784B46A4331f5c7C495F296AE700652265ab2fC6'
+
+  - id: 7
+    name: DAI Stablecoin
+    symbol: DAI
+    decimals: 18
+    addressByNetwork:
+      '1': '0x6B175474E89094C44Da98b954EedeAC495271d0F'
+      '4': '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa'
+
+  - id: 8
+    name: Synth sETH
+    symbol: sETH
+    decimals: 18
+    addressByNetwork:
+      '1': '0x5e74C9036fb86BD7eCdcb084a0673EFc32eA31cb'
+      '4': '0x0647b2c7a2a818276154b0fc79557f512b165bc1'
+
+  - id: 9
+    name: Synth sUSD
+    symbol: sUSD
+    decimals: 18
+    addressByNetwork:
+      '1': '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
+      '4': '0x1b642a124cdfa1e5835276a6ddaa6cfc4b35d52c'
+
+  - id: 10
+    name: Synth sBTC
+    symbol: sBTC
+    decimals: 18
+    addressByNetwork:
+      '1': '0xfE18be6b3Bd88A2D2A7f928d00292E7a9963CfC6'
+
+  - id: 11
+    name: Wrapped BTC
+    symbol: WBTC
+    decimals: 8
+    addressByNetwork:
+      '1': '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'
+
+  - id: 13
+    name: Compound Dai
+    symbol: cDAI
+    decimals: 8
+    addressByNetwork:
+      '1': '0x5d3a536E4D6DbD6114cc1Ead35777bAB948E3643'
+
+  - id: 15
+    name: Synthetix Network
+    symbol: SNX
+    decimals: 18
+    addressByNetwork:
+      '1': '0xC011A72400E58ecD99Ee497CF89E3775d4bd732F'
+      '4': '0x322A3346bf24363f451164d96A5b5cd5A7F4c337'
+
+  - id: 16
+    name: Chai
+    symbol: CHAI
+    decimals: 18
+    addressByNetwork:
+      '1': '0x06AF07097C9Eeb7fD685c692751D5C66dB49c215'
+
+  - id: 18
+    name: Gnosis Token
+    symbol: GNO
+    decimals: 18
+    addressByNetwork:
+      '1': '0x6810e776880C02933D47DB1b9fc05908e5386b96'
+      '4': '0xd0Dab4E640D95E9E8A47545598c33e31bDb53C7c'
+
+  - id: 19
+    name: Panvala pan
+    symbol: PAN
+    decimals: 18
+    addressByNetwork:
+      '1': '0xD56daC73A4d6766464b38ec6D91eB45Ce7457c44'
+
+  - id: 0
+    name: OWL
+    symbol: OWL
+    decimals: 18
+    addressByNetwork:
+      '1': '0x1A5F9352Af8aF974bFC03399e3767DF6370d82e4'
+      '4': '0xa7D1C04fAF998F9161fC9F800a99A809b84cfc9D'

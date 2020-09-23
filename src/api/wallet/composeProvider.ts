@@ -119,7 +119,7 @@ export const composeProvider = <T extends Provider>(
 
   engine.push(
     createConditionalMiddleware<[]>(
-      req => req.method === 'eth_gasPrice',
+      (req) => req.method === 'eth_gasPrice',
       async (_req, res) => {
         const fetchedPrice = await fetchGasPrice()
 
@@ -146,7 +146,7 @@ export const composeProvider = <T extends Provider>(
 
     engine.push(
       createConditionalMiddleware(
-        req => req.method === 'eth_accounts',
+        (req) => req.method === 'eth_accounts',
         (_req, res) => {
           if (substituteAccount) {
             res.result = [substituteAccount]
@@ -165,8 +165,8 @@ export const composeProvider = <T extends Provider>(
 
   engine.push(
     createConditionalMiddleware<TransactionConfig[]>(
-      req => req.method === 'eth_sendTransaction',
-      async req => {
+      (req) => req.method === 'eth_sendTransaction',
+      async (req) => {
         const txConfig = req.params?.[0]
         // no parameters, which shouldn't happen
         if (!txConfig) return false
@@ -183,19 +183,24 @@ export const composeProvider = <T extends Provider>(
 
   engine.push(
     createConditionalMiddleware<TransactionConfig[]>(
-      req => req.method === 'eth_sendTransaction',
-      async req => {
+      (req) => req.method === 'eth_sendTransaction',
+      async (req) => {
         const txConfig = req.params?.[0]
         // no parameters, which shouldn't happen
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth.estimateGas(txConfig)
+          const gasLimit = await web3.eth.estimateGas(txConfig).catch((error) => {
+            console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
+            throw error
+          })
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
           txConfig.gas = numberToHex(gasLimit)
         } else {
           logDebug('[composeProvider] Gas Limit: ' + txConfig.gas)
         }
+
+        logDebug('[composeProvider] Sending transaction', txConfig)
 
         // don't mark as handled
         // pass modified tx on
@@ -210,7 +215,7 @@ export const composeProvider = <T extends Provider>(
   const composedProvider: T = providerFromEngine(engine)
 
   const providerProxy = new Proxy(composedProvider, {
-    get: function(target, prop, receiver): unknown {
+    get: function (target, prop, receiver): unknown {
       if (prop === 'request' || prop === 'sendAsync' || prop === 'send') {
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)

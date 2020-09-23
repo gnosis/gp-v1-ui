@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner, faCheckCircle } from '@fortawesome/free-solid-svg-icons'
 
 // componet
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 // PoolingWidget: subcomponent
 import { HighlightDiv } from 'components/PoolingWidget/PoolingWidget.styled'
@@ -37,11 +37,7 @@ const AddFunding: React.FC<AddFundingProps> = ({ txIdentifier, txReceipt }) => (
     </HighlightDiv>
     <p>
       <strong>Great</strong> - your liquidity provision is being created right now. Your standing orders will be visible
-      on the{' '}
-      <strong>
-        <Link to="orders">Orders page</Link>
-      </strong>{' '}
-      where you can also cancel these at any time.
+      on this very page, where you can also cancel them at any time.
     </p>
     <p>
       <strong>What now?</strong>

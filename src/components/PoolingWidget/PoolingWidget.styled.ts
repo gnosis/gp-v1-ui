@@ -4,39 +4,81 @@ import { MEDIA } from 'const'
 // assets
 import arrowBlue from 'assets/img/arrow-blue.svg'
 import arrowWhite from 'assets/img/arrow-white.svg'
+// components
+import { WrappedWidget } from 'components/TradeWidget/TradeWidget.styled'
 
-export const PoolingInterfaceWrapper = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  padding: 2.4rem 2.4rem 8rem;
+export const StepDescriptionWrapper = styled.div`
+  width: 50%;
+  padding: 0 2.4rem 0 0;
   box-sizing: border-box;
-  align-items: flex-start;
-  align-content: flex-start;
-  position: relative;
-  max-width: 85rem;
-  background: var(--color-background-pageWrapper);
-  box-shadow: var(--box-shadow-wrapper);
-  border-radius: 0.6rem;
-  margin: 0 auto;
-  min-height: 54rem;
-  font-size: 1.4rem;
-  line-height: 1.4;
+
+  .liqContent {
+    color: var(--color-text-primary);
+    font-size: inherit;
+    line-height: inherit;
+    margin: 1.6rem 0 0;
+
+    > ul {
+      list-style: none;
+      padding-inline-start: 2rem;
+      padding: 0;
+    }
+
+    > ul > li {
+      margin: 0 0 0.5rem;
+    }
+
+    > ul > li > img {
+      margin: 0 0.5rem 0 0;
+    }
+  }
+`
+
+export const PoolingInterfaceWrapper = styled(WrappedWidget)`
+  font-size: 1.35rem;
+  line-height: 1.25;
+
+  > form {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 2rem;
+    min-width: 51.4rem;
+    max-width: 75rem;
+
+    > h2 {
+      margin: 1rem auto 2.4rem;
+      width: 100%;
+      text-align: center;
+      font-weight: var(--font-weight-bold);
+      font-size: 2rem;
+      color: var(--color-text-primary);
+      letter-spacing: 0;
+    }
+  }
+
+  @media ${MEDIA.tablet} {
+    > form {
+      min-width: 100%;
+      max-width: 100%;
+      padding: 2rem 4rem;
+    }
+  }
 
   @media ${MEDIA.mobile} {
     flex-flow: column wrap;
-    padding: 1.6rem 1.6rem 0;
     width: 100%;
     font-size: 1.3rem;
-  }
 
-  form > h2 {
-    margin: 1rem auto 2.4rem;
-    width: 100%;
-    text-align: center;
-    font-weight: var(--font-weight-bold);
-    font-size: 2rem;
-    color: var(--color-text-primary);
-    letter-spacing: 0;
+    > form {
+      min-width: 100%;
+      max-width: 100%;
+      padding: 1.6rem;
+    }
+
+    ${StepDescriptionWrapper} {
+      width: 100%;
+      padding: 0;
+    }
   }
 `
 
@@ -117,18 +159,10 @@ export const StepButtonsWrapper = styled.div`
   display: flex;
   width: 100%;
   margin: auto 0 0;
-  height: 5.6rem;
-  position: absolute;
-  bottom: 0;
-  left: 0;
   border-top: 0.1rem solid var(--color-background-banner);
   justify-content: space-between;
   align-items: center;
-
-  @media ${MEDIA.mobile} {
-    position: relative;
-    height: auto;
-  }
+  padding: 2rem 0 0;
 
   > button,
   > a {
@@ -245,38 +279,6 @@ export const BarWrapper = styled.div<{ $bgColor?: string; $minHeight?: string }>
   > ${StepSeparator} {
     @media ${MEDIA.mobile} {
       margin: 0 0 2.1rem;
-    }
-  }
-`
-
-export const StepDescriptionWrapper = styled.div`
-  width: 50%;
-  padding: 0 2.4rem 0 0;
-  box-sizing: border-box;
-
-  @media ${MEDIA.mobile} {
-    width: 100%;
-    padding: 0;
-  }
-
-  .liqContent {
-    color: var(--color-text-primary);
-    font-size: inherit;
-    line-height: inherit;
-    margin: 1.6rem 0 0;
-
-    > ul {
-      list-style: none;
-      padding-inline-start: 2rem;
-      padding: 0;
-    }
-
-    > ul > li {
-      margin: 0 0 0.5rem;
-    }
-
-    > ul > li > img {
-      margin: 0 0.5rem 0 0;
     }
   }
 `

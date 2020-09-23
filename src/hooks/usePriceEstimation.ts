@@ -5,6 +5,7 @@ import useSafeState from './useSafeState'
 
 import { getPriceEstimation } from 'services'
 import { dexPriceEstimatorApi } from 'api'
+import { logDebug } from 'utils'
 
 interface Params {
   baseTokenId: number
@@ -80,6 +81,7 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
         }
 
         const price = await dexPriceEstimatorApi.getPrice(getPriceParams)
+        logDebug({ baseTokenId, quoteTokenId, amount, price: price?.toString() })
 
         if (!cancelled) {
           setPriceEstimation(price)
@@ -111,4 +113,44 @@ export function usePriceEstimationWithSlippage(params: SlippageParams): Result {
   ])
 
   return { priceEstimation, isPriceLoading }
+}
+
+interface PriceInOwlParams {
+  networkId: number
+  tokenId: number
+  tokenDecimals?: number
+}
+
+const estimationInOwlDefaults = {
+  baseTokenId: 0,
+  baseTokenDecimals: 18,
+  amount: '',
+}
+
+export function usePriceEstimationInOwl(params: PriceInOwlParams): Result {
+  const { networkId, tokenId: quoteTokenId, tokenDecimals: quoteTokenDecimals } = params
+
+  const getPriceParams: SlippageParams = {
+    ...estimationInOwlDefaults,
+    networkId,
+    quoteTokenId,
+    quoteTokenDecimals,
+  }
+
+  return usePriceEstimationWithSlippage(getPriceParams)
+}
+
+const WETHestimationInOWLDefaults = {
+  ...estimationInOwlDefaults,
+  quoteTokenId: 1,
+  quoteTokenDecimals: 18,
+}
+
+export function useWETHPriceInOwl(networkId: number): Result {
+  const getPriceParams: SlippageParams = {
+    ...WETHestimationInOWLDefaults,
+    networkId,
+  }
+
+  return usePriceEstimationWithSlippage(getPriceParams)
 }

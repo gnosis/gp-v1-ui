@@ -31,9 +31,9 @@ export const MEDIA_QUERIES = MEDIA_QUERY_MATCHES.map(({ query }) => query)
 export const MEDIA_QUERY_NAMES = MEDIA_QUERY_MATCHES.map(({ name }) => name).concat(DEFAULT_QUERY_NAME)
 
 export const subscribeToScreenSizeChange = (callback: (event: MediaQueryListEvent) => void): Command => {
-  const mediaQueryLists = MEDIA_QUERIES.map(query => window.matchMedia(query))
+  const mediaQueryLists = MEDIA_QUERIES.map((query) => window.matchMedia(query))
 
-  mediaQueryLists.forEach(mql => mql.addListener(callback))
+  mediaQueryLists.forEach((mql) => mql.addListener(callback))
 
-  return (): void => mediaQueryLists.forEach(mql => mql.removeListener(callback))
+  return (): void => mediaQueryLists.forEach((mql) => mql.removeListener(callback))
 }

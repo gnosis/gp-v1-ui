@@ -12,9 +12,13 @@ function useSortByTopic<T, K extends string>(
   data: T[],
   defaultTopic: K,
   compareFnFactory: CustomSortComparator<T, K>,
+  initialSort?: 'asc' | 'desc',
 ): { sortedData: T[]; sortTopic: SortTopic<K>; setSortTopic: React.Dispatch<React.SetStateAction<SortTopic<K>>> } {
   // true == 'asc' && false == 'dsc'
-  const [sortTopic, setSortTopic] = useSafeState<SortTopic<K>>({ topic: defaultTopic, asc: true })
+  const [sortTopic, setSortTopic] = useSafeState<SortTopic<K>>({
+    topic: defaultTopic,
+    asc: !initialSort || initialSort === 'asc',
+  })
   const [sortedData, setSortedData] = useSafeState<T[]>(data)
 
   const { asc, topic } = sortTopic

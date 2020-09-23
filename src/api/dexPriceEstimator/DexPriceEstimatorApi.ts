@@ -5,6 +5,9 @@ import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
 export interface DexPriceEstimatorApi {
   getPrice(params: GetPriceParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
+  getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
+  getMinOrderAmounInOWLUrl(networkId: number): string
+  getMinOrderAmounInOWL(networkId: number): Promise<BigNumber>
 }
 
 interface GetPriceParams {
@@ -20,6 +23,26 @@ interface OrderBookParams {
   baseTokenId: number
   quoteTokenId: number
   hops?: number
+  batchId?: number
+}
+
+/**
+ * Price point as defined in the API
+ * Both price and volume are numbers (floats)
+ *
+ * The price and volume are expressed in atoms
+ */
+export interface RawPricePoint {
+  price: number
+  volume: number
+}
+
+/**
+ * DATA returned from api as JSON
+ */
+export interface OrderBookData {
+  asks: RawPricePoint[]
+  bids: RawPricePoint[]
 }
 
 interface Token {
@@ -53,11 +76,14 @@ function getDexPriceEstimatorUrl(baseUlr: string): string {
   return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
 }
 
+// when price-estimation service doesn't return anything
+export const DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS = new BigNumber(2500)
+
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
 
   public constructor(params: DexPriceEstimatorParams) {
-    params.forEach(endpoint => {
+    params.forEach((endpoint) => {
       this.urlsByNetwork[endpoint.networkId] = getDexPriceEstimatorUrl(
         process.env.PRICE_ESTIMATOR_URL === 'production'
           ? endpoint.url_production
@@ -100,13 +126,59 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   }
 
   public getOrderBookUrl(params: OrderBookParams): string {
-    const { networkId, baseTokenId, quoteTokenId, hops = ORDER_BOOK_HOPS_DEFAULT } = params
+    const { networkId, baseTokenId, quoteTokenId, hops = ORDER_BOOK_HOPS_DEFAULT, batchId } = params
     assert(hops >= 0, 'Hops should be positive')
     assert(hops <= ORDER_BOOK_HOPS_MAX, 'Hops should be not be greater than ' + ORDER_BOOK_HOPS_MAX)
 
     const baseUrl = this._getBaseUrl(networkId)
 
-    return `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+    let url = `${baseUrl}markets/${baseTokenId}-${quoteTokenId}?atoms=true&hops=${hops}`
+    if (batchId) {
+      url += `&batchId=${batchId}`
+    }
+    return url
+  }
+
+  public async getOrderBookData(params: OrderBookParams): Promise<OrderBookData> {
+    try {
+      const url = await this.getOrderBookUrl(params)
+
+      const res = await fetch(url)
+      if (!res.ok) {
+        // backend returns {"message":"invalid url query"}
+        // for bad requests
+        throw await res.json()
+      }
+      return await res.json()
+    } catch (error) {
+      console.error(error)
+
+      const { baseTokenId, quoteTokenId } = params
+
+      throw new Error(
+        `Failed to query orderbook data for baseToken id ${baseTokenId} quoteToken id ${quoteTokenId}: ${error.message}`,
+      )
+    }
+  }
+
+  public getMinOrderAmounInOWLUrl(networkId: number): string {
+    const baseUrl = this._getBaseUrl(networkId)
+    return `${baseUrl}minimum-order-size-owl`
+  }
+
+  public async getMinOrderAmounInOWL(networkId: number): Promise<BigNumber> {
+    try {
+      const url = this.getMinOrderAmounInOWLUrl(networkId)
+      const res = await fetch(url)
+      // not res.json() because backend returns "8738236863863283268688" big number of OWL in atoms
+      const minAmount = await res.text()
+
+      return new BigNumber(minAmount).div(1e18)
+    } catch (error) {
+      console.error(error)
+
+      return DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS
+    }
   }
 
   private parsePricesResponse(
@@ -117,9 +189,9 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   ): BigNumber {
     const baseAmountInUnits = new BigNumber(baseAmountInAtoms).dividedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals))
 
-    const price = baseAmountInUnits.dividedBy(quoteAmountInUnits)
+    const price = quoteAmountInUnits.dividedBy(baseAmountInUnits)
 
-    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals)) : price
+    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(quoteAmountInUnits)) : price
   }
 
   private async query<T>(networkId: number, queryString: string): Promise<T | null> {

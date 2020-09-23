@@ -40,7 +40,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     events: BaseTradeEvent[],
     blockTimes: Map<number, number>,
   ): Promise<TradeReversion[]> {
-    return events.map<TradeReversion>(event => {
+    return events.map<TradeReversion>((event) => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
 
@@ -54,7 +54,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     orders: Map<string, Order>,
     tokens: Map<number, TokenDetails>,
   ): Promise<Trade[]> {
-    return events.map<Trade>(event => {
+    return events.map<Trade>((event) => {
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
 
@@ -111,7 +111,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     const orderIdsMap = new Map<string, { buyTokenId: number; sellTokenId: number; blockNumber: number }>()
     const tokenIdsSet = new Set<number>()
 
-    tradeEvents.forEach(event => {
+    tradeEvents.forEach((event) => {
       const { blockNumber, sellTokenId, buyTokenId, orderId } = event
 
       blocksSet.add(blockNumber)
@@ -126,7 +126,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
 
     // Go over trade reversion blocks as well
     // Only add blocks though, no need to check orders nor tokens
-    tradeReversionEvents.forEach(event => {
+    tradeReversionEvents.forEach((event) => {
       blocksSet.add(event.blockNumber)
     })
 
@@ -135,11 +135,11 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     // Only if there are trade events
     if (tradeEvents.length > 0) {
       // Add all existing orders to map. No problem to have more than what we need since it'll be picked by id later.
-      existingOrders.forEach(order => orders.set(order.id, order))
+      existingOrders.forEach((order) => orders.set(order.id, order))
 
       // Fetch from contract the ones we don't have locally, and add it to the map
       await Promise.all(
-        Array.from(orderIdsMap.keys()).map(async orderId => {
+        Array.from(orderIdsMap.keys()).map(async (orderId) => {
           // We already have this order, ignore
           // Keep in mind the global state filters out deleted orders
           if (orders.has(orderId)) {
@@ -196,7 +196,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     await addUnlistedTokensToUserTokenListById(Array.from(tokenIdsSet))
 
     // Create tokens map. No need to do the extra hop to filter, since it'll be picked by id later
-    const tokens = new Map(getTokens(networkId).map(token => [token.id, token]))
+    const tokens = new Map(getTokens(networkId).map((token) => [token.id, token]))
 
     // ### TRADES and TRADE REVERSIONS ###
     // Final step, put all together

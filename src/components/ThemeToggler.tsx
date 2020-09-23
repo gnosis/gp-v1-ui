@@ -3,11 +3,12 @@ import styled from 'styled-components'
 import useSafeState from 'hooks/useSafeState'
 import { MEDIA } from 'const'
 
-const FUSE_APP_THEME = 'FUSE_APP_THEME'
+const APP_THEME = 'APP_THEME'
 
-const TogglerWrapper = styled.div`
+export const ThemeTogglerWrapper = styled.div`
   font-size: inherit;
   margin: 0 6rem 0 0;
+
   @media ${MEDIA.mobile} {
     margin: 2.4rem 0;
   }
@@ -44,7 +45,7 @@ const toggleValue2class = {
 const themeClasses = Object.values(toggleValue2class)
 
 const ThemeToggler: React.FC = () => {
-  const startTheme = localStorage.getItem(FUSE_APP_THEME) || 'auto'
+  const startTheme = localStorage.getItem(APP_THEME) || 'auto'
   const [active, setActive] = useSafeState(startTheme)
 
   useEffect(() => {
@@ -53,16 +54,15 @@ const ThemeToggler: React.FC = () => {
     document.body.classList.remove(...themeClasses)
     if (className) {
       document.body.classList.add(className)
-      localStorage.setItem(FUSE_APP_THEME, active)
+      localStorage.setItem(APP_THEME, active)
     } else {
-      localStorage.removeItem(FUSE_APP_THEME)
+      localStorage.removeItem(APP_THEME)
     }
   }, [active])
 
   return (
-    <TogglerWrapper>
-      Theme:{' '}
-      {toggleValues.map(value => (
+    <ThemeTogglerWrapper>
+      {toggleValues.map((value) => (
         <ToggleLabel key={value} selected={value === active}>
           <input
             type="radio"
@@ -74,7 +74,7 @@ const ThemeToggler: React.FC = () => {
           {value}
         </ToggleLabel>
       ))}
-    </TogglerWrapper>
+    </ThemeTogglerWrapper>
   )
 }
 

@@ -196,6 +196,7 @@ const customSelectStyles = {
     bottom: '0',
     margin: 'auto',
     width: '42rem',
+    maxWidth: '100%',
     minWidth: '30rem',
     background: 'var(--color-background-pageWrapper)',
     color: 'var(--color-text-primary)',
@@ -269,7 +270,7 @@ interface Props {
   tabIndex?: number
 }
 
-const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = e => {
+const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
   if (e.key === 'Enter') {
     e.preventDefault()
   }
@@ -277,7 +278,7 @@ const stopEnterPropagation: React.KeyboardEventHandler<HTMLDivElement> = e => {
 
 const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange, tabIndex = 0 }) => {
   const options = useMemo(
-    () => tokens.map(token => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
+    () => tokens.map((token) => ({ token, value: `${token.symbol} ${token.address}`, label: token.name })),
     [tokens],
   )
 

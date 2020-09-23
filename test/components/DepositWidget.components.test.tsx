@@ -13,6 +13,7 @@ const fakeRowState: Record<keyof TokenLocalState, boolean> = {
   enabling: false,
   enabled: false,
   claiming: false,
+  immatureClaim: false,
   depositing: false,
   withdrawing: false,
   highlighted: false,

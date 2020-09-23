@@ -1,6 +1,6 @@
 import React from 'react'
 import { TokenDetails, safeTokenName } from '@gnosis.pm/dex-js'
-import { EtherscanLink } from 'components/EtherscanLink'
+import { EtherscanLink } from 'components/common/EtherscanLink'
 
 export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
   const displayName = safeTokenName(token)
@@ -34,11 +34,11 @@ export function computeMarketProp({
   const sellTokenFormatted = safeTokenName(sellToken).toLowerCase()
 
   // BUYTOKEN/SELLTOKEN
-  const marketList = acceptedSeparators.map(sep => `${buyTokenFormatted}${sep}${sellTokenFormatted}`)
+  const marketList = acceptedSeparators.map((sep) => `${buyTokenFormatted}${sep}${sellTokenFormatted}`)
 
   if (inverseMarket) {
     // SELLTOKEN/BUYTOKEN
-    const inverseMarketList = acceptedSeparators.map(sep => `${sellTokenFormatted}${sep}${buyTokenFormatted}`)
+    const inverseMarketList = acceptedSeparators.map((sep) => `${sellTokenFormatted}${sep}${buyTokenFormatted}`)
     return marketList.concat(inverseMarketList)
   }
 
