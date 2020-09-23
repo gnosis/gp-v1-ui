@@ -12,7 +12,7 @@ import { formatSmart, formatAmountFull } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 
 // Components
-import TokenImg from 'components/common/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
 import { Spinner } from 'components/common/Spinner'
 
@@ -103,7 +103,13 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     <>
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
-          <TokenImg src={image} alt={name} faded={tokenDisabled} />
+          <TokenImgWrapper
+            address={address}
+            addressMainnet={addressMainnet}
+            name={name}
+            symbol={symbol}
+            faded={tokenDisabled}
+          />
           <div title={`${name || address}${symbol && ` [${symbol}]`}`}>
             <TokenSymbol symbol={symbol} warning={override?.description} warningUrl={override?.url} />
             {name}

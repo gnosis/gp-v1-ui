@@ -65,13 +65,6 @@ const TokenDisplay = styled.div`
 
   text-align: center;
 
-  .tokenImage {
-    grid-area: image;
-    height: 5em;
-    width: 5em;
-    margin: 0;
-  }
-
   .tokenName,
   .tokenSymbol {
     word-break: break-word;
@@ -97,6 +90,13 @@ const TokenDisplay = styled.div`
       align-self: flex-start;
     }
   }
+`
+
+const TokenImageStyled = styled(TokenImg)`
+  grid-area: image;
+  height: 5em;
+  width: 5em;
+  margin: 0;
 `
 
 const NonTokenDisplay = styled.div`
@@ -136,7 +136,12 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
         )
       return (
         <TokenDisplay>
-          <TokenImg src={token.image} alt={token.name} className="tokenImage" />
+          <TokenImageStyled
+            address={token.address}
+            addressMainnet={token.addressMainnet}
+            name={token.name}
+            symbol={token.symbol}
+          />
           <div className="tokenSymbol">
             <strong>{token.symbol}</strong>
           </div>
@@ -175,7 +180,12 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
 
       return (
         <TokenDisplay>
-          <TokenImg src={token.image} alt={token.name} className="tokenImage" />
+          <TokenImageStyled
+            address={token.address}
+            addressMainnet={token.addressMainnet}
+            name={token.name}
+            symbol={token.symbol}
+          />
           <div className="tokenSymbol">
             <strong>{token.symbol}</strong>
           </div>

@@ -1,7 +1,7 @@
 import React from 'react'
 
 // assets
-import TokenImg from 'components/common/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 import checkIcon from 'assets/img/li-check.svg'
 
 // types
@@ -21,7 +21,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, select
   return (
     <TokenSelectorWrapper>
       {tokens.map((tokenDetails) => {
-        const { name, symbol, address, id, image } = tokenDetails
+        const { name, symbol, address, addressMainnet, id } = tokenDetails
         return (
           <TokenBox
             key={address}
@@ -32,7 +32,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, select
               {/* <FontAwesomeIcon icon={faCheckCircle} color="green" /> */}
               <img src={checkIcon} width="20" height="20" />
             </CheckboxWrapper>
-            <TokenImg alt={name} src={image} />
+            <TokenImgWrapper address={address} addressMainnet={addressMainnet} name={name} symbol={symbol} />
             <div>
               <ProgressStepText>{symbol}</ProgressStepText>
               <ProgressStepText>

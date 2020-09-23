@@ -9,7 +9,7 @@ const Wrapper = styled.img<WrapperProps>`
   height: 2.8rem;
   border-radius: 3.6rem;
   object-fit: contain;
-  margin: 0 1rem 0 0;
+  // margin: 0 1rem 0 0;
   background-color: white;
   padding: 2px;
   opacity: ${(props): number => (props.faded ? 0.4 : 1)};
