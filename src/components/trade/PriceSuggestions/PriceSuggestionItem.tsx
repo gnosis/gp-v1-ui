@@ -9,6 +9,12 @@ import { displayTokenSymbolOrLink } from 'utils/display'
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
 
+import styled from 'styled-components'
+
+const LongPriceStrong = styled.strong`
+  word-break: break-all;
+`
+
 export interface Props {
   label: string
   baseToken: TokenDetails
@@ -67,9 +73,9 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
       <span>
         <span>{label}</span>{' '}
         {amount && (
-          <strong>
+          <LongPriceStrong>
             ({amount} {displayTokenSymbolOrLink(quoteToken)})
-          </strong>
+          </LongPriceStrong>
         )}
       </span>
       <button
