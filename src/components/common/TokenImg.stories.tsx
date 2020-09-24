@@ -5,9 +5,7 @@ import { TokenImg, Props } from './TokenImg'
 import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
 import { Frame } from './Frame'
 import styled from 'styled-components'
-
-const ADDRESS_GNO = '0x6810e776880C02933D47DB1b9fc05908e5386b96'
-const ADDRESS_WXDAI = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
+import { ADDRESS_GNO, ADDRESS_WXDAI } from 'storybook/data'
 
 export default {
   title: 'Common/TokenImg',
