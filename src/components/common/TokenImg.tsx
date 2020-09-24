@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { getImageUrl, safeTokenName } from 'utils'
+import { getImageUrl, RequireContextMock, safeTokenName } from 'utils'
 import unknownTokenImg from 'assets/img/unknown-token.png'
 
 const Wrapper = styled.img<WrapperProps>`
@@ -32,14 +32,7 @@ export interface WrapperProps {
 }
 
 const tokensIconsRequire =
-  process.env.NODE_ENV === 'test'
-    ? // mock for jest
-      Object.assign(() => '', {
-        keys: () => [],
-        resolve: () => '',
-        id: '',
-      })
-    : require.context('assets/img/tokens', false)
+  process.env.NODE_ENV === 'test' ? RequireContextMock : require.context('assets/img/tokens', false)
 const tokensIconsFiles = tokensIconsRequire.keys()
 
 export const TokenImg: React.FC<Props> = (props) => {

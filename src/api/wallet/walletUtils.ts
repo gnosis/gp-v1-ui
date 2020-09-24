@@ -1,16 +1,12 @@
 // mode='sync' by default
 // to not deal with Promises
 // included chunk is small as it's just resolved paths to images
+
+import { RequireContextMock } from 'utils'
+
 // not js code
 const walletIconsRequire =
-  process.env.NODE_ENV === 'test'
-    ? // mock for jest
-      Object.assign(() => '', {
-        keys: () => [],
-        resolve: () => '',
-        id: '',
-      })
-    : require.context('assets/img/wallets', false)
+  process.env.NODE_ENV === 'test' ? RequireContextMock : require.context('assets/img/wallets', false)
 const walletIconsFiles = walletIconsRequire.keys()
 
 export const getWCWalletIconURL = (walletName: string): string | undefined => {
