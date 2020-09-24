@@ -45,16 +45,12 @@ const tokensIconsFiles = tokensIconsRequire.keys()
 export const TokenImg: React.FC<Props> = (props) => {
   const { address, addressMainnet, symbol, name } = props
 
-  // TODO: Probably a good idea to allow to see in etherscan (probably wrapping this in BlockExplorerLink component)
-
-  // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
-  // return walletIconFile && tokensIconsRequire<{ default: string }>(walletIconFile).default
-
   const iconFile = tokensIconsFiles.find(
     (file) => file.includes(address) || (addressMainnet && file.includes(addressMainnet)),
   )
-
   const iconFileUrl = iconFile ? tokensIconsRequire(iconFile) : undefined
+  // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
+  // https://github.com/gnosis/dex-react/issues/1442
   const safeName = safeTokenName({ id: 0, address, addressMainnet, symbol, name })
   return (
     <Wrapper

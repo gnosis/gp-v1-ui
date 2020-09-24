@@ -62,7 +62,6 @@ export const TokenImgRestyled = styled(TokenImg)`
   height: 4rem;
   margin: 0.5rem 3rem 0.5rem 0.5rem;
   background-color: yellow;
-  // margin: 0 1rem 0 0;
 `
 export const Restyle: Story = () => (
   <>
