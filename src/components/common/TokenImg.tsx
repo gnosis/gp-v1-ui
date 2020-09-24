@@ -63,9 +63,6 @@ export const TokenImg: React.FC<Props> = (props) => {
 }
 
 export const TokenImgWrapper = styled(TokenImg)`
-  // width: 2.4rem;
-  // height: 2.4rem;
-  // margin: 0 0.5rem 0 0;
   margin: 0 1rem 0 0;
 `
 
