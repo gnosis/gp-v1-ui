@@ -67,7 +67,6 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     address,
     addressMainnet,
     name,
-    image,
     symbol,
     decimals,
     totalExchangeBalance,
