@@ -7,7 +7,7 @@ import BN from 'bn.js'
 import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
 
 // utils
-import { validatePositiveConstructor, validInputPattern, logDebug } from 'utils'
+import { validatePositiveConstructor, validInputPattern, logDebug, getIsWrappable, getNativeTokenName } from 'utils'
 
 // components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
@@ -18,12 +18,12 @@ import { InputBox } from 'components/InputBox'
 import useSafeState from 'hooks/useSafeState'
 import { useWrapUnwrapEth } from 'hooks/useWrapUnwrapEth'
 import { useTokenBalances } from 'hooks/useTokenBalances'
-import { WETH_ADDRESS_MAINNET } from 'const'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { composeOptionalParams } from 'utils/transaction'
 import { toast } from 'toastify'
 import { useEthBalances } from 'hooks/useEthBalance'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 export const INPUT_ID_AMOUNT = 'wrapAmount'
 
@@ -111,6 +111,8 @@ interface WrapUnwrapInfo {
 }
 
 interface GetModalParams {
+  nativeToken: string
+  wrappedToken: string
   wrap: boolean
   wethHelpVisible: boolean
   showWethHelp: React.Dispatch<React.SetStateAction<boolean>>
@@ -121,16 +123,33 @@ interface GetModalParams {
 }
 
 function getModalParams(params: GetModalParams): WrapUnwrapInfo {
-  const { wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, unwrappingWeth, wrappingEth } = params
+  const {
+    nativeToken,
+    wrappedToken,
+    wrap,
+    wethHelpVisible,
+    showWethHelp,
+    wethBalance,
+    ethBalance,
+    unwrappingWeth,
+    wrappingEth,
+  } = params
   const WethHelp = (
     <div className="more-info">
       <p>
-        Gnosis Protocol allows the exchange of any ERC20 token. As ETH is not an ERC20 token, it must first be wrapped.
+        Gnosis Protocol allows the exchange of any ERC20 token. As {nativeToken} is not an ERC20 token, it must first be
+        wrapped.
       </p>
-      <p>By wrapping ETH you will be minting your submitted amount as WETH.</p>
       <p>
-        ETH can be <b>wrapped</b> as WETH anytime. Equally, WETH can be <b>unwrapped</b> back into ETH
+        By wrapping {nativeToken} you will be minting your submitted amount as {wrappedToken}.
       </p>
+      <p>
+        {nativeToken} can be <b>wrapped</b> as {wrappedToken} anytime. Equally, {wrappedToken} can be <b>unwrapped</b>{' '}
+        back into {nativeToken}
+      </p>
+      {nativeToken === 'xDAI' && (
+        <p>{wrappedToken} is a wrapped native token, in the same way WETH is to Ether in the Mainnet network.</p>
+      )}
       <p>
         Learn more about WETH{' '}
         <a target="_blank" rel="noopener noreferrer" href="https://weth.io/">
@@ -144,7 +163,8 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
     const description = (
       <>
         <p>
-          Wrap ETH into WETH, so it can later be deposited into the exchange. {wethHelpVisible && WethHelp}
+          Wrap {nativeToken} into {wrappedToken}, so it can later be deposited into the exchange.{' '}
+          {wethHelpVisible && WethHelp}
           <a onClick={(): void => showWethHelp(!wethHelpVisible)}>
             {wethHelpVisible ? '[-] Show less...' : '[+] Show more...'}
           </a>
@@ -153,16 +173,16 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
     )
     const tooltipText = (
       <div>
-        Wrapping converts ETH into WETH,
+        Wrapping converts {nativeToken} into {wrappedToken},
         <br />
-        so it can be deposited into the exchange)
+        so it can be deposited into the exchange
       </div>
     )
 
     return {
-      title: 'Wrap ETH',
+      title: 'Wrap ' + nativeToken,
       amountLabel: 'Amount to Wrap',
-      symbolSource: 'ETH',
+      symbolSource: nativeToken,
       balance: ethBalance,
       description,
       tooltipText,
@@ -172,7 +192,7 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
     const description = (
       <>
         <p>
-          Unwrapping converts WETH back into ETH.{' '}
+          Unwrapping converts {wrappedToken} back into {nativeToken}.{' '}
           {!wethHelpVisible && <a onClick={(): void => showWethHelp(true)}>Learn more...</a>}
         </p>
         {wethHelpVisible && WethHelp}
@@ -180,12 +200,12 @@ function getModalParams(params: GetModalParams): WrapUnwrapInfo {
     )
 
     return {
-      title: 'Unwrap WETH',
+      title: 'Unwrap ' + wrappedToken,
       amountLabel: 'Amount to Unwrap',
-      symbolSource: 'WETH',
+      symbolSource: wrappedToken,
       balance: wethBalance || null,
       description,
-      tooltipText: 'Unwrapping converts WETH back into ETH',
+      tooltipText: `Unwrapping converts ${wrappedToken} back into ${nativeToken}`,
       loading: unwrappingWeth,
     }
   }
@@ -196,12 +216,15 @@ interface WrapEtherFormData {
 }
 
 const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrapEtherBtnProps) => {
+  const { networkIdOrDefault } = useWalletConnection()
+  const { nativeToken, wrappedToken } = getNativeTokenName(networkIdOrDefault)
   const { wrap, label, className } = props
   const [wethHelpVisible, showWethHelp] = useSafeState(false)
   const { wrapEth, unwrapWeth, wrappingEth, unwrappingWeth } = useWrapUnwrapEth()
   const { ethBalance } = useEthBalances()
   const { balances } = useTokenBalances()
-  const wethBalanceDetails = balances.find((token) => token.addressMainnet === WETH_ADDRESS_MAINNET)
+
+  const wethBalanceDetails = balances.find((token) => getIsWrappable(networkIdOrDefault, token.address))
   const wethBalance = wethBalanceDetails?.walletBalance
 
   const { register, errors, handleSubmit, setValue, watch } = useForm<WrapEtherFormData>({
@@ -210,8 +233,29 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const amountError = errors[INPUT_ID_AMOUNT]
 
   const { title, balance, symbolSource, tooltipText, description, amountLabel, loading } = useMemo(
-    () => getModalParams({ wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth }),
-    [wrap, wethHelpVisible, showWethHelp, wethBalance, ethBalance, wrappingEth, unwrappingWeth],
+    () =>
+      getModalParams({
+        nativeToken,
+        wrappedToken,
+        wrap,
+        wethHelpVisible,
+        showWethHelp,
+        wethBalance,
+        ethBalance,
+        wrappingEth,
+        unwrappingWeth,
+      }),
+    [
+      nativeToken,
+      wrappedToken,
+      wrap,
+      wethHelpVisible,
+      showWethHelp,
+      wethBalance,
+      ethBalance,
+      wrappingEth,
+      unwrappingWeth,
+    ],
   )
 
   // Show Warning: Check if the user is Wrapping all his balance
@@ -306,10 +350,11 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
             {amountError && <p className="error">{amountError.message}</p>}
             {wrapAllBalance && (
               <p className="error">
-                You are wrapping all your ETH balance. This would only make sense if your wallet doesn&apos;t need ETH
+                You are wrapping all your {nativeToken} balance. This would only make sense if your wallet doesn&apos;t
+                need {nativeToken}
                 to pay the gas (as in some wallets that use tokens as payment). <br />
                 <br />
-                Normally you would want to wrap a smaller fraction of your ETH.
+                Normally you would want to wrap a smaller fraction of your {nativeToken}.
                 <br />
                 <br />
                 Are you sure you want to continue?
@@ -336,16 +381,16 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
 
           let wrapUnwrapPromise, successMessage: string, errorMessage: string
           if (wrap) {
-            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ETH`)
+            logDebug(`[WrapEtherBtn] Wrap ${wrapAmount} ${nativeToken}`)
 
             wrapUnwrapPromise = wrapEth(wrapAmount, txOptionalParams)
-            successMessage = `Successfully wrapped ${wrapAmountEther} ETH`
-            errorMessage = `Error wrapping ${wrapAmountEther} ETH`
+            successMessage = `Successfully wrapped ${wrapAmountEther} ${nativeToken}`
+            errorMessage = `Error wrapping ${wrapAmountEther} ${nativeToken}`
           } else {
-            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} WETH`)
+            logDebug(`[WrapEtherBtn] Unwrap ${wrapAmount} ${wrappedToken}`)
             wrapUnwrapPromise = unwrapWeth(wrapAmount, txOptionalParams)
-            successMessage = `Successfully unwrapped ${wrapAmountEther} WETH`
-            errorMessage = `Error unwrapping ${wrapAmountEther} WETH`
+            successMessage = `Successfully unwrapped ${wrapAmountEther} ${wrappedToken}`
+            errorMessage = `Error unwrapping ${wrapAmountEther} ${wrappedToken}`
           }
 
           wrapUnwrapPromise

@@ -3,6 +3,10 @@ import { WalletApi } from './wallet/WalletApi'
 const GAS_STATIONS = {
   1: 'https://safe-relay.gnosis.pm/api/v1/gas-station/',
   4: 'https://safe-relay.staging.gnosisdev.com/api/v1/gas-station/',
+  // Pending price estimation
+
+  // TODO: Pending review what makes sense here. How do gas prices are stablished in xDAI network
+  100: undefined,
 }
 
 export type GasPriceLevel = Exclude<keyof GasStationResponse, 'lastUpdate'>

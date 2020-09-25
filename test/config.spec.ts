@@ -55,13 +55,24 @@ describe('Test config defaults', () => {
       config: [
         {
           networkId: 1,
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_production: 'https://dex-price-estimator.gnosis.io',
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-mainnet.dev.gnosisdev.com',
         },
         {
           networkId: 4,
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_production: 'https://dex-price-estimator.rinkeby.gnosis.io',
+          // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-rinkeby.dev.gnosisdev.com',
+        },
+        {
+          networkId: 100,
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          url_production: 'https://price-estimate-xdai.dev.gnosisdev.com',
+          // eslint-disable-next-line @typescript-eslint/camelcase
+          url_develop: 'https://price-estimate-xdai.dev.gnosisdev.com',
         },
       ],
     }
@@ -79,6 +90,10 @@ describe('Test config defaults', () => {
         {
           networkId: 4,
           url: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby',
+        },
+        {
+          networkId: 100,
+          url: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol-xdai',
         },
       ],
     }
@@ -103,6 +118,7 @@ describe('Test config defaults', () => {
       config: [
         { networkId: 1, blockNumber: 9340147 },
         { networkId: 4, blockNumber: 5844678 },
+        { networkId: 100, blockNumber: 11948310 },
       ],
     }
     expect(CONFIG.exchangeContractConfig).toEqual(expected)
@@ -116,10 +132,15 @@ describe('Test config defaults', () => {
       }),
     ])
 
-    const { [Network.Mainnet]: disabledOnMainnet, [Network.Rinkeby]: disabledOnRinkeby } = CONFIG.disabledTokens
+    const {
+      [Network.Mainnet]: disabledOnMainnet,
+      [Network.Rinkeby]: disabledOnRinkeby,
+      [Network.xDai]: disabledOnXdai,
+    } = CONFIG.disabledTokens
 
     if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
     if (disabledOnRinkeby.length) expect(disabledOnRinkeby).toEqual(disabledTokensArray)
+    if (disabledOnRinkeby.length) expect(disabledOnXdai).toEqual(disabledTokensArray)
   })
 
   it('initialTokenSelection', () => {
