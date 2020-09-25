@@ -4,6 +4,7 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 
 import { BlockExplorerLink, Props } from 'components/common/BlockExplorerLink'
 import { Network } from 'types'
+import { ADDRESS_ACCOUNT_XDAI, ADDRESS_GNOSIS_PROTOCOL_XDAI, ADDRESS_GNO_XDAI, TX_XDAI } from 'storybook/data'
 
 const networkIds = Object.values(Network).filter(Number.isInteger)
 
@@ -64,4 +65,40 @@ Token.args = {
   type: 'token',
   label: 'GNO token',
   identifier: '0x6810e776880c02933d47db1b9fc05908e5386b96',
+}
+
+export const TxXdai = Template.bind({})
+TxXdai.storyName = 'Tx on xDAI'
+TxXdai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'tx',
+  identifier: TX_XDAI,
+}
+
+export const ContractXDai = Template.bind({})
+ContractXDai.storyName = 'Contract on xDAI'
+ContractXDai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'contract',
+  identifier: ADDRESS_GNOSIS_PROTOCOL_XDAI,
+}
+
+export const TokenXDai = Template.bind({})
+TokenXDai.storyName = 'Token on xDAI'
+TokenXDai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'token',
+  identifier: ADDRESS_GNO_XDAI,
+}
+
+export const AddressXDai = Template.bind({})
+AddressXDai.storyName = 'Address on xDAI'
+AddressXDai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'address',
+  identifier: ADDRESS_ACCOUNT_XDAI,
 }
