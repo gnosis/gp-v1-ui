@@ -190,6 +190,8 @@ export interface ExchangeApiParams extends DepositApiDependencies {
 
 type TradeEvent = BatchExchangeEvents['Trade']
 
+const EXTRA_GAS_PER_ORDER_CANCELLATION = 5000
+
 /**
  * Basic implementation of Stable Coin Converter API
  */
@@ -469,7 +471,12 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
   }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
     logDebug('[ExchangeApi] cancelOrders:', orderIds)
-    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
+    const gas = await contract.methods.cancelOrders(orderIds).estimateGas({ from: userAddress })
+    // for edge case when batch changes and order gets deleted instead of cancelled
+    // but the estimation was at the point the order would have gotten cancelled
+    // issue#1444
+    const safeGasAmount = gas + EXTRA_GAS_PER_ORDER_CANCELLATION * orderIds.length
+    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress, gas: safeGasAmount })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)
