@@ -3,7 +3,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 
 import { LastTrades, Props, LastTradesItem } from 'components/trade/LastTrades/LastTrades'
-import { DAI } from 'storybook/tokens'
+import { DAI } from 'storybook/data'
 import BigNumber from 'bignumber.js'
 import { CenteredAndFramed } from 'storybook/decorators'
 
