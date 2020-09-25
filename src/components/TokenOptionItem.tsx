@@ -13,7 +13,7 @@ import { TokenFromExchange } from 'services/factories'
 import { tokenListApi } from 'api'
 
 // components
-import { TokenImgWrapper } from 'components/TokenImg'
+import { TokenImg } from 'components/common/TokenImg'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
@@ -75,7 +75,8 @@ const ExtraOptionsMessage = styled.a`
 `
 
 interface OptionItemProps {
-  image?: string
+  address: string
+  addressMainnet?: string
   name?: string
   symbol?: string
   faded?: boolean
@@ -86,7 +87,8 @@ interface OptionItemProps {
 // generic component to display token
 // with custom children option
 export const OptionItem: React.FC<OptionItemProps> = ({
-  image,
+  address,
+  addressMainnet,
   name,
   symbol,
   children,
@@ -96,7 +98,7 @@ export const OptionItem: React.FC<OptionItemProps> = ({
 }) => {
   return (
     <OptionItemWrapper>
-      <TokenImgWrapper src={image} alt={name} faded={faded} />
+      <TokenImg address={address} addressMainnet={addressMainnet} name={name} symbol={symbol} faded={faded} />
 
       <div className="tokenDetails">
         <div className="tokenName">
@@ -158,7 +160,12 @@ const generateMessage = ({
           </a>
         )
       return (
-        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+        <OptionItem
+          name={token.name}
+          symbol={token.symbol}
+          address={token.address}
+          addressMainnet={token.addressMainnet}
+        >
           <ExtraOptionsMessage
             href="https://docs.gnosis.io/protocol/docs/addtoken1/"
             rel="noopener noreferrer"
@@ -188,7 +195,12 @@ const generateMessage = ({
       }
 
       return (
-        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+        <OptionItem
+          name={token.name}
+          symbol={token.symbol}
+          address={token.address}
+          addressMainnet={token.addressMainnet}
+        >
           <button onClick={handleAddToken}>Add Token</button>
         </OptionItem>
       )

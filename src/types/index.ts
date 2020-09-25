@@ -13,7 +13,7 @@ export enum Network {
   Rinkeby = 4,
   Goerli = 5,
   Kovan = 42,
-  xDai = 100,
+  xDAI = 100,
 }
 
 export interface MinimalTokenDetails {
@@ -26,7 +26,6 @@ export interface MinimalTokenDetails {
 export interface TokenDetails extends MinimalTokenDetails {
   id: number
   addressMainnet?: string
-  image?: string
   disabled?: boolean
   override?: TokenOverride
 }

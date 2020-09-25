@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 // components
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 import {
   UserWalletItem,
@@ -24,7 +24,7 @@ import {
   LogInOutButton,
   WalletName,
   WalletImage,
-  EtherscanButton,
+  BlockExplorerButton,
 } from './UserWallet.styled'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -183,9 +183,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
             <QRCode className="QRCode" value={userAddress} renderAs="svg" size={150} />
             {/* Etherscan Link */}
             {/* TODO: add network specific */}
-            <EtherscanButton>
-              <EtherscanLink
-                className="etherscanLink"
+            <BlockExplorerButton>
+              <BlockExplorerLink
                 type="address"
                 identifier={userAddress}
                 label={
@@ -194,7 +193,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                   </>
                 }
               />
-            </EtherscanButton>
+            </BlockExplorerButton>
             {/* Log In/Out Button */}
             {renderLogInOutButton()}
           </UserWalletItem>

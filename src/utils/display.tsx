@@ -1,11 +1,11 @@
 import React from 'react'
 import { TokenDetails, safeTokenName } from '@gnosis.pm/dex-js'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
   const displayName = safeTokenName(token)
   if (displayName.startsWith('0x')) {
-    return <EtherscanLink type="token" identifier={token.address} />
+    return <BlockExplorerLink type="token" identifier={token.address} />
   }
   return displayName
 }

@@ -208,6 +208,6 @@ export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTo
   {
     [Network.Mainnet]: {},
     [Network.Rinkeby]: {},
-    [Network.xDai]: {},
+    [Network.xDAI]: {},
   },
 )

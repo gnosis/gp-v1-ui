@@ -1,12 +1,15 @@
 import { findFromListHoC as findTokenHox, toTokenSymbol } from 'storybook/utils'
 import { DefaultTokenDetails } from './types'
 
+export const ADDRESS_GNO = '0x6810e776880C02933D47DB1b9fc05908e5386b96'
+export const ADDRESS_WXDAI = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
+
 // Default params to be used as initial values
 // and when there's no Token found for symbol
 export const GNO: DefaultTokenDetails = {
   id: 1,
   name: 'Gnosis Token',
-  address: '0x1',
+  address: ADDRESS_GNO,
   symbol: 'GNO',
   decimals: 18,
 }

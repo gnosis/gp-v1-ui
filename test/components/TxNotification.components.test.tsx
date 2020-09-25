@@ -4,13 +4,13 @@ import { shallow } from 'enzyme'
 import { TxNotification } from 'components/TxNotification'
 
 import { TX_HASH } from '../data'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 describe('<TxNotification />', () => {
   it('renders with link component', () => {
     const wrapper = shallow(<TxNotification txHash={TX_HASH} />)
     expect(wrapper.text()).toMatch(/^The transaction has been sent! Check .* for details$/)
-    expect(wrapper.contains(<EtherscanLink type="tx" identifier={TX_HASH} />)).toBeTruthy()
+    expect(wrapper.contains(<BlockExplorerLink type="tx" identifier={TX_HASH} />)).toBeTruthy()
   })
 
   it('does not render component', () => {

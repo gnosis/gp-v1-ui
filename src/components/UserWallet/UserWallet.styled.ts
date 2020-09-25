@@ -64,7 +64,7 @@ const WalletButton = styled.button`
   }
 `
 
-export const EtherscanButton = styled(WalletButton)`
+export const BlockExplorerButton = styled(WalletButton)`
   background: transparent;
   color: var(--color-text-primary);
   > a,
