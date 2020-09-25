@@ -2,7 +2,7 @@ import { TokenDetails } from 'types'
 import { getErc20Info } from 'services/helpers'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import Web3 from 'web3'
-import { getImageUrl, logDebug } from 'utils'
+import { logDebug } from 'utils'
 
 interface Params {
   erc20Api: Erc20Api
@@ -28,11 +28,6 @@ export function getTokenFromErc20Factory(closureParams: Params) {
       return null
     }
 
-    const token = {
-      ...erc20Info,
-      image: getImageUrl(params.tokenAddress),
-    }
-
-    return token
+    return erc20Info
   }
 }

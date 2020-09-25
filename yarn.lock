@@ -1611,19 +1611,19 @@
   dependencies:
     prop-types "^15.7.2"
 
-"@gnosis.pm/dex-contracts@^0.2.0":
-  version "0.2.15"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-contracts/-/dex-contracts-0.2.15.tgz#254314c6f8dff33a022a3d2b67035b08f0782c94"
-  integrity sha512-rvGuiHfl12F70qBiJimUv/uGdn5+Dfao2xAbhiQh9/wJBt5A5nVYONnZ13JFfIoOrSJTRT1n61SEhLfLOlG6dw==
+"@gnosis.pm/dex-contracts@^0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-contracts/-/dex-contracts-0.4.3.tgz#b887eb543cae039d1e9607870232394cab5c3be7"
+  integrity sha512-ObyItfEzWRwfwWSSncPFP8aT54+Vi7VzTvqCbNYTwF+Einn9kdJvasTWkFaw5eiZE1ykD//kFB4T8xv80F2lBw==
   dependencies:
-    bn.js "^5.1.1"
+    bn.js "^5.1.3"
 
-"@gnosis.pm/dex-js@@gnosis.pm/dex-js@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.5.0.tgz#9e32f7ffc9cb40c842f61af2402f554217035731"
-  integrity sha512-yAxHZvbebI/JUhWQVeXCmIsL7K8H+ZdYJVckNtO1nuJjY0sIhMhOQ9F2P8c1hlC51wklauf5Lzvn7+EfUZ7Kvg==
+"@gnosis.pm/dex-js@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/dex-js/-/dex-js-0.7.0.tgz#bbf0df74f03bb106269d5273933a3f9c707d93c4"
+  integrity sha512-z23A8ALMIm7ED1oHtnM5APYYli9/S2pGCzZtpWBKYdNzSsAj6sOtFp4gRTOptNeAIu7xC7Q5N62zW8gd6qaw8w==
   dependencies:
-    "@gnosis.pm/dex-contracts" "^0.2.0"
+    "@gnosis.pm/dex-contracts" "^0.4.3"
     bignumber.js "^9.0.0"
 
 "@hapi/address@^4.1.0":
@@ -5175,7 +5175,7 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.0, bn.js@^4.11.1, bn.js@^4.11.6, bn.js@^
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.9.tgz#26d556829458f9d1e81fc48952493d0ba3507828"
   integrity sha512-E6QoYqCKZfgatHTdHzs1RRKP7ip4vvm+EyRUeE2RF0NblwVvb0p6jSVeNTOFxPn26QXN2o6SMfNxKp6kU8zQaw==
 
-bn.js@^5.1.1:
+bn.js@^5.1.1, bn.js@^5.1.3:
   version "5.1.3"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.1.3.tgz#beca005408f642ebebea80b042b4d18d2ac0ee6b"
   integrity sha512-GkTiFpjFtUzU9CbMeJ5iazkCzGL3jrhzerzZIuqLABjbwRaFt33I9tUdSNryIptM+RxDet6OKm2WnLXzW51KsQ==
