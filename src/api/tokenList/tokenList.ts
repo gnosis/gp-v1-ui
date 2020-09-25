@@ -1,7 +1,6 @@
 import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
 
-import { getImageUrl } from 'utils'
 import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
 
 export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsConfig[]): TokenDetails[] {
@@ -13,7 +12,7 @@ export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsCon
       const { id, name, symbol, decimals = DEFAULT_PRECISION } = token
       const addressMainnet = token.addressByNetwork[Network.Mainnet]
 
-      acc.push({ id, name, symbol, decimals, address, addressMainnet, image: getImageUrl(addressMainnet) })
+      acc.push({ id, name, symbol, decimals, address, addressMainnet })
       return acc
     }
 
