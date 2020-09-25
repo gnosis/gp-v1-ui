@@ -35,11 +35,7 @@ const tokensIconsRequire =
   process.env.NODE_ENV === 'test' ? RequireContextMock : require.context('assets/img/tokens', false)
 
 const tokensIconsFilesByAddress = tokensIconsRequire.keys().reduce((acc, file) => {
-  let address
-  const match = file.match(/(0x\w{40})/)
-  if (match && match.length > 0) {
-    address = match[match.length - 1]
-  }
+  const address = file.match(/0x\w{40}/)?.[0]
   if (!address) {
     throw new Error(
       "Error initializing 'assets/img/tokens' images. The image doesn't have the expected format: " + file,
