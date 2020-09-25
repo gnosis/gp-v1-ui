@@ -86,12 +86,12 @@ const createConditionalMiddleware = <T extends unknown>(
 
 interface ExtraMiddlewareHandlers {
   fetchGasPrice(): Promise<string | undefined>
-  earmarkTxData(data?: string): Promise<string>
+  earmarkTx(tx: TransactionConfig): Promise<void>
 }
 
 export const composeProvider = <T extends Provider>(
   provider: T,
-  { fetchGasPrice, earmarkTxData }: ExtraMiddlewareHandlers,
+  { fetchGasPrice, earmarkTx }: ExtraMiddlewareHandlers,
 ): T => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
@@ -150,9 +150,10 @@ export const composeProvider = <T extends Provider>(
         // no parameters, which shouldn't happen
         if (!txConfig) return false
 
-        const earmarkedData = await earmarkTxData(txConfig.data)
+        // tx.data += decode*
+        // if gas is specified tx.gas += cost of decode*
+        await earmarkTx(txConfig)
 
-        txConfig.data = earmarkedData
         // don't mark as handled
         // pass modified tx on
         return false
