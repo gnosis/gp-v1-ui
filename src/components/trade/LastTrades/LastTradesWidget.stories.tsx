@@ -3,7 +3,7 @@ import React from 'react'
 import { Story, Meta } from '@storybook/react/types-6-0'
 
 import { LastTradesWidget, Props } from 'components/trade/LastTrades/LastTradesWidget'
-import { DAI } from 'storybook/tokens'
+import { DAI } from 'storybook/data'
 import { Apollo } from 'storybook/decorators'
 
 export default {
