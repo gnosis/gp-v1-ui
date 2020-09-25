@@ -8,12 +8,12 @@ import sampleDataSet from 'storybook/orderbookSamples'
 import { processRawApiData } from './OrderBookWidget'
 import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 import {
-  defaultBaseToken,
-  defaultQuoteToken,
-  tokenSymbolsWithDefaults,
+  baseTokenDefault,
+  quoteTokenDefault,
+  tokenConfigSymbolsWithDefaults,
   defaultNetworkId,
-  findTokenBySymbolOrAddress,
-} from 'storybook/tokenDefaults'
+  findTokenConfig,
+} from 'storybook/data'
 
 type SampleData = typeof sampleDataSet[0]
 
@@ -62,11 +62,11 @@ const SampleTemplate: React.FC<SampleProps> = ({
   baseToken: baseTokenSymbolOrAddress,
   quoteToken: quoteTokenSymbolOrAddress,
 }) => {
-  const baseToken = useMemo(() => findTokenBySymbolOrAddress(baseTokenSymbolOrAddress, defaultBaseToken), [
+  const baseToken = useMemo(() => findTokenConfig(baseTokenSymbolOrAddress, baseTokenDefault), [
     baseTokenSymbolOrAddress,
   ])
 
-  const quoteToken = useMemo(() => findTokenBySymbolOrAddress(quoteTokenSymbolOrAddress, defaultQuoteToken), [
+  const quoteToken = useMemo(() => findTokenConfig(quoteTokenSymbolOrAddress, quoteTokenDefault), [
     quoteTokenSymbolOrAddress,
   ])
 
@@ -125,8 +125,8 @@ sampleDataSet.forEach(({ name, description = '', asks = [], bids = [] }) => {
       description={description}
       asks={object('asks', asks)}
       bids={object('bids', bids)}
-      baseToken={select('baseToken', tokenSymbolsWithDefaults, tokenSymbolsWithDefaults[0])}
-      quoteToken={select('quoteToken', tokenSymbolsWithDefaults, tokenSymbolsWithDefaults[1])}
+      baseToken={select('baseToken', tokenConfigSymbolsWithDefaults, tokenConfigSymbolsWithDefaults[0])}
+      quoteToken={select('quoteToken', tokenConfigSymbolsWithDefaults, tokenConfigSymbolsWithDefaults[1])}
       networkId={+optionsKnob('networkId', NetworkRadioOptions, String(defaultNetworkId), { display: 'inline-radio' })}
     />
   ))

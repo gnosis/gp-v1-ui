@@ -4,13 +4,14 @@ import styled from 'styled-components'
 import { MEDIA } from 'const'
 
 // Assets
-import { faSkull } from '@fortawesome/free-solid-svg-icons'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Layout: Subcomponents
 import Header from 'components/layout/SwapLayout/Header'
 import Footer from 'components/layout/SwapLayout/Footer'
 import LegalBanner from 'components/LegalBanner'
+import GlobalStyles from 'styles/global'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -74,17 +75,20 @@ const navigation = [
 ]
 
 export const SwapLayout: React.FC = ({ children }) => (
-  <Wrapper>
-    <LegalBanner>
-      <p>
-        <FontAwesomeIcon icon={faSkull} style={{ marginRight: '0.3rem' }} /> This project is in beta. Use at your own
-        risk.
-      </p>
-    </LegalBanner>
-    <Header navigation={navigation} />
-    <main>{children}</main>
-    <Footer />
-  </Wrapper>
+  <>
+    <GlobalStyles />
+    <Wrapper>
+      <LegalBanner>
+        <p>
+          <FontAwesomeIcon icon={faExclamationTriangle} style={{ marginRight: '0.3rem' }} /> This project is in beta.
+          Use at your own risk.
+        </p>
+      </LegalBanner>
+      <Header navigation={navigation} />
+      <main>{children}</main>
+      <Footer />
+    </Wrapper>
+  </>
 )
 
 export default SwapLayout

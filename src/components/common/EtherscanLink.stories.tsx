@@ -4,6 +4,7 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 
 import { EtherscanLink, EtherscanLinkProps } from 'components/common/EtherscanLink'
 import { Network } from 'types'
+import { ADDRESS_GNO, ADDRESS_GNOSIS_PROTOCOL, ADDRESS_GNOSIS_PROTOCOL_RINKEBY, TX_EXAMPLE } from 'storybook/data'
 
 const networkIds = Object.values(Network).filter(Number.isInteger)
 
@@ -20,7 +21,7 @@ const Template: Story<EtherscanLinkProps> = (args) => <EtherscanLink {...args} /
 
 const defaultParams: EtherscanLinkProps = {
   type: 'tx',
-  identifier: '0x5f995094ff596cf1aa27e8ec84fab21c4ec6a512981b13c563a58c9172607c3d',
+  identifier: TX_EXAMPLE,
   networkId: Network.Mainnet,
 }
 
@@ -41,7 +42,7 @@ Rinkeby.args = {
   networkId: Network.Rinkeby,
   type: 'contract',
   label: 'Gnosis Protocol (Rinkeby)',
-  identifier: '0xC576eA7bd102F7E476368a5E98FA455d1Ea34dE2',
+  identifier: ADDRESS_GNOSIS_PROTOCOL_RINKEBY,
 }
 
 export const Labeled = Template.bind({})
@@ -54,8 +55,8 @@ export const Contract = Template.bind({})
 Contract.args = {
   ...defaultParams,
   type: 'contract',
-  label: 'Gnosis Protocol token',
-  identifier: '0x6f400810b62df8e13fded51be75ff5393eaa841f',
+  label: 'Gnosis Protocol contract',
+  identifier: ADDRESS_GNOSIS_PROTOCOL,
 }
 
 export const Token = Template.bind({})
@@ -63,5 +64,5 @@ Token.args = {
   ...defaultParams,
   type: 'token',
   label: 'GNO token',
-  identifier: '0x6810e776880c02933d47db1b9fc05908e5386b96',
+  identifier: ADDRESS_GNO,
 }

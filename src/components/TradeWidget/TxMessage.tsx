@@ -7,10 +7,8 @@ import { TradeFormData } from '.'
 import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
 
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
-import { EllipsisText } from 'components/common/EllipsisText'
 
 import useSafeState from 'hooks/useSafeState'
-import { SwapIcon } from './SwapIcon'
 import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
 import BigNumber from 'bignumber.js'
 import { ZERO_BIG_NUMBER } from 'const'
@@ -20,6 +18,7 @@ import { useGasPrice } from 'hooks/useGasPrice'
 import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
+import { SwapPrice } from 'components/common/SwapPrice'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -74,38 +73,32 @@ const OrderValidityTooltip: React.FC = () => (
   </HelpTooltipContainer>
 )
 
-interface SimpleDisplayPriceProps extends Omit<TxMessageProps, 'networkId'> {
+interface SimpleDisplayPriceProps {
   price: string
   priceInverse: string
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
 }
 
 export const SimpleDisplayPrice: React.FC<SimpleDisplayPriceProps> = ({
   price,
   priceInverse,
-  sellToken,
-  receiveToken,
+  baseToken,
+  quoteToken,
 }) => {
-  // true = direct
-  // false = indirect
-  const [showPrice, setShowPrice] = useSafeState(true)
-  const swapPrices = (): void => setShowPrice((state) => !state)
-
-  const displaySellToken = displayTokenSymbolOrLink(sellToken)
-  const displayReceiveToken = displayTokenSymbolOrLink(receiveToken)
-  const sellTokenTitle = symbolOrAddress(sellToken)
-  const receiveTokenTitle = symbolOrAddress(receiveToken)
+  const [isPriceInverted, setPriceInverted] = useSafeState(false)
+  const swapPrices = (): void => setPriceInverted((state) => !state)
 
   return (
     <div>
-      <span>{showPrice ? priceInverse : price}</span>{' '}
-      <EllipsisText as="strong" title={showPrice ? sellTokenTitle : receiveTokenTitle}>
-        {showPrice ? displaySellToken : displayReceiveToken}
-      </EllipsisText>
-      <small> per </small>
-      <EllipsisText as="strong" title={showPrice ? receiveTokenTitle : sellTokenTitle}>
-        {showPrice ? displayReceiveToken : displaySellToken}
-      </EllipsisText>
-      <SwapIcon swap={swapPrices} />
+      <span>{isPriceInverted ? priceInverse : price}</span>{' '}
+      <SwapPrice
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        isPriceInverted={isPriceInverted}
+        onSwapPrices={swapPrices}
+        showBaseToken
+      />
     </div>
   )
 }
@@ -317,12 +310,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         <div className="sectionTitle">
           <strong>Prices</strong>
         </div>
-        <SimpleDisplayPrice
-          receiveToken={receiveToken}
-          sellToken={sellToken}
-          price={price}
-          priceInverse={priceInverse}
-        />
+        <SimpleDisplayPrice baseToken={receiveToken} quoteToken={sellToken} price={price} priceInverse={priceInverse} />
 
         {/* Order Validity */}
 
@@ -350,7 +338,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
               Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
               their running costs. Learn more{' '}
               <a
-                href="https://docs.gnosis.io/protocol/docs/introduction1/#minimum-order"
+                href="https://docs.gnosis.io/protocol/docs/faq#minimum-order"
                 rel="noopener noreferrer"
                 target="_blank"
               >

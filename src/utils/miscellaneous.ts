@@ -192,3 +192,9 @@ export function flattenMapOfSets<K, T>(map: Map<K, Set<T>>): T[] {
 export function divideBN(numerator: BN, denominator: BN): BigNumber {
   return new BigNumber(numerator.toString()).dividedBy(denominator.toString())
 }
+
+export const RequireContextMock: __WebpackModuleApi.RequireContext = Object.assign(() => '', {
+  keys: () => [],
+  resolve: () => '',
+  id: '',
+})

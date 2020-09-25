@@ -159,8 +159,8 @@ const PriceInputBox = styled.div<{ hidden?: boolean }>`
 `
 
 export interface Props {
-  sellToken: TokenDetails
-  receiveToken: TokenDetails
+  quoteToken: TokenDetails
+  baseToken: TokenDetails
   priceInputId: string
   priceInverseInputId: string
   tabIndex?: number
@@ -179,8 +179,8 @@ export function invertPriceFromString(priceValue: string): string {
 }
 
 export const Price: React.FC<Props> = ({
-  sellToken,
-  receiveToken,
+  quoteToken,
+  baseToken,
   priceInputId,
   priceInverseInputId,
   tabIndex,
@@ -193,27 +193,28 @@ export const Price: React.FC<Props> = ({
   const errorPriceInverse = errors[priceInverseInputId]
   const isError = errorPrice || errorPriceInverse
 
-  const updateInversePrice = useCallback(
-    (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
+  const updateTheOtherPrice = useCallback(
+    (theOtherInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
       const priceInverseValue = invertPriceFromString(priceValue)
-      setValue(inverseInputId, priceInverseValue, { shouldValidate: true })
+      setValue(theOtherInputId, priceInverseValue, { shouldValidate: true })
     },
     [setValue],
   )
 
   const onChangePrice = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      updateInversePrice(priceInverseInputId, e)
+      // Update
+      updateTheOtherPrice(priceInverseInputId, e)
     },
-    [updateInversePrice, priceInverseInputId],
+    [updateTheOtherPrice, priceInverseInputId],
   )
 
   const onChangePriceInverse = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      updateInversePrice(priceInputId, e)
+      updateTheOtherPrice(priceInputId, e)
     },
-    [updateInversePrice, priceInputId],
+    [updateTheOtherPrice, priceInputId],
   )
 
   const { onKeyPress: onKeyPressPrice, removeExcessZeros: removeExcessZerosPrice } = useNumberInput({
@@ -224,14 +225,15 @@ export const Price: React.FC<Props> = ({
     inputId: priceInverseInputId,
     precision: DEFAULT_PRECISION,
   })
+  const isDirect = priceShown === 'DIRECT'
 
   return (
     <Wrapper>
       <strong>
-        Limit Price <OrderBookBtn baseToken={receiveToken} quoteToken={sellToken} />
+        Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={priceShown !== 'DIRECT'}>
+      <PriceInputBox hidden={!isDirect}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -245,15 +247,16 @@ export const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <SwapPrice
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            isPriceInverted={true}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
+            isPriceInverted={false}
+            showBaseToken
             onSwapPrices={onSwapPrices}
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={priceShown !== 'INVERSE'}>
+      <PriceInputBox hidden={isDirect}>
         <label>
           <input
             name={priceInverseInputId}
@@ -267,9 +270,10 @@ export const Price: React.FC<Props> = ({
             tabIndex={tabIndex}
           />
           <SwapPrice
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            isPriceInverted={false}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
+            isPriceInverted
+            showBaseToken
             onSwapPrices={onSwapPrices}
           />
         </label>

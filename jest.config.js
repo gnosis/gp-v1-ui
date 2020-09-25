@@ -1,3 +1,4 @@
+const path = require('path')
 const loadConfig = require('./src/loadConfig')
 const overrideEnvConfig = require('./src/overrideEnvConfig')
 
@@ -9,7 +10,7 @@ module.exports = {
     '^.+\\.tsx?$': 'ts-jest',
   },
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
-  moduleDirectories: ['node_modules', 'src'],
+  moduleDirectories: ['node_modules', path.resolve(__dirname, 'src')],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
   setupFilesAfterEnv: ['<rootDir>/test/setupEnzyme.ts'],

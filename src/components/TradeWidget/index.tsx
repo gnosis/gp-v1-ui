@@ -152,7 +152,7 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = calculateValidityTimes(trade.validFrom || validFromParam)
   const defaultValidUntil = calculateValidityTimes(trade.validUntil || validUntilParam)
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('INVERSE')
+  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
 
   const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
@@ -482,6 +482,7 @@ const TradeWidget: React.FC = () => {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     const price = data[priceInputId]
+
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line
@@ -620,8 +621,8 @@ const TradeWidget: React.FC = () => {
           <Price
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            sellToken={sellToken}
-            receiveToken={receiveToken}
+            baseToken={receiveToken}
+            quoteToken={sellToken}
             tabIndex={1}
             onSwapPrices={swapPrices}
             priceShown={priceShown}

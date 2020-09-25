@@ -12,7 +12,6 @@ const tokens: TokenDetails[] = [
     symbol: 'WETH',
     decimals: 18,
     addressMainnet: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png`,
     address: TOKEN_1,
   },
 
@@ -25,7 +24,6 @@ const tokens: TokenDetails[] = [
     symbol: 'USDT',
     decimals: 6,
     addressMainnet: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png`,
     address: TOKEN_2,
   },
 
@@ -38,7 +36,6 @@ const tokens: TokenDetails[] = [
     symbol: 'TUSD',
     decimals: 18,
     addressMainnet: '0x0000000000085d4780B73119b644AE5ecd22b376',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x0000000000085d4780B73119b644AE5ecd22b376/logo.png`,
     address: TOKEN_3,
   },
 
@@ -53,7 +50,6 @@ const tokens: TokenDetails[] = [
     symbol: 'USDC',
     decimals: 6,
     addressMainnet: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png`,
     address: TOKEN_4,
   },
 
@@ -68,7 +64,6 @@ const tokens: TokenDetails[] = [
     symbol: 'PAX',
     decimals: 18,
     addressMainnet: '0x8E870D67F660D95d5be530380D0eC0bd388289E1',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x8E870D67F660D95d5be530380D0eC0bd388289E1/logo.png`,
     address: TOKEN_5,
   },
 
@@ -82,7 +77,6 @@ const tokens: TokenDetails[] = [
     symbol: 'GUSD',
     decimals: 2,
     addressMainnet: '0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x056Fd409E1d7A124BD7017459dFEa2F387b6d5Cd/logo.png`,
     address: TOKEN_6,
   },
 
@@ -95,7 +89,6 @@ const tokens: TokenDetails[] = [
     symbol: 'DAI',
     decimals: 18,
     addressMainnet: '0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359',
-    image: `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359/logo.png`,
     address: TOKEN_7,
   },
 
