@@ -115,7 +115,7 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
 }
 
 function createTokenListApi(): TokenList {
-  const networkIds = [Network.Mainnet, Network.Rinkeby, Network.xDai]
+  const networkIds = [Network.Mainnet, Network.Rinkeby, Network.xDAI]
 
   let tokenListApi: TokenList
   if (process.env.MOCK_TOKEN_LIST === 'true') {

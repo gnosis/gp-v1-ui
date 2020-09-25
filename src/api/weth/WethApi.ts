@@ -31,7 +31,7 @@ function getWethAddressByNetwork(networkId: number): string {
       return WETH_ADDRESS_MAINNET
     case Network.Rinkeby:
       return WETH_ADDRESS_RINKEBY
-    case Network.xDai:
+    case Network.xDAI:
       // Is not wxDAI is not WETH, but it has the same approve/withdraw methods
       // it's just convenient to not rename the API and keep calling it WethApi although it wraps also xDAI
       return WXDAI_ADDRESS_XDAI

@@ -135,7 +135,7 @@ describe('Test config defaults', () => {
     const {
       [Network.Mainnet]: disabledOnMainnet,
       [Network.Rinkeby]: disabledOnRinkeby,
-      [Network.xDai]: disabledOnXdai,
+      [Network.xDAI]: disabledOnXdai,
     } = CONFIG.disabledTokens
 
     if (disabledOnMainnet.length) expect(disabledOnMainnet).toEqual(disabledTokensArray)
