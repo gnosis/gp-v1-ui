@@ -108,7 +108,7 @@ export const BlockExplorerLink: React.FC<Props> = ({
   }
 
   const url = getExplorerUrl(networkId, type, identifier)
-  const label = labelProp || (useUrlAsLabel ? url : undefined) || abbreviateString(identifier, 6, 4)
+  const label = labelProp || (useUrlAsLabel && url) || abbreviateString(identifier, 6, 4)
 
   return (
     <a href={url} target="_blank" rel="noopener noreferrer" className={className}>
