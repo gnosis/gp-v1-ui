@@ -46,18 +46,6 @@ const tokensIconsFilesByAddress: Record<string, string> = tokensIconsRequire.key
   return acc
 }, {})
 
-const defaultFallbackRequire = <T,>(reqPath: string): T => {
-  const module = tokensIconsRequire(reqPath)
-  // https://github.com/storybookjs/storybook/issues/11610
-  // in storybook module = 'static/media/0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d.5a86806e.png'
-  // in webpack module = {
-  //   default: "/5a86806e7c0681c126888fe301054197.png",
-  //   Symbol(Symbol.toStringTag): "Module",
-  //   __esModule: true
-  // }
-  return module.default ?? module
-}
-
 export const TokenImg: React.FC<Props> = (props) => {
   const { address, addressMainnet, symbol, name } = props
 
