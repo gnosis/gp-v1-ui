@@ -54,7 +54,9 @@ export const TokenImg: React.FC<Props> = (props) => {
     iconFile = tokensIconsFilesByAddress[addressMainnet.toLowerCase()]
   }
 
-  const iconFileUrl = iconFile ? defaultFallbackRequire<string>(iconFile) : getImageUrl(addressMainnet || address)
+  const iconFileUrl: string | undefined = iconFile
+    ? tokensIconsRequire(iconFile)
+    : getImageUrl(addressMainnet || address)
 
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
   // https://github.com/gnosis/dex-react/issues/1442
