@@ -8,6 +8,7 @@ import { IClientMeta } from '@walletconnect/types'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
+import { TransactionConfig } from 'web3-core'
 
 import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
 
@@ -15,7 +16,7 @@ import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
 import { composeProvider } from './composeProvider'
 import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
-import { earmarkTxData } from 'api/earmark'
+import { earmarkTxData, calcEarmarkedGas } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
 import { getWCWalletIconURL } from './walletUtils'
 
@@ -362,9 +363,16 @@ export class WalletApiImpl implements WalletApi {
 
     this._fetchGasPrice = fetchGasPrice
 
-    const earmarkingFunction = async (data?: string): Promise<string> => earmarkTxData(data, await this.userPrintAsync)
+    const earmarkingFunction = async (tx: TransactionConfig): Promise<void> => {
+      const userPrint = await this.userPrintAsync
+      tx.data = earmarkTxData(tx.data, userPrint)
 
-    const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTxData: earmarkingFunction })
+      if (tx.gas) {
+        tx.gas = calcEarmarkedGas(tx.gas, userPrint)
+      }
+    }
+
+    const composedProvider = composeProvider(provider, { fetchGasPrice, earmarkTx: earmarkingFunction })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this._web3.setProvider(composedProvider)

@@ -15,7 +15,7 @@ import { formatSmart } from 'utils'
 import { tokenListApi } from 'api'
 
 // components
-import { TokenImgWrapper } from 'components/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 import { MenuList } from 'components/TokenSelectorComponents'
 import { SearchItem, OptionItem } from 'components/TokenOptionItem'
 
@@ -142,9 +142,9 @@ const SelectedTokenWrapper = styled.span`
 `
 
 function renderOptionLabel(token: TokenDetails | TokenBalanceDetails): React.ReactNode {
-  const { name, symbol, image, decimals } = token
+  const { name, symbol, decimals, address, addressMainnet } = token
   return (
-    <OptionItem name={name} symbol={symbol} image={image}>
+    <OptionItem name={name} symbol={symbol} address={address} addressMainnet={addressMainnet}>
       {'totalExchangeBalance' in token && (
         <div className="tokenBalance">{formatSmart(token.totalExchangeBalance, decimals)}</div>
       )}
@@ -158,10 +158,11 @@ function formatOptionLabel(
 ): React.ReactNode {
   const { token } = options
   const { context } = labelMeta
+  const { name, symbol, address, addressMainnet } = token
   return context === 'value' ? (
     <span>
       <SelectedTokenWrapper>
-        <TokenImgWrapper src={token.image} alt={token.name} />
+        <TokenImgWrapper address={address} addressMainnet={addressMainnet} name={name} symbol={symbol} />
         <strong>{token.symbol}</strong>
       </SelectedTokenWrapper>
     </span>
