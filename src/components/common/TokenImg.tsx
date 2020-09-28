@@ -34,7 +34,7 @@ export interface WrapperProps {
 const tokensIconsRequire =
   process.env.NODE_ENV === 'test' ? RequireContextMock : require.context('assets/img/tokens', false)
 
-const tokensIconsFilesByAddress = tokensIconsRequire.keys().reduce((acc, file) => {
+const tokensIconsFilesByAddress: Record<string, string> = tokensIconsRequire.keys().reduce((acc, file) => {
   const address = file.match(/0x\w{40}/)?.[0]
   if (!address) {
     throw new Error(
@@ -46,6 +46,18 @@ const tokensIconsFilesByAddress = tokensIconsRequire.keys().reduce((acc, file) =
   return acc
 }, {})
 
+const defaultFallbackRequire = <T,>(reqPath: string): T => {
+  const module = tokensIconsRequire(reqPath)
+  // https://github.com/storybookjs/storybook/issues/11610
+  // in storybook module = 'static/media/0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d.5a86806e.png'
+  // in webpack module = {
+  //   default: "/5a86806e7c0681c126888fe301054197.png",
+  //   Symbol(Symbol.toStringTag): "Module",
+  //   __esModule: true
+  // }
+  return module.default ?? module
+}
+
 export const TokenImg: React.FC<Props> = (props) => {
   const { address, addressMainnet, symbol, name } = props
 
@@ -54,10 +66,7 @@ export const TokenImg: React.FC<Props> = (props) => {
     iconFile = tokensIconsFilesByAddress[addressMainnet.toLowerCase()]
   }
 
-  let iconFileUrl = iconFile ? tokensIconsRequire(iconFile) : getImageUrl(addressMainnet || address)
-
-  // TODO: Fix issue with ES6 export
-  iconFileUrl = iconFileUrl.default || iconFileUrl
+  const iconFileUrl = iconFile ? defaultFallbackRequire<string>(iconFile) : getImageUrl(addressMainnet || address)
 
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
   // https://github.com/gnosis/dex-react/issues/1442
