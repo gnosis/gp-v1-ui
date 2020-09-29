@@ -8,13 +8,12 @@ import { IClientMeta } from '@walletconnect/types'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
-import { TransactionConfig } from 'web3-core'
 
 import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
-import { composeProvider } from './composeProvider'
+import { composeProvider, Earmark } from './composeProvider'
 import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
 import { earmarkTxData, calcEarmarkedGas } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
@@ -42,6 +41,11 @@ const getProviderState = async (web3: Web3): Promise<ProviderState | null> => {
   }
 }
 
+export interface UserPrint {
+  userPrint: string
+  gas: number
+}
+
 export interface WalletApi {
   isConnected(): Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
@@ -55,7 +59,7 @@ export interface WalletApi {
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo | null
   blockchainState: BlockchainUpdatePrompt
-  userPrintAsync: Promise<string>
+  userPrintAsync: Promise<UserPrint>
   getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null>
 }
 
@@ -254,7 +258,7 @@ export class WalletApiImpl implements WalletApi {
   private _provider: Provider | null
   private _web3: Web3
   private _providerInfo: ProviderInfo | null = null
-  public userPrintAsync: Promise<string> = Promise.resolve('')
+  public userPrintAsync: Promise<UserPrint> = Promise.resolve({ userPrint: '', gas: 0 })
   public blockchainState: BlockchainUpdatePrompt
 
   private _unsubscribe: Command
@@ -363,12 +367,12 @@ export class WalletApiImpl implements WalletApi {
 
     this._fetchGasPrice = fetchGasPrice
 
-    const earmarkingFunction = async (tx: TransactionConfig): Promise<void> => {
-      const userPrint = await this.userPrintAsync
-      tx.data = earmarkTxData(tx.data, userPrint)
+    const earmarkingFunction = async (data?: string): Promise<Earmark> => {
+      const { userPrint, gas: extraGas } = await this.userPrintAsync
 
-      if (tx.gas) {
-        tx.gas = calcEarmarkedGas(tx.gas, userPrint)
+      return {
+        data: earmarkTxData(data, userPrint),
+        extraGas,
       }
     }
 
@@ -629,9 +633,9 @@ export class WalletApiImpl implements WalletApi {
 
   // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
-  private async _generateAsyncUserPrint(): Promise<string> {
+  private async _generateAsyncUserPrint(): Promise<UserPrint> {
     const providerInfo = this.getProviderInfo()
-    if (!providerInfo) return ''
+    if (!providerInfo) return { userPrint: '', gas: 0 }
 
     const { name: providerName } = providerInfo
 
@@ -655,9 +659,16 @@ export class WalletApiImpl implements WalletApi {
 
     const encoded = txDataEncoder(flagObject)
 
+    const gas = calcEarmarkedGas(encoded)
+
     logDebug('Encoded object', flagObject)
     logDebug('User Wallet print', encoded)
-    return encoded
+    logDebug('Extra gas for rint', gas)
+
+    return {
+      userPrint: encoded,
+      gas,
+    }
   }
 }
 
