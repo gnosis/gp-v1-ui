@@ -34,6 +34,20 @@ module.exports = {
       customRules: custom.module.rules,
     })
 
+    const rulesWithMarkdownAndImages = replaceRulesForFile({
+      filename: 'token_address.png',
+      baseRules: rulesWithMarkdown,
+      customRules: [{
+        // what storybook uses
+        test: /\.(svg|ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\?.*)?$/,
+        loader: 'file-loader',
+        // only change from storybook -- esModule: false -> true
+        // this way require() and require.context need module.default
+        // same as in webpack config
+        options: { name: 'static/media/[name].[hash:8].[ext]', esModule: true }
+      }]
+    })
+  
     return {
       ...config,
       module: {
@@ -41,7 +55,7 @@ module.exports = {
         // enable rules override sparingly
         // only if storybook can't transpile something
         // rules: custom.module.rules,
-        rules: rulesWithMarkdown,
+        rules: rulesWithMarkdownAndImages,
       },
       resolve: {
         ...config.resolve,
