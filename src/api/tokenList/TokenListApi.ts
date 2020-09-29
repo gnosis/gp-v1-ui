@@ -3,7 +3,7 @@ import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
 import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
-import { DISABLED_TOKEN_MAPS } from 'const'
+import { DISABLED_TOKEN_MAPS, EMPTY_ARRAY } from 'const'
 
 const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails): TokenDetails => {
   const tokenOverride = DISABLED_TOKEN_MAPS[networkId]?.[token.address]
@@ -98,7 +98,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   }
 
   public getTokens(networkId: number): TokenDetails[] {
-    return this._tokensByNetwork[networkId] || []
+    return this._tokensByNetwork[networkId] || EMPTY_ARRAY
   }
 
   private static mergeTokenLists(...lists: TokenDetails[][]): TokenDetails[] {
