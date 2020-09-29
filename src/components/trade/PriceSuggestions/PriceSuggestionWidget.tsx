@@ -44,7 +44,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
   const updatePrices = useCallback(
     (price: string, invertedPrice) => {
       if (wasPriorityAdjusted) {
-        if (isPriceInverted) {
+        if (!isPriceInverted) {
           setValue(priceInputId, price)
           setValue(priceInverseInputId, invertedPrice)
         } else {
@@ -52,7 +52,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
           setValue(priceInputId, invertedPrice)
         }
       } else {
-        if (isPriceInverted) {
+        if (!isPriceInverted) {
           setValue(priceInverseInputId, invertedPrice)
           setValue(priceInputId, price)
         } else {
@@ -93,7 +93,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
       // Prices
       fillPrice={limitPrice}
       fillPriceLoading={fillPriceLoading}
-      bestAskPrice={bestAskPrice && invertPrice(bestAskPrice)}
+      bestAskPrice={bestAskPrice}
       bestAskPriceLoading={isBestAskLoading}
       // Events
       onClickPrice={updatePrices}

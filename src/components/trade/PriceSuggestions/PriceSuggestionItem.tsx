@@ -83,7 +83,7 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const displayPrice =
     priceFormatted === 'Infinity' || invertedPriceFormatted === 'Infinity'
       ? 'N/A'
-      : !wasPriorityAdjusted
+      : wasPriorityAdjusted
       ? invertedPriceFormatted
       : priceFormatted
 
