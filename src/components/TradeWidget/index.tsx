@@ -76,75 +76,6 @@ import { updateTradeState } from 'reducers-actions/trade'
 import validationSchema from 'components/TradeWidget/validationSchema'
 import { TxMessage } from 'components/TradeWidget/TxMessage'
 
-const PricingDebug: React.FC<{
-  wasPriorityAdjusted: boolean
-  receiveToken: TokenDetails
-  sellToken: TokenDetails
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
-  priceShown: 'INVERSE' | 'DIRECT'
-  startOpen: boolean
-}> = ({ wasPriorityAdjusted, receiveToken, sellToken, baseToken, quoteToken, priceShown, startOpen = true }) => {
-  const [open, setOpen] = useState(startOpen)
-  const handleClose = (): void => setOpen((open) => !open)
-
-  return (
-    <small
-      style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        background: 'var(--color-background-button-hover)',
-        borderRadius: '0 0 1.5rem 0',
-        color: '#fff',
-        padding: '1rem',
-        height: open ? 'auto' : '3.45rem',
-        minWidth: '29rem',
-        overflow: 'hidden',
-      }}
-    >
-      <a
-        href="#"
-        onClick={handleClose}
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          padding: '1rem 1.5rem 1rem',
-          color: '#fff',
-          fontWeight: 'bold',
-        }}
-      >
-        {open ? '▲' : '▼'}
-      </a>
-      {open ? (
-        <>
-          <strong>Market:</strong> {receiveToken.symbol}/{sellToken.symbol}
-          <br />
-          <strong>Status:</strong> {baseToken.symbol}/{quoteToken.symbol}{' '}
-          <strong>{wasPriorityAdjusted ? '[ADJUSTED]' : '[UNADJUSTED]'}</strong>
-          <br />
-          <br />
-          --------------------------------------------
-          <br />
-          <br />
-          <strong>Price Shown:</strong> {priceShown}
-          <br />
-          <br />
-          --------------------------------------------
-          <br />
-          <br />
-          <strong>Base Priority:</strong> [{baseToken.symbol}] {baseToken.priority}
-          <br />
-          <strong>Quote Priority:</strong> [{quoteToken.symbol}] {quoteToken.priority}
-        </>
-      ) : (
-        <strong>Open market debugger</strong>
-      )}
-    </small>
-  )
-}
-
 export type TradeFormTokenId = keyof TradeFormData
 
 export interface TradeFormData {
@@ -658,17 +589,6 @@ const TradeWidget: React.FC = () => {
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormProvider {...methods}>
         <WrappedForm onSubmit={(e): void => e.preventDefault()} autoComplete="off" noValidate>
-          {process.env.NODE_ENV === 'development' && (
-            <PricingDebug
-              priceShown={priceShown}
-              wasPriorityAdjusted={wasPriorityAdjusted}
-              receiveToken={receiveToken}
-              sellToken={sellToken}
-              baseToken={baseToken}
-              quoteToken={quoteToken}
-              startOpen={false}
-            />
-          )}
           {sameToken && (
             <>
               <WarningLabel className="warning">Tokens cannot be the same! </WarningLabel>
