@@ -7,7 +7,7 @@ import RpcEngine, {
 } from 'json-rpc-engine'
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
-import { numberToHex } from 'web3-utils'
+import { numberToHex, hexToNumber } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
@@ -84,9 +84,14 @@ const createConditionalMiddleware = <T extends unknown>(
   }
 }
 
+export interface Earmark {
+  data: string
+  extraGas: number
+}
+
 interface ExtraMiddlewareHandlers {
   fetchGasPrice(): Promise<string | undefined>
-  earmarkTx(tx: TransactionConfig): Promise<void>
+  earmarkTx(data?: string): Promise<Earmark>
 }
 
 export const composeProvider = <T extends Provider>(
@@ -151,8 +156,14 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         // tx.data += decode*
+        const { data, extraGas } = await earmarkTx(txConfig.data)
+        txConfig.data = data
+
         // if gas is specified tx.gas += cost of decode*
-        await earmarkTx(txConfig)
+        if (txConfig.gas) {
+          const newGas = hexToNumber(txConfig.gas) + extraGas
+          txConfig.gas = numberToHex(newGas)
+        }
 
         // don't mark as handled
         // pass modified tx on
