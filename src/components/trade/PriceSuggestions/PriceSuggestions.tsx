@@ -166,12 +166,6 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
     <Wrapper>
       <div>
         <strong>Price Suggestions</strong> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
-        <SwapPrice
-          quoteToken={baseToken}
-          baseToken={quoteToken}
-          onSwapPrices={onSwapPrices}
-          isPriceInverted={isPriceInverted}
-        />
       </div>
       <div className="container">
         <PriceSuggestionItem label="Best ask" price={bestAskPrice} loading={bestAskPriceLoading} {...commonProps} />

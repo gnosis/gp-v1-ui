@@ -8,7 +8,6 @@ import useBestAsk from 'hooks/useBestAsk'
 
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
 import { TokenDetails } from 'types'
-import { invertPrice } from '@gnosis.pm/dex-js'
 
 interface Props
   extends Pick<
