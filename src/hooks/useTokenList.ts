@@ -41,9 +41,10 @@ export function mapPrioritiesToTokenList({
   // no networkId or map is empty as network id returns no tokens
   if (!stablecoinMap?.size) return tokenList
 
-  return tokenList.map<TokenDetails>((token) =>
-    Object.assign({}, token, { priority: stablecoinMap.get(token.address.toLowerCase()) || Number.MAX_SAFE_INTEGER }),
-  )
+  return tokenList.map<TokenDetails>((token) => ({
+    ...token,
+    priority: stablecoinMap.get(token.address.toLowerCase()) || Number.MAX_SAFE_INTEGER,
+  }))
 }
 
 export const useTokenList = ({

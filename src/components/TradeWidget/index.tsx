@@ -156,6 +156,8 @@ export interface TradeFormData {
   priceInverse: string
 }
 
+type PriceType = 'INVERSE' | 'DIRECT'
+
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
 // TESTING
@@ -225,7 +227,7 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = calculateValidityTimes(trade.validFrom || validFromParam)
   const defaultValidUntil = calculateValidityTimes(trade.validUntil || validUntilParam)
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
+  const [priceShown, setPriceShown] = useState<PriceType>('DIRECT')
   const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
   const defaultFormValues: TradeFormData = {
