@@ -230,13 +230,16 @@ export const Price: React.FC<Props> = ({
     precision: DEFAULT_PRECISION,
   })
 
+  const hideInverse = (!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)
+  const hideDirect = (isPriceInverted && wasPriorityAdjusted) || (!isPriceInverted && !wasPriorityAdjusted)
+
   return (
     <Wrapper>
       <strong>
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={(isPriceInverted && wasPriorityAdjusted) || (!isPriceInverted && !wasPriorityAdjusted)}>
+      <PriceInputBox hidden={hideInverse}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -252,14 +255,14 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={baseToken}
             quoteToken={quoteToken}
-            isPriceInverted={!wasPriorityAdjusted}
+            isPriceInverted={wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
             showBaseToken
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={(!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)}>
+      <PriceInputBox hidden={hideDirect}>
         <label>
           <input
             name={priceInverseInputId}
@@ -275,7 +278,7 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={baseToken}
             quoteToken={quoteToken}
-            isPriceInverted={wasPriorityAdjusted}
+            isPriceInverted={!wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
             showBaseToken
           />
