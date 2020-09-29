@@ -25,7 +25,6 @@ export interface MinimalTokenDetails {
 export interface TokenDetails extends MinimalTokenDetails {
   id: number
   addressMainnet?: string
-  image?: string
   disabled?: boolean
   override?: TokenOverride
   priority?: number

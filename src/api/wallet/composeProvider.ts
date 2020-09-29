@@ -86,12 +86,12 @@ const createConditionalMiddleware = <T extends unknown>(
 
 interface ExtraMiddlewareHandlers {
   fetchGasPrice(): Promise<string | undefined>
-  earmarkTxData(data?: string): Promise<string>
+  earmarkTx(tx: TransactionConfig): Promise<void>
 }
 
 export const composeProvider = <T extends Provider>(
   provider: T,
-  { fetchGasPrice, earmarkTxData }: ExtraMiddlewareHandlers,
+  { fetchGasPrice, earmarkTx }: ExtraMiddlewareHandlers,
 ): T => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
@@ -150,9 +150,10 @@ export const composeProvider = <T extends Provider>(
         // no parameters, which shouldn't happen
         if (!txConfig) return false
 
-        const earmarkedData = await earmarkTxData(txConfig.data)
+        // tx.data += decode*
+        // if gas is specified tx.gas += cost of decode*
+        await earmarkTx(txConfig)
 
-        txConfig.data = earmarkedData
         // don't mark as handled
         // pass modified tx on
         return false
@@ -169,12 +170,17 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth.estimateGas(txConfig)
+          const gasLimit = await web3.eth.estimateGas(txConfig).catch((error) => {
+            console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
+            throw error
+          })
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
           txConfig.gas = numberToHex(gasLimit)
         } else {
           logDebug('[composeProvider] Gas Limit: ' + txConfig.gas)
         }
+
+        logDebug('[composeProvider] Sending transaction', txConfig)
 
         // don't mark as handled
         // pass modified tx on
@@ -193,6 +199,10 @@ export const composeProvider = <T extends Provider>(
       if (prop === 'sendAsync' || prop === 'send') {
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)
+      }
+      // pretend we don't support provider.request yet
+      if (prop === 'request') {
+        return undefined
       }
       // MMask or other provider handles it
       return Reflect.get(provider, prop, receiver)

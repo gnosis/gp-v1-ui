@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { LimitOrder, Props } from './LimitOrder'
 import BigNumber from 'bignumber.js'
-import { GNO, DAI } from 'storybook/tokens'
+import { DAI, GNO } from 'storybook/data'
 
 export default {
   title: 'Trade/LimitOrder',
@@ -37,7 +37,6 @@ const Template: Story<Partial<Props>> = (props) => {
 }
 
 export const Basic = Template.bind({})
-Basic.args = {}
 
 export const NoAmount = Template.bind({})
 NoAmount.args = {

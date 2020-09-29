@@ -182,10 +182,8 @@ export function invertPriceFromString(priceValue: string): string {
 }
 
 export const Price: React.FC<Props> = ({
-  // sellToken,
-  // receiveToken,
-  baseToken,
   quoteToken,
+  baseToken,
   priceInputId,
   priceInverseInputId,
   tabIndex,
@@ -199,27 +197,28 @@ export const Price: React.FC<Props> = ({
   const errorPriceInverse = errors[priceInverseInputId]
   const isError = errorPrice || errorPriceInverse
 
-  const updateInversePrice = useCallback(
-    (inverseInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
+  const updateTheOtherPrice = useCallback(
+    (theOtherInputId: string, event: React.ChangeEvent<HTMLInputElement>): void => {
       const priceValue = event.target.value
       const priceInverseValue = invertPriceFromString(priceValue)
-      setValue(inverseInputId, priceInverseValue, { shouldValidate: true })
+      setValue(theOtherInputId, priceInverseValue, { shouldValidate: true })
     },
     [setValue],
   )
 
   const onChangePrice = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      updateInversePrice(priceInverseInputId, e)
+      // Update
+      updateTheOtherPrice(priceInverseInputId, e)
     },
-    [updateInversePrice, priceInverseInputId],
+    [updateTheOtherPrice, priceInverseInputId],
   )
 
   const onChangePriceInverse = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>): void => {
-      updateInversePrice(priceInputId, e)
+      updateTheOtherPrice(priceInputId, e)
     },
-    [updateInversePrice, priceInputId],
+    [updateTheOtherPrice, priceInputId],
   )
 
   const { onKeyPress: onKeyPressPrice, removeExcessZeros: removeExcessZerosPrice } = useNumberInput({
@@ -255,6 +254,7 @@ export const Price: React.FC<Props> = ({
             quoteToken={quoteToken}
             isPriceInverted={!wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
+            showBaseToken
           />
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
@@ -277,6 +277,7 @@ export const Price: React.FC<Props> = ({
             quoteToken={quoteToken}
             isPriceInverted={wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
+            showBaseToken
           />
         </label>
         <FormInputError errorMessage={errorPriceInverse?.message} />

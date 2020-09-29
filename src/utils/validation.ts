@@ -1,6 +1,6 @@
 import { ValidationError, ObjectSchema } from 'joi'
 import { validInputPattern } from 'utils'
-import { ResolverResult } from 'react-hook-form/dist/types/form'
+import { ResolverResult } from 'react-hook-form'
 
 export function preventInvalidChars(event: React.KeyboardEvent<HTMLInputElement>): void {
   if (

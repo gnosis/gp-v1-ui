@@ -50,7 +50,7 @@ import {
 import TokensAdder from './TokenAdder'
 import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
-import { PriceSuggestionsComp as PriceSuggestions } from 'components/trade/PriceSuggestions'
+import { PriceSuggestionWidget as PriceSuggestions } from 'components/trade/PriceSuggestions'
 import Price, { invertPriceFromString } from 'components/trade/Price'
 
 // hooks
@@ -209,7 +209,7 @@ const TradeWidget: React.FC = () => {
       : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams<{ sell?: string; buy?: string }>()
   const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
   const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
   const {
@@ -554,6 +554,7 @@ const TradeWidget: React.FC = () => {
     const buyAmount = parseAmount(data[receiveInputId], receiveToken.decimals)
     const sellAmount = parseAmount(data[sellInputId], sellToken.decimals)
     const price = data[priceInputId]
+
     // Minutes - then divided by 5min for batch length to get validity time
     // 0 validUntil time  = unlimited order
     // TODO: review this line

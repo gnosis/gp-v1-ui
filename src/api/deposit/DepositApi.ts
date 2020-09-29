@@ -149,6 +149,8 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams,
   }: DepositParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[DepositApi] deposit:', { tokenAddress, amount: amount.toString() })
+
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
@@ -168,6 +170,8 @@ export class DepositApiImpl implements DepositApi {
     txOptionalParams,
   }: RequestWithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[DepositApi] requestWithdraw:', { tokenAddress, amount: amount.toString() })
+
     // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
@@ -183,6 +187,7 @@ export class DepositApiImpl implements DepositApi {
 
   public async withdraw({ userAddress, tokenAddress, networkId, txOptionalParams }: WithdrawParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[DepositApi] requestWithdraw:', { userAddress, tokenAddress })
     const tx = contract.methods.withdraw(userAddress, tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {

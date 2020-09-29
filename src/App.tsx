@@ -5,12 +5,10 @@ import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
-
-// SCSS
 import GlobalStyles from 'styles/global'
 
 // Main layout
-import Layout from 'components/Layout'
+import { SwapLayout, TradingLayout } from 'components/layout'
 
 // Pages
 const About = React.lazy(() =>
@@ -31,6 +29,13 @@ const Trades = React.lazy(() =>
   import(
     /* webpackChunkName: "Trade_chunk"*/
     'pages/Trades'
+  ),
+)
+
+const Trading = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Trade_chunk"*/
+    'pages/Trading'
   ),
 )
 
@@ -59,6 +64,12 @@ const NotFound = React.lazy(() =>
   import(
     /* webpackChunkName: "Extra_routes_chunk"*/
     'pages/NotFound'
+  ),
+)
+const NotFound2 = React.lazy(() =>
+  import(
+    /* webpackChunkName: "Extra_routes_chunk"*/
+    'pages/NotFound2'
   ),
 )
 const ConnectWallet = React.lazy(() =>
@@ -108,26 +119,40 @@ const initialUrl = getInitialUrl()
 // App
 const App: React.FC = () => (
   <>
-    <GlobalStyles />
     <Router basename={process.env.BASE_URL}>
-      <Layout>
-        <React.Suspense fallback={null}>
-          <Switch>
-            <PrivateRoute path="/orders" exact component={Orders} />
-            <Route path="/trade/:buy-:sell" component={Trade} />
-            <PrivateRoute path="/liquidity" exact component={Strategies} />
-            <PrivateRoute path="/wallet" exact component={Wallet} />
-            <Route path="/about" exact component={About} />
-            <Route path="/faq" exact component={FAQ} />
-            <Route path="/book" exact component={OrderBook} />
-            <Route path="/connect-wallet" exact component={ConnectWallet} />
-            <Route path="/trades" exact component={Trades} />
-            <Route path="/settings" exact component={Settings} />
-            <Redirect from="/" to={initialUrl} />
-            <Route component={NotFound} />
-          </Switch>
-        </React.Suspense>
-      </Layout>
+      <Switch>
+        <Route path="/v2">
+          <TradingLayout>
+            <React.Suspense fallback={null}>
+              <Switch>
+                <Route path="/v2" exact component={Trading} />
+                <Route component={NotFound2} />
+              </Switch>
+            </React.Suspense>
+          </TradingLayout>
+        </Route>
+        <Route>
+          <SwapLayout>
+            <GlobalStyles />
+            <React.Suspense fallback={null}>
+              <Switch>
+                <PrivateRoute path="/orders" exact component={Orders} />
+                <Route path="/trade/:buy-:sell" component={Trade} />
+                <PrivateRoute path="/liquidity" exact component={Strategies} />
+                <PrivateRoute path="/wallet" exact component={Wallet} />
+                <Route path="/about" exact component={About} />
+                <Route path="/faq" exact component={FAQ} />
+                <Route path="/book" exact component={OrderBook} />
+                <Route path="/connect-wallet" exact component={ConnectWallet} />
+                <Route path="/trades" exact component={Trades} />
+                <Route path="/settings" exact component={Settings} />
+                <Redirect from="/" to={initialUrl} />
+                <Route component={NotFound} />
+              </Switch>
+            </React.Suspense>
+          </SwapLayout>
+        </Route>
+      </Switch>
     </Router>
     {process.env.NODE_ENV === 'development' && <Console />}
   </>

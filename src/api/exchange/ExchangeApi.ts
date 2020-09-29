@@ -190,6 +190,8 @@ export interface ExchangeApiParams extends DepositApiDependencies {
 
 type TradeEvent = BatchExchangeEvents['Trade']
 
+const EXTRA_GAS_PER_ORDER_CANCELLATION = 5000
+
 /**
  * Basic implementation of Stable Coin Converter API
  */
@@ -358,6 +360,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
   public async addToken({ userAddress, tokenAddress, networkId, txOptionalParams }: AddTokenParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
+    logDebug('[ExchangeApi] addToken:', tokenAddress)
     const tx = contract.methods.addToken(tokenAddress).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -383,7 +386,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
 
     const contract = await this._getContract(networkId)
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    logDebug('[ExchangeApi] placeOrder:', {
+      buyTokenId,
+      sellTokenId,
+      validUntil,
+      buyAmount: buyAmount.toString(),
+      sellAmount: sellAmount.toString(),
+    })
     const tx = contract.methods
       .placeOrder(buyTokenId, sellTokenId, validUntil, buyAmount.toString(), sellAmount.toString())
       .send({ from: userAddress })
@@ -425,6 +434,14 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     const buyAmountsStr = buyAmounts.map(String)
     const sellAmountsStr = sellAmounts.map(String)
 
+    logDebug('[ExchangeApi] placeValidFromOrders:', {
+      buyTokens,
+      sellTokens,
+      validFroms,
+      validUntils,
+      buyAmountsStr,
+      sellAmountsStr,
+    })
     const tx = contract.methods
       .placeValidFromOrders(buyTokens, sellTokens, validFroms, validUntils, buyAmountsStr, sellAmountsStr)
       .send({ from: userAddress })
@@ -453,7 +470,13 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     txOptionalParams,
   }: CancelOrdersParams): Promise<Receipt> {
     const contract = await this._getContract(networkId)
-    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress })
+    logDebug('[ExchangeApi] cancelOrders:', orderIds)
+    const gas = await contract.methods.cancelOrders(orderIds).estimateGas({ from: userAddress })
+    // for edge case when batch changes and order gets deleted instead of cancelled
+    // but the estimation was at the point the order would have gotten cancelled
+    // issue#1444
+    const safeGasAmount = gas + EXTRA_GAS_PER_ORDER_CANCELLATION * orderIds.length
+    const tx = contract.methods.cancelOrders(orderIds).send({ from: userAddress, gas: safeGasAmount })
 
     if (txOptionalParams?.onSentTransaction) {
       tx.once('transactionHash', txOptionalParams.onSentTransaction)

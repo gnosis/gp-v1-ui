@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useForm, Resolver as FormResolver } from 'react-hook-form'
+import { useForm, Resolver as FormResolver, FieldErrors, ResolverResult } from 'react-hook-form'
 import styled from 'styled-components'
 import { DevTool } from 'HookFormDevtool'
 
@@ -7,8 +7,7 @@ import { walletApi } from 'api'
 import { setCustomWCOptions, getWCOptionsFromStorage, WCOptions } from 'utils'
 import { useHistory } from 'react-router'
 import { WCSettings, wcResolver } from 'components/Settings/WalletConnect'
-import { ContentPage } from 'components/Layout/PageWrapper'
-import { FieldErrors, ResolverResult } from 'react-hook-form/dist/types/form'
+import { ContentPage } from 'components/layout'
 
 const SettingsButtonSubmit = styled.button`
   height: 3.6rem;

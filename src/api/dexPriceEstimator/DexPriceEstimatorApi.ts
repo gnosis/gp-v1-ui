@@ -7,6 +7,8 @@ export interface DexPriceEstimatorApi {
   getBestAsk(params: GetBestAskParams): Promise<BigNumber | null>
   getOrderBookUrl(params: OrderBookParams): string
   getOrderBookData(params: OrderBookParams): Promise<OrderBookData>
+  getMinOrderAmounInOWLUrl(networkId: number): string
+  getMinOrderAmounInOWL(networkId: number): Promise<BigNumber>
 }
 
 interface GetPriceParams {
@@ -76,6 +78,9 @@ export type DexPriceEstimatorParams = PriceEstimatorEndpoint[]
 function getDexPriceEstimatorUrl(baseUlr: string): string {
   return `${baseUlr}${baseUlr.endsWith('/') ? '' : '/'}api/v1/`
 }
+
+// when price-estimation service doesn't return anything
+export const DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS = new BigNumber(2500)
 
 export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   private urlsByNetwork: { [networkId: number]: string } = {}
@@ -168,6 +173,11 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
       const url = await this.getOrderBookUrl(params)
 
       const res = await fetch(url)
+      if (!res.ok) {
+        // backend returns {"message":"invalid url query"}
+        // for bad requests
+        throw await res.json()
+      }
       return await res.json()
     } catch (error) {
       console.error(error)
@@ -180,6 +190,26 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     }
   }
 
+  public getMinOrderAmounInOWLUrl(networkId: number): string {
+    const baseUrl = this._getBaseUrl(networkId)
+    return `${baseUrl}minimum-order-size-owl`
+  }
+
+  public async getMinOrderAmounInOWL(networkId: number): Promise<BigNumber> {
+    try {
+      const url = this.getMinOrderAmounInOWLUrl(networkId)
+      const res = await fetch(url)
+      // not res.json() because backend returns "8738236863863283268688" big number of OWL in atoms
+      const minAmount = await res.text()
+
+      return new BigNumber(minAmount).div(1e18)
+    } catch (error) {
+      console.error(error)
+
+      return DEFAULT_MIN_AMOUNT_IN_OWL_ATOMS
+    }
+  }
+
   private parsePricesResponse(
     baseAmountInAtoms: string,
     baseDecimals: number,
@@ -188,9 +218,9 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
   ): BigNumber {
     const baseAmountInUnits = new BigNumber(baseAmountInAtoms).dividedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals))
 
-    const price = baseAmountInUnits.dividedBy(quoteAmountInUnits)
+    const price = quoteAmountInUnits.dividedBy(baseAmountInUnits)
 
-    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(baseDecimals)) : price
+    return inWei ? price.multipliedBy(TEN_BIG_NUMBER.exponentiatedBy(quoteAmountInUnits)) : price
   }
 
   private async query<T>(networkId: number, queryString: string): Promise<T | null> {

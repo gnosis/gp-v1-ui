@@ -9,6 +9,12 @@ import { displayTokenSymbolOrLink } from 'utils/display'
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
 
+import styled from 'styled-components'
+
+const LongPriceStrong = styled.strong`
+  word-break: break-all;
+`
+
 export interface Props {
   label: string
   baseToken: TokenDetails
@@ -58,7 +64,7 @@ function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): F
   }
 }
 
-export const PriceSuggestion: React.FC<Props> = (props) => {
+export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const {
     label,
     isPriceInverted,
@@ -86,9 +92,9 @@ export const PriceSuggestion: React.FC<Props> = (props) => {
       <span>
         <span>{label}</span>{' '}
         {amount && (
-          <strong>
+          <LongPriceStrong>
             ({amount} {displayTokenSymbolOrLink(sellToken)})
-          </strong>
+          </LongPriceStrong>
         )}
       </span>
       <button
