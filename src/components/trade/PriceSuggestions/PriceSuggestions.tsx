@@ -5,7 +5,6 @@ import { TokenDetails } from '@gnosis.pm/dex-js'
 import { MEDIA } from 'const'
 
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
-import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
 import { PriceSuggestionItem } from 'components/trade/PriceSuggestions/PriceSuggestionItem'
 import BigNumber from 'bignumber.js'
