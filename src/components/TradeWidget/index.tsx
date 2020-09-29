@@ -5,6 +5,7 @@ import { useParams } from 'react-router'
 import { toast } from 'toastify'
 import BN from 'bn.js'
 import Modali from 'modali'
+import styled from 'styled-components'
 
 import { decodeSymbol } from '@gnosis.pm/dex-js'
 
@@ -120,6 +121,15 @@ const validUntilId: TradeFormTokenId = 'validUntil'
 // Grab CONFIG tokens
 const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
 
+const NoTokens = styled.div`
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  font-weight: bold;
+}
+`
 
 const TradeWidgetContainer: React.FC = () => {
   const { networkIdOrDefault, isConnected } = useWalletConnection()
@@ -193,7 +203,7 @@ const TradeWidgetContainer: React.FC = () => {
   // don't need to depend on more than network as everything else updates together
   // also avoids excessive setStates
 
-  if (!sellToken || !receiveToken) return null
+  if (!sellToken || !receiveToken) return <NoTokens>NO TOKENS FOUND</NoTokens>
 
   return (
     <TradeWidget
