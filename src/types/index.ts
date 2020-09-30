@@ -2,6 +2,7 @@ import BN from 'bn.js'
 import { TransactionReceipt } from 'web3-core'
 import { PendingFlux } from 'api/deposit/DepositApi'
 import { TokenOverride } from './config'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 export type Command = () => void
 export type Mutation<T> = (original: T) => T
@@ -15,21 +16,12 @@ export enum Network {
   Kovan = 42,
 }
 
-export interface MinimalTokenDetails {
-  address: string
-  symbol?: string
-  name?: string
-  decimals: number
-}
-
-export interface TokenDetails extends MinimalTokenDetails {
-  id: number
-  addressMainnet?: string
+export interface TokenDetails extends TokenDex {
   disabled?: boolean
   override?: TokenOverride
 }
 
-export interface TokenBalanceDetails extends TokenDetails {
+export interface BalanceDetails {
   exchangeBalance: BN
   pendingDeposit: PendingFlux
   pendingWithdraw: PendingFlux
@@ -39,6 +31,8 @@ export interface TokenBalanceDetails extends TokenDetails {
   totalExchangeBalance: BN
   immatureClaim?: boolean
 }
+
+export type TokenBalanceDetails = TokenDetails & BalanceDetails
 
 export interface WithTxOptionalParams {
   txOptionalParams?: TxOptionalParams

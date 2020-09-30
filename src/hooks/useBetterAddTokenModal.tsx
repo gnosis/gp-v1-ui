@@ -136,12 +136,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
         )
       return (
         <TokenDisplay>
-          <TokenImageStyled
-            address={token.address}
-            addressMainnet={token.addressMainnet}
-            name={token.name}
-            symbol={token.symbol}
-          />
+          <TokenImageStyled address={token.address} name={token.name} symbol={token.symbol} />
           <div className="tokenSymbol">
             <strong>{token.symbol}</strong>
           </div>

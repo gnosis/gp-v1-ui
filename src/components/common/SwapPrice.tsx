@@ -4,7 +4,7 @@ import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
 import { EllipsisText } from 'components/common/EllipsisText'
 
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 const SwapPriceWrapper = styled.div`
   display: inline-block;
@@ -20,8 +20,8 @@ const SwapPriceWrapper = styled.div`
   }
 `
 export interface Props {
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
+  baseToken: TokenDex
+  quoteToken: TokenDex
   showBaseToken?: boolean
   isPriceInverted: boolean
   onSwapPrices: () => void
