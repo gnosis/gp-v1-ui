@@ -1,4 +1,3 @@
-import { TokenDetails } from 'types'
 import { getErc20Info } from 'services/helpers'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import Web3 from 'web3'
