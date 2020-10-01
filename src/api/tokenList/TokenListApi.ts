@@ -2,6 +2,7 @@ import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
+import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
 import { DISABLED_TOKEN_MAPS } from 'const'
 
 const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails): TokenDetails => {
@@ -29,6 +30,7 @@ export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
 
 export interface TokenListApiParams {
   networkIds: number[]
+  initialTokenList: TokenDetailsConfig[]
 }
 
 export interface AddTokenParams {
@@ -62,7 +64,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
-  public constructor({ networkIds }: TokenListApiParams) {
+  public constructor({ networkIds, initialTokenList }: TokenListApiParams) {
     super()
 
     // Init the tokens by network
@@ -76,7 +78,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
         this.loadTokenList(networkId, 'service'),
         this.loadTokenList(networkId, 'user'),
         // then default list
-        getTokensByNetwork(networkId),
+        getTokensByNetwork(networkId, initialTokenList),
       )
       this._tokensByNetwork[networkId] = TokenListApiImpl.extendTokensInList(
         tokenList,
