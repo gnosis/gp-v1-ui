@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AnyFunction } from 'types'
 declare module 'console-feed' {
+  import { AnyFunction } from 'types'
+
   export type Methods =
     | 'log'
     | 'debug'
