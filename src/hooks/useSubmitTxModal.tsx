@@ -1,4 +1,4 @@
-import { ModalHook, useModali, Button } from 'components/common/StyledModal'
+import Modali, { ModalHook, useModali } from 'components/common/StyledModal'
 import React, { useRef } from 'react'
 
 interface UseSubmitTxResult {
@@ -23,7 +23,7 @@ export const useSubmitTxModal = ({ onCancel, onConfirm, message }: ClickWrapperP
     message: isShown.current && (typeof message === 'function' ? message() : message),
     buttons: [
       // Cancel button only if there's anything to cancel
-      <Button
+      <Modali.Button
         label="Cancel"
         key="no"
         isStyleCancel
@@ -32,7 +32,7 @@ export const useSubmitTxModal = ({ onCancel, onConfirm, message }: ClickWrapperP
           onCancel?.()
         }}
       />,
-      <Button
+      <Modali.Button
         // nothing to add -- Close
         label="Confirm"
         key="yes"

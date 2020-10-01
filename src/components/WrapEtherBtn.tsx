@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
-import Modali, { useModali } from 'modali'
+import Modali, { useModali } from 'components/common/StyledModal'
 import BN from 'bn.js'
 
 import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'

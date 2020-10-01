@@ -4,7 +4,7 @@ import { useForm, useWatch, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { toast } from 'toastify'
 import BN from 'bn.js'
-import Modali from 'modali'
+import Modali from 'components/common/StyledModal'
 
 import { decodeSymbol } from '@gnosis.pm/dex-js'
 
