@@ -1,6 +1,6 @@
 import React from 'react'
 import { createGlobalStyle } from 'styled-components'
-import { Modal as PreModal, ModalProps } from 'modali'
+import { Modal as PreModal, Button, ModalHook, useModali, ModalProps } from 'modali'
 
 import variables from 'styles/variables'
 import { MEDIA } from 'const'
@@ -159,9 +159,11 @@ const ModaliGlobalStyle = createGlobalStyle`
   }
 `
 
-export const Modal: React.FC<ModalProps> = (props) => (
+const Modal: React.FC<ModalProps> = (props) => (
   <>
     <ModaliGlobalStyle />
     <PreModal {...props} />
   </>
 )
+
+export { Modal, ModalHook, ModalProps, Button, useModali }
