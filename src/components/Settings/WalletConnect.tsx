@@ -42,12 +42,13 @@ const WCSettingsSchema = Joi.object({
 } */
 
 // validates only walletconnect slice of form data
-export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData> => {
+export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData, 'walletconnect'> => {
   const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
 
-  const { value: values, error } = result
+  const { value, error } = result
+  const values: WCOptions = value
 
   return {
     name: 'walletconnect',
