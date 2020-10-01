@@ -42,26 +42,16 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => {
-      if (wasPriorityAdjusted) {
-        if (!isPriceInverted) {
-          setValue(priceInputId, price)
-          setValue(priceInverseInputId, invertedPrice)
-        } else {
-          setValue(priceInverseInputId, price)
-          setValue(priceInputId, invertedPrice)
-        }
+      if (!isPriceInverted) {
+        setValue(priceInverseInputId, invertedPrice)
+        setValue(priceInputId, price)
       } else {
-        if (!isPriceInverted) {
-          setValue(priceInverseInputId, invertedPrice)
-          setValue(priceInputId, price)
-        } else {
-          setValue(priceInputId, invertedPrice)
-          setValue(priceInverseInputId, price)
-        }
+        setValue(priceInputId, invertedPrice)
+        setValue(priceInverseInputId, price)
       }
       trigger()
     },
-    [wasPriorityAdjusted, trigger, isPriceInverted, setValue, priceInputId, priceInverseInputId],
+    [trigger, isPriceInverted, setValue, priceInputId, priceInverseInputId],
   )
 
   const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
