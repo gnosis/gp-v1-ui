@@ -52,7 +52,7 @@ export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormDa
 
   return {
     name: 'walletconnect',
-    values: error ? null : values,
+    values: error ? {} : values,
     errors: error
       ? error.details.reduce((previous, currentError) => {
           // when exlusive fields are both present
