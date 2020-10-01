@@ -32,8 +32,6 @@ import {
 } from '../../test/data'
 import Web3 from 'web3'
 import { ETH_NODE_URL } from 'const'
-import { tokenList as initialTokenList } from '@gnosis.pm/dex-js'
-
 // TODO connect to mainnet if we need AUTOCONNECT at all
 export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
 
@@ -123,7 +121,7 @@ function createTokenListApi(): TokenList {
   if (process.env.MOCK_TOKEN_LIST === 'true') {
     tokenListApi = new TokenListApiMock(tokenList)
   } else {
-    tokenListApi = new TokenListApiImpl({ networkIds, initialTokenList })
+    tokenListApi = new TokenListApiImpl({ networkIds, initialTokenList: CONFIG.initialTokenList })
   }
 
   window['tokenListApi'] = tokenListApi // register for convenience
