@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AnyFunction } from 'types'
 declare module 'console-feed' {
   export type Methods =
     | 'log'
@@ -120,7 +121,7 @@ declare module 'console-feed' {
     styles?: Styles
     filter?: Methods[]
     searchKeywords?: string
-    logFilter?: Function
+    logFilter?: AnyFunction
   }
 
   // export type Console = new () => React.PureComponent<Props, any>
@@ -129,7 +130,7 @@ declare module 'console-feed' {
 
   export interface Storage {
     pointers: {
-      [name: string]: Function
+      [name: string]: AnyFunction
     }
     src: any
   }

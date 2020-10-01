@@ -4,6 +4,7 @@ import { PendingFlux } from 'api/deposit/DepositApi'
 import { TokenOverride } from './config'
 
 export type Command = () => void
+export type AnyFunction = (...args: unknown[]) => unknown
 export type Mutation<T> = (original: T) => T
 export type Unpromise<T> = T extends Promise<infer U> ? U : T
 
