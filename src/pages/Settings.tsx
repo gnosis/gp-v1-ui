@@ -74,8 +74,8 @@ const composeValuesErrors = <T extends SettingsFormData, K extends keyof T = key
   }>(
     (acc, elem) => {
       // accumulate errors
-      // or leave as null
-      if (elem.errors) {
+      // or leave as empty object
+      if (Object.keys(elem.errors).length > 0) {
         if (!acc.errors) acc.errors = {}
 
         acc.errors = {
