@@ -8,7 +8,7 @@ import { BATCH_START_THRESHOLD } from './validationSchema'
 import { BATCH_TIME_IN_MS } from 'const'
 import { TokenDetails } from 'types'
 
-export function calculateReceiveAmount(priceValue: string, sellValue: string): string {
+export function calculateReceiveAmount(priceValue?: string, sellValue?: string): string {
   let receiveAmount = ''
   if (priceValue && sellValue) {
     const sellAmount = parseBigNumber(sellValue)

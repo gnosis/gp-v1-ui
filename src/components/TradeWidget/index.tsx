@@ -158,9 +158,6 @@ const TradeWidget: React.FC = () => {
   const defaultValidFrom = calculateValidityTimes(trade.validFrom || validFromParam)
   const defaultValidUntil = calculateValidityTimes(trade.validUntil || validUntilParam)
 
-  const [priceShown, setPriceShown] = useState<PriceType>('DIRECT')
-  const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
-
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
     [receiveInputId]: '',
@@ -186,6 +183,10 @@ const TradeWidget: React.FC = () => {
       defaultTokenSymbol: initialReceiveToken,
     }),
   )
+
+  const [priceShown, setPriceShown] = useState<PriceType>('DIRECT')
+  const priceIsInverse = priceShown === 'INVERSE'
+  const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
 
   const { baseToken, quoteToken, wasPriorityAdjusted } = usePrioritiseTokensForPrice({ receiveToken, sellToken })
 
@@ -233,13 +234,7 @@ const TradeWidget: React.FC = () => {
   })
   const { control, handleSubmit, reset, setValue, trigger } = methods
 
-  const {
-    sellToken: sellValue,
-    validFrom: validFromValue,
-    validUntil: validUntilValue,
-    price: priceValue,
-    priceInverse: priceInverseValue,
-  } = useWatch({
+  const { sellToken: sellValue, validFrom: validFromValue, validUntil: validUntilValue, price: priceValue } = useWatch({
     control,
     defaultValue: defaultFormValues,
   })
@@ -262,8 +257,8 @@ const TradeWidget: React.FC = () => {
 
   // Update receive amount
   useEffect(() => {
-    priceValue && sellValue && setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
-  }, [priceValue, priceInverseValue, setValue, sellValue])
+    setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
+  }, [priceValue, setValue, sellValue])
 
   const url = buildUrl({
     sell: sellValue,
@@ -631,7 +626,7 @@ const TradeWidget: React.FC = () => {
             receiveToken={receiveToken}
             sellToken={sellToken}
             onSwapPrices={swapPrices}
-            isPriceInverted={priceShown === 'INVERSE'}
+            isPriceInverted={priceIsInverse}
             wasPriorityAdjusted={wasPriorityAdjusted}
             tabIndex={1}
           />
@@ -646,7 +641,7 @@ const TradeWidget: React.FC = () => {
             amount={debouncedSellValue}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            isPriceInverted={priceShown === 'INVERSE'}
+            isPriceInverted={priceIsInverse}
             wasPriorityAdjusted={wasPriorityAdjusted}
             onSwapPrices={swapPrices}
           />
