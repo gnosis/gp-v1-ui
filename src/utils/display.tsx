@@ -1,8 +1,8 @@
 import React from 'react'
-import { TokenDetails, safeTokenName } from '@gnosis.pm/dex-js'
+import { TokenDex, safeTokenName } from '@gnosis.pm/dex-js'
 import { EtherscanLink } from 'components/common/EtherscanLink'
 
-export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode | string {
+export function displayTokenSymbolOrLink(token: TokenDex): React.ReactNode | string {
   const displayName = safeTokenName(token)
   if (displayName.startsWith('0x')) {
     return <EtherscanLink type="token" identifier={token.address} />
@@ -10,7 +10,7 @@ export function displayTokenSymbolOrLink(token: TokenDetails): React.ReactNode |
   return displayName
 }
 
-export function symbolOrAddress(token: TokenDetails): string {
+export function symbolOrAddress(token: TokenDex): string {
   return token.symbol || token.address
 }
 
@@ -25,8 +25,8 @@ export function computeMarketProp({
   acceptedSeparators = ['-', '/', ''],
   inverseMarket = false,
 }: {
-  sellToken: TokenDetails
-  buyToken: TokenDetails
+  sellToken: TokenDex
+  buyToken: TokenDex
   acceptedSeparators?: string[]
   inverseMarket?: boolean
 }): string[] {
