@@ -24,12 +24,12 @@ const Wrapper = styled.div`
       margin-right: 0.5rem;
       text-transform: capitalize;
 
-      // tooltip
+      /* tooltip */
       ~ span {
         font-size: 1.2rem;
       }
     }
-    // swapper
+    /* swapper */
     > div {
       display: none;
       align-items: center;
@@ -70,12 +70,12 @@ const Wrapper = styled.div`
         font-weight: bold;
       }
 
-      // Separator
+      /* Separator */
       > div:nth-child(2) {
         font-size: larger;
         margin: 0 0.1rem;
       }
-      // Swap SVG
+      /* Swap SVG */
       > span:last-child {
         padding: 0 0.2rem 0 0.4rem;
       }
@@ -85,13 +85,13 @@ const Wrapper = styled.div`
       grid-auto-flow: row;
 
       > div {
-        // tokenA/TokenB swapSVG
+        /* tokenA/TokenB swapSVG */
         > div {
-          // hide: /
+          /* hide: */
           &:nth-child(2),
-        // hide: tokenB
+        /* hide: tokenB */
         &:nth-child(3),
-        // hide: swapSVG
+        /* hide: swapSVG */
         ~ span {
             display: none;
           }

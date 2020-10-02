@@ -85,11 +85,10 @@ export const TopWrapper = styled.div`
 export const CountDownStyled = styled.div`
   display: flex;
   flex-flow: column;
-  order 2;
+  order: 2;
   min-width: 15rem;
 
   > ${BatchNumberWrapper} {
-    min-width: 16rem;
     display: flex;
     font-family: var(--font-mono);
     font-size: 1.2rem;

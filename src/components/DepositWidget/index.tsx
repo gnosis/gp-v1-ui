@@ -134,7 +134,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  // button
+  /* button */
   .balances-manageTokens {
     color: var(--color-text-active);
     text-align: right;
@@ -155,7 +155,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  // label + radio input
+  /* label + radio input */
   .balances-hideZero {
     display: flex;
     flex-flow: row nowrap;
