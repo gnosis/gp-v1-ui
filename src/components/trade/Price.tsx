@@ -230,7 +230,13 @@ export const Price: React.FC<Props> = ({
     precision: DEFAULT_PRECISION,
   })
 
-  const showInverse = (!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)
+  // Show Inverse Price ... IF
+  // DIRECT + ADJUSTED || INVERSE + UNADJUSTED
+  // aka
+  // 1. price = DIRECT && market = ADJUSTED
+  // 2. price = INVERSE && market = UNADJUSTED
+  const marketAdjustedisPriceInverted =
+    (!isPriceInverted && wasPriorityAdjusted) || (isPriceInverted && !wasPriorityAdjusted)
 
   return (
     <Wrapper>
@@ -238,7 +244,7 @@ export const Price: React.FC<Props> = ({
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* DIRECT */}
-      <PriceInputBox hidden={showInverse}>
+      <PriceInputBox hidden={marketAdjustedisPriceInverted}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -254,6 +260,8 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={baseToken}
             quoteToken={quoteToken}
+            // if priority of token was adjusted i.e BASE = QUOTE now
+            // we must check here as to not invert the token again inside SwapPrice
             isPriceInverted={wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
             showBaseToken
@@ -262,7 +270,7 @@ export const Price: React.FC<Props> = ({
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
       {/* INVERSE */}
-      <PriceInputBox hidden={!showInverse}>
+      <PriceInputBox hidden={!marketAdjustedisPriceInverted}>
         <label>
           <input
             name={priceInverseInputId}
@@ -278,6 +286,8 @@ export const Price: React.FC<Props> = ({
           <SwapPrice
             baseToken={baseToken}
             quoteToken={quoteToken}
+            // if priority of token was adjusted i.e BASE = QUOTE now
+            // we must check here as to not invert the token again inside SwapPrice
             isPriceInverted={!wasPriorityAdjusted}
             onSwapPrices={onSwapPrices}
             showBaseToken
