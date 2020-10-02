@@ -5,28 +5,32 @@ export interface GetMarketResult extends Market {
 }
 
 export function getMarket({ sellToken, receiveToken }: TradeTokenSelection): GetMarketResult {
-  let baseToken = receiveToken
-  let quoteToken = sellToken
-  let wasPriorityAdjusted = false
-
+  // Choose the market depending on the prios of selected tokens
   // i.e.
-  // Prio: 1                  - STABLE USD
-  // Prio: 2                  - STABLE EUR
-  // Prio: 3                  - WETH
-  // Prio: MAX_SAFE_INTEGER   - VOLATILE
-  const basePrio = baseToken.priority || Number.MAX_SAFE_INTEGER
-  const quotePrio = quoteToken.priority || Number.MAX_SAFE_INTEGER
+  //  Prio: 1                  - STABLE USD
+  //  Prio: 2                  - STABLE EUR
+  //  Prio: 3                  - WETH
+  //  Prio: MAX_SAFE_INTEGER   - VOLATILE
+  const receiveTokenPrio = receiveToken.priority || Number.MAX_SAFE_INTEGER
+  const sellTokenPrio = sellToken.priority || Number.MAX_SAFE_INTEGER
 
   // Receive token has priority = make price point
-  if (basePrio < quotePrio) {
-    baseToken = sellToken
+  let baseToken, quoteToken
+  if (receiveTokenPrio < sellTokenPrio) {
+    // Receive token is the quote
     quoteToken = receiveToken
-    wasPriorityAdjusted = true
+    baseToken = sellToken
+  } else {
+    // Base token is the quote
+    quoteToken = sellToken
+    baseToken = receiveToken
   }
 
   return {
     baseToken,
     quoteToken,
-    wasPriorityAdjusted,
+    // TODO: I kept this prop for respecing this part of the original PR, but I think it shouldn't be here. We'll review later
+    //      https://github.com/gnosis/dex-react/issues/1476
+    wasPriorityAdjusted: receiveToken === quoteToken,
   }
 }
