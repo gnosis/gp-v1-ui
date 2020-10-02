@@ -10,15 +10,13 @@ import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggest
 import { TokenDetails } from 'types'
 
 interface Props
-  extends Pick<
-    PriceSuggestionsProps,
-    'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices' | 'wasPriorityAdjusted'
-  > {
+  extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
   receiveToken: TokenDetails
   sellToken: TokenDetails
   networkId: number
   priceInputId: string
   priceInverseInputId: string
+  wasPriorityAdjusted: boolean
 }
 
 export const PriceSuggestionWidget: React.FC<Props> = (props) => {
@@ -27,7 +25,6 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
-    receiveToken,
     sellToken,
     isPriceInverted,
     priceInputId,
@@ -35,23 +32,38 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     wasPriorityAdjusted,
     onSwapPrices,
   } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = receiveToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = sellToken
+  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
+  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
     (price: string, invertedPrice) => {
-      if (!isPriceInverted) {
-        setValue(priceInverseInputId, invertedPrice)
-        setValue(priceInputId, price)
+      // Why do we need to check if the market priority was adjusted here?
+      // adjusting a market (i.e switching which token = QUOTE when showing price)
+      // it is essentially the same as flipping the market, meaning inverting THAT price will essentially
+      // show the original price. So it needs to be checked to keep it inverted
+      if (wasPriorityAdjusted) {
+        if (!isPriceInverted) {
+          setValue(priceInputId, invertedPrice)
+          setValue(priceInverseInputId, price)
+        } else {
+          setValue(priceInputId, price)
+          setValue(priceInverseInputId, invertedPrice)
+        }
       } else {
-        setValue(priceInputId, invertedPrice)
-        setValue(priceInverseInputId, price)
+        if (!isPriceInverted) {
+          setValue(priceInputId, price)
+          setValue(priceInverseInputId, invertedPrice)
+        } else {
+          setValue(priceInputId, invertedPrice)
+          setValue(priceInverseInputId, price)
+        }
       }
+
       trigger()
     },
-    [trigger, isPriceInverted, setValue, priceInputId, priceInverseInputId],
+    [wasPriorityAdjusted, trigger, isPriceInverted, setValue, priceInputId, priceInverseInputId],
   )
 
   const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
@@ -76,7 +88,6 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
       quoteToken={quoteToken}
       sellToken={sellToken}
       isPriceInverted={isPriceInverted}
-      wasPriorityAdjusted={wasPriorityAdjusted}
       // Order size
       amount={amount}
       // Prices
