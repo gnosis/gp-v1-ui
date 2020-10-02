@@ -85,7 +85,7 @@ type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 // 2: account changes
 // 3: new block is mined
 
-interface BlockchainUpdatePrompt {
+export interface BlockchainUpdatePrompt {
   account: string
   chainId: number
   blockHeader: BlockHeader | null
