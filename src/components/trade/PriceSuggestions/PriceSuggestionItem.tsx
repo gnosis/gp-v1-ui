@@ -2,7 +2,7 @@ import React from 'react'
 import BigNumber from 'bignumber.js'
 
 import { PRICE_ESTIMATION_PRECISION } from 'const'
-import { invertPrice, TokenDetails } from '@gnosis.pm/dex-js'
+import { invertPrice, TokenDex } from '@gnosis.pm/dex-js'
 
 import { displayTokenSymbolOrLink } from 'utils/display'
 
@@ -17,8 +17,8 @@ const LongPriceStrong = styled.strong`
 
 export interface Props {
   label: string
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
+  baseToken: TokenDex
+  quoteToken: TokenDex
   amount?: string
   price: BigNumber | null
   isPriceInverted: boolean

@@ -9,7 +9,7 @@ import joi from 'joi'
 // const, type, utils
 import { DEFAULT_PRECISION, LIQUIDITY_TOKEN_LIST, INPUT_PRECISION_SIZE } from 'const'
 import { Receipt } from 'types'
-import { TokenDetails, ZERO } from '@gnosis.pm/dex-js'
+import { TokenDex, ZERO } from '@gnosis.pm/dex-js'
 import { maxAmountsForSpread, resolverFactory, VALIDATOR_ERROR_KEYS } from 'utils'
 
 // components
@@ -36,7 +36,7 @@ import { useTokenList } from 'hooks/useTokenList'
 export const FIRST_STEP = 1
 export const LAST_STEP = 2
 
-function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails): Map<number, TokenDetails> {
+function addRemoveMapItem(map: Map<number, TokenDex>, newToken: TokenDex): Map<number, TokenDex> {
   // Cache map (no mutate)
   const copyMap = new Map(map)
   // Map item doesn't exist? Add that fool in
@@ -46,14 +46,14 @@ function addRemoveMapItem(map: Map<number, TokenDetails>, newToken: TokenDetails
   return copyMap
 }
 
-function setFullTokenMap(tokens: TokenDetails[]): Map<number, TokenDetails> {
+function setFullTokenMap(tokens: TokenDex[]): Map<number, TokenDex> {
   const tokenMap = new Map()
   tokens.forEach((token) => tokenMap.set(token.id, token))
   return tokenMap
 }
 
 // TODO: Decide the best place to put this. This file is too long already, but feels to specific for utils
-export function createOrderParams(tokens: TokenDetails[], spread: number): MultipleOrdersOrder[] {
+export function createOrderParams(tokens: TokenDex[], spread: number): MultipleOrdersOrder[] {
   // We'll create 2 orders for each pair: SELL_A -> BUY_B and SELL_B -> BUY_A
 
   // With 2 tokens A, B, we have 1 pair [(A, B)] == 2 orders
@@ -161,9 +161,7 @@ const PoolingInterface: React.FC = () => {
     )
   }, [tokenList])
 
-  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDetails>>(() =>
-    setFullTokenMap(tokens),
-  )
+  const [selectedTokensMap, setSelectedTokensMap] = useSafeState<Map<number, TokenDex>>(() => setFullTokenMap(tokens))
 
   useEffect(() => {
     setSelectedTokensMap(setFullTokenMap(tokens))
@@ -254,7 +252,7 @@ const PoolingInterface: React.FC = () => {
   ])
 
   const handleTokenSelect = useCallback(
-    (token: TokenDetails): void => {
+    (token: TokenDex): void => {
       const state = addRemoveMapItem(selectedTokensMap, token)
       return setSelectedTokensMap(state)
     },

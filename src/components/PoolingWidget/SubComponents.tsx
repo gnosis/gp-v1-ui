@@ -2,7 +2,7 @@ import React from 'react'
 
 // types
 import { Receipt } from 'types'
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 // PoolingWidget: subcomponents
 import TokenSelector from 'components/PoolingWidget/TokenSelector'
@@ -12,7 +12,7 @@ import { CreateStrategy } from 'components/PoolingWidget/CreateStrategy'
 export interface SubComponentProps extends TokenSelectorProps {
   isSubmitting: boolean
   step: number
-  selectedTokensMap: Map<number, TokenDetails>
+  selectedTokensMap: Map<number, TokenDex>
   spread: number
   setSpread: React.Dispatch<React.SetStateAction<number>>
   txHash: string
