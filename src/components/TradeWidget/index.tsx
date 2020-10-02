@@ -72,6 +72,7 @@ import { updateTradeState } from 'reducers-actions/trade'
 // Validation
 import validationSchema from 'components/TradeWidget/validationSchema'
 import { TxMessage } from 'components/TradeWidget/TxMessage'
+import { getMarket } from 'utils/markets'
 
 const NULL_BALANCE_TOKEN = {
   exchangeBalance: ZERO,
@@ -181,6 +182,11 @@ const TradeWidget: React.FC = () => {
       defaultTokenSymbol: initialReceiveToken,
     }),
   )
+
+  // Get canonical market
+  const { baseToken, quoteToken, wasPriorityAdjusted } = getMarket({ receiveToken, sellToken })
+  // TODO: Remove debug log
+  console.log('Canonical Market', baseToken.symbol, quoteToken.symbol, wasPriorityAdjusted)
 
   useEffect(() => {
     //  when switching networks
@@ -621,16 +627,16 @@ const TradeWidget: React.FC = () => {
           <Price
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            baseToken={receiveToken}
-            quoteToken={sellToken}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
             tabIndex={1}
             onSwapPrices={swapPrices}
             priceShown={priceShown}
           />
           <PriceSuggestions
             networkId={networkIdOrDefault}
-            baseToken={receiveToken}
-            quoteToken={sellToken}
+            baseToken={baseToken}
+            quoteToken={quoteToken}
             amount={debouncedSellValue}
             isPriceInverted={priceShown === 'INVERSE'}
             priceInputId={priceInputId}
