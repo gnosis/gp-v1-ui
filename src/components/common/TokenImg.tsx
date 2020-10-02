@@ -55,7 +55,7 @@ export const TokenImg: React.FC<Props> = (props) => {
   }
 
   const iconFileUrl: string | undefined = iconFile
-    ? tokensIconsRequire(iconFile)
+    ? tokensIconsRequire(iconFile).default
     : getImageUrl(addressMainnet || address)
 
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
