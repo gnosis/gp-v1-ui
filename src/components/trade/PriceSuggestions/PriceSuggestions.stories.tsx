@@ -1,16 +1,16 @@
 import React, { useState } from 'react'
-import { useForm, FormProvider } from 'react-hook-form'
 
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { PriceSuggestions, Props } from './PriceSuggestions'
-import { Frame } from 'components/common/Frame'
 import BigNumber from 'bignumber.js'
 import { DAI, GNO } from 'storybook/data'
+import { Form } from 'storybook/decorators'
 
 export default {
   title: 'Trade/PriceSuggestions',
   component: PriceSuggestions,
+  decorators: [Form],
 } as Meta
 
 const defaultProps = {
@@ -27,22 +27,15 @@ const defaultProps = {
 const Template: Story<Partial<Props>> = (props) => {
   const [isPriceInverted, setIsPriceInverted] = useState<boolean>(false)
 
-  const methods = useForm()
   return (
-    <Frame style={{ maxWidth: '50rem' }}>
-      <FormProvider {...methods}>
-        <form>
-          <PriceSuggestions
-            {...defaultProps}
-            isPriceInverted={isPriceInverted}
-            onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
-            onClickPrice={(price, invertedPrice) => (): void =>
-              console.log('Click price', price, invertedPrice, isPriceInverted)}
-            {...props}
-          />
-        </form>
-      </FormProvider>
-    </Frame>
+    <PriceSuggestions
+      {...defaultProps}
+      isPriceInverted={isPriceInverted}
+      onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
+      onClickPrice={(price, invertedPrice) => (): void =>
+        console.log('Click price', price, invertedPrice, isPriceInverted)}
+      {...props}
+    />
   )
 }
 
