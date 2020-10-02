@@ -4,11 +4,14 @@ import { Command, Network } from 'types'
 import useSafeState from './useSafeState'
 import { BlockchainUpdatePrompt, WalletInfo } from 'api/wallet/WalletApi'
 
-type PendingStateObject = { pending: true; networkIdOrDefault: number } & Partial<WalletInfo>
+interface PendingStateObject extends WalletInfo {
+  pending: true
+  networkIdOrDefault: number
+}
 
 const PendingState: PendingStateObject = {
   pending: true,
-  isConnected: undefined,
+  isConnected: false,
   userAddress: undefined,
   networkId: undefined,
   networkIdOrDefault: Network.Mainnet,
