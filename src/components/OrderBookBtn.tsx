@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import Modali, { useModali } from 'components/common/StyledModal'
+import Modali, { useModali } from 'components/common/Modal'
 
 // assets
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'

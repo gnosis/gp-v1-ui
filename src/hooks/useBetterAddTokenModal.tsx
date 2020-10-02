@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react'
-import Modali, { useModali, ModalHook } from 'components/common/StyledModal'
+import Modali, { useModali, ModalHook } from 'components/common/Modal'
 import { fetchTokenData, FetchTokenResult } from 'services'
 import { Deferred, createDeferredPromise } from 'utils'
 import { TokenDetails } from 'types'

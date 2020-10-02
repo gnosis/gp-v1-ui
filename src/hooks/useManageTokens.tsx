@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import Modali, { useModali, ModalHook } from 'components/common/StyledModal'
+import Modali, { useModali, ModalHook } from 'components/common/Modal'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { useWalletConnection } from './useWalletConnection'

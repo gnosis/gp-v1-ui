@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import Modali from 'components/common/StyledModal'
+import Modali from 'components/common/Modal'
 
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 import { TokenDetails } from 'types'

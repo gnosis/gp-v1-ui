@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import Modali from 'components/common/StyledModal'
+import Modali from 'components/common/Modal'
 import styled from 'styled-components'
 import BN from 'bn.js'
 

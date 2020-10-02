@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import BN from 'bn.js'
-import Modali, { useModali, ModalHook, toggleModaliComponent } from 'components/common/StyledModal'
+import Modali, { useModali, ModalHook, toggleModaliComponent } from 'components/common/Modal'
 
 // Components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'

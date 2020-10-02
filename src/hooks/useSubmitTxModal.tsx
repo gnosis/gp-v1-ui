@@ -1,4 +1,4 @@
-import Modali, { ModalHook, useModali } from 'components/common/StyledModal'
+import Modali, { ModalHook, useModali } from 'components/common/Modal'
 import React, { useRef } from 'react'
 
 interface UseSubmitTxResult {
