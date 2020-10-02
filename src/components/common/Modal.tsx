@@ -2,13 +2,9 @@ import React from 'react'
 import { createGlobalStyle } from 'styled-components'
 import Modali, { ModalHook, toggleModaliComponent, useModali } from 'modali'
 
-import variables from 'styles/variables'
 import { MEDIA } from 'const'
 
-const ModaliGlobalStyle = createGlobalStyle`
-// global root variables
-  ${variables}
-  
+const ModaliGlobalStyle = createGlobalStyle` 
 /* Hack to fix Modali screen flash */
   .modali-overlay {
     display: none
