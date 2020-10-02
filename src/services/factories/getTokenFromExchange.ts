@@ -6,14 +6,15 @@ import { getToken } from 'utils'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TokenList } from 'api/tokenList/TokenListApi'
-import { TokenFromErc20Params, TokenFromErc20 } from './'
+import { TokenFromErc20Params } from './'
+import { TokenErc20 } from '@gnosis.pm/dex-js'
 
 interface FactoryParams {
   tokenListApi: TokenList
   exchangeApi: ExchangeApi
   erc20Api: Erc20Api
   web3: Web3
-  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
+  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenErc20 | null>
 }
 
 interface GetByAddressParams {

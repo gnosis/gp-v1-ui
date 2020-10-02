@@ -2,7 +2,7 @@ import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
-import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
+import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
 import { DISABLED_TOKEN_MAPS, EMPTY_ARRAY } from 'const'
 
 const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails): TokenDetails => {
@@ -30,7 +30,7 @@ export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
 
 export interface TokenListApiParams {
   networkIds: number[]
-  initialTokenList: TokenDetailsConfig[]
+  initialTokenList: TokenDetailsConfigLegacy[]
 }
 
 export interface AddTokenParams {

@@ -1,9 +1,9 @@
 import Web3 from 'web3'
 
-import { MinimalTokenDetails } from 'types'
 import { logDebug, silentPromise } from 'utils'
 import { DEFAULT_PRECISION } from 'const'
 import { Erc20Api } from 'api/erc20/Erc20Api'
+import { TokenErc20 } from '@gnosis.pm/dex-js'
 
 interface Params {
   tokenAddress: string
@@ -15,12 +15,7 @@ interface Params {
 /**
  * Fetches info for an arbitrary ERC20 token from given address
  */
-export async function getErc20Info({
-  tokenAddress,
-  networkId,
-  erc20Api,
-  web3,
-}: Params): Promise<MinimalTokenDetails | null> {
+export async function getErc20Info({ tokenAddress, networkId, erc20Api, web3 }: Params): Promise<TokenErc20 | null> {
   // First check whether given address is a contract
   const code = await web3.eth.getCode(tokenAddress)
   if (code === '0x') {

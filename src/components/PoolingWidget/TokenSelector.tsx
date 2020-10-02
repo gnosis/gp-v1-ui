@@ -5,16 +5,16 @@ import { TokenImgWrapper } from 'components/common/TokenImg'
 import checkIcon from 'assets/img/li-check.svg'
 
 // types
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 // PoolingWidget: subcomponent
 import { ProgressStepText } from 'components/PoolingWidget/PoolingWidget.styled'
 import { TokenSelectorWrapper, TokenBox, CheckboxWrapper } from 'components/PoolingWidget/TokenSelector.styled'
 
 export interface TokenSelectorProps {
-  handleTokenSelect: (tokenData: TokenDetails) => void
-  selectedTokensMap: Map<number, TokenDetails>
-  tokens: TokenDetails[]
+  handleTokenSelect: (tokenData: TokenDex) => void
+  selectedTokensMap: Map<number, TokenDex>
+  tokens: TokenDex[]
 }
 
 const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, selectedTokensMap, tokens }) => {

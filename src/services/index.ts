@@ -9,7 +9,6 @@ import {
   getTokensFactory,
   getTokenFromErc20Factory,
   TokenFromExchange,
-  TokenFromErc20,
   getTradesAndTradeReversionsFactory,
   addUnlistedTokensToUserTokenListByIdFactory,
 } from './factories'
@@ -17,6 +16,7 @@ import {
 import { logDebug } from 'utils'
 import { TokenDetails } from 'types'
 import { toChecksumAddress } from 'web3-utils'
+import { TokenErc20 } from '@gnosis.pm/dex-js'
 
 const apis = {
   tokenListApi,
@@ -141,7 +141,7 @@ type ValidResons =
   | TokenFromExchange.NOT_IN_TOKEN_LIST
 
 export interface FetchTokenResult {
-  token: TokenDetails | TokenFromErc20 | null
+  token: TokenDetails | TokenErc20 | null
   reason: ValidResons | null
   tokenAddress: string
 }
@@ -159,30 +159,35 @@ export const fetchTokenData = async ({
       getTokenFromErc20(params),
     ])
 
-    if (!tokenInExchange)
+    if (!tokenInExchange) {
+      // Token is not registered in the contract
       return {
         token: erc20Token,
         reason: erc20Token ? TokenFromExchange.NOT_REGISTERED_ON_CONTRACT : TokenFromExchange.NOT_ERC20,
         tokenAddress: params.tokenAddress,
       }
-
-    if (!erc20Token)
+    } else if (!erc20Token) {
+      // Token is not a ERC20
       return {
         token: null,
         reason: TokenFromExchange.NOT_ERC20,
         tokenAddress: params.tokenAddress,
       }
+    } else {
+      // Token is an ERC20 and registered in the contract
 
-    // get registered id
-    const tokenId = await exchangeApi.getTokenIdByAddress(params)
-
-    return {
-      token: {
+      // get registered id
+      const tokenId = await exchangeApi.getTokenIdByAddress(params)
+      const token: TokenDetails = {
         ...erc20Token,
         id: tokenId,
-      },
-      reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
-      tokenAddress: params.tokenAddress,
+      }
+
+      return {
+        token,
+        reason: TokenFromExchange.NOT_IN_TOKEN_LIST,
+        tokenAddress: params.tokenAddress,
+      }
     }
   } catch (error) {
     logDebug('Error fetching token', params, error)
