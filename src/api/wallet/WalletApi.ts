@@ -259,7 +259,11 @@ export class WalletApiImpl implements WalletApi {
   private _web3: Web3
   private _providerInfo: ProviderInfo | null = null
   public userPrintAsync: Promise<UserPrint> = Promise.resolve({ userPrint: '', gas: 0 })
-  public blockchainState: BlockchainUpdatePrompt
+  public blockchainState: BlockchainUpdatePrompt = {
+    account: '',
+    chainId: 0,
+    blockHeader: null,
+  }
 
   private _unsubscribe: Command
   private _fetchGasPrice: ReturnType<typeof fetchGasPriceFactory> = async () => undefined
