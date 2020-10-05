@@ -26,7 +26,7 @@ export const Apollo = (DecoratedStory: () => StoryFnReactReturnType): JSX.Elemen
 export const Form = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => {
   const methods = useForm()
   return (
-    <Frame style={{ maxWidth: '50rem' }}>
+    <Frame>
       <FormProvider {...methods}>
         <form>{DecoratedStory()}</form>
       </FormProvider>
