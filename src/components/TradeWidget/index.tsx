@@ -101,10 +101,11 @@ export interface TradeFormData {
 
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
-export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
+export const DEFAULT_FORM_STATE: TradeFormData = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
+  priceInverse: invertPriceFromString('0'),
   // ASAP
   validFrom: null,
   // Do not expire (never)
@@ -387,7 +388,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
         validUntilWithBatchID,
         expiresNever,
       },
-      resetStateOptions: Partial<TradeFormData> = DEFAULT_FORM_STATE,
+      resetStateOptions: TradeFormData = DEFAULT_FORM_STATE,
     ): void => {
       batchUpdateState(() => {
         // reset form on successful order placing
@@ -484,8 +485,8 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: undefined,
-                  validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
+                  validFrom: null,
+                  validUntil: isNever ? null : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
             },
@@ -525,7 +526,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: batchIdToDate(validFromWithBatchId).getTime().toString(),
-                  validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
+                  validUntil: isNever ? null : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
             },
