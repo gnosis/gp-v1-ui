@@ -4,7 +4,6 @@ import { useForm, useWatch, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { toast } from 'toastify'
 import BN from 'bn.js'
-import Modali from 'modali'
 import styled from 'styled-components'
 
 import { decodeSymbol } from '@gnosis.pm/dex-js'
@@ -32,10 +31,10 @@ import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { tokenListApi } from 'api'
 
 // components
-
 import OrdersWidget from 'components/OrdersWidget'
 import { TxNotification } from 'components/TxNotification'
 import { Spinner } from 'components/common/Spinner'
+import Modal from 'components/common/Modal'
 
 // TradeWidget: subcomponents
 import {
@@ -722,7 +721,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Select different tokens' : 'Submit limit order'}
           </SubmitButton>
-          <Modali.Modal {...modalProps} />
+          <Modal.Modal {...modalProps} />
         </WrappedForm>
       </FormProvider>
       <ExpandableOrdersPanel>
