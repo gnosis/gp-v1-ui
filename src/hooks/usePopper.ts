@@ -45,7 +45,7 @@ interface Result<T extends HTMLElement, U extends HTMLElement = HTMLDivElement> 
   target: RefObject<T>
   ref: RefObject<U>
   isShown: boolean
-  state: State | {}
+  state: State | Record<string, unknown>
 }
 
 export const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDivElement>(
@@ -55,7 +55,7 @@ export const usePopper = <T extends HTMLElement, U extends HTMLElement = HTMLDiv
   const popupRef = useRef<U>(null)
   const targetRef = useRef<T>(null)
   const popperRef = useRef<Instance | null>(null)
-  const [state, setState] = useState<State | {}>({})
+  const [state, setState] = useState<State | Record<string, unknown>>({})
 
   useEffect(() => {
     if (!targetRef.current || !popupRef.current) return
