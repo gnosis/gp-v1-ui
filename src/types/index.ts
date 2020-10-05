@@ -5,6 +5,7 @@ import { TokenOverride } from './config'
 import { TokenDex } from '@gnosis.pm/dex-js'
 
 export type Command = () => void
+export type AnyFunction = (...args: unknown[]) => unknown
 export type Mutation<T> = (original: T) => T
 export type Unpromise<T> = T extends Promise<infer U> ? U : T
 
