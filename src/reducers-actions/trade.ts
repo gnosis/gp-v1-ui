@@ -1,11 +1,11 @@
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 import { Actions } from 'reducers-actions'
 
 export interface TradeState {
   price: string | null
   sellAmount: string | null
-  sellToken: Required<TokenDetails> | null
-  buyToken: Required<TokenDetails> | null
+  sellToken: Required<TokenDex> | null
+  buyToken: Required<TokenDex> | null
   validFrom: string | null
   validUntil: string | null
 }

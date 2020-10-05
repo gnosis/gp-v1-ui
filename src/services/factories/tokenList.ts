@@ -5,13 +5,14 @@ import { TcrApi } from 'api/tcr/TcrApi'
 import { TokenDetails, Command } from 'types'
 import { logDebug, retry } from 'utils'
 
-import { TokenFromErc20Params, TokenFromErc20 } from './'
+import { TokenFromErc20Params } from './'
+import { TokenErc20 } from '@gnosis.pm/dex-js'
 
 export function getTokensFactory(factoryParams: {
   tokenListApi: TokenList
   exchangeApi: ExchangeApi
   tcrApi?: TcrApi
-  getTokenFromErc20: (params: TokenFromErc20Params) => Promise<TokenFromErc20>
+  getTokenFromErc20: (params: TokenFromErc20Params) => Promise<TokenErc20 | null>
 }): (networkId: number) => TokenDetails[] {
   const { tokenListApi, exchangeApi, tcrApi, getTokenFromErc20 } = factoryParams
 
@@ -103,7 +104,7 @@ export function getTokensFactory(factoryParams: {
     }
   }
 
-  async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenFromErc20 | string> {
+  async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenErc20 | string> {
     // Simple wrapper function to return original address instead of null for make logging easier
     const erc20Details = await getTokenFromErc20({ networkId, tokenAddress })
     return erc20Details || tokenAddress
@@ -161,7 +162,7 @@ export function getTokensFactory(factoryParams: {
         .map((token) => [token.address, token]),
     )
 
-    const promises: Promise<TokenFromErc20 | string>[] = []
+    const promises: Promise<TokenErc20 | string>[] = []
 
     // Go over all value (id) and key (tokenAddress) pairs registered on the contract
     addressesAndIds.forEach((id, tokenAddress) => {
