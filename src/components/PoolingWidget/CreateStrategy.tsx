@@ -1,5 +1,5 @@
 import React from 'react'
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 // types, util, const
 import { Receipt } from 'types'
@@ -14,7 +14,7 @@ import AddFunding from 'components/PoolingWidget/AddFunding'
 
 export interface CreateStrategyProps {
   isSubmitting: boolean
-  selectedTokensMap: Map<number, TokenDetails>
+  selectedTokensMap: Map<number, TokenDex>
   spread: number
   setSpread: (spread: number) => void
   txIdentifier: string
@@ -23,7 +23,7 @@ export interface CreateStrategyProps {
 }
 
 interface SpreadInformationProps {
-  selectedTokensMap: Map<number, TokenDetails>
+  selectedTokensMap: Map<number, TokenDex>
   spread: number
 }
 

@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { TokenDetails } from '@gnosis.pm/dex-js'
 
 import { MEDIA } from 'const'
 
@@ -9,6 +8,7 @@ import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
 import { PriceSuggestionItem } from 'components/trade/PriceSuggestions/PriceSuggestionItem'
 import BigNumber from 'bignumber.js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 const Wrapper = styled.div`
   > div {
@@ -116,8 +116,8 @@ const OnchainOrderbookTooltip = (
 
 export interface Props {
   // Market
-  baseToken: TokenDetails
-  quoteToken: TokenDetails
+  baseToken: TokenDex
+  quoteToken: TokenDex
   isPriceInverted: boolean
 
   // Order Size
