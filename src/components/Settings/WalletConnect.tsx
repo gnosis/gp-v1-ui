@@ -106,7 +106,6 @@ const OrSeparator = styled.div`
   @media ${MEDIA.mobile} {
     padding: 1rem 1.5em;
   }
-}
 `
 
 const ErrorWrapper = styled.p`

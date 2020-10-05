@@ -5,9 +5,9 @@ import checkWhite from 'assets/img/check-white.svg'
 import greenCheck from 'assets/img/check-green.svg'
 
 const GlobalStyles = createGlobalStyle`
-  // global root variables
+  /* global root variables */
   ${variables}
-  // Import font faces
+  /* Import font faces */
   ${fontFace}
 
   html, body {  
@@ -43,8 +43,8 @@ const GlobalStyles = createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 6px!important;
-    height: 6px!important;
+    width: 6px !important;
+    height: 6px !important;
   }
   ::-webkit-scrollbar-thumb {
       background-color: rgba(0,0,0,.2);
@@ -174,7 +174,7 @@ const GlobalStyles = createGlobalStyle`
       color: transparent;
     }
     
-    &[type=checkbox] {
+    &[type="checkbox"] {
       margin: 0 auto;
       background: transparent;
       appearance: none;
@@ -254,7 +254,7 @@ const GlobalStyles = createGlobalStyle`
 
   @media only screen and (max-width: 736px) {
     .Toastify__toast-container {
-      width: 90vw; // fallback
+      width: 90vw; /* fallback */
       width: calc(100vw - 2rem);
       margin: auto;
       right: 0;
@@ -306,8 +306,7 @@ const GlobalStyles = createGlobalStyle`
     direction: rtl;
   }
 
-  // .Toastify__toast--default {
-  // }
+  /* .Toastify__toast--default {} */
 
   .Toastify__toast--info::before {
     content: '';
@@ -885,9 +884,9 @@ const GlobalStyles = createGlobalStyle`
   }
   /* END Toastify custom styling */
   
-  // Web3Connect styling
-  // SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
-  // or am i missing something?
+  /* Web3Connect styling
+  SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
+  or am i missing something? */
   #WEB3_CONNECT_MODAL_ID > div > div > div:last-child {
       display: flex;
       width: 100%;
@@ -909,7 +908,7 @@ const GlobalStyles = createGlobalStyle`
         font-weight: var(--font-weight-bold);
       }
     
-    // Individual outer container
+    /* Individual outer container */
     > div {
       background: var(--color-background-pageWrapper);
       border-radius: var(--border-radius);
@@ -920,7 +919,7 @@ const GlobalStyles = createGlobalStyle`
       border: 0;
     }
     
-    // Individual inner container
+    /* Individual inner container */
     > div > div {
       background: var(--color-background-pageWrapper);
       display: flex;
@@ -942,7 +941,7 @@ const GlobalStyles = createGlobalStyle`
         }
     }
     
-    // Provider image
+    /* Provider image */
     > div > div > div:nth-of-type(1) {
       background: 0;
       box-shadow: none;
@@ -958,7 +957,7 @@ const GlobalStyles = createGlobalStyle`
         }
     }
     
-    // Client name
+    /* Client name */
     > div > div > div:nth-of-type(2) {
       font-size: 1.5rem;
       text-align: left;
@@ -967,16 +966,16 @@ const GlobalStyles = createGlobalStyle`
       color: var(--color-text-primary);
     }
     
-    // Client description
+    /* Client description */
     > div > div > div:nth-of-type(3) {
       font-size: 1.5rem;
       color: var(--color-text-primary);
       white-space: nowrap;
     }
   }
-  // End WEB3 connect
+  /* End WEB3 connect */
   
-  // Start WalletConnect Modal
+  /* Start WalletConnect Modal */
   #walletconnect-qrcode-modal {
     .walletconnect-modal__headerLogo {
       max-width: 24rem;
@@ -995,7 +994,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0 2rem;
     color: var(--color-text-primary);
   }
-  // End WalletConnect Modal
+  /* End WalletConnect Modal */
 
   
 
@@ -1081,8 +1080,6 @@ const GlobalStyles = createGlobalStyle`
 
       &.MuiPickersDay-dayWithMargin:not(.MuiPickersDay-daySelected),
       &.MuiPickersYear-yearSelected, 
-      &.MuiPickersYear-yearSelected, 
-      &.MuiPickersYear-yearButton, 
       &.MuiPickersYear-yearButton {
         background-color: var(--color-background-pageWrapper);
 
@@ -1111,26 +1108,20 @@ const GlobalStyles = createGlobalStyle`
     }
 
     div {
-      & {
-        .MuiPickersClock-pin,
-        .MuiPickersClockPointer-pointer,
-        .MuiPickersClockPointer-thumb.MuiPickersClockPointer-noPoint {
-          background-color: var(--color-background-CTA);
-          border-color: var(--color-background-CTA);
-        }
-
+      .MuiPickersClock-pin,
+      .MuiPickersClockPointer-pointer,
+      .MuiPickersClockPointer-thumb.MuiPickersClockPointer-noPoint {
+        background-color: var(--color-background-CTA);
+        border-color: var(--color-background-CTA);
       }
 
-      & {
-        .MuiPickersModalDialog-dialogRoot {
-          background: var(--color-background-pageWrapper);
-        }
+      .MuiPickersModalDialog-dialogRoot {
+        background: var(--color-background-pageWrapper);
       }
     }
 
     .MuiToolbar-root.MuiToolbar-regular.MuiPickersToolbar-toolbar.MuiPickersDateTimePickerToolbar-toolbar.MuiToolbar-gutters, 
     div.MuiPaper-root.MuiPaper-elevation1.MuiPaper-rounded > div.MuiTabs-root.MuiPickerDTTabs-tabs {
-      // background-color: var(--color-background-button-hover);  
       background-color: var(--color-background-CTA);
     }
   }

@@ -102,7 +102,6 @@ const Wrapper = styled.div`
     padding: 0 0.8rem;
 
     > div {
-      width: 100%;
       display: flex;
       justify-content: flex-start;
       font-weight: var(--font-weight-normal);
@@ -134,7 +133,7 @@ const Wrapper = styled.div`
           margin: 0 0.4rem;
           min-width: 12rem;
 
-          // tooltip svg
+          /* tooltip svg */
           > span {
             font-size: 1.25rem;
             color: var(--color-text-primary);

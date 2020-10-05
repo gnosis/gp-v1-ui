@@ -123,7 +123,6 @@ export const WalletDrawerInnerWrapper = styled.div`
       background: var(--color-background-input);
       border-radius: 0.6rem 0.6rem 0 0;
       border: 0;
-      font-size: 1.6rem;
       line-height: 1;
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;

@@ -27,7 +27,7 @@ export interface Props {
 
 export interface LimitOrderFormData {
   // TODO: Add form data
-  amount: string
+  amount?: string
 }
 
 function formatToken(token?: TokenDex): string {
@@ -69,7 +69,7 @@ export const LimitOrder: React.FC<Props> = (props: Props) => {
 
   const { handleSubmit, register, watch } = useForm<LimitOrderFormData>({
     defaultValues: {
-      amount: amount,
+      amount,
     },
   })
   const amountCurrent = watch('amount')
