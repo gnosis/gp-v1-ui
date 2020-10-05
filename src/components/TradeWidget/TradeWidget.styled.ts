@@ -191,7 +191,7 @@ export const ExpandableOrdersPanel = styled.div`
   flex: 1;
   min-width: 50vw;
   max-width: 100%;
-  background: var(--color-background) none repeat scroll 0% 0%; /* var(--color-background-pageWrapper); */
+  background: var(--color-background) none repeat scroll 0% 0%;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
   transition: flex 0.2s ease-in-out;

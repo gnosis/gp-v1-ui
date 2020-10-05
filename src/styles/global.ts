@@ -1269,7 +1269,6 @@ const GlobalStyles = createGlobalStyle`
 
     .MuiToolbar-root.MuiToolbar-regular.MuiPickersToolbar-toolbar.MuiPickersDateTimePickerToolbar-toolbar.MuiToolbar-gutters, 
     div.MuiPaper-root.MuiPaper-elevation1.MuiPaper-rounded > div.MuiTabs-root.MuiPickerDTTabs-tabs {
-      /* background-color: var(--color-background-button-hover);   */
       background-color: var(--color-background-CTA);
     }
   }

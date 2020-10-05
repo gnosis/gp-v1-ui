@@ -73,7 +73,6 @@ export const PageWrapper = styled.section`
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     min-height: 35rem;
     height: auto;
-    /* max-width: 100%; */
   }
 
   @media ${MEDIA.tablet} {

@@ -215,7 +215,6 @@ export const CardTable = styled.table<CardTableProps>`
       position: relative;
       display: grid;
       grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
-      grid-template-rows: dssl;
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
       /* grid-gap */
       ${({ $gap }): string => ($gap ? `grid-gap: ${$gap};` : '')}
