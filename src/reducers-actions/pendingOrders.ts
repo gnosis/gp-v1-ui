@@ -1,6 +1,7 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
-import { toBN, setStorageItem } from 'utils'
+import { setStorageItem } from 'utils'
+import { toBN } from '@gnosis.pm/dex-js'
 
 const STORAGE_PENDING_ORDER_KEY = 'STORAGE_PENDING_ORDER_TX_HASHES'
 
@@ -66,11 +67,14 @@ export interface PendingOrdersState {
       '0x90dcJsdkjb22': [],
       '0xd9sjsdasnci1': [],
     },
+    100: {
+    },
   }
 */
 export const EMPTY_PENDING_ORDERS_STATE = {
   1: {},
   4: {},
+  100: {},
 }
 
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {

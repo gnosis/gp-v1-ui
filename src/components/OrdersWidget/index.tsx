@@ -122,6 +122,11 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
     [allTrades, displayOnly],
   )
 
+  const settledAndNotRevertedTrades = useMemo(
+    () => trades.filter((trade) => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
+    [trades],
+  )
+
   const tabList = useMemo<TabData<OrderTabs>[]>(
     () => [
       {
@@ -130,7 +135,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
       },
       {
         type: 'trades',
-        count: trades.length,
+        count: settledAndNotRevertedTrades.length,
       },
       {
         type: 'closed',
@@ -141,7 +146,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
       classifiedOrders.active.orders.length,
       classifiedOrders.active.pendingOrders.length,
       classifiedOrders.closed.orders.length,
-      trades.length,
+      settledAndNotRevertedTrades.length,
     ],
   )
 
@@ -298,11 +303,6 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
       }
     },
     [deleteOrders, forceOrdersRefresh, markedForDeletion, selectedTab, setClassifiedOrders],
-  )
-
-  const settledAndNotRevertedTrades = useMemo(
-    () => trades.filter((trade) => trade && isTradeSettled(trade) && !isTradeReverted(trade)),
-    [trades],
   )
 
   const {

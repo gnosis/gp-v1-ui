@@ -2,6 +2,7 @@ import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
 import { getDefaultProvider } from '..'
+import { toBN } from '@gnosis.pm/dex-js'
 
 import Web3Modal, { getProviderInfo, IProviderOptions, IProviderInfo, isMobile } from 'web3modal'
 import { IClientMeta } from '@walletconnect/types'
@@ -9,7 +10,7 @@ import { IClientMeta } from '@walletconnect/types'
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
 
-import { logDebug, toBN, txDataEncoder, generateWCOptions } from 'utils'
+import { logDebug, txDataEncoder, generateWCOptions } from 'utils'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
