@@ -5,12 +5,12 @@ import { Meta, Story } from '@storybook/react/types-6-0'
 import { PriceSuggestions, Props } from './PriceSuggestions'
 import BigNumber from 'bignumber.js'
 import { DAI, GNO } from 'storybook/data'
-import { Form } from 'storybook/decorators'
+import { FormEmpty } from 'storybook/decorators'
 
 export default {
   title: 'Trade/PriceSuggestions',
   component: PriceSuggestions,
-  decorators: [Form],
+  decorators: [FormEmpty],
 } as Meta
 
 const defaultProps = {

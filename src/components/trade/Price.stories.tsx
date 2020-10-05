@@ -4,12 +4,12 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react/types-6-0'
 import { Price, Props } from './Price'
 import { DAI, GNO } from 'storybook/data'
-import { Form } from 'storybook/decorators'
+import { FormEmpty } from 'storybook/decorators'
 
 export default {
   title: 'Trade/Price',
   component: Price,
-  decorators: [Form],
+  decorators: [FormEmpty],
 } as Meta
 
 const Template: Story<Props> = (props) => <Price {...props} />
