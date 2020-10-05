@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import Modali, { useModali, ModalHook } from 'components/common/Modal'
+import Modal, { useModal, ModalHook } from 'components/common/Modal'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { useWalletConnection } from './useWalletConnection'
@@ -157,7 +157,7 @@ const ManageTokensContainer: React.FC = () => {
   const addTokensSafeModali: UseAddTokenModalResult['addTokensToList'] = useCallback(
     (...args) => {
       return addTokensToList(...args).finally(() => {
-        // hack for second Modali closing
+        // hack for second Modal closing
         document.body.classList.add('modali-open')
       })
     },
@@ -239,7 +239,7 @@ const ManageTokensContainer: React.FC = () => {
           <TokenList tokens={filteredTokens} disabledTokens={tokensDisabledState} onToggleToken={toggleTokenState} />
         )}
       </TokenListWrapper>
-      <Modali.Modal {...modalProps} />
+      <Modal.Modal {...modalProps} />
     </div>
   )
 }
@@ -250,7 +250,7 @@ interface UseManageTokensResult {
 }
 
 export const useManageTokens = (): UseManageTokensResult => {
-  const [modalProps, toggleModal] = useModali({
+  const [modalProps, toggleModal] = useModal({
     animated: true,
     centered: true,
     title: 'Manage your Token list',

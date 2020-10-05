@@ -1,7 +1,7 @@
 import React, { CSSProperties, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
-import Modali from 'components/common/Modal'
+import Modal from 'components/common/Modal'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
 // assets
@@ -389,7 +389,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
           e.preventDefault()
         }}
       >
-        <Modali.Modal {...modalProps} />
+        <Modal.Modal {...modalProps} />
       </div>
     </Wrapper>
   )

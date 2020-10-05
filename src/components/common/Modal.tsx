@@ -165,4 +165,4 @@ const Modal: React.FC<Modali.ModalProps> = (props) => (
 // To import default Modali and not change much code elsewhere
 const StyledModali = { ...Modali, Modal }
 
-export { StyledModali as default, ModalHook, toggleModaliComponent, useModali }
+export { StyledModali as default, ModalHook, toggleModaliComponent as toggleModal, useModali as useModal }

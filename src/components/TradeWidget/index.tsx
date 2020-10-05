@@ -34,7 +34,7 @@ import { tokenListApi } from 'api'
 import OrdersWidget from 'components/OrdersWidget'
 import { TxNotification } from 'components/TxNotification'
 import { Spinner } from 'components/common/Spinner'
-import Modali from 'components/common/Modal'
+import Modal from 'components/common/Modal'
 
 // TradeWidget: subcomponents
 import {
@@ -721,7 +721,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Select different tokens' : 'Submit limit order'}
           </SubmitButton>
-          <Modali.Modal {...modalProps} />
+          <Modal.Modal {...modalProps} />
         </WrappedForm>
       </FormProvider>
       <ExpandableOrdersPanel>
