@@ -85,7 +85,7 @@ type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 // 2: account changes
 // 3: new block is mined
 
-interface BlockchainUpdatePrompt {
+export interface BlockchainUpdatePrompt {
   account: string
   chainId: number
   blockHeader: BlockHeader | null
@@ -246,9 +246,12 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const isPromise = <T>(maybePromise: any): maybePromise is Promise<T> =>
-  maybePromise instanceof Promise || ('then' in maybePromise && typeof maybePromise.then === 'function')
+export const isPromise = <T, S>(maybePromise: PromiseLike<T> | S): maybePromise is PromiseLike<T> =>
+  maybePromise instanceof Promise ||
+  (!!maybePromise &&
+    (typeof maybePromise === 'object' || typeof maybePromise === 'function') &&
+    'then' in maybePromise &&
+    typeof maybePromise.then === 'function')
 
 /**
  * Basic implementation of Wallet API
@@ -259,7 +262,11 @@ export class WalletApiImpl implements WalletApi {
   private _web3: Web3
   private _providerInfo: ProviderInfo | null = null
   public userPrintAsync: Promise<UserPrint> = Promise.resolve({ userPrint: '', gas: 0 })
-  public blockchainState: BlockchainUpdatePrompt
+  public blockchainState: BlockchainUpdatePrompt = {
+    account: '',
+    chainId: 0,
+    blockHeader: null,
+  }
 
   private _unsubscribe: Command
   private _fetchGasPrice: ReturnType<typeof fetchGasPriceFactory> = async () => undefined
@@ -327,19 +334,19 @@ export class WalletApiImpl implements WalletApi {
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
     else if (isWalletConnectProvider(provider)) {
       // hackaround
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       provider.handleReadRequests = async function (payload: unknown): Promise<unknown> {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (!this.http) {
           const error = new Error('HTTP Connection not available')
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           this.emit('error', error)
           throw error
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this.http.send(payload)
 

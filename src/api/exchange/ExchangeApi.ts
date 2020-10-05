@@ -230,7 +230,7 @@ export class ExchangeApiImpl extends DepositApiImpl implements ExchangeApi {
     // TODO: Anyway, this is required because `blockNumber` option isn't typed.
     // TODO: Dima might have an idea on how to manually fix that on `dex-js` side.
     // TODO: In the mean time, the double layer ignore is required.
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     //@ts-ignore
     const rawOrder = await contract.methods.orders(userAddress, orderId).call({}, blockNumber)
 
