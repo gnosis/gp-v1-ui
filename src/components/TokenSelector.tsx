@@ -1,7 +1,7 @@
 import React, { CSSProperties, useMemo, useState, useCallback, useRef, useEffect } from 'react'
 import styled from 'styled-components'
 import Select, { ActionMeta } from 'react-select'
-import Modali from 'modali'
+import Modal from 'components/common/Modal'
 import { FormatOptionLabelContext } from 'react-select/src/Select'
 
 // assets
@@ -31,11 +31,11 @@ const Wrapper = styled.div`
 
   label {
     text-transform: uppercase;
-    padding-left: 0.5rem; // to align with Select input padding
+    padding-left: 0.5rem; /* to align with Select input padding */
   }
 
   input {
-    margin-left: 0; // to fix extra space on Select search box
+    margin-left: 0; /* to fix extra space on Select search box */
   }
 
   .tokenBalance {
@@ -389,7 +389,7 @@ const TokenSelector: React.FC<Props> = ({ isDisabled, tokens, selected, onChange
           e.preventDefault()
         }}
       >
-        <Modali.Modal {...modalProps} />
+        <Modal.Modal {...modalProps} />
       </div>
     </Wrapper>
   )

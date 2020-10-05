@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import Modali from 'modali'
+import Modal from 'components/common/Modal'
 import styled from 'styled-components'
 import BN from 'bn.js'
 
@@ -135,7 +135,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  // button
+  /* button */
   .balances-manageTokens {
     color: var(--color-text-active);
     text-align: right;
@@ -156,7 +156,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  // label + radio input
+  /* label + radio input */
   .balances-hideZero {
     display: flex;
     flex-flow: row nowrap;
@@ -379,7 +379,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </tbody>
           </CardTable>
         )}
-        <Modali.Modal {...modalProps} />
+        <Modal.Modal {...modalProps} />
       </BalancesWidget>
     </StandaloneCardWrapper>
   )
@@ -452,8 +452,8 @@ const DepositWidget: React.FC = () => {
         {...restActions}
         requestWithdrawConfirmation={requestWithdrawConfirmation}
       />
-      <Modali.Modal {...withdrawOverwriteModal} />
-      <Modali.Modal {...withdrawAndClaimModal} />
+      <Modal.Modal {...withdrawOverwriteModal} />
+      <Modal.Modal {...withdrawAndClaimModal} />
     </>
   )
 }

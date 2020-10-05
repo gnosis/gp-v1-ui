@@ -60,7 +60,7 @@ export const TokenImg: React.FC<Props> = (props) => {
 
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
   // https://github.com/gnosis/dex-react/issues/1442
-  const safeName = safeTokenName({ id: 0, address, addressMainnet, symbol, name })
+  const safeName = safeTokenName({ address, symbol, name })
 
   return <Wrapper alt={safeName} src={iconFileUrl} onError={_loadFallbackTokenImage} {...props} />
 }

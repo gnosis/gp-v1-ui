@@ -22,7 +22,6 @@ const Wrapper = styled.footer`
   flex-flow: row wrap;
   align-items: center;
   justify-content: center;
-  padding: 0;
   text-align: center;
   background: transparent;
   font-weight: var(--font-weight-normal);
@@ -135,7 +134,6 @@ const SideContentWrapper = styled.div`
 
     > a {
       margin: 0 0.4rem;
-      text-decoration: none;
       color: inherit;
       text-decoration: underline;
       transition: color 0.2s ease-in-out;

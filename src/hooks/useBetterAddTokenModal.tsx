@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react'
-import Modali, { useModali, ModalHook } from 'modali'
+import Modal, { useModal, ModalHook } from 'components/common/Modal'
 import { fetchTokenData, FetchTokenResult } from 'services'
 import { Deferred, createDeferredPromise } from 'utils'
 import { TokenDetails } from 'types'
@@ -136,12 +136,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
         )
       return (
         <TokenDisplay>
-          <TokenImageStyled
-            address={token.address}
-            addressMainnet={token.addressMainnet}
-            name={token.name}
-            symbol={token.symbol}
-          />
+          <TokenImageStyled address={token.address} name={token.name} symbol={token.symbol} />
           <div className="tokenSymbol">
             <strong>{token.symbol}</strong>
           </div>
@@ -268,7 +263,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
     [fetchResults],
   )
 
-  const [modalProps, toggleModal] = useModali({
+  const [modalProps, toggleModal] = useModal({
     animated: true,
     centered: true,
     title: 'Do you want to add new Tokens?',
@@ -286,7 +281,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
     buttons: [
       // Cancel button only if there's anything to cancel
       canAddAnyToken ? (
-        <Modali.Button
+        <Modal.Button
           label="Cancel"
           key="no"
           isStyleCancel
@@ -297,7 +292,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
       ) : (
         <>&nbsp;</>
       ),
-      <Modali.Button
+      <Modal.Button
         // nothing to add -- Close
         label={canAddAnyToken ? 'Confirm' : 'Close'}
         key="yes"

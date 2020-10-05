@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import BN from 'bn.js'
-import Modali, { useModali, ModalHook, toggleModaliComponent } from 'modali'
+import Modal, { useModal, ModalHook, toggleModal } from 'components/common/Modal'
 
 // Components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
@@ -36,19 +36,19 @@ interface Params {
 
 interface Result {
   withdrawOverwriteModal: ModalHook
-  toggleWithdrawOverwriteModal: toggleModaliComponent
+  toggleWithdrawOverwriteModal: toggleModal
   withdrawAndClaimModal: ModalHook
-  toggleWithdrawAndClaimModal: toggleModaliComponent
+  toggleWithdrawAndClaimModal: toggleModal
 }
 
 export function useDepositModals(params: Params): Result {
   const { amount, tokenAddress, requestWithdrawToken } = params
 
   const getButtons = useCallback(
-    (toggleModal: toggleModaliComponent): React.ReactNode[] => {
+    (toggleModal: toggleModal): React.ReactNode[] => {
       return [
-        <Modali.Button label="Cancel" key="no" isStyleCancel onClick={toggleModal} />,
-        <Modali.Button
+        <Modal.Button label="Cancel" key="no" isStyleCancel onClick={toggleModal} />,
+        <Modal.Button
           label="Continue"
           key="yes"
           isStyleDefault
@@ -63,7 +63,7 @@ export function useDepositModals(params: Params): Result {
     [amount, requestWithdrawToken, tokenAddress],
   )
 
-  const [withdrawOverwriteModal, toggleWithdrawOverwriteModal] = useModali({
+  const [withdrawOverwriteModal, toggleWithdrawOverwriteModal] = useModal({
     ...DEFAULT_MODAL_OPTIONS,
     title: 'Confirm withdraw overwrite',
     message: <OverwriteModalBody />,
@@ -72,7 +72,7 @@ export function useDepositModals(params: Params): Result {
     }),
   })
 
-  const [withdrawAndClaimModal, toggleWithdrawAndClaimModal] = useModali({
+  const [withdrawAndClaimModal, toggleWithdrawAndClaimModal] = useModal({
     ...DEFAULT_MODAL_OPTIONS,
     title: 'Please note',
     message: <WithdrawAndClaimModalBody />,

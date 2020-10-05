@@ -9,13 +9,12 @@ import { IClientMeta } from '@walletconnect/types'
 
 import Web3 from 'web3'
 import { BlockHeader } from 'web3-eth'
-import { TransactionConfig } from 'web3-core'
 
 import { logDebug, txDataEncoder, generateWCOptions } from 'utils'
 
 import { subscribeToWeb3Event } from './subscriptionHelpers'
 import { getMatchingScreenSize, subscribeToScreenSizeChange } from 'utils/mediaQueries'
-import { composeProvider } from './composeProvider'
+import { composeProvider, Earmark } from './composeProvider'
 import fetchGasPriceFactory, { GasPriceLevel } from 'api/gasStation'
 import { earmarkTxData, calcEarmarkedGas } from 'api/earmark'
 import { Provider, isMetamaskProvider, isWalletConnectProvider, ProviderRpcError } from './providerUtils'
@@ -43,6 +42,11 @@ const getProviderState = async (web3: Web3): Promise<ProviderState | null> => {
   }
 }
 
+export interface UserPrint {
+  userPrint: string
+  gas: number
+}
+
 export interface WalletApi {
   isConnected(): Promise<boolean>
   connect(givenProvider?: Provider): Promise<boolean>
@@ -56,7 +60,7 @@ export interface WalletApi {
   removeOnChangeWalletInfo(callback: (walletInfo: WalletInfo) => void): void
   getProviderInfo(): ProviderInfo | null
   blockchainState: BlockchainUpdatePrompt
-  userPrintAsync: Promise<string>
+  userPrintAsync: Promise<UserPrint>
   getGasPrice(gasPriceLevel?: GasPriceLevel): Promise<number | null>
 }
 
@@ -82,7 +86,7 @@ type OnChangeWalletInfo = (walletInfo: WalletInfo) => void
 // 2: account changes
 // 3: new block is mined
 
-interface BlockchainUpdatePrompt {
+export interface BlockchainUpdatePrompt {
   account: string
   chainId: number
   blockHeader: BlockHeader | null
@@ -243,9 +247,12 @@ const closeOpenWebSocketConnection = (web3: Web3): void => {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const isPromise = <T>(maybePromise: any): maybePromise is Promise<T> =>
-  maybePromise instanceof Promise || ('then' in maybePromise && typeof maybePromise.then === 'function')
+export const isPromise = <T, S>(maybePromise: PromiseLike<T> | S): maybePromise is PromiseLike<T> =>
+  maybePromise instanceof Promise ||
+  (!!maybePromise &&
+    (typeof maybePromise === 'object' || typeof maybePromise === 'function') &&
+    'then' in maybePromise &&
+    typeof maybePromise.then === 'function')
 
 /**
  * Basic implementation of Wallet API
@@ -255,8 +262,12 @@ export class WalletApiImpl implements WalletApi {
   private _provider: Provider | null
   private _web3: Web3
   private _providerInfo: ProviderInfo | null = null
-  public userPrintAsync: Promise<string> = Promise.resolve('')
-  public blockchainState: BlockchainUpdatePrompt
+  public userPrintAsync: Promise<UserPrint> = Promise.resolve({ userPrint: '', gas: 0 })
+  public blockchainState: BlockchainUpdatePrompt = {
+    account: '',
+    chainId: 0,
+    blockHeader: null,
+  }
 
   private _unsubscribe: Command
   private _fetchGasPrice: ReturnType<typeof fetchGasPriceFactory> = async () => undefined
@@ -324,19 +335,19 @@ export class WalletApiImpl implements WalletApi {
     if (isMetamaskProvider(provider)) provider.autoRefreshOnNetworkChange = false
     else if (isWalletConnectProvider(provider)) {
       // hackaround
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       provider.handleReadRequests = async function (payload: unknown): Promise<unknown> {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (!this.http) {
           const error = new Error('HTTP Connection not available')
-          // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           this.emit('error', error)
           throw error
         }
-        // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         return this.http.send(payload)
 
@@ -364,12 +375,12 @@ export class WalletApiImpl implements WalletApi {
 
     this._fetchGasPrice = fetchGasPrice
 
-    const earmarkingFunction = async (tx: TransactionConfig): Promise<void> => {
-      const userPrint = await this.userPrintAsync
-      tx.data = earmarkTxData(tx.data, userPrint)
+    const earmarkingFunction = async (data?: string): Promise<Earmark> => {
+      const { userPrint, gas: extraGas } = await this.userPrintAsync
 
-      if (tx.gas) {
-        tx.gas = calcEarmarkedGas(tx.gas, userPrint)
+      return {
+        data: earmarkTxData(data, userPrint),
+        extraGas,
       }
     }
 
@@ -630,9 +641,9 @@ export class WalletApiImpl implements WalletApi {
 
   // new userPrint is generated when provider or screen size changes
   // other flags -- mobile, browser -- are stable
-  private async _generateAsyncUserPrint(): Promise<string> {
+  private async _generateAsyncUserPrint(): Promise<UserPrint> {
     const providerInfo = this.getProviderInfo()
-    if (!providerInfo) return ''
+    if (!providerInfo) return { userPrint: '', gas: 0 }
 
     const { name: providerName } = providerInfo
 
@@ -656,9 +667,16 @@ export class WalletApiImpl implements WalletApi {
 
     const encoded = txDataEncoder(flagObject)
 
+    const gas = calcEarmarkedGas(encoded)
+
     logDebug('Encoded object', flagObject)
     logDebug('User Wallet print', encoded)
-    return encoded
+    logDebug('Extra gas for rint', gas)
+
+    return {
+      userPrint: encoded,
+      gas,
+    }
   }
 }
 

@@ -1,5 +1,4 @@
 import React, { useMemo, useCallback, useEffect, useRef } from 'react'
-// eslint-disable-next-line @typescript-eslint/camelcase
 import { unstable_batchedUpdates } from 'react-dom'
 
 // Assets

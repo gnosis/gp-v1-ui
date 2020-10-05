@@ -27,7 +27,7 @@ export const AddFundingWrapper = styled.div`
       font-size: inherit;
       line-height: inherit;
 
-      // Block Explorer Link
+      /* Etherscan link */
       a {
         word-break: break-all;
         display: block;
