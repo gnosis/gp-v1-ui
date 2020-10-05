@@ -1,5 +1,5 @@
+import Modal, { ModalHook, useModal } from 'components/common/Modal'
 import React, { useRef } from 'react'
-import Modali, { useModali, ModalHook } from 'modali'
 
 interface UseSubmitTxResult {
   toggleModal: () => void
@@ -15,7 +15,7 @@ interface ClickWrapperProps {
 export const useSubmitTxModal = ({ onCancel, onConfirm, message }: ClickWrapperProps): UseSubmitTxResult => {
   const isShown = useRef(false)
 
-  const [modalProps, toggleModal] = useModali({
+  const [modalProps, toggleModal] = useModal({
     animated: true,
     centered: true,
     title: 'Order Confirmation',
@@ -23,7 +23,7 @@ export const useSubmitTxModal = ({ onCancel, onConfirm, message }: ClickWrapperP
     message: isShown.current && (typeof message === 'function' ? message() : message),
     buttons: [
       // Cancel button only if there's anything to cancel
-      <Modali.Button
+      <Modal.Button
         label="Cancel"
         key="no"
         isStyleCancel
@@ -32,7 +32,7 @@ export const useSubmitTxModal = ({ onCancel, onConfirm, message }: ClickWrapperP
           onCancel?.()
         }}
       />,
-      <Modali.Button
+      <Modal.Button
         // nothing to add -- Close
         label="Confirm"
         key="yes"

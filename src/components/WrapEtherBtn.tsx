@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import styled from 'styled-components'
-import Modali, { useModali } from 'modali'
+import Modal, { useModal } from 'components/common/Modal'
 import BN from 'bn.js'
 
 import { DEFAULT_PRECISION, formatAmountFull, toWei, parseAmount, ZERO } from '@gnosis.pm/dex-js'
@@ -249,7 +249,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
   const toggleRef = useRef<() => void>()
   const isModalShownRef = useRef(false)
 
-  const [modalHook, toggleModal] = useModali({
+  const [modalHook, toggleModal] = useModal({
     ...DEFAULT_MODAL_OPTIONS,
     title,
     message: (
@@ -320,8 +320,8 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       </ModalWrapper>
     ),
     buttons: [
-      <Modali.Button label="Cancel" key="no" isStyleCancel onClick={(): void => modalHook.hide()} />,
-      <Modali.Button
+      <Modal.Button label="Cancel" key="no" isStyleCancel onClick={(): void => modalHook.hide()} />,
+      <Modal.Button
         label="Continue"
         key="yes"
         isStyleDefault
@@ -369,7 +369,7 @@ const WrapUnwrapEtherBtn: React.FC<WrapUnwrapEtherBtnProps> = (props: WrapUnwrap
       <TooltipWrapper as="button" type="button" className={className} onClick={toggleModal} tooltip={tooltipText}>
         {loading && <FontAwesomeIcon icon={faSpinner} spin />} {label || title}
       </TooltipWrapper>
-      <Modali.Modal {...modalHook} />
+      <Modal.Modal {...modalHook} />
     </>
   )
 }
