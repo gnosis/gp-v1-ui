@@ -128,7 +128,6 @@ const NoTokens = styled.div`
   align-items: center;
   font-size: 3rem;
   font-weight: bold;
-}
 `
 
 const TradeWidgetContainer: React.FC = () => {
