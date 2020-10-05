@@ -20,7 +20,7 @@ export function withGlobalContext<P>(
   }
 }
 
-const useGlobalState = (): [GlobalState, React.Dispatch<AnyAction>] =>
+const useGlobalState = (): [globalState: GlobalState, dispatch: React.Dispatch<AnyAction>] =>
   useContext(GlobalStateContext) as [GlobalState, React.Dispatch<AnyAction>]
 
 export default useGlobalState
