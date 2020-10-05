@@ -3303,9 +3303,9 @@
     "@types/react" "*"
 
 "@types/react-native@*":
-  version "0.63.23"
-  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.23.tgz#bc4617e5bbb1ac28cb5dbf7ad09cc49a2cce914c"
-  integrity sha512-4pWQpgyzX+vCEJDceW9Zsc8/SZtJrIUIw9lwYKeTWAtSHWdcRwUns2O/18L98WGo6NUNVdLzY59vOW8ZGWJxSA==
+  version "0.63.25"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.25.tgz#a08bbe17a75cce993f52655a8fe75f30bf77e965"
+  integrity sha512-cRm+1iQecewpFYOArYJoM1qGd0JpFJ6f97KqIy9H2GawAdWkgyarSk8CBy4SMt2WOtPkysCu2EG7UwIT3vNeaA==
   dependencies:
     "@types/react" "*"
 
@@ -11347,9 +11347,9 @@ jest-resolve@^26.5.0:
     slash "^3.0.0"
 
 jest-runner@^26.5.0:
-  version "26.5.0"
-  resolved "https://registry.yarnpkg.com/jest-runner/-/jest-runner-26.5.0.tgz#77fa74966716ce46a19cfd03ea5e491da4dfc9aa"
-  integrity sha512-+FSgnB4dIwov+kqDPrbyATZ/zLMb5AGSQ7oi6mtrbcw9a0D2npuAworKTRAtgWo+XFZtpZwdH+HQAB5l3KrjWg==
+  version "26.5.1"
+  resolved "https://registry.yarnpkg.com/jest-runner/-/jest-runner-26.5.1.tgz#a56c1e1fbed7470ae69ebd5456ba4d4443c8701f"
+  integrity sha512-gFHXehvMZD8qwNzaIl2MDFFI99m4kKk06H2xh2u4IkC+tHYIJjE5J175l9cbL3RuU2slfS2m57KZgcPZfbTavQ==
   dependencies:
     "@jest/console" "^26.5.0"
     "@jest/environment" "^26.5.0"

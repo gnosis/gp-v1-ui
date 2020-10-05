@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from 'react'
-import Modali from 'modali'
+import Modal from 'components/common/Modal'
 import styled from 'styled-components'
 import BN from 'bn.js'
 
@@ -376,7 +376,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
             </tbody>
           </CardTable>
         )}
-        <Modali.Modal {...modalProps} />
+        <Modal.Modal {...modalProps} />
       </BalancesWidget>
     </StandaloneCardWrapper>
   )
@@ -449,8 +449,8 @@ const DepositWidget: React.FC = () => {
         {...restActions}
         requestWithdrawConfirmation={requestWithdrawConfirmation}
       />
-      <Modali.Modal {...withdrawOverwriteModal} />
-      <Modali.Modal {...withdrawAndClaimModal} />
+      <Modal.Modal {...withdrawOverwriteModal} />
+      <Modal.Modal {...withdrawAndClaimModal} />
     </>
   )
 }
