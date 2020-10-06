@@ -147,6 +147,7 @@ export function getTokensFactory(factoryParams: {
         // Remove addresses that are not on the TCR, if any
         const isInTcr = tcrAddressesSet.has(address)
         logDebug(`[tokenListFactory][${networkId}] ${id} : ${address}. On TCR? ${isInTcr}`)
+        return isInTcr
       })
     } else {
       // If not using a TCR, filter by default list
