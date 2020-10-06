@@ -156,7 +156,7 @@ export function getTokensFactory(factoryParams: {
       filteredAddressAndIds = tokensConfig
         .map((token): [string, number] | null => {
           const tokenId = listedAddressesAndIds.get(token.address)
-          return [token.address, tokenId] || null
+          return tokenId !== undefined ? [token.address, tokenId] : null
         })
         .filter(notEmpty)
     }
