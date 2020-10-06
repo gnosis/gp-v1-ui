@@ -11,7 +11,14 @@ export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsCon
       const { id, name, symbol, decimals = DEFAULT_PRECISION } = token
       const addressMainnet = token.addressByNetwork[Network.Mainnet]
 
-      acc.push({ id, name, symbol, decimals, address, addressMainnet })
+      acc.push({
+        id,
+        name,
+        symbol,
+        decimals,
+        address,
+        addressMainnet,
+      })
       return acc
     }
 
