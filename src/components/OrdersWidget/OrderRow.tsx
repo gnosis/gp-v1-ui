@@ -1,9 +1,9 @@
-import React, { useMemo, useEffect, useRef, useState } from 'react'
+import React, { useMemo, useEffect, useRef } from 'react'
 import { toast } from 'toastify'
 
 // types, utils and services
 import { TokenDetails } from 'types'
-import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
+import { isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
 // assets
 import alertIcon from 'assets/img/alert.svg'
@@ -26,14 +26,13 @@ import {
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
-  getMarket,
 } from 'utils'
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { SwapPrice } from 'components/common/SwapPrice'
+import { SmartPrice } from 'components/common/SmartPrice'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
@@ -49,10 +48,14 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   )
 }
 
-const DeleteOrder: React.FC<Pick<
-  Props,
-  'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
->> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
+type DeleteOrderProps = Pick<Props, 'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'>
+
+const DeleteOrder: React.FC<DeleteOrderProps> = ({
+  isMarkedForDeletion,
+  toggleMarkedForDeletion,
+  pending,
+  disabled,
+}) => (
   <td data-label="Cancel Order" className="checked">
     <input
       type="checkbox"
@@ -96,37 +99,13 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
-  const [isPriceInverted, setIsPriceInverted] = useState(false)
-  const { baseToken, quoteToken } = getMarket({ sellToken, receiveToken: buyToken })
-
-  const [price, priceInverse] = useMemo((): string[] => {
-    const buyOrderPrice = calculatePrice({
-      numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
-      denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
-    })
-    const buyOrderPriceInverse = invertPrice(buyOrderPrice)
-    const sellTokenIsQuote = buyToken === quoteToken
-    let price, priceInverse
-    if (sellTokenIsQuote) {
-      price = buyOrderPrice
-      priceInverse = buyOrderPriceInverse
-    } else {
-      price = buyOrderPriceInverse
-      priceInverse = buyOrderPrice
-    }
-    return [formatPrice(price), formatPrice(priceInverse)]
-  }, [buyToken, sellToken, quoteToken, order.priceDenominator, order.priceNumerator])
-
   return (
     <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        {isPriceInverted ? priceInverse : price}
-        &nbsp;
-        <SwapPrice
-          baseToken={baseToken}
-          quoteToken={quoteToken}
-          isPriceInverted={isPriceInverted}
-          onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
+        <SmartPrice
+          sellToken={sellToken}
+          buyToken={buyToken}
+          price={{ numerator: order.priceNumerator, denominator: order.priceDenominator }}
         />
       </div>
     </td>
