@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef } from 'react'
+import React, { useMemo, useEffect, useRef, useState } from 'react'
 import { toast } from 'toastify'
 
 // types, utils and services
@@ -26,12 +26,14 @@ import {
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
+  getMarket,
 } from 'utils'
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
+import { SwapPrice } from 'components/common/SwapPrice'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
@@ -94,24 +96,38 @@ interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
+  const { baseToken, quoteToken } = getMarket({ sellToken, receiveToken: buyToken })
+
   const [price, priceInverse] = useMemo((): string[] => {
-    const price = calculatePrice({
+    const buyOrderPrice = calculatePrice({
       numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
       denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
     })
-    const priceInverse = invertPrice(price)
-
+    const buyOrderPriceInverse = invertPrice(buyOrderPrice)
+    const sellTokenIsQuote = buyToken === quoteToken
+    let price, priceInverse
+    if (sellTokenIsQuote) {
+      price = buyOrderPrice
+      priceInverse = buyOrderPriceInverse
+    } else {
+      price = buyOrderPriceInverse
+      priceInverse = buyOrderPrice
+    }
     return [formatPrice(price), formatPrice(priceInverse)]
-  }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])
+  }, [buyToken, sellToken, quoteToken, order.priceDenominator, order.priceNumerator])
 
   return (
     <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        <strong>
-          {priceInverse} {displayTokenSymbolOrLink(sellToken)}
-        </strong>
-        <br />
-        {price} {displayTokenSymbolOrLink(buyToken)}
+        {isPriceInverted ? priceInverse : price}
+        &nbsp;
+        <SwapPrice
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+          isPriceInverted={isPriceInverted}
+          onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
+        />
       </div>
     </td>
   )
