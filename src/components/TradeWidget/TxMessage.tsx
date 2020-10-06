@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { logDebug, formatDateLocaleShortTime } from 'utils'
+import { logDebug, formatDateLocaleShortTime, getMarket } from 'utils'
 import { useFormContext } from 'react-hook-form'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
@@ -255,6 +255,9 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
     return { formattedAmount: amountFull, amountInUSD }
   }, [recommendedAmount, roundedAmountInUSD, sellToken.decimals])
 
+  // Get canonical market
+  const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
+
   return (
     <TxMessageWrapper>
       <div className="intro-text">
@@ -310,7 +313,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         <div className="sectionTitle">
           <strong>Prices</strong>
         </div>
-        <SimpleDisplayPrice baseToken={receiveToken} quoteToken={sellToken} price={price} priceInverse={priceInverse} />
+        <SimpleDisplayPrice baseToken={baseToken} quoteToken={quoteToken} price={price} priceInverse={priceInverse} />
 
         {/* Order Validity */}
 
