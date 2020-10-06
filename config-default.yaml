@@ -53,6 +53,12 @@ dexPriceEstimator:
       url_production: https://dex-price-estimator.rinkeby.gnosis.io
       url_develop: https://price-estimate-rinkeby.dev.gnosisdev.com
 
+    - networkId: 100
+      # TODO: No production URL yet. For now, using DEV also in PRODUCTION
+      #url_production: https://dex-price-estimator.xdai.gnosis.io
+      url_production: https://price-estimate-xdai.dev.gnosisdev.com
+      url_develop: https://price-estimate-xdai.dev.gnosisdev.com
+      
 # Subgraph abstraction, used for getting the last price
 theGraphApi:
   type: 'the-graph' # choices: the-graph
@@ -62,6 +68,9 @@ theGraphApi:
 
     - networkId: 4
       url: https://api.thegraph.com/subgraphs/name/gnosis/protocol-rinkeby
+
+    - networkId: 100
+      url: https://api.thegraph.com/subgraphs/name/gnosis/protocol-xdai
 
 # Eth node config
 defaultProviderConfig:
@@ -84,6 +93,8 @@ exchangeContractConfig:
       blockNumber: 9340147
     - networkId: 4
       blockNumber: 5844678
+    - networkId: 100
+      blockNumber: 11948310
 
 # Wallet Connect
 walletConnect:
@@ -133,6 +144,7 @@ disabledTokens:
     - address: '0x6Fb0855c404E09c47C3fBCA25f08d4E41f9F062f'
     - address: '0xFC4B8ED459e00e5400be803A9BB3954234FD50e3'
   4: [] # Rinkeby
+  100: [] # xDAI
 
 # Initial token selection for the sell token and buy token
 initialTokenSelection:
@@ -150,6 +162,7 @@ initialTokenList:
     addressByNetwork:
       '1': '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2'
       '4': '0xc778417E063141139Fce010982780140Aa0cD5Ab'
+      '100': '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'
 
   - id: 2
     name: Tether USD
@@ -158,6 +171,7 @@ initialTokenList:
     addressByNetwork:
       '1': '0xdAC17F958D2ee523a2206206994597C13D831ec7'
       '4': '0xa9881E6459CA05d7D7C95374463928369cD7a90C'
+      '100': '0x4ECaBa5870353805a9F068101A40E0f32ed605C6'
 
   - id: 3
     name: TrueUSD
@@ -165,7 +179,7 @@ initialTokenList:
     decimals: 18
     addressByNetwork:
       '1': '0x0000000000085d4780B73119b644AE5ecd22b376'
-      '4': '0x0000000000085d4780B73119b644AE5ecd22b376'
+      '4': '0x0000000000085d4780B73119b644AE5ecd22b376'      
 
   - id: 4
     name: USD Coin
@@ -174,6 +188,7 @@ initialTokenList:
     addressByNetwork:
       '1': '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48'
       '4': '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b'
+      '100': '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83'
 
   - id: 5
     name: Paxos Standard
@@ -198,6 +213,7 @@ initialTokenList:
     addressByNetwork:
       '1': '0x6B175474E89094C44Da98b954EedeAC495271d0F'
       '4': '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa'
+      '100': '0x44fA8E6f47987339850636F88629646662444217'
 
   - id: 8
     name: Synth sETH
@@ -214,6 +230,7 @@ initialTokenList:
     addressByNetwork:
       '1': '0x57Ab1E02fEE23774580C119740129eAC7081e9D3'
       '4': '0x1b642a124cdfa1e5835276a6ddaa6cfc4b35d52c'
+      '100': '0xB1950Fb2C9C0CbC8553578c67dB52Aa110A93393'
 
   - id: 10
     name: Synth sBTC
@@ -258,6 +275,7 @@ initialTokenList:
     addressByNetwork:
       '1': '0x6810e776880C02933D47DB1b9fc05908e5386b96'
       '4': '0xd0Dab4E640D95E9E8A47545598c33e31bDb53C7c'
+      '100': '0x9C58BAcC331c9aa871AFD802DB6379a98e80CEdb'
 
   - id: 19
     name: Panvala pan
@@ -266,6 +284,22 @@ initialTokenList:
     addressByNetwork:
       '1': '0xD56daC73A4d6766464b38ec6D91eB45Ce7457c44'
 
+  - id: 20
+    name: STAKE
+    symbol: STAKE
+    decimals: 18
+    addressByNetwork:
+      '1': '0x0ae055097c6d159879521c384f1d2123d1f195e6'
+      '100': '0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e'      
+
+  - id: 21
+    name: Wrapped xDAI
+    symbol: wxDAI
+    decimals: 18
+    addressByNetwork:
+      '100': '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
+        
+
   - id: 0
     name: OWL
     symbol: OWL
@@ -273,3 +307,4 @@ initialTokenList:
     addressByNetwork:
       '1': '0x1A5F9352Af8aF974bFC03399e3767DF6370d82e4'
       '4': '0xa7D1C04fAF998F9161fC9F800a99A809b84cfc9D'
+      '100': '0x0905Ab807F8FD040255F0cF8fa14756c1D824931'

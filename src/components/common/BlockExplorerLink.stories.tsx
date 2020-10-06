@@ -2,24 +2,33 @@ import React from 'react'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
 
-import { EtherscanLink, EtherscanLinkProps } from 'components/common/EtherscanLink'
+import { BlockExplorerLink, Props } from 'components/common/BlockExplorerLink'
 import { Network } from 'types'
-import { ADDRESS_GNO, ADDRESS_GNOSIS_PROTOCOL, ADDRESS_GNOSIS_PROTOCOL_RINKEBY, TX_EXAMPLE } from 'storybook/data'
+import {
+  ADDRESS_ACCOUNT_XDAI,
+  ADDRESS_GNOSIS_PROTOCOL_XDAI,
+  ADDRESS_GNO_XDAI,
+  ADDRESS_GNO,
+  ADDRESS_GNOSIS_PROTOCOL,
+  ADDRESS_GNOSIS_PROTOCOL_RINKEBY,
+  TX_EXAMPLE,
+  TX_XDAI,
+} from 'storybook/data'
 
 const networkIds = Object.values(Network).filter(Number.isInteger)
 
 export default {
-  title: 'Common/EtherscanLink',
-  component: EtherscanLink,
+  title: 'Common/BlockExplorerLink',
+  component: BlockExplorerLink,
   argTypes: {
     label: { control: 'text' },
     networkId: { control: { type: 'inline-radio', options: networkIds } },
   },
 } as Meta
 
-const Template: Story<EtherscanLinkProps> = (args) => <EtherscanLink {...args} />
+const Template: Story<Props> = (args) => <BlockExplorerLink {...args} />
 
-const defaultParams: EtherscanLinkProps = {
+const defaultParams: Props = {
   type: 'tx',
   identifier: TX_EXAMPLE,
   networkId: Network.Mainnet,
@@ -65,4 +74,40 @@ Token.args = {
   type: 'token',
   label: 'GNO token',
   identifier: ADDRESS_GNO,
+}
+
+export const TxXdai = Template.bind({})
+TxXdai.storyName = 'Tx on xDAI'
+TxXdai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'tx',
+  identifier: TX_XDAI,
+}
+
+export const ContractXDai = Template.bind({})
+ContractXDai.storyName = 'Contract on xDAI'
+ContractXDai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'contract',
+  identifier: ADDRESS_GNOSIS_PROTOCOL_XDAI,
+}
+
+export const TokenXDai = Template.bind({})
+TokenXDai.storyName = 'Token on xDAI'
+TokenXDai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'token',
+  identifier: ADDRESS_GNO_XDAI,
+}
+
+export const AddressXDai = Template.bind({})
+AddressXDai.storyName = 'Address on xDAI'
+AddressXDai.args = {
+  ...defaultParams,
+  networkId: Network.xDAI,
+  type: 'address',
+  identifier: ADDRESS_ACCOUNT_XDAI,
 }

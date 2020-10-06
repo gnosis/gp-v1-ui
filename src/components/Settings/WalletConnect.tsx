@@ -42,16 +42,17 @@ const WCSettingsSchema = Joi.object({
 } */
 
 // validates only walletconnect slice of form data
-export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData> => {
+export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData, 'walletconnect'> => {
   const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
 
-  const { value: values, error } = result
+  const { value, error } = result
+  const values: WCOptions = value
 
   return {
     name: 'walletconnect',
-    values: error ? null : values,
+    values: error ? {} : values,
     errors: error
       ? error.details.reduce((previous, currentError) => {
           // when exlusive fields are both present
@@ -105,7 +106,6 @@ const OrSeparator = styled.div`
   @media ${MEDIA.mobile} {
     padding: 1rem 1.5em;
   }
-}
 `
 
 const ErrorWrapper = styled.p`

@@ -2,9 +2,9 @@ import { TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
-import { DISABLED_TOKEN_MAPS } from 'const'
 import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
 import quoteTokenPriorities from 'data/quoteTokenPriorities'
+import { DISABLED_TOKEN_MAPS, EMPTY_ARRAY } from 'const'
 
 const priosByNetwork = new Map<number, Map<string, number>>()
 
@@ -132,7 +132,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   }
 
   public getTokens(networkId: number): TokenDetails[] {
-    return this._tokensByNetwork[networkId] || []
+    return this._tokensByNetwork[networkId] || EMPTY_ARRAY
   }
 
   private static mergeTokenLists(...lists: TokenDetails[][]): TokenDetails[] {

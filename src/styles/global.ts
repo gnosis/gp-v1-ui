@@ -3,12 +3,11 @@ import fontFace from './fonts'
 import variables from './variables'
 import checkWhite from 'assets/img/check-white.svg'
 import greenCheck from 'assets/img/check-green.svg'
-import { MEDIA } from 'const'
 
 const GlobalStyles = createGlobalStyle`
-  // global root variables
+  /* global root variables */
   ${variables}
-  // Import font faces
+  /* Import font faces */
   ${fontFace}
 
   html, body {  
@@ -44,8 +43,8 @@ const GlobalStyles = createGlobalStyle`
   }
 
   ::-webkit-scrollbar {
-    width: 6px!important;
-    height: 6px!important;
+    width: 6px !important;
+    height: 6px !important;
   }
   ::-webkit-scrollbar-thumb {
       background-color: rgba(0,0,0,.2);
@@ -175,7 +174,7 @@ const GlobalStyles = createGlobalStyle`
       color: transparent;
     }
     
-    &[type=checkbox] {
+    &[type="checkbox"] {
       margin: 0 auto;
       background: transparent;
       appearance: none;
@@ -255,7 +254,7 @@ const GlobalStyles = createGlobalStyle`
 
   @media only screen and (max-width: 736px) {
     .Toastify__toast-container {
-      width: 90vw; // fallback
+      width: 90vw; /* fallback */
       width: calc(100vw - 2rem);
       margin: auto;
       right: 0;
@@ -307,8 +306,7 @@ const GlobalStyles = createGlobalStyle`
     direction: rtl;
   }
 
-  // .Toastify__toast--default {
-  // }
+  /* .Toastify__toast--default {} */
 
   .Toastify__toast--info::before {
     content: '';
@@ -886,9 +884,9 @@ const GlobalStyles = createGlobalStyle`
   }
   /* END Toastify custom styling */
   
-  // Web3Connect styling
-  // SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
-  // or am i missing something?
+  /* Web3Connect styling
+  SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
+  or am i missing something? */
   #WEB3_CONNECT_MODAL_ID > div > div > div:last-child {
       display: flex;
       width: 100%;
@@ -910,7 +908,7 @@ const GlobalStyles = createGlobalStyle`
         font-weight: var(--font-weight-bold);
       }
     
-    // Individual outer container
+    /* Individual outer container */
     > div {
       background: var(--color-background-pageWrapper);
       border-radius: var(--border-radius);
@@ -921,7 +919,7 @@ const GlobalStyles = createGlobalStyle`
       border: 0;
     }
     
-    // Individual inner container
+    /* Individual inner container */
     > div > div {
       background: var(--color-background-pageWrapper);
       display: flex;
@@ -943,7 +941,7 @@ const GlobalStyles = createGlobalStyle`
         }
     }
     
-    // Provider image
+    /* Provider image */
     > div > div > div:nth-of-type(1) {
       background: 0;
       box-shadow: none;
@@ -959,7 +957,7 @@ const GlobalStyles = createGlobalStyle`
         }
     }
     
-    // Client name
+    /* Client name */
     > div > div > div:nth-of-type(2) {
       font-size: 1.5rem;
       text-align: left;
@@ -968,16 +966,16 @@ const GlobalStyles = createGlobalStyle`
       color: var(--color-text-primary);
     }
     
-    // Client description
+    /* Client description */
     > div > div > div:nth-of-type(3) {
       font-size: 1.5rem;
       color: var(--color-text-primary);
       white-space: nowrap;
     }
   }
-  // End WEB3 connect
+  /* End WEB3 connect */
   
-  // Start WalletConnect Modal
+  /* Start WalletConnect Modal */
   #walletconnect-qrcode-modal {
     .walletconnect-modal__headerLogo {
       max-width: 24rem;
@@ -996,156 +994,9 @@ const GlobalStyles = createGlobalStyle`
     padding: 0 2rem;
     color: var(--color-text-primary);
   }
-  // End WalletConnect Modal
+  /* End WalletConnect Modal */
 
-  /* Hack to fix Modali screen flash */
-  .modali-overlay {
-    display: none
-  }
-
-  .modali-wrapper::before {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    content: "";
-    background-color: var(--color-background-modali);
-  }
-
-  /* Hack to not darken view further when two modali are open */
-  .modali-wrapper:nth-last-of-type(n+3)::before {
-    display: none;
-  }
-
-  /* End hack */
   
-  .modali-open .modali-overlay {
-    background-color: var(--color-background-modali);
-    opacity: 1;
-  }
-  
-  .modali-open .modali-wrapper-centered .modali {
-    background: var(--color-background-pageWrapper);
-    box-shadow: 0 .2rem .4rem 0 rgba(0,0,0,0.14);
-    border-radius: .6rem;
-    border: 0;
-    margin: 0 auto;
-    
-    .modali-header {
-      height: 5.6rem;
-      padding: 0 1.6rem;
-      box-sizing: border-box;
-      letter-spacing: 0;
-      font-size: 1.6rem;
-      text-align: left;
-      color: var(--color-text-primary);
-      margin: 0;
-      display: flex;
-      align-items: center;
-      font-family: var(--font-default);
-      font-weight: var(--font-weight-regular);
-      border-bottom: 0.1rem solid var(--color-background-banner);
-    }
-    
-    .modali-header .modali-title {
-      font-size: inherit;
-      font-weight: inherit;
-      line-height: 1;
-    }
-    
-    .modali-header .modali-close-button {
-      background: transparent;
-      font-size: 4rem;
-      line-height: 1;
-      color: var(--color-modali-close);
-      font-weight: normal;
-      opacity: .5;
-      padding: 0;
-      margin: auto 0 auto auto;
-      
-        &:hover {
-          opacity: 1;
-        }
-    }
-    
-    .modali-body {
-      font-size: 1.4rem;
-      line-height: 1.3;
-      background: inherit;
-      color: var(--color-text-primary);
-    }
-    
-    .modali-footer {
-      margin: 1.6rem auto 0;
-      height: 5.6rem;
-      border-top: 0.1rem solid var(--color-background-banner);
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 1.6rem;
-      box-sizing: border-box;
-
-      .modali-button.modali-button-default, .modali-button.modali-button-cancel {
-        margin: 0;
-        border-radius: 0.6rem;
-        outline: 0;
-        height: 3.6rem;
-        box-sizing: border-box;
-        letter-spacing: 0.03rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        text-transform: uppercase;
-        background: var(--color-background-CTA);
-        color: var(--color-text-CTA);
-        font-weight: var(--font-weight-bold);
-        font-size: 1.4rem;
-        
-        &:hover {
-          background-color: var(--color-background-button-hover);
-          color: var(--color-text-button-hover);
-        }
-      }
-      
-      .modali-button.modali-button-default {
-        border-radius: 0.6rem;
-        min-width: 14rem;
-        padding: 0 1.6rem;
-      }
-
-      .modali-button.modali-button-cancel {
-        background: transparent;
-        color: var(--color-text-active);
-      }
-    }
-  }
-  
-  // Heavier specification of the selector to ensure override from global.ts
-  // Ideally take out the modali default injected styles and only load from our end.
-  body.modali-open .modali.modali-size-large {
-    width: 80vw;
-    max-width: initial;
-    min-width: initial;
-    max-height: 100%;
-      @media (min-width: 500px) {
-          min-width: initial !important;
-      }
-      @media ${MEDIA.mobile},
-      @media ${MEDIA.tablet} {
-        width: 100%;
-      }
-  }
-  
-  body.modali-open .modali-wrapper-centered {
-    top: 0!important;
-  }
-  
-  body.modali-open .modali-body-style {
-    padding: 0;
-  }
 
   body > div.MuiDialog-root { 
     h3, h4, h5, span.MuiTypography-overline {
@@ -1229,8 +1080,6 @@ const GlobalStyles = createGlobalStyle`
 
       &.MuiPickersDay-dayWithMargin:not(.MuiPickersDay-daySelected),
       &.MuiPickersYear-yearSelected, 
-      &.MuiPickersYear-yearSelected, 
-      &.MuiPickersYear-yearButton, 
       &.MuiPickersYear-yearButton {
         background-color: var(--color-background-pageWrapper);
 
@@ -1259,26 +1108,20 @@ const GlobalStyles = createGlobalStyle`
     }
 
     div {
-      & {
-        .MuiPickersClock-pin,
-        .MuiPickersClockPointer-pointer,
-        .MuiPickersClockPointer-thumb.MuiPickersClockPointer-noPoint {
-          background-color: var(--color-background-CTA);
-          border-color: var(--color-background-CTA);
-        }
-
+      .MuiPickersClock-pin,
+      .MuiPickersClockPointer-pointer,
+      .MuiPickersClockPointer-thumb.MuiPickersClockPointer-noPoint {
+        background-color: var(--color-background-CTA);
+        border-color: var(--color-background-CTA);
       }
 
-      & {
-        .MuiPickersModalDialog-dialogRoot {
-          background: var(--color-background-pageWrapper);
-        }
+      .MuiPickersModalDialog-dialogRoot {
+        background: var(--color-background-pageWrapper);
       }
     }
 
     .MuiToolbar-root.MuiToolbar-regular.MuiPickersToolbar-toolbar.MuiPickersDateTimePickerToolbar-toolbar.MuiToolbar-gutters, 
     div.MuiPaper-root.MuiPaper-elevation1.MuiPaper-rounded > div.MuiTabs-root.MuiPickerDTTabs-tabs {
-      // background-color: var(--color-background-button-hover);  
       background-color: var(--color-background-CTA);
     }
   }

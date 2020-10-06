@@ -9,7 +9,7 @@ import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@
 import alertIcon from 'assets/img/alert.svg'
 
 // components
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { Spinner } from 'components/common/Spinner'
 import { StatusCountdown } from 'components/StatusCountdown'
 
@@ -40,7 +40,9 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
       <Spinner size="sm" />
       &nbsp;Pending...
       <br />
-      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
+      {transactionHash && (
+        <BlockExplorerLink identifier={transactionHash} type="tx" label={<small>View status</small>} />
+      )}
     </>
   )
 }

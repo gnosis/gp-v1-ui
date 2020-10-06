@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import Modali from 'modali'
+import Modal from 'components/common/Modal'
 
 import { useBetterAddTokenModal } from 'hooks/useBetterAddTokenModal'
 import { TokenDetails } from 'types'
@@ -24,7 +24,7 @@ const TokensAdder: React.FC<TokensAdderProps> = ({ tokenAddresses, networkId, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // no deps, so that we only open modal once on mount
 
-  return tokenAddresses.length > 0 ? <Modali.Modal {...modalProps} /> : null
+  return tokenAddresses.length > 0 ? <Modal.Modal {...modalProps} /> : null
 }
 
 export default TokensAdder
