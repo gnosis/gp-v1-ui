@@ -138,29 +138,29 @@ export function getTokensFactory(factoryParams: {
       retry(() => fetchAddressesAndIds(networkId, numTokens)),
     ])
 
+    let filteredAddressAndIds: [string, number][]
     if (tcrAddressesSet.size > 0) {
       // If filtering by TCR
       logDebug(`[tokenListFactory][${networkId}] TCR contains ${tcrAddressesSet.size} addresses`)
       logDebug(`[tokenListFactory][${networkId}] Token id and address mapping:`)
-      const filteredAddressAndIds = Array.from(listedAddressesAndIds.entries()).filter(([address, id]) => {
+      filteredAddressAndIds = Array.from(listedAddressesAndIds.entries()).filter(([address, id]) => {
         // Remove addresses that are not on the TCR, if any
         const isInTcr = tcrAddressesSet.has(address)
         logDebug(`[tokenListFactory][${networkId}] ${id} : ${address}. On TCR? ${isInTcr}`)
       })
-      return new Map<string, number>(filteredAddressAndIds)
     } else {
       // If not using a TCR, filter by default list
       logDebug(`[tokenListFactory][${networkId}] Not using a TCR. Filtering by tokens in the config file`)
       const tokensConfig = tokenListApi.getTokens(networkId)
-      const filteredAddressAndIds = tokensConfig
+      filteredAddressAndIds = tokensConfig
         .map((token): [string, number] | null => {
           const tokenId = listedAddressesAndIds[token.address]
           return [token.address, tokenId] || null
         })
         .filter(notEmpty)
-
-      return new Map<string, number>(filteredAddressAndIds)
     }
+
+    return new Map<string, number>(filteredAddressAndIds)
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
