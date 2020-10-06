@@ -1,4 +1,4 @@
-import { calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
+import { calculatePrice, formatPrice, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
 import React, { useMemo, useState } from 'react'
 import BN from 'bn.js'
 import { TokenDetails } from 'types'
@@ -39,9 +39,20 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
     return [formatPrice(price), formatPrice(priceInverse)]
   }, [buyToken, sellToken, quoteToken, priceFraction])
 
+  let priceDisplayed: string, quoteDisplayed: TokenDetails, baseDisplayed: TokenDetails
+  if (isPriceInverted) {
+    priceDisplayed = priceInverse
+    quoteDisplayed = baseToken
+    baseDisplayed = quoteToken
+  } else {
+    priceDisplayed = price
+    quoteDisplayed = quoteToken
+    baseDisplayed = baseToken
+  }
+
   return (
-    <span title="123.444 AAA per BBB">
-      {isPriceInverted ? priceInverse : price}
+    <span title={`${priceDisplayed} ${safeTokenName(quoteDisplayed)} per ${safeTokenName(baseDisplayed)}`}>
+      {priceDisplayed}
       &nbsp;
       <SwapPrice
         baseToken={baseToken}
