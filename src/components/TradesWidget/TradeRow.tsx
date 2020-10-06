@@ -78,6 +78,61 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
+interface MarketAndPricesParams extends Pick<Trade, 'buyToken' | 'sellToken' | 'limitPrice' | 'fillPrice'> {
+  isPriceInverted: boolean
+}
+
+interface MarketAndPrices {
+  side: string
+  quoteTokenLabel: React.ReactNode
+  sellTokenLabel: React.ReactNode
+  buyTokenLabel: React.ReactNode
+  market: string
+  limitPrice: BigNumber | undefined
+  fillPrice: BigNumber
+}
+
+function getMarketAndPrices(params: MarketAndPricesParams): MarketAndPrices {
+  const { sellToken, buyToken, isPriceInverted, fillPrice, limitPrice } = params
+  const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault } = getMarket({
+    sellToken,
+    receiveToken: buyToken,
+  })
+  const baseToken = isPriceInverted ? quoteTokenDefault : baseTokenDefault
+
+  const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
+  const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
+
+  let side: string,
+    quoteTokenLabel: React.ReactNode,
+    market: string,
+    limitPriceBN: BigNumber | undefined,
+    fillPriceBN: BigNumber
+  if (sellToken === baseToken) {
+    side = 'Sell'
+    quoteTokenLabel = buyTokenLabel
+    market = `${sellTokenLabel}/${buyTokenLabel}`
+    limitPriceBN = limitPrice
+    fillPriceBN = fillPrice
+  } else {
+    side = 'Buy'
+    quoteTokenLabel = sellTokenLabel
+    market = `${buyTokenLabel}/${sellTokenLabel}`
+    limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
+    fillPriceBN = invertPrice(fillPrice)
+  }
+
+  return {
+    market,
+    side,
+    quoteTokenLabel,
+    sellTokenLabel,
+    buyTokenLabel,
+    limitPrice: limitPriceBN,
+    fillPrice: fillPriceBN,
+  }
+}
+
 export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const { trade, networkId, onCellClick } = params
   const {
@@ -122,33 +177,26 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
   const [isPriceInverted, setIsPriceInverted] = useState(false)
-  const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault } = getMarket({
-    sellToken,
-    receiveToken: buyToken,
-  })
-  const baseToken = isPriceInverted ? quoteTokenDefault : baseTokenDefault
 
-  const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
-  const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
-
-  let side: string,
-    quoteTokenLabel: React.ReactNode,
-    market: string,
-    limitPriceBN: BigNumber | undefined,
-    fillPriceBN: BigNumber
-  if (sellToken === baseToken) {
-    side = 'Sell'
-    quoteTokenLabel = buyTokenLabel
-    market = `${sellTokenLabel}/${buyTokenLabel}`
-    limitPriceBN = limitPrice
-    fillPriceBN = fillPrice
-  } else {
-    side = 'Buy'
-    quoteTokenLabel = sellTokenLabel
-    market = `${buyTokenLabel}/${sellTokenLabel}`
-    limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
-    fillPriceBN = invertPrice(fillPrice)
-  }
+  const {
+    side,
+    market,
+    quoteTokenLabel,
+    sellTokenLabel,
+    buyTokenLabel,
+    fillPrice: marketFillPrice,
+    limitPrice: marketLimitPrice,
+  } = useMemo(
+    () =>
+      getMarketAndPrices({
+        sellToken,
+        buyToken,
+        isPriceInverted,
+        limitPrice,
+        fillPrice,
+      }),
+    [sellToken, buyToken, isPriceInverted, limitPrice, fillPrice],
+  )
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
@@ -171,14 +219,14 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       </td>
       <td
         data-label="Limit Price / Fill Price"
-        title={`${limitPriceBN ? formatPrice({ price: limitPriceBN, decimals: 8 }) : 'N/A'} / ${formatPrice({
-          price: fillPriceBN,
+        title={`${marketLimitPrice ? formatPrice({ price: marketLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice({
+          price: marketFillPrice,
           decimals: 8,
         })}`}
       >
-        {limitPriceBN ? formatPrice(limitPriceBN) : 'N/A'} {quoteTokenLabel}
+        {marketLimitPrice ? formatPrice(marketLimitPrice) : 'N/A'} {quoteTokenLabel}
         <br />
-        {formatPrice(fillPriceBN)} {quoteTokenLabel}
+        {formatPrice(marketFillPrice)} {quoteTokenLabel}
       </td>
       <td
         data-label="Sold / Bought"
