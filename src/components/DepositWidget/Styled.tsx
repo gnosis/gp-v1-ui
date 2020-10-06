@@ -46,6 +46,15 @@ export const TokenRow = styled.tr`
     justify-content: center;
     line-height: 1;
     padding: 0;
+
+    border: 0.1rem solid var(--color-text-CTA);
+    &:hover {
+      background-color: var(--color-background-button-hover);
+      border-color: var(--color-background-button-hover);
+      > svg {
+        fill: ghostwhite;
+      }
+    }
   }
 
   .withdrawToken {
@@ -59,18 +68,6 @@ export const TokenRow = styled.tr`
     background: var(--color-background-banner);
     > svg {
       fill: var(--color-svg-deposit);
-    }
-  }
-
-  .depositToken,
-  .withdrawToken {
-    border: 0.1rem solid var(--color-text-CTA);
-    &:hover {
-      background-color: var(--color-background-button-hover);
-      border-color: var(--color-background-button-hover);
-      > svg {
-        fill: ghostwhite;
-      }
     }
   }
 
@@ -105,7 +102,6 @@ export const TokenRow = styled.tr`
 `
 
 export const RowClaimButton = styled.button`
-  margin-bottom: 0;
   margin: 0;
   padding: 0;
   text-align: right;

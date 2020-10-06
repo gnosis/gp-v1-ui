@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
-import Modali, { useModali } from 'modali'
+import Modal, { useModal } from 'components/common/Modal'
 
 // assets
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
@@ -126,7 +126,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
     setQuoteToken(quoteTokenDefault)
   }, [baseTokenDefault, quoteTokenDefault, setBaseToken, setQuoteToken])
 
-  const [modalHook, toggleModal] = useModali({
+  const [modalHook, toggleModal] = useModal({
     ...DEFAULT_MODAL_OPTIONS,
     onHide: () => {
       // Reset the selection on close
@@ -172,7 +172,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
     ),
     buttons: [
       <>&nbsp;</>,
-      <Modali.Button label="Close" key="yes" isStyleDefault onClick={(): void => modalHook.hide()} />,
+      <Modal.Button label="Close" key="yes" isStyleDefault onClick={(): void => modalHook.hide()} />,
     ],
   })
 
@@ -181,7 +181,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
       <ViewOrderBookBtn className={className} onClick={toggleModal} type="button">
         {label || 'View Order Book'} <FontAwesomeIcon className="chart-icon" icon={faChartLine} />
       </ViewOrderBookBtn>
-      <Modali.Modal {...modalHook} />
+      <Modal.Modal {...modalHook} />
     </>
   )
 }

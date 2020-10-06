@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useMemo, useCallback } from 'react'
-import Modali, { useModali, ModalHook } from 'modali'
+import Modal, { useModal, ModalHook } from 'components/common/Modal'
 import { fetchTokenData, FetchTokenResult } from 'services'
 import { Deferred, createDeferredPromise } from 'utils'
 import { TokenDetails } from 'types'
@@ -9,7 +9,7 @@ import { tokenListApi } from 'api'
 import { TokenFromExchange } from 'services/factories'
 import { unstable_batchedUpdates as batchUpdates } from 'react-dom'
 import useSafeState from './useSafeState'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { useWalletConnection } from './useWalletConnection'
 import Spinner from 'components/common/Spinner'
 
@@ -141,7 +141,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
             <strong>{token.symbol}</strong>
           </div>
           <div className="tokenName">{token.name}</div>
-          <EtherscanLink
+          <BlockExplorerLink
             className="tokenText"
             type="token"
             identifier={token.address}
@@ -185,7 +185,7 @@ const ExplainTokenReason: React.FC<ExplainTokenReasonProps> = ({ token, reason, 
             <strong>{token.symbol}</strong>
           </div>
           <div className="tokenName">{token.name}</div>
-          <EtherscanLink
+          <BlockExplorerLink
             type="token"
             className="tokenText"
             identifier={token.address}
@@ -263,7 +263,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
     [fetchResults],
   )
 
-  const [modalProps, toggleModal] = useModali({
+  const [modalProps, toggleModal] = useModal({
     animated: true,
     centered: true,
     title: 'Do you want to add new Tokens?',
@@ -281,7 +281,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
     buttons: [
       // Cancel button only if there's anything to cancel
       canAddAnyToken ? (
-        <Modali.Button
+        <Modal.Button
           label="Cancel"
           key="no"
           isStyleCancel
@@ -292,7 +292,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
       ) : (
         <>&nbsp;</>
       ),
-      <Modali.Button
+      <Modal.Button
         // nothing to add -- Close
         label={canAddAnyToken ? 'Confirm' : 'Close'}
         key="yes"

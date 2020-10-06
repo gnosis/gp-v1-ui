@@ -3,7 +3,6 @@ import arrow from 'assets/img/arrow.svg'
 import { MEDIA } from 'const'
 
 export const UserWalletWrapper = styled.div`
-  position: relative;
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
@@ -27,7 +26,6 @@ export const UserWalletItem = styled.div`
   margin: 0;
   white-space: initial;
   font-family: var(--font-mono);
-  letter-spacing: 0;
   font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   letter-spacing: 0;
@@ -64,7 +62,7 @@ const WalletButton = styled.button`
   }
 `
 
-export const EtherscanButton = styled(WalletButton)`
+export const BlockExplorerButton = styled(WalletButton)`
   background: transparent;
   color: var(--color-text-primary);
   > a,
@@ -89,7 +87,6 @@ export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
   color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
   margin: 0;
   font-family: var(--font-mono);
-  letter-spacing: 0;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0;
   flex: 1;
@@ -199,7 +196,6 @@ export const CopyDiv = styled.div`
 
 export const UserWalletSlideWrapper = styled.div`
   position: absolute;
-  background: inherit;
   left: 0;
   background: var(--color-background-pageWrapper);
   width: 31rem;
@@ -245,7 +241,7 @@ export const UserWalletSlideWrapper = styled.div`
   > button > i {
     font-style: normal;
     font-size: 4rem;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     color: #526877;
     font-weight: lighter;
     opacity: 0.5;
@@ -255,7 +251,6 @@ export const UserWalletSlideWrapper = styled.div`
 export const NetworkTitle = styled.div`
   color: inherit;
   position: absolute;
-  text-transform: uppercase;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.3rem;

@@ -6,7 +6,7 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { EllipsisText } from 'components/common/EllipsisText'
 
 import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
@@ -175,7 +175,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
         <EllipsisText title={orderId}>{orderId}</EllipsisText>
       </td>
       <td data-label="View on Etherscan">
-        <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
+        <BlockExplorerLink type="event" identifier={txHash} networkId={networkId} />
       </td>
     </TradeRowFoldableWrapper>
   )

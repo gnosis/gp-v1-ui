@@ -32,7 +32,6 @@ const TabsWrapper = styled.div`
       letter-spacing: 0;
       text-align: center;
       background: transparent;
-      flex: 1;
       height: 100%;
       outline: 0;
       text-transform: uppercase;
@@ -45,7 +44,6 @@ const TabsWrapper = styled.div`
       border-bottom: 0.3rem solid transparent;
 
       > i {
-        height: 1.8rem;
         font-weight: inherit;
         font-size: 1.1rem;
         color: var(--color-background-pageWrapper);

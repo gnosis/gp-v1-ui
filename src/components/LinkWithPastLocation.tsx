@@ -2,12 +2,16 @@ import React, { useMemo } from 'react'
 import { useLocation } from 'react-router'
 import { LinkProps, NavLink } from 'react-router-dom'
 import { Location, LocationDescriptorObject } from 'history'
+import { AnyFunction } from 'types'
 
 // LinkProps.to can be a string, a Location object or a function returning the first two
 type LocationTo = LinkProps['to']
 
 // handle string or Location object
-const constructLocationObject = (to: Exclude<LocationTo, Function>, location: Location): LocationDescriptorObject => {
+const constructLocationObject = (
+  to: Exclude<LocationTo, AnyFunction>,
+  location: Location,
+): LocationDescriptorObject => {
   if (typeof to === 'string')
     return {
       pathname: to,

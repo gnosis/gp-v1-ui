@@ -24,7 +24,6 @@ export const WrappedWidget = styled(Widget)`
   height: 100%;
   overflow-x: visible;
   min-width: 0;
-  margin: 0 auto;
   width: auto;
   flex-flow: row nowrap;
   display: flex;
@@ -192,7 +191,7 @@ export const ExpandableOrdersPanel = styled.div`
   flex: 1;
   min-width: 50vw;
   max-width: 100%;
-  background: var(--color-background) none repeat scroll 0% 0%; // var(--color-background-pageWrapper);
+  background: var(--color-background) none repeat scroll 0% 0%;
   border-radius: 0 0.6rem 0.6rem 0;
   box-sizing: border-box;
   transition: flex 0.2s ease-in-out;
@@ -205,13 +204,13 @@ export const ExpandableOrdersPanel = styled.div`
     border-radius: 0;
   }
 
-  // Connect Wallet banner in the orders panel
+  /* Connect Wallet banner in the orders panel */
   ${Wrapper} {
     background: transparent;
     box-shadow: none;
   }
 
-  // Orders widget when inside the ExpandableOrdersPanel
+  /* Orders widget when inside the ExpandableOrdersPanel */
   ${OrdersWrapper} {
     width: calc(100% - 1.6rem);
     height: 90%;
@@ -227,7 +226,7 @@ export const ExpandableOrdersPanel = styled.div`
       width: 100%;
     }
 
-    // Search Filter
+    /* Search Filter */
     .widgetFilterTools {
       > .balances-searchTokens {
         height: 3.6rem;

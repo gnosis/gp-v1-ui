@@ -28,12 +28,11 @@ const BannerCloser = styled.span`
   font-weight: bold;
   font-size: 1.4rem;
   margin: 0 0 0 1.2rem;
-  opacity: .7;
-  transition: opacity .2s ease-in-out;
-    &:hover {
-      opacity: 1;
-    }
-}
+  opacity: 0.7;
+  transition: opacity 0.2s ease-in-out;
+  &:hover {
+    opacity: 1;
+  }
 `
 
 const DISCLAIMER = 'DISCLAIMER'
