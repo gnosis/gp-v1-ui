@@ -18,7 +18,7 @@ const fontFace = css`
     font-style: normal;
   }
   font-face {
-    font-family: 'Roboto Mono';
+    font-family: 'Roboto Mono', monospace;
     src: url(${RobotoMono}) format('woff2');
     font-weight: 400;
     font-style: normal;

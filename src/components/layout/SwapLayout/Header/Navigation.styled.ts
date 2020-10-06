@@ -22,10 +22,9 @@ export const NavLinksWrapper = styled.div<{ $open?: boolean; $responsive: boolea
   a:visited {
     border: 0.125rem solid transparent;
     color: var(--color-text-secondary);
-    font-weight: bolder;
     text-decoration: none;
     transition: color 0.2s ease-in-out, background 0.2s ease-in-out;
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-bold, bolder);
     font-size: 2.1rem;
     padding: 0 4rem;
     border-radius: 15rem;
@@ -68,7 +67,7 @@ export const OrderedNavLinkDiv = styled.span`
   align-items: center;
   flex: 1 1 auto;
 
-  // Hide 'ORDERS' tab on desktop/tablet (until we decide to show it for all devices...)
+  /* Hide 'ORDERS' tab on desktop/tablet (until we decide to show it for all devices...) */
   &:nth-of-type(3) {
     display: none;
     @media ${MEDIA.mobile} {

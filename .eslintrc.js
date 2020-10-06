@@ -35,7 +35,7 @@ module.exports = {
       },
     },
   ],
-  plugins: ['react-hooks'],
+  plugins: ['react-hooks', '@typescript-eslint'],
   settings: {
     react: {
       version: 'detect', // Tells eslint-plugin-react to automatically detect the version of React to use

@@ -12,8 +12,6 @@ export const Wrapper = styled.div`
   width: 100%;
   min-height: 35rem;
   min-width: 55rem;
-  display: flex;
-  flex-flow: row nowrap;
   font-size: 1.6rem;
   line-height: 1;
   display: flex;

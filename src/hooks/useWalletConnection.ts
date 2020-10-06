@@ -2,19 +2,39 @@ import { walletApi } from 'api'
 import { useEffect, useMemo } from 'react'
 import { Command, Network } from 'types'
 import useSafeState from './useSafeState'
-import { WalletInfo } from 'api/wallet/WalletApi'
+import { BlockchainUpdatePrompt, WalletInfo } from 'api/wallet/WalletApi'
 
-const PendingState: { pending: true; networkIdOrDefault: number } & { [K in keyof WalletInfo]: undefined } = {
+interface PendingStateObject extends WalletInfo {
+  pending: true
+  networkIdOrDefault: number
+}
+
+const PendingState: PendingStateObject = {
   pending: true,
-  isConnected: undefined,
+  isConnected: false,
   userAddress: undefined,
   networkId: undefined,
   networkIdOrDefault: Network.Mainnet,
 }
 
+const constructPendingState = ({ chainId, account, blockHeader }: BlockchainUpdatePrompt): PendingStateObject => {
+  const blockNumber = blockHeader?.number
+  const networkId = chainId || PendingState.networkId
+  const networkIdOrDefault = chainId || PendingState.networkIdOrDefault
+  const userAddress = account || PendingState.userAddress
+
+  return {
+    ...PendingState,
+    networkId,
+    networkIdOrDefault,
+    userAddress,
+    blockNumber,
+  }
+}
+
 export const useWalletConnection = ():
   | (WalletInfo & { pending: false; networkIdOrDefault: number })
-  | typeof PendingState => {
+  | PendingStateObject => {
   const [walletInfo, setWalletInfo] = useSafeState<WalletInfo | null>(null)
 
   useEffect((): Command => {
@@ -23,7 +43,7 @@ export const useWalletConnection = ():
 
   return useMemo(() => {
     return !walletInfo
-      ? PendingState
+      ? constructPendingState(walletApi.blockchainState)
       : {
           ...walletInfo,
           networkIdOrDefault: walletInfo.networkId || Network.Mainnet,

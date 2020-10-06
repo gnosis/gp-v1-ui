@@ -139,7 +139,7 @@ const Wrapper = <C extends keyof JSX.IntrinsicElements | React.ComponentType = '
       | typeof targetProps
       | Omit<typeof targetProps, 'onMouseEnter' | 'onMouseLeave'>
       | Omit<typeof targetProps, 'onFocus' | 'onBlur'>
-      | {} = {}
+      | Record<string, unknown> = {}
     if (focus && hover) {
       // pass all targetProps by default
       finalTargetProps = targetProps
