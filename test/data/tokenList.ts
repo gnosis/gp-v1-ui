@@ -1,5 +1,5 @@
 import { TokenDetails } from 'types'
-import { TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7, TOKEN_8 } from './basic'
+import { TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4, TOKEN_5, TOKEN_6, TOKEN_7, TOKEN_8, TOKEN_9 } from './basic'
 
 // Ether, Tether, TrueUSD, USD Coin, Paxos, Gemini, Dai
 const tokens: TokenDetails[] = [
@@ -96,11 +96,22 @@ const tokens: TokenDetails[] = [
   //  for testing token with problematic characters for the URL
   {
     id: 77,
-    name: 'Fake token',
+    name: 'Fake token 1',
     symbol: 'FTK /21/10-DAI $99 & +|-',
     decimals: 18,
     addressMainnet: TOKEN_8,
     address: TOKEN_8,
+  },
+
+  // Fake token (FTK)
+  //  for testing token with problematic characters for the URL
+  {
+    id: 78,
+    name: 'Fake token 2',
+    symbol: 'FTK2',
+    decimals: 18,
+    addressMainnet: TOKEN_9,
+    address: TOKEN_9,
   },
 ]
 

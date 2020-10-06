@@ -19,6 +19,7 @@ export enum Network {
 export interface TokenDetails extends TokenDex {
   disabled?: boolean
   override?: TokenOverride
+  priority?: number
 }
 
 export interface BalanceDetails {
@@ -30,6 +31,16 @@ export interface BalanceDetails {
   enabled: boolean
   totalExchangeBalance: BN
   immatureClaim?: boolean
+}
+
+export interface TradeTokenSelection {
+  sellToken: TokenDetails
+  receiveToken: TokenDetails
+}
+
+export interface Market {
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
 }
 
 export type TokenBalanceDetails = TokenDetails & BalanceDetails
