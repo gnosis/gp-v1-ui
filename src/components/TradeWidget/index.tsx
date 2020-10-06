@@ -262,9 +262,9 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   const defaultValidFrom = calculateValidityTimes(trade.validFrom || validFromParam)
   const defaultValidUntil = calculateValidityTimes(trade.validUntil || validUntilParam)
 
-  const [priceShown, setPriceShown] = useState<'INVERSE' | 'DIRECT'>('DIRECT')
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
 
-  const swapPrices = (): void => setPriceShown((oldPrice) => (oldPrice === 'DIRECT' ? 'INVERSE' : 'DIRECT'))
+  const swapPrices = (): void => setIsPriceInverted((invertedMarket) => !invertedMarket)
 
   const defaultFormValues: TradeFormData = {
     [sellInputId]: defaultSellAmount,
@@ -314,10 +314,17 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
     )
   }, [dispatch, priceValue, sellValue, sellToken, receiveToken, validFromValue, validUntilValue])
 
+  // Get canonical market
+  const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
+
   // Update receive amount
   useEffect(() => {
-    priceValue && sellValue && setValue(receiveInputId, calculateReceiveAmount(priceValue, sellValue))
-  }, [priceValue, priceInverseValue, setValue, sellValue])
+    if (priceValue && sellValue) {
+      // If price is quoted in sell tokens, we use it, otherwise we use the inverse
+      const priceUsedForReciveAmount = sellToken === quoteToken ? priceValue : priceInverseValue
+      setValue(receiveInputId, calculateReceiveAmount(priceUsedForReciveAmount, sellValue))
+    }
+  }, [isPriceInverted, quoteToken, sellToken, priceValue, priceInverseValue, setValue, sellValue])
 
   const url = buildUrl({
     sell: sellValue,
@@ -637,9 +644,6 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
     },
   })
 
-  // Get canonical market
-  const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
-
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
       <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
@@ -687,14 +691,14 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             quoteToken={quoteToken}
             tabIndex={1}
             onSwapPrices={swapPrices}
-            priceShown={priceShown}
+            isPriceInverted={isPriceInverted}
           />
           <PriceSuggestions
             networkId={networkIdOrDefault}
             baseToken={baseToken}
             quoteToken={quoteToken}
             amount={debouncedSellValue}
-            isPriceInverted={priceShown === 'INVERSE'}
+            isPriceInverted={isPriceInverted}
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
             onSwapPrices={swapPrices}

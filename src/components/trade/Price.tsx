@@ -165,7 +165,7 @@ export interface Props {
   priceInverseInputId: string
   tabIndex?: number
   onSwapPrices: () => void
-  priceShown: 'INVERSE' | 'DIRECT'
+  isPriceInverted: boolean
 }
 
 export function invertPriceFromString(priceValue: string): string {
@@ -185,7 +185,7 @@ export const Price: React.FC<Props> = ({
   priceInverseInputId,
   tabIndex,
   onSwapPrices,
-  priceShown,
+  isPriceInverted,
 }) => {
   const { register, errors, setValue } = useFormContext<TradeFormData>()
 
@@ -225,7 +225,6 @@ export const Price: React.FC<Props> = ({
     inputId: priceInverseInputId,
     precision: DEFAULT_PRECISION,
   })
-  const isDirect = priceShown === 'DIRECT'
 
   return (
     <Wrapper>
@@ -233,7 +232,7 @@ export const Price: React.FC<Props> = ({
         Limit Price <OrderBookBtn baseToken={baseToken} quoteToken={quoteToken} />
       </strong>
       {/* using display: none to hide to avoid hook-form reregister */}
-      <PriceInputBox hidden={!isDirect}>
+      <PriceInputBox hidden={isPriceInverted}>
         <label>
           <input
             className={isError ? 'error' : ''}
@@ -256,7 +255,7 @@ export const Price: React.FC<Props> = ({
         </label>
         <FormInputError errorMessage={errorPrice?.message} />
       </PriceInputBox>
-      <PriceInputBox hidden={isDirect}>
+      <PriceInputBox hidden={!isPriceInverted}>
         <label>
           <input
             name={priceInverseInputId}
