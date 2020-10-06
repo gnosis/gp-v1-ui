@@ -206,7 +206,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       </td>
       <td data-label="Market" className="showResponsive">
         <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
-        <a
+        <span
           onClick={(): void =>
             onCellClick({
               target: { value: market },
@@ -214,7 +214,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           }
         >
           {market}
-        </a>{' '}
+        </span>{' '}
         ➡ {side}
       </td>
       <td
