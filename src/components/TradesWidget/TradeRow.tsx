@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { formatDistanceStrict } from 'date-fns'
 
@@ -14,6 +14,8 @@ import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 import { isTradeSettled, divideBN, formatPercentage, getMarket } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { MEDIA } from 'const'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+import BigNumber from 'bignumber.js'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   td {
@@ -96,8 +98,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
   // Calculate the inverse price - just make sure Limit Price is defined and isn't ZERO
   // don't want none of that divide by zero and destroy the world stuff
-  const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
-  const invertedFillPrice = invertPrice(fillPrice)
 
   const date = new Date(timestamp)
 
@@ -121,21 +121,33 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
     }
   }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
-  const { baseToken } = getMarket({ sellToken, receiveToken: buyToken })
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
+  const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault } = getMarket({
+    sellToken,
+    receiveToken: buyToken,
+  })
+  const baseToken = isPriceInverted ? quoteTokenDefault : baseTokenDefault
+
   const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
   const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
 
-  let side: string, baseTokenLabel: React.ReactNode, quoteTokenLabel: React.ReactNode, market: string
+  let side: string,
+    quoteTokenLabel: React.ReactNode,
+    market: string,
+    limitPriceBN: BigNumber | undefined,
+    fillPriceBN: BigNumber
   if (sellToken === baseToken) {
     side = 'Sell'
-    baseTokenLabel = sellTokenLabel
     quoteTokenLabel = buyTokenLabel
     market = `${sellTokenLabel}/${buyTokenLabel}`
+    limitPriceBN = limitPrice
+    fillPriceBN = fillPrice
   } else {
     side = 'Buy'
-    baseTokenLabel = buyTokenLabel
     quoteTokenLabel = sellTokenLabel
     market = `${buyTokenLabel}/${sellTokenLabel}`
+    limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
+    fillPriceBN = invertPrice(fillPrice)
   }
 
   // Do not display trades that are not settled
@@ -144,29 +156,29 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <td
-        data-label="Market"
-        className="showResponsive"
-        onClick={(): void =>
-          onCellClick({
-            target: { value: market },
-          })
-        }
-      >
-        {market} ➡ {side}
+      <td data-label="Market" className="showResponsive">
+        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
+        <a
+          onClick={(): void =>
+            onCellClick({
+              target: { value: market },
+            })
+          }
+        >
+          {market}
+        </a>{' '}
+        ➡ {side}
       </td>
       <td
         data-label="Limit Price / Fill Price"
-        title={`${invertedLimitPrice ? formatPrice({ price: invertedLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice(
-          {
-            price: invertedFillPrice,
-            decimals: 8,
-          },
-        )}`}
+        title={`${limitPriceBN ? formatPrice({ price: limitPriceBN, decimals: 8 }) : 'N/A'} / ${formatPrice({
+          price: fillPriceBN,
+          decimals: 8,
+        })}`}
       >
-        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'} {quoteTokenLabel}
+        {limitPriceBN ? formatPrice(limitPriceBN) : 'N/A'} {quoteTokenLabel}
         <br />
-        {formatPrice(invertedFillPrice)} {quoteTokenLabel}
+        {formatPrice(fillPriceBN)} {quoteTokenLabel}
       </td>
       <td
         data-label="Sold / Bought"
