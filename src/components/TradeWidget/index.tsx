@@ -638,9 +638,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   })
 
   // Get canonical market
-  const { baseToken, quoteToken, wasPriorityAdjusted } = getMarket({ receiveToken, sellToken })
-  // TODO: Remove debug log
-  console.log('Canonical Market', baseToken.symbol, quoteToken.symbol, wasPriorityAdjusted)
+  const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
 
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
