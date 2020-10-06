@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
+import { displayTokenSymbolOrLink } from 'utils/display'
 import { EllipsisText } from 'components/common/EllipsisText'
 
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
