@@ -34,7 +34,7 @@ export interface WrapperProps {
 const tokensIconsRequire =
   process.env.NODE_ENV === 'test' ? RequireContextMock : require.context('assets/img/tokens', false)
 
-const tokensIconsFilesByAddress = tokensIconsRequire.keys().reduce((acc, file) => {
+const tokensIconsFilesByAddress: Record<string, string> = tokensIconsRequire.keys().reduce((acc, file) => {
   const address = file.match(/0x\w{40}/)?.[0]
   if (!address) {
     throw new Error(
@@ -54,7 +54,10 @@ export const TokenImg: React.FC<Props> = (props) => {
     iconFile = tokensIconsFilesByAddress[addressMainnet.toLowerCase()]
   }
 
-  const iconFileUrl = iconFile ? tokensIconsRequire(iconFile) : getImageUrl(addressMainnet || address)
+  const iconFileUrl: string | undefined = iconFile
+    ? tokensIconsRequire(iconFile).default
+    : getImageUrl(addressMainnet || address)
+
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
   // https://github.com/gnosis/dex-react/issues/1442
   const safeName = safeTokenName({ address, symbol, name })

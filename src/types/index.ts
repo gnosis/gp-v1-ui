@@ -5,6 +5,7 @@ import { TokenOverride } from './config'
 import { TokenDex } from '@gnosis.pm/dex-js'
 
 export type Command = () => void
+export type AnyFunction = (...args: unknown[]) => unknown
 export type Mutation<T> = (original: T) => T
 export type Unpromise<T> = T extends Promise<infer U> ? U : T
 
@@ -14,6 +15,7 @@ export enum Network {
   Rinkeby = 4,
   Goerli = 5,
   Kovan = 42,
+  xDAI = 100,
 }
 
 export interface TokenDetails extends TokenDex {

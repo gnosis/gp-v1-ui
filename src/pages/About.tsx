@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import { ContentPage } from 'components/layout'
 import addressesByNetwork from 'api/deposit/batchExchangeAddresses'
 import { getNetworkFromId } from '@gnosis.pm/dex-js'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 export const AboutWrapper = styled(ContentPage)`
   line-height: 2.2rem;
@@ -34,7 +34,12 @@ const About: React.FC = () => {
     return (
       <React.Fragment key={address}>
         {index > 0 && <span>, </span>}
-        <EtherscanLink type="contract" identifier={address} networkId={networkId} label={getNetworkFromId(networkId)} />
+        <BlockExplorerLink
+          type="contract"
+          identifier={address}
+          networkId={networkId}
+          label={getNetworkFromId(networkId)}
+        />
       </React.Fragment>
     )
   })

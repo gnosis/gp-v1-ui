@@ -6,8 +6,6 @@ export const CreateStrategyWrapper = styled.div`
   flex-flow: column nowrap;
   width: 50%;
   width: calc(50% - 1.5rem);
-  padding: 0;
-  box-sizing: border-box;
   background: var(--color-background);
   border-radius: 0.6rem;
   padding: 0 1.6rem;

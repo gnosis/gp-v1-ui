@@ -1,11 +1,11 @@
 import BN from 'bn.js'
 import { AbiItem } from 'web3-utils'
-import { Erc20Contract } from '@gnosis.pm/dex-js'
+import { Erc20Contract, toBN } from '@gnosis.pm/dex-js'
 import erc20Abi from '@gnosis.pm/dex-js/build/contracts/abi/Erc20.json'
 
 import { TxOptionalParams, Receipt } from 'types'
 import { ZERO } from 'const'
-import { logDebug, toBN } from 'utils'
+import { logDebug } from 'utils'
 
 import ERC20_DETAILS from 'api/erc20/erc20Details.json'
 

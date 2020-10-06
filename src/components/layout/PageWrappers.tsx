@@ -51,7 +51,7 @@ export const StandaloneCardWrapper = styled.div`
   flex-flow: column wrap;
   position: relative;
 
-  // Pages in standalone mode use bigger fonts
+  /* Pages in standalone mode use bigger fonts */
   ${CardWidgetWrapper} {
     > table {
       > thead,
@@ -73,7 +73,6 @@ export const PageWrapper = styled.section`
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     min-height: 35rem;
     height: auto;
-    // max-width: 100%;
   }
 
   @media ${MEDIA.tablet} {

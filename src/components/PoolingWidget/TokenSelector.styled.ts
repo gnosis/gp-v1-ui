@@ -55,7 +55,6 @@ export const TokenBox = styled.div<{ $selected: boolean }>`
   }
 
   > img {
-    height: auto;
     width: 3.6rem;
     height: 3.6rem;
     object-fit: contain;
