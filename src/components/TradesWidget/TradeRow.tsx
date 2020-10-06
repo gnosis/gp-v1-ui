@@ -11,7 +11,7 @@ import { EllipsisText } from 'components/common/EllipsisText'
 
 import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 
-import { isTradeSettled, divideBN, formatPercentage } from 'utils'
+import { isTradeSettled, divideBN, formatPercentage, getMarket } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { MEDIA } from 'const'
 
@@ -121,10 +121,22 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
     }
   }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
-  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
-    buyToken,
-    sellToken,
-  ])
+  const { baseToken } = getMarket({ sellToken, receiveToken: buyToken })
+  const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
+  const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
+
+  let side: string, baseTokenLabel: React.ReactNode, quoteTokenLabel: React.ReactNode, market: string
+  if (sellToken === baseToken) {
+    side = 'Sell'
+    baseTokenLabel = sellTokenLabel
+    quoteTokenLabel = buyTokenLabel
+    market = `${sellTokenLabel}/${buyTokenLabel}`
+  } else {
+    side = 'Buy'
+    baseTokenLabel = buyTokenLabel
+    quoteTokenLabel = sellTokenLabel
+    market = `${buyTokenLabel}/${sellTokenLabel}`
+  }
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
@@ -141,7 +153,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           })
         }
       >
-        {market}
+        {market} ➡ {side}
       </td>
       <td
         data-label="Limit Price / Fill Price"
@@ -152,9 +164,9 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           },
         )}`}
       >
-        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'}
+        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'} {quoteTokenLabel}
         <br />
-        {formatPrice(invertedFillPrice)}
+        {formatPrice(invertedFillPrice)} {quoteTokenLabel}
       </td>
       <td
         data-label="Sold / Bought"
@@ -164,9 +176,8 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           precision: sellTokenDecimals,
         })} / ${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
       >
-        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {displayTokenSymbolOrLink(sellToken)}
-        <br />
-        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
+        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {sellTokenLabel} <br />
+        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {buyTokenLabel}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
