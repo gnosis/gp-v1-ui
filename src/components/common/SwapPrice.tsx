@@ -29,32 +29,24 @@ export interface Props {
 
 export const SwapPrice: React.FC<Props> = (props) => {
   const { baseToken, quoteToken, isPriceInverted, showBaseToken = false, onSwapPrices } = props
-  let actualBaseToken, actualQuoteToken, actualBaseTokenTitle, actualQuoteTokenTitle
+  let actualBaseToken, actualQuoteToken
   if (isPriceInverted) {
     // Price is inversed
     actualBaseToken = displayTokenSymbolOrLink(quoteToken)
     actualQuoteToken = displayTokenSymbolOrLink(baseToken)
-    actualBaseTokenTitle = symbolOrAddress(quoteToken)
-    actualQuoteTokenTitle = symbolOrAddress(baseToken)
   } else {
     // Price is direct
     actualBaseToken = displayTokenSymbolOrLink(baseToken)
     actualQuoteToken = displayTokenSymbolOrLink(quoteToken)
-    actualBaseTokenTitle = symbolOrAddress(baseToken)
-    actualQuoteTokenTitle = symbolOrAddress(quoteToken)
   }
 
   return (
     <SwapPriceWrapper onClick={onSwapPrices}>
-      <EllipsisText as="strong" title={actualQuoteTokenTitle}>
-        {actualQuoteToken}
-      </EllipsisText>
+      <EllipsisText as="strong">{actualQuoteToken}</EllipsisText>
       {showBaseToken && (
         <>
           <small> per </small>
-          <EllipsisText as="strong" title={actualBaseTokenTitle}>
-            {actualBaseToken}
-          </EllipsisText>
+          <EllipsisText as="strong">{actualBaseToken}</EllipsisText>
         </>
       )}
 
