@@ -321,8 +321,8 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   useEffect(() => {
     if (priceValue && sellValue) {
       // If price is quoted in sell tokens, we use it, otherwise we use the inverse
-      const priceUsedForReciveAmount = sellToken === quoteToken ? priceValue : priceInverseValue
-      setValue(receiveInputId, calculateReceiveAmount(priceUsedForReciveAmount, sellValue))
+      const priceUsedForReceiveAmount = sellToken === quoteToken ? priceValue : priceInverseValue
+      setValue(receiveInputId, calculateReceiveAmount(priceUsedForReceiveAmount, sellValue))
     }
   }, [isPriceInverted, quoteToken, sellToken, priceValue, priceInverseValue, setValue, sellValue])
 
