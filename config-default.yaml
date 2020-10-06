@@ -213,7 +213,8 @@ initialTokenList:
     addressByNetwork:
       '1': '0x6B175474E89094C44Da98b954EedeAC495271d0F'
       '4': '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa'
-      '100': '0x44fA8E6f47987339850636F88629646662444217'
+      # Disabled DAI: It's more convenient to use wxDAI
+      #'100': '0x44fA8E6f47987339850636F88629646662444217'
 
   - id: 8
     name: Synth sETH
