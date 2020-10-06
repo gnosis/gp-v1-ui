@@ -155,7 +155,7 @@ export function getTokensFactory(factoryParams: {
       const tokensConfig = tokenListApi.getTokens(networkId)
       filteredAddressAndIds = tokensConfig
         .map((token): [string, number] | null => {
-          const tokenId = listedAddressesAndIds[token.address]
+          const tokenId = listedAddressesAndIds.get(token.address)
           return [token.address, tokenId] || null
         })
         .filter(notEmpty)
