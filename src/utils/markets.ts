@@ -1,4 +1,6 @@
+import { safeTokenName } from '@gnosis.pm/dex-js'
 import { Market, TradeTokenSelection } from 'types'
+import { logDebug } from './miscellaneous'
 
 export interface GetMarketResult extends Market {
   wasPriorityAdjusted: boolean
@@ -25,6 +27,12 @@ export function getMarket({ sellToken, receiveToken }: TradeTokenSelection): Get
     quoteToken = sellToken
     baseToken = receiveToken
   }
+
+  logDebug(
+    `[utils:market] Market for ${safeTokenName(sellToken)} (${sellTokenPrio}) and ${safeTokenName(
+      receiveToken,
+    )} (${receiveTokenPrio}): ${safeTokenName(baseToken)}-${safeTokenName(quoteToken)}`,
+  )
 
   return {
     baseToken,
