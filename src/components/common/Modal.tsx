@@ -1,6 +1,6 @@
 import React from 'react'
 import { createGlobalStyle } from 'styled-components'
-import Modali, { ModalHook, toggleModaliComponent, useModali } from 'modali'
+import Modali, { ModalHook, ModalOptions, ModalProps, toggleModaliComponent, useModali } from 'modali'
 
 import { MEDIA } from 'const'
 
@@ -164,4 +164,11 @@ const Modal: React.FC<Modali.ModalProps> = (props) => (
 // To import default Modali and not change much code elsewhere
 const StyledModali = { ...Modali, Modal }
 
-export { StyledModali as default, ModalHook, toggleModaliComponent as toggleModal, useModali as useModal }
+export {
+  StyledModali as default,
+  ModalHook,
+  ModalOptions,
+  ModalProps,
+  toggleModaliComponent as toggleModal,
+  useModali as useModal,
+}
