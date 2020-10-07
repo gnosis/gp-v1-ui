@@ -10,9 +10,9 @@ interface BaseTokenSelection {
   receiveToken: string
 }
 
-export interface TokenSelection extends BaseTokenSelection {
+export type TokenSelection = BaseTokenSelection & {
   networks: {
-    [n: string]: BaseTokenSelection | undefined
+    [n in Network]?: BaseTokenSelection
   }
 }
 
