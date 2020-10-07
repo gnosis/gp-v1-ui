@@ -104,10 +104,9 @@ export function getTokensFactory(factoryParams: {
     }
   }
 
-  async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenErc20 | string> {
+  async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenErc20 | null> {
     // Simple wrapper function to return original address instead of null for make logging easier
-    const erc20Details = await getTokenFromErc20({ networkId, tokenAddress })
-    return erc20Details || tokenAddress
+    return getTokenFromErc20({ networkId, tokenAddress })
   }
 
   async function fetchAddressesAndIds(networkId: number, numTokens: number): Promise<Map<string, number>> {
@@ -175,30 +174,39 @@ export function getTokensFactory(factoryParams: {
     const tokensConfigMap = new Map(tokensConfig.map((t) => [t.address, t]))
     const tokenDetailsPromises: (Promise<TokenDetails | undefined> | TokenDetails)[] = []
     addressToIdMap.forEach((id, tokenAddress) => {
-      const token = tokensConfigMap.get(tokenAddress)
+      // Resolve the details using the config, otherwise fetch the token
+      const token: TokenDetails | undefined | Promise<TokenDetails | undefined> = tokensConfigMap.has(tokenAddress)
+        ? tokensConfigMap.get(tokenAddress)
+        : _fetchToken(networkId, id, tokenAddress)
+
       if (token) {
         tokenDetailsPromises.push(token)
-      } else {
-        const fullTokenPromise = getErc20DetailsOrAddress(networkId, tokenAddress).then((partialToken) => {
-          if (typeof partialToken === 'string') {
-            // We replaced potential null responses with original tokenAddress string for logging purposes
-            logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
-            return
-          }
-          // If we got a valid response
-          logDebug(
-            `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
-          )
-          // build token object
-          const token: TokenDetails = { ...partialToken, id }
-
-          return token
-        })
-        tokenDetailsPromises.push(fullTokenPromise)
       }
     })
 
     return (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
+  }
+
+  async function _fetchToken(
+    networkId: number,
+    tokenId: number,
+    tokenAddress: string,
+  ): Promise<TokenDetails | undefined> {
+    const partialToken = await getErc20DetailsOrAddress(networkId, tokenAddress)
+
+    if (!partialToken) {
+      logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
+      return
+    }
+
+    logDebug(
+      `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
+    )
+
+    return {
+      ...partialToken,
+      id: tokenId,
+    }
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
