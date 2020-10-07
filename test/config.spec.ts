@@ -144,13 +144,18 @@ describe('Test config defaults', () => {
   })
 
   it('initialTokenSelection', () => {
-    expect(CONFIG.initialTokenSelection).toEqual(
-      expect.objectContaining({
-        sellToken: expect.any(String),
-        receiveToken: expect.any(String),
-        network: expect.any(Object),
-      }),
-    )
+    const expectedTokenSelectionObject = {
+      sellToken: expect.any(String),
+      receiveToken: expect.any(String),
+    }
+    expect(CONFIG.initialTokenSelection).toEqual(expect.objectContaining(expectedTokenSelectionObject))
+
+    const configNetworks = CONFIG.initialTokenSelection.networks
+    Object.keys(configNetworks).forEach((networkKey) => {
+      const networkSpecificSelection = configNetworks[networkKey]
+      expect(networkKey).toEqual(expect.any(String))
+      expect(networkSpecificSelection).toEqual(expect.objectContaining(expectedTokenSelectionObject))
+    })
   })
 
   it('initialTokenList', () => {
