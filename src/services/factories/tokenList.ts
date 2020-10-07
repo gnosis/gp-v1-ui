@@ -167,15 +167,14 @@ export function getTokensFactory(factoryParams: {
     return new Map<string, number>(filteredAddressAndIds)
   }
 
-  async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
-    const tokensConfig = tokenListApi.getTokens(networkId)
-
-    // Get filtered ids and addresses
-    const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
-
+  async function _fetchTokenDetails(
+    networkId: number,
+    addressToIdMap: Map<string, number>,
+    tokensConfig: TokenDetails[],
+  ): Promise<TokenDetails[]> {
     const tokensConfigMap = new Map(tokensConfig.map((t) => [t.address, t]))
     const tokenDetailsPromises: (Promise<TokenDetails | undefined> | TokenDetails)[] = []
-    filteredAddressesAndIds.forEach((id, tokenAddress) => {
+    addressToIdMap.forEach((id, tokenAddress) => {
       const token = tokensConfigMap.get(tokenAddress)
       if (token) {
         tokenDetailsPromises.push(token)
@@ -199,9 +198,19 @@ export function getTokensFactory(factoryParams: {
       }
     })
 
-    const tokenDetails = (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
+    return (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
+  }
 
-    // Persist it \o/
+  async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
+    const tokensConfig = tokenListApi.getTokens(networkId)
+
+    // Get filtered ids and addresses
+    const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
+
+    // Get token details for each filtered token
+    const tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
+
+    // Persist it
     tokenListApi.persistTokens({ networkId, tokenList: tokenDetails })
   }
 
