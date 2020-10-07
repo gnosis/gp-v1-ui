@@ -5,8 +5,16 @@ import { useFormContext } from 'react-hook-form'
 
 // types, const and utils
 import { TokenDetails, TokenBalanceDetails } from 'types'
-import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
-import { formatSmart, formatAmountFull, parseAmount, validInputPattern, validatePositiveConstructor } from 'utils'
+import { ZERO, MEDIA } from 'const'
+import {
+  formatSmart,
+  formatAmountFull,
+  parseAmount,
+  validInputPattern,
+  validatePositiveConstructor,
+  getIsWrappable,
+  getNativeTokenName,
+} from 'utils'
 
 // components
 import TokenSelector from 'components/TokenSelector'
@@ -27,6 +35,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import useNoScroll from 'hooks/useNoScroll'
 import { useNumberInput } from 'components/TradeWidget/useNumberInput'
 import { useRowActions } from 'components/DepositWidget/useRowActions'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 const Wrapper = styled.div`
   display: flex;
@@ -172,6 +181,7 @@ const TokenRow: React.FC<Props> = ({
   userConnected = true,
   autoFocus,
 }) => {
+  const { networkIdOrDefault } = useWalletConnection()
   const { register, errors, setValue, watch } = useFormContext<TradeFormData>()
   const error = errors[inputId]
 
@@ -205,7 +215,8 @@ const TokenRow: React.FC<Props> = ({
   const editableAndConnected = !readOnly && userConnected
   const showEnableToken = editableAndConnected && tokenDisabled
 
-  const isWeth = balance.addressMainnet === WETH_ADDRESS_MAINNET
+  const { nativeToken } = getNativeTokenName(networkIdOrDefault)
+  const isWrappable = getIsWrappable(networkIdOrDefault, balance.address)
 
   const errorOrWarning = error?.message ? (
     <FormInputError errorMessage={error.message as string} />
@@ -292,7 +303,7 @@ const TokenRow: React.FC<Props> = ({
               )}
             </>
           )}
-          {editableAndConnected && isWeth && <WrapEtherBtn label="+ Wrap Ether" />}
+          {editableAndConnected && isWrappable && <WrapEtherBtn label={'+ Wrap ' + nativeToken} />}
           <span>
             Balance:
             <FormMessage className={balanceClassName}>

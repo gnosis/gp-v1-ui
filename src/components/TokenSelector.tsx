@@ -31,11 +31,11 @@ const Wrapper = styled.div`
 
   label {
     text-transform: uppercase;
-    padding-left: 0.5rem; // to align with Select input padding
+    padding-left: 0.5rem; /* to align with Select input padding */
   }
 
   input {
-    margin-left: 0; // to fix extra space on Select search box
+    margin-left: 0; /* to fix extra space on Select search box */
   }
 
   .tokenBalance {

@@ -60,6 +60,7 @@ export interface TokenOverride {
 export interface DisabledTokens {
   [Network.Mainnet]: TokenOverride[]
   [Network.Rinkeby]: TokenOverride[]
+  [Network.xDAI]: TokenOverride[]
 }
 
 export interface Config {

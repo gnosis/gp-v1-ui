@@ -130,8 +130,8 @@ const ModaliGlobalStyle = createGlobalStyle`
     }
   }
   
-  // Heavier specification of the selector to ensure override from global.ts
-  // Ideally take out the modali default injected styles and only load from our end.
+  /* Heavier specification of the selector to ensure override from global.ts
+  Ideally take out the modali default injected styles and only load from our end. */
   body.modali-open .modali.modali-size-large {
     width: 80vw;
     max-width: initial;
@@ -140,14 +140,13 @@ const ModaliGlobalStyle = createGlobalStyle`
       @media (min-width: 500px) {
           min-width: initial !important;
       }
-      @media ${MEDIA.mobile},
-      @media ${MEDIA.tablet} {
+      @media ${MEDIA.mobile}, ${MEDIA.tablet} {
         width: 100%;
       }
   }
   
   body.modali-open .modali-wrapper-centered {
-    top: 0!important;
+    top: 0 !important;
   }
   
   body.modali-open .modali-body-style {

@@ -9,6 +9,7 @@ function _getAddress(networkId: number): string {
 const addressesByNetwork = {
   [Network.Rinkeby]: _getAddress(Network.Rinkeby),
   [Network.Mainnet]: _getAddress(Network.Mainnet),
+  [Network.xDAI]: _getAddress(Network.xDAI),
 }
 
 export const getAddressForNetwork = (networkId: Network): string | null => {

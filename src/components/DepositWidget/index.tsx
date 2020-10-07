@@ -31,6 +31,7 @@ import useDataFilter from 'hooks/useDataFilter'
 
 // Reducer/Actions
 import { TokenLocalState } from 'reducers-actions'
+import { useWalletConnection } from 'hooks/useWalletConnection'
 
 interface WithdrawState {
   amount: BN
@@ -134,7 +135,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  // button
+  /* button */
   .balances-manageTokens {
     color: var(--color-text-active);
     text-align: right;
@@ -155,7 +156,7 @@ export const BalancesWidget = styled(CardWidgetWrapper)`
     }
   }
 
-  // label + radio input
+  /* label + radio input */
   .balances-hideZero {
     display: flex;
     flex-flow: row nowrap;
@@ -254,6 +255,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
   requestWithdrawConfirmation,
   hasTokensToShow = false,
 }) => {
+  const { networkIdOrDefault } = useWalletConnection()
   const windowSpecs = useWindowSizes()
 
   const [{ localTokens }] = useGlobalState()
@@ -332,6 +334,7 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               {displayedBalances && displayedBalances.length > 0 ? (
                 displayedBalances.map((tokenBalances) => (
                   <Row
+                    networkId={networkIdOrDefault}
                     key={tokenBalances.address}
                     ethBalance={ethBalance}
                     tokenBalances={tokenBalances}

@@ -1,7 +1,7 @@
 import Web3 from 'web3'
 
 import { Network, WithTxOptionalParams, Receipt } from 'types'
-import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY } from 'const'
+import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY, WXDAI_ADDRESS_XDAI } from 'const'
 import { wethAbi } from '@gnosis.pm/dex-js'
 import { logDebug } from 'utils'
 
@@ -31,6 +31,10 @@ function getWethAddressByNetwork(networkId: number): string {
       return WETH_ADDRESS_MAINNET
     case Network.Rinkeby:
       return WETH_ADDRESS_RINKEBY
+    case Network.xDAI:
+      // Is not wxDAI is not WETH, but it has the same approve/withdraw methods
+      // it's just convenient to not rename the API and keep calling it WethApi although it wraps also xDAI
+      return WXDAI_ADDRESS_XDAI
     default:
       throw new Error(`WethApi was not deployed to network ${networkId}`)
   }

@@ -11,7 +11,7 @@ import builtOnGP from 'assets/img/builtOnGP.svg'
 
 // Components
 import ThemeToggler, { ThemeTogglerWrapper } from 'components/ThemeToggler'
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 // Hooks
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -22,7 +22,6 @@ const Wrapper = styled.footer`
   flex-flow: row wrap;
   align-items: center;
   justify-content: center;
-  padding: 0;
   text-align: center;
   background: transparent;
   font-weight: var(--font-weight-normal);
@@ -135,7 +134,6 @@ const SideContentWrapper = styled.div`
 
     > a {
       margin: 0 0.4rem;
-      text-decoration: none;
       color: inherit;
       text-decoration: underline;
       transition: color 0.2s ease-in-out;
@@ -181,7 +179,7 @@ const SideContentWrapper = styled.div`
   }
 `
 
-const LinkWrapper = styled(EtherscanLink)`
+const LinkWrapper = styled(BlockExplorerLink)`
   margin: 0;
   text-align: center;
   border: 0.1rem solid #c5d3e0;
