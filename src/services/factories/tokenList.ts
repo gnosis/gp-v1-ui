@@ -164,6 +164,12 @@ export function getTokensFactory(factoryParams: {
     return new Map<string, number>(filteredAddressAndIds)
   }
 
+  /**
+   * updateTokenDetails Function purpose:
+   * 1. get intersection of tokens from tokenListApi.getTokens(networkId) and filteredAddressesAndIds
+     2. fetch tokens that are in filteredAddressesAndIds but not in tokenListApi.getTokens(networkId) as ERC20
+     3. fill in the blanks of tokens from 2 from chain as ERC20 (assign ids to fetched ERC20)
+   */
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
     // Get filtered ids and addresses
     const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens)
@@ -184,17 +190,17 @@ export function getTokensFactory(factoryParams: {
         // have only id and address
         // need to gather more data
         const fullTokenPromise = getErc20DetailsOrAddress(networkId, tokenAddress).then((partialToken) => {
-      if (typeof partialToken === 'string') {
-        // We replaced potential null responses with original tokenAddress string for logging purposes
-        logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
+          if (typeof partialToken === 'string') {
+            // We replaced potential null responses with original tokenAddress string for logging purposes
+            logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
             return
           }
-        // If we got a valid response
-        logDebug(
-          `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
-        )
-        // build token object
-        const token: TokenDetails = { ...partialToken, id }
+          // If we got a valid response
+          logDebug(
+            `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
+          )
+          // build token object
+          const token: TokenDetails = { ...partialToken, id }
 
           return token
         })
