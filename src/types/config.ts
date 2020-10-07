@@ -11,7 +11,7 @@ interface BaseTokenSelection {
 }
 
 export interface TokenSelection extends BaseTokenSelection {
-  network: {
+  networks: {
     [n: string]: BaseTokenSelection | undefined
   }
 }
