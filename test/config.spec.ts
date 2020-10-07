@@ -148,6 +148,7 @@ describe('Test config defaults', () => {
       expect.objectContaining({
         sellToken: expect.any(String),
         receiveToken: expect.any(String),
+        network: expect.any(Object),
       }),
     )
   })

@@ -5,9 +5,15 @@ import { ContractDeploymentBlock } from 'api/exchange/ExchangeApi'
 import { Network } from 'types'
 import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
 
-export interface TokenSelection {
+interface BaseTokenSelection {
   sellToken: string
   receiveToken: string
+}
+
+export interface TokenSelection extends BaseTokenSelection {
+  network: {
+    [n: string]: BaseTokenSelection | undefined
+  }
 }
 
 export interface MultiTcrConfig {
