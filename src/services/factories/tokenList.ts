@@ -130,7 +130,11 @@ export function getTokensFactory(factoryParams: {
     return new Set(tcrApi && (await tcrApi.getTokens(networkId)))
   }
 
-  async function _getFilteredIdsMap(networkId: number, numTokens: number): Promise<Map<string, number>> {
+  async function _getFilteredIdsMap(
+    networkId: number,
+    numTokens: number,
+    tokensConfig: TokenDetails[],
+  ): Promise<Map<string, number>> {
     const [tcrAddressesSet, listedAddressesAndIds] = await Promise.all([
       // Fetch addresses from TCR
       retry(() => fetchTcrAddresses(networkId)),
@@ -152,7 +156,6 @@ export function getTokensFactory(factoryParams: {
     } else {
       // If not using a TCR, filter by default list
       logDebug(`[tokenListFactory][${networkId}] Not using a TCR. Filtering by tokens in the config file`)
-      const tokensConfig = tokenListApi.getTokens(networkId)
       filteredAddressAndIds = tokensConfig
         .map((token): [string, number] | null => {
           const tokenId = listedAddressesAndIds.get(token.address)
@@ -165,61 +168,41 @@ export function getTokensFactory(factoryParams: {
   }
 
   async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
+    const tokensConfig = tokenListApi.getTokens(networkId)
+
     // Get filtered ids and addresses
-    const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens)
+    const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
 
-    // Create a map of current token list addresses and tokens
-    const localAddressesMap = new Map<string, TokenDetails>(
-      tokenListApi
-        .getTokens(networkId)
-        // Remove tokens that are on the list but not registered on the contract neither on TCR
-        .filter(({ address }) => filteredAddressesAndIds.has(address))
-        // Map it with token address as key for easy access
-        .map((token) => [token.address, token]),
-    )
-
-    const promises: Promise<TokenErc20 | string>[] = []
-
-    // Go over all value (id) and key (tokenAddress) pairs registered on the contract
+    const tokensConfigMap = new Map(tokensConfig.map((t) => [t.address, t]))
+    const tokenDetailsPromises: (Promise<TokenDetails | undefined> | TokenDetails)[] = []
     filteredAddressesAndIds.forEach((id, tokenAddress) => {
-      if (!localAddressesMap.has(tokenAddress)) {
-        // New token not in our local list, fetch erc20 details for it
-        logDebug(`[tokenListFactory][${networkId}] Address ${tokenAddress} with id ${id} not in local list, fetching`)
-        promises.push(getErc20DetailsOrAddress(networkId, tokenAddress))
+      const token = tokensConfigMap.get(tokenAddress)
+      if (token) {
+        tokenDetailsPromises.push(token)
       } else {
-        // Token already exists, update id
-        logDebug(`[tokenListFactory][${networkId}] Address ${tokenAddress} already in the list, updating id to ${id}`)
-        const token = localAddressesMap.get(tokenAddress) as TokenDetails
-        token.id = id
+        const fullTokenPromise = getErc20DetailsOrAddress(networkId, tokenAddress).then((partialToken) => {
+          if (typeof partialToken === 'string') {
+            // We replaced potential null responses with original tokenAddress string for logging purposes
+            logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
+            return
+          }
+          // If we got a valid response
+          logDebug(
+            `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
+          )
+          // build token object
+          const token: TokenDetails = { ...partialToken, id }
+
+          return token
+        })
+        tokenDetailsPromises.push(fullTokenPromise)
       }
     })
 
-    const partialTokens = await Promise.all(promises)
-
-    // For all newly fetched tokens
-    partialTokens.forEach((partialToken) => {
-      if (typeof partialToken === 'string') {
-        // We replaced potential null responses with original tokenAddress string for logging purposes
-        logDebug(`[tokenListFactory][${networkId}] Address ${partialToken} is not a valid ERC20 token`)
-      } else if (partialToken) {
-        // If we got a valid response
-        logDebug(
-          `[tokenListFactory][${networkId}] Got details for address ${partialToken.address}: symbol '${partialToken.symbol}' name '${partialToken.name}'`,
-        )
-        // Get id from address/id mapping
-        const id = filteredAddressesAndIds.get(partialToken.address) as number
-        // build token object
-        const token: TokenDetails = { ...partialToken, id }
-        // add to local address map
-        localAddressesMap.set(partialToken.address, token)
-      }
-    })
-
-    // Convert map values to a list. Map keeps insertion order, so new tokens are added at the end
-    const tokenList = Array.from(localAddressesMap.values())
+    const tokenDetails = (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
 
     // Persist it \o/
-    tokenListApi.persistTokens({ networkId, tokenList })
+    tokenListApi.persistTokens({ networkId, tokenList: tokenDetails })
   }
 
   async function updateTokens(networkId: number): Promise<void> {
