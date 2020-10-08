@@ -211,3 +211,7 @@ export const DISABLED_TOKEN_MAPS = Object.keys(disabledTokens).reduce<DisabledTo
     [Network.xDAI]: {},
   },
 )
+
+// Limit as to where price colour changes
+export const HIGH_PRICE_IMPACT_THRESHOLD = 3
+export const LOW_PRICE_IMPACT_THRESHOLD = 1
