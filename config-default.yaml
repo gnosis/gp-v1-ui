@@ -148,8 +148,14 @@ disabledTokens:
 
 # Initial token selection for the sell token and buy token
 initialTokenSelection:
+  # defaults
   sellToken: DAI
   receiveToken: USDC
+  # network override - selected within component as reliant on network
+  networks:
+    '100':
+      sellToken: wxDAI
+      receiveToken: USDC
 
 # Initial Token List
 #   List of token loaded by default
