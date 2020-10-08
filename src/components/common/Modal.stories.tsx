@@ -1,4 +1,5 @@
 import React from 'react'
+import { action } from '@storybook/addon-actions'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
 import Modal, { ModalOptions, ModalProps, useModal } from 'components/common/Modal'
@@ -24,7 +25,7 @@ const Template: Story<{ props: ModalProps; options?: ModalOptions }> = (args) =>
 const LoremDefaultModalOptions = {
   title: 'Lorem Ipsum',
   message: (
-    <div style={{ height: '80vh', overflowY: 'auto' }}>
+    <div style={{ height: '20rem', overflowY: 'auto' }}>
       <LoremIpsum />
     </div>
   ),
@@ -36,7 +37,7 @@ LoremOneButton.args = {
     ...LoremDefaultModalOptions,
     buttons: [
       <>&nbsp;</>,
-      <Modal.Button label="Close" key="yes" isStyleDefault onClick={(): void => console.log('Closing modal')} />,
+      <Modal.Button label="Close" key="yes" isStyleDefault onClick={action('Close button clicked')} />,
     ],
   },
 }
@@ -46,13 +47,8 @@ LoremTwoButtons.args = {
   options: {
     ...LoremDefaultModalOptions,
     buttons: [
-      <Modal.Button label="Cancel" key="cancel" isStyleCancel onClick={(): void => console.log('Closing modal')} />,
-      <Modal.Button
-        label="Confirm"
-        key="confirm"
-        isStyleDefault
-        onClick={(): void => console.log('Confirming modal')}
-      />,
+      <Modal.Button label="Cancel" key="cancel" isStyleCancel onClick={action('Close button clicked')} />,
+      <Modal.Button label="Confirm" key="confirm" isStyleDefault onClick={action('Confirm button clicked')} />,
     ],
   },
 }
