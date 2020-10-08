@@ -52,16 +52,6 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     quoteTokenDecimals,
   })
 
-  // TODO: Use best ask price instead
-  const { priceEstimation: bestAskPrice, isPriceLoading: bestAskPriceLoading } = usePriceEstimationWithSlippage({
-    networkId,
-    amount: '0',
-    baseTokenId,
-    baseTokenDecimals,
-    quoteTokenId,
-    quoteTokenDecimals,
-  })
-
   return (
     <PriceSuggestions
       // Market
@@ -73,8 +63,6 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
       // Prices
       fillPrice={limitPrice}
       fillPriceLoading={fillPriceLoading}
-      bestAskPrice={bestAskPrice}
-      bestAskPriceLoading={bestAskPriceLoading}
       // Events
       onClickPrice={updatePrices}
       onSwapPrices={onSwapPrices}
