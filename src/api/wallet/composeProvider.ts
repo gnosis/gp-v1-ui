@@ -9,7 +9,7 @@ import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
 import { numberToHex, hexToNumber } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
-import { logDebug } from 'utils'
+import { delay, logDebug } from 'utils'
 import { web3 } from 'api'
 
 // custom providerAsMiddleware
@@ -100,6 +100,27 @@ export const composeProvider = <T extends Provider>(
 ): T => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
+
+  let lastTransaction = ''
+
+  engine.push(
+    createConditionalMiddleware<string[]>(
+      (req) => req.method === 'eth_getTransactionReceipt',
+      async (req) => {
+        const tx = req.params?.[0]
+
+        console.log('eth_getTransactionReceipt for tx:', tx, req)
+        if (tx && tx !== lastTransaction) {
+          // initial check for tx receipt on a fresh tx
+          console.log('First eth_getTransactionReceipt for tx:', tx, req)
+          lastTransaction = tx
+          await delay(10000)
+        }
+
+        return false
+      },
+    ),
+  )
 
   engine.push(
     createConditionalMiddleware<[]>(
