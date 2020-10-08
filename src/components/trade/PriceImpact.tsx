@@ -3,12 +3,13 @@ import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 
 import { PriceSuggestionsWrapper } from './PriceSuggestions/PriceSuggestions'
+import { HelpTooltip } from 'components/Tooltip'
+
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
-import { ONE_HUNDRED_BIG_NUMBER, ONE_BIG_NUMBER, HIGH_PRICE_IMPACT_THRESHOLD, LOW_PRICE_IMPACT_THRESHOLD } from 'const'
+import { ONE_HUNDRED_BIG_NUMBER, ONE_BIG_NUMBER } from 'const'
 import { TokenDetails } from 'types'
 import { parseBigNumber } from 'utils'
-import { HelpTooltip } from 'components/Tooltip'
 
 const BoldColourTag = styled.strong`
   &.highImpact {
@@ -34,13 +35,17 @@ interface PriceImpactProps {
   networkId: number
 }
 
+// Limit as to where price colour changes
+const HIGH_PRICE_IMPACT_THRESHOLD = new BigNumber(3)
+const LOW_PRICE_IMPACT_THRESHOLD = ONE_BIG_NUMBER
+
 // sets colour of strong tag presenting price impact
-const getImpactColourClass = (impact: string): string => {
+const getImpactColourClass = (impact: BigNumber | null): string => {
   let className = ''
   if (impact) {
-    if (+impact > HIGH_PRICE_IMPACT_THRESHOLD) {
+    if (impact.gt(HIGH_PRICE_IMPACT_THRESHOLD)) {
       className = 'highImpact'
-    } else if (+impact < LOW_PRICE_IMPACT_THRESHOLD) {
+    } else if (impact.lt(LOW_PRICE_IMPACT_THRESHOLD)) {
       className = 'lowImpact'
     }
   }
@@ -58,7 +63,7 @@ function calculatePriceImpact({
   const limitPriceBigNumber = limitPrice && parseBigNumber(limitPrice)
   if (!bestAskPrice || !limitPriceBigNumber) return null
 
-  // PRICE_IMPACT = 100 - 100 * BEST_ASK / LIMIT_PRICE
+  // PRICE_IMPACT = 100 - (BEST_ASK / LIMIT_PRICE * 100)
   return ONE_BIG_NUMBER.minus(bestAskPrice.div(limitPriceBigNumber)).times(ONE_HUNDRED_BIG_NUMBER)
 }
 
@@ -76,10 +81,15 @@ function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpa
     quoteTokenDecimals,
   })
 
-  const priceImpact = React.useMemo(() => calculatePriceImpact({ bestAskPrice, limitPrice }), [
-    bestAskPrice,
-    limitPrice,
-  ])
+  const { priceImpact, className } = React.useMemo(() => {
+    const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
+    const className = getImpactColourClass(priceImpact)
+
+    return {
+      priceImpact,
+      className,
+    }
+  }, [bestAskPrice, limitPrice])
 
   if (!priceImpact) return null
 
@@ -88,7 +98,7 @@ function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpa
       <div className="container">
         <span>
           <span>Price impact </span>
-          <BoldColourTag className={getImpactColourClass(priceImpact.toFixed(0))}>
+          <BoldColourTag className={className}>
             <HelpTooltip tooltip={PriceImpactTooltip} /> {priceImpact.toFixed(2)}%
           </BoldColourTag>
         </span>
