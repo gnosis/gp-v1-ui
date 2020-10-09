@@ -193,34 +193,42 @@ export function getTokensFactory(factoryParams: {
     return (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
   }
 
-  function _moveTokenToHeadOfArray(tokenAddress: string, tokenList: TokenDetails[]): TokenDetails[] {
-    const tokenIndex = tokenList.findIndex((t) => t.address === tokenAddress)
-    if (tokenIndex !== -1) {
-      const token = tokenList[tokenIndex]
-      tokenList.splice(tokenIndex, 1)
+  type TokenComparator = (a: TokenDetails, b: TokenDetails) => number
 
-      return [token, ...tokenList]
-    }
+  function _createTokenComparator(networkId: number): TokenComparator {
+    let comparator: TokenComparator
+    // allows correct unicode comparison
+    const compareByLabel: TokenComparator = (a, b) => a.label.localeCompare(b.label)
 
-    return tokenList
-  }
-
-  function _sortTokens(networkId: number, tokens: TokenDetails[]): TokenDetails[] {
-    // Sort tokens
-    let tokensSorted = tokens.sort(_tokenComparer)
-
-    // Make sure wxDAI and WETH are the first tokens
     switch (networkId) {
       case Network.Mainnet:
-        return _moveTokenToHeadOfArray(WETH_ADDRESS_MAINNET, tokensSorted)
+        comparator = (a, b): number => {
+          // WETH first
+          if (a.address === WETH_ADDRESS_MAINNET) return -1
+          return compareByLabel(a, b)
+        }
       case Network.Rinkeby:
-        return _moveTokenToHeadOfArray(WETH_ADDRESS_RINKEBY, tokensSorted)
+        comparator = (a, b): number => {
+          // WETH first
+          if (a.address === WETH_ADDRESS_RINKEBY) return -1
+          return compareByLabel(a, b)
+        }
       case Network.xDAI:
-        tokensSorted = _moveTokenToHeadOfArray(WETH_ADDRESS_XDAI, tokensSorted)
-        return _moveTokenToHeadOfArray(WXDAI_ADDRESS_XDAI, tokensSorted)
+        comparator = (a, b): number => {
+          // WXDAI before WETH
+          if (a.address === WXDAI_ADDRESS_XDAI && b.address === WETH_ADDRESS_XDAI) return -1
+          // WETH after WXDAI
+          if (a.address === WETH_ADDRESS_XDAI && b.address === WXDAI_ADDRESS_XDAI) return 1
+          // WXDAI and WETH first
+          if (a.address === WXDAI_ADDRESS_XDAI) return -1
+          if (a.address === WETH_ADDRESS_XDAI) return -1
+          return compareByLabel(a, b)
+        }
       default:
-        return tokensSorted
+        comparator = compareByLabel
     }
+
+    return comparator
   }
 
   async function _fetchToken(
