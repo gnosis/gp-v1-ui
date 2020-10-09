@@ -173,24 +173,21 @@ export function getTokensFactory(factoryParams: {
     tokensConfig: TokenDetails[],
   ): Promise<TokenDetails[]> {
     const tokensConfigMap = new Map(tokensConfig.map((t) => [t.address, t]))
-    const tokenDetailsPromises: (Promise<TokenDetails | undefined> | TokenDetails)[] = []
-    addressToIdMap.forEach((id, tokenAddress) => {
-      // Resolve the details using the config, otherwise fetch the token
-      const token: undefined | Promise<TokenDetails | undefined> = tokensConfigMap.has(tokenAddress)
-        ? Promise.resolve(tokensConfigMap.get(tokenAddress))
-        : _fetchToken(networkId, id, tokenAddress)
+    const tokenDetailsPromises: Promise<TokenDetails | undefined>[] = []
 
-      if (token) {
-        // Add a label for convenience
-        token.then((token) => {
+    async function _fillToken(id: number, tokenAddress: string): Promise<TokenDetails | undefined> {
+      // Resolve the details using the config, otherwise fetch the token
+      const token = tokensConfigMap.get(tokenAddress) || (await _fetchToken(networkId, id, tokenAddress))
+
           if (token) {
             token.label = safeTokenName(token)
           }
-          return token
-        })
 
-        tokenDetailsPromises.push(token)
+      return token
       }
+
+    addressToIdMap.forEach((id, tokenAddress) => {
+      tokenDetailsPromises.push(_fillToken(id, tokenAddress))
     })
 
     return (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
