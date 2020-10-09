@@ -2,11 +2,12 @@ import { TokenList } from 'api/tokenList/TokenListApi'
 import { SubscriptionCallback } from 'api/tokenList/Subscriptions'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TcrApi } from 'api/tcr/TcrApi'
-import { TokenDetails, Command } from 'types'
+import { TokenDetails, Command, Network } from 'types'
 import { logDebug, notEmpty, retry } from 'utils'
 
 import { TokenFromErc20Params } from './'
-import { TokenErc20 } from '@gnosis.pm/dex-js'
+import { safeTokenName, TokenErc20 } from '@gnosis.pm/dex-js'
+import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY, WETH_ADDRESS_XDAI, WXDAI_ADDRESS_XDAI } from 'const'
 
 export function getTokensFactory(factoryParams: {
   tokenListApi: TokenList
@@ -175,16 +176,54 @@ export function getTokensFactory(factoryParams: {
     const tokenDetailsPromises: (Promise<TokenDetails | undefined> | TokenDetails)[] = []
     addressToIdMap.forEach((id, tokenAddress) => {
       // Resolve the details using the config, otherwise fetch the token
-      const token: TokenDetails | undefined | Promise<TokenDetails | undefined> = tokensConfigMap.has(tokenAddress)
-        ? tokensConfigMap.get(tokenAddress)
+      const token: undefined | Promise<TokenDetails | undefined> = tokensConfigMap.has(tokenAddress)
+        ? Promise.resolve(tokensConfigMap.get(tokenAddress))
         : _fetchToken(networkId, id, tokenAddress)
 
       if (token) {
+        // Add a label for convenience
+        token.then((token) => {
+          if (token) {
+            token.label = safeTokenName(token)
+          }
+          return token
+        })
+
         tokenDetailsPromises.push(token)
       }
     })
 
     return (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
+  }
+
+  function _moveTokenToHeadOfArray(tokenAddress: string, tokenList: TokenDetails[]): TokenDetails[] {
+    const tokenIndex = tokenList.findIndex((t) => t.address === tokenAddress)
+    if (tokenIndex !== -1) {
+      const token = tokenList[tokenIndex]
+      tokenList.splice(tokenIndex, 1)
+
+      return [token, ...tokenList]
+    }
+
+    return tokenList
+  }
+
+  function _sortTokens(networkId: number, tokens: TokenDetails[]): TokenDetails[] {
+    // Sort tokens
+    let tokensSorted = tokens.sort(_tokenComparer)
+
+    // Make sure wxDAI and WETH are the first tokens
+    switch (networkId) {
+      case Network.Mainnet:
+        return _moveTokenToHeadOfArray(WETH_ADDRESS_MAINNET, tokensSorted)
+      case Network.Rinkeby:
+        return _moveTokenToHeadOfArray(WETH_ADDRESS_RINKEBY, tokensSorted)
+      case Network.xDAI:
+        tokensSorted = _moveTokenToHeadOfArray(WETH_ADDRESS_XDAI, tokensSorted)
+        return _moveTokenToHeadOfArray(WXDAI_ADDRESS_XDAI, tokensSorted)
+      default:
+        return tokensSorted
+    }
   }
 
   async function _fetchToken(
@@ -206,6 +245,7 @@ export function getTokensFactory(factoryParams: {
     return {
       ...partialToken,
       id: tokenId,
+      label: '', // Label is not nullable for convenience, but it's added later. This adds a default for making TS happy
     }
   }
 
@@ -218,8 +258,20 @@ export function getTokensFactory(factoryParams: {
     // Get token details for each filtered token
     const tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
 
+    // Sort tokens
+    const tokenList = _sortTokens(networkId, tokenDetails)
+
     // Persist it
-    tokenListApi.persistTokens({ networkId, tokenList: tokenDetails })
+    tokenListApi.persistTokens({ networkId, tokenList })
+  }
+
+  function _tokenComparer(a: TokenDetails, b: TokenDetails): number {
+    if (a.label < b.label) {
+      return -1
+    } else if (a.label > b.label) {
+      return 1
+    }
+    return 0
   }
 
   async function updateTokens(networkId: number): Promise<void> {

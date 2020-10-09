@@ -50,10 +50,12 @@ export const removePendingOrdersAction = (payload: {
   payload,
 })
 
+export interface PendingOrdersUser {
+  [userAddress: string]: PendingTxObj[] | undefined
+}
+
 export interface PendingOrdersState {
-  [networkId: number]: {
-    [userAddress: string]: PendingTxObj[]
-  }
+  [networkId: number]: PendingOrdersUser | undefined
 }
 
 /* 
@@ -81,12 +83,16 @@ export const reducer = (state: PendingOrdersState, action: ReducerType): Pending
   switch (action.type) {
     case 'SAVE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
-
-      const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
-      const newPendingTxArray = userPendingOrdersArr.concat(orders)
-      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
-
-      return newState
+      const pendingOrders = state[networkId] || {}
+      const userPendingOrders = pendingOrders[userAddress] || []
+      const newPendingOrders = userPendingOrders.concat(orders)
+      return {
+        ...state,
+        [networkId]: {
+          ...pendingOrders,
+          [userAddress]: newPendingOrders,
+        },
+      }
     }
     case 'REPLACE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
