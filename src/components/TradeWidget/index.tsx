@@ -587,7 +587,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
 
   const tokenAddressesToAdd: string[] = useMemo(
-    () => preprocessTokenAddressesToAdd([sellToken?.symbol, receiveToken.symbol], networkIdOrDefault),
+    () => preprocessTokenAddressesToAdd([sellToken.symbol, receiveToken.symbol], networkIdOrDefault),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   ) // no deps, so that we only calc once on mount
