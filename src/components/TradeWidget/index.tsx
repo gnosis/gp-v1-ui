@@ -213,8 +213,6 @@ interface TradeWidgetProps {
   balances: TokenBalanceDetails[]
   setSellToken: (token: TokenDetails) => void
   setReceiveToken: (token: TokenDetails) => void
-  // sellTokenSymbol: string
-  // receiveTokenSymbol: string
 }
 
 const TradeWidget: React.FC<TradeWidgetProps> = ({
@@ -226,8 +224,6 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   balances,
   setSellToken,
   setReceiveToken,
-  // sellTokenSymbol,
-  // receiveTokenSymbol,
 }) => {
   const {
     sellAmount: sellParam,
