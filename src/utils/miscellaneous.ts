@@ -49,7 +49,11 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
   value: string | number | undefined = '',
   tokens: T[] | undefined | null,
 ): T | undefined {
-  return (tokens || []).find((token: T): boolean => {
+  if (!tokens) {
+    return undefined
+  }
+
+  const token = tokens.find((token: T): boolean => {
     const tokenKeyValue = token[key]
     if (tokenKeyValue) {
       switch (typeof tokenKeyValue) {
@@ -64,6 +68,8 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
       return false
     }
   })
+
+  return token
 }
 
 export const delay = <T>(ms = 100, result?: T): Promise<T> => new Promise((resolve) => setTimeout(resolve, ms, result))
