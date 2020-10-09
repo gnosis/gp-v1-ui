@@ -179,12 +179,12 @@ export function getTokensFactory(factoryParams: {
       // Resolve the details using the config, otherwise fetch the token
       const token = tokensConfigMap.get(tokenAddress) || (await _fetchToken(networkId, id, tokenAddress))
 
-          if (token) {
-            token.label = safeTokenName(token)
-          }
+      if (token) {
+        token.label = safeTokenName(token)
+      }
 
       return token
-      }
+    }
 
     addressToIdMap.forEach((id, tokenAddress) => {
       tokenDetailsPromises.push(_fillToken(id, tokenAddress))
@@ -264,19 +264,12 @@ export function getTokensFactory(factoryParams: {
     const tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
 
     // Sort tokens
-    const tokenList = _sortTokens(networkId, tokenDetails)
+    // note that sort mutates tokenDetails
+    // but it's ok as tokenDetails is a newly created array
+    tokenDetails.sort(_createTokenComparator(networkId))
 
     // Persist it
-    tokenListApi.persistTokens({ networkId, tokenList })
-  }
-
-  function _tokenComparer(a: TokenDetails, b: TokenDetails): number {
-    if (a.label < b.label) {
-      return -1
-    } else if (a.label > b.label) {
-      return 1
-    }
-    return 0
+    tokenListApi.persistTokens({ networkId, tokenList: tokenDetails })
   }
 
   async function updateTokens(networkId: number): Promise<void> {
