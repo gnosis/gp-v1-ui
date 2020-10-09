@@ -144,7 +144,17 @@ disabledTokens:
     - address: '0x6Fb0855c404E09c47C3fBCA25f08d4E41f9F062f'
     - address: '0xFC4B8ED459e00e5400be803A9BB3954234FD50e3'
   4: [] # Rinkeby
-  100: [] # xDAI
+  100: # xDAI
+    - address: '0x44fA8E6f47987339850636F88629646662444217'
+      name: DAI (use xwDAI)
+      symbol: DAI
+      description: |
+        This token is disabled for trading, instead use wxDAI. 
+        
+        wxDAI is the wrapper of the native token xDAI, and it's convertible 1:1 to/from DAI.
+      reason: UNUSED
+      url: https://www.xdaichain.com/for-developers/developer-resources/wrapped-xdai
+   
 
 # Initial token selection for the sell token and buy token
 initialTokenSelection:
