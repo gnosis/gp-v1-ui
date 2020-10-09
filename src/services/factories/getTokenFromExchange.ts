@@ -7,7 +7,7 @@ import { Erc20Api } from 'api/erc20/Erc20Api'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TokenList } from 'api/tokenList/TokenListApi'
 import { TokenFromErc20Params } from './'
-import { TokenErc20 } from '@gnosis.pm/dex-js'
+import { safeTokenName, TokenErc20 } from '@gnosis.pm/dex-js'
 
 interface FactoryParams {
   tokenListApi: TokenList
@@ -86,6 +86,7 @@ function getTokenFromExchangeByAddressFactory(
       token = {
         ...erc20token,
         id: tokenId,
+        label: safeTokenName(erc20token),
       }
     }
 
@@ -149,6 +150,7 @@ function getTokenFromExchangeByIdFactory(
       return {
         ...erc20token,
         id: tokenId,
+        label: safeTokenName(erc20token),
       }
     }
 
