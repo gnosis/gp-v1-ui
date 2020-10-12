@@ -97,7 +97,6 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
         )
       })
     })
-    console.log('[getTokenFromExchangeByIdFactory] tokens in API', this._tokensByNetwork)
   }
 
   public setListReady(state: boolean): void {
