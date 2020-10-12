@@ -22,6 +22,7 @@ const fakeRowState: Record<keyof TokenLocalState, boolean> = {
 const initialEthBalance = TEN
 const initialTokenBalanceDetails = {
   id: 1,
+  label: 'TTT',
   name: 'Test token',
   symbol: 'TTT',
   decimals: 18,
