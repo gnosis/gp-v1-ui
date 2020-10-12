@@ -45,4 +45,9 @@ module.exports = {
   globals: {
     VERSION: true,
   },
+  env: {
+    browser: true,
+    node: true,
+    jest: true,
+  },
 }
