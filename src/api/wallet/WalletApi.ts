@@ -338,6 +338,7 @@ export class WalletApiImpl implements WalletApi {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       provider.handleReadRequests = async function (payload: unknown): Promise<unknown> {
+        if (payload && typeof payload === 'object' && 'skipCache' in payload) delete payload['skipCache']
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if (!this.http) {
