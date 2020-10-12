@@ -20,6 +20,8 @@ const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails)
 }
 
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
+  setListReady: (state: boolean) => void
+  isListReady: boolean
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   addTokens: (params: AddTokensParams) => void
@@ -64,6 +66,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
+  // token list flag - prevents stale/incorrect data
+  // from being presented during token list calculation
+  public isListReady = true
+
   public constructor({ networkIds, initialTokenList }: TokenListApiParams) {
     super()
 
@@ -91,6 +97,11 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
         )
       })
     })
+    console.log('[getTokenFromExchangeByIdFactory] tokens in API', this._tokensByNetwork)
+  }
+
+  public setListReady(state: boolean): void {
+    this.isListReady = state
   }
 
   public hasToken(params: HasTokenParams): boolean {
