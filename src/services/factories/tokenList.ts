@@ -301,13 +301,12 @@ export function getTokensFactory(factoryParams: {
         // Otherwise, only update the ids
         await updateTokenIds(networkId, tokens)
       }
-
-      tokenListApi.setListReady(true)
     } catch (e) {
       // Failed to update after retries.
       logDebug(`[tokenListFactory][${networkId}] Failed to update tokens: ${e.message}`)
       // Clear flag so on next query we try again.
       areTokensUpdated.delete(networkId)
+    } finally {
       tokenListApi.setListReady(true)
     }
   }
