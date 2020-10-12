@@ -205,14 +205,18 @@ export function getTokensFactory(factoryParams: {
         comparator = (a, b): number => {
           // WETH first
           if (a.address === WETH_ADDRESS_MAINNET) return -1
+          if (b.address === WETH_ADDRESS_MAINNET) return 1
           return compareByLabel(a, b)
         }
+        break
       case Network.Rinkeby:
         comparator = (a, b): number => {
           // WETH first
           if (a.address === WETH_ADDRESS_RINKEBY) return -1
+          if (b.address === WETH_ADDRESS_RINKEBY) return 1
           return compareByLabel(a, b)
         }
+        break
       case Network.xDAI:
         comparator = (a, b): number => {
           // WXDAI before WETH
@@ -221,9 +225,12 @@ export function getTokensFactory(factoryParams: {
           if (a.address === WETH_ADDRESS_XDAI && b.address === WXDAI_ADDRESS_XDAI) return 1
           // WXDAI and WETH first
           if (a.address === WXDAI_ADDRESS_XDAI) return -1
+          if (b.address === WXDAI_ADDRESS_XDAI) return 1
           if (a.address === WETH_ADDRESS_XDAI) return -1
+          if (b.address === WETH_ADDRESS_XDAI) return 1
           return compareByLabel(a, b)
         }
+        break
       default:
         comparator = compareByLabel
     }
