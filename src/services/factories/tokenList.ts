@@ -181,6 +181,11 @@ export function getTokensFactory(factoryParams: {
 
       if (token) {
         token.label = safeTokenName(token)
+        // TODO: review this
+        // needs to be here to set correct IDs when using default initialTokenList
+        // from config as the IDs there are not correct
+        token.id =
+          addressToIdMap.get(token.address) !== token.id ? (addressToIdMap.get(token.address) as number) : token.id
       }
 
       return token
@@ -287,6 +292,10 @@ export function getTokensFactory(factoryParams: {
       const tokens = tokenListApi.getTokens(networkId)
 
       logDebug(`[tokenListFactory][${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
+
+      // TODO: review this logic
+      // why update tokenDetails when token list lengths don't match?
+      // why would token IDs not also need to be updated?
       if (numTokens > tokens.length) {
         // When there are more tokens in the contract than locally, fetch the new tokens
         await updateTokenDetails(networkId, numTokens)
