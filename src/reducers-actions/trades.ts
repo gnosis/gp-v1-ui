@@ -134,7 +134,7 @@ function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, 
 
   // Filter out trades in that range (curr ... curr -2).
   // The `revertKey` is composed by batchId|orderId, so this regex looks for the batchIds in the keys
-  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\\\|`)
+  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\\|`)
 
   const pending = new Map<string, Trade[]>()
 

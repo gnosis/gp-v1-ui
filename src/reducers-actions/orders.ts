@@ -114,12 +114,13 @@ export async function sideEffect(state: OrdersState, action: ReducerActionType):
   switch (action.type) {
     case 'OVERWRITE_ORDERS':
     case 'UPDATE_ORDERS':
-    case 'APPEND_ORDERS':
+    case 'APPEND_ORDERS': {
       const newTokenIdsFromOrders = new Set<number>()
 
       // orders can contain many duplicated tokenIds
       state.orders.forEach(({ sellTokenId, buyTokenId }) => newTokenIdsFromOrders.add(sellTokenId).add(buyTokenId))
 
       addUnlistedTokensToUserTokenListById(Array.from(newTokenIdsFromOrders))
+    }
   }
 }
