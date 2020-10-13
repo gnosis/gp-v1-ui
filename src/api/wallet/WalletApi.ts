@@ -67,7 +67,7 @@ export interface WalletApi {
 export interface WalletInfo {
   isConnected: boolean
   userAddress?: string
-  networkId?: number
+  networkId?: Network
   blockNumber?: number
 }
 
