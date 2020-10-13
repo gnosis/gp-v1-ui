@@ -288,6 +288,10 @@ export function getTokensFactory(factoryParams: {
     areTokensUpdated.add(networkId)
 
     try {
+      // Set token list readiness to false
+      // and prevent stale data being presented in app
+      tokenListApi.setListReady(false)
+
       const numTokens = await retry(() => exchangeApi.getNumTokens(networkId))
       const tokens = tokenListApi.getTokens(networkId)
 
@@ -308,6 +312,8 @@ export function getTokensFactory(factoryParams: {
       logDebug(`[tokenListFactory][${networkId}] Failed to update tokens: ${e.message}`)
       // Clear flag so on next query we try again.
       areTokensUpdated.delete(networkId)
+    } finally {
+      tokenListApi.setListReady(true)
     }
   }
 
