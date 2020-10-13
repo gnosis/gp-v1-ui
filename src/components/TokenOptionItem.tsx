@@ -176,7 +176,7 @@ const generateMessage = ({
     case TokenFromExchange.NOT_ERC20:
       return <>Not a valid ERC20 token</>
     // registered but not in list --> option to add
-    case TokenFromExchange.NOT_IN_TOKEN_LIST:
+    case TokenFromExchange.NOT_IN_TOKEN_LIST: {
       if (!token || !('id' in token)) return <>{defaultText}</>
 
       const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
@@ -201,6 +201,7 @@ const generateMessage = ({
           <button onClick={handleAddToken}>Add Token</button>
         </OptionItem>
       )
+    }
     default:
       return <>{defaultText}</>
   }

@@ -114,6 +114,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           return `${fillPercentage} matched out of ${orderAmount} ${displayTokenSymbolOrLink(sellToken)}`
         }
       }
+      // falls through
       case 'liquidity':
       case 'unknown':
       default:

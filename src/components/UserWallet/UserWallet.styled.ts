@@ -254,7 +254,7 @@ export const NetworkTitle = styled.div`
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.3rem;
-  top: -0.6rem;
+  top: -0.8rem;
   white-space: nowrap;
 `
 

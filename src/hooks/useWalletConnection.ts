@@ -6,7 +6,7 @@ import { BlockchainUpdatePrompt, WalletInfo } from 'api/wallet/WalletApi'
 
 interface PendingStateObject extends WalletInfo {
   pending: true
-  networkIdOrDefault: number
+  networkIdOrDefault: Network
 }
 
 const PendingState: PendingStateObject = {
@@ -33,7 +33,7 @@ const constructPendingState = ({ chainId, account, blockHeader }: BlockchainUpda
 }
 
 export const useWalletConnection = ():
-  | (WalletInfo & { pending: false; networkIdOrDefault: number })
+  | (WalletInfo & { pending: false; networkIdOrDefault: Network })
   | PendingStateObject => {
   const [walletInfo, setWalletInfo] = useSafeState<WalletInfo | null>(null)
 

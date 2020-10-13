@@ -1,4 +1,4 @@
-import { TokenDetails } from 'types'
+import { Network, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
@@ -20,6 +20,9 @@ const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails)
 }
 
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
+  setListReady: (state: boolean, networkId?: Network) => void
+  getIsListReady: () => boolean
+  isListReady: boolean
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   addTokens: (params: AddTokensParams) => void
@@ -64,6 +67,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
+  // token list flag - prevents stale/incorrect data
+  // from being presented during token list calculation
+  public isListReady = true
+
   public constructor({ networkIds, initialTokenList }: TokenListApiParams) {
     super()
 
@@ -91,6 +98,17 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
         )
       })
     })
+  }
+
+  public setListReady(state: boolean, networkId?: Network): void {
+    this.isListReady = state
+    if (this.isListReady && networkId) {
+      this.triggerSubscriptions(this._tokensByNetwork[networkId])
+    }
+  }
+
+  public getIsListReady(): boolean {
+    return this.isListReady
   }
 
   public hasToken(params: HasTokenParams): boolean {
