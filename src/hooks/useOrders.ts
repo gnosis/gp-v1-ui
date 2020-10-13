@@ -48,9 +48,11 @@ export function useOrders(): Result {
   useEffect(() => {
     // continue loading new orders
     // from current offset
-    setIsLoading(true)
+    // make sure token list is ready before setting
+    isListReady && setIsLoading(true)
+
     // whenever new block is mined
-  }, [blockNumber, setIsLoading])
+  }, [blockNumber, isListReady, setIsLoading])
 
   useEffect(() => {
     let cancelled = false
@@ -58,7 +60,7 @@ export function useOrders(): Result {
     const fetchOrders = async (offset: number): Promise<void> => {
       // isLoading is the important one
       // controls ongoing fetching chain
-      if (!userAddress || !networkId || !isLoading || !isListReady) {
+      if (!userAddress || !networkId || !isLoading) {
         // next isLoading = true will be when userAddress and networkId are valid
         setIsLoading(false)
         return
@@ -122,7 +124,7 @@ export function useOrders(): Result {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [offset, isLoading, isListReady])
+  }, [offset, isLoading])
 
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {

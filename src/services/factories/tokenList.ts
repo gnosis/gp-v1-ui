@@ -313,15 +313,17 @@ export function getTokensFactory(factoryParams: {
       // Clear flag so on next query we try again.
       areTokensUpdated.delete(networkId)
     } finally {
-      tokenListApi.setListReady(true)
+      tokenListApi.setListReady(true, networkId)
     }
   }
 
   return function (networkId: number): TokenDetails[] {
     if (!areTokensUpdated.has(networkId)) {
       logDebug(`[tokenListFactory][${networkId}] Will update tokens for network`)
+
       updateTokens(networkId)
     }
+
     return tokenListApi.getTokens(networkId)
   }
 }

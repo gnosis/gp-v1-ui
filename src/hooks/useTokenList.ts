@@ -31,5 +31,5 @@ export const useTokenList = ({ networkId, excludeDeprecated }: UseTokenListParam
     return subscribeToTokenList(() => forceUpdate({}))
   }, [forceUpdate])
 
-  return { tokens, isListReady: tokenListApi.isListReady }
+  return { tokens, isListReady: tokenListApi.getIsListReady() }
 }
