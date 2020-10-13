@@ -115,7 +115,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
   const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault, label, className } = props
   const { networkIdOrDefault: networkId } = useWalletConnection()
   // get all tokens
-  const tokenList = useTokenList({ networkId })
+  const { tokens: tokenList } = useTokenList({ networkId })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
   const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''

@@ -11,6 +11,7 @@ import useGlobalState from './useGlobalState'
 import { useWalletConnection } from './useWalletConnection'
 import usePendingOrders from './usePendingOrders'
 import { useCheckWhenTimeRemainingInBatch } from './useTimeRemainingInBatch'
+import { useTokenList } from './useTokenList'
 
 // Constants/Types
 import { REFRESH_WHEN_SECONDS_LEFT } from 'const'
@@ -32,6 +33,12 @@ export function useOrders(): Result {
     dispatch,
   ] = useGlobalState()
 
+  // TODO: check this - currently in use for subscription
+  // to change in token list to trigger update of orders
+  // and the incorrect state shown sometimes when loading app from
+  // fresh state and seeing incorrect token list Issue #1486
+  const { tokens, isListReady } = useTokenList({ networkId })
+
   // Pending Orders
   const pendingOrders = usePendingOrders()
 
@@ -51,7 +58,7 @@ export function useOrders(): Result {
     const fetchOrders = async (offset: number): Promise<void> => {
       // isLoading is the important one
       // controls ongoing fetching chain
-      if (!userAddress || !networkId || !isLoading) {
+      if (!userAddress || !networkId || !isLoading || !isListReady) {
         // next isLoading = true will be when userAddress and networkId are valid
         setIsLoading(false)
         return
@@ -115,7 +122,7 @@ export function useOrders(): Result {
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [offset, isLoading])
+  }, [offset, isLoading, isListReady])
 
   // allow to fresh start/refresh on demand
   const forceOrdersRefresh = useCallback((): void => {
@@ -140,7 +147,8 @@ export function useOrders(): Result {
     }
     forceOrdersRefresh()
     dispatch(overwriteOrders([]))
-  }, [userAddress, networkId, forceOrdersRefresh, dispatch])
+    // Subscribe to tokens change to force orders refresh
+  }, [tokens, userAddress, networkId, forceOrdersRefresh, dispatch])
 
   return {
     orders,

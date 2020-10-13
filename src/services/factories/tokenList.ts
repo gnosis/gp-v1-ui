@@ -181,6 +181,11 @@ export function getTokensFactory(factoryParams: {
 
       if (token) {
         token.label = safeTokenName(token)
+        // TODO: review this
+        // needs to be here to set correct IDs when using default initialTokenList
+        // from config as the IDs there are not correct
+        token.id =
+          addressToIdMap.get(token.address) !== token.id ? (addressToIdMap.get(token.address) as number) : token.id
       }
 
       return token
@@ -283,10 +288,18 @@ export function getTokensFactory(factoryParams: {
     areTokensUpdated.add(networkId)
 
     try {
+      // Set token list readiness to false
+      // and prevent stale data being presented in app
+      tokenListApi.setListReady(false)
+
       const numTokens = await retry(() => exchangeApi.getNumTokens(networkId))
       const tokens = tokenListApi.getTokens(networkId)
 
       logDebug(`[tokenListFactory][${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
+
+      // TODO: review this logic
+      // why update tokenDetails when token list lengths don't match?
+      // why would token IDs not also need to be updated?
       if (numTokens > tokens.length) {
         // When there are more tokens in the contract than locally, fetch the new tokens
         await updateTokenDetails(networkId, numTokens)
@@ -299,6 +312,8 @@ export function getTokensFactory(factoryParams: {
       logDebug(`[tokenListFactory][${networkId}] Failed to update tokens: ${e.message}`)
       // Clear flag so on next query we try again.
       areTokensUpdated.delete(networkId)
+    } finally {
+      tokenListApi.setListReady(true)
     }
   }
 
