@@ -5,6 +5,8 @@ import GenericSubscriptions from './Subscriptions'
 export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> implements TokenList {
   private _tokenList: TokenDetails[]
 
+  public isListReady = false
+
   public constructor(tokenList: TokenDetails[]) {
     super()
 
@@ -33,6 +35,10 @@ export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> imple
   public persistTokens({ tokenList }: PersistTokensParams): void {
     this._tokenList = tokenList
     this.triggerSubscriptions(tokenList)
+  }
+
+  public setListReady(state: boolean): void {
+    this.isListReady = state
   }
 }
 
