@@ -111,6 +111,7 @@ export const sideEffect = (state: PendingOrdersState, action: ReducerType): Pend
     case 'SAVE_PENDING_ORDERS':
     case 'REPLACE_PENDING_ORDERS':
       setStorageItem(STORAGE_PENDING_ORDER_KEY, state)
+    // falls through
     default:
       return state
   }

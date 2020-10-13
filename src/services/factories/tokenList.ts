@@ -173,61 +173,71 @@ export function getTokensFactory(factoryParams: {
     tokensConfig: TokenDetails[],
   ): Promise<TokenDetails[]> {
     const tokensConfigMap = new Map(tokensConfig.map((t) => [t.address, t]))
-    const tokenDetailsPromises: (Promise<TokenDetails | undefined> | TokenDetails)[] = []
-    addressToIdMap.forEach((id, tokenAddress) => {
+    const tokenDetailsPromises: Promise<TokenDetails | undefined>[] = []
+
+    async function _fillToken(id: number, tokenAddress: string): Promise<TokenDetails | undefined> {
       // Resolve the details using the config, otherwise fetch the token
-      const token: undefined | Promise<TokenDetails | undefined> = tokensConfigMap.has(tokenAddress)
-        ? Promise.resolve(tokensConfigMap.get(tokenAddress))
-        : _fetchToken(networkId, id, tokenAddress)
+      const token = tokensConfigMap.get(tokenAddress) || (await _fetchToken(networkId, id, tokenAddress))
 
       if (token) {
-        // Add a label for convenience
-        token.then((token: TokenDetails) => {
-          token.label = safeTokenName(token)
-          // TODO: review this
-          // needs to be here to set correct IDs when using default initialTokenList
-          // from config as the IDs there are not correct
-          token.id =
-            addressToIdMap.get(token.address) !== token.id ? (addressToIdMap.get(token.address) as number) : token.id
-
-          return token
-        })
-
-        tokenDetailsPromises.push(token)
+        token.label = safeTokenName(token)
+        token.id =
+          addressToIdMap.get(token.address) !== token.id ? (addressToIdMap.get(token.address) as number) : token.id
       }
+
+      return token
+    }
+
+    addressToIdMap.forEach((id, tokenAddress) => {
+      tokenDetailsPromises.push(_fillToken(id, tokenAddress))
     })
 
     return (await Promise.all(tokenDetailsPromises)).filter(notEmpty)
   }
 
-  function _moveTokenToHeadOfArray(tokenAddress: string, tokenList: TokenDetails[]): TokenDetails[] {
-    const tokenIndex = tokenList.findIndex((t) => t.address === tokenAddress)
-    if (tokenIndex !== -1) {
-      const token = tokenList[tokenIndex]
-      tokenList.splice(tokenIndex, 1)
+  type TokenComparator = (a: TokenDetails, b: TokenDetails) => number
 
-      return [token, ...tokenList]
-    }
+  function _createTokenComparator(networkId: number): TokenComparator {
+    let comparator: TokenComparator
+    // allows correct unicode comparison
+    const compareByLabel: TokenComparator = (a, b) => a.label.localeCompare(b.label)
 
-    return tokenList
-  }
-
-  function _sortTokens(networkId: number, tokens: TokenDetails[]): TokenDetails[] {
-    // Sort tokens
-    let tokensSorted = tokens.sort(_tokenComparer)
-
-    // Make sure wxDAI and WETH are the first tokens
     switch (networkId) {
       case Network.Mainnet:
-        return _moveTokenToHeadOfArray(WETH_ADDRESS_MAINNET, tokensSorted)
+        comparator = (a, b): number => {
+          // WETH first
+          if (a.address === WETH_ADDRESS_MAINNET) return -1
+          if (b.address === WETH_ADDRESS_MAINNET) return 1
+          return compareByLabel(a, b)
+        }
+        break
       case Network.Rinkeby:
-        return _moveTokenToHeadOfArray(WETH_ADDRESS_RINKEBY, tokensSorted)
+        comparator = (a, b): number => {
+          // WETH first
+          if (a.address === WETH_ADDRESS_RINKEBY) return -1
+          if (b.address === WETH_ADDRESS_RINKEBY) return 1
+          return compareByLabel(a, b)
+        }
+        break
       case Network.xDAI:
-        tokensSorted = _moveTokenToHeadOfArray(WETH_ADDRESS_XDAI, tokensSorted)
-        return _moveTokenToHeadOfArray(WXDAI_ADDRESS_XDAI, tokensSorted)
+        comparator = (a, b): number => {
+          // WXDAI before WETH
+          if (a.address === WXDAI_ADDRESS_XDAI && b.address === WETH_ADDRESS_XDAI) return -1
+          // WETH after WXDAI
+          if (a.address === WETH_ADDRESS_XDAI && b.address === WXDAI_ADDRESS_XDAI) return 1
+          // WXDAI and WETH first
+          if (a.address === WXDAI_ADDRESS_XDAI) return -1
+          if (b.address === WXDAI_ADDRESS_XDAI) return 1
+          if (a.address === WETH_ADDRESS_XDAI) return -1
+          if (b.address === WETH_ADDRESS_XDAI) return 1
+          return compareByLabel(a, b)
+        }
+        break
       default:
-        return tokensSorted
+        comparator = compareByLabel
     }
+
+    return comparator
   }
 
   async function _fetchToken(
@@ -263,19 +273,12 @@ export function getTokensFactory(factoryParams: {
     const tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
 
     // Sort tokens
-    const tokenList = _sortTokens(networkId, tokenDetails)
+    // note that sort mutates tokenDetails
+    // but it's ok as tokenDetails is a newly created array
+    tokenDetails.sort(_createTokenComparator(networkId))
 
     // Persist it
-    tokenListApi.persistTokens({ networkId, tokenList })
-  }
-
-  function _tokenComparer(a: TokenDetails, b: TokenDetails): number {
-    if (a.label < b.label) {
-      return -1
-    } else if (a.label > b.label) {
-      return 1
-    }
-    return 0
+    tokenListApi.persistTokens({ networkId, tokenList: tokenDetails })
   }
 
   async function updateTokens(networkId: number): Promise<void> {
