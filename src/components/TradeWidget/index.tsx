@@ -152,7 +152,7 @@ const TradeWidgetContainer: React.FC = () => {
   const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
   const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
 
-  const { sellToken: initialSellTokenDefaultNetwork, buyToken: initialReceiveTokenDefaultNetwork } =
+  const { sellToken: initialSellTokenDefaultNetwork, receiveToken: initialReceiveTokenDefaultNetwork } =
     initialTokenSelection.networks[networkIdOrDefault] || {}
 
   const sellTokenWithFallback = useMemo(
