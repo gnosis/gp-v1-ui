@@ -1,4 +1,4 @@
-import { TokenDetails } from 'types'
+import { Network, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
@@ -20,7 +20,8 @@ const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails)
 }
 
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
-  setListReady: (state: boolean) => void
+  setListReady: (state: boolean, networkId?: Network) => void
+  getIsListReady: () => boolean
   isListReady: boolean
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
@@ -99,8 +100,15 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     })
   }
 
-  public setListReady(state: boolean): void {
+  public setListReady(state: boolean, networkId?: Network): void {
     this.isListReady = state
+    if (this.isListReady && networkId) {
+      this.triggerSubscriptions(this._tokensByNetwork[networkId])
+    }
+  }
+
+  public getIsListReady(): boolean {
+    return this.isListReady
   }
 
   public hasToken(params: HasTokenParams): boolean {
