@@ -13,6 +13,10 @@ export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> imple
     this._tokenList = tokenList
   }
 
+  public getIsListReady(): boolean {
+    return this.isListReady
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getTokens(_networkId: number): TokenDetails[] {
     return this._tokenList
