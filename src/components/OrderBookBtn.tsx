@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 import Modal, { useModal } from 'components/common/Modal'
 
@@ -115,19 +115,18 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
   const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault, label, className } = props
   const { networkIdOrDefault: networkId } = useWalletConnection()
   // get all tokens
-  const tokenList = useTokenList({ networkId })
+  const { tokens: tokenList } = useTokenList({ networkId })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
   const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''
 
-  // Update if any of the base tokens change
-  useEffect(() => {
-    setBaseToken(baseTokenDefault)
-    setQuoteToken(quoteTokenDefault)
-  }, [baseTokenDefault, quoteTokenDefault, setBaseToken, setQuoteToken])
-
   const [modalHook, toggleModal] = useModal({
     ...DEFAULT_MODAL_OPTIONS,
+    onShow: () => {
+      // Update if any of the base tokens change
+      setBaseToken(baseTokenDefault)
+      setQuoteToken(quoteTokenDefault)
+    },
     onHide: () => {
       // Reset the selection on close
       setBaseToken(baseTokenDefault)

@@ -19,6 +19,7 @@ export enum Network {
 }
 
 export interface TokenDetails extends TokenDex {
+  label: string
   disabled?: boolean
   override?: TokenOverride
   priority?: number

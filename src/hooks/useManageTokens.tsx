@@ -148,7 +148,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
 const ManageTokensContainer: React.FC = () => {
   const { networkId, networkIdOrDefault } = useWalletConnection()
   // get all tokens
-  const tokens = useTokenList({ networkId })
+  const { tokens } = useTokenList({ networkId })
 
   const [search, setSearch] = useState('')
   const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)

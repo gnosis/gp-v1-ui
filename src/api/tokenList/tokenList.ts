@@ -1,6 +1,6 @@
 import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
-import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
+import { safeTokenName, TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
 
 export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsConfigLegacy[]): TokenDetails[] {
   // Return token details
@@ -13,6 +13,7 @@ export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsCon
 
       acc.push({
         id,
+        label: safeTokenName({ address, name, symbol }),
         name,
         symbol,
         decimals,

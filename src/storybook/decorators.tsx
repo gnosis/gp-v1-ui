@@ -4,6 +4,7 @@ import { Frame } from 'components/common/Frame'
 import { StoryFnReactReturnType } from '@storybook/react/dist/client/preview/types'
 import { ApolloProvider } from '@apollo/client'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
 
 export const CenteredAndFramed = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => (
   <div style={{ textAlign: 'center' }}>
@@ -21,3 +22,17 @@ export const Apollo = (DecoratedStory: () => StoryFnReactReturnType): JSX.Elemen
     <Frame style={{ display: 'inline-block' }}>{DecoratedStory()}</Frame>
   </ApolloProvider>
 )
+
+export const Form = (args?: UseFormOptions) =>
+  function InnerForm(DecoratedStory: () => StoryFnReactReturnType): JSX.Element {
+    const methods = useForm(args)
+    return (
+      <Frame>
+        <FormProvider {...methods}>
+          <form>{DecoratedStory()}</form>
+        </FormProvider>
+      </Frame>
+    )
+  }
+
+export const FormEmpty = Form()

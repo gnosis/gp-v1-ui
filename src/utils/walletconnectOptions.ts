@@ -8,7 +8,12 @@ export interface WCOptions {
   rpc?: {
     mainnet?: string
     rinkeby?: string
+    xDAI?: string
   }
+}
+
+const defaultRPC = {
+  [Network.xDAI]: 'https://rpc.xdaichain.com/',
 }
 
 export const setCustomWCOptions = (options: WCOptions): boolean => {
@@ -32,11 +37,12 @@ export const getWCOptionsFromStorage = (): WCOptions => {
 const mapStoredRpc = (rpc?: WCOptions['rpc']): IRPCMap | undefined => {
   if (!rpc) return
 
-  const { mainnet, rinkeby } = rpc
+  const { mainnet, rinkeby, xDAI } = rpc
 
   const rpcMap = {}
   if (mainnet) rpcMap[Network.Mainnet] = mainnet
   if (rinkeby) rpcMap[Network.Rinkeby] = rinkeby
+  if (xDAI) rpcMap[Network.xDAI] = xDAI
 
   return rpcMap
 }
@@ -46,6 +52,9 @@ export const generateWCOptions = (): IWalletConnectProviderOptions => {
   return {
     infuraId: infuraId || INFURA_ID,
     bridge: bridge || WALLET_CONNECT_BRIDGE,
-    rpc: mapStoredRpc(rpc),
+    rpc: {
+      ...defaultRPC,
+      ...mapStoredRpc(rpc),
+    },
   }
 }

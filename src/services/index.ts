@@ -16,7 +16,7 @@ import {
 import { logDebug } from 'utils'
 import { TokenDetails } from 'types'
 import { toChecksumAddress } from 'web3-utils'
-import { TokenErc20 } from '@gnosis.pm/dex-js'
+import { safeTokenName, TokenErc20 } from '@gnosis.pm/dex-js'
 
 const apis = {
   tokenListApi,
@@ -181,6 +181,7 @@ export const fetchTokenData = async ({
       const token: TokenDetails = {
         ...erc20Token,
         id: tokenId,
+        label: safeTokenName(erc20Token),
       }
 
       return {

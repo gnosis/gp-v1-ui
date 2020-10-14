@@ -8,6 +8,7 @@ const tokens: TokenDetails[] = [
   //  Wrapper of Ether to make it ERC-20 compliant
   {
     id: 1,
+    label: 'WETH',
     name: 'Wrapped Ether',
     symbol: 'WETH',
     decimals: 18,
@@ -20,6 +21,7 @@ const tokens: TokenDetails[] = [
   //  Fiat enabled collateralized stable coin, that is backed by the most popular fiat currency, USD (US Dollar) in a 1:1 ratio
   {
     id: 2,
+    label: 'USDT',
     name: 'Tether USD',
     symbol: 'USDT',
     decimals: 6,
@@ -32,6 +34,7 @@ const tokens: TokenDetails[] = [
   //  US Dollar backed stable coin which is totally fiat-collateralized
   {
     id: 3,
+    label: 'DAI',
     name: 'TrueUSD',
     symbol: 'TUSD',
     decimals: 18,
@@ -46,6 +49,7 @@ const tokens: TokenDetails[] = [
   //  launched by cryptocurrency finance firm circle Internet financial Ltd and the CENTRE open source consortium launched
   {
     id: 4,
+    label: 'USDC',
     name: 'USD Coin',
     symbol: 'USDC',
     decimals: 6,
@@ -60,6 +64,7 @@ const tokens: TokenDetails[] = [
   //  approved by the New York State Department of Financial Services
   {
     id: 5,
+    label: 'PAX',
     name: 'Paxos Standard',
     symbol: 'PAX',
     decimals: 18,
@@ -73,6 +78,7 @@ const tokens: TokenDetails[] = [
   //  launched same day as PAX by Gemini Trust Company. backed by USD
   {
     id: 6,
+    label: 'GUSD',
     name: 'Gemini Dollar',
     symbol: 'GUSD',
     decimals: 2,
@@ -85,6 +91,7 @@ const tokens: TokenDetails[] = [
   //  crypto-collateralized cryptocurrency: stable coin which is pegged to USD
   {
     id: 7,
+    label: 'DAI',
     name: 'DAI Stablecoin',
     symbol: 'DAI',
     decimals: 18,
@@ -96,6 +103,7 @@ const tokens: TokenDetails[] = [
   //  for testing token with problematic characters for the URL
   {
     id: 77,
+    label: 'FTK /21/10-DAI $99 & +|-',
     name: 'Fake token 1',
     symbol: 'FTK /21/10-DAI $99 & +|-',
     decimals: 18,
@@ -108,6 +116,7 @@ const tokens: TokenDetails[] = [
   {
     id: 78,
     name: 'Fake token 2',
+    label: 'FTK2',
     symbol: 'FTK2',
     decimals: 18,
     addressMainnet: TOKEN_9,

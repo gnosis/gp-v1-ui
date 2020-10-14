@@ -23,6 +23,7 @@ beforeEach(() => {
 
 const NEW_TOKEN = {
   id: 7,
+  label: 'NTK',
   name: 'New Token',
   symbol: 'NTK',
   decimals: 18,
