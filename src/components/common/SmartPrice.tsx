@@ -21,9 +21,9 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
       denominator: { amount: priceFraction.denominator, decimals: sellToken.decimals },
     })
     const buyOrderPriceInverse = invertPrice(buyOrderPrice)
-    const sellTokenIsQuote = buyToken === quoteToken
+    const buyTokenIsQuote = buyToken === quoteToken
     let price, priceInverse
-    if (sellTokenIsQuote) {
+    if (buyTokenIsQuote) {
       price = buyOrderPrice
       priceInverse = buyOrderPriceInverse
     } else {
