@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { formatDistanceStrict } from 'date-fns'
 
@@ -11,9 +11,11 @@ import { EllipsisText } from 'components/common/EllipsisText'
 
 import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 
-import { isTradeSettled, divideBN, formatPercentage } from 'utils'
+import { isTradeSettled, divideBN, formatPercentage, getMarket } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { MEDIA } from 'const'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+import BigNumber from 'bignumber.js'
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   td {
@@ -76,6 +78,61 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
+interface MarketAndPricesParams extends Pick<Trade, 'buyToken' | 'sellToken' | 'limitPrice' | 'fillPrice'> {
+  isPriceInverted: boolean
+}
+
+interface MarketAndPrices {
+  side: string
+  quoteTokenLabel: React.ReactNode
+  sellTokenLabel: React.ReactNode
+  buyTokenLabel: React.ReactNode
+  market: string
+  limitPrice: BigNumber | undefined
+  fillPrice: BigNumber
+}
+
+function getMarketAndPrices(params: MarketAndPricesParams): MarketAndPrices {
+  const { sellToken, buyToken, isPriceInverted, fillPrice, limitPrice } = params
+  const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault } = getMarket({
+    sellToken,
+    receiveToken: buyToken,
+  })
+  const baseToken = isPriceInverted ? quoteTokenDefault : baseTokenDefault
+
+  const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
+  const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
+
+  let side: string,
+    quoteTokenLabel: React.ReactNode,
+    market: string,
+    limitPriceBN: BigNumber | undefined,
+    fillPriceBN: BigNumber
+  if (sellToken === baseToken) {
+    side = 'Sell'
+    quoteTokenLabel = buyTokenLabel
+    market = `${sellTokenLabel}/${buyTokenLabel}`
+    limitPriceBN = limitPrice
+    fillPriceBN = fillPrice
+  } else {
+    side = 'Buy'
+    quoteTokenLabel = sellTokenLabel
+    market = `${buyTokenLabel}/${sellTokenLabel}`
+    limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
+    fillPriceBN = invertPrice(fillPrice)
+  }
+
+  return {
+    market,
+    side,
+    quoteTokenLabel,
+    sellTokenLabel,
+    buyTokenLabel,
+    limitPrice: limitPriceBN,
+    fillPrice: fillPriceBN,
+  }
+}
+
 export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const { trade, networkId, onCellClick } = params
   const {
@@ -96,8 +153,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
   // Calculate the inverse price - just make sure Limit Price is defined and isn't ZERO
   // don't want none of that divide by zero and destroy the world stuff
-  const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
-  const invertedFillPrice = invertPrice(fillPrice)
 
   const date = new Date(timestamp)
 
@@ -121,10 +176,27 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
     }
   }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
-  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
-    buyToken,
-    sellToken,
-  ])
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
+
+  const {
+    side,
+    market,
+    quoteTokenLabel,
+    sellTokenLabel,
+    buyTokenLabel,
+    fillPrice: marketFillPrice,
+    limitPrice: marketLimitPrice,
+  } = useMemo(
+    () =>
+      getMarketAndPrices({
+        sellToken,
+        buyToken,
+        isPriceInverted,
+        limitPrice,
+        fillPrice,
+      }),
+    [sellToken, buyToken, isPriceInverted, limitPrice, fillPrice],
+  )
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
@@ -132,29 +204,29 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
         {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
-      <td
-        data-label="Market"
-        className="showResponsive"
-        onClick={(): void =>
-          onCellClick({
-            target: { value: market },
-          })
-        }
-      >
-        {market}
+      <td data-label="Market" className="showResponsive">
+        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
+        <span
+          onClick={(): void =>
+            onCellClick({
+              target: { value: market },
+            })
+          }
+        >
+          {market}
+        </span>{' '}
+        ➡ {side}
       </td>
       <td
         data-label="Limit Price / Fill Price"
-        title={`${invertedLimitPrice ? formatPrice({ price: invertedLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice(
-          {
-            price: invertedFillPrice,
-            decimals: 8,
-          },
-        )}`}
+        title={`${marketLimitPrice ? formatPrice({ price: marketLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice({
+          price: marketFillPrice,
+          decimals: 8,
+        })}`}
       >
-        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'}
+        {marketLimitPrice ? formatPrice(marketLimitPrice) : 'N/A'} {quoteTokenLabel}
         <br />
-        {formatPrice(invertedFillPrice)}
+        {formatPrice(marketFillPrice)} {quoteTokenLabel}
       </td>
       <td
         data-label="Sold / Bought"
@@ -164,9 +236,8 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           precision: sellTokenDecimals,
         })} / ${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
       >
-        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {displayTokenSymbolOrLink(sellToken)}
-        <br />
-        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
+        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {sellTokenLabel} <br />
+        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {buyTokenLabel}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
