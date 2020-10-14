@@ -70,7 +70,7 @@ describe('Test config defaults', () => {
         {
           networkId: 100,
           // eslint-disable-next-line @typescript-eslint/camelcase
-          url_production: 'https://price-estimate-xdai.dev.gnosisdev.com',
+          url_production: 'https://dex-price-estimator.xdai.gnosis.io',
           // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-xdai.dev.gnosisdev.com',
         },
