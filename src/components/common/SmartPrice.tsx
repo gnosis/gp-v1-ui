@@ -52,7 +52,7 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
         baseToken={baseToken}
         quoteToken={quoteToken}
         isPriceInverted={isPriceInverted}
-        onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
+        onSwapPrices={(): void => setIsPriceInverted((isPriceInverted) => !isPriceInverted)}
       />
     </span>
   )
