@@ -56,3 +56,8 @@ export interface TxOptionalParams {
 }
 
 export type Receipt = TransactionReceipt
+
+export interface Fraction {
+  denominator: BN
+  numerator: BN
+}
