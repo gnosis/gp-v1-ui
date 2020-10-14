@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useRef } from 'react'
 import { toast } from 'toastify'
 
 // types, utils and services
-import { TokenDetails } from 'types'
+import { Fraction, TokenDetails } from 'types'
 import { isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
 // assets
@@ -93,20 +93,17 @@ const Market: React.FC<MarketProps> = ({ sellToken, buyToken, onCellClick }) => 
   )
 }
 
-interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
+interface OrderDetailsProps {
   buyToken: TokenDetails
   sellToken: TokenDetails
+  price: Fraction
 }
 
-const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
+const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, price }) => {
   return (
     <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        <SmartPrice
-          sellToken={sellToken}
-          buyToken={buyToken}
-          price={{ numerator: order.priceNumerator, denominator: order.priceDenominator }}
-        />
+        <SmartPrice sellToken={sellToken} buyToken={buyToken} price={price} />
       </div>
     </td>
   )
@@ -332,6 +329,14 @@ const OrderRow: React.FC<Props> = (props) => {
     fetchToken(order.id, order.sellToken as TokenDetails, setSellToken, isPendingOrder)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
+  const price: Fraction = useMemo(
+    () => ({
+      numerator: order.priceNumerator,
+      denominator: order.priceDenominator,
+    }),
+    [order.priceNumerator, order.priceDenominator],
+  )
+
   return (
     sellToken &&
     buyToken && (
@@ -344,7 +349,7 @@ const OrderRow: React.FC<Props> = (props) => {
         />
         <OrderID orderId={order.id} onCellClick={onCellClick} />
         <Market sellToken={sellToken} buyToken={buyToken} onCellClick={onCellClick} />
-        <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
+        <OrderDetails price={price} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
         <Status

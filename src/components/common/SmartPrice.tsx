@@ -1,15 +1,9 @@
 import { calculatePrice, formatPrice, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
 import React, { useMemo, useState } from 'react'
-import BN from 'bn.js'
-import { TokenDetails } from 'types'
+import { Fraction, TokenDetails } from 'types'
 
 import { SwapPrice } from 'components/common/SwapPrice'
 import { getMarket } from 'utils'
-
-interface Fraction {
-  denominator: BN
-  numerator: BN
-}
 
 interface Props {
   buyToken: TokenDetails
