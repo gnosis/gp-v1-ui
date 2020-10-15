@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import styled from 'styled-components'
 
 import { PriceSuggestionsWrapper } from './PriceSuggestions/PriceSuggestions'
-import { HelpTooltip } from 'components/Tooltip'
+import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
@@ -27,7 +27,11 @@ const BoldColourTag = styled.strong`
   }
 `
 
-const PriceImpactTooltip = 'The difference between the market price and the estimated price due to trade size'
+const PriceImpactTooltip: React.FC = () => (
+  <HelpTooltipContainer>
+    The difference between the market price and the estimated fill price due to order size
+  </HelpTooltipContainer>
+)
 
 interface PriceImpactProps {
   baseToken: TokenDetails
@@ -103,7 +107,7 @@ function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpa
         <span>
           <span>Price impact </span>
           <BoldColourTag className={className}>
-            <HelpTooltip tooltip={PriceImpactTooltip} /> {priceImpactSmart}%
+            <HelpTooltip tooltip={<PriceImpactTooltip />} /> {priceImpactSmart}%
           </BoldColourTag>
         </span>
       </div>
