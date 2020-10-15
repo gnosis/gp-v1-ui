@@ -171,11 +171,10 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
     <CardTable
       $rowSeparation="0"
       $gap="0 0.6rem"
-      $columns={`1fr 0.8fr minmax(6.6rem, 1fr) 1.2fr 6.5rem 5.5rem ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
+      $columns={`0.8fr minmax(6.6rem, 1fr) 1.2fr 1.2fr 6.5rem 5.5rem 1fr ${isTab ? 'minmax(9.3rem, 0.6fr)' : '0.74fr'}`}
     >
       <thead>
         <tr>
-          <th>Date</th>
           <th>Market</th>
           <th>
             <SplitHeaderTitle>
@@ -183,14 +182,11 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
               <span>Fill Price</span>
             </SplitHeaderTitle>
           </th>
-          <th>
-            <SplitHeaderTitle>
-              <span>Sold /</span>
-              <span>Bought</span>
-            </SplitHeaderTitle>
-          </th>
+          <th>Sold</th>
+          <th>Bought</th>
           <th>Type</th>
           <th>Order ID</th>
+          <th>Date</th>
           <th>
             <CsvButtonContainer>
               <span>Tx</span>

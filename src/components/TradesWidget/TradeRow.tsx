@@ -202,9 +202,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
-      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
-        {formatDistanceStrict(date, new Date(), { addSuffix: true })}
-      </td>
       <td data-label="Market" className="showResponsive">
         <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
         <span
@@ -230,14 +227,20 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
         {formatPrice(marketFillPrice)} {quoteTokenLabel}
       </td>
       <td
-        data-label="Sold / Bought"
+        data-label="Sold"
         className="showResponsive"
         title={`${formatAmountFull({
           amount: sellAmount,
           precision: sellTokenDecimals,
-        })} / ${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
+        })}`}
       >
-        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {sellTokenLabel} <br />
+        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {sellTokenLabel}
+      </td>
+      <td
+        data-label="Bought"
+        className="showResponsive"
+        title={`${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
+      >
         {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {buyTokenLabel}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
@@ -245,6 +248,9 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       </td>
       <td data-label="Order ID" onClick={(): void => onCellClick({ target: { value: orderId } })}>
         <EllipsisText title={orderId}>{orderId}</EllipsisText>
+      </td>
+      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
+        {formatDistanceStrict(date, new Date(), { addSuffix: true })}
       </td>
       <td data-label="View on Etherscan">
         <BlockExplorerLink type="event" identifier={txHash} networkId={networkId} />
