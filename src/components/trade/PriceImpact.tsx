@@ -7,9 +7,10 @@ import { HelpTooltip } from 'components/Tooltip'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
-import { ONE_HUNDRED_BIG_NUMBER, ONE_BIG_NUMBER } from 'const'
+import { ONE_HUNDRED_BIG_NUMBER, ONE_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
 import { TokenDetails } from 'types'
-import { parseBigNumber } from 'utils'
+import { formatSmart, parseAmount, parseBigNumber } from 'utils'
+import BN from 'bn.js'
 
 const BoldColourTag = styled.strong`
   &.highImpact {
@@ -64,7 +65,8 @@ function calculatePriceImpact({
   if (!bestAskPrice || !limitPriceBigNumber) return null
 
   // PRICE_IMPACT = 100 - (BEST_ASK / LIMIT_PRICE * 100)
-  return ONE_BIG_NUMBER.minus(bestAskPrice.div(limitPriceBigNumber)).times(ONE_HUNDRED_BIG_NUMBER)
+  const impact = ONE_BIG_NUMBER.minus(bestAskPrice.div(limitPriceBigNumber)).times(ONE_HUNDRED_BIG_NUMBER)
+  return impact.lt(ZERO_BIG_NUMBER) ? ZERO_BIG_NUMBER : impact
 }
 
 function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpactProps): React.ReactElement | null {
@@ -81,17 +83,19 @@ function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpa
     quoteTokenDecimals,
   })
 
-  const { priceImpact, className } = React.useMemo(() => {
+  const { priceImpactSmart, className } = React.useMemo(() => {
     const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
+    const priceImpactSmart =
+      priceImpact && formatSmart({ amount: parseAmount(priceImpact.toString(), 4) as BN, precision: 4 })
     const className = getImpactColourClass(priceImpact)
 
     return {
-      priceImpact,
+      priceImpactSmart,
       className,
     }
   }, [bestAskPrice, limitPrice])
 
-  if (!priceImpact) return null
+  if (!priceImpactSmart) return null
 
   return (
     <PriceSuggestionsWrapper>
@@ -99,7 +103,7 @@ function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpa
         <span>
           <span>Price impact </span>
           <BoldColourTag className={className}>
-            <HelpTooltip tooltip={PriceImpactTooltip} /> {priceImpact.toFixed(2)}%
+            <HelpTooltip tooltip={PriceImpactTooltip} /> {priceImpactSmart}%
           </BoldColourTag>
         </span>
       </div>
