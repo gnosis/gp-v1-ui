@@ -103,21 +103,16 @@ function getMarketAndPrices(params: MarketAndPricesParams): MarketAndPrices {
   const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
   const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
 
-  let side: string,
-    quoteTokenLabel: React.ReactNode,
-    market: string,
-    limitPriceBN: BigNumber | undefined,
-    fillPriceBN: BigNumber
+  const market = `${buyTokenLabel}/${sellTokenLabel}`
+  let side: string, quoteTokenLabel: React.ReactNode, limitPriceBN: BigNumber | undefined, fillPriceBN: BigNumber
   if (sellToken === baseToken) {
     side = 'Sell'
     quoteTokenLabel = buyTokenLabel
-    market = `${sellTokenLabel}/${buyTokenLabel}`
     limitPriceBN = limitPrice
     fillPriceBN = fillPrice
   } else {
     side = 'Buy'
     quoteTokenLabel = sellTokenLabel
-    market = `${buyTokenLabel}/${sellTokenLabel}`
     limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
     fillPriceBN = invertPrice(fillPrice)
   }
@@ -180,7 +175,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const [isPriceInverted, setIsPriceInverted] = useState(false)
 
   const {
-    side,
     market,
     quoteTokenLabel,
     sellTokenLabel,
@@ -203,7 +197,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   return !isTradeSettled(trade) ? null : (
     <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
       <td data-label="Market" className="showResponsive">
-        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
         <span
           onClick={(): void =>
             onCellClick({
@@ -211,9 +204,8 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
             })
           }
         >
-          {market}
-        </span>{' '}
-        ➡ {side}
+          Swap {sellTokenLabel} for {buyTokenLabel}
+        </span>
       </td>
       <td
         data-label="Limit Price / Fill Price"
@@ -222,6 +214,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           decimals: 8,
         })}`}
       >
+        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
         {marketLimitPrice ? formatPrice(marketLimitPrice) : 'N/A'} {quoteTokenLabel}
         <br />
         {formatPrice(marketFillPrice)} {quoteTokenLabel}
