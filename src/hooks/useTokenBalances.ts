@@ -114,7 +114,7 @@ export const useTokenBalances = (passOnParams: Partial<UseTokenListParams> = {})
   const [error, setError] = useSafeState(false)
 
   // get all tokens, maybe without deprecated
-  const tokens = useTokenList({ networkId: walletInfo.networkId, ...passOnParams })
+  const { tokens } = useTokenList({ networkId: walletInfo.networkId, ...passOnParams })
 
   // Get token balances
   useEffect(() => {
