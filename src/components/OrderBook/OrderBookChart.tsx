@@ -77,9 +77,6 @@ const Wrapper = styled.div`
     &.amcharts-Sprite-group.amcharts-RoundedRectangle-group {
       fill-opacity: 0.3;
     }
-    // &[role='scrollbar'] tspan {
-    //   font-weight: bold;
-    // }
   }
   path.amcharts-RoundedRectangle {
     fill: var(--color-background-input);
