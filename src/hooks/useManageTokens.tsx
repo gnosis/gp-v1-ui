@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import Modali, { useModali, ModalHook } from 'modali'
+import Modal, { useModal, ModalHook } from 'components/common/Modal'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { useWalletConnection } from './useWalletConnection'
@@ -63,7 +63,7 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
   return (
     <>
       {tokens.map((token) => {
-        const { name, symbol, image, address, disabled, override } = token
+        const { name, symbol, address, addressMainnet, disabled, override } = token
 
         const checked = !disabledTokens.has(address)
 
@@ -83,7 +83,8 @@ const TokenList: React.FC<TokenListProps> = ({ tokens, onToggleToken, disabledTo
             <OptionItem
               name={name}
               symbol={symbol}
-              image={image}
+              address={address}
+              addressMainnet={addressMainnet}
               faded={disabled}
               warning={override?.description}
               warningUrl={override?.url}
@@ -147,7 +148,7 @@ const SearchInput: React.FC<SearchInputProps> = (props) => {
 const ManageTokensContainer: React.FC = () => {
   const { networkId, networkIdOrDefault } = useWalletConnection()
   // get all tokens
-  const tokens = useTokenList({ networkId })
+  const { tokens } = useTokenList({ networkId })
 
   const [search, setSearch] = useState('')
   const { value: debouncedSearch, setImmediate: setDebouncedSearch } = useDebounce(search, 500)
@@ -156,7 +157,7 @@ const ManageTokensContainer: React.FC = () => {
   const addTokensSafeModali: UseAddTokenModalResult['addTokensToList'] = useCallback(
     (...args) => {
       return addTokensToList(...args).finally(() => {
-        // hack for second Modali closing
+        // hack for second Modal closing
         document.body.classList.add('modali-open')
       })
     },
@@ -238,7 +239,7 @@ const ManageTokensContainer: React.FC = () => {
           <TokenList tokens={filteredTokens} disabledTokens={tokensDisabledState} onToggleToken={toggleTokenState} />
         )}
       </TokenListWrapper>
-      <Modali.Modal {...modalProps} />
+      <Modal.Modal {...modalProps} />
     </div>
   )
 }
@@ -249,7 +250,7 @@ interface UseManageTokensResult {
 }
 
 export const useManageTokens = (): UseManageTokensResult => {
-  const [modalProps, toggleModal] = useModali({
+  const [modalProps, toggleModal] = useModal({
     animated: true,
     centered: true,
     title: 'Manage your Token list',

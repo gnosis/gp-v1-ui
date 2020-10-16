@@ -1,10 +1,8 @@
 import { TokenDetails, Network } from 'types'
 import { DEFAULT_PRECISION } from 'const'
+import { safeTokenName, TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
 
-import { getImageUrl } from 'utils'
-import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
-
-export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsConfig[]): TokenDetails[] {
+export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsConfigLegacy[]): TokenDetails[] {
   // Return token details
   const tokenDetails: TokenDetails[] = tokenList.reduce((acc: TokenDetails[], token) => {
     const address = token.addressByNetwork[networkId]
@@ -13,7 +11,15 @@ export function getTokensByNetwork(networkId: number, tokenList: TokenDetailsCon
       const { id, name, symbol, decimals = DEFAULT_PRECISION } = token
       const addressMainnet = token.addressByNetwork[Network.Mainnet]
 
-      acc.push({ id, name, symbol, decimals, address, addressMainnet, image: getImageUrl(addressMainnet) })
+      acc.push({
+        id,
+        label: safeTokenName({ address, name, symbol }),
+        name,
+        symbol,
+        decimals,
+        address,
+        addressMainnet,
+      })
       return acc
     }
 

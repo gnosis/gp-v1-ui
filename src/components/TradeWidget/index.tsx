@@ -4,7 +4,7 @@ import { useForm, useWatch, FormProvider, SubmitHandler } from 'react-hook-form'
 import { useParams } from 'react-router'
 import { toast } from 'toastify'
 import BN from 'bn.js'
-import Modali from 'modali'
+import styled from 'styled-components'
 
 import { decodeSymbol } from '@gnosis.pm/dex-js'
 
@@ -14,7 +14,7 @@ import { SwitcherSVG } from 'assets/img/SVG'
 // const, types
 import { ZERO } from 'const'
 import { PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
-import { TokenDetails, Network } from 'types'
+import { TokenDetails, Network, TokenBalanceDetails } from 'types'
 
 // utils
 import { getToken, parseAmount, dateToBatchId, resolverFactory, logDebug, batchIdToDate } from 'utils'
@@ -31,10 +31,10 @@ import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { tokenListApi } from 'api'
 
 // components
-
 import OrdersWidget from 'components/OrdersWidget'
 import { TxNotification } from 'components/TxNotification'
 import { Spinner } from 'components/common/Spinner'
+import Modal from 'components/common/Modal'
 
 // TradeWidget: subcomponents
 import {
@@ -67,11 +67,12 @@ import { useSubmitTxModal } from 'hooks/useSubmitTxModal'
 
 // Reducers
 import { savePendingOrdersAction } from 'reducers-actions/pendingOrders'
-import { updateTradeState } from 'reducers-actions/trade'
+import { updateTradeState, TradeState } from 'reducers-actions/trade'
 
 // Validation
 import validationSchema from 'components/TradeWidget/validationSchema'
 import { TxMessage } from 'components/TradeWidget/TxMessage'
+import { AnyAction } from 'combine-reducers'
 
 const NULL_BALANCE_TOKEN = {
   exchangeBalance: ZERO,
@@ -99,10 +100,11 @@ export interface TradeFormData {
 
 const validationResolver = resolverFactory<TradeFormData>(validationSchema)
 
-export const DEFAULT_FORM_STATE: Partial<TradeFormData> = {
+export const DEFAULT_FORM_STATE: TradeFormData = {
   sellToken: '0',
   receiveToken: '0',
   price: '0',
+  priceInverse: invertPriceFromString('0'),
   // ASAP
   validFrom: null,
   // Do not expire (never)
@@ -117,11 +119,21 @@ const validFromId: TradeFormTokenId = 'validFrom'
 const validUntilId: TradeFormTokenId = 'validUntil'
 
 // Grab CONFIG tokens
-const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
+const initialTokenSelection = CONFIG.initialTokenSelection
+const { sellToken: initialSellTokenDefault, receiveToken: initialReceiveTokenDefault } = initialTokenSelection
 
-const TradeWidget: React.FC = () => {
-  const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
-  const { connectWallet } = useConnectWallet()
+const NoTokens = styled.div`
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  font-weight: bold;
+`
+
+const TradeWidgetContainer: React.FC = () => {
+  const { networkIdOrDefault, isConnected } = useWalletConnection()
+
   const [{ trade }, dispatch] = useGlobalState()
 
   // get all token balances but deprecated
@@ -136,15 +148,92 @@ const TradeWidget: React.FC = () => {
       : tokenListApi.getTokens(networkIdOrDefault)
 
   // Listen on manual changes to URL search query
-  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams()
+  const { sell: encodedSellTokenSymbol, buy: decodeReceiveTokenSymbol } = useParams<{ sell?: string; buy?: string }>()
   const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
   const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
+
+  const { sellToken: initialSellTokenDefaultNetwork, receiveToken: initialReceiveTokenDefaultNetwork } =
+    initialTokenSelection.networks[networkIdOrDefault] || {}
+
+  const sellTokenWithFallback = useMemo(
+    (): TokenDetails | undefined =>
+      chooseTokenWithFallback({
+        token: trade.sellToken,
+        tokens,
+        tokenSymbolFromUrl: sellTokenSymbol,
+        defaultTokenSymbol: initialSellTokenDefaultNetwork || initialSellTokenDefault,
+      }),
+    [trade.sellToken, tokens, sellTokenSymbol, initialSellTokenDefaultNetwork],
+  )
+
+  const buyTokenWithFallback = useMemo(
+    (): TokenDetails | undefined =>
+      chooseTokenWithFallback({
+        token: trade.buyToken,
+        tokens,
+        tokenSymbolFromUrl: receiveTokenSymbol,
+        defaultTokenSymbol: initialReceiveTokenDefaultNetwork || initialReceiveTokenDefault,
+      }),
+    [trade.buyToken, tokens, receiveTokenSymbol, initialReceiveTokenDefaultNetwork],
+  )
+
+  const [sellToken, setSellToken] = useState(sellTokenWithFallback)
+  const [receiveToken, setReceiveToken] = useState(buyTokenWithFallback)
+
+  useEffect(() => {
+    setSellToken(sellTokenWithFallback)
+    setReceiveToken(buyTokenWithFallback)
+  }, [sellTokenWithFallback, buyTokenWithFallback])
+
+  // don't need to depend on more than network as everything else updates together
+  // also avoids excessive setStates
+
+  if (!sellToken || !receiveToken) return <NoTokens>NO TOKENS FOUND</NoTokens>
+
+  return (
+    <TradeWidget
+      sellToken={sellToken}
+      receiveToken={receiveToken}
+      trade={trade}
+      dispatch={dispatch}
+      tokens={tokens}
+      balances={balances}
+      setSellToken={setSellToken}
+      setReceiveToken={setReceiveToken}
+    />
+  )
+}
+
+interface TradeWidgetProps {
+  trade: TradeState
+  dispatch: React.Dispatch<AnyAction>
+  sellToken: TokenDetails
+  receiveToken: TokenDetails
+  tokens: TokenDetails[]
+  balances: TokenBalanceDetails[]
+  setSellToken: (token: TokenDetails) => void
+  setReceiveToken: (token: TokenDetails) => void
+}
+
+const TradeWidget: React.FC<TradeWidgetProps> = ({
+  trade,
+  dispatch,
+  sellToken,
+  receiveToken,
+  tokens,
+  balances,
+  setSellToken,
+  setReceiveToken,
+}) => {
   const {
     sellAmount: sellParam,
     price: priceParam,
     validFrom: validFromParam,
     validUntil: validUntilParam,
   } = useQuery()
+
+  const { connectWallet } = useConnectWallet()
+  const { networkId, networkIdOrDefault, isConnected, userAddress } = useWalletConnection()
 
   // Combining global state with query params
   const defaultPrice = trade.price || priceParam
@@ -164,57 +253,6 @@ const TradeWidget: React.FC = () => {
     [priceInputId]: defaultPrice,
     [priceInverseInputId]: invertPriceFromString(defaultPrice),
   }
-
-  const [sellToken, setSellToken] = useState(() =>
-    chooseTokenWithFallback({
-      token: trade.sellToken,
-      tokens,
-      tokenSymbolFromUrl: sellTokenSymbol,
-      defaultTokenSymbol: initialSellToken,
-    }),
-  )
-  const [receiveToken, setReceiveToken] = useState(() =>
-    chooseTokenWithFallback({
-      token: trade.buyToken,
-      tokens,
-      tokenSymbolFromUrl: receiveTokenSymbol,
-      defaultTokenSymbol: initialReceiveToken,
-    }),
-  )
-
-  useEffect(() => {
-    //  when switching networks
-    // trade stays filled with last tokens
-    // which may not be available on the new network
-    if (trade.sellToken) {
-      // check if it should be different
-      const sellTokenOrFallback = chooseTokenWithFallback({
-        // don't consider token from trade from wrong network valid
-        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
-          ? trade.sellToken
-          : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
-        tokenSymbolFromUrl: sellTokenSymbol, // from url params
-        defaultTokenSymbol: initialSellToken, // default sellToken
-      })
-      setSellToken(sellTokenOrFallback)
-    }
-
-    if (trade.buyToken) {
-      const buyTokenOrFallback = chooseTokenWithFallback({
-        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
-          ? trade.buyToken
-          : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault),
-        tokenSymbolFromUrl: receiveTokenSymbol,
-        defaultTokenSymbol: initialReceiveToken, // default buyToken
-      })
-      setReceiveToken(buyTokenOrFallback)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkIdOrDefault])
-  // don't need to depend on more than network as everything else updates together
-  // also avoids excessive setStates
 
   const [unlimited, setUnlimited] = useState(!defaultValidUntil || !Number(defaultValidUntil))
   const [asap, setAsap] = useState(!defaultValidFrom || !Number(defaultValidFrom))
@@ -294,7 +332,7 @@ const TradeWidget: React.FC = () => {
     setReceiveToken(sellTokenBalance)
     // selected price no longer has meaning, reset and force user pick/insert new one
     resetPrices()
-  }, [receiveTokenBalance, resetPrices, sellTokenBalance])
+  }, [receiveTokenBalance, resetPrices, sellTokenBalance, setReceiveToken, setSellToken])
 
   const onSelectChangeFactory = useCallback(
     (
@@ -329,7 +367,7 @@ const TradeWidget: React.FC = () => {
         validUntilWithBatchID,
         expiresNever,
       },
-      resetStateOptions: Partial<TradeFormData> = DEFAULT_FORM_STATE,
+      resetStateOptions: TradeFormData = DEFAULT_FORM_STATE,
     ): void => {
       batchUpdateState(() => {
         // reset form on successful order placing
@@ -426,8 +464,8 @@ const TradeWidget: React.FC = () => {
                   ...DEFAULT_FORM_STATE,
                   price,
                   priceInverse: invertPriceFromString(price),
-                  validFrom: undefined,
-                  validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
+                  validFrom: null,
+                  validUntil: isNever ? null : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
             },
@@ -467,7 +505,7 @@ const TradeWidget: React.FC = () => {
                   price,
                   priceInverse: invertPriceFromString(price),
                   validFrom: batchIdToDate(validFromWithBatchId).getTime().toString(),
-                  validUntil: isNever ? undefined : batchIdToDate(validUntilWithBatchID).getTime().toString(),
+                  validUntil: isNever ? null : batchIdToDate(validUntilWithBatchID).getTime().toString(),
                 },
               )
             },
@@ -549,7 +587,7 @@ const TradeWidget: React.FC = () => {
   const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
 
   const tokenAddressesToAdd: string[] = useMemo(
-    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+    () => preprocessTokenAddressesToAdd([sellToken.symbol, receiveToken.symbol], networkIdOrDefault),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   ) // no deps, so that we only calc once on mount
@@ -663,7 +701,7 @@ const TradeWidget: React.FC = () => {
             {isSubmitting && <Spinner size="lg" spin={isSubmitting} />}{' '}
             {sameToken ? 'Select different tokens' : 'Submit limit order'}
           </SubmitButton>
-          <Modali.Modal {...modalProps} />
+          <Modal.Modal {...modalProps} />
         </WrappedForm>
       </FormProvider>
       <ExpandableOrdersPanel>
@@ -685,4 +723,4 @@ const TradeWidget: React.FC = () => {
   )
 }
 
-export default TradeWidget
+export default TradeWidgetContainer

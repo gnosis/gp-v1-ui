@@ -69,7 +69,7 @@ async function placeValidFromOrdersTx(placeOrderParams: PlaceValidFromOrders): P
         // Asap, if no validFrom is specified
         if (!asapBatchIdPromise) {
           // Calculate asapBatchId (if it's not previously calculated)
-          asapBatchIdPromise = asapBatchIdPromise = exchangeApi
+          asapBatchIdPromise = exchangeApi
             .getCurrentBatchId(networkId)
             .then((currentBatchId) => currentBatchId + BATCHES_TO_WAIT)
         }

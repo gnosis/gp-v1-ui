@@ -1,7 +1,7 @@
 import BN from 'bn.js'
-import { assert } from '@gnosis.pm/dex-js'
+import { assert, toBN } from '@gnosis.pm/dex-js'
 
-import { logDebug, toBN } from 'utils'
+import { logDebug } from 'utils'
 import { ZERO } from 'const'
 
 import { BatchExchangeContract, batchExchangeAbi } from '@gnosis.pm/dex-js'

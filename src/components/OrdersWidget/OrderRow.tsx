@@ -9,7 +9,7 @@ import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@
 import alertIcon from 'assets/img/alert.svg'
 
 // components
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { Spinner } from 'components/common/Spinner'
 import { StatusCountdown } from 'components/StatusCountdown'
 
@@ -40,7 +40,9 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
       <Spinner size="sm" />
       &nbsp;Pending...
       <br />
-      {transactionHash && <EtherscanLink identifier={transactionHash} type="tx" label={<small>View status</small>} />}
+      {transactionHash && (
+        <BlockExplorerLink identifier={transactionHash} type="tx" label={<small>View status</small>} />
+      )}
     </>
   )
 }
@@ -159,10 +161,15 @@ const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = (
   return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
 }
 
-const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { orderId: string }> = ({ orderId, onCellClick }) => (
+const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { isPendingOrder: boolean; orderId: string }> = ({
+  orderId,
+  isPendingOrder,
+  onCellClick,
+}) => (
   <td
     data-label="Order ID"
-    onClick={(): void =>
+    onClick={(): false | void =>
+      !isPendingOrder &&
       onCellClick({
         target: {
           value: orderId,
@@ -170,7 +177,7 @@ const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { orderId: string }> 
       })
     }
   >
-    <EllipsisText title={orderId}>{orderId}</EllipsisText>
+    {isPendingOrder ? <Spinner /> : <EllipsisText title={orderId}>{orderId}</EllipsisText>}
   </td>
 )
 
@@ -345,7 +352,7 @@ const OrderRow: React.FC<Props> = (props) => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
-        <OrderID orderId={order.id} onCellClick={onCellClick} />
+        <OrderID orderId={order.id} isPendingOrder={!!isPendingOrder} onCellClick={onCellClick} />
         <Market sellToken={sellToken} buyToken={buyToken} onCellClick={onCellClick} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />

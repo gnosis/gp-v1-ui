@@ -338,7 +338,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
               Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
               their running costs. Learn more{' '}
               <a
-                href="https://docs.gnosis.io/protocol/docs/introduction1/#minimum-order"
+                href="https://docs.gnosis.io/protocol/docs/faq#minimum-order"
                 rel="noopener noreferrer"
                 target="_blank"
               >

@@ -7,12 +7,12 @@ import { faClock, faPlus, faMinus, faBaby } from '@fortawesome/free-solid-svg-ic
 import { MinusSVG, PlusSVG } from 'assets/img/SVG'
 
 // const, utils, types
-import { ZERO, MEDIA, WETH_ADDRESS_MAINNET } from 'const'
-import { formatSmart, formatAmountFull } from 'utils'
+import { ZERO, MEDIA } from 'const'
+import { formatSmart, formatAmountFull, getIsWrappable, getNativeTokenName } from 'utils'
 import { TokenBalanceDetails, Command } from 'types'
 
 // Components
-import TokenImg from 'components/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 import { WrapEtherBtn, UnwrapEtherBtn } from 'components/WrapEtherBtn'
 import { Spinner } from 'components/common/Spinner'
 
@@ -27,6 +27,7 @@ import { TokenSymbol } from 'components/TokenSymbol'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 
 export interface RowProps extends Record<keyof TokenLocalState, boolean> {
+  networkId: number
   ethBalance: BN | null
   tokenBalances: TokenBalanceDetails
   onSubmitDeposit: (amount: BN, onTxHash: (hash: string) => void) => Promise<void>
@@ -47,6 +48,7 @@ const ImmatureClaimTooltip: React.FC<{ displayName: string }> = ({ displayName }
 
 export const Row: React.FC<RowProps> = (props: RowProps) => {
   const {
+    networkId,
     ethBalance,
     tokenBalances,
     onSubmitDeposit,
@@ -67,7 +69,6 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
     address,
     addressMainnet,
     name,
-    image,
     symbol,
     decimals,
     totalExchangeBalance,
@@ -97,13 +98,21 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
 
   const isDepositFormVisible = visibleForm == 'deposit'
   const isWithdrawFormVisible = visibleForm == 'withdraw'
-  const isWeth = addressMainnet === WETH_ADDRESS_MAINNET
+
+  const isWrappable = getIsWrappable(networkId, address)
+  const { nativeToken, wrappedToken } = getNativeTokenName(networkId)
 
   return (
     <>
       <TokenRow data-address={address} className={className} data-address-mainnet={addressMainnet}>
         <td data-label="Token">
-          <TokenImg src={image} alt={name} faded={tokenDisabled} />
+          <TokenImgWrapper
+            address={address}
+            addressMainnet={addressMainnet}
+            name={name}
+            symbol={symbol}
+            faded={tokenDisabled}
+          />
           <div title={`${name || address}${symbol && ` [${symbol}]`}`}>
             <TokenSymbol symbol={symbol} warning={override?.description} warningUrl={override?.url} />
             {name}
@@ -148,20 +157,20 @@ export const Row: React.FC<RowProps> = (props: RowProps) => {
         </td>
         <td
           data-label="Wallet"
-          title={(!isWeth && formatAmountFull({ amount: walletBalance, precision: decimals })) || ''}
+          title={(!isWrappable && formatAmountFull({ amount: walletBalance, precision: decimals })) || ''}
         >
-          {isWeth ? (
+          {isWrappable ? (
             <ul>
               <li title={ethBalance ? formatAmountFull({ amount: ethBalance, precision: decimals }) : undefined}>
                 <span>
-                  {ethBalance ? formatSmart(ethBalance, decimals) : '-'} <span>ETH</span>
+                  {ethBalance ? formatSmart(ethBalance, decimals) : '-'} <span>{nativeToken}</span>
                 </span>{' '}
                 <WrapEtherBtn label="Wrap" className="wrapUnwrapEther" />
               </li>
               <li title={formatAmountFull({ amount: walletBalance, precision: decimals }) || undefined}>
                 {(claiming || depositing) && spinner}
                 <span>
-                  {formatSmart(walletBalance, decimals)} <span>WETH</span>
+                  {formatSmart(walletBalance, decimals)} <span>{wrappedToken}</span>
                 </span>{' '}
                 <UnwrapEtherBtn label="Unwrap" className="wrapUnwrapEther" />
               </li>

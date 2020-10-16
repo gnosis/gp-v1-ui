@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 
-import { logDebug, getImageUrl } from 'utils'
+import { logDebug, safeTokenName } from 'utils'
 
 import { getErc20Info } from '../helpers'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
@@ -52,7 +52,7 @@ export function addTokenToExchangeFactory(
       const token: TokenDetails = {
         ...erc20Info,
         id,
-        image: getImageUrl(tokenAddress),
+        label: safeTokenName(erc20Info),
       }
 
       // TODO: cache new token

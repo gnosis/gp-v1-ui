@@ -1,8 +1,9 @@
-import { TokenDetails } from 'types'
 import { getErc20Info } from 'services/helpers'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import Web3 from 'web3'
-import { getImageUrl, logDebug } from 'utils'
+import { logDebug } from 'utils'
+import { TokenErc20 } from '@gnosis.pm/dex-js'
+// import { TokenErc20 } from '@gnosis.pm/dex-js'
 
 interface Params {
   erc20Api: Erc20Api
@@ -14,10 +15,8 @@ export interface TokenFromErc20Params {
   networkId: number
 }
 
-export type TokenFromErc20 = Omit<TokenDetails, 'id'> | null
-
 export function getTokenFromErc20Factory(closureParams: Params) {
-  return async (params: TokenFromErc20Params): Promise<TokenFromErc20> => {
+  return async (params: TokenFromErc20Params): Promise<TokenErc20 | null> => {
     // Get base info from the ERC20 contract
     const erc20Info = await getErc20Info({ ...closureParams, ...params })
     if (!erc20Info) {
@@ -28,11 +27,6 @@ export function getTokenFromErc20Factory(closureParams: Params) {
       return null
     }
 
-    const token = {
-      ...erc20Info,
-      image: getImageUrl(params.tokenAddress),
-    }
-
-    return token
+    return erc20Info
   }
 }

@@ -1,9 +1,9 @@
-import { TokenDetails } from 'types'
+import { Network, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
-import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
-import { DISABLED_TOKEN_MAPS } from 'const'
+import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
+import { DISABLED_TOKEN_MAPS, EMPTY_ARRAY } from 'const'
 
 const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails): TokenDetails => {
   const tokenOverride = DISABLED_TOKEN_MAPS[networkId]?.[token.address]
@@ -20,6 +20,9 @@ const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails)
 }
 
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
+  setListReady: (state: boolean, networkId?: Network) => void
+  getIsListReady: () => boolean
+  isListReady: boolean
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   addTokens: (params: AddTokensParams) => void
@@ -30,7 +33,7 @@ export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
 
 export interface TokenListApiParams {
   networkIds: number[]
-  initialTokenList: TokenDetailsConfig[]
+  initialTokenList: TokenDetailsConfigLegacy[]
 }
 
 export interface AddTokenParams {
@@ -64,6 +67,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
+  // token list flag - prevents stale/incorrect data
+  // from being presented during token list calculation
+  public isListReady = true
+
   public constructor({ networkIds, initialTokenList }: TokenListApiParams) {
     super()
 
@@ -93,12 +100,23 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     })
   }
 
+  public setListReady(state: boolean, networkId?: Network): void {
+    this.isListReady = state
+    if (this.isListReady && networkId) {
+      this.triggerSubscriptions(this._tokensByNetwork[networkId])
+    }
+  }
+
+  public getIsListReady(): boolean {
+    return this.isListReady
+  }
+
   public hasToken(params: HasTokenParams): boolean {
     return this._tokenAddressNetworkSet.has(TokenListApiImpl.constructAddressNetworkKey(params))
   }
 
   public getTokens(networkId: number): TokenDetails[] {
-    return this._tokensByNetwork[networkId] || []
+    return this._tokensByNetwork[networkId] || EMPTY_ARRAY
   }
 
   private static mergeTokenLists(...lists: TokenDetails[][]): TokenDetails[] {

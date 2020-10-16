@@ -1,27 +1,27 @@
 import React from 'react'
 
 // assets
-import TokenImg from 'components/TokenImg'
+import { TokenImgWrapper } from 'components/common/TokenImg'
 import checkIcon from 'assets/img/li-check.svg'
 
 // types
-import { TokenDetails } from '@gnosis.pm/dex-js'
+import { TokenDex } from '@gnosis.pm/dex-js'
 
 // PoolingWidget: subcomponent
 import { ProgressStepText } from 'components/PoolingWidget/PoolingWidget.styled'
 import { TokenSelectorWrapper, TokenBox, CheckboxWrapper } from 'components/PoolingWidget/TokenSelector.styled'
 
 export interface TokenSelectorProps {
-  handleTokenSelect: (tokenData: TokenDetails) => void
-  selectedTokensMap: Map<number, TokenDetails>
-  tokens: TokenDetails[]
+  handleTokenSelect: (tokenData: TokenDex) => void
+  selectedTokensMap: Map<number, TokenDex>
+  tokens: TokenDex[]
 }
 
 const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, selectedTokensMap, tokens }) => {
   return (
     <TokenSelectorWrapper>
       {tokens.map((tokenDetails) => {
-        const { name, symbol, address, id, image } = tokenDetails
+        const { name, symbol, address, addressMainnet, id } = tokenDetails
         return (
           <TokenBox
             key={address}
@@ -32,7 +32,7 @@ const TokenSelector: React.FC<TokenSelectorProps> = ({ handleTokenSelect, select
               {/* <FontAwesomeIcon icon={faCheckCircle} color="green" /> */}
               <img src={checkIcon} width="20" height="20" />
             </CheckboxWrapper>
-            <TokenImg alt={name} src={image} />
+            <TokenImgWrapper address={address} addressMainnet={addressMainnet} name={name} symbol={symbol} />
             <div>
               <ProgressStepText>{symbol}</ProgressStepText>
               <ProgressStepText>

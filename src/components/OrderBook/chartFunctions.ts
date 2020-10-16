@@ -2,9 +2,10 @@ import * as am4core from '@amcharts/amcharts4/core'
 import * as am4charts from '@amcharts/amcharts4/charts'
 import am4themesSpiritedaway from '@amcharts/amcharts4/themes/spiritedaway'
 
-import { getNetworkFromId, safeTokenName } from 'utils'
+import { safeTokenName } from 'utils'
 
 import { TokenDetails, Network } from 'types'
+import { getNetworkFromId } from '@gnosis.pm/dex-js'
 
 const ZOOM_BUTTON_CONTAINER_ID = 'zoomButtonContainer'
 

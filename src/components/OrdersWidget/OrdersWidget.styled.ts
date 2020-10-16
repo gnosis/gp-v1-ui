@@ -159,7 +159,6 @@ export const OrdersForm = styled.div`
         letter-spacing: 0;
         text-align: center;
         background: transparent;
-        flex: 1;
         height: 100%;
         outline: 0;
         text-transform: uppercase;
@@ -173,7 +172,6 @@ export const OrdersForm = styled.div`
         min-height: 6.4rem;
 
         > i {
-          height: 1.8rem;
           font-weight: inherit;
           font-size: 1.1rem;
           color: var(--color-background-pageWrapper);
@@ -240,7 +238,6 @@ export const OrdersForm = styled.div`
 
   .deleteContainer {
     display: flex;
-    flex-direction: column;
     position: sticky;
     top: 4rem;
     z-index: 2;

@@ -1,6 +1,7 @@
 import { PendingTxObj } from 'api/exchange/ExchangeApi'
 import { Actions } from 'reducers-actions'
-import { toBN, setStorageItem } from 'utils'
+import { setStorageItem } from 'utils'
+import { toBN } from '@gnosis.pm/dex-js'
 
 const STORAGE_PENDING_ORDER_KEY = 'STORAGE_PENDING_ORDER_TX_HASHES'
 
@@ -49,10 +50,12 @@ export const removePendingOrdersAction = (payload: {
   payload,
 })
 
+export interface PendingOrdersUser {
+  [userAddress: string]: PendingTxObj[] | undefined
+}
+
 export interface PendingOrdersState {
-  [networkId: number]: {
-    [userAddress: string]: PendingTxObj[]
-  }
+  [networkId: number]: PendingOrdersUser | undefined
 }
 
 /* 
@@ -66,23 +69,30 @@ export interface PendingOrdersState {
       '0x90dcJsdkjb22': [],
       '0xd9sjsdasnci1': [],
     },
+    100: {
+    },
   }
 */
 export const EMPTY_PENDING_ORDERS_STATE = {
   1: {},
   4: {},
+  100: {},
 }
 
 export const reducer = (state: PendingOrdersState, action: ReducerType): PendingOrdersState => {
   switch (action.type) {
     case 'SAVE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
-
-      const userPendingOrdersArr = state[networkId][userAddress] ? state[networkId][userAddress] : []
-      const newPendingTxArray = userPendingOrdersArr.concat(orders)
-      const newState = { ...state, [networkId]: { ...state[networkId], [userAddress]: newPendingTxArray } }
-
-      return newState
+      const pendingOrders = state[networkId] || {}
+      const userPendingOrders = pendingOrders[userAddress] || []
+      const newPendingOrders = userPendingOrders.concat(orders)
+      return {
+        ...state,
+        [networkId]: {
+          ...pendingOrders,
+          [userAddress]: newPendingOrders,
+        },
+      }
     }
     case 'REPLACE_PENDING_ORDERS': {
       const { networkId, orders, userAddress } = action.payload
@@ -101,6 +111,7 @@ export const sideEffect = (state: PendingOrdersState, action: ReducerType): Pend
     case 'SAVE_PENDING_ORDERS':
     case 'REPLACE_PENDING_ORDERS':
       setStorageItem(STORAGE_PENDING_ORDER_KEY, state)
+    // falls through
     default:
       return state
   }

@@ -134,7 +134,7 @@ declare module 'modali' {
    */
   type toggleModaliComponent = () => void
 
-  export function useModali(options?: ModalOptions): [ModalHook, toggleModaliComponent]
+  export function useModali(options?: ModalOptions): [modalHook: ModalHook, toggleModal: toggleModaliComponent]
 
   /**
    * The `<Modali.Modal />` component provides a beautiful, WAI-ARIA accessible

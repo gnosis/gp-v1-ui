@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 // components
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 
 import {
   UserWalletItem,
@@ -24,7 +24,7 @@ import {
   LogInOutButton,
   WalletName,
   WalletImage,
-  EtherscanButton,
+  BlockExplorerButton,
 } from './UserWallet.styled'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
@@ -32,11 +32,12 @@ import useSafeState from 'hooks/useSafeState'
 import { useConnectWallet } from 'hooks/useConnectWallet'
 import useNoScroll from 'hooks/useNoScroll'
 
-import { abbreviateString, getNetworkFromId } from 'utils'
+import { abbreviateString } from 'utils'
 // TODO: probably not do this
 import WalletImg from 'assets/img/eth-network.svg'
 import { Spinner } from 'components/common/Spinner'
 import { walletApi } from 'api'
+import { getNetworkFromId } from '@gnosis.pm/dex-js'
 
 interface UserWalletProps extends RouteComponentProps {
   className: string
@@ -118,10 +119,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     }
 
     return (
-      <LogInOutButton $loggedIn={isConnected}>
-        <a onClick={onClick} className={props.className}>
-          {content}
-        </a>
+      <LogInOutButton $loggedIn={isConnected} onClick={onClick}>
+        <a className={props.className}>{content}</a>
       </LogInOutButton>
     )
   }, [connectWallet, disconnectWallet, isConnected, loadingLabel, props.className])
@@ -184,9 +183,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
             <QRCode className="QRCode" value={userAddress} renderAs="svg" size={150} />
             {/* Etherscan Link */}
             {/* TODO: add network specific */}
-            <EtherscanButton>
-              <EtherscanLink
-                className="etherscanLink"
+            <BlockExplorerButton>
+              <BlockExplorerLink
                 type="address"
                 identifier={userAddress}
                 label={
@@ -195,7 +193,7 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
                   </>
                 }
               />
-            </EtherscanButton>
+            </BlockExplorerButton>
             {/* Log In/Out Button */}
             {renderLogInOutButton()}
           </UserWalletItem>

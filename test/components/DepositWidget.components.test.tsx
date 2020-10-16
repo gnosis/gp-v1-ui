@@ -5,7 +5,7 @@ import BN from 'bn.js'
 import { Row, RowProps } from 'components/DepositWidget/Row'
 
 import { ZERO, ONE, TEN } from 'const'
-import { TokenBalanceDetails } from 'types'
+import { Network, TokenBalanceDetails } from 'types'
 import { TokenLocalState } from 'reducers-actions'
 import { createFlux } from '../data'
 
@@ -22,6 +22,7 @@ const fakeRowState: Record<keyof TokenLocalState, boolean> = {
 const initialEthBalance = TEN
 const initialTokenBalanceDetails = {
   id: 1,
+  label: 'TTT',
   name: 'Test token',
   symbol: 'TTT',
   decimals: 18,
@@ -56,6 +57,7 @@ function _createRow({
   const onSubmitWithdraw = jest.fn<Promise<void>, [BN, Function]>()
   return (
     <Row
+      networkId={Network.Mainnet}
       ethBalance={ethBalance}
       tokenBalances={tokenBalanceDetails}
       onEnableToken={onEnableToken}

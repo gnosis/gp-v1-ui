@@ -1,5 +1,5 @@
-import { TokenDetails } from '@gnosis.pm/dex-js'
 import { Actions } from 'reducers-actions'
+import { TokenDetails } from 'types'
 
 export interface TradeState {
   price: string | null
