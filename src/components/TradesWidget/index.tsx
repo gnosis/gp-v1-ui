@@ -177,7 +177,7 @@ export const InnerTradesWidget: React.FC<InnerTradesWidgetProps> = (props) => {
     >
       <thead>
         <tr>
-          <th>Pair</th>
+          <th></th>
           <th>
             <SplitHeaderTitle>
               <span>Limit Price /</span>

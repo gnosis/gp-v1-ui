@@ -23,6 +23,10 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
     &[data-label='Market'] {
       cursor: pointer;
     }
+
+    span.swapIcon {
+      margin-left: 0.4rem;
+    }
   }
 
   @media ${MEDIA.mobile} {
@@ -83,7 +87,6 @@ interface MarketAndPricesParams extends Pick<Trade, 'buyToken' | 'sellToken' | '
 }
 
 interface MarketAndPrices {
-  side: string
   quoteTokenLabel: React.ReactNode
   sellTokenLabel: React.ReactNode
   buyTokenLabel: React.ReactNode
@@ -104,14 +107,12 @@ function getMarketAndPrices(params: MarketAndPricesParams): MarketAndPrices {
   const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
 
   const market = `${buyTokenLabel}/${sellTokenLabel}`
-  let side: string, quoteTokenLabel: React.ReactNode, limitPriceBN: BigNumber | undefined, fillPriceBN: BigNumber
+  let quoteTokenLabel: React.ReactNode, limitPriceBN: BigNumber | undefined, fillPriceBN: BigNumber
   if (sellToken === baseToken) {
-    side = 'Sell'
     quoteTokenLabel = buyTokenLabel
     limitPriceBN = limitPrice
     fillPriceBN = fillPrice
   } else {
-    side = 'Buy'
     quoteTokenLabel = sellTokenLabel
     limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
     fillPriceBN = invertPrice(fillPrice)
@@ -119,7 +120,6 @@ function getMarketAndPrices(params: MarketAndPricesParams): MarketAndPrices {
 
   return {
     market,
-    side,
     quoteTokenLabel,
     sellTokenLabel,
     buyTokenLabel,
@@ -214,10 +214,10 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           decimals: 8,
         })}`}
       >
-        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
         {marketLimitPrice ? formatPrice(marketLimitPrice) : 'N/A'} {quoteTokenLabel}
         <br />
         {formatPrice(marketFillPrice)} {quoteTokenLabel}
+        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
       </td>
       <td
         data-label="Sold"
