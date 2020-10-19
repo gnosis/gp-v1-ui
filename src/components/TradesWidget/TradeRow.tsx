@@ -34,6 +34,7 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
     div.surplusHighlight {
       color: var(--color-button-success);
       font-size: smaller;
+      font-weight: bolder;
       margin: 0.2rem 0;
     }
   }
@@ -240,7 +241,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
             {formatPrice(marketFillPrice)} {quoteTokenLabel}
           </div>
           {surplus && surplus > SURPLUS_THRESHOLD && (
-            <div className="surplusHighlight">{surplus.toFixed(2)}% surplus</div>
+            <div className="surplusHighlight">+{surplus.toFixed(2)}% surplus</div>
           )}
         </SplitHeaderTitle>
         <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}

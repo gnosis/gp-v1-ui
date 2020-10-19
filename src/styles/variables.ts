@@ -109,7 +109,7 @@ const DarkColors = `
 
   /* Buttons */
   --color-button-primary: #e8e6e3;
-  --color-button-success: #91c591;
+  --color-button-success: #00BE2E;
   --color-button-disabled: #3d4043;
   --color-button-danger: #9c1818;
   --color-button-secondary: #696969;
