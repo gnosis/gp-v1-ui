@@ -151,17 +151,17 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
 }
 
 const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = ({ order, isPendingOrder }) => {
-  const { isNeverExpires, expiresOn, expireDateLocal } = useMemo(() => {
+  const { isNeverExpires, expiresOn, expireDateFormatted } = useMemo(() => {
     const isNeverExpires = isNeverExpiresOrder(order.validUntil) || (isPendingOrder && order.validUntil === 0)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
-    const expireDateLocal = batchIdToDate(order.validUntil).toLocaleString()
+    const expireDateFormatted = batchIdToDate(order.validUntil).toLocaleString()
 
-    return { isNeverExpires, expiresOn, expireDateLocal }
+    return { isNeverExpires, expiresOn, expireDateFormatted }
   }, [isPendingOrder, order.validUntil])
 
   return (
     <td data-label="Expires">
-      {isNeverExpires ? <span>Never</span> : <span title={expireDateLocal}>{expiresOn}</span>}
+      {isNeverExpires ? <span>Never</span> : <span title={expireDateFormatted}>{expiresOn}</span>}
     </td>
   )
 }
