@@ -3,9 +3,13 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
+import PrivateRoute from './PrivateRoute'
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
 import GlobalStyles from 'styles/global'
+import { ToastContainer } from 'setupToastify'
+
+import { assertNonNull } from 'utils'
 
 // Main layout
 import { SwapLayout, TradingLayout } from 'components/layout'
@@ -113,8 +117,6 @@ const Settings = React.lazy(
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
-import PrivateRoute from './PrivateRoute'
-import { assertNonNull } from 'utils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
@@ -147,6 +149,7 @@ const App: React.FC = () => (
         <Route>
           <SwapLayout>
             <GlobalStyles />
+            <ToastContainer />
             <React.Suspense fallback={null}>
               <Switch>
                 <PrivateRoute path="/orders" exact component={Orders} />
