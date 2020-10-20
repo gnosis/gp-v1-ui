@@ -111,7 +111,7 @@ const DarkColors = `
   --color-button-primary: #e8e6e3;
   --color-button-success: #00BE2E;
   --color-button-disabled: #3d4043;
-  --color-button-danger: #9c1818;
+  --color-button-danger: #eb4025;
   --color-button-secondary: #696969;
   --color-modali-close: #218DFF;
 
