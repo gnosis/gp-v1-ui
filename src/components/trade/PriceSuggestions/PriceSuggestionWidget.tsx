@@ -5,6 +5,7 @@ import { TradeFormData } from 'components/TradeWidget'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+import useBestAsk from 'hooks/useBestAsk'
 
 interface Props
   extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
@@ -52,14 +53,10 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     quoteTokenDecimals,
   })
 
-  // TODO: Use best ask price instead
-  const { priceEstimation: bestAskPrice, isPriceLoading: bestAskPriceLoading } = usePriceEstimationWithSlippage({
+  const { bestAskPrice, isBestAskLoading } = useBestAsk({
     networkId,
-    amount: '0',
     baseTokenId,
-    baseTokenDecimals,
     quoteTokenId,
-    quoteTokenDecimals,
   })
 
   return (
@@ -74,7 +71,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
       fillPrice={limitPrice}
       fillPriceLoading={fillPriceLoading}
       bestAskPrice={bestAskPrice}
-      bestAskPriceLoading={bestAskPriceLoading}
+      bestAskPriceLoading={isBestAskLoading}
       // Events
       onClickPrice={updatePrices}
       onSwapPrices={onSwapPrices}
