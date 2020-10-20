@@ -69,7 +69,7 @@ function calculatePriceImpact({
   if (!bestAskPrice || !limitPriceBigNumber) return null
 
   // PRICE_IMPACT = 100 - (BEST_ASK / LIMIT_PRICE * 100)
-  const impact = ONE_BIG_NUMBER.minus(bestAskPrice.div(limitPriceBigNumber)).times(ONE_HUNDRED_BIG_NUMBER)
+  const impact = ONE_HUNDRED_BIG_NUMBER.minus(bestAskPrice.div(limitPriceBigNumber).times(ONE_HUNDRED_BIG_NUMBER))
   return impact.lt(ZERO_BIG_NUMBER) ? ZERO_BIG_NUMBER : impact
 }
 
@@ -90,7 +90,9 @@ function PriceImpact({ limitPrice, baseToken, quoteToken, networkId }: PriceImpa
   const { priceImpactSmart, className } = React.useMemo(() => {
     const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
     const priceImpactSmart =
-      priceImpact && formatSmart({ amount: parseAmount(priceImpact.toString(), 4) as BN, precision: 4 })
+      priceImpact &&
+      !priceImpact.isZero() &&
+      formatSmart({ amount: parseAmount(priceImpact.toString(), 4) as BN, precision: 4, smallLimit: '0.01' })
     const className = getImpactColourClass(priceImpact)
 
     return {
