@@ -73,22 +73,25 @@ interface MarketProps {
 }
 
 const Market: React.FC<MarketProps> = ({ sellToken, buyToken, onCellClick }) => {
-  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
-    buyToken,
-    sellToken,
-  ])
+  const labels = useMemo(
+    () => ({
+      label: `Swap ${displayTokenSymbolOrLink(buyToken)} for ${displayTokenSymbolOrLink(sellToken)}`,
+      market: `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`,
+    }),
+    [buyToken, sellToken],
+  )
   return (
     <td
       data-label="Market"
       onClick={(): void =>
         onCellClick({
           target: {
-            value: market,
+            value: labels.market,
           },
         })
       }
     >
-      {market}
+      {labels.label}
     </td>
   )
 }
@@ -125,20 +128,23 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
     sellToken.decimals,
   ])
 
+  let filledCellContent = 'no limit'
+  let totalCellContent = 'no limit'
+
+  if (!order.isUnlimited) {
+    filledCellContent = `${filledAmount} ${displayTokenSymbolOrLink(sellToken)}`
+    totalCellContent = `${totalAmount} ${displayTokenSymbolOrLink(sellToken)}`
+  }
+
   return (
-    <td data-label="Unfilled Amount">
-      {order.isUnlimited ? (
-        <span>no limit</span>
-      ) : (
-        <>
-          <div className="amounts">
-            {filledAmount} {displayTokenSymbolOrLink(sellToken)}
-            <br />
-            {totalAmount} {displayTokenSymbolOrLink(sellToken)}
-          </div>
-        </>
-      )}
-    </td>
+    <>
+      <td className="amounts" data-label="Filled Amount">
+        {filledCellContent}
+      </td>
+      <td className="amounts" data-label="Total Amount">
+        {totalCellContent}
+      </td>
+    </>
   )
 }
 
@@ -352,11 +358,11 @@ const OrderRow: React.FC<Props> = (props) => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
-        <OrderID orderId={order.id} isPendingOrder={!!isPendingOrder} onCellClick={onCellClick} />
         <Market sellToken={sellToken} buyToken={buyToken} onCellClick={onCellClick} />
         <OrderDetails price={price} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
+        <OrderID orderId={order.id} isPendingOrder={!!isPendingOrder} onCellClick={onCellClick} />
         <Status
           order={order}
           isOverBalance={isOverBalance}
