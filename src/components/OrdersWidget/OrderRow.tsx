@@ -151,20 +151,30 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
 }
 
 const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = ({ order, isPendingOrder }) => {
-  const { isNeverExpires, expiresOn } = useMemo(() => {
+  const { isNeverExpires, expiresOn, expireDateFormatted } = useMemo(() => {
     const isNeverExpires = isNeverExpiresOrder(order.validUntil) || (isPendingOrder && order.validUntil === 0)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
+    const expireDateFormatted = batchIdToDate(order.validUntil).toLocaleString()
 
-    return { isNeverExpires, expiresOn }
+    return { isNeverExpires, expiresOn, expireDateFormatted }
   }, [isPendingOrder, order.validUntil])
 
-  return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
+  return (
+    <td data-label="Expires">
+      {isNeverExpires ? <span>Never</span> : <span title={expireDateFormatted}>{expiresOn}</span>}
+    </td>
+  )
 }
 
-const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { orderId: string }> = ({ orderId, onCellClick }) => (
+const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { isPendingOrder: boolean; orderId: string }> = ({
+  orderId,
+  isPendingOrder,
+  onCellClick,
+}) => (
   <td
     data-label="Order ID"
-    onClick={(): void =>
+    onClick={(): false | void =>
+      !isPendingOrder &&
       onCellClick({
         target: {
           value: orderId,
@@ -172,7 +182,7 @@ const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { orderId: string }> 
       })
     }
   >
-    <EllipsisText title={orderId}>{orderId}</EllipsisText>
+    {isPendingOrder ? <Spinner /> : <EllipsisText title={orderId}>{orderId}</EllipsisText>}
   </td>
 )
 
@@ -186,8 +196,9 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   const batchId = dateToBatchId(now)
   const msRemainingInBatch = getTimeRemainingInBatch({ inMilliseconds: true })
 
+  const validFromDate = batchIdToDate(order.validFrom)
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
-  const isScheduled = batchIdToDate(order.validFrom) > now
+  const isScheduled = validFromDate > now
   const isActiveNextBatch = batchId === order.validFrom
   const isFirstActiveBatch = batchId === order.validFrom + 1 && msRemainingInBatch > 60 * 1000 // up until minute 4
   const isUnlimited = order.isUnlimited
@@ -246,7 +257,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
-    <td className="status showResponsive" data-label="Status">
+    <td className="status showResponsive" data-label="Status" title={isScheduled ? validFromDate.toLocaleString() : ''}>
       {pending ? (
         pending
       ) : isFilled ? (
@@ -347,7 +358,7 @@ const OrderRow: React.FC<Props> = (props) => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
-        <OrderID orderId={order.id} onCellClick={onCellClick} />
+        <OrderID orderId={order.id} isPendingOrder={!!isPendingOrder} onCellClick={onCellClick} />
         <Market sellToken={sellToken} buyToken={buyToken} onCellClick={onCellClick} />
         <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />

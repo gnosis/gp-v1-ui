@@ -167,10 +167,11 @@ function createTcrApi(web3: Web3): TcrApi | undefined {
     case 'none':
       tcrApi = undefined
       break
-    case 'multi-tcr':
+    case 'multi-tcr': {
       const multiTcrApiConfig = CONFIG.tcr
       tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
       break
+    }
 
     default:
       throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)

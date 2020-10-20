@@ -120,7 +120,8 @@ const validFromId: TradeFormTokenId = 'validFrom'
 const validUntilId: TradeFormTokenId = 'validUntil'
 
 // Grab CONFIG tokens
-const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
+const initialTokenSelection = CONFIG.initialTokenSelection
+const { sellToken: initialSellTokenDefault, receiveToken: initialReceiveTokenDefault } = initialTokenSelection
 
 const NoTokens = styled.div`
   height: 100%;
@@ -152,54 +153,39 @@ const TradeWidgetContainer: React.FC = () => {
   const sellTokenSymbol = decodeSymbol(encodedSellTokenSymbol || '')
   const receiveTokenSymbol = decodeSymbol(decodeReceiveTokenSymbol || '')
 
-  const [sellToken, setSellToken] = useState(() =>
-    chooseTokenWithFallback({
-      token: trade.sellToken,
-      tokens,
-      tokenSymbolFromUrl: sellTokenSymbol,
-      defaultTokenSymbol: initialSellToken,
-    }),
+  const { sellToken: initialSellTokenDefaultNetwork, receiveToken: initialReceiveTokenDefaultNetwork } =
+    initialTokenSelection.networks[networkIdOrDefault] || {}
+
+  const sellTokenWithFallback = useMemo(
+    (): TokenDetails | undefined =>
+      chooseTokenWithFallback({
+        token: trade.sellToken,
+        tokens,
+        tokenSymbolFromUrl: sellTokenSymbol,
+        defaultTokenSymbol: initialSellTokenDefaultNetwork || initialSellTokenDefault,
+      }),
+    [trade.sellToken, tokens, sellTokenSymbol, initialSellTokenDefaultNetwork],
   )
-  const [receiveToken, setReceiveToken] = useState(() =>
-    chooseTokenWithFallback({
-      token: trade.buyToken,
-      tokens,
-      tokenSymbolFromUrl: receiveTokenSymbol,
-      defaultTokenSymbol: initialReceiveToken,
-    }),
+
+  const buyTokenWithFallback = useMemo(
+    (): TokenDetails | undefined =>
+      chooseTokenWithFallback({
+        token: trade.buyToken,
+        tokens,
+        tokenSymbolFromUrl: receiveTokenSymbol,
+        defaultTokenSymbol: initialReceiveTokenDefaultNetwork || initialReceiveTokenDefault,
+      }),
+    [trade.buyToken, tokens, receiveTokenSymbol, initialReceiveTokenDefaultNetwork],
   )
+
+  const [sellToken, setSellToken] = useState(sellTokenWithFallback)
+  const [receiveToken, setReceiveToken] = useState(buyTokenWithFallback)
 
   useEffect(() => {
-    //  when switching networks
-    // trade stays filled with last tokens
-    // which may not be available on the new network
-    if (trade.sellToken) {
-      // check if it should be different
-      const sellTokenOrFallback = chooseTokenWithFallback({
-        // don't consider token from trade from wrong network valid
-        token: tokenListApi.hasToken({ tokenAddress: trade.sellToken.address, networkId: networkIdOrDefault })
-          ? trade.sellToken
-          : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault), // get immediate new tokens
-        tokenSymbolFromUrl: sellTokenSymbol, // from url params
-        defaultTokenSymbol: initialSellToken, // default sellToken
-      })
-      setSellToken(sellTokenOrFallback)
-    }
+    setSellToken(sellTokenWithFallback)
+    setReceiveToken(buyTokenWithFallback)
+  }, [sellTokenWithFallback, buyTokenWithFallback])
 
-    if (trade.buyToken) {
-      const buyTokenOrFallback = chooseTokenWithFallback({
-        token: tokenListApi.hasToken({ tokenAddress: trade.buyToken.address, networkId: networkIdOrDefault })
-          ? trade.buyToken
-          : null,
-        tokens: tokenListApi.getTokens(networkIdOrDefault),
-        tokenSymbolFromUrl: receiveTokenSymbol,
-        defaultTokenSymbol: initialReceiveToken, // default buyToken
-      })
-      setReceiveToken(buyTokenOrFallback)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkIdOrDefault])
   // don't need to depend on more than network as everything else updates together
   // also avoids excessive setStates
 
@@ -215,8 +201,6 @@ const TradeWidgetContainer: React.FC = () => {
       balances={balances}
       setSellToken={setSellToken}
       setReceiveToken={setReceiveToken}
-      sellTokenSymbol={sellTokenSymbol}
-      receiveTokenSymbol={receiveTokenSymbol}
     />
   )
 }
@@ -228,10 +212,8 @@ interface TradeWidgetProps {
   receiveToken: TokenDetails
   tokens: TokenDetails[]
   balances: TokenBalanceDetails[]
-  setSellToken: React.Dispatch<React.SetStateAction<TokenDetails>>
-  setReceiveToken: React.Dispatch<React.SetStateAction<TokenDetails>>
-  sellTokenSymbol: string
-  receiveTokenSymbol: string
+  setSellToken: (token: TokenDetails) => void
+  setReceiveToken: (token: TokenDetails) => void
 }
 
 const TradeWidget: React.FC<TradeWidgetProps> = ({
@@ -243,8 +225,6 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   balances,
   setSellToken,
   setReceiveToken,
-  sellTokenSymbol,
-  receiveTokenSymbol,
 }) => {
   const {
     sellAmount: sellParam,
@@ -608,7 +588,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
 
   const tokenAddressesToAdd: string[] = useMemo(
-    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+    () => preprocessTokenAddressesToAdd([sellToken.symbol, receiveToken.symbol], networkIdOrDefault),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   ) // no deps, so that we only calc once on mount

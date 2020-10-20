@@ -70,7 +70,7 @@ describe('Test config defaults', () => {
         {
           networkId: 100,
           // eslint-disable-next-line @typescript-eslint/camelcase
-          url_production: 'https://price-estimate-xdai.dev.gnosisdev.com',
+          url_production: 'https://dex-price-estimator.xdai.gnosis.io',
           // eslint-disable-next-line @typescript-eslint/camelcase
           url_develop: 'https://price-estimate-xdai.dev.gnosisdev.com',
         },
@@ -144,12 +144,18 @@ describe('Test config defaults', () => {
   })
 
   it('initialTokenSelection', () => {
-    expect(CONFIG.initialTokenSelection).toEqual(
-      expect.objectContaining({
-        sellToken: expect.any(String),
-        receiveToken: expect.any(String),
-      }),
-    )
+    const expectedTokenSelectionObject = {
+      sellToken: expect.any(String),
+      receiveToken: expect.any(String),
+    }
+    expect(CONFIG.initialTokenSelection).toEqual(expect.objectContaining(expectedTokenSelectionObject))
+
+    const configNetworks = CONFIG.initialTokenSelection.networks
+    Object.keys(configNetworks).forEach((networkKey) => {
+      const networkSpecificSelection = configNetworks[networkKey]
+      expect(networkKey).toEqual(expect.any(String))
+      expect(networkSpecificSelection).toEqual(expect.objectContaining(expectedTokenSelectionObject))
+    })
   })
 
   it('initialTokenList', () => {
