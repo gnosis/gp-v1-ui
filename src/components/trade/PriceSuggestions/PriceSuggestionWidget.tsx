@@ -6,7 +6,7 @@ import { TradeFormData } from 'components/TradeWidget'
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
 import PriceImpact from '../PriceImpact'
-import { isTruthy } from 'utils'
+import { isStrNumTruthy } from 'utils'
 
 interface Props
   extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
@@ -72,7 +72,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
         onClickPrice={updatePrices}
         onSwapPrices={onSwapPrices}
       />
-      {isTruthy(amount) && (
+      {isStrNumTruthy(amount) && (
         <PriceImpact
           baseToken={baseToken}
           quoteToken={quoteToken}

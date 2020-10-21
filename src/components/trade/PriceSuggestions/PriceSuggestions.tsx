@@ -10,6 +10,7 @@ import { PriceSuggestionItem } from 'components/trade/PriceSuggestions/PriceSugg
 
 import BigNumber from 'bignumber.js'
 import { TokenDex } from '@gnosis.pm/dex-js'
+import { isStrNumTruthy } from 'utils'
 
 export const PriceSuggestionsWrapper = styled.div`
   > div {
@@ -165,7 +166,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
         />
       </div>
       <div className="container">
-        {amount && +amount > 0 && (
+        {isStrNumTruthy(amount) && (
           <PriceSuggestionItem
             label="Fill price"
             amount={amount}
