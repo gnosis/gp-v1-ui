@@ -5,12 +5,15 @@ import { TradeFormData } from 'components/TradeWidget'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+import PriceImpact from '../PriceImpact'
+import { isTruthy } from 'utils'
 
 interface Props
   extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
   networkId: number
   priceInputId: string
   priceInverseInputId: string
+  limitPrice: string
 }
 
 export const PriceSuggestionWidget: React.FC<Props> = (props) => {
@@ -19,6 +22,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
+    limitPrice,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
@@ -43,7 +47,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     [isPriceInverted, trigger, setValue, priceInputId, priceInverseInputId],
   )
 
-  const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
+  const { priceEstimation: fillPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
     amount: amount || '0',
     baseTokenId,
@@ -53,19 +57,30 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
   })
 
   return (
-    <PriceSuggestions
-      // Market
-      baseToken={baseToken}
-      quoteToken={quoteToken}
-      isPriceInverted={isPriceInverted}
-      // Order size
-      amount={amount}
-      // Prices
-      fillPrice={limitPrice}
-      fillPriceLoading={fillPriceLoading}
-      // Events
-      onClickPrice={updatePrices}
-      onSwapPrices={onSwapPrices}
-    />
+    <>
+      <PriceSuggestions
+        // Market
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        isPriceInverted={isPriceInverted}
+        // Order size
+        amount={amount}
+        // Prices
+        fillPrice={fillPrice}
+        fillPriceLoading={fillPriceLoading}
+        // Events
+        onClickPrice={updatePrices}
+        onSwapPrices={onSwapPrices}
+      />
+      {isTruthy(amount) && (
+        <PriceImpact
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+          limitPrice={limitPrice}
+          fillPrice={fillPrice}
+          networkId={networkId}
+        />
+      )}
+    </>
   )
 }
