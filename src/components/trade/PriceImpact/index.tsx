@@ -3,12 +3,20 @@ import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { TokenDex } from '@gnosis.pm/dex-js'
 
+<<<<<<< HEAD
 import { BoldColourTag } from './PriceImpact.styled'
 import { FormMessage } from 'components/common/FormMessage'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { PriceSuggestionsWrapper } from '../PriceSuggestions/PriceSuggestions'
 
 import useBestAsk from 'hooks/useBestAsk'
+=======
+import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
+import { PriceSuggestionsWrapper } from '../PriceSuggestions/PriceSuggestions'
+import { BoldColourTag, PriceImpactFormMessage } from './PriceImpact.styled'
+
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+>>>>>>> move unrelated files into more related FS
 
 import { formatSmart, parseAmount } from 'utils'
 import { calculatePriceImpact, determinePriceWarning, getImpactColourClass } from './utils'
