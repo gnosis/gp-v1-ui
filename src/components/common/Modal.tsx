@@ -4,6 +4,8 @@ import Modali, { ModalHook, ModalOptions, ModalProps, toggleModaliComponent, use
 
 import { MEDIA } from 'const'
 
+const MODALI_OVERLAY_COLOUR = '#2f3e4e80'
+
 const ModaliGlobalStyle = createGlobalStyle` 
 /* Hack to fix Modali screen flash */
   .modali-overlay {
@@ -17,18 +19,17 @@ const ModaliGlobalStyle = createGlobalStyle`
     left: 0;
     right: 0;
     content: "";
-    background-color: var(--color-background-modali);
+    background-color: var(--color-background-opaque-grey, ${MODALI_OVERLAY_COLOUR});
   }
 
   /* Hack to not darken view further when two modali are open */
   .modali-wrapper:nth-last-of-type(n+3)::before {
     display: none;
   }
-
   /* End hack */
   
   .modali-open .modali-overlay {
-    background-color: var(--color-background-modali);
+    background-color: var(--color-background-opaque-grey, ${MODALI_OVERLAY_COLOUR});
     opacity: 1;
   }
   

@@ -1037,7 +1037,7 @@ const GlobalStyles = createGlobalStyle`
     
     button {
       &.Mui-selected.MuiTab-fullWidth:hover {
-        background: var(--color-background-modali);
+        background: var(--color-background-opaque-grey);
       }
 
       &.MuiPickersYear-yearButton.MuiPickersYear-yearSelected,
@@ -1103,7 +1103,7 @@ const GlobalStyles = createGlobalStyle`
       
 
       &.MuiPickersArrowSwitcher-iconButton {
-        background-color: var(--color-background-modali);
+        background-color: var(--color-background-opaque-grey);
       }
     }
 
