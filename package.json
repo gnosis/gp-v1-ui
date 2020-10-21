@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/dex-react",
-  "version": "1.4.2",
+  "version": "1.5.1",
   "description": "",
   "main": "src/index.js",
   "sideEffects": false,
@@ -15,20 +15,22 @@
     "lint:js:fix": "eslint src --fix --ext .ts,.tsx,.js",
     "lint:css": "stylelint 'src/**/*.[jt]s?(x)' --syntax 'css-in-js'",
     "lint:css:fix": "stylelint 'src/**/*.[jt]s?(x)' --syntax 'css-in-js' --fix",
-    "lint": "npm run lint:js && npm run lint:css",
+    "lint": "npm-run-all --parallel lint:*",
     "stats": "rimraf ./dist && NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "MOCK=true jest",
     "test-coverage": "MOCK=true jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "verify": "npm run lint && npm run test",
+    "verify": "npm-run-all --parallel lint:* test",
     "format": "prettier --write \"src/**/*.ts?(x)\" \"src/**/*.js?(x)\"",
     "storybook": "BROWSER=NONE start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "docs": "start-storybook --docs",
-    "build-docs": "build-storybook --docs"
+    "build-docs": "build-storybook --docs",
+    "check-types": "tsc --noEmit"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run verify"
+      "pre-commit": "npm run verify",
+      "pre-push": "npm run check-types"
     }
   },
   "author": "",
@@ -60,6 +62,7 @@
     "json-rpc-engine": "^5.1.8",
     "modali": "^1.2.0",
     "node-cache": "^5.1.0",
+    "npm-run-all": "^4.1.5",
     "qrcode.react": "^1.0.0",
     "react": "^16.12.0",
     "react-copy-to-clipboard": "^5.0.2",
