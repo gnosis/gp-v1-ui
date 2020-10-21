@@ -1,21 +1,20 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
-import { ToastId } from 'react-toastify'
 import { toast } from 'toastify'
 
 import { useWalletConnection } from 'hooks/useWalletConnection'
-import useSafeState from 'hooks/useSafeState'
 
 import { Network } from 'types'
 
-const availableNetworks = CONFIG.exchangeContractConfig.config.map(({ networkId }) => networkId)
+const { config: networkIdList } = CONFIG.exchangeContractConfig
+const availableNetworks = new Set(networkIdList.map(({ networkId }) => networkId))
+const availableNetworksName = networkIdList
+  .map(({ networkId: id }, idx, arr) => (idx === arr.length - 1 ? 'or ' : '') + Network[id])
+  .join(', ')
 
 const NetworkErrorMessage: React.FC = () => (
   <div>
     <div>Please switch to a supported network!</div>
-    <strong>{`${availableNetworks.map(
-      (id, idx, arr) => (idx === arr.length - 1 ? ' or ' : ' ') + Network[id],
-    )}`}</strong>
+    <strong>{availableNetworksName}</strong>
     <br />
     <br />
     <div>
@@ -31,52 +30,25 @@ const NetworkErrorMessage: React.FC = () => (
 function runCheckOnValidNetworks(networkId?: number): boolean {
   if (!networkId) return true
 
-  return availableNetworks.includes(networkId)
+  return availableNetworks.has(networkId)
 }
 
 const useNetworkCheck = (): void => {
-  const [currentNetworkId, setCurrentNetworkId] = useSafeState<Network | undefined>(undefined)
-  const [currentNetworkErrorId, setCurrentNetworkErrorId] = useSafeState<ToastId | undefined>(undefined)
-
   const { networkId } = useWalletConnection()
 
-  const isValidOrNonNetwork = React.useMemo(() => runCheckOnValidNetworks(networkId), [networkId])
-
-  // User switched network, dismiss current error
   React.useEffect(() => {
-    const isNewNetworkError = !isValidOrNonNetwork && currentNetworkId !== networkId
+    const isValidOrNonNetwork = runCheckOnValidNetworks(networkId)
 
-    async function dealWithNewNetworkError(): Promise<void> {
-      if (isValidOrNonNetwork) {
-        if (currentNetworkErrorId) {
-          await toast.dismiss(currentNetworkErrorId)
-          setCurrentNetworkErrorId(undefined)
-        }
-      }
+    if (isValidOrNonNetwork) return
 
-      // Connected to a network but not one of the accepted ones
-      else if (isNewNetworkError) {
-        currentNetworkErrorId && (await toast.dismiss(currentNetworkErrorId))
-        const toastID = await toast.error(<NetworkErrorMessage />, {
-          autoClose: false,
-        })
+    const promisedToastID = toast.error(<NetworkErrorMessage />, {
+      autoClose: false,
+    })
 
-        ReactDOM.unstable_batchedUpdates(() => {
-          setCurrentNetworkId(networkId)
-          setCurrentNetworkErrorId(toastID)
-        })
-      }
+    return (): void => {
+      promisedToastID.then((toastID) => toast.dismiss(toastID))
     }
-
-    dealWithNewNetworkError()
-  }, [
-    currentNetworkErrorId,
-    currentNetworkId,
-    isValidOrNonNetwork,
-    networkId,
-    setCurrentNetworkErrorId,
-    setCurrentNetworkId,
-  ])
+  }, [networkId])
 }
 
 export default useNetworkCheck
