@@ -17,7 +17,7 @@ const CardRowDrawer = styled.tr`
   width: 100%;
   height: 100%;
   border-radius: 0.6rem;
-  background: var(--color-background-modali);
+  background: var(--color-background-opaque-grey);
 
   /* Inner td wrapper */
   > td {
