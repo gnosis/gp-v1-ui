@@ -1,12 +1,12 @@
 import tokenList from '../data/tokenList'
-import { TradeTokenSelection } from 'types'
-import { getMarket, GetMarketResult } from 'utils'
+import { Market, TradeTokenSelection } from 'types'
+import { getMarket } from 'utils'
 
 // QUOTE gives price
 //     BASE/QUOTE
 // e.g WETH/TUSD
 
-function assertMarket(tradeTokenSelection: TradeTokenSelection, expectedMarket: GetMarketResult): void {
+function assertMarket(tradeTokenSelection: TradeTokenSelection, expectedMarket: Market): void {
   // Run through checkMarketFn
   const market = getMarket(tradeTokenSelection)
   expect(market).toEqual(expectedMarket)
@@ -28,7 +28,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: TUSD,
         baseToken: USDT,
-        wasPriorityAdjusted: false,
       }
 
       // Expected, Given Market
@@ -43,7 +42,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: TUSD,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -59,7 +57,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: WETH,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -73,7 +70,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: WETH,
-        wasPriorityAdjusted: true,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -89,7 +85,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: WETH,
-        wasPriorityAdjusted: true,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -103,7 +98,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: WETH,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -119,7 +113,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: WETH,
-        wasPriorityAdjusted: true,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -133,7 +126,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: USDT,
         baseToken: WETH,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -149,7 +141,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: WETH,
         baseToken: FAKE,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -163,7 +154,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: WETH,
         baseToken: FAKE,
-        wasPriorityAdjusted: true,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -179,7 +169,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: FAKE,
         baseToken: FAKE2,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)
@@ -193,7 +182,6 @@ describe('Check market and check base/quote token priorities', () => {
       const expectedResult = {
         quoteToken: FAKE2,
         baseToken: FAKE,
-        wasPriorityAdjusted: false,
       }
 
       assertMarket(givenTokens, expectedResult)

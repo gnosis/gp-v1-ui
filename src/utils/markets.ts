@@ -2,11 +2,7 @@ import { safeTokenName } from '@gnosis.pm/dex-js'
 import { Market, TradeTokenSelection } from 'types'
 import { logDebug } from './miscellaneous'
 
-export interface GetMarketResult extends Market {
-  wasPriorityAdjusted: boolean
-}
-
-export function getMarket({ sellToken, receiveToken }: TradeTokenSelection): GetMarketResult {
+export function getMarket({ sellToken, receiveToken }: TradeTokenSelection): Market {
   // Choose the market depending on the prios of selected tokens
   // i.e.
   //  Prio: 1                  - STABLE USD
@@ -37,8 +33,5 @@ export function getMarket({ sellToken, receiveToken }: TradeTokenSelection): Get
   return {
     baseToken,
     quoteToken,
-    // TODO: I kept this prop for respecing this part of the original PR, but I think it shouldn't be here. We'll review later
-    //      https://github.com/gnosis/dex-react/issues/1476
-    wasPriorityAdjusted: receiveToken === quoteToken,
   }
 }
