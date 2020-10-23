@@ -74,9 +74,21 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
     let timeoutId: NodeJS.Timeout | null = null
 
     timeoutId = setTimeout(function askOnTimeout() {
-      // code 106 -- Timeout
-      // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
-      end({ message: 'Timeout for transaction approval or rejection', code: 106 })
+      if (confirm('Stop waiting for tx approval?')) {
+        // stop waiting
+        setTimeout(() => {
+          // if using an async confirm (modal, toast, etc.)
+          // won't need this timeout as execution will be in order anyway
+          // otherwise timeout to break out of sync code
+          if (!timeoutId) return // reset in end() call from provider response
+          // code 106 -- Timeout
+          // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
+          end({ message: 'Timeout for transaction approval or rejection', code: 106 })
+        }, 500) // after a delay, to allow end() call from provider response to take propagate throw middlewares
+      } else {
+        // wait some more
+        timeoutId = setTimeout(askOnTimeout, timeout)
+      }
     }, timeout)
 
     const endWithTimeout = (error?: JsonRpcError<unknown>): void => {
