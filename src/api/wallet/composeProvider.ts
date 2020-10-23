@@ -230,7 +230,7 @@ export const composeProvider = <T extends Provider>(
   )
 
   const walletMiddleware = providerAsMiddleware(provider)
-  engine.push(walletMiddleware)
+  engine.push(wrapInTimeout(walletMiddleware))
 
   const composedProvider: T = providerFromEngine(engine)
 
