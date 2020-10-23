@@ -60,7 +60,7 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   if (isLimitPriceLessThanFillPrice) {
     // CASE 5: Limit price LESS THAN Fill price AND Best Ask price
     if (isLimitPriceLessThanFillAndBestAsk) {
-      warning = 'Your order might only be filled when the market price reaches your limit price'
+      warning = '⚠️ Your order might only be filled when the market price reaches your limit price'
     } else {
       // CASE 3 & 4: Limit price LESS THAN Fill price but EQUAL TO or GREATER than Best Ask price
       warning = 'Your order might only be partially filled'
@@ -69,7 +69,7 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
     // CASE 6: Limit price is GREATER THAN Fill price (and Best Ask)
     const impactLevel = determineImpactLevel(impact)
     if (impactLevel === 3) {
-      warning = 'Deep in the market: Your order might be fully executed at this price.'
+      warning = '⚠️ Deep in the market: Your order might be fully executed at this price.'
     } else {
       warning = 'Your order might be fully executed at this price.'
     }
