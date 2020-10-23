@@ -59,12 +59,13 @@ function PriceImpact({
     const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
     // Smart format, if possible
     const priceImpactSmart =
-      priceImpact &&
-      !priceImpact.isZero() &&
-      formatSmart({ amount: parseAmount(priceImpact.toString(), 4) as BN, precision: 4, smallLimit: '0.01' })
+      (priceImpact &&
+        !priceImpact.isZero() &&
+        formatSmart({ amount: parseAmount(priceImpact.toString(), 4) as BN, precision: 4, smallLimit: '0.01' })) ||
+      '<0.01'
 
     // Calculate any applicable trade warnings
-    const priceWarning = determinePriceWarning({ limitPrice, fillPrice, bestAskPrice })
+    const priceWarning = determinePriceWarning({ limitPrice, fillPrice, bestAskPrice }, priceImpact)
     // Dynamic class for styling
     const className = getImpactColourClass(priceImpact)
 
@@ -89,8 +90,10 @@ function PriceImpact({
       )}
       {/* Warning */}
       {priceWarning && (
-        <PriceImpactFormMessage className="warning tradeWarning">
-          <span>⚠️</span> <span>{priceWarning}</span>
+        <PriceImpactFormMessage className="warning">
+          <BoldColourTag as="span" className={className}>
+            {priceWarning}
+          </BoldColourTag>
         </PriceImpactFormMessage>
       )}
     </PriceSuggestionsWrapper>
