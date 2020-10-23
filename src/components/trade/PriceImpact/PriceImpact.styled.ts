@@ -4,8 +4,10 @@ import { FormMessage } from 'components/common/FormMessage'
 export const PriceImpactFormMessage = styled(FormMessage)`
   &&&&& {
     flex-flow: row nowrap;
+    font-weight: bold;
+    background: none;
 
-    > span:first-child {
+    > span.icon {
       font-size: larger;
       margin: 0 0.7rem 0 0.5rem;
     }
@@ -15,6 +17,10 @@ export const PriceImpactFormMessage = styled(FormMessage)`
 export const BoldColourTag = styled.strong`
   &.highImpact {
     color: var(--color-button-danger);
+  }
+
+  &.midImpact {
+    color: var(--color-button-warning, lightorange);
   }
 
   &.lowImpact {
