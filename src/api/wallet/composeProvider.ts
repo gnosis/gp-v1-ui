@@ -62,6 +62,35 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
   }
 }
 
+// wait 7 sec, for now
+const DEFAULT_TX_APPROVAL_TIMEOUT = 7000
+
+const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPROVAL_TIMEOUT): JsonRpcMiddleware => {
+  return (req, res, next, end): void => {
+    if (req.method !== 'eth_sendTransaction') {
+      return middleware(req, res, next, end)
+    }
+
+    let timeoutId: NodeJS.Timeout | null = null
+
+    timeoutId = setTimeout(function askOnTimeout() {
+      // code 106 -- Timeout
+      // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
+      end({ message: 'Timeout for transaction approval or rejection', code: 106 })
+    }, timeout)
+
+    const endWithTimeout = (error?: JsonRpcError<unknown>): void => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+        timeoutId = null
+      }
+      end(error)
+    }
+
+    return middleware(req, res, next, endWithTimeout)
+  }
+}
+
 const createConditionalMiddleware = <T extends unknown>(
   condition: (req: JsonRpcRequest<T>) => boolean,
   handle: (req: JsonRpcRequest<T>, res: JsonRpcResponse<T>) => boolean | Promise<boolean>, // handled -- true, not --false
