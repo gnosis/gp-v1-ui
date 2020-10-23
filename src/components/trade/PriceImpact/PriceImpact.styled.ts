@@ -1,18 +1,4 @@
 import styled from 'styled-components'
-import { FormMessage } from 'components/common/FormMessage'
-
-export const PriceImpactFormMessage = styled(FormMessage)`
-  &&&&& {
-    flex-flow: row nowrap;
-    font-weight: bold;
-    background: none;
-
-    > span.icon {
-      font-size: larger;
-      margin: 0 0.7rem 0 0.5rem;
-    }
-  }
-`
 
 export const BoldColourTag = styled.strong`
   &.highImpact {

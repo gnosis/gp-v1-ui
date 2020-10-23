@@ -3,9 +3,10 @@ import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import { TokenDex } from '@gnosis.pm/dex-js'
 
+import { BoldColourTag } from './PriceImpact.styled'
+import { FormMessage } from 'components/common/FormMessage'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { PriceSuggestionsWrapper } from '../PriceSuggestions/PriceSuggestions'
-import { BoldColourTag, PriceImpactFormMessage } from './PriceImpact.styled'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 
@@ -31,7 +32,7 @@ interface PriceImpactProps {
 
 const PriceImpactTooltip: React.FC = () => (
   <HelpTooltipContainer>
-    The difference between the market price and the estimated fill price due to order size
+    The difference between the market price and the limit price due to order size
   </HelpTooltipContainer>
 )
 
@@ -90,11 +91,9 @@ function PriceImpact({
       )}
       {/* Warning */}
       {priceWarning && (
-        <PriceImpactFormMessage className="warning">
-          <BoldColourTag as="span" className={className}>
-            {priceWarning}
-          </BoldColourTag>
-        </PriceImpactFormMessage>
+        <FormMessage className="warning">
+          <BoldColourTag as="span">{priceWarning}</BoldColourTag>
+        </FormMessage>
       )}
     </PriceSuggestionsWrapper>
   )

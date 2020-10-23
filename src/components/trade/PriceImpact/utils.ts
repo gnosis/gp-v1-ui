@@ -47,11 +47,18 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   const { limitPrice, fillPrice, bestAskPrice } = params
 
   const limitPriceBigNumber = limitPrice && parseBigNumber(limitPrice)
-  // const fillPriceRounded = fillPrice?.toFixed(5)
+  const fillPriceRounded = fillPrice?.toFixed(5)
 
   // CASE 1 & 2: no warning
   // round fillPrice to 5 decimals points and string compare against limit
-  if (!limitPriceBigNumber || limitPriceBigNumber.isZero() || !fillPrice || !bestAskPrice) return null
+  if (
+    !limitPriceBigNumber ||
+    limitPriceBigNumber.isZero() ||
+    !fillPrice ||
+    !bestAskPrice ||
+    fillPriceRounded === limitPrice
+  )
+    return null
 
   const isLimitPriceLessThanFillPrice = limitPriceBigNumber.lt(fillPrice)
   const isLimitPriceLessThanFillAndBestAsk = isLimitPriceLessThanFillPrice && limitPriceBigNumber.lt(bestAskPrice)
