@@ -66,6 +66,9 @@ Read more [here](https://github.com/gnosis/dex-react/wiki/Fork-project).
 
 Learn about customizing components [here](https://github.com/gnosis/dex-react/wiki/Customize-Components).
 
+## 🖧 Supported networks
+App is currently compatible with Mainnet, Rinkeby, and xDAI. Please refer to the [wiki](https://github.com/gnosis/dex-react/wiki#-compatible-networks) for further information.
+
 ## 🦺 Testnet faucets
 
 Test faucets allow to get some tokens for using them in a testnet.

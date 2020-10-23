@@ -58,7 +58,7 @@ const LightColors = `
   --color-text-wallet: #000;
   --color-text-deposit-header: #000000;
   --color-background-nav-active: #DFE6EF;
-  --color-background-modali: #2f3e4e80;
+  --color-background-opaque-grey: #2f3e4e80;
   --color-text-modali: #526877;
 
   /* SVGs */
