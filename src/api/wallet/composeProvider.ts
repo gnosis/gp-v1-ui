@@ -12,6 +12,8 @@ import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
 
+import { openWaitForTxApprovalModal } from 'components/OuterModal'
+
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
   // WalletConnectProvider.sendAsync is web3-provider-engine.sendAsync
@@ -73,18 +75,13 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
 
     let timeoutId: NodeJS.Timeout | null = null
 
-    timeoutId = setTimeout(function askOnTimeout() {
-      if (confirm('Stop waiting for tx approval?')) {
+    timeoutId = setTimeout(async function askOnTimeout() {
+      if (await openWaitForTxApprovalModal(timeout)) {
         // stop waiting
-        setTimeout(() => {
-          // if using an async confirm (modal, toast, etc.)
-          // won't need this timeout as execution will be in order anyway
-          // otherwise timeout to break out of sync code
-          if (!timeoutId) return // reset in end() call from provider response
-          // code 106 -- Timeout
-          // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
-          end({ message: 'Timeout for transaction approval or rejection', code: 106 })
-        }, 500) // after a delay, to allow end() call from provider response to take propagate throw middlewares
+        if (!timeoutId) return // reset in end() call from provider response
+        // code 106 -- Timeout
+        // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
+        end({ message: 'Timeout for transaction approval or rejection', code: 106 })
       } else {
         // wait some more
         timeoutId = setTimeout(askOnTimeout, timeout)
