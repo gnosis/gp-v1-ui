@@ -9,13 +9,15 @@ import { displayTokenSymbolOrLink, symbolOrAddress } from 'utils/display'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 
 import useSafeState from 'hooks/useSafeState'
-import { usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
+import { usePriceEstimationWithSlippage, usePriceEstimationInOwl, useWETHPriceInOwl } from 'hooks/usePriceEstimation'
+import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
+import usePriceImpact from 'components/trade/PriceImpact/usePriceImpact'
+import { useGasPrice } from 'hooks/useGasPrice'
+
 import BigNumber from 'bignumber.js'
 import { ZERO_BIG_NUMBER } from 'const'
 
 import alertIcon from 'assets/img/alert.svg'
-import { useGasPrice } from 'hooks/useGasPrice'
-import { useMinTradableAmountInOwl } from 'hooks/useMinTradableAmountInOwl'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 import { SwapPrice } from 'components/common/SwapPrice'
@@ -258,6 +260,77 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
   // Get canonical market
   const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
 
+  const baseProps = {
+    baseTokenId: baseToken.id,
+    quoteTokenId: quoteToken.id,
+    networkId,
+  }
+
+  const { priceEstimation: fillPrice } = usePriceEstimationWithSlippage({
+    ...baseProps,
+    baseTokenDecimals: baseToken.decimals,
+    quoteTokenDecimals: quoteToken.decimals,
+    amount: sellTokenAmount,
+  })
+
+  const { priceImpactWarning } = usePriceImpact({
+    ...baseProps,
+    limitPrice: price,
+    fillPrice,
+  })
+
+  logDebug('[TX-MESSAGE] limit price:', sellTokenAmount)
+  logDebug('[TX-MESSAGE] warning:', priceImpactWarning)
+  logDebug('[TX-MESSAGE] fillPrice:', fillPrice?.toString())
+
+  const renderWarnings = React.useCallback(() => {
+    if (!isLoading) {
+      return (
+        <>
+          {isLowVolume && (
+            <Warning>
+              <div>
+                <p>
+                  This is a low volume order. We recommend selling at least{' '}
+                  <strong>
+                    {formattedAmount} {symbolOrAddress(sellToken)}
+                  </strong>{' '}
+                  (approximately <strong>${amountInUSD}</strong>) of the token.
+                </p>
+                <p>
+                  Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
+                  their running costs. Learn more{' '}
+                  <a
+                    href="https://docs.gnosis.io/protocol/docs/faq#minimum-order"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    here
+                  </a>
+                  .
+                </p>
+              </div>
+              <img className="alert" src={alertIcon} />
+            </Warning>
+          )}
+          {priceImpactWarning?.warning && (
+            <Warning>
+              <div style={{ flexFlow: 'column' }}>
+                {priceImpactWarning.warningTitle && (
+                  <strong style={{ marginBottom: '0.2rem' }}>Price Alert: {priceImpactWarning.warningTitle}</strong>
+                )}
+                <div>{priceImpactWarning.warning}</div>
+              </div>
+              <img className="alert" src={alertIcon} />
+            </Warning>
+          )}
+        </>
+      )
+    }
+
+    return null
+  }, [amountInUSD, formattedAmount, isLoading, isLowVolume, priceImpactWarning, sellToken])
+
   return (
     <TxMessageWrapper>
       <div className="intro-text">
@@ -327,32 +400,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
           Expires: <span>{validUntil ? formatDateLocaleShortTime(+validUntil) : 'Never'}</span>
         </div>
       </div>
-      {!isLoading && isLowVolume && (
-        <Warning>
-          <div>
-            <p>
-              This is a low volume order. We recommend selling at least{' '}
-              <strong>
-                {formattedAmount} {symbolOrAddress(sellToken)}
-              </strong>{' '}
-              (approximately <strong>${amountInUSD}</strong>) of the token.
-            </p>
-            <p>
-              Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
-              their running costs. Learn more{' '}
-              <a
-                href="https://docs.gnosis.io/protocol/docs/faq#minimum-order"
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                here
-              </a>
-              .
-            </p>
-          </div>
-          <img className="alert" src={alertIcon} />
-        </Warning>
-      )}
+      {renderWarnings()}
     </TxMessageWrapper>
   )
 }
