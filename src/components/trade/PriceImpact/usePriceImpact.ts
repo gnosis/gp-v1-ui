@@ -18,12 +18,18 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
 
   return useMemo(() => {
     const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
+    const priceImpactBN = priceImpact && (parseAmount(priceImpact.toString(), 4) as BN)
     // Smart format, if possible
-    const priceImpactSmart =
-      (priceImpact &&
-        !priceImpact.isZero() &&
-        formatSmart({ amount: parseAmount(priceImpact.toString(), 4) as BN, precision: 4, smallLimit: '0.01' })) ||
-      '<0.01'
+    let priceImpactSmart: string
+    if (priceImpactBN && !priceImpactBN.isZero()) {
+      priceImpactSmart = formatSmart({
+        amount: priceImpactBN,
+        precision: 4,
+        smallLimit: '0.01',
+      })
+    } else {
+      priceImpactSmart = '<0.01'
+    }
 
     // Calculate any applicable trade warnings
     const priceImpactWarning = determinePriceWarning({ limitPrice, fillPrice, bestAskPrice }, priceImpact)
