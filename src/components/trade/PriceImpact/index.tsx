@@ -1,34 +1,13 @@
 import React from 'react'
-import BigNumber from 'bignumber.js'
-import BN from 'bn.js'
-import { TokenDex } from '@gnosis.pm/dex-js'
 
-import { BoldColourTag } from './PriceImpact.styled'
 import { FormMessage } from 'components/common/FormMessage'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
+import { BoldColourTag } from './PriceImpact.styled'
 import { PriceSuggestionsWrapper } from '../PriceSuggestions/PriceSuggestions'
 
-import useBestAsk from 'hooks/useBestAsk'
+import usePriceImpact from './usePriceImpact'
 
-import { formatSmart, parseAmount } from 'utils'
-import { calculatePriceImpact, determinePriceWarning, getImpactColourClass } from './utils'
-
-export interface PriceImpactArgsBase {
-  limitPrice?: string | null
-  bestAskPrice: BigNumber | null
-}
-
-export interface PriceImpactArgs extends PriceImpactArgsBase {
-  fillPrice: BigNumber | null
-}
-
-interface PriceImpactProps {
-  baseToken: TokenDex
-  quoteToken: TokenDex
-  limitPrice?: string | null
-  fillPrice: BigNumber | null
-  networkId: number
-}
+import { PriceImpactProps } from './types'
 
 const PriceImpactTooltip: React.FC = () => (
   <HelpTooltipContainer>
@@ -36,47 +15,18 @@ const PriceImpactTooltip: React.FC = () => (
   </HelpTooltipContainer>
 )
 
-function PriceImpact({
-  limitPrice,
-  fillPrice,
-  baseToken,
-  quoteToken,
-  networkId,
-}: PriceImpactProps): React.ReactElement | null {
-  const { id: baseTokenId } = baseToken
-  const { id: quoteTokenId } = quoteToken
+function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
+  const {
+    baseToken: { id: baseTokenId },
+    quoteToken: { id: quoteTokenId },
+    ...rest
+  } = params
 
-  const { bestAskPrice } = useBestAsk({
-    networkId,
+  const { priceImpactSmart, priceImpactWarning, priceImpactClassName } = usePriceImpact({
+    ...rest,
     baseTokenId,
     quoteTokenId,
   })
-
-  const { priceImpactSmart, className, priceWarning } = React.useMemo(() => {
-    const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
-    const priceImpactBN = priceImpact && (parseAmount(priceImpact.toString(), 4) as BN)
-    // Smart format, if possible
-    let priceImpactSmart: string
-    if (priceImpactBN && !priceImpactBN.isZero()) {
-      priceImpactSmart = formatSmart({
-        amount: priceImpactBN,
-        precision: 4,
-        smallLimit: '0.01',
-      })
-    } else {
-      priceImpactSmart = '<0.01'
-    }
-    // Calculate any applicable trade warnings
-    const priceWarning = determinePriceWarning({ limitPrice, fillPrice, bestAskPrice }, priceImpact)
-    // Dynamic class for styling
-    const className = getImpactColourClass(priceImpact)
-
-    return {
-      priceImpactSmart,
-      className,
-      priceWarning,
-    }
-  }, [bestAskPrice, fillPrice, limitPrice])
 
   return (
     <PriceSuggestionsWrapper as="section">
@@ -84,16 +34,16 @@ function PriceImpact({
         <div className="container">
           <span>
             <span>Price impact </span>
-            <BoldColourTag className={className}>
+            <BoldColourTag className={priceImpactClassName}>
               <HelpTooltip tooltip={<PriceImpactTooltip />} /> {priceImpactSmart}%
             </BoldColourTag>
           </span>
         </div>
       )}
       {/* Warning */}
-      {priceWarning && (
+      {priceImpactWarning && (
         <FormMessage className="warning">
-          <BoldColourTag as="span">{priceWarning}</BoldColourTag>
+          <BoldColourTag as="span">{priceImpactWarning}</BoldColourTag>
         </FormMessage>
       )}
     </PriceSuggestionsWrapper>
