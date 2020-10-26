@@ -22,6 +22,7 @@ export interface TokenDetails extends TokenDex {
   label: string
   disabled?: boolean
   override?: TokenOverride
+  priority?: number
 }
 
 export interface BalanceDetails {
@@ -35,6 +36,16 @@ export interface BalanceDetails {
   immatureClaim?: boolean
 }
 
+export interface TradeTokenSelection {
+  sellToken: TokenDetails
+  receiveToken: TokenDetails
+}
+
+export interface Market {
+  baseToken: TokenDetails
+  quoteToken: TokenDetails
+}
+
 export type TokenBalanceDetails = TokenDetails & BalanceDetails
 
 export interface WithTxOptionalParams {
@@ -46,3 +57,8 @@ export interface TxOptionalParams {
 }
 
 export type Receipt = TransactionReceipt
+
+export interface Fraction {
+  denominator: BN
+  numerator: BN
+}
