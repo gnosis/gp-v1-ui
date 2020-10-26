@@ -43,6 +43,8 @@ const useNetworkCheck = (): void => {
 
     const promisedToastID = toast.error(<NetworkErrorMessage />, {
       autoClose: false,
+      closeOnClick: false,
+      closeButton: false,
     })
 
     return (): void => {
