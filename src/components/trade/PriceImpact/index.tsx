@@ -8,7 +8,7 @@ import { FormMessage } from 'components/common/FormMessage'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { PriceSuggestionsWrapper } from '../PriceSuggestions/PriceSuggestions'
 
-import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
+import useBestAsk from 'hooks/useBestAsk'
 
 import { formatSmart, parseAmount } from 'utils'
 import { calculatePriceImpact, determinePriceWarning, getImpactColourClass } from './utils'
@@ -43,17 +43,14 @@ function PriceImpact({
   quoteToken,
   networkId,
 }: PriceImpactProps): React.ReactElement | null {
-  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
+  const { id: baseTokenId } = baseToken
+  const { id: quoteTokenId } = quoteToken
 
   // TODO: useBestAskPrice hook here
-  const { priceEstimation: bestAskPrice } = usePriceEstimationWithSlippage({
+  const { bestAskPrice } = useBestAsk({
     networkId,
-    amount: '0',
     baseTokenId,
-    baseTokenDecimals,
     quoteTokenId,
-    quoteTokenDecimals,
   })
 
   const { priceImpactSmart, className, priceWarning } = React.useMemo(() => {
