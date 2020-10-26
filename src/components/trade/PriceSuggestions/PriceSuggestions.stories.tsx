@@ -29,7 +29,7 @@ const Template: Story<Partial<Props>> = (props) => {
     <PriceSuggestions
       {...defaultProps}
       isPriceInverted={isPriceInverted}
-      onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
+      onSwapPrices={(): void => setIsPriceInverted((isPriceInverted) => !isPriceInverted)}
       onClickPrice={(price, invertedPrice) => (): void =>
         console.log('Click price', price, invertedPrice, isPriceInverted)}
       {...props}

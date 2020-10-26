@@ -63,7 +63,6 @@ export const StandaloneCardWrapper = styled.div`
 `
 export const PageWrapper = styled.section`
   height: 75rem;
-  min-width: 85rem;
   max-width: 100%;
 
   background: var(--color-background-pageWrapper);
@@ -73,10 +72,6 @@ export const PageWrapper = styled.section`
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     min-height: 35rem;
     height: auto;
-  }
-
-  @media ${MEDIA.tablet} {
-    min-width: 72.7rem;
   }
 
   @media ${MEDIA.mobile} {
