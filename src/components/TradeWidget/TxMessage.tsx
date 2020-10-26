@@ -313,13 +313,11 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
               <img className="alert" src={alertIcon} />
             </Warning>
           )}
-          {priceImpactWarning?.warning && (
+          {priceImpactWarning && (
             <Warning>
               <div style={{ flexFlow: 'column' }}>
-                {priceImpactWarning.warningTitle && (
-                  <strong style={{ marginBottom: '0.2rem' }}>Price Alert: {priceImpactWarning.warningTitle}</strong>
-                )}
-                <div>{priceImpactWarning.warning}</div>
+                <strong style={{ marginBottom: '0.2rem' }}>Price Alert</strong>
+                <div>{priceImpactWarning}</div>
               </div>
               <img className="alert" src={alertIcon} />
             </Warning>

@@ -22,7 +22,7 @@ export interface PriceImpactProps {
 export interface UsePriceImpactReturn {
   priceImpactSmart: string
   priceImpactClassName: string
-  priceImpactWarning: { warning: string | null; warningTitle: string | null } | null
+  priceImpactWarning: string | null
 }
 
 export type UsePriceImpactParams = BestAskParams & Pick<PriceImpactProps, 'limitPrice' | 'fillPrice'>

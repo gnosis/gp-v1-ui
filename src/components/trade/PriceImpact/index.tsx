@@ -41,9 +41,9 @@ function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
         </div>
       )}
       {/* Warning */}
-      {priceImpactWarning?.warning && (
+      {priceImpactWarning && (
         <FormMessage className="warning">
-          <BoldColourTag as="span">{priceImpactWarning.warning}</BoldColourTag>
+          <BoldColourTag as="span">{priceImpactWarning}</BoldColourTag>
         </FormMessage>
       )}
     </PriceSuggestionsWrapper>
