@@ -9,6 +9,9 @@ import { PriceImpactArgs, PriceImpactArgsBase } from '../PriceImpact'
 const HIGH_PRICE_IMPACT_THRESHOLD = new BigNumber(5)
 const MID_PRICE_IMPACT_THRESHOLD = new BigNumber(3)
 const LOW_PRICE_IMPACT_THRESHOLD = ONE_BIG_NUMBER
+// TODO: remove for slippage toggle
+// 0.5% placeholder slippage
+const PLACEHOLDER_SLIPPAGE = new BigNumber(0.005)
 
 const determineImpactLevel = (impact: BigNumber | null): number => {
   let impactLevel = 0
@@ -60,7 +63,11 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   )
     return null
 
+  // Is user's limit price less than the suggested fill price?
   const isLimitPriceLessThanFillPrice = limitPriceBigNumber.lt(fillPrice)
+  // Is user's limit price less than suggested fill price AND best ask?
+  // One could assume that if the limit price is lower than best ask then it's lower than fill
+  // but just to be safe
   const isLimitPriceLessThanFillAndBestAsk = isLimitPriceLessThanFillPrice && limitPriceBigNumber.lt(bestAskPrice)
 
   let warning: string
@@ -75,7 +82,10 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   } else {
     // CASE 6: Limit price is GREATER THAN Fill price (and Best Ask)
     const impactLevel = determineImpactLevel(impact)
-    if (impactLevel === 3) {
+    // Calculate Deep Market warning threshold using slippage
+    const deepMarketPriceCeiling = limitPriceBigNumber.gte(fillPrice.times(ONE_BIG_NUMBER.plus(PLACEHOLDER_SLIPPAGE)))
+    // Check against impact level AND the slippage
+    if (impactLevel === 3 && deepMarketPriceCeiling) {
       warning = '⚠️ Deep in the market: Your order might be fully executed at this price.'
     } else {
       warning = 'Your order might be fully executed at this price.'
