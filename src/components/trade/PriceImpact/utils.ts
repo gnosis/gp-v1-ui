@@ -20,8 +20,12 @@ enum ImpactLevel {
   NONE = 0,
 }
 
-const DEEP_MARKET_WARNING = '⚠️ Deep in the market: Your order might be fully executed at this price.'
-const BELOW_ASK_WARNING = '⚠️ Your order might only be filled when the market price reaches your limit price'
+const WARNINGS = {
+  DEEP_MARKET: '⚠️ Deep in the market: Your order might be fully executed at this price',
+  UNEXECUTED: '⚠️ Your order might only be filled when the market price reaches your limit price',
+  PARTIALLY_EXECUTED: 'Your order might only be partially filled',
+  MAYBE_FULLY_EXECUTED: 'Your order might be fully executed at this price',
+}
 
 const determineImpactLevel = (impact: BigNumber | null): ImpactLevel => {
   const impactLevel = ImpactLevel.NONE
@@ -83,24 +87,24 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   // limitPrice * 1.05
   const isPriceAboveDeepMarketThreshold =
     impactLevel === ImpactLevel.HIGH && limitPriceBigNumber.gte(fillPrice.times(HIGH_PLACEHOLDER_SLIPPAGE))
-
+  // Price is:
+  // 1. above Fill Price
+  // 2.not above deep market
   const isPriceMidImpactAndExecutable =
-    impactLevel >= ImpactLevel.LOW &&
-    !orderWontBeFullyExecuted &&
-    limitPriceBigNumber.gte(fillPrice.times(MID_PLACEHOLDER_SLIPPAGE))
+    !isPriceAboveDeepMarketThreshold && limitPriceBigNumber.gte(fillPrice.times(MID_PLACEHOLDER_SLIPPAGE))
 
   switch (true) {
     // CASE 6: Limit price is GREATER THAN Fill price AND upper threshold 5%
     case isPriceAboveDeepMarketThreshold:
-      return DEEP_MARKET_WARNING
+      return WARNINGS.DEEP_MARKET
     // CASE 5
     case orderWontBeExecuted:
-      return BELOW_ASK_WARNING
+      return WARNINGS.UNEXECUTED
     case orderWontBeFullyExecuted:
-      return 'Your order might only be partially filled'
+      return WARNINGS.PARTIALLY_EXECUTED
     // CASE 2
     case isPriceMidImpactAndExecutable:
-      return 'Your order might be fully executed at this price.'
+      return WARNINGS.MAYBE_FULLY_EXECUTED
     // CASE 4 & 3
     default:
       return ''
