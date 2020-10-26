@@ -20,6 +20,9 @@ enum ImpactLevel {
   NONE = 0,
 }
 
+const DEEP_MARKET_WARNING = '⚠️ Deep in the market: Your order might be fully executed at this price.'
+const BELOW_ASK_WARNING = '⚠️ Your order might only be filled when the market price reaches your limit price'
+
 const determineImpactLevel = (impact: BigNumber | null): ImpactLevel => {
   const impactLevel = ImpactLevel.NONE
 
@@ -89,10 +92,10 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   switch (true) {
     // CASE 6: Limit price is GREATER THAN Fill price AND upper threshold 5%
     case isPriceAboveDeepMarketThreshold:
-      return '⚠️ Deep in the market: Your order might be fully executed at this price.'
+      return DEEP_MARKET_WARNING
     // CASE 5
     case orderWontBeExecuted:
-      return '⚠️ Your order might only be filled when the market price reaches your limit price'
+      return BELOW_ASK_WARNING
     case orderWontBeFullyExecuted:
       return 'Your order might only be partially filled'
     // CASE 2
