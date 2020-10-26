@@ -2,8 +2,7 @@ import BigNumber from 'bignumber.js'
 
 import { parseBigNumber } from 'utils'
 import { ONE_HUNDRED_BIG_NUMBER, ONE_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
-
-import { PriceImpactArgs, PriceImpactArgsBase } from '../PriceImpact'
+import { PriceImpactArgs, PriceImpactArgsBase } from './types'
 
 // Limit as to where price colour changes
 const HIGH_PRICE_IMPACT_THRESHOLD = new BigNumber(5) // 5%
