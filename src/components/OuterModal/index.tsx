@@ -125,8 +125,11 @@ const useOuterModalHook = (): UseGlobalModalParamsResult => {
   useMemo(() => {
     let deferred: Deferred<boolean>
     const fillAndOpenModal = (components: FillAndToggleModal): Promise<boolean> => {
+      // guard against double-open
+      // only one such Modal allowed at a time
       if (isShownRef.current) return Promise.resolve(false)
 
+      // will be resolved on Confirm/Cancelin Modal
       deferred = createDeferredPromise<boolean>()
 
       setModalOptions({
@@ -140,6 +143,7 @@ const useOuterModalHook = (): UseGlobalModalParamsResult => {
     }
     openGlobalModal = fillAndOpenModal
     closeGlobalModal = (): void => {
+      // guard agains double-close
       if (!isShownRef.current) return
 
       toggleRef.current()
