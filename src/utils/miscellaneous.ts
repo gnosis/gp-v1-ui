@@ -209,4 +209,4 @@ export function notEmpty<TValue>(value: TValue | null | undefined): value is TVa
   return value !== null && value !== undefined
 }
 
-export const isStrNumTruthy = (value?: string | number): boolean => !!value && !!+value
+export const isNonZeroNumber = (value?: string | number): boolean => !!value && !!+value
