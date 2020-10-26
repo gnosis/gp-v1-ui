@@ -145,10 +145,6 @@ const useOuterModalHook = (): UseGlobalModalParamsResult => {
       toggleRef.current()
       deferred.resolve(false)
     }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).openGlobalModal = openGlobalModal
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).closeGlobalModal = closeGlobalModal
 
     return fillAndOpenModal
   }, [])
@@ -163,10 +159,7 @@ const useOuterModalHook = (): UseGlobalModalParamsResult => {
 }
 
 const GlobalModal: React.FC = () => {
-  const { modalProps, toggleModal } = useOuterModalHook()
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(window as any).toggleModal = toggleModal
+  const { modalProps } = useOuterModalHook()
 
   return <Modal.Modal {...modalProps} />
 }
