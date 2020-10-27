@@ -21,10 +21,10 @@ enum ImpactLevel {
 }
 
 const WARNINGS = {
-  DEEP_MARKET: '⚠️ Deep in the market: Your order might be fully executed at this price',
-  UNEXECUTED: '⚠️ Your order might only be filled when the market price reaches your limit price',
-  PARTIALLY_EXECUTED: '⚠️ Your order might only be partially filled',
-  MAYBE_FULLY_EXECUTED: '⚠️ Your order might be fully executed at this price',
+  DEEP_MARKET: 'Deep in the market: Your order might be fully executed at this price',
+  UNEXECUTED: 'Your order might only be filled when the market price reaches your limit price',
+  PARTIALLY_EXECUTED: 'Your order might only be partially filled',
+  MAYBE_FULLY_EXECUTED: 'Your order might be fully executed at this price',
 }
 
 const determineImpactLevel = (impact: BigNumber | null): ImpactLevel => {

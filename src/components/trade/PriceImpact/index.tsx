@@ -9,6 +9,9 @@ import usePriceImpact from './usePriceImpact'
 
 import { PriceImpactProps, SimplePriceImpactProps } from './types'
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+
 const PriceImpactTooltip: React.FC = () => (
   <HelpTooltipContainer>
     The difference between the market price and the limit price due to order size
@@ -47,7 +50,9 @@ function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
       {/* Warning */}
       {priceImpactWarning && (
         <FormMessage className="warning">
-          <BoldColourTag as="span">{priceImpactWarning}</BoldColourTag>
+          <BoldColourTag as="span">
+            <FontAwesomeIcon icon={faExclamationTriangle} size="sm" /> {priceImpactWarning}
+          </BoldColourTag>
         </FormMessage>
       )}
     </PriceSuggestionsWrapper>

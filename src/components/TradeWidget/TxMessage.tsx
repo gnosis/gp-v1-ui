@@ -319,7 +319,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
             <Warning>
               <div style={{ flexFlow: 'column' }}>
                 <strong>Price Alert</strong>
-                <div className="warningContainer">{priceImpactWarning.slice(2)}</div>
+                <div className="warningContainer">{priceImpactWarning}</div>
               </div>
               <img className="alert" src={alertIcon} />
             </Warning>
