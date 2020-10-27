@@ -28,7 +28,7 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
         smallLimit: '0.01',
       })
     } else {
-      priceImpactSmart = '<0.01'
+      priceImpactSmart = '0'
     }
 
     // Calculate any applicable trade warnings
