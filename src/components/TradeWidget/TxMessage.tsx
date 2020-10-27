@@ -21,6 +21,7 @@ import alertIcon from 'assets/img/alert.svg'
 import { DEFAULT_GAS_PRICE, ROUND_TO_NUMBER, roundToNext } from 'utils/minFee'
 import { parseAmount, formatAmount } from '@gnosis.pm/dex-js'
 import { SwapPrice } from 'components/common/SwapPrice'
+import { SimplePriceImpact } from 'components/trade/PriceImpact'
 
 interface TxMessageProps {
   sellToken: TokenDetails
@@ -119,6 +120,10 @@ const Warning = styled.div`
 
   > div {
     width: 94%;
+  }
+
+  div.warningContainer {
+    margin-top: 0.5rem;
   }
 
   .alert {
@@ -273,7 +278,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
     amount: sellTokenAmount,
   })
 
-  const { priceImpactWarning } = usePriceImpact({
+  const { priceImpactSmart, priceImpactClassName, priceImpactWarning } = usePriceImpact({
     ...baseProps,
     limitPrice: price,
     fillPrice,
@@ -286,13 +291,14 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
           {isLowVolume && (
             <Warning>
               <div>
-                <p>
+                <strong>Low Volume Alert</strong>
+                <div className="warningContainer">
                   This is a low volume order. We recommend selling at least{' '}
                   <strong>
                     {formattedAmount} {symbolOrAddress(sellToken)}
                   </strong>{' '}
                   (approximately <strong>${amountInUSD}</strong>) of the token.
-                </p>
+                </div>
                 <p>
                   Please keep in mind that solvers may not include your order if it does not generate enough fees to pay
                   their running costs. Learn more{' '}
@@ -312,8 +318,8 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
           {priceImpactWarning && (
             <Warning>
               <div style={{ flexFlow: 'column' }}>
-                <strong style={{ marginBottom: '0.2rem' }}>Price Alert</strong>
-                <div>{priceImpactWarning}</div>
+                <strong>Price Alert</strong>
+                <div className="warningContainer">{priceImpactWarning.slice(2)}</div>
               </div>
               <img className="alert" src={alertIcon} />
             </Warning>
@@ -376,14 +382,19 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
         </div>
 
         {/* Prices */}
-
         <div className="sectionTitle">
           <strong>Prices</strong>
         </div>
         <SimpleDisplayPrice baseToken={baseToken} quoteToken={quoteToken} price={price} priceInverse={priceInverse} />
 
+        {/* Price Impact */}
+        <div className="sectionTitle">
+          <strong>Price Impact</strong>
+        </div>
+        <div>
+          Percentage: <SimplePriceImpact className={priceImpactClassName} impactAmount={priceImpactSmart} />
+        </div>
         {/* Order Validity */}
-
         <div className="sectionTitle">
           <strong>Order Validity Details</strong> <HelpTooltip tooltip={<OrderValidityTooltip />} />
         </div>
