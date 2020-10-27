@@ -19,6 +19,11 @@ export interface PriceImpactProps {
   networkId: number
 }
 
+export interface SimplePriceImpactProps {
+  className?: string
+  impactAmount: string | null
+}
+
 export interface UsePriceImpactReturn {
   priceImpactSmart: string
   priceImpactClassName: string

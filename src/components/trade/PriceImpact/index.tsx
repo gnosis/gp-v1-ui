@@ -7,12 +7,18 @@ import { PriceSuggestionsWrapper } from '../PriceSuggestions/PriceSuggestions'
 
 import usePriceImpact from './usePriceImpact'
 
-import { PriceImpactProps } from './types'
+import { PriceImpactProps, SimplePriceImpactProps } from './types'
 
 const PriceImpactTooltip: React.FC = () => (
   <HelpTooltipContainer>
     The difference between the market price and the limit price due to order size
   </HelpTooltipContainer>
+)
+
+export const SimplePriceImpact: React.FC<SimplePriceImpactProps> = ({ className, impactAmount }) => (
+  <BoldColourTag className={className}>
+    <HelpTooltip tooltip={<PriceImpactTooltip />} /> {impactAmount}%
+  </BoldColourTag>
 )
 
 function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
@@ -34,9 +40,7 @@ function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
         <div className="container">
           <span>
             <span>Price impact </span>
-            <BoldColourTag className={priceImpactClassName}>
-              <HelpTooltip tooltip={<PriceImpactTooltip />} /> {priceImpactSmart}%
-            </BoldColourTag>
+            <SimplePriceImpact className={priceImpactClassName} impactAmount={priceImpactSmart} />
           </span>
         </div>
       )}
