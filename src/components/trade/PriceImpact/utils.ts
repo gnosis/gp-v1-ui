@@ -53,7 +53,7 @@ const getImpactColourClass = (impact: BigNumber | null): string => {
       return 'midImpact'
     case ImpactLevel.LOW:
       return 'lowImpact'
-    default:
+    case ImpactLevel.NONE:
       return ''
   }
 }
