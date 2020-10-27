@@ -279,10 +279,6 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
     fillPrice,
   })
 
-  logDebug('[TX-MESSAGE] limit price:', sellTokenAmount)
-  logDebug('[TX-MESSAGE] warning:', priceImpactWarning)
-  logDebug('[TX-MESSAGE] fillPrice:', fillPrice?.toString())
-
   const renderWarnings = React.useCallback(() => {
     if (!isLoading) {
       return (
