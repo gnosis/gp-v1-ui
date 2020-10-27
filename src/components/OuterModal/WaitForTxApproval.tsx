@@ -8,7 +8,7 @@ const WaitForTxWrapper = styled.div`
   font-size: 1.3em;
 `
 
-export const WaitForTxApprovalMessage: React.FC<{ timePassed: number }> = ({ timePassed }) => {
+export const WaitForTxApprovalMessage: React.FC = () => {
   return (
     <WaitForTxWrapper>
       <h4>No response from wallet for pending transaction</h4>
@@ -24,9 +24,9 @@ export const WaitForTxApprovalMessage: React.FC<{ timePassed: number }> = ({ tim
 const leftButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="No, stop waiting" />
 const rightButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="Yes" />
 
-export const openWaitForTxApprovalModal = (timePassed: number): Promise<boolean> =>
+export const openWaitForTxApprovalModal = (): Promise<boolean> =>
   openGlobalModal({
-    message: <WaitForTxApprovalMessage timePassed={timePassed} />,
+    message: <WaitForTxApprovalMessage />,
     leftButton,
     rightButton,
   })

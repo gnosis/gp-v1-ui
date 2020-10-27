@@ -76,7 +76,7 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
     let timeoutId: NodeJS.Timeout | null = null
 
     timeoutId = setTimeout(async function askOnTimeout() {
-      if (await openWaitForTxApprovalModal(timeout)) {
+      if (await openWaitForTxApprovalModal()) {
         // stop waiting
         if (!timeoutId) return // reset in end() call from provider response
         // code 106 -- Timeout
