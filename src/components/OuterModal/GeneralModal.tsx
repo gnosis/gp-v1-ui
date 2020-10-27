@@ -37,7 +37,7 @@ export const useGlobalModal = ({
     buttons: [
       LeftButton && (
         <LeftButton
-          label="No"
+          label="Cancel"
           key="no"
           isStyleCancel
           onClick={(): void => {
@@ -48,7 +48,7 @@ export const useGlobalModal = ({
       ),
       RightButton && (
         <RightButton
-          label="Yes"
+          label="Confirm"
           key="yes"
           isStyleDefault
           onClick={(): void => {
