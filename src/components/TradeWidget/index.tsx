@@ -52,7 +52,6 @@ import TokenRow from 'components/TradeWidget/TokenRow'
 import OrderValidity from 'components/TradeWidget/OrderValidity'
 import { PriceSuggestionWidget as PriceSuggestions } from 'components/trade/PriceSuggestions'
 import Price, { invertPriceFromString } from 'components/trade/Price'
-import PriceImpact from 'components/trade/PriceImpact'
 
 // hooks
 import useURLParams from 'hooks/useURLParams'
@@ -684,20 +683,15 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             // Keep original selling pair
             receiveToken={receiveToken}
             sellToken={sellToken}
-            // Amount
+            // SellAmount // Limit Price
             amount={debouncedSellValue}
+            limitPrice={priceValue}
             // Price inversion
             isPriceInverted={isPriceInverted}
             onSwapPrices={swapPrices}
             // Form inputIDs
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-          />
-          <PriceImpact
-            baseToken={receiveToken}
-            quoteToken={sellToken}
-            limitPrice={priceValue}
-            networkId={networkIdOrDefault}
           />
           <OrderValidity
             validFromInputId={validFromId}

@@ -2,12 +2,12 @@ import React, { useCallback } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { TradeFormData } from 'components/TradeWidget'
-
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+import PriceImpact from '../PriceImpact'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-import useBestAsk from 'hooks/useBestAsk'
 
+import { isNonZeroNumber } from 'utils'
 import { invertPrice } from '@gnosis.pm/dex-js'
 import { TokenDetails } from 'types'
 
@@ -18,6 +18,7 @@ interface Props
   priceInverseInputId: string
   receiveToken: TokenDetails
   sellToken: TokenDetails
+  limitPrice: string
 }
 
 export const PriceSuggestionWidget: React.FC<Props> = (props) => {
@@ -28,13 +29,12 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     quoteToken,
     receiveToken,
     sellToken,
+    limitPrice,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
     onSwapPrices,
   } = props
-  const { id: baseTokenId } = baseToken
-  const { id: quoteTokenId } = quoteToken
   const { id: receiveTokenId, decimals: receiveTokenDecimals } = receiveToken
   const { id: sellTokenId, decimals: sellTokenDecimals } = sellToken
 
@@ -54,7 +54,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     [isPriceInverted, trigger, setValue, priceInputId, priceInverseInputId],
   )
 
-  const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
+  const { priceEstimation: fillPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
     amount: amount || '0',
     baseTokenId: receiveTokenId,
@@ -64,30 +64,33 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
   })
 
   // We need the price of the other token if the market was adjusted, otherwise prices will be wrong
-  const adjustedLimitPrice = limitPrice && (sellToken === quoteToken ? limitPrice : invertPrice(limitPrice))
-
-  const { bestAskPrice, isBestAskLoading } = useBestAsk({
-    networkId,
-    baseTokenId,
-    quoteTokenId,
-  })
+  const adjustedFillPrice = fillPrice && (sellToken === quoteToken ? fillPrice : invertPrice(fillPrice))
 
   return (
-    <PriceSuggestions
-      // Market
-      baseToken={baseToken}
-      quoteToken={quoteToken}
-      isPriceInverted={isPriceInverted}
-      // Order size
-      amount={amount}
-      // Prices
-      fillPrice={adjustedLimitPrice}
-      fillPriceLoading={fillPriceLoading}
-      bestAskPrice={bestAskPrice}
-      bestAskPriceLoading={isBestAskLoading}
-      // Events
-      onClickPrice={updatePrices}
-      onSwapPrices={onSwapPrices}
-    />
+    <>
+      <PriceSuggestions
+        // Market
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        isPriceInverted={isPriceInverted}
+        // Order size
+        amount={amount}
+        // Prices
+        fillPrice={adjustedFillPrice}
+        fillPriceLoading={fillPriceLoading}
+        // Events
+        onClickPrice={updatePrices}
+        onSwapPrices={onSwapPrices}
+      />
+      {isNonZeroNumber(amount) && (
+        <PriceImpact
+          baseToken={baseToken}
+          quoteToken={quoteToken}
+          limitPrice={limitPrice}
+          fillPrice={fillPrice}
+          networkId={networkId}
+        />
+      )}
+    </>
   )
 }
