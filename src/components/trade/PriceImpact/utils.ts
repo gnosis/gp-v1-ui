@@ -14,10 +14,10 @@ const HIGH_PLACEHOLDER_SLIPPAGE = new BigNumber(1.05) // 5%
 const MID_PLACEHOLDER_SLIPPAGE = new BigNumber(1.03) // 3%
 
 enum ImpactLevel {
-  HIGH = 3,
-  MID = 2,
-  LOW = 1,
-  NONE = 0,
+  NONE,
+  LOW,
+  MID,
+  HIGH,
 }
 
 const WARNINGS = {
