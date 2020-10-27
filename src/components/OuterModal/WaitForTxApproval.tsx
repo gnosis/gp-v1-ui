@@ -11,16 +11,17 @@ const WaitForTxWrapper = styled.div`
 export const WaitForTxApprovalMessage: React.FC<{ timePassed: number }> = ({ timePassed }) => {
   return (
     <WaitForTxWrapper>
+      <h4>No response from wallet for pending transaction</h4>
       <p>
-        It has been {timePassed} seconds since transaction was submitted for approval. Some wallets do not respond to{' '}
-        <code>eth_sendTransaction</code> calls.
+        Mesa has detected a potential transaction timeout. Please validate with your wallet that you have properly
+        accepted or rejected the transaction.
       </p>
-      <p>Stop waiting for transaction approval from Wallet?</p>
+      <p>Do you need more time signing the transaction?</p>
     </WaitForTxWrapper>
   )
 }
 
-const leftButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="No" />
+const leftButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="No, stop waiting" />
 const rightButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="Yes" />
 
 export const openWaitForTxApprovalModal = (timePassed: number): Promise<boolean> =>
