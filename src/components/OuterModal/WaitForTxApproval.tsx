@@ -41,6 +41,18 @@ const CLOSE_DELAY = 3000
 
 export const WaitForTxApprovalMessage: React.FC = () => {
   const { pendingTxApprovals } = useGlobalModalContext<GlobaModalContextSlice>()
+
+  const [initialHeight, setInitialHeight] = useState(0)
+
+  const wrapperRef = useRef<HTMLDivElement>(null)
+
+  // layout effect for sync rerendering on style change
+  // otherwise we get layout thrashing
+  useLayoutEffect(() => {
+    if (!wrapperRef.current) return
+    setInitialHeight(wrapperRef.current.offsetHeight)
+  }, [])
+
   const pendingTxNumber = pendingTxApprovals.size
 
   useEffect(() => {
@@ -48,6 +60,9 @@ export const WaitForTxApprovalMessage: React.FC = () => {
     // allow time to read `Will Close` message
     if (pendingTxNumber === 0) setTimeout(closeGlobalModal, CLOSE_DELAY)
   }, [pendingTxNumber])
+
+  return (
+    <WaitForTxWrapper ref={wrapperRef} style={initialHeight ? { height: initialHeight + 'px' } : undefined}>
       {pendingTxNumber ? <PenidngTxApprovalsMessage txNumber={pendingTxNumber} /> : <NoTxsWillClose />}
     </WaitForTxWrapper>
   )
