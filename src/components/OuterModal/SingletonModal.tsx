@@ -3,7 +3,7 @@ import Modal from 'components/common/Modal'
 import { useGlobalModal, UseGlobalModalParamsResult } from './GeneralModal'
 import { Deferred, createDeferredPromise } from 'utils'
 
-interface FillAndToggleModal {
+export interface FillAndToggleModal {
   message: React.ReactNode
   title?: React.ReactNode
   leftButton?: typeof Modal.Button
@@ -88,10 +88,36 @@ const useOuterModalHook = (): UseGlobalModalParamsResult => {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyObject = Record<string, any>
+export let setOuterModalContext: <T extends AnyObject>(value: React.SetStateAction<Partial<T>>) => void
+
+const useOuterModalContexSetter = (): AnyObject => {
+  const [modalContextValue, setModalContextValue] = useState<AnyObject>({})
+
+  useMemo(() => {
+    setOuterModalContext = setModalContextValue
+  }, [])
+
+  return modalContextValue
+}
+
+const GlobalModalContext = React.createContext<AnyObject>({})
+
+export const useGlobalModalContext = <T extends AnyObject>(): T => {
+  return React.useContext(GlobalModalContext) as T
+}
+
 const GlobalModal: React.FC = () => {
   const { modalProps } = useOuterModalHook()
 
-  return <Modal.Modal {...modalProps} />
+  const modalContextValue = useOuterModalContexSetter()
+
+  return (
+    <GlobalModalContext.Provider value={modalContextValue}>
+      <Modal.Modal {...modalProps} />
+    </GlobalModalContext.Provider>
+  )
 }
 
 // singleton to have and escape hatch
