@@ -33,6 +33,38 @@ const rightButton: typeof Modal.Button = (props) => <Modal.Button {...props} lab
 
 let txsPendingApprovalCount = 0
 export const areTxsPendingApproval = (): boolean => txsPendingApprovalCount > 0
+
+export const addTxPendingApproval = (id: number | string | void): void => {
+  if (id === undefined) return
+
+  setOuterModalContext<GlobaModalContextSlice>(({ pendingTxApprovals = new Set(), ...rest }) => {
+    const newPendingTxApprovals = new Set(pendingTxApprovals)
+    newPendingTxApprovals.add(id)
+    txsPendingApprovalCount = newPendingTxApprovals.size
+
+    return {
+      ...rest,
+      pendingTxApprovals: newPendingTxApprovals,
+    }
+  })
+}
+export const removeTxPendingApproval = (id: number | string | void): void => {
+  if (id === undefined) return
+
+  setOuterModalContext<GlobaModalContextSlice>(({ pendingTxApprovals = new Set(), ...rest }) => {
+    const newPendingTxApprovals = new Set(pendingTxApprovals)
+    newPendingTxApprovals.delete(id)
+
+    txsPendingApprovalCount = newPendingTxApprovals.size
+
+    return {
+      ...rest,
+      pendingTxApprovals: newPendingTxApprovals,
+    }
+  })
+}
+
+export const openWaitForTxApprovalModal = (): Promise<boolean> =>
   openGlobalModal({
     message: <WaitForTxApprovalMessage />,
     leftButton,
