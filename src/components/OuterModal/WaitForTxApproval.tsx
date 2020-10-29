@@ -12,18 +12,30 @@ interface GlobaModalContextSlice {
   pendingTxApprovals: Set<number | string>
 }
 
-export const WaitForTxApprovalMessage: React.FC = () => {
-  const { pendingTxApprovals } = useGlobalModalContext<GlobaModalContextSlice>()
-
+const PenidngTxApprovalsMessage: React.FC<{ txNumber: number }> = ({ txNumber }) => {
   return (
-    <WaitForTxWrapper>
+    <>
       <h4>No response from wallet for pending transaction</h4>
-      <p>There are currently {pendingTxApprovals.size} transactions waiting for approval for your wallet.</p>
+      <p>There are currently {txNumber} transactions waiting for approval for your wallet.</p>
       <p>
         Mesa has detected a potential transaction timeout. Please validate with your wallet that you have properly
         accepted or rejected the transaction.
       </p>
       <p>Do you need more time signing the transaction?</p>
+    </>
+  )
+}
+
+const NoTxsWillClose: React.FC = () => {
+  return (
+    <>
+      <h4>All transactions have been handled</h4>
+      <p>Mesa has received responses for all pending transactions.</p>
+      <p> This modal will close in a moment.</p>
+    </>
+  )
+}
+
 // time to display `Will Close` message
 const CLOSE_DELAY = 3000
 
@@ -36,6 +48,7 @@ export const WaitForTxApprovalMessage: React.FC = () => {
     // allow time to read `Will Close` message
     if (pendingTxNumber === 0) setTimeout(closeGlobalModal, CLOSE_DELAY)
   }, [pendingTxNumber])
+      {pendingTxNumber ? <PenidngTxApprovalsMessage txNumber={pendingTxNumber} /> : <NoTxsWillClose />}
     </WaitForTxWrapper>
   )
 }
