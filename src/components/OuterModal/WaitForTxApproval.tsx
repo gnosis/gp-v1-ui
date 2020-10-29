@@ -2,16 +2,23 @@ import React from 'react'
 import styled from 'styled-components'
 
 import Modal from 'components/common/Modal'
-import { openGlobalModal } from './SingletonModal'
+import { openGlobalModal, useGlobalModalContext, setOuterModalContext } from './SingletonModal'
 
 const WaitForTxWrapper = styled.div`
   font-size: 1.3em;
 `
 
+interface GlobaModalContextSlice {
+  pendingTxApprovals: Set<number | string>
+}
+
 export const WaitForTxApprovalMessage: React.FC = () => {
+  const { pendingTxApprovals } = useGlobalModalContext<GlobaModalContextSlice>()
+
   return (
     <WaitForTxWrapper>
       <h4>No response from wallet for pending transaction</h4>
+      <p>There are currently {pendingTxApprovals.size} transactions waiting for approval for your wallet.</p>
       <p>
         Mesa has detected a potential transaction timeout. Please validate with your wallet that you have properly
         accepted or rejected the transaction.
@@ -24,7 +31,8 @@ export const WaitForTxApprovalMessage: React.FC = () => {
 const leftButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="No, stop waiting" />
 const rightButton: typeof Modal.Button = (props) => <Modal.Button {...props} label="Yes" />
 
-export const openWaitForTxApprovalModal = (): Promise<boolean> =>
+let txsPendingApprovalCount = 0
+export const areTxsPendingApproval = (): boolean => txsPendingApprovalCount > 0
   openGlobalModal({
     message: <WaitForTxApprovalMessage />,
     leftButton,
