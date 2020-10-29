@@ -59,39 +59,40 @@ const getImpactColourClass = (impact: BigNumber | null): string => {
 }
 
 function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null): string | null {
-  const { limitPrice, fillPrice, bestAskPrice } = params
+  const { limitPrice: limitPriceString, fillPrice, bestAskPrice } = params
 
-  const limitPriceBigNumber = limitPrice && parseBigNumber(limitPrice)
-  const fillPriceRounded = fillPrice?.toFixed(5)
-  // const noLimitPrice = !limitPriceBigNumber || limitPriceBigNumber.isZero()
+  const limitPrice = limitPriceString && parseBigNumber(limitPriceString)
 
   // No comparable prices, or user opting for suggested fill price
   // round values before comparing
   if (
-    !limitPriceBigNumber ||
-    limitPriceBigNumber.isZero() ||
+    // if any of the limit/fill/bestAsk params are
+    // null or zero, return null
+    !limitPrice ||
+    limitPrice.isZero() ||
     !fillPrice ||
     !bestAskPrice ||
-    fillPriceRounded === limitPrice
+    // round to 5 places and check limit = fill
+    fillPrice.toFixed(12) === limitPrice.toFixed(12)
   )
     return null
 
   // Is user's limit price less than the suggested fill price?
-  const orderWontBeFullyExecuted = limitPriceBigNumber.lt(fillPrice)
+  const orderWontBeFullyExecuted = limitPrice.lt(fillPrice)
   // Is user's limit price less than suggested fill price AND best ask?
   // One could assume that if the limit price is lower than best ask then it's lower than fill
   // but just to be safe
-  const orderWontBeExecuted = limitPriceBigNumber.lt(bestAskPrice)
+  const orderWontBeExecuted = limitPrice.lt(bestAskPrice)
   const impactLevel = determineImpactLevel(impact)
   // Calculate Deep Market warning threshold using slippage
   // limitPrice * 1.05
   const isPriceAboveDeepMarketThreshold =
-    impactLevel === ImpactLevel.HIGH && limitPriceBigNumber.gte(fillPrice.times(HIGH_PLACEHOLDER_SLIPPAGE))
+    impactLevel === ImpactLevel.HIGH && limitPrice.gte(fillPrice.times(HIGH_PLACEHOLDER_SLIPPAGE))
   // Price is:
   // 1. above Fill Price
   // 2.not above deep market
   const isPriceMidImpactAndExecutable =
-    !isPriceAboveDeepMarketThreshold && limitPriceBigNumber.gte(fillPrice.times(MID_PLACEHOLDER_SLIPPAGE))
+    !isPriceAboveDeepMarketThreshold && limitPrice.gte(fillPrice.times(MID_PLACEHOLDER_SLIPPAGE))
 
   switch (true) {
     // CASE 6: Limit price is GREATER THAN Fill price AND upper threshold 5%
@@ -111,12 +112,12 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
   }
 }
 
-function calculatePriceImpact({ limitPrice, bestAskPrice }: PriceImpactArgsBase): BigNumber | null {
-  const limitPriceBigNumber = limitPrice && parseBigNumber(limitPrice)
-  if (!bestAskPrice || !limitPriceBigNumber) return null
+function calculatePriceImpact({ limitPrice: limitPriceString, bestAskPrice }: PriceImpactArgsBase): BigNumber | null {
+  const limitPrice = limitPriceString && parseBigNumber(limitPriceString)
+  if (!bestAskPrice || !limitPrice) return null
 
   // PRICE_IMPACT = 100 - (BEST_ASK / LIMIT_PRICE * 100)
-  const impact = ONE_HUNDRED_BIG_NUMBER.minus(bestAskPrice.div(limitPriceBigNumber).times(ONE_HUNDRED_BIG_NUMBER))
+  const impact = ONE_HUNDRED_BIG_NUMBER.minus(bestAskPrice.div(limitPrice).times(ONE_HUNDRED_BIG_NUMBER))
   return impact.lt(ZERO_BIG_NUMBER) ? ZERO_BIG_NUMBER : impact
 }
 
