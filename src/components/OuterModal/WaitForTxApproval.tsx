@@ -1,8 +1,8 @@
-import React from 'react'
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import styled from 'styled-components'
 
 import Modal from 'components/common/Modal'
-import { openGlobalModal, useGlobalModalContext, setOuterModalContext } from './SingletonModal'
+import { openGlobalModal, useGlobalModalContext, setOuterModalContext, closeGlobalModal } from './SingletonModal'
 
 const WaitForTxWrapper = styled.div`
   font-size: 1.3em;
@@ -24,6 +24,18 @@ export const WaitForTxApprovalMessage: React.FC = () => {
         accepted or rejected the transaction.
       </p>
       <p>Do you need more time signing the transaction?</p>
+// time to display `Will Close` message
+const CLOSE_DELAY = 3000
+
+export const WaitForTxApprovalMessage: React.FC = () => {
+  const { pendingTxApprovals } = useGlobalModalContext<GlobaModalContextSlice>()
+  const pendingTxNumber = pendingTxApprovals.size
+
+  useEffect(() => {
+    // don't close immediately when txs resolved/rejected
+    // allow time to read `Will Close` message
+    if (pendingTxNumber === 0) setTimeout(closeGlobalModal, CLOSE_DELAY)
+  }, [pendingTxNumber])
     </WaitForTxWrapper>
   )
 }
