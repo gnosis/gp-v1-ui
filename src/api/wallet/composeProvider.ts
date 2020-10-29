@@ -12,7 +12,12 @@ import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
 
-import { openWaitForTxApprovalModal } from 'components/OuterModal'
+import {
+  addTxPendingApproval,
+  areTxsPendingApproval,
+  openWaitForTxApprovalModal,
+  removeTxPendingApproval,
+} from 'components/OuterModal'
 
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
@@ -75,20 +80,40 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
 
     let timeoutId: NodeJS.Timeout | null = null
 
+    // new tx pending approval fired
+    addTxPendingApproval(req.id)
+
     timeoutId = setTimeout(async function askOnTimeout() {
+      // all txs were approved/rejected in the wallet
+      // in-between timeout on the modal close -- reopen
+      if (!areTxsPendingApproval()) return
+      // new tx waiting for approval
       if (await openWaitForTxApprovalModal()) {
+        // if user chose to wait more in Modal
+        // or rejected/approved txs in the wallet
+        // don't retrigger modal
+        if (!areTxsPendingApproval()) return
+        // wait some more
+        timeoutId = setTimeout(askOnTimeout, timeout)
+      } else {
+        // modal closed with `No, stop waiting`
+        removeTxPendingApproval(req.id)
         // stop waiting
         if (!timeoutId) return // reset in end() call from provider response
         // code 106 -- Timeout
         // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
         end({ message: 'Timeout for transaction approval or rejection', code: 106 })
-      } else {
-        // wait some more
-        timeoutId = setTimeout(askOnTimeout, timeout)
       }
+      // if modal closed
+      // either new one will be reopened
+      // or tx were rejected/approved in the wallet already
+      // or user chose not to wait anymore
     }, timeout)
 
     const endWithTimeout = (error?: JsonRpcError<unknown>): void => {
+      // if tx wasn't already rejected through the modal
+      // remove it from pending here
+      removeTxPendingApproval(req.id)
       if (timeoutId) {
         clearTimeout(timeoutId)
         timeoutId = null
