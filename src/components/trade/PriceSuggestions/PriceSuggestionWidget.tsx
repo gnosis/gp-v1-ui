@@ -3,15 +3,21 @@ import { useFormContext } from 'react-hook-form'
 
 import { TradeFormData } from 'components/TradeWidget'
 
-import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+
+import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
 import useBestAsk from 'hooks/useBestAsk'
+
+import { invertPrice } from '@gnosis.pm/dex-js'
+import { TokenDetails } from 'types'
 
 interface Props
   extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
   networkId: number
   priceInputId: string
   priceInverseInputId: string
+  receiveToken: TokenDetails
+  sellToken: TokenDetails
 }
 
 export const PriceSuggestionWidget: React.FC<Props> = (props) => {
@@ -20,13 +26,17 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
+    receiveToken,
+    sellToken,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
     onSwapPrices,
   } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
+  const { id: baseTokenId } = baseToken
+  const { id: quoteTokenId } = quoteToken
+  const { id: receiveTokenId, decimals: receiveTokenDecimals } = receiveToken
+  const { id: sellTokenId, decimals: sellTokenDecimals } = sellToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
@@ -47,11 +57,14 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
   const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
     amount: amount || '0',
-    baseTokenId,
-    baseTokenDecimals,
-    quoteTokenId,
-    quoteTokenDecimals,
+    baseTokenId: receiveTokenId,
+    baseTokenDecimals: receiveTokenDecimals,
+    quoteTokenId: sellTokenId,
+    quoteTokenDecimals: sellTokenDecimals,
   })
+
+  // We need the price of the other token if the market was adjusted, otherwise prices will be wrong
+  const adjustedLimitPrice = limitPrice && (sellToken === quoteToken ? limitPrice : invertPrice(limitPrice))
 
   const { bestAskPrice, isBestAskLoading } = useBestAsk({
     networkId,
@@ -68,7 +81,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
       // Order size
       amount={amount}
       // Prices
-      fillPrice={limitPrice}
+      fillPrice={adjustedLimitPrice}
       fillPriceLoading={fillPriceLoading}
       bestAskPrice={bestAskPrice}
       bestAskPriceLoading={isBestAskLoading}

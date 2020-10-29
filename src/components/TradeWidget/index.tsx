@@ -674,14 +674,23 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             isPriceInverted={isPriceInverted}
           />
           <PriceSuggestions
+            // Network
             networkId={networkIdOrDefault}
+            // Tokens
+            // Canonical market
             baseToken={baseToken}
             quoteToken={quoteToken}
+            // Keep original selling pair
+            receiveToken={receiveToken}
+            sellToken={sellToken}
+            // Amount
             amount={debouncedSellValue}
+            // Price inversion
             isPriceInverted={isPriceInverted}
+            onSwapPrices={swapPrices}
+            // Form inputIDs
             priceInputId={priceInputId}
             priceInverseInputId={priceInverseInputId}
-            onSwapPrices={swapPrices}
           />
           <OrderValidity
             validFromInputId={validFromId}
