@@ -74,6 +74,7 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
 const DEFAULT_TX_APPROVAL_TIMEOUT = 7000
 
 const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPROVAL_TIMEOUT): JsonRpcMiddleware => {
+  let timeoutId: NodeJS.Timeout | null = null
   // keep track of pending txs in closure
   const txsPendingApproval = new Map<string | number, () => void>()
   return (req, res, next, end): void => {
@@ -125,6 +126,10 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
       // remove it from pending here
       removeTxPendingApproval(req.id)
       if (req.id !== undefined) txsPendingApproval.delete(req.id)
+
+      // if no more txs left
+      // no need for modal
+      if (timeoutId && txsPendingApproval.size === 0) {
         clearTimeout(timeoutId)
         timeoutId = null
       }
