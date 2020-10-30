@@ -84,8 +84,10 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
       />
       {isNonZeroNumber(amount) && (
         <PriceImpact
-          baseToken={baseToken}
-          quoteToken={quoteToken}
+          // Pass original tokenPair to check market adjustment
+          baseToken={receiveToken}
+          quoteToken={sellToken}
+          // Prices
           limitPrice={limitPrice}
           fillPrice={fillPrice}
           networkId={networkId}

@@ -266,8 +266,8 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
   const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
 
   const baseProps = {
-    baseTokenId: baseToken.id,
-    quoteTokenId: quoteToken.id,
+    baseTokenId: receiveToken.id,
+    quoteTokenId: sellToken.id,
     networkId,
   }
 
@@ -280,7 +280,7 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
 
   const { priceImpactSmart, priceImpactClassName, priceImpactWarning } = usePriceImpact({
     ...baseProps,
-    limitPrice: price,
+    limitPrice: sellToken === quoteToken ? price : priceInverse,
     fillPrice,
   })
 
