@@ -1,18 +1,18 @@
 import { css } from 'styled-components'
 
 const AllColors = `
-  // FONTS
+  /* FONTS */
   --font-default: "Inter", "Helvetica Neue", Helvetica, sans-serif;
   --font-mono: "Roboto Mono", monospace;
   --font-arial: Arial, Helvetica, sans-serif;
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 700;
-  // ------------------------------
+  /* ------------------------------ */
 `
 
 const LightColors = `
-  // Background
+  /* Background */
   --color-background-lighter: #f7f7f7;
   --color-background-darker: #EDF2F7;
   --color-background: #EDF2F7;
@@ -33,10 +33,10 @@ const LightColors = `
   --color-background-button-disabled-hover: #2772c3;
   --color-background-balance-button-hover: #218DFF;
 
-  // Borders
+  /* Borders */
   --color-border: transparent;
 
-  // Text
+  /* Text */
   --color-text-primary: #456483;
   --color-text-secondary: #9FB4C9;
   --color-text-active: #218DFF;
@@ -45,7 +45,7 @@ const LightColors = `
   --color-text-selection: #fff;
   --color-text-button-hover: #fff;
 
-  // Buttons
+  /* Buttons */
   --color-button-primary: #000;
   --color-button-success: #5ca95c;
   --color-button-disabled: #666;
@@ -53,30 +53,30 @@ const LightColors = `
   --color-button-secondary: #696969;
   --color-modali-close: #526877;
 
-  // Components
+  /* Components */
   --color-background-banner: #DFE6EF;
   --color-text-wallet: #000;
   --color-text-deposit-header: #000000;
   --color-background-nav-active: #DFE6EF;
-  --color-background-modali: #2f3e4e80;
+  --color-background-opaque-grey: #2f3e4e80;
   --color-text-modali: #526877;
 
-  // SVGs
+  /* SVGs */
   --color-svg-deposit: #000;
   --color-svg-withdraw: #fff;
   --color-svg-switcher: #476481;
 
-  // Shadow
+  /* Shadow */
   --shadow-color: #00000047;
 
-  // States
+  /* States */
   --color-error: red;
   --color-text-deleteOrders: #a71409;
   --color-background-deleteOrders: #ffd6d6;
 `
 
 const DarkColors = `
-  // Background
+  /* Background */
   --color-background-lighter: #f7f7f7;
   --color-background: #2e2e2e;
   --color-background-pageWrapper: #181a1b;
@@ -96,10 +96,10 @@ const DarkColors = `
   --color-background-button-disabled-hover: #2772c3;
   --color-background-balance-button-hover: #0B66C6;
 
-  // Borders
+  /* Borders */
   --color-border: #262626;
 
-  // Text
+  /* Text */
   --color-text-primary: #a1c3e4;
   --color-text-secondary: #545454;
   --color-text-active: #218DFF;
@@ -107,64 +107,57 @@ const DarkColors = `
   --color-text-selection: #218DFF;
   --color-text-button-hover: #e9e9f0;
 
-  // Buttons
+  /* Buttons */
   --color-button-primary: #e8e6e3;
-  --color-button-success: #91c591;
+  --color-button-success: #00BE2E;
   --color-button-disabled: #3d4043;
   --color-button-danger: #9c1818;
   --color-button-secondary: #696969;
   --color-modali-close: #218DFF;
 
-  // Components
+  /* Components */
   --color-background-banner: #252729;
   --color-text-banner: wheat;
   --color-background-nav-active: #404040;
 
-  // SVGs
+  /* SVGs */
   --color-svg-deposit: #218DFF;
   --color-svg-withdraw: #000;
   --color-svg-switcher: #218DFF;
 
-  // Shadow
+  /* Shadow */
   --shadow-color: #00000047;
 
-  // States
+  /* States */
   --color-error: #cd3636;
   --color-text-deleteOrders: #bdb6b5;
   --color-background-deleteOrders: #621b1b;
 `
 
 const variables = css`
-  // General styles for all themes
+  /* General styles for all themes */
   :root {
     ${AllColors}
   }
 
   :root,
   body.light-theme {
-    // ------------------------------
-    // COLOURS
-    //-----------------------------
+    /* COLOURS */
+
     ${LightColors}
 
-    // ------------------------------
-    // BORDERS
-    // ------------------------------
+    /* BORDERS */
     --border-radius: 0.4375rem;
     --border-radius-top: 0.6rem 0.6rem 0 0;
 
-    // ------------------------------
-    // BOX-SHADOW
-    // ------------------------------
+    /* BOX-SHADOW */
     --box-shadow: 0.0625rem 0.125rem 0.125rem -0.0625rem var(--shadow-color);
     --box-shadow-wrapper: 0 -1rem 4rem 0 rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02) 0 0.276726rem 0.221381rem 0,
       rgba(0, 0, 0, 0.027) 0 0.666501rem 0.532008rem 0, rgba(0, 0, 0, 0.035) 0 1.25216rem 1.0172rem 0,
       rgba(0, 0, 0, 0.043) 0 2.23363rem 1.7869rem 0, rgba(0, 0, 0, 0.05) 0 4.17776rem 3.34221rem 0,
       rgba(0, 0, 0, 0.07) 0 10rem 8rem 0;
 
-    //-------------------------------
-    // GRID
-    // ------------------------------
+    /* GRID */
     --grid-row-size-walletPage: minmax(10.9375rem, 1.1fr) repeat(3, 1fr) minmax(10.3125rem, 1fr);
   }
 

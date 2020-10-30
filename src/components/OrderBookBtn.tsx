@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import Modali, { useModali } from 'modali'
+import Modal, { useModal } from 'components/common/Modal'
 
 // assets
 import { faChartLine } from '@fortawesome/free-solid-svg-icons'
@@ -115,19 +115,18 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
   const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault, label, className } = props
   const { networkIdOrDefault: networkId } = useWalletConnection()
   // get all tokens
-  const tokenList = useTokenList({ networkId })
+  const { tokens: tokenList } = useTokenList({ networkId })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails>(baseTokenDefault)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails>(quoteTokenDefault)
   const networkDescription = networkId !== Network.Mainnet ? ` (${getNetworkFromId(networkId)})` : ''
 
-  // Update if any of the base tokens change
-  useEffect(() => {
-    setBaseToken(baseTokenDefault)
-    setQuoteToken(quoteTokenDefault)
-  }, [baseTokenDefault, quoteTokenDefault, setBaseToken, setQuoteToken])
-
-  const [modalHook, toggleModal] = useModali({
+  const [modalHook, toggleModal] = useModal({
     ...DEFAULT_MODAL_OPTIONS,
+    onShow: () => {
+      // Update if any of the base tokens change
+      setBaseToken(baseTokenDefault)
+      setQuoteToken(quoteTokenDefault)
+    },
     onHide: () => {
       // Reset the selection on close
       setBaseToken(baseTokenDefault)
@@ -172,7 +171,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
     ),
     buttons: [
       <>&nbsp;</>,
-      <Modali.Button label="Close" key="yes" isStyleDefault onClick={(): void => modalHook.hide()} />,
+      <Modal.Button label="Close" key="yes" isStyleDefault onClick={(): void => modalHook.hide()} />,
     ],
   })
 
@@ -181,7 +180,7 @@ export const OrderBookBtn: React.FC<OrderBookBtnProps> = (props: OrderBookBtnPro
       <ViewOrderBookBtn className={className} onClick={toggleModal} type="button">
         {label || 'View Order Book'} <FontAwesomeIcon className="chart-icon" icon={faChartLine} />
       </ViewOrderBookBtn>
-      <Modali.Modal {...modalHook} />
+      <Modal.Modal {...modalHook} />
     </>
   )
 }

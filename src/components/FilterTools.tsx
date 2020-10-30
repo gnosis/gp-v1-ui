@@ -55,7 +55,7 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
     border-radius: 0 1.6rem 0rem 0rem;
   }
 
-  // label + search input
+  /* label + search input */
   > .balances-searchTokens {
     position: relative;
     display: flex;
@@ -97,7 +97,7 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
       box-sizing: border-box;
       border-bottom: 0.2rem solid transparent;
       font-weight: var(--font-weight-normal);
-      // accommodate clearFilter
+      /* accommodate clearFilter */
       padding: 0 10.4rem 0 4.8rem;
       outline: 0;
 
@@ -112,9 +112,6 @@ export const BalanceTools = styled.div<{ $css?: string | false }>`
 
       &:focus {
         color: var(--color-text-active);
-      }
-
-      &:focus {
         border-bottom: 0.2rem solid var(--color-text-active);
         border-color: var(--color-text-active);
 

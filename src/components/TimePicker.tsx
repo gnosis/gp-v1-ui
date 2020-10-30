@@ -7,6 +7,7 @@ import { Control, UseFormMethods, FieldError, Controller } from 'react-hook-form
 
 import { TradeFormData } from './TradeWidget'
 import { BATCH_TIME, BATCH_TIME_IN_MS } from 'const'
+import { GlobalStyles } from './TimePicker/TimePicker.styled'
 
 interface DateTimePickerBase extends Omit<DateTimePickerProps, 'renderInput'> {
   error?: FieldError
@@ -36,18 +37,21 @@ const DateTimePickerBase: React.FC<DateTimePickerBase> = ({
   }, [])
 
   return (
-    <MobileDateTimePicker
-      {...restProps}
-      dateAdapter={memoizedDateAdapter}
-      disablePast
-      minutesStep={BATCH_TIME / 60}
-      // inputFormat="yyyy/MM/dd HH:mm"
-      ampm={false}
-      minDateTime={minDateTime}
-      renderInput={(props): JSX.Element => (
-        <TextField {...props} label="Set custom date" name={inputName} error={!!error} />
-      )}
-    />
+    <>
+      <GlobalStyles />
+      <MobileDateTimePicker
+        {...restProps}
+        dateAdapter={memoizedDateAdapter}
+        disablePast
+        minutesStep={BATCH_TIME / 60}
+        // inputFormat="yyyy/MM/dd HH:mm"
+        ampm={false}
+        minDateTime={minDateTime}
+        renderInput={(props): JSX.Element => (
+          <TextField {...props} label="Set custom date" name={inputName} error={!!error} />
+        )}
+      />
+    </>
   )
 }
 

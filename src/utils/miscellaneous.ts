@@ -49,7 +49,11 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
   value: string | number | undefined = '',
   tokens: T[] | undefined | null,
 ): T | undefined {
-  return (tokens || []).find((token: T): boolean => {
+  if (!tokens) {
+    return undefined
+  }
+
+  const token = tokens.find((token: T): boolean => {
     const tokenKeyValue = token[key]
     if (tokenKeyValue) {
       switch (typeof tokenKeyValue) {
@@ -64,6 +68,8 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
       return false
     }
   })
+
+  return token
 }
 
 export const delay = <T>(ms = 100, result?: T): Promise<T> => new Promise((resolve) => setTimeout(resolve, ms, result))
@@ -191,4 +197,14 @@ export function flattenMapOfSets<K, T>(map: Map<K, Set<T>>): T[] {
 
 export function divideBN(numerator: BN, denominator: BN): BigNumber {
   return new BigNumber(numerator.toString()).dividedBy(denominator.toString())
+}
+
+export const RequireContextMock: __WebpackModuleApi.RequireContext = Object.assign(() => '', {
+  keys: () => [],
+  resolve: () => '',
+  id: '',
+})
+
+export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
+  return value !== null && value !== undefined
 }

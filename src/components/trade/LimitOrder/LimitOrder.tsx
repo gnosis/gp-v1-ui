@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import { TokenDetails, safeTokenName, invertPrice } from '@gnosis.pm/dex-js'
+import { safeTokenName, invertPrice, TokenDex } from '@gnosis.pm/dex-js'
 import BigNumber from 'bignumber.js'
 import { Frame } from 'components/common/Frame'
 import { useForm } from 'react-hook-form'
@@ -15,8 +15,8 @@ const Wrapper = styled.div`
 `
 
 export interface Props {
-  sellToken?: TokenDetails
-  receiveToken?: TokenDetails
+  sellToken?: TokenDex
+  receiveToken?: TokenDex
   limitPrice: BigNumber | null
   isPriceInverted: boolean
   amount?: string
@@ -27,10 +27,10 @@ export interface Props {
 
 export interface LimitOrderFormData {
   // TODO: Add form data
-  amount: string
+  amount?: string
 }
 
-function formatToken(token?: TokenDetails): string {
+function formatToken(token?: TokenDex): string {
   return token ? safeTokenName(token) : 'N/A'
 }
 
@@ -69,7 +69,7 @@ export const LimitOrder: React.FC<Props> = (props: Props) => {
 
   const { handleSubmit, register, watch } = useForm<LimitOrderFormData>({
     defaultValues: {
-      amount: amount,
+      amount,
     },
   })
   const amountCurrent = watch('amount')

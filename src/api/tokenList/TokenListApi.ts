@@ -1,25 +1,62 @@
-import { TokenDetails } from 'types'
+import { Network, TokenDetails } from 'types'
 import { getTokensByNetwork } from './tokenList'
 import { logDebug } from 'utils'
 import GenericSubscriptions, { SubscriptionsInterface } from './Subscriptions'
-import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
-import { DISABLED_TOKEN_MAPS } from 'const'
+import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
+import quoteTokenPriorities from 'data/quoteTokenPriorities'
+import { DISABLED_TOKEN_MAPS, EMPTY_ARRAY } from 'const'
 
-const addOverrideToDisabledTokens = (networkId: number) => (token: TokenDetails): TokenDetails => {
-  const tokenOverride = DISABLED_TOKEN_MAPS[networkId]?.[token.address]
-  if (tokenOverride) {
-    token.override = tokenOverride
-    token.disabled = true
-    // override only keys present in both token and tokenOverride
-    Object.keys(token).forEach((key) => {
-      if (tokenOverride[key] !== undefined) token[key] = tokenOverride[key]
-    })
+const priosByNetwork = new Map<number, Map<string, number>>()
+
+function getTokenPriorities(networkId: number | undefined): Map<string, number> | null {
+  if (!networkId) return null
+
+  const prioritiesCached = priosByNetwork.get(networkId)
+  if (prioritiesCached) {
+    return prioritiesCached
   }
 
-  return token
+  // Get the priorities for all tokens
+  const priorities = new Map<string, number>()
+  quoteTokenPriorities.forEach(({ priority, addresses }) => {
+    if (addresses[networkId] && addresses[networkId].length) {
+      addresses[networkId].forEach((address: string) => priorities.set(address.toLowerCase(), priority))
+    }
+  })
+
+  // Cache priorities
+  priosByNetwork.set(networkId, priorities)
+
+  return priorities
+}
+
+function addAdditionalTokenDetails(networkId: number): (token: TokenDetails) => TokenDetails {
+  const disabledTokensMap = DISABLED_TOKEN_MAPS[networkId]
+  const prioritiesMap = getTokenPriorities(networkId)
+
+  return (token: TokenDetails): TokenDetails => {
+    // Add token override to tokens
+    const tokenOverride = disabledTokensMap?.[token.address]
+    if (tokenOverride) {
+      token.override = tokenOverride
+      token.disabled = true
+      // override only keys present in both token and tokenOverride
+      Object.keys(token).forEach((key) => {
+        if (tokenOverride[key] !== undefined) token[key] = tokenOverride[key]
+      })
+    }
+
+    // Add priority
+    token.priority = prioritiesMap?.get(token.address.toLowerCase())
+
+    return token
+  }
 }
 
 export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
+  setListReady: (state: boolean, networkId?: Network) => void
+  getIsListReady: () => boolean
+  isListReady: boolean
   getTokens: (networkId: number) => TokenDetails[]
   addToken: (params: AddTokenParams) => void
   addTokens: (params: AddTokensParams) => void
@@ -30,7 +67,7 @@ export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
 
 export interface TokenListApiParams {
   networkIds: number[]
-  initialTokenList: TokenDetailsConfig[]
+  initialTokenList: TokenDetailsConfigLegacy[]
 }
 
 export interface AddTokenParams {
@@ -64,6 +101,10 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
   private _tokensByNetwork: { [networkId: number]: TokenDetails[] }
   private _tokenAddressNetworkSet: Set<string>
 
+  // token list flag - prevents stale/incorrect data
+  // from being presented during token list calculation
+  public isListReady = true
+
   public constructor({ networkIds, initialTokenList }: TokenListApiParams) {
     super()
 
@@ -82,7 +123,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
       )
       this._tokensByNetwork[networkId] = TokenListApiImpl.extendTokensInList(
         tokenList,
-        addOverrideToDisabledTokens(networkId),
+        addAdditionalTokenDetails(networkId),
       )
 
       tokenList.forEach(({ address }) => {
@@ -93,12 +134,23 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     })
   }
 
+  public setListReady(state: boolean, networkId?: Network): void {
+    this.isListReady = state
+    if (this.isListReady && networkId) {
+      this.triggerSubscriptions(this._tokensByNetwork[networkId])
+    }
+  }
+
+  public getIsListReady(): boolean {
+    return this.isListReady
+  }
+
   public hasToken(params: HasTokenParams): boolean {
     return this._tokenAddressNetworkSet.has(TokenListApiImpl.constructAddressNetworkKey(params))
   }
 
   public getTokens(networkId: number): TokenDetails[] {
-    return this._tokensByNetwork[networkId] || []
+    return this._tokensByNetwork[networkId] || EMPTY_ARRAY
   }
 
   private static mergeTokenLists(...lists: TokenDetails[][]): TokenDetails[] {
@@ -106,10 +158,11 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     const result: TokenDetails[] = []
 
     lists
-      .reduce((acc, l) => acc.concat(l), [])
+      .reduce((acc, list) => acc.concat(list), [])
       .forEach((token) => {
-        if (!seenAddresses.has(token.address.toLowerCase())) {
-          seenAddresses.add(token.address.toLowerCase())
+        const addressLower = token.address.toLowerCase()
+        if (!seenAddresses.has(addressLower)) {
+          seenAddresses.add(addressLower)
           result.push(token)
         }
       })
@@ -148,7 +201,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     })
     if (addedTokens.length === 0) return
 
-    const extendedTokens = TokenListApiImpl.extendTokensInList(addedTokens, addOverrideToDisabledTokens(networkId))
+    const extendedTokens = TokenListApiImpl.extendTokensInList(addedTokens, addAdditionalTokenDetails(networkId))
 
     this._tokensByNetwork[networkId] = TokenListApiImpl.mergeTokenLists(
       this._tokensByNetwork[networkId],
@@ -180,7 +233,7 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     // fetch list of user added tokens
     const userAddedTokens = this.loadTokenList(networkId, 'user')
 
-    const extendedTokens = TokenListApiImpl.extendTokensInList(tokenList, addOverrideToDisabledTokens(networkId))
+    const extendedTokens = TokenListApiImpl.extendTokensInList(tokenList, addAdditionalTokenDetails(networkId))
 
     // update copy in memory, appending anything user might have added
     this._tokensByNetwork[networkId] = TokenListApiImpl.mergeTokenLists(extendedTokens, userAddedTokens)

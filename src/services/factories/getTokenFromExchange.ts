@@ -6,14 +6,15 @@ import { getToken } from 'utils'
 import { Erc20Api } from 'api/erc20/Erc20Api'
 import { ExchangeApi } from 'api/exchange/ExchangeApi'
 import { TokenList } from 'api/tokenList/TokenListApi'
-import { TokenFromErc20Params, TokenFromErc20 } from './'
+import { TokenFromErc20Params } from './'
+import { safeTokenName, TokenErc20 } from '@gnosis.pm/dex-js'
 
 interface FactoryParams {
   tokenListApi: TokenList
   exchangeApi: ExchangeApi
   erc20Api: Erc20Api
   web3: Web3
-  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenFromErc20>
+  getTokenFromErc20(params: TokenFromErc20Params): Promise<TokenErc20 | null>
 }
 
 interface GetByAddressParams {
@@ -85,6 +86,7 @@ function getTokenFromExchangeByAddressFactory(
       token = {
         ...erc20token,
         id: tokenId,
+        label: safeTokenName(erc20token),
       }
     }
 
@@ -118,7 +120,14 @@ function getTokenFromExchangeByIdFactory(
   const { tokenListApi, exchangeApi, getTokenFromErc20 } = factoryParams
 
   return async ({ tokenId, networkId }: GetByIdParams): Promise<TokenDetails | null> => {
+    // Grab token list: either TCR or default token list
+    // if default token list is used, IDs need to be updated first
+    // or app will see strange data as wrong token IDs from config token list will be used
     const tokens = tokenListApi.getTokens(networkId)
+    // this will always return the initial config list first as it is injected
+    // early in the TokenListAPI constructor
+    // render 1: config list with incorrect IDs
+    // render 2: updated token list with correct IDs
 
     // Try from our current list of tokens, by id
     let token = getToken('id', tokenId, tokens)
@@ -148,6 +157,7 @@ function getTokenFromExchangeByIdFactory(
       return {
         ...erc20token,
         id: tokenId,
+        label: safeTokenName(erc20token),
       }
     }
 

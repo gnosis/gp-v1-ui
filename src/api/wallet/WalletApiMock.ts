@@ -1,8 +1,9 @@
 import { Network, Command } from 'types'
 import BN from 'bn.js'
 import assert from 'assert'
+import { toWei } from '@gnosis.pm/dex-js'
 
-import { logDebug, wait, toWei } from 'utils'
+import { logDebug, wait } from 'utils'
 import { USER_1, USER_2 } from '../../../test/data'
 import { WalletApi, WalletInfo, ProviderInfo } from './WalletApi'
 
@@ -23,7 +24,7 @@ export class WalletApiMock implements WalletApi {
     chainId: 1,
     blockHeader: null,
   }
-  public userPrintAsync = Promise.resolve('')
+  public userPrintAsync = Promise.resolve({ userPrint: '', gas: 0 })
 
   public constructor() {
     this._connected = process.env.AUTOCONNECT === 'true'

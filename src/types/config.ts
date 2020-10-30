@@ -3,11 +3,17 @@ import { MultiTcrApiParams } from 'api/tcr/MultiTcrApi'
 import { DexPriceEstimatorParams } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 import { ContractDeploymentBlock } from 'api/exchange/ExchangeApi'
 import { Network } from 'types'
-import { TokenDetailsConfig } from '@gnosis.pm/dex-js'
+import { TokenDetailsConfigLegacy } from '@gnosis.pm/dex-js'
 
-export interface TokenSelection {
+interface BaseTokenSelection {
   sellToken: string
   receiveToken: string
+}
+
+export type TokenSelection = BaseTokenSelection & {
+  networks: {
+    [n in Network]?: BaseTokenSelection
+  }
 }
 
 export interface MultiTcrConfig {
@@ -60,6 +66,7 @@ export interface TokenOverride {
 export interface DisabledTokens {
   [Network.Mainnet]: TokenOverride[]
   [Network.Rinkeby]: TokenOverride[]
+  [Network.xDAI]: TokenOverride[]
 }
 
 export interface Config {
@@ -68,7 +75,7 @@ export interface Config {
   logoPath: string
   templatePath: string
   initialTokenSelection: TokenSelection
-  initialTokenList: TokenDetailsConfig[]
+  initialTokenList: TokenDetailsConfigLegacy[]
   tcr: MultiTcrConfig | NoTcrConfig
   dexPriceEstimator: DexPriceEstimatorConfig
   theGraphApi: TheGraphApiConfig

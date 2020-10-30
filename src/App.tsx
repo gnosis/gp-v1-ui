@@ -3,105 +3,120 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
+import PrivateRoute from './PrivateRoute'
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
 import GlobalStyles from 'styles/global'
+import { ToastContainer } from 'setupToastify'
+
+import { assertNonNull } from 'utils'
 
 // Main layout
 import { SwapLayout, TradingLayout } from 'components/layout'
 
 // Pages
-const About = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Extra_routes_chunk"*/
-    'pages/About'
-  ),
+const About = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Extra_routes_chunk"*/
+      'pages/About'
+    ),
 )
 
-const Trade = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Trade_chunk"*/
-    'pages/Trade'
-  ),
+const Trade = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Trade_chunk"*/
+      'pages/Trade'
+    ),
 )
 
-const Trades = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Trade_chunk"*/
-    'pages/Trades'
-  ),
+const Trades = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Trade_chunk"*/
+      'pages/Trades'
+    ),
 )
 
-const Trading = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Trade_chunk"*/
-    'pages/Trading'
-  ),
+const Trading = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Trade_chunk"*/
+      'pages/Trading'
+    ),
 )
 
-const Strategies = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Strategies_chunk"*/
-    'pages/Strategies'
-  ),
+const Strategies = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Strategies_chunk"*/
+      'pages/Strategies'
+    ),
 )
 
-const Orders = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Orders_chunk"*/
-    'pages/Orders'
-  ),
+const Orders = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Orders_chunk"*/
+      'pages/Orders'
+    ),
 )
 
-const Wallet = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Wallet_chunk"*/
-    'pages/Wallet'
-  ),
+const Wallet = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Wallet_chunk"*/
+      'pages/Wallet'
+    ),
 )
 
-const NotFound = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Extra_routes_chunk"*/
-    'pages/NotFound'
-  ),
+const NotFound = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Extra_routes_chunk"*/
+      'pages/NotFound'
+    ),
 )
-const NotFound2 = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Extra_routes_chunk"*/
-    'pages/NotFound2'
-  ),
+const NotFound2 = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Extra_routes_chunk"*/
+      'pages/NotFound2'
+    ),
 )
-const ConnectWallet = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Extra_routes_chunk"*/
-    'pages/ConnectWallet'
-  ),
+const ConnectWallet = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Extra_routes_chunk"*/
+      'pages/ConnectWallet'
+    ),
 )
-const FAQ = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Extra_routes_chunk"*/
-    'pages/FAQ'
-  ),
+const FAQ = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Extra_routes_chunk"*/
+      'pages/FAQ'
+    ),
 )
-const OrderBook = React.lazy(() =>
-  import(
-    /* webpackChunkName: "OrderBook_chunk"*/
-    'pages/OrderBook'
-  ),
+const OrderBook = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "OrderBook_chunk"*/
+      'pages/OrderBook'
+    ),
 )
-const Settings = React.lazy(() =>
-  import(
-    /* webpackChunkName: "Settings_chunk"*/
-    'pages/Settings'
-  ),
+const Settings = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "Settings_chunk"*/
+      'pages/Settings'
+    ),
 )
 
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
-import PrivateRoute from './PrivateRoute'
-import { assertNonNull } from 'utils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
@@ -111,7 +126,7 @@ function getInitialUrl(): string {
   const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
   assertNonNull(initialSellToken, 'sellToken is required in the initialTokenSelection config')
   assertNonNull(initialReceiveToken, 'receiveToken is required in the initialTokenSelection config')
-  return '/trade/' + encodeSymbol(initialSellToken) + '-' + encodeSymbol(initialReceiveToken) + '?sell=0&price=0'
+  return '/trade/' + encodeSymbol(initialReceiveToken) + '-' + encodeSymbol(initialSellToken) + '?sell=0&price=0'
 }
 
 const initialUrl = getInitialUrl()
@@ -134,6 +149,7 @@ const App: React.FC = () => (
         <Route>
           <SwapLayout>
             <GlobalStyles />
+            <ToastContainer />
             <React.Suspense fallback={null}>
               <Switch>
                 <PrivateRoute path="/orders" exact component={Orders} />

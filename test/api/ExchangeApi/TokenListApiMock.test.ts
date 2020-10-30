@@ -23,6 +23,7 @@ beforeEach(() => {
 
 const NEW_TOKEN = {
   id: 7,
+  label: 'NTK',
   name: 'New Token',
   symbol: 'NTK',
   decimals: 18,
@@ -34,9 +35,9 @@ const NEW_TOKEN = {
 // TODO: These tests are dumb. Either do something meaningful or remove them entirely
 
 describe('MOCK: Basic functions', () => {
-  test('Mock API Token list has length 8', () => {
+  test('Mock API Token list has length 9', () => {
     const tokens = instanceMock.getTokens(1)
-    expect(tokens.length).toBe(8)
+    expect(tokens.length).toBe(9)
   })
   test('Mock API Token list has expected token', () => {
     const tokens = instanceMock.getTokens(1)

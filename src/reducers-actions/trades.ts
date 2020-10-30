@@ -1,10 +1,11 @@
 import BigNumber from 'bignumber.js'
+import { toBN } from '@gnosis.pm/dex-js'
 
 import { Trade, TradeReversion, EventWithBlockInfo } from 'api/exchange/ExchangeApi'
 
 import { Actions } from 'reducers-actions'
 
-import { logDebug, dateToBatchId, toBN, setStorageItem, flattenMapOfLists } from 'utils'
+import { logDebug, dateToBatchId, setStorageItem, flattenMapOfLists } from 'utils'
 import { TRADES_LOCAL_STORAGE_KEY } from 'const'
 
 // ******** TYPES/INTERFACES
@@ -133,7 +134,7 @@ function getPendingTrades(tradesByRevertKey: Map<string, Trade[]>): Map<string, 
 
   // Filter out trades in that range (curr ... curr -2).
   // The `revertKey` is composed by batchId|orderId, so this regex looks for the batchIds in the keys
-  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\\\|`)
+  const batchesRegex = new RegExp(`^(${currentBatchId}|${currentBatchId - 1}|${currentBatchId - 2})\\|`)
 
   const pending = new Map<string, Trade[]>()
 

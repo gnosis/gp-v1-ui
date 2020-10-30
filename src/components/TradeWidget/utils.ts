@@ -54,14 +54,16 @@ export const chooseTokenWithFallback = ({
   token,
   tokenSymbolFromUrl,
   defaultTokenSymbol,
-}: ChooseTokenInput): TokenDetails => {
-  return (
-    token ||
-    (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())
-      ? getToken('address', tokenSymbolFromUrl, tokens)
-      : getToken('symbol', tokenSymbolFromUrl, tokens)) ||
-    (getToken('symbol', defaultTokenSymbol, tokens) as Required<TokenDetails>)
-  )
+}: ChooseTokenInput): TokenDetails | undefined => {
+  if (tokenSymbolFromUrl && isAddress(tokenSymbolFromUrl?.toLowerCase())) {
+    return getToken('address', tokenSymbolFromUrl, tokens)
+  } else {
+    return (
+      getToken('symbol', token?.symbol, tokens) ||
+      getToken('symbol', tokenSymbolFromUrl, tokens) ||
+      getToken('symbol', defaultTokenSymbol, tokens)
+    )
+  }
 }
 
 export function buildUrl(params: {

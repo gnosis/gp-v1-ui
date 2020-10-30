@@ -25,9 +25,11 @@ const WCSettingsSchema = Joi.object({
   rpc: Joi.object({
     mainnet: RPCSchema,
     rinkeby: RPCSchema,
+    xDAI: RPCSchema,
   }).empty({
     mainnet: '',
     rinkeby: '',
+    xDAI: '',
   }),
 })
   .oxor('infuraId', 'rpc')
@@ -42,16 +44,17 @@ const WCSettingsSchema = Joi.object({
 } */
 
 // validates only walletconnect slice of form data
-export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData> => {
+export const wcResolver = (data: WCOptions): CustomResolverResult<SettingsFormData, 'walletconnect'> => {
   const result = WCSettingsSchema.validate(data, {
     abortEarly: false,
   })
 
-  const { value: values, error } = result
+  const { value, error } = result
+  const values: WCOptions = value
 
   return {
     name: 'walletconnect',
-    values: error ? null : values,
+    values: error ? {} : values,
     errors: error
       ? error.details.reduce((previous, currentError) => {
           // when exlusive fields are both present
@@ -105,7 +108,6 @@ const OrSeparator = styled.div`
   @media ${MEDIA.mobile} {
     padding: 1rem 1.5em;
   }
-}
 `
 
 const ErrorWrapper = styled.p`
@@ -192,7 +194,7 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
       <Disclaimer>
         <p>
           Here you can set the <strong>InfuraId</strong> or <strong>RPC URL</strong> that will be used for connecting
-          the WalletConnect provider to Mainnet and/or Rinkeby. It is also possible to set a custom WalletConnect{' '}
+          the WalletConnect provider to Mainnet, Rinkeby and/or xDAI. It is also possible to set a custom WalletConnect{' '}
           <strong>Bridge URL</strong> to use instead of the default one.
         </p>
       </Disclaimer>
@@ -238,6 +240,18 @@ export const WCSettings: React.FC<WCSettingsProps> = ({ register, errors }) => {
                     placeholder="https://rinkeby.node_url"
                   />
                   <small className="inputLabel">RINKEBY </small>
+                </InputBox>
+              </InputContainer>
+              <InputContainer>
+                <InputBox>
+                  <Input
+                    type="text"
+                    className="movingLabel"
+                    name="walletconnect.rpc.xDAI"
+                    ref={register}
+                    placeholder="https://xdai.node_url"
+                  />
+                  <small className="inputLabel">xDAI </small>
                 </InputBox>
               </InputContainer>
             </FormField>

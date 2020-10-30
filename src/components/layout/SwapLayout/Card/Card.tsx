@@ -17,9 +17,9 @@ const CardRowDrawer = styled.tr`
   width: 100%;
   height: 100%;
   border-radius: 0.6rem;
-  background: var(--color-background-modali);
+  background: var(--color-background-opaque-grey);
 
-  // Inner td wrapper
+  /* Inner td wrapper */
   > td {
     position: relative;
     z-index: 9999;
@@ -66,9 +66,6 @@ const CardRowDrawer = styled.tr`
       @media ${MEDIA.mobile} {
         padding: 0 5rem 0 1.6rem;
       }
-    }
-
-    .times {
     }
   }
 `
@@ -134,7 +131,7 @@ export const ResponsiveRowSizeToggler: React.FC<ResponsiveRowSizeTogglerProps> =
 }
 
 export const FoldableRowWrapper = styled.tr<{ $open?: boolean; $openCSS?: string }>`
-  // Handling card opening/closing logic
+  /* Handling card opening/closing logic */
   &&&&& {
     .cardOpener {
       display: none;
@@ -171,7 +168,7 @@ export const FoldableRowWrapper = styled.tr<{ $open?: boolean; $openCSS?: string
   }
 `
 
-export const CardTable = styled.table<{
+interface CardTableProps {
   $bgColor?: string
 
   $columns?: string
@@ -184,7 +181,9 @@ export const CardTable = styled.table<{
   $justify?: string
 
   $webCSS?: string
-}>`
+}
+
+export const CardTable = styled.table<CardTableProps>`
   display: grid;
   flex: 1;
   width: 100%;
@@ -216,9 +215,8 @@ export const CardTable = styled.table<{
       position: relative;
       display: grid;
       grid-template-columns: ${({ $columns }): string => $columns || `repeat(auto-fit, minmax(3rem, 1fr))`};
-      // grid-template-rows
       ${({ $rows }): string => ($rows ? `grid-template-rows: ${$rows};` : '')}
-      // grid-gap
+      /* grid-gap */
       ${({ $gap }): string => ($gap ? `grid-gap: ${$gap};` : '')}
       align-items: ${({ $align = 'center' }): string => $align};
       justify-content: ${({ $justify = 'center' }): string => $justify};
@@ -227,8 +225,8 @@ export const CardTable = styled.table<{
 
       min-height: 4rem;
 
-      // How much separation between ROWS
-      margin: ${({ $rowSeparation = '1rem' }): string => `${$rowSeparation} 0`};
+      /* How much separation between ROWS */
+      margin: ${({ $rowSeparation = '1rem' }): string => $rowSeparation} 0;
       text-align: center;
       transition: all 0.2s ease-in-out;
 
@@ -247,7 +245,7 @@ export const CardTable = styled.table<{
         background-color: rgba(159, 180, 201, 0.5);
       }
 
-      // Separation between CELLS
+      /* Separation between CELLS */
       > th,
       > td {
         display: flex;
@@ -260,9 +258,9 @@ export const CardTable = styled.table<{
     }
   }
 
-  // Table Header
+  /* Table Header */
   thead {
-    // No styling for table header
+    /* No styling for table header */
     tr {
       background-color: transparent;
       box-shadow: none;
@@ -298,7 +296,7 @@ export const CardTable = styled.table<{
 
     tr:not(.cardRowDrawer) {
       td {
-        // td.status
+        /* td.status */
         &.status {
           flex-flow: column;
           align-items: flex-start;
@@ -325,7 +323,7 @@ export const CardTable = styled.table<{
     }
   }
 
-  // Top level custom CSS
+  /* Top level custom CSS */
   ${({ $webCSS }): string | undefined => $webCSS}
 `
 
@@ -357,9 +355,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
     flex-flow: column nowrap;
     width: auto;
 
-    /////////////////////
-    // TABLE HEADERS
-    /////////////////////
+    /* TABLE HEADERS */
     thead {
       @media ${MEDIA.mobile} {
         display: none;
@@ -371,9 +367,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
       }
     }
 
-    /////////////////////
-    // TABLE BODY
-    /////////////////////
+    /* TABLE BODY */
     tbody {
       line-height: 1;
 
@@ -425,9 +419,7 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
       }
     }
 
-    /////////////////////
-    // ALL TABLE ROWS
-    /////////////////////
+    /* ALL TABLE ROWS */
     tr:not(.cardRowDrawer) {
       ${({ $columns }): string => ($columns ? `grid-template-columns: ${$columns}` : '')};
       text-align: left;

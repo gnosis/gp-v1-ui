@@ -1,6 +1,7 @@
 module.exports = {
   parser: '@typescript-eslint/parser', // Specifies the ESLint parser
   extends: [
+    'eslint:recommended',
     'plugin:react/recommended', // Uses the recommended rules from @eslint-plugin-react
     'plugin:@typescript-eslint/recommended', // Uses the recommended rules from @typescript-eslint/eslint-plugin
     'prettier/@typescript-eslint', // Uses eslint-config-prettier to disable ESLint rules from @typescript-eslint/eslint-plugin that would conflict with prettier
@@ -35,7 +36,7 @@ module.exports = {
       },
     },
   ],
-  plugins: ['react-hooks'],
+  plugins: ['react-hooks', '@typescript-eslint'],
   settings: {
     react: {
       version: 'detect', // Tells eslint-plugin-react to automatically detect the version of React to use
@@ -43,5 +44,10 @@ module.exports = {
   },
   globals: {
     VERSION: true,
+  },
+  env: {
+    browser: true,
+    node: true,
+    jest: true,
   },
 }

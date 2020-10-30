@@ -5,10 +5,16 @@ import GenericSubscriptions from './Subscriptions'
 export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> implements TokenList {
   private _tokenList: TokenDetails[]
 
+  public isListReady = false
+
   public constructor(tokenList: TokenDetails[]) {
     super()
 
     this._tokenList = tokenList
+  }
+
+  public getIsListReady(): boolean {
+    return this.isListReady
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,6 +39,10 @@ export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> imple
   public persistTokens({ tokenList }: PersistTokensParams): void {
     this._tokenList = tokenList
     this.triggerSubscriptions(tokenList)
+  }
+
+  public setListReady(state: boolean): void {
+    this.isListReady = state
   }
 }
 

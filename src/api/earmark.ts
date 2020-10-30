@@ -22,3 +22,9 @@ export const earmarkGasPrice = (gasPrice: string, userPrint: string): string => 
 
 // simple concatenation, with '0x' for empty data to have `0x<userPrint>` at the least
 export const earmarkTxData = (data = '0x', userPrint: string): string => data + userPrint
+
+const GAS_PER_DATA_CHAR = 8 // wei
+
+// calculates gas needed to save extra earmark data to chain
+// 16 wei per 2 characters
+export const calcEarmarkedGas = (userPrint: string): number => GAS_PER_DATA_CHAR * userPrint.length

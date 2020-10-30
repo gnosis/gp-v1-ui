@@ -13,7 +13,7 @@ import { TokenFromExchange } from 'services/factories'
 import { tokenListApi } from 'api'
 
 // components
-import { TokenImgWrapper } from 'components/TokenImg'
+import { TokenImg } from 'components/common/TokenImg'
 
 // hooks
 import useSafeState from 'hooks/useSafeState'
@@ -75,7 +75,8 @@ const ExtraOptionsMessage = styled.a`
 `
 
 interface OptionItemProps {
-  image?: string
+  address: string
+  addressMainnet?: string
   name?: string
   symbol?: string
   faded?: boolean
@@ -86,7 +87,8 @@ interface OptionItemProps {
 // generic component to display token
 // with custom children option
 export const OptionItem: React.FC<OptionItemProps> = ({
-  image,
+  address,
+  addressMainnet,
   name,
   symbol,
   children,
@@ -96,7 +98,7 @@ export const OptionItem: React.FC<OptionItemProps> = ({
 }) => {
   return (
     <OptionItemWrapper>
-      <TokenImgWrapper src={image} alt={name} faded={faded} />
+      <TokenImg address={address} addressMainnet={addressMainnet} name={name} symbol={symbol} faded={faded} />
 
       <div className="tokenDetails">
         <div className="tokenName">
@@ -151,14 +153,16 @@ const generateMessage = ({
   switch (reason) {
     // not registered --> advise to register
     case TokenFromExchange.NOT_REGISTERED_ON_CONTRACT:
-      if (!token)
+      if (!token) {
         return (
           <a href="https://docs.gnosis.io/protocol/docs/addtoken1/" rel="noopener noreferrer" target="_blank">
             Register token on Exchange first
           </a>
         )
+      }
+
       return (
-        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+        <OptionItem name={token.name} symbol={token.symbol} address={token.address}>
           <ExtraOptionsMessage
             href="https://docs.gnosis.io/protocol/docs/addtoken1/"
             rel="noopener noreferrer"
@@ -172,7 +176,7 @@ const generateMessage = ({
     case TokenFromExchange.NOT_ERC20:
       return <>Not a valid ERC20 token</>
     // registered but not in list --> option to add
-    case TokenFromExchange.NOT_IN_TOKEN_LIST:
+    case TokenFromExchange.NOT_IN_TOKEN_LIST: {
       if (!token || !('id' in token)) return <>{defaultText}</>
 
       const handleAddToken: React.MouseEventHandler<HTMLButtonElement> = async (e) => {
@@ -188,10 +192,16 @@ const generateMessage = ({
       }
 
       return (
-        <OptionItem name={token.name} symbol={token.symbol} image={token.image}>
+        <OptionItem
+          name={token.name}
+          symbol={token.symbol}
+          address={token.address}
+          addressMainnet={token.addressMainnet}
+        >
           <button onClick={handleAddToken}>Add Token</button>
         </OptionItem>
       )
+    }
     default:
       return <>{defaultText}</>
   }

@@ -7,7 +7,7 @@ import RpcEngine, {
 } from 'json-rpc-engine'
 import providerFromEngine from 'eth-json-rpc-middleware/providerFromEngine'
 import { TransactionConfig } from 'web3-core'
-import { numberToHex } from 'web3-utils'
+import { numberToHex, hexToNumber } from 'web3-utils'
 import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
@@ -84,14 +84,19 @@ const createConditionalMiddleware = <T extends unknown>(
   }
 }
 
+export interface Earmark {
+  data: string
+  extraGas: number
+}
+
 interface ExtraMiddlewareHandlers {
   fetchGasPrice(): Promise<string | undefined>
-  earmarkTxData(data?: string): Promise<string>
+  earmarkTx(data?: string): Promise<Earmark>
 }
 
 export const composeProvider = <T extends Provider>(
   provider: T,
-  { fetchGasPrice, earmarkTxData }: ExtraMiddlewareHandlers,
+  { fetchGasPrice, earmarkTx }: ExtraMiddlewareHandlers,
 ): T => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const engine = new (RpcEngine as any)() as JsonRpcEngine
@@ -150,9 +155,16 @@ export const composeProvider = <T extends Provider>(
         // no parameters, which shouldn't happen
         if (!txConfig) return false
 
-        const earmarkedData = await earmarkTxData(txConfig.data)
+        // tx.data += decode*
+        const { data, extraGas } = await earmarkTx(txConfig.data)
+        txConfig.data = data
 
-        txConfig.data = earmarkedData
+        // if gas is specified tx.gas += cost of decode*
+        if (txConfig.gas) {
+          const newGas = hexToNumber(txConfig.gas) + extraGas
+          txConfig.gas = numberToHex(newGas)
+        }
+
         // don't mark as handled
         // pass modified tx on
         return false
@@ -198,6 +210,10 @@ export const composeProvider = <T extends Provider>(
       if (prop === 'sendAsync' || prop === 'send') {
         // composedProvider handles it
         return Reflect.get(target, prop, receiver)
+      }
+      // pretend we don't support provider.request yet
+      if (prop === 'request') {
+        return undefined
       }
       // MMask or other provider handles it
       return Reflect.get(provider, prop, receiver)

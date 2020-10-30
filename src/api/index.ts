@@ -115,7 +115,7 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
 }
 
 function createTokenListApi(): TokenList {
-  const networkIds = [Network.Mainnet, Network.Rinkeby]
+  const networkIds = [Network.Mainnet, Network.Rinkeby, Network.xDAI]
 
   let tokenListApi: TokenList
   if (process.env.MOCK_TOKEN_LIST === 'true') {
@@ -167,10 +167,11 @@ function createTcrApi(web3: Web3): TcrApi | undefined {
     case 'none':
       tcrApi = undefined
       break
-    case 'multi-tcr':
+    case 'multi-tcr': {
       const multiTcrApiConfig = CONFIG.tcr
       tcrApi = new MultiTcrApiProxy({ web3, ...multiTcrApiConfig.config })
       break
+    }
 
     default:
       throw new Error('Unknown implementation for DexPriceEstimatorApi: ' + type)

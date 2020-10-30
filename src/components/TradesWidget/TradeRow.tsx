@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { formatDistanceStrict } from 'date-fns'
 
@@ -6,20 +6,36 @@ import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECIS
 
 import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 
-import { EtherscanLink } from 'components/common/EtherscanLink'
+import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { EllipsisText } from 'components/common/EllipsisText'
 
 import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 
-import { isTradeSettled, divideBN, formatPercentage } from 'utils'
+import { isTradeSettled, divideBN, formatPercentage, getMarket } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { MEDIA } from 'const'
+import { MEDIA, ONE_BIG_NUMBER, ONE_HUNDRED_BIG_NUMBER } from 'const'
+import { SwapIcon } from 'components/TradeWidget/SwapIcon'
+import BigNumber from 'bignumber.js'
+
+// minimum floor amount surplus must be greater than for it to display on frontend
+const SURPLUS_THRESHOLD = 0.1
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   td {
     &[data-label='Order ID'],
     &[data-label='Market'] {
       cursor: pointer;
+    }
+
+    span.swapIcon {
+      margin-left: 0.4rem;
+    }
+
+    div.surplusHighlight {
+      color: var(--color-button-success);
+      font-size: smaller;
+      font-weight: bolder;
+      margin: 0.2rem 0;
     }
   }
 
@@ -41,6 +57,11 @@ const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
       }
     }
   }
+`
+
+const SplitHeaderTitle = styled.div`
+  display: flex;
+  flex-flow: column;
 `
 
 interface TradeRowProps {
@@ -76,6 +97,58 @@ const TypePill = styled.span<{
   text-transform: uppercase;
 `
 
+interface MarketAndPricesParams extends Pick<Trade, 'buyToken' | 'sellToken' | 'limitPrice' | 'fillPrice'> {
+  isPriceInverted: boolean
+}
+
+interface MarketAndPrices {
+  quoteTokenLabel: React.ReactNode
+  sellTokenLabel: React.ReactNode
+  buyTokenLabel: React.ReactNode
+  market: string
+  limitPrice?: BigNumber
+  fillPrice: BigNumber
+  surplus?: number
+}
+
+const calcPercentage = (amount: BigNumber, divisor: BigNumber): BigNumber =>
+  ONE_HUNDRED_BIG_NUMBER.times(ONE_BIG_NUMBER.minus(amount.div(divisor)))
+
+function getMarketAndPrices(params: MarketAndPricesParams): MarketAndPrices {
+  const { sellToken, buyToken, isPriceInverted, fillPrice, limitPrice } = params
+  const { baseToken: baseTokenDefault, quoteToken: quoteTokenDefault } = getMarket({
+    sellToken,
+    receiveToken: buyToken,
+  })
+  const baseToken = isPriceInverted ? quoteTokenDefault : baseTokenDefault
+
+  const sellTokenLabel = displayTokenSymbolOrLink(sellToken)
+  const buyTokenLabel = displayTokenSymbolOrLink(buyToken)
+  const surplus = limitPrice && Math.abs(calcPercentage(limitPrice, fillPrice).toNumber())
+
+  const market = `${buyTokenLabel}/${sellTokenLabel}`
+  let quoteTokenLabel: React.ReactNode, limitPriceBN: BigNumber | undefined, fillPriceBN: BigNumber
+  if (sellToken === baseToken) {
+    quoteTokenLabel = buyTokenLabel
+    limitPriceBN = limitPrice
+    fillPriceBN = fillPrice
+  } else {
+    quoteTokenLabel = sellTokenLabel
+    limitPriceBN = (limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)) || undefined
+    fillPriceBN = invertPrice(fillPrice)
+  }
+
+  return {
+    market,
+    quoteTokenLabel,
+    sellTokenLabel,
+    buyTokenLabel,
+    limitPrice: limitPriceBN,
+    fillPrice: fillPriceBN,
+    surplus,
+  }
+}
+
 export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const { trade, networkId, onCellClick } = params
   const {
@@ -96,8 +169,6 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
   const sellTokenDecimals = sellToken.decimals || DEFAULT_PRECISION
   // Calculate the inverse price - just make sure Limit Price is defined and isn't ZERO
   // don't want none of that divide by zero and destroy the world stuff
-  const invertedLimitPrice = limitPrice && !limitPrice.isZero() && invertPrice(limitPrice)
-  const invertedFillPrice = invertPrice(fillPrice)
 
   const date = new Date(timestamp)
 
@@ -114,6 +185,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           return `${fillPercentage} matched out of ${orderAmount} ${displayTokenSymbolOrLink(sellToken)}`
         }
       }
+      // falls through
       case 'liquidity':
       case 'unknown':
       default:
@@ -121,52 +193,75 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
     }
   }, [orderSellAmount, sellAmount, sellToken, sellTokenDecimals, type])
 
-  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
-    buyToken,
-    sellToken,
-  ])
+  const [isPriceInverted, setIsPriceInverted] = useState(false)
+
+  const {
+    market,
+    quoteTokenLabel,
+    sellTokenLabel,
+    buyTokenLabel,
+    fillPrice: marketFillPrice,
+    limitPrice: marketLimitPrice,
+    surplus,
+  } = useMemo(
+    () =>
+      getMarketAndPrices({
+        sellToken,
+        buyToken,
+        isPriceInverted,
+        limitPrice,
+        fillPrice,
+      }),
+    [sellToken, buyToken, isPriceInverted, limitPrice, fillPrice],
+  )
 
   // Do not display trades that are not settled
   return !isTradeSettled(trade) ? null : (
     <TradeRowFoldableWrapper data-order-id={orderId} data-batch-id={batchId}>
-      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
-        {formatDistanceStrict(date, new Date(), { addSuffix: true })}
+      <td data-label="Market" className="showResponsive">
+        <span
+          onClick={(): void =>
+            onCellClick({
+              target: { value: market },
+            })
+          }
+        >
+          Swap {sellTokenLabel} for {buyTokenLabel}
+        </span>
       </td>
       <td
-        data-label="Market"
-        className="showResponsive"
-        onClick={(): void =>
-          onCellClick({
-            target: { value: market },
-          })
-        }
+        data-label="Fill Price"
+        title={formatPrice({
+          price: marketFillPrice,
+          decimals: 8,
+        })}
       >
-        {market}
+        <SplitHeaderTitle>
+          <div>
+            {formatPrice(marketFillPrice)} {quoteTokenLabel}
+          </div>
+          {surplus && surplus > SURPLUS_THRESHOLD && (
+            <div className="surplusHighlight">+{surplus.toFixed(2)}% surplus</div>
+          )}
+        </SplitHeaderTitle>
+        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
       </td>
       <td
-        data-label="Limit Price / Fill Price"
-        title={`${invertedLimitPrice ? formatPrice({ price: invertedLimitPrice, decimals: 8 }) : 'N/A'} / ${formatPrice(
-          {
-            price: invertedFillPrice,
-            decimals: 8,
-          },
-        )}`}
-      >
-        {invertedLimitPrice ? formatPrice(invertedLimitPrice) : 'N/A'}
-        <br />
-        {formatPrice(invertedFillPrice)}
-      </td>
-      <td
-        data-label="Sold / Bought"
+        data-label="Sold"
         className="showResponsive"
         title={`${formatAmountFull({
           amount: sellAmount,
           precision: sellTokenDecimals,
-        })} / ${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
+        })}`}
       >
-        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {displayTokenSymbolOrLink(sellToken)}
-        <br />
-        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {displayTokenSymbolOrLink(buyToken)}
+        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {sellTokenLabel}
+      </td>
+      <td
+        data-label="Bought"
+        className="showResponsive"
+        title={`${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
+      >
+        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {buyTokenLabel}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>
@@ -174,8 +269,18 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       <td data-label="Order ID" onClick={(): void => onCellClick({ target: { value: orderId } })}>
         <EllipsisText title={orderId}>{orderId}</EllipsisText>
       </td>
+      <td
+        data-label="Limit Price"
+        title={marketLimitPrice ? formatPrice({ price: marketLimitPrice, decimals: 8 }) : 'N/A'}
+      >
+        {marketLimitPrice ? formatPrice(marketLimitPrice) : 'N/A'} {quoteTokenLabel}
+        <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
+      </td>
+      <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
+        {formatDistanceStrict(date, new Date(), { addSuffix: true })}
+      </td>
       <td data-label="View on Etherscan">
-        <EtherscanLink type="event" identifier={txHash} networkId={networkId} />
+        <BlockExplorerLink type="event" identifier={txHash} networkId={networkId} />
       </td>
     </TradeRowFoldableWrapper>
   )
