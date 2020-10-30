@@ -282,18 +282,16 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
       wethXdaiTokens,
       memoizedZeroFilterParams: {
         data: filteredBalances.filter((token: TokenBalanceDetails): boolean => {
-          const isWethOrWxDai = TOKEN_FILTER_IGNORE_LIST.has(token.address)
-          if (isWethOrWxDai) {
-            wethXdaiTokens.push(token)
-          }
+          const isWethOrWxDai = TOKEN_FILTER_IGNORE_LIST.has(token.address) && !ethBalance?.isZero()
 
+          isWethOrWxDai && wethXdaiTokens.push(token)
           return !isWethOrWxDai
         }),
         isSearchFilter: false,
         filterFnFactory: (): typeof customHideZeroFilterFn => customHideZeroFilterFn,
       },
     }
-  }, [filteredBalances])
+  }, [ethBalance, filteredBalances])
 
   const {
     filteredData: displayedBalances,
