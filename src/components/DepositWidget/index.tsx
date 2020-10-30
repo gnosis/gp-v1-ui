@@ -6,7 +6,7 @@ import BN from 'bn.js'
 // Utils, const, types
 import { logDebug, getToken } from 'utils'
 import { checkTokenAgainstSearch } from 'utils/filter'
-import { ZERO, MEDIA } from 'const'
+import { ZERO, MEDIA, TOKEN_FILTER_IGNORE_LIST } from 'const'
 import { TokenBalanceDetails } from 'types'
 
 // Components
@@ -276,14 +276,22 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
     handlers: { handleSearch, clearFilters: clearFilters1 },
   } = useDataFilter(memoizedSearchFilterParams)
 
-  const memoizedZeroFilterParams = useMemo(
-    () => ({
-      data: filteredBalances,
-      isSearchFilter: false,
-      filterFnFactory: (): typeof customHideZeroFilterFn => customHideZeroFilterFn,
-    }),
-    [filteredBalances],
-  )
+  const { memoizedZeroFilterParams, wethXdaiTokens } = useMemo(() => {
+    const wethXdaiTokens: TokenBalanceDetails[] = []
+    return {
+      wethXdaiTokens,
+      memoizedZeroFilterParams: {
+        data: filteredBalances.filter((token: TokenBalanceDetails): boolean => {
+          if (TOKEN_FILTER_IGNORE_LIST.has(token.address)) {
+            wethXdaiTokens.push(token)
+          }
+          return !TOKEN_FILTER_IGNORE_LIST.has(token.address)
+        }),
+        isSearchFilter: false,
+        filterFnFactory: (): typeof customHideZeroFilterFn => customHideZeroFilterFn,
+      },
+    }
+  }, [filteredBalances])
 
   const {
     filteredData: displayedBalances,
@@ -331,6 +339,36 @@ const BalancesDisplay: React.FC<BalanceDisplayProps> = ({
               </tr>
             </thead>
             <tbody>
+              {wethXdaiTokens?.length > 0 &&
+                wethXdaiTokens.map((tokenBalances) => (
+                  <Row
+                    networkId={networkIdOrDefault}
+                    key={tokenBalances.address}
+                    ethBalance={ethBalance}
+                    tokenBalances={tokenBalances}
+                    onEnableToken={(): Promise<void> => enableToken(tokenBalances.address)}
+                    onSubmitDeposit={(balance, onTxHash): Promise<void> =>
+                      depositToken(balance, tokenBalances.address, onTxHash)
+                    }
+                    onSubmitWithdraw={(balance, onTxHash): Promise<void> => {
+                      return requestWithdrawConfirmation(
+                        balance,
+                        tokenBalances.address,
+                        tokenBalances.claimable,
+                        onTxHash,
+                      )
+                    }}
+                    onClaim={(): Promise<void | React.ReactText> => claimToken(tokenBalances.address)}
+                    claiming={claiming.has(tokenBalances.address)}
+                    withdrawing={withdrawing.has(tokenBalances.address)}
+                    depositing={depositing.has(tokenBalances.address)}
+                    highlighted={highlighted.has(tokenBalances.address)}
+                    enabling={enabling.has(tokenBalances.address)}
+                    enabled={enabled.has(tokenBalances.address)}
+                    immatureClaim={immatureClaim.has(tokenBalances.address)}
+                    {...windowSpecs}
+                  />
+                ))}
               {displayedBalances && displayedBalances.length > 0 ? (
                 displayedBalances.map((tokenBalances) => (
                   <Row
