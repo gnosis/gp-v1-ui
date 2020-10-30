@@ -104,6 +104,13 @@ export const removeTxPendingApproval = (id: number | string | void): void => {
   })
 }
 
+export const removeAllTxsPendingApproval = (): void => {
+  setOuterModalContext<GlobaModalContextSlice>((oldState) => ({
+    ...oldState,
+    pendingTxApprovals: new Set(),
+  }))
+}
+
 export const openWaitForTxApprovalModal = (): Promise<boolean> =>
   openGlobalModal({
     message: <WaitForTxApprovalMessage />,
