@@ -17,10 +17,7 @@ const PenidngTxApprovalsMessage: React.FC<{ txNumber: number }> = ({ txNumber })
     <>
       <h4>No response from wallet for pending transaction</h4>
       <p>There are currently {txNumber} transactions waiting for approval for your wallet.</p>
-      <p>
-        Mesa has detected a potential transaction timeout. Please validate with your wallet that you have properly
-        accepted or rejected the transaction.
-      </p>
+      <p>Please validate with your wallet that you have properly accepted or rejected the transaction.</p>
       <p>Do you need more time signing the transaction?</p>
     </>
   )
@@ -31,7 +28,7 @@ const NoTxsWillClose: React.FC = () => {
     <>
       <h4>All transactions have been handled</h4>
       <p>Mesa has received responses for all pending transactions.</p>
-      <p> This modal will close in a moment.</p>
+      <p>This modal will close in a moment.</p>
     </>
   )
 }
