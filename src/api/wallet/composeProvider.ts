@@ -73,21 +73,28 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
 const DEFAULT_TX_APPROVAL_TIMEOUT = 7000
 
 const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPROVAL_TIMEOUT): JsonRpcMiddleware => {
+  // keep track of pending txs in closure
+  const txsPendingApproval = new Map<string | number, () => void>()
   return (req, res, next, end): void => {
     if (req.method !== 'eth_sendTransaction') {
       return middleware(req, res, next, end)
     }
 
-    let timeoutId: NodeJS.Timeout | null = null
+    // restart waiting before modal opening on new txs
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutId = null
+    }
 
     // new tx pending approval fired
     addTxPendingApproval(req.id)
+    if (req.id !== undefined) {
+      // code 106 -- Timeout
+      // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
+      txsPendingApproval.set(req.id, () => end({ message: 'Timeout for transaction approval or rejection', code: 106 }))
+    }
 
     timeoutId = setTimeout(async function askOnTimeout() {
-      // all txs were approved/rejected in the wallet
-      // in-between timeout on the modal close -- reopen
-      if (!areTxsPendingApproval()) return
-      // new tx waiting for approval
       if (await openWaitForTxApprovalModal()) {
         // if user chose to wait more in Modal
         // or rejected/approved txs in the wallet
@@ -106,7 +113,7 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
       }
       // if modal closed
       // either new one will be reopened
-      // or tx were rejected/approved in the wallet already
+      // or txs were rejected/approved in the wallet already
       // or user chose not to wait anymore
     }, timeout)
 
@@ -114,7 +121,7 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
       // if tx wasn't already rejected through the modal
       // remove it from pending here
       removeTxPendingApproval(req.id)
-      if (timeoutId) {
+      if (req.id !== undefined) txsPendingApproval.delete(req.id)
         clearTimeout(timeoutId)
         timeoutId = null
       }
