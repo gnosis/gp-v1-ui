@@ -43,7 +43,7 @@ export const FormMessage = styled.div.attrs<Props>((props) => ({
     color: var(--color-text-primary);
     background: var(--color-background-validation-warning);
     border-radius: 0 0 0.3rem 0.3rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0.7rem;
     box-sizing: border-box;
     margin: 0.3rem 0 1rem;
   }
