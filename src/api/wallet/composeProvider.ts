@@ -16,6 +16,7 @@ import {
   addTxPendingApproval,
   areTxsPendingApproval,
   openWaitForTxApprovalModal,
+  removeAllTxsPendingApproval,
   removeTxPendingApproval,
 } from 'components/OuterModal'
 
@@ -104,11 +105,13 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
         timeoutId = setTimeout(askOnTimeout, timeout)
       } else {
         // modal closed with `No, stop waiting`
-        removeTxPendingApproval(req.id)
+        // all pending txs were cancelled
+        removeAllTxsPendingApproval()
+        txsPendingApproval.forEach((endCb) => endCb())
+        txsPendingApproval.clear()
         // stop waiting
         if (!timeoutId) return // reset in end() call from provider response
-        // code 106 -- Timeout
-        // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
+
         end({ message: 'Timeout for transaction approval or rejection', code: 106 })
       }
       // if modal closed
