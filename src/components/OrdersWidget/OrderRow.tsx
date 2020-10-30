@@ -26,6 +26,7 @@ import {
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
+  parseBigNumber,
 } from 'utils'
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
@@ -117,10 +118,10 @@ interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
-  const filledAmount = useMemo(() => {
+  const { filledAmount, filledAmountBN } = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return formatSmart(filledAmount, sellToken.decimals) || '0'
+    return { filledAmount: formatSmart(filledAmount, sellToken.decimals) || '0', filledAmountBN: filledAmount }
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
   const totalAmount = useMemo(() => formatSmart(order.priceDenominator, sellToken.decimals) || '0', [
@@ -130,16 +131,27 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
 
   let filledCellContent = 'no limit'
   let totalCellContent = 'no limit'
+  let amountFilled: string | null = null
 
   if (!order.isUnlimited) {
     filledCellContent = `${filledAmount} ${displayTokenSymbolOrLink(sellToken)}`
     totalCellContent = `${totalAmount} ${displayTokenSymbolOrLink(sellToken)}`
+
+    // Calculate filled amount percentage
+    // need to convert BN values to Bignumber for decimals math...
+    const filledAmt = parseBigNumber(filledAmountBN.toString())
+    const totalAmt = parseBigNumber(order.priceDenominator.toString())
+    const calculatable = filledAmt && totalAmt && !filledAmt.isZero()
+    // TS hates the above conditional statements, filledAmt and totalAmt are not NULL when calculatable passed ternary!
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    amountFilled = calculatable ? filledAmt!.div(totalAmt!).times('100').toFixed(2) : null
   }
 
   return (
     <>
       <td className="amounts" data-label="Filled Amount">
         {filledCellContent}
+        {amountFilled && <div className="surplusHighlight">{amountFilled}% filled</div>}
       </td>
       <td className="amounts" data-label="Total Amount">
         {totalCellContent}
