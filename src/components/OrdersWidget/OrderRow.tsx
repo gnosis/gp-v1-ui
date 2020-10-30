@@ -76,7 +76,7 @@ interface MarketProps {
 const Market: React.FC<MarketProps> = ({ sellToken, buyToken, onCellClick }) => {
   const labels = useMemo(
     () => ({
-      label: `Swap ${displayTokenSymbolOrLink(buyToken)} for ${displayTokenSymbolOrLink(sellToken)}`,
+      label: `Swap ${displayTokenSymbolOrLink(sellToken)} for ${displayTokenSymbolOrLink(buyToken)}`,
       market: `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`,
     }),
     [buyToken, sellToken],
