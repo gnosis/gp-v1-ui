@@ -141,10 +141,9 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
     // need to convert BN values to Bignumber for decimals math...
     const filledAmt = parseBigNumber(filledAmountBN.toString())
     const totalAmt = parseBigNumber(order.priceDenominator.toString())
-    const calculatable = filledAmt && totalAmt && !filledAmt.isZero()
-    // TS hates the above conditional statements, filledAmt and totalAmt are not NULL when calculatable passed ternary!
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    amountFilled = calculatable ? filledAmt!.div(totalAmt!).times('100').toFixed(2) : null
+    if (filledAmt && totalAmt && !filledAmt.isZero()) {
+      amountFilled = filledAmt.div(totalAmt).times('100').toFixed(2)
+    }
   }
 
   return (
