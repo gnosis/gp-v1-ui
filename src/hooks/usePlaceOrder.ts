@@ -190,11 +190,9 @@ export const usePlaceOrder = (): Result => {
         console.error(`[usePlaceOrder] Error placing order`, e)
 
         if (e.message.match(/Must have Address to get ID/)) {
-          toast.error(
-            `Error placing order: One of the selected tokens is not registered in the exchange. You should register them first`,
-          )
+          toast.error('One of the selected tokens is not registered in the exchange. You should register them first')
         } else {
-          toast.error(`Error placing order: ${e.message}`)
+          toast.error(e.message)
         }
 
         return { success: false }
@@ -288,7 +286,7 @@ export const usePlaceOrder = (): Result => {
         return { success: true, receipt }
       } catch (e) {
         console.error(`[usePlaceOrder] Error placing orders`, e)
-        toast.error(`Error placing orders: ${e.message}`)
+        toast.error(e.message)
 
         return { success: false }
       } finally {

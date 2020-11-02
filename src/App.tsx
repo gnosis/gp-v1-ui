@@ -11,6 +11,8 @@ import { ToastContainer } from 'setupToastify'
 
 import { assertNonNull } from 'utils'
 
+import { GlobalModalInstance } from 'components/OuterModal'
+
 // Main layout
 import { SwapLayout, TradingLayout } from 'components/layout'
 
@@ -169,6 +171,7 @@ const App: React.FC = () => (
           </SwapLayout>
         </Route>
       </Switch>
+      {GlobalModalInstance}
     </Router>
     {process.env.NODE_ENV === 'development' && <Console />}
   </>

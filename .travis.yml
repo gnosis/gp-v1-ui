@@ -2,7 +2,8 @@ if: (branch = develop) OR (branch = master) OR (type = pull_request) OR (tag IS 
 language: node_js
 node_js:
   # TODO: stable (v13.0.1 at the time) breaks sha3 package compilation
-  - 'lts/*'
+  # Sticky v12
+  - '12'
 cache: 'yarn'
 script:
   - yarn test-coverage

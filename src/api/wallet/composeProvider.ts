@@ -12,6 +12,14 @@ import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
 
+import {
+  addTxPendingApproval,
+  areTxsPendingApproval,
+  openWaitForTxApprovalModal,
+  removeAllTxsPendingApproval,
+  removeTxPendingApproval,
+} from 'components/OuterModal'
+
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
   // WalletConnectProvider.sendAsync is web3-provider-engine.sendAsync
@@ -62,37 +70,64 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
   }
 }
 
-// wait 7 sec, for now
-const DEFAULT_TX_APPROVAL_TIMEOUT = 7000
+// wait 1 minute
+const DEFAULT_TX_APPROVAL_TIMEOUT = 60000
 
 const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPROVAL_TIMEOUT): JsonRpcMiddleware => {
+  let timeoutId: NodeJS.Timeout | null = null
+  // keep track of pending txs in closure
+  const txsPendingApproval = new Map<string | number, () => void>()
   return (req, res, next, end): void => {
     if (req.method !== 'eth_sendTransaction') {
       return middleware(req, res, next, end)
     }
 
-    let timeoutId: NodeJS.Timeout | null = null
+    // restart waiting before modal opening on new txs
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      timeoutId = null
+    }
 
-    timeoutId = setTimeout(function askOnTimeout() {
-      if (confirm('Stop waiting for tx approval?')) {
-        // stop waiting
-        setTimeout(() => {
-          // if using an async confirm (modal, toast, etc.)
-          // won't need this timeout as execution will be in order anyway
-          // otherwise timeout to break out of sync code
-          if (!timeoutId) return // reset in end() call from provider response
-          // code 106 -- Timeout
-          // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
-          end({ message: 'Timeout for transaction approval or rejection', code: 106 })
-        }, 500) // after a delay, to allow end() call from provider response to take propagate throw middlewares
-      } else {
+    // new tx pending approval fired
+    addTxPendingApproval(req.id)
+    if (req.id !== undefined) {
+      // code 106 -- Timeout
+      // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
+      txsPendingApproval.set(req.id, () =>
+        end({ message: 'User opted out of waiting for transaction response', code: 106 }),
+      )
+    }
+
+    timeoutId = setTimeout(async function askOnTimeout() {
+      if (await openWaitForTxApprovalModal()) {
+        // if user chose to wait more in Modal
+        // or rejected/approved txs in the wallet
+        // don't retrigger modal
+        if (!areTxsPendingApproval()) return
         // wait some more
         timeoutId = setTimeout(askOnTimeout, timeout)
+      } else {
+        // modal closed with `No, stop waiting`
+        // all pending txs were cancelled
+        removeAllTxsPendingApproval()
+        txsPendingApproval.forEach((endCb) => endCb())
+        txsPendingApproval.clear()
       }
+      // if modal closed
+      // either new one will be reopened
+      // or txs were rejected/approved in the wallet already
+      // or user chose not to wait anymore
     }, timeout)
 
     const endWithTimeout = (error?: JsonRpcError<unknown>): void => {
-      if (timeoutId) {
+      // if tx wasn't already rejected through the modal
+      // remove it from pending here
+      removeTxPendingApproval(req.id)
+      if (req.id !== undefined) txsPendingApproval.delete(req.id)
+
+      // if no more txs left
+      // no need for modal
+      if (timeoutId && txsPendingApproval.size === 0) {
         clearTimeout(timeoutId)
         timeoutId = null
       }
