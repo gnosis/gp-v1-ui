@@ -110,10 +110,6 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
         removeAllTxsPendingApproval()
         txsPendingApproval.forEach((endCb) => endCb())
         txsPendingApproval.clear()
-        // stop waiting
-        if (!timeoutId) return // reset in end() call from provider response
-
-        end({ message: 'Timeout for transaction approval or rejection', code: 106 })
       }
       // if modal closed
       // either new one will be reopened
