@@ -148,8 +148,8 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
 
   return (
     <>
-      <td className="amounts" data-label="Filled Amount">
-        {filledCellContent}
+      <td className="amounts column" data-label="Filled Amount">
+        <div>{filledCellContent}</div>
         {amountFilled && <div className="surplusHighlight">{amountFilled}% filled</div>}
       </td>
       <td className="amounts" data-label="Total Amount">

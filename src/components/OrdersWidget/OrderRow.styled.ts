@@ -56,6 +56,11 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
   }
 
   td {
+    &.column {
+      > div {
+        width: 100%;
+      }
+    }
     &[data-label='Order ID'],
     &[data-label='Market'] {
       cursor: pointer;
