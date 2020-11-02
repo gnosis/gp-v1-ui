@@ -27,7 +27,7 @@ const NoTxsWillClose: React.FC = () => {
   return (
     <>
       <h4>All transactions have been handled</h4>
-      <p>Mesa has received responses for all pending transactions.</p>
+      <p>Responses received for all pending transactions.</p>
       <p>This modal will close in a moment.</p>
     </>
   )
