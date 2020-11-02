@@ -683,8 +683,10 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             // Keep original selling pair
             receiveToken={receiveToken}
             sellToken={sellToken}
-            // Amount
+            // SellAmount // Limit Price
             amount={debouncedSellValue}
+            // Limit price needs to be shown as correct quote token
+            limitPrice={sellToken === quoteToken ? priceValue : priceInverseValue}
             // Price inversion
             isPriceInverted={isPriceInverted}
             onSwapPrices={swapPrices}
