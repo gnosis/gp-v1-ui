@@ -16,7 +16,7 @@ const PenidngTxApprovalsMessage: React.FC<{ txNumber: number }> = ({ txNumber })
   return (
     <>
       <h4>No response from wallet for pending transaction</h4>
-      <p>There are currently {txNumber} transactions waiting for approval for your wallet.</p>
+      <p>There are currently {txNumber} transactions waiting for approval from your wallet.</p>
       <p>Please validate with your wallet that you have properly accepted or rejected the transaction.</p>
       <p>Do you need more time signing the transaction?</p>
     </>
