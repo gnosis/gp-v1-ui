@@ -1,5 +1,6 @@
 export default [
-  { // New  
+  {
+    // New
     name: 'Bids deep in the market with uneven volume',
     description: 'Bids deep in the market with uneven volume',
     bids: [
@@ -43,9 +44,11 @@ export default [
       },
     ],
   },
-  { // Done 
+  {
+    // Done
     name: 'Volume stepped up and down inconsistently but without interlaping ',
-    description: 'Bids and asks do not interlap but they are inconsistently having higher and lower volume, not really broken',
+    description:
+      'Bids and asks do not interlap but they are inconsistently having higher and lower volume, not really broken',
     bids: [
       {
         volume: 125,
@@ -83,7 +86,8 @@ export default [
       },
     ],
   },
-  { // done 
+  {
+    // done
     name: 'Liquid market with very high volume and high price in the asks',
     description: 'Self explanatory',
     bids: [
