@@ -35,7 +35,7 @@ const Wrapper = styled.div`
     }
 
     @media ${MEDIA.desktopLarge} {
-      padding: 0 10%;
+      padding: 0 7%;
     }
 
     @media ${MEDIA.mobile} {
