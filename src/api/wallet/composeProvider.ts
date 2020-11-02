@@ -70,8 +70,8 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
   }
 }
 
-// wait 7 sec, for now
-const DEFAULT_TX_APPROVAL_TIMEOUT = 7000
+// wait 1 minute
+const DEFAULT_TX_APPROVAL_TIMEOUT = 60000
 
 const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPROVAL_TIMEOUT): JsonRpcMiddleware => {
   let timeoutId: NodeJS.Timeout | null = null
