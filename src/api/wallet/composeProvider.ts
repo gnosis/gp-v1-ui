@@ -93,7 +93,9 @@ const wrapInTimeout = (middleware: JsonRpcMiddleware, timeout = DEFAULT_TX_APPRO
     if (req.id !== undefined) {
       // code 106 -- Timeout
       // https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal#possible-future-error-codes
-      txsPendingApproval.set(req.id, () => end({ message: 'Timeout for transaction approval or rejection', code: 106 }))
+      txsPendingApproval.set(req.id, () =>
+        end({ message: 'User opted out of waiting for transaction response', code: 106 }),
+      )
     }
 
     timeoutId = setTimeout(async function askOnTimeout() {
