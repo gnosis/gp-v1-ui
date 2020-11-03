@@ -208,3 +208,5 @@ export const RequireContextMock: __WebpackModuleApi.RequireContext = Object.assi
 export function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
   return value !== null && value !== undefined
 }
+
+export const isNonZeroNumber = (value?: string | number): boolean => !!value && !!+value

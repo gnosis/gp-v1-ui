@@ -1,6 +1,6 @@
 import React, { useEffect, ChangeEvent, useMemo } from 'react'
 import { ContentPage } from 'components/layout'
-import OrderBookWidget from 'components/OrderBookWidget'
+import OrderBookWidget from 'components/OrderBook/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 import { useTokenList } from 'hooks/useTokenList'
 import { useWalletConnection } from 'hooks/useWalletConnection'

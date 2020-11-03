@@ -13,7 +13,7 @@ import { safeTokenName, getNetworkFromId } from '@gnosis.pm/dex-js'
 
 // components
 import { DEFAULT_MODAL_OPTIONS, ModalBodyWrapper } from 'components/Modal'
-import OrderBookWidget from 'components/OrderBookWidget'
+import OrderBookWidget from 'components/OrderBook/OrderBookWidget'
 import TokenSelector from 'components/TokenSelector'
 
 // hooks

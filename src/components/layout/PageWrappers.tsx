@@ -61,9 +61,10 @@ export const StandaloneCardWrapper = styled.div`
     }
   }
 `
-export const PageWrapper = styled.section`
+export const PageWrapper = styled.section<{ $autoWidth?: boolean }>`
   height: 75rem;
-  min-width: 85rem;
+  width: ${({ $autoWidth = false }): string => ($autoWidth ? 'auto' : '100%')};
+  margin: auto;
   max-width: 100%;
 
   background: var(--color-background-pageWrapper);
@@ -73,10 +74,6 @@ export const PageWrapper = styled.section`
   @media ${MEDIA.tablet}, ${MEDIA.mobile} {
     min-height: 35rem;
     height: auto;
-  }
-
-  @media ${MEDIA.tablet} {
-    min-width: 72.7rem;
   }
 
   @media ${MEDIA.mobile} {

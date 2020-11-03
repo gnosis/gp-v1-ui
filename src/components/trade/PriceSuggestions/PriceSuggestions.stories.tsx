@@ -18,8 +18,6 @@ const defaultProps = {
   quoteToken: DAI,
   fillPrice: new BigNumber('55.13245672'),
   fillPriceLoading: false,
-  bestAskPrice: new BigNumber('51.153236'),
-  bestAskPriceLoading: false,
   isPriceInverted: false,
   amount: '100',
 }
@@ -31,7 +29,7 @@ const Template: Story<Partial<Props>> = (props) => {
     <PriceSuggestions
       {...defaultProps}
       isPriceInverted={isPriceInverted}
-      onSwapPrices={(): void => setIsPriceInverted(!isPriceInverted)}
+      onSwapPrices={(): void => setIsPriceInverted((isPriceInverted) => !isPriceInverted)}
       onClickPrice={(price, invertedPrice) => (): void =>
         console.log('Click price', price, invertedPrice, isPriceInverted)}
       {...props}
@@ -46,17 +44,6 @@ NoAmount.args = {
   amount: undefined,
 }
 
-export const NoAmountLoadingPrice = Template.bind({})
-NoAmountLoadingPrice.args = {
-  amount: undefined,
-  bestAskPriceLoading: true,
-}
-
-export const LoadingBestAsk = Template.bind({})
-LoadingBestAsk.args = {
-  bestAskPriceLoading: true,
-}
-
 export const LoadingFillPrice = Template.bind({})
 LoadingFillPrice.args = {
   fillPriceLoading: true,
@@ -65,5 +52,4 @@ LoadingFillPrice.args = {
 export const NoPrice = Template.bind({})
 NoPrice.args = {
   fillPrice: null,
-  bestAskPrice: null,
 }
