@@ -13,11 +13,7 @@ before_install:
   - sudo apt-get -y install python-pip python-dev
   - pip install awscli --upgrade --user
   # use production url for price estimator on master or tagged
-  - export PRICE_ESTIMATOR_URL=$([[
-    $TRAVIS_BRANCH = master || \
-    $TRAVIS_BRANCH = release/* || \
-    $TRAVIS_BRANCH = hotfix/* || \
-    $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
+  - export PRICE_ESTIMATOR_URL=$([[ $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = release/* || $TRAVIS_BRANCH = hotfix/* || $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
   - echo "PRICE_ESTIMATOR_URL=$PRICE_ESTIMATOR_URL"
   - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
   - echo "TRAVIS_TAG=$TRAVIS_TAG"
