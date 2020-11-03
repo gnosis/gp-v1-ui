@@ -14,9 +14,6 @@ before_install:
   - pip install awscli --upgrade --user
   # use production url for price estimator on master or tagged
   - export PRICE_ESTIMATOR_URL=$([[ $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = release/* || $TRAVIS_BRANCH = hotfix/* || $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
-  - echo "PRICE_ESTIMATOR_URL=$PRICE_ESTIMATOR_URL"
-  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH"
-  - echo "TRAVIS_TAG=$TRAVIS_TAG"
 before_deploy:
   # zip ./dist folder if tag IS present
   - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = "" ]]; then
