@@ -7,10 +7,12 @@ import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
 import { SwapPrice } from 'components/common/SwapPrice'
 import { EllipsisText } from 'components/common/EllipsisText'
 import { PriceSuggestionItem } from 'components/trade/PriceSuggestions/PriceSuggestionItem'
+
 import BigNumber from 'bignumber.js'
 import { TokenDex } from '@gnosis.pm/dex-js'
+import { isNonZeroNumber } from 'utils'
 
-const Wrapper = styled.div`
+export const PriceSuggestionsWrapper = styled.div`
   > div {
     display: flex;
     flex-flow: row nowrap;
@@ -124,8 +126,6 @@ export interface Props {
   amount?: string
 
   // Prices
-  bestAskPrice: BigNumber | null
-  bestAskPriceLoading: boolean
   fillPrice: BigNumber | null
   fillPriceLoading: boolean
 
@@ -140,8 +140,6 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
     baseToken,
     quoteToken,
     isPriceInverted,
-    bestAskPrice,
-    bestAskPriceLoading,
     fillPrice,
     fillPriceLoading,
     onClickPrice,
@@ -157,7 +155,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
   }
 
   return (
-    <Wrapper>
+    <PriceSuggestionsWrapper>
       <div>
         <strong>Price Suggestions</strong> <HelpTooltip tooltip={OnchainOrderbookTooltip} />
         <SwapPrice
@@ -168,8 +166,7 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
         />
       </div>
       <div className="container">
-        <PriceSuggestionItem label="Best ask" price={bestAskPrice} loading={bestAskPriceLoading} {...commonProps} />
-        {amount && +amount != 0 && +amount != 1 && (
+        {isNonZeroNumber(amount) && (
           <PriceSuggestionItem
             label="Fill price"
             amount={amount}
@@ -179,6 +176,6 @@ export const PriceSuggestions: React.FC<Props> = (props) => {
           />
         )}
       </div>
-    </Wrapper>
+    </PriceSuggestionsWrapper>
   )
 }

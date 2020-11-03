@@ -22,7 +22,7 @@ const Wrapper = styled.div`
   main {
     flex: 0 1 auto;
     margin: 2.4rem auto 5rem;
-    width: auto;
+    width: 100%;
     display: flex;
     flex-flow: row wrap;
     align-items: flex-start;
@@ -30,13 +30,19 @@ const Wrapper = styled.div`
     font-size: 1.3rem;
     line-height: 1.2;
 
+    @media ${MEDIA.desktop} {
+      padding: 0 2%;
+    }
+
+    @media ${MEDIA.desktopLarge} {
+      padding: 0 10%;
+    }
+
     @media ${MEDIA.mobile} {
       width: 100%;
     }
 
     > section {
-      width: 100%;
-
       @media ${MEDIA.mobile} {
         overflow: initial;
       }

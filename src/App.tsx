@@ -3,9 +3,17 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch, Redirect } from 'react-router-dom'
+import PrivateRoute from './PrivateRoute'
 import Console from './Console'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
 import GlobalStyles from 'styles/global'
+import { ToastContainer } from 'setupToastify'
+
+import useNetworkCheck from 'hooks/useNetworkCheck'
+
+import { assertNonNull } from 'utils'
+
+import { GlobalModalInstance } from 'components/OuterModal'
 
 // Main layout
 import { SwapLayout, TradingLayout } from 'components/layout'
@@ -113,8 +121,6 @@ const Settings = React.lazy(
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
-import PrivateRoute from './PrivateRoute'
-import { assertNonNull } from 'utils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
@@ -130,46 +136,53 @@ function getInitialUrl(): string {
 const initialUrl = getInitialUrl()
 
 // App
-const App: React.FC = () => (
-  <>
-    <Router basename={process.env.BASE_URL}>
-      <Switch>
-        <Route path="/v2">
-          <TradingLayout>
-            <React.Suspense fallback={null}>
-              <Switch>
-                <Route path="/v2" exact component={Trading} />
-                <Route component={NotFound2} />
-              </Switch>
-            </React.Suspense>
-          </TradingLayout>
-        </Route>
-        <Route>
-          <SwapLayout>
-            <GlobalStyles />
-            <React.Suspense fallback={null}>
-              <Switch>
-                <PrivateRoute path="/orders" exact component={Orders} />
-                <Route path="/trade/:buy-:sell" component={Trade} />
-                <PrivateRoute path="/liquidity" exact component={Strategies} />
-                <PrivateRoute path="/wallet" exact component={Wallet} />
-                <Route path="/about" exact component={About} />
-                <Route path="/faq" exact component={FAQ} />
-                <Route path="/book" exact component={OrderBook} />
-                <Route path="/connect-wallet" exact component={ConnectWallet} />
-                <Route path="/trades" exact component={Trades} />
-                <Route path="/settings" exact component={Settings} />
-                <Redirect from="/" to={initialUrl} />
-                <Route component={NotFound} />
-              </Switch>
-            </React.Suspense>
-          </SwapLayout>
-        </Route>
-      </Switch>
-    </Router>
-    {process.env.NODE_ENV === 'development' && <Console />}
-  </>
-)
+const App: React.FC = () => {
+  // Deal with incorrect network
+  useNetworkCheck()
+
+  return (
+    <>
+      <Router basename={process.env.BASE_URL}>
+        <Switch>
+          <Route path="/v2">
+            <TradingLayout>
+              <React.Suspense fallback={null}>
+                <Switch>
+                  <Route path="/v2" exact component={Trading} />
+                  <Route component={NotFound2} />
+                </Switch>
+              </React.Suspense>
+            </TradingLayout>
+          </Route>
+          <Route>
+            <SwapLayout>
+              <GlobalStyles />
+              <ToastContainer />
+              <React.Suspense fallback={null}>
+                <Switch>
+                  <PrivateRoute path="/orders" exact component={Orders} />
+                  <Route path="/trade/:buy-:sell" component={Trade} />
+                  <PrivateRoute path="/liquidity" exact component={Strategies} />
+                  <PrivateRoute path="/wallet" exact component={Wallet} />
+                  <Route path="/about" exact component={About} />
+                  <Route path="/faq" exact component={FAQ} />
+                  <Route path="/book" exact component={OrderBook} />
+                  <Route path="/connect-wallet" exact component={ConnectWallet} />
+                  <Route path="/trades" exact component={Trades} />
+                  <Route path="/settings" exact component={Settings} />
+                  <Redirect from="/" to={initialUrl} />
+                  <Route component={NotFound} />
+                </Switch>
+              </React.Suspense>
+            </SwapLayout>
+          </Route>
+        </Switch>
+        {GlobalModalInstance}
+      </Router>
+      {process.env.NODE_ENV === 'development' && <Console />}
+    </>
+  )
+}
 
 export default hot(
   withGlobalContext(

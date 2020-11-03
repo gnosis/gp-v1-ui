@@ -2,8 +2,8 @@ import React, { useMemo, useEffect, useRef } from 'react'
 import { toast } from 'toastify'
 
 // types, utils and services
-import { TokenDetails } from 'types'
-import { isNeverExpiresOrder, calculatePrice, formatPrice, invertPrice } from '@gnosis.pm/dex-js'
+import { Fraction, TokenDetails } from 'types'
+import { isNeverExpiresOrder } from '@gnosis.pm/dex-js'
 
 // assets
 import alertIcon from 'assets/img/alert.svg'
@@ -26,12 +26,14 @@ import {
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
+  parseBigNumber,
 } from 'utils'
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
+import { SmartPrice } from 'components/common/SmartPrice'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
@@ -47,10 +49,14 @@ const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   )
 }
 
-const DeleteOrder: React.FC<Pick<
-  Props,
-  'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'
->> = ({ isMarkedForDeletion, toggleMarkedForDeletion, pending, disabled }) => (
+type DeleteOrderProps = Pick<Props, 'isMarkedForDeletion' | 'toggleMarkedForDeletion' | 'pending' | 'disabled'>
+
+const DeleteOrder: React.FC<DeleteOrderProps> = ({
+  isMarkedForDeletion,
+  toggleMarkedForDeletion,
+  pending,
+  disabled,
+}) => (
   <td data-label="Cancel Order" className="checked">
     <input
       type="checkbox"
@@ -68,50 +74,40 @@ interface MarketProps {
 }
 
 const Market: React.FC<MarketProps> = ({ sellToken, buyToken, onCellClick }) => {
-  const market = useMemo(() => `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`, [
-    buyToken,
-    sellToken,
-  ])
+  const labels = useMemo(
+    () => ({
+      label: `Swap ${displayTokenSymbolOrLink(sellToken)} for ${displayTokenSymbolOrLink(buyToken)}`,
+      market: `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`,
+    }),
+    [buyToken, sellToken],
+  )
   return (
     <td
       data-label="Market"
       onClick={(): void =>
         onCellClick({
           target: {
-            value: market,
+            value: labels.market,
           },
         })
       }
     >
-      {market}
+      {labels.label}
     </td>
   )
 }
 
-interface OrderDetailsProps extends Pick<Props, 'order' | 'pending'> {
+interface OrderDetailsProps {
   buyToken: TokenDetails
   sellToken: TokenDetails
+  price: Fraction
 }
 
-const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, order }) => {
-  const [price, priceInverse] = useMemo((): string[] => {
-    const price = calculatePrice({
-      numerator: { amount: order.priceNumerator, decimals: buyToken.decimals },
-      denominator: { amount: order.priceDenominator, decimals: sellToken.decimals },
-    })
-    const priceInverse = invertPrice(price)
-
-    return [formatPrice(price), formatPrice(priceInverse)]
-  }, [buyToken.decimals, order.priceDenominator, order.priceNumerator, sellToken.decimals])
-
+const OrderDetails: React.FC<OrderDetailsProps> = ({ buyToken, sellToken, price }) => {
   return (
     <td data-label="Price" className="showResponsive">
       <div className="order-details">
-        <strong>
-          {priceInverse} {displayTokenSymbolOrLink(sellToken)}
-        </strong>
-        <br />
-        {price} {displayTokenSymbolOrLink(buyToken)}
+        <SmartPrice sellToken={sellToken} buyToken={buyToken} price={price} />
       </div>
     </td>
   )
@@ -122,10 +118,10 @@ interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
-  const filledAmount = useMemo(() => {
+  const { filledAmount, filledAmountBN } = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return formatSmart(filledAmount, sellToken.decimals) || '0'
+    return { filledAmount: formatSmart(filledAmount, sellToken.decimals) || '0', filledAmountBN: filledAmount }
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
   const totalAmount = useMemo(() => formatSmart(order.priceDenominator, sellToken.decimals) || '0', [
@@ -133,32 +129,50 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
     sellToken.decimals,
   ])
 
+  let filledCellContent = 'no limit'
+  let totalCellContent = 'no limit'
+  let amountFilled: string | null = null
+
+  if (!order.isUnlimited) {
+    filledCellContent = `${filledAmount} ${displayTokenSymbolOrLink(sellToken)}`
+    totalCellContent = `${totalAmount} ${displayTokenSymbolOrLink(sellToken)}`
+
+    // Calculate filled amount percentage
+    // need to convert BN values to Bignumber for decimals math...
+    const filledAmt = parseBigNumber(filledAmountBN.toString())
+    const totalAmt = parseBigNumber(order.priceDenominator.toString())
+    if (filledAmt && totalAmt && !filledAmt.isZero()) {
+      amountFilled = filledAmt.div(totalAmt).times('100').toFixed(2)
+    }
+  }
+
   return (
-    <td data-label="Unfilled Amount">
-      {order.isUnlimited ? (
-        <span>no limit</span>
-      ) : (
-        <>
-          <div className="amounts">
-            {filledAmount} {displayTokenSymbolOrLink(sellToken)}
-            <br />
-            {totalAmount} {displayTokenSymbolOrLink(sellToken)}
-          </div>
-        </>
-      )}
-    </td>
+    <>
+      <td className="amounts column" data-label="Filled Amount">
+        <div>{filledCellContent}</div>
+        {amountFilled && <div className="surplusHighlight">{amountFilled}% filled</div>}
+      </td>
+      <td className="amounts" data-label="Total Amount">
+        {totalCellContent}
+      </td>
+    </>
   )
 }
 
 const Expires: React.FC<Pick<Props, 'order' | 'pending' | 'isPendingOrder'>> = ({ order, isPendingOrder }) => {
-  const { isNeverExpires, expiresOn } = useMemo(() => {
+  const { isNeverExpires, expiresOn, expireDateFormatted } = useMemo(() => {
     const isNeverExpires = isNeverExpiresOrder(order.validUntil) || (isPendingOrder && order.validUntil === 0)
     const expiresOn = isNeverExpires ? '' : formatDateFromBatchId(order.validUntil)
+    const expireDateFormatted = batchIdToDate(order.validUntil).toLocaleString()
 
-    return { isNeverExpires, expiresOn }
+    return { isNeverExpires, expiresOn, expireDateFormatted }
   }, [isPendingOrder, order.validUntil])
 
-  return <td data-label="Expires">{isNeverExpires ? <span>Never</span> : <span>{expiresOn}</span>}</td>
+  return (
+    <td data-label="Expires">
+      {isNeverExpires ? <span>Never</span> : <span title={expireDateFormatted}>{expiresOn}</span>}
+    </td>
+  )
 }
 
 const OrderID: React.FC<Pick<MarketProps, 'onCellClick'> & { isPendingOrder: boolean; orderId: string }> = ({
@@ -191,8 +205,9 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   const batchId = dateToBatchId(now)
   const msRemainingInBatch = getTimeRemainingInBatch({ inMilliseconds: true })
 
+  const validFromDate = batchIdToDate(order.validFrom)
   const isExpiredOrder = batchIdToDate(order.validUntil) <= now
-  const isScheduled = batchIdToDate(order.validFrom) > now
+  const isScheduled = validFromDate > now
   const isActiveNextBatch = batchId === order.validFrom
   const isFirstActiveBatch = batchId === order.validFrom + 1 && msRemainingInBatch > 60 * 1000 // up until minute 4
   const isUnlimited = order.isUnlimited
@@ -251,7 +266,7 @@ const Status: React.FC<Pick<Props, 'order' | 'isOverBalance' | 'transactionHash'
   }, [forceUpdate, isActiveNextBatch, isFirstActiveBatch])
 
   return (
-    <td className="status showResponsive" data-label="Status">
+    <td className="status showResponsive" data-label="Status" title={isScheduled ? validFromDate.toLocaleString() : ''}>
       {pending ? (
         pending
       ) : isFilled ? (
@@ -342,6 +357,14 @@ const OrderRow: React.FC<Props> = (props) => {
     fetchToken(order.id, order.sellToken as TokenDetails, setSellToken, isPendingOrder)
   }, [isPendingOrder, networkId, order, setBuyToken, setSellToken])
 
+  const price: Fraction = useMemo(
+    () => ({
+      numerator: order.priceNumerator,
+      denominator: order.priceDenominator,
+    }),
+    [order.priceNumerator, order.priceDenominator],
+  )
+
   return (
     sellToken &&
     buyToken && (
@@ -352,11 +375,11 @@ const OrderRow: React.FC<Props> = (props) => {
           pending={pending}
           disabled={disabled || isPendingOrder || pending}
         />
-        <OrderID orderId={order.id} isPendingOrder={!!isPendingOrder} onCellClick={onCellClick} />
         <Market sellToken={sellToken} buyToken={buyToken} onCellClick={onCellClick} />
-        <OrderDetails order={order} sellToken={sellToken} buyToken={buyToken} />
+        <OrderDetails price={price} sellToken={sellToken} buyToken={buyToken} />
         <Amounts order={order} sellToken={sellToken} />
         <Expires order={order} pending={pending} isPendingOrder={isPendingOrder} />
+        <OrderID orderId={order.id} isPendingOrder={!!isPendingOrder} onCellClick={onCellClick} />
         <Status
           order={order}
           isOverBalance={isOverBalance}
