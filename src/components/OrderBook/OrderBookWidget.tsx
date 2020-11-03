@@ -15,6 +15,8 @@ export interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
   batchId?: number
 }
 
+const ORDER_BOOK_REFRESH_INTERVAL = 5000 // 5 sec
+
 const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   const { baseToken, quoteToken, networkId, hops, batchId } = props
   const [apiData, setApiData] = useSafeState<PricePointDetails[] | null>(null)
@@ -33,6 +35,7 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
   useEffect(() => {
     // handle stale fetches resolving out of order
     let cancelled = false
+    let timeoutId: NodeJS.Timeout | null = null
 
     const fetchApiData = async (): Promise<void> => {
       try {
@@ -54,12 +57,14 @@ const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
         console.error('Error populating orderbook with data', error)
         setError(error)
       }
+      timeoutId = setTimeout(fetchApiData, ORDER_BOOK_REFRESH_INTERVAL)
     }
 
     fetchApiData()
 
     return (): void => {
       cancelled = true
+      if (timeoutId) clearTimeout(timeoutId)
     }
   }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
 
