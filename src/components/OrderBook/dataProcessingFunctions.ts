@@ -1,30 +1,14 @@
-import React, { useEffect, useMemo } from 'react'
-
-import { dexPriceEstimatorApi } from 'api'
-import { OrderBookData, RawPricePoint } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
-
-import useSafeState from 'hooks/useSafeState'
-
-import OrderBookChart, { OrderBookChartProps, OrderBookError, PricePointDetails, Offer } from './OrderBookChart'
-import { TokenDetails } from 'types'
-import { formatSmart, logDebug } from 'utils'
-import BigNumber from 'bignumber.js'
-import { TEN_BIG_NUMBER, DEFAULT_PRECISION, ZERO_BIG_NUMBER, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME } from 'const'
 import BN from 'bn.js'
-import { useDebounce } from 'hooks/useDebounce'
+import BigNumber from 'bignumber.js'
+import { TEN_BIG_NUMBER, formatSmart, DEFAULT_PRECISION, ONE_BIG_NUMBER, ZERO_BIG_NUMBER } from '@gnosis.pm/dex-js'
+
+import { logDebug } from 'utils'
+import { TokenDetails } from 'types'
+
+import { RawPricePoint, PricePoint, Offer, PricePointDetails } from './types'
+import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 
 const SMALL_VOLUME_THRESHOLD = 0.01
-
-/**
- * Normalized price point
- * Both price and volume are BigNumbers (decimal)
- *
- * The price and volume are expressed in atoms
- */
-interface PricePoint {
-  price: BigNumber
-  volume: BigNumber
-}
 
 function _toPricePoint(pricePoint: RawPricePoint, quoteTokenDecimals: number, baseTokenDecimals: number): PricePoint {
   return {
@@ -69,7 +53,11 @@ const processData = (
   )
 
   // Filter tiny orders
-  pricePoints = pricePoints.filter((pricePoint) => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+  pricePoints = pricePoints
+    .filter((pricePoint) => pricePoint.volume.gt(SMALL_VOLUME_THRESHOLD))
+    // sort by price according to type
+    // bid orders must be inverted to calculate the descending total volume
+    .sort(({ price: a }, { price: b }) => (isBid ? b.comparedTo(a) : a.comparedTo(b)))
 
   // Convert the price points that can be represented in the graph (PricePointDetails)
   const { points } = pricePoints.reduce(
@@ -124,7 +112,8 @@ const processData = (
     },
   )
 
-  return points
+  // Bid points were sorted in reverse for the volume calculation. Revert them back
+  return isBid ? points.reverse() : points
 }
 
 function _printOrderBook(pricePoints: PricePointDetails[], baseTokenSymbol = '', quoteTokenSymbol = ''): void {
@@ -134,7 +123,7 @@ function _printOrderBook(pricePoints: PricePointDetails[], baseTokenSymbol = '',
     logDebug(
       `\t${isBid ? 'Bid' : 'Ask'} ${pricePoint.totalVolumeFormatted} ${baseTokenSymbol} at ${
         pricePoint.priceFormatted
-      } ${quoteTokenSymbol}`,
+      } ${quoteTokenSymbol}\tinverted ${_formatSmartBigNumber(ONE_BIG_NUMBER.dividedBy(pricePoint.price))}`,
     )
   })
 }
@@ -152,7 +141,7 @@ export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDat
     const pricePoints = bids.concat(asks)
 
     // Sort points by price
-    pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
+    // pricePoints.sort((lhs, rhs) => lhs.price.comparedTo(rhs.price))
 
     _printOrderBook(pricePoints, baseToken.symbol, quoteToken.symbol)
 
@@ -162,63 +151,3 @@ export const processRawApiData = ({ data, baseToken, quoteToken }: ProcessRawDat
     return []
   }
 }
-
-export interface OrderBookProps extends Omit<OrderBookChartProps, 'data'> {
-  hops?: number
-  batchId?: number
-}
-
-const OrderBookWidget: React.FC<OrderBookProps> = (props) => {
-  const { baseToken, quoteToken, networkId, hops, batchId } = props
-  const [apiData, setApiData] = useSafeState<PricePointDetails[] | null>(null)
-  const [error, setError] = useSafeState<Error | null>(null)
-
-  const { value: debouncedBatchId } = useDebounce(batchId, ORDERBOOK_DATA_FETCH_DEBOUNCE_TIME)
-
-  // sync resetting ApiData to avoid old data on new labels flash
-  // and layout changes
-  useMemo(() => {
-    setApiData(null)
-    setError(null)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId])
-
-  useEffect(() => {
-    // handle stale fetches resolving out of order
-    let cancelled = false
-
-    const fetchApiData = async (): Promise<void> => {
-      try {
-        const rawData = await dexPriceEstimatorApi.getOrderBookData({
-          baseTokenId: baseToken.id,
-          quoteTokenId: quoteToken.id,
-          hops,
-          networkId,
-          batchId: debouncedBatchId,
-        })
-
-        if (cancelled) return
-
-        const processedData = processRawApiData({ data: rawData, baseToken, quoteToken })
-
-        setApiData(processedData)
-      } catch (error) {
-        if (cancelled) return
-        console.error('Error populating orderbook with data', error)
-        setError(error)
-      }
-    }
-
-    fetchApiData()
-
-    return (): void => {
-      cancelled = true
-    }
-  }, [baseToken, quoteToken, networkId, hops, debouncedBatchId, setApiData, setError])
-
-  if (error) return <OrderBookError error={error} />
-
-  return <OrderBookChart baseToken={baseToken} quoteToken={quoteToken} networkId={networkId} data={apiData} />
-}
-
-export default OrderBookWidget

@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import Tabs, { TabItemType, TabThemeType } from 'components/common/Tabs/Tabs'
 
-import OrderBookWidget from 'components/OrderBookWidget'
+import OrderBookWidget from 'components/OrderBook/OrderBookWidget'
 import PriceChart from 'components/PriceChart'
 
 // Styled components

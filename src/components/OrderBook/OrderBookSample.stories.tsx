@@ -5,7 +5,7 @@ import { withKnobs, select, object, optionsKnob } from '@storybook/addon-knobs'
 import OrderBookChart, { OrderBookChartProps } from './OrderBookChart'
 import { Network } from 'types'
 import sampleDataSet from 'storybook/orderbookSamples'
-import { processRawApiData } from './OrderBookWidget'
+import { processRawApiData } from './dataProcessingFunctions'
 import { OrderBookData } from 'api/dexPriceEstimator/DexPriceEstimatorApi'
 import {
   baseTokenDefault,

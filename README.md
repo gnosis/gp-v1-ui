@@ -72,6 +72,9 @@ Learn about customizing components [here](https://github.com/gnosis/gp-v1-ui/wik
 ## 🖧 Supported networks
 App is currently compatible with Mainnet, Rinkeby, and xDAI. Please refer to the [wiki](https://github.com/gnosis/gp-v1-ui/wiki#-compatible-networks) for further information.
 
+## 🖧 Supported networks
+App is currently compatible with Mainnet, Rinkeby, and xDAI. Please refer to the [wiki](https://github.com/gnosis/dex-react/wiki#-compatible-networks) for further information.
+
 ## 🦺 Testnet faucets
 
 Test faucets allow to get some tokens for using them in a testnet.
