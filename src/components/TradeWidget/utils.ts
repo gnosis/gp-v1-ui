@@ -17,9 +17,7 @@ export function calculateReceiveAmount(priceValue: string, sellValue: string): s
 
     if (sellAmount && price) {
       const receiveBigNumber = sellAmount.dividedBy(price)
-      // Receive at least input value
-      // uses amount floor < 0.0001
-      // but Limit Price set shows full amount
+      // Format the "Receive at least" input amount same as PriceSuggestions price
       receiveAmount =
         receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : formatPriceToPrecision(receiveBigNumber)
     }
