@@ -21,35 +21,47 @@ export interface Props {
 
 interface FormattedPrices {
   priceFormatted: string
-  invertedPriceFormatted: string
+  inversePriceFormatted: string
+  inversePriceRaw: string
+  priceRaw: string
 }
 
-function formatPriceToPrecision(price: BigNumber): string {
-  return price.toFixed(PRICE_ESTIMATION_PRECISION)
+const LOW_PRICE_FLOOR = new BigNumber(0.0001)
+
+export function formatPriceToPrecision(price: BigNumber): string {
+  return price.gt(LOW_PRICE_FLOOR) ? price.toFixed(PRICE_ESTIMATION_PRECISION) : '< ' + LOW_PRICE_FLOOR.toString()
 }
 
 function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): FormattedPrices {
   if (price) {
-    const invertedPriceFormattedAux = formatPriceToPrecision(invertPrice(price))
+    const inversePriceFormattedAux = formatPriceToPrecision(invertPrice(price))
     const priceFormattedAux = formatPriceToPrecision(price)
+    const inversePriceRaw = invertPrice(price).toString(10)
+    const priceRaw = price.toString(10)
 
     if (isPriceInverted) {
       // Price is inverted
       return {
-        priceFormatted: invertedPriceFormattedAux,
-        invertedPriceFormatted: priceFormattedAux,
+        priceFormatted: inversePriceFormattedAux,
+        inversePriceFormatted: priceFormattedAux,
+        priceRaw: inversePriceRaw,
+        inversePriceRaw: priceRaw,
       }
     } else {
       // Price is not inverted
       return {
         priceFormatted: priceFormattedAux,
-        invertedPriceFormatted: invertedPriceFormattedAux,
+        inversePriceFormatted: inversePriceFormattedAux,
+        priceRaw,
+        inversePriceRaw,
       }
     }
   } else {
     return {
       priceFormatted: 'N/A',
-      invertedPriceFormatted: 'N/A',
+      inversePriceFormatted: 'N/A',
+      priceRaw: 'N/A',
+      inversePriceRaw: 'N/A',
     }
   }
 }
@@ -57,9 +69,9 @@ function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): F
 export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const { label, isPriceInverted, price, loading, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
 
-  const { priceFormatted, invertedPriceFormatted } = getPriceFormatted(price, isPriceInverted)
-  const displayPrice = priceFormatted === 'Infinity' || invertedPriceFormatted === 'Infinity' ? 'N/A' : priceFormatted
-
+  // Return raw, unformatted values to pass to price calculations
+  const { priceRaw, inversePriceRaw, priceFormatted, inversePriceFormatted } = getPriceFormatted(price, isPriceInverted)
+  const displayPrice = priceFormatted === 'Infinity' || inversePriceFormatted === 'Infinity' ? 'N/A' : priceFormatted
   return (
     <>
       <span>
@@ -67,8 +79,9 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
       </span>
       <button
         type="button"
+        title={isPriceInverted ? inversePriceRaw : priceRaw}
         disabled={loading || displayPrice === 'N/A'}
-        onClick={(): void => onClickPrice(priceFormatted, invertedPriceFormatted)}
+        onClick={(): void => onClickPrice(priceRaw, inversePriceRaw)}
       >
         {loading ? <Spinner /> : displayPrice}
       </button>

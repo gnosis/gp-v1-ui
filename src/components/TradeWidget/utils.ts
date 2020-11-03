@@ -7,6 +7,7 @@ import { encodeTokenSymbol } from '@gnosis.pm/dex-js'
 import { BATCH_START_THRESHOLD } from './validationSchema'
 import { BATCH_TIME_IN_MS } from 'const'
 import { TokenDetails } from 'types'
+import { formatPriceToPrecision } from 'components/trade/PriceSuggestions/PriceSuggestionItem'
 
 export function calculateReceiveAmount(priceValue: string, sellValue: string): string {
   let receiveAmount = ''
@@ -16,7 +17,11 @@ export function calculateReceiveAmount(priceValue: string, sellValue: string): s
 
     if (sellAmount && price) {
       const receiveBigNumber = sellAmount.dividedBy(price)
-      receiveAmount = receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : receiveBigNumber.toString(10)
+      // Receive at least input value
+      // uses amount floor < 0.0001
+      // but Limit Price set shows full amount
+      receiveAmount =
+        receiveBigNumber.isNaN() || !receiveBigNumber.isFinite() ? '0' : formatPriceToPrecision(receiveBigNumber)
     }
   }
 
