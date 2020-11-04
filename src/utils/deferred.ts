@@ -1,8 +1,7 @@
 export type PromiseResolve<T> = (value: T | PromiseLike<T>) => void
 export type PromiseReject = (reason?: unknown) => void
 
-export interface Deferred<T> {
-  promise: Promise<T>
+export interface Deferred<T> extends Promise<T> {
   resolve: PromiseResolve<T>
   reject: PromiseReject
 }
@@ -16,9 +15,8 @@ export const createDeferredPromise = <T>(): Deferred<T> => {
     reject = rej
   })
 
-  return {
-    promise,
+  return Object.assign(promise, {
     resolve,
     reject,
-  }
+  })
 }

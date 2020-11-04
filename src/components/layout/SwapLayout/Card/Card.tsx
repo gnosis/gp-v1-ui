@@ -390,6 +390,10 @@ export const CardWidgetWrapper = styled(Widget)<{ $columns?: string }>`
           word-break: break-word;
           white-space: normal;
 
+          &.column {
+            flex-flow: column nowrap;
+          }
+
           @media ${MEDIA.mobile} {
             width: 100%;
             border-bottom: 0.1rem solid rgba(0, 0, 0, 0.14);

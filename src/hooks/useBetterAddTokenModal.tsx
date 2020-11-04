@@ -379,7 +379,7 @@ export const useBetterAddTokenModal = (options: AddTokenOptions = defaultOptions
         })
       }
 
-      return deferred.promise.then((value) => {
+      return deferred.then((value) => {
         // close modal
         if (isShownRef.current) toggleRef.current()
 

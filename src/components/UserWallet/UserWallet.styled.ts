@@ -54,12 +54,8 @@ const WalletButton = styled.button`
   font-size: 1.5rem;
   margin: 1.2rem 0;
   padding: 1rem 2rem;
-  width: calc(100% - 4rem);
   white-space: nowrap;
-
-  @media ${MEDIA.mobile} {
-    width: auto;
-  }
+  width: auto;
 `
 
 export const BlockExplorerButton = styled(WalletButton)`
