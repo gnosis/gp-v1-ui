@@ -57,7 +57,6 @@ export const LimitOrder: React.FC<Props> = (props: Props) => {
   // Mock data
   // TODO: Delete
   const fillPriceFormatted = '51.15324'
-  const bestAskPriceFormatted = '55.13246'
 
   const sellTokenName = formatToken(sellToken)
   const receiveTokenName = formatToken(receiveToken)
@@ -104,8 +103,6 @@ export const LimitOrder: React.FC<Props> = (props: Props) => {
               // Prices
               fillPrice={new BigNumber(fillPriceFormatted)}
               fillPriceLoading={false}
-              bestAskPrice={new BigNumber(bestAskPriceFormatted)}
-              bestAskPriceLoading={false}
               // Events
               // TODO: PriceSuggestions should send the price in quote tokens always, instead of sending both
               onClickPrice={(price, invertedPrice): void => onSelectedPrice(isPriceInverted ? invertedPrice : price)}
