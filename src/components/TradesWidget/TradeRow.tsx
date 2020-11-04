@@ -18,7 +18,7 @@ import { SwapIcon } from 'components/TradeWidget/SwapIcon'
 import BigNumber from 'bignumber.js'
 
 // minimum floor amount surplus must be greater than for it to display on frontend
-const SURPLUS_THRESHOLD = 0.1
+const SURPLUS_THRESHOLD = 0.01
 
 const TradeRowFoldableWrapper = styled(FoldableRowWrapper)`
   td {

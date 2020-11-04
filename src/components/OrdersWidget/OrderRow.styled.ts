@@ -5,6 +5,13 @@ import { MEDIA } from 'const'
 export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
   color: ${({ $color = '' }): string => $color};
 
+  div.surplusHighlight {
+    color: var(--color-button-success);
+    font-size: smaller;
+    font-weight: bolder;
+    margin: 0.2rem 0;
+  }
+
   &.pending {
     background: rgba(33, 141, 255, 0.1);
   }
@@ -49,6 +56,11 @@ export const OrderRowWrapper = styled(FoldableRowWrapper)<{ $color?: string }>`
   }
 
   td {
+    &.column {
+      > div {
+        width: 100%;
+      }
+    }
     &[data-label='Order ID'],
     &[data-label='Market'] {
       cursor: pointer;

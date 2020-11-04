@@ -26,6 +26,7 @@ import {
   isOrderFilled,
   dateToBatchId,
   getTimeRemainingInBatch,
+  parseBigNumber,
 } from 'utils'
 
 import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
@@ -75,7 +76,7 @@ interface MarketProps {
 const Market: React.FC<MarketProps> = ({ sellToken, buyToken, onCellClick }) => {
   const labels = useMemo(
     () => ({
-      label: `Swap ${displayTokenSymbolOrLink(buyToken)} for ${displayTokenSymbolOrLink(sellToken)}`,
+      label: `Swap ${displayTokenSymbolOrLink(sellToken)} for ${displayTokenSymbolOrLink(buyToken)}`,
       market: `${displayTokenSymbolOrLink(buyToken)}/${displayTokenSymbolOrLink(sellToken)}`,
     }),
     [buyToken, sellToken],
@@ -117,10 +118,10 @@ interface AmountsProps extends Pick<Props, 'order' | 'pending'> {
 }
 
 const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
-  const filledAmount = useMemo(() => {
+  const { filledAmount, filledAmountBN } = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return formatSmart(filledAmount, sellToken.decimals) || '0'
+    return { filledAmount: formatSmart(filledAmount, sellToken.decimals) || '0', filledAmountBN: filledAmount }
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
   const totalAmount = useMemo(() => formatSmart(order.priceDenominator, sellToken.decimals) || '0', [
@@ -130,16 +131,26 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
 
   let filledCellContent = 'no limit'
   let totalCellContent = 'no limit'
+  let amountFilled: string | null = null
 
   if (!order.isUnlimited) {
     filledCellContent = `${filledAmount} ${displayTokenSymbolOrLink(sellToken)}`
     totalCellContent = `${totalAmount} ${displayTokenSymbolOrLink(sellToken)}`
+
+    // Calculate filled amount percentage
+    // need to convert BN values to Bignumber for decimals math...
+    const filledAmt = parseBigNumber(filledAmountBN.toString())
+    const totalAmt = parseBigNumber(order.priceDenominator.toString())
+    if (filledAmt && totalAmt && !filledAmt.isZero()) {
+      amountFilled = filledAmt.div(totalAmt).times('100').toFixed(2)
+    }
   }
 
   return (
     <>
-      <td className="amounts" data-label="Filled Amount">
-        {filledCellContent}
+      <td className="amounts column" data-label="Filled Amount">
+        <div>{filledCellContent}</div>
+        {amountFilled && <div className="surplusHighlight">{amountFilled}% filled</div>}
       </td>
       <td className="amounts" data-label="Total Amount">
         {totalCellContent}
