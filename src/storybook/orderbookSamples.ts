@@ -1,11 +1,12 @@
 export default [
   {
-    name: 'Liquid market',
-    description: 'Typical stair case order book. The market is liquid and a relatively small spread',
+    // New
+    name: 'Bids deep in the market with uneven volume',
+    description: 'Bids deep in the market with uneven volume',
     bids: [
       {
         volume: 125,
-        price: 99.99,
+        price: 600,
       },
       {
         volume: 135,
@@ -13,233 +14,80 @@ export default [
       },
       {
         volume: 145,
-        price: 89.99,
+        price: 300,
       },
       {
         volume: 155,
         price: 84.99,
       },
-    ],
-    asks: [
       {
-        volume: 125,
-        price: 100.1,
-      },
-      {
-        volume: 135,
-        price: 105.1,
-      },
-      {
-        volume: 145,
-        price: 110.1,
-      },
-      {
-        volume: 155,
-        price: 115.1,
-      },
-    ],
-  },
-  {
-    name: 'Liquid market, big spread',
-    description: 'Wide spread, asks/bids are large in size and stepped',
-    bids: [
-      {
-        volume: 125,
-        price: 50,
-      },
-      {
-        volume: 135,
-        price: 45,
-      },
-      {
-        volume: 145,
-        price: 35,
-      },
-      {
-        volume: 155,
-        price: 25,
-      },
-    ],
-    asks: [
-      {
-        volume: 125,
+        volume: 165,
         price: 150,
       },
+    ],
+    asks: [
+      {
+        volume: 125,
+        price: 100.1,
+      },
       {
         volume: 135,
-        price: 155,
+        price: 105.1,
       },
       {
         volume: 145,
-        price: 165,
+        price: 110.1,
       },
       {
         volume: 155,
-        price: 175,
+        price: 115.1,
       },
     ],
   },
   {
-    name: 'Liquid market when prices fall 20%',
-    description: 'The market has low volumes near the current price, it has high volumes when price drops around 20%',
+    // Done
+    name: 'Volume stepped up and down inconsistently but without interlaping ',
+    description:
+      'Bids and asks do not interlap but they are inconsistently having higher and lower volume, not really broken',
     bids: [
       {
-        volume: 5,
+        volume: 125,
         price: 99.99,
       },
       {
-        volume: 6,
+        volume: 225,
         price: 94.99,
       },
       {
-        volume: 7,
+        volume: 130,
         price: 89.99,
       },
       {
-        volume: 8,
+        volume: 230,
         price: 84.99,
-      },
-      {
-        volume: 155,
-        price: 79.99,
-      },
-      {
-        volume: 165,
-        price: 74.99,
       },
     ],
     asks: [
       {
-        volume: 5,
+        volume: 125,
         price: 100.1,
       },
       {
-        volume: 6,
+        volume: 135,
         price: 105.1,
       },
       {
-        volume: 7,
+        volume: 145,
         price: 110.1,
       },
       {
-        volume: 8,
-        price: 115.1,
-      },
-      {
         volume: 155,
-        price: 120.1,
-      },
-      {
-        volume: 165,
-        price: 125.1,
+        price: 115.1,
       },
     ],
   },
   {
-    name: 'Liquid market when prices fall 40%',
-    description: 'The market has low volumes near the current price, it has high volumes when price drops around 40%',
-    bids: [
-      {
-        volume: 5,
-        price: 99.99,
-      },
-      {
-        volume: 6,
-        price: 94.99,
-      },
-      {
-        volume: 7,
-        price: 89.99,
-      },
-      {
-        volume: 8,
-        price: 84.99,
-      },
-      {
-        volume: 8,
-        price: 79.99,
-      },
-      {
-        volume: 8,
-        price: 74.99,
-      },
-      {
-        volume: 8, // Repeated volumes on purpose
-        price: 69.99,
-      },
-      {
-        volume: 9,
-        price: 64.99,
-      },
-      {
-        volume: 155,
-        price: 59.99,
-      },
-      {
-        volume: 165,
-        price: 54.99,
-      },
-      {
-        volume: 175,
-        price: 49.99,
-      },
-      {
-        volume: 185,
-        price: 44.99,
-      },
-    ],
-    asks: [
-      {
-        volume: 5,
-        price: 100.1,
-      },
-      {
-        volume: 6,
-        price: 105.1,
-      },
-      {
-        volume: 7,
-        price: 110.1,
-      },
-      {
-        volume: 8,
-        price: 115.1,
-      },
-      {
-        volume: 8,
-        price: 120.1,
-      },
-      {
-        volume: 8,
-        price: 125.1,
-      },
-      {
-        volume: 8, // Repeated volumes on purpose
-        price: 130.1,
-      },
-      {
-        volume: 9,
-        price: 135.1,
-      },
-      {
-        volume: 155,
-        price: 140.1,
-      },
-      {
-        volume: 165,
-        price: 145.1,
-      },
-      {
-        volume: 175,
-        price: 150.1,
-      },
-      {
-        volume: 185,
-        price: 155.1,
-      },
-    ],
-  },
-  {
+    // done
     name: 'Liquid market with very high volume and high price in the asks',
     description: 'Self explanatory',
     bids: [
@@ -470,54 +318,6 @@ export default [
       {
         volume: 1040,
         price: 120,
-      },
-    ],
-  },
-  {
-    name: 'Low volume overlap, with big price difference',
-    description: 'Market overlaps deeper than the previous examples',
-    bids: [
-      {
-        volume: 4,
-        price: 140,
-      },
-      {
-        volume: 6,
-        price: 130,
-      },
-      {
-        volume: 7,
-        price: 120,
-      },
-      {
-        volume: 25,
-        price: 70,
-      },
-      {
-        volume: 27,
-        price: 50,
-      },
-    ],
-    asks: [
-      {
-        volume: 4,
-        price: 60,
-      },
-      {
-        volume: 6,
-        price: 70,
-      },
-      {
-        volume: 7,
-        price: 80,
-      },
-      {
-        volume: 25,
-        price: 130,
-      },
-      {
-        volume: 27,
-        price: 150,
       },
     ],
   },
@@ -803,53 +603,4 @@ export default [
       },
     ],
   },
-  {
-    name: 'No bids',
-    description: 'self explanatory',
-    bids: [
-      {
-        volume: 125,
-        price: 99.99,
-      },
-      {
-        volume: 135,
-        price: 94.99,
-      },
-      {
-        volume: 145,
-        price: 89.99,
-      },
-      {
-        volume: 155,
-        price: 84.99,
-      },
-    ],
-  },
-  {
-    name: 'No asks',
-    description: 'self explanatory',
-    asks: [
-      {
-        volume: 125,
-        price: 100.1,
-      },
-      {
-        volume: 135,
-        price: 105.1,
-      },
-      {
-        volume: 145,
-        price: 110.1,
-      },
-      {
-        volume: 155,
-        price: 115.1,
-      },
-    ],
-  },
-  {
-    name: 'No bids and no asks',
-    // ... :o
-  },
-  // ... in general, we need to create markets where we play with where the liquidity is, we can define cases where big chunks of it is a big price falls
 ]
