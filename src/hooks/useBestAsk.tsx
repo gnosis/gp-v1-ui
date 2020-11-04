@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 import useSafeState from './useSafeState'
 import { dexPriceEstimatorApi } from 'api'
 
-interface BestAskParams {
+export interface BestAskParams {
   networkId: number
   baseTokenId: number
   quoteTokenId: number

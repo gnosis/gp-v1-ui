@@ -61,8 +61,10 @@ export const StandaloneCardWrapper = styled.div`
     }
   }
 `
-export const PageWrapper = styled.section`
+export const PageWrapper = styled.section<{ $autoWidth?: boolean }>`
   height: 75rem;
+  width: ${({ $autoWidth = false }): string => ($autoWidth ? 'auto' : '100%')};
+  margin: auto;
   max-width: 100%;
 
   background: var(--color-background-pageWrapper);
