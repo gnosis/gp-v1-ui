@@ -51,10 +51,10 @@ function _createRow({
     ...balances,
   }
 
-  const onSubmitDeposit = jest.fn<Promise<void>, [BN, Function]>()
+  const onSubmitDeposit = jest.fn<Promise<void>, [BN, (hash: string) => void]>()
   const onClaim = jest.fn<Promise<void>, []>()
   const onEnableToken = jest.fn<Promise<void>, []>()
-  const onSubmitWithdraw = jest.fn<Promise<void>, [BN, Function]>()
+  const onSubmitWithdraw = jest.fn<Promise<void>, [BN, (hash: string) => void]>()
   return (
     <Row
       networkId={Network.Mainnet}
