@@ -28,14 +28,16 @@ interface FormattedPrices {
 
 const LOW_PRICE_FLOOR = new BigNumber('0.0001')
 
-export function formatPriceToPrecision(price: BigNumber): string {
-  return price.gt(LOW_PRICE_FLOOR) ? price.toFixed(PRICE_ESTIMATION_PRECISION) : '< ' + LOW_PRICE_FLOOR.toString()
+export function formatPriceToPrecision(price: BigNumber, useThreshold = false): string {
+  return price.gt(LOW_PRICE_FLOOR) || !useThreshold
+    ? price.toFixed(PRICE_ESTIMATION_PRECISION)
+    : '< ' + LOW_PRICE_FLOOR.toString()
 }
 
 function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): FormattedPrices {
   if (price) {
-    const inversePriceLabel = formatPriceToPrecision(invertPrice(price))
-    const priceLabel = formatPriceToPrecision(price)
+    const inversePriceLabel = formatPriceToPrecision(invertPrice(price), true)
+    const priceLabel = formatPriceToPrecision(price, true)
     const inversePriceValue = invertPrice(price).toString(10)
     const priceValue = price.toString(10)
 
