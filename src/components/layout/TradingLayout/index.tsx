@@ -1,11 +1,12 @@
 import React from 'react'
 import { Frame } from 'components/common/Frame'
+import { Header } from './Header'
 
 export const TradingLayout: React.FC = ({ children }) => (
   <div>
-    <Frame>Header</Frame>
+    <Header label="My Header" />
     <Frame>{children}</Frame>
-    <Frame>Footer</Frame>
+    <Frame>My Footer</Frame>
   </div>
 )
 
