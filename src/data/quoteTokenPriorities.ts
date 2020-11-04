@@ -40,6 +40,16 @@ const quoteTokenPriorityList: QuoteTokenPriorityList = [
         '0x1b642a124CDFa1E5835276A6ddAA6CFC4B35d52c', // sUSD
         '0x784B46A4331f5c7C495F296AE700652265ab2fC6', // GUSD
       ],
+      // xDAI
+      [Network.xDAI]: [
+        '0xddafbb505ad214d7b80b1f830fccc89b60fb7a83', // USDC
+        '0x4ecaba5870353805a9f068101a40e0f32ed605c6', // USDT
+        '0x44fa8e6f47987339850636f88629646662444217', // DAI
+        '0xc439e5b1dee4f866b681e7c5e5df140aa47fbf19', // SAI
+        '0xb1950fb2c9c0cbc8553578c67db52aa110a93393', // sUSD
+        '0xb714654e905edad1ca1940b7790a8239ece5a9ff', // TUSD
+        '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d', // wxDAI
+      ],
     },
   },
   {
@@ -48,7 +58,9 @@ const quoteTokenPriorityList: QuoteTokenPriorityList = [
     addresses: {
       [Network.Mainnet]: ['0x1a5f9352af8af974bfc03399e3767df6370d82e4'], // OWL
       // Rinkeby
-      [Network.Rinkeby]: ['0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d'],
+      [Network.Rinkeby]: ['0xa7d1c04faf998f9161fc9f800a99a809b84cfc9d'], // OWL
+      // xDAI
+      [Network.xDAI]: ['0x0905ab807f8fd040255f0cf8fa14756c1d824931'], // xOWL
     },
   },
   {
@@ -65,6 +77,10 @@ const quoteTokenPriorityList: QuoteTokenPriorityList = [
       ],
       // Rinkeby
       [Network.Rinkeby]: [],
+      // xDAI
+      [Network.xDAI]: [
+        '0x0e0293b766e89011abd9bea5612d978c3a13cbb8', // dCHF
+      ],
     },
   },
   {
@@ -77,6 +93,10 @@ const quoteTokenPriorityList: QuoteTokenPriorityList = [
       // Rinkeby
       [Network.Rinkeby]: [
         '0xc778417E063141139Fce010982780140Aa0cD5Ab', // WETH
+      ],
+      // xDAI
+      [Network.xDAI]: [
+        '0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1', // WETH
       ],
     },
   },

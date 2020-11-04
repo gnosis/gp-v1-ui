@@ -4,16 +4,8 @@ import BigNumber from 'bignumber.js'
 import { PRICE_ESTIMATION_PRECISION } from 'const'
 import { invertPrice, TokenDex } from '@gnosis.pm/dex-js'
 
-import { displayTokenSymbolOrLink } from 'utils/display'
-
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
-
-import styled from 'styled-components'
-
-const LongPriceStrong = styled.strong`
-  word-break: break-all;
-`
 
 export interface Props {
   label: string
@@ -63,7 +55,7 @@ function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): F
 }
 
 export const PriceSuggestionItem: React.FC<Props> = (props) => {
-  const { label, isPriceInverted, price, loading, amount, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
+  const { label, isPriceInverted, price, loading, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
 
   const { priceFormatted, invertedPriceFormatted } = getPriceFormatted(price, isPriceInverted)
   const displayPrice = priceFormatted === 'Infinity' || invertedPriceFormatted === 'Infinity' ? 'N/A' : priceFormatted
@@ -72,11 +64,6 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
     <>
       <span>
         <span>{label}</span>{' '}
-        {amount && (
-          <LongPriceStrong>
-            ({amount} {displayTokenSymbolOrLink(quoteToken)})
-          </LongPriceStrong>
-        )}
       </span>
       <button
         type="button"
