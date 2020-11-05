@@ -4,10 +4,17 @@ node_js:
   # TODO: stable (v13.0.1 at the time) breaks sha3 package compilation
   # Sticky v12
   - '12'
-cache: 'yarn'
+cache:
+  yarn: true
+  directories:
+    - ~/.cache
 script:
   - yarn test-coverage
   - yarn build
+  after_script:
+    - script: yarn test:integration
+      # on:
+      #   branch: develop
 before_install:
   # Needed to deploy pull request and releases
   - sudo apt-get -y install python-pip python-dev
