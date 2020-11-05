@@ -97,12 +97,6 @@ const NavStyled = styled.ol`
     position: relative;
   }
 `
-
-const NavContent = `
-  <li><a href="#">Trade</a></li>
-  <li><a href="#">Swap</a></li>
-  <li><a href="#">Liquidity</a></li>
-`
 // =======================================
 
 // Move to separte NavUserTools
@@ -186,7 +180,17 @@ export const Header: React.FC = () => (
     <Logo href="#">
       <img src={LogoImage} />
     </Logo>
-    <NavStyled dangerouslySetInnerHTML={{ __html: NavContent }} />
+    <NavStyled>
+      <li>
+        <a href="#">Trade</a>
+      </li>
+      <li>
+        <a href="#">Swap</a>
+      </li>
+      <li>
+        <a href="#">Liquidity</a>
+      </li>
+    </NavStyled>
     <NavUserTools>
       <PortfolioLink>
         <a href="#">Portfolio</a>
