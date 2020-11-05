@@ -4,7 +4,11 @@ node_js:
   # TODO: stable (v13.0.1 at the time) breaks sha3 package compilation
   # Sticky v12
   - '12'
-cache: 'yarn'
+cache:
+  yarn: true
+  npm: false
+  directories:
+    - .eslint-cache
 script:
   - yarn test-coverage
   - yarn build
