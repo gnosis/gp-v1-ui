@@ -19,7 +19,7 @@
     "stats": "rimraf ./dist && NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "MOCK=true jest --cacheDirectory .jest-cache -o",
     "test:integration": "CYPRESS_BASE_URL=http://localhost:8081 start-server-and-test 'serve dist -s -l 8081' http://localhost:8081 'cypress run'",
-    "test-coverage": "MOCK=true jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "test:coverage": "MOCK=true jest --coverage --cache --cacheDirectory .jest-cache && cat ./coverage/lcov.info | coveralls",
     "verify": "npm-run-all --parallel lint:* test",
     "format": "prettier --write \"src/**/*.ts?(x)\" \"src/**/*.js?(x)\"",
     "storybook": "BROWSER=NONE start-storybook -p 6006",

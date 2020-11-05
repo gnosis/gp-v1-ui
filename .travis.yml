@@ -12,7 +12,7 @@ cache:
     - .jest-cache
     - ~/.cache
 script:
-  - yarn test-coverage
+  - yarn test:coverage
   - yarn build
   # Integration test, only in tags, master and develop
   - if [[ $TRAVIS_TAG != "" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
