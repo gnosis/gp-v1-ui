@@ -11,7 +11,7 @@
     "start": "NODE_ENV=development webpack-dev-server --mode development --hot --host 0.0.0.0 --disable-host-check",
     "mock": "MOCK=true yarn start",
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
-    "lint:js": "eslint src --ext .ts,.tsx,.js",
+    "lint:js": "eslint src --cache --cache-location .eslint-cache --ext .ts,.tsx,.js",
     "lint:js:fix": "eslint src --fix --ext .ts,.tsx,.js",
     "lint:css": "stylelint 'src/**/*.[jt]s?(x)' --syntax 'css-in-js'",
     "lint:css:fix": "stylelint 'src/**/*.[jt]s?(x)' --syntax 'css-in-js' --fix",
