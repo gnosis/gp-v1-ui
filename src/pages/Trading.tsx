@@ -11,8 +11,13 @@ const Wrapper = styled.div`
 
 export const Trading: React.FC = () => (
   <Wrapper>
-    <h2>Trading page</h2>
-    <img src="https://media.giphy.com/media/3o8dFzIXb0qaE3pYWs/source.gif"></img>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <h2>The Best Trading Experience</h2>
+    <img height="500" src="https://ipfs.rarible.com/ipfs/QmPEj5hLBKNSJeVQsdBM7gLUXexSWBxhSU3wwGYHgEyJqu" />
   </Wrapper>
 )
 
