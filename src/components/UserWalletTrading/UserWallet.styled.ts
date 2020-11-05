@@ -114,8 +114,7 @@ export const ConnectWallet = styled.div`
 `
 
 export const UserAddress = styled.div`
-  @media ${MEDIA.mobile} {
-  }
+  background: transparent;
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`
@@ -170,13 +169,12 @@ export const CopyDiv = styled.div`
   }
 `
 
-export const EtherImage = styled(WalletImage)``
+export const EtherImage = styled(WalletImage)`
+  background: transparent;
+`
 
 export const UserWalletSlideWrapper = styled.div`
-  position: absolute;
-  left: 0;
   background: var(--color-background-pageWrapper);
-  display: flex;
   padding: 2.6rem 1.6rem;
   box-sizing: border-box;
   z-index: 10;
