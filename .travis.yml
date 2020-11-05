@@ -11,7 +11,8 @@ cache:
 script:
   - yarn test-coverage
   - yarn build
-  - if [[ $TRAVIS_TAG != "" || $TRAVIS_PULL_REQUEST != "true" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
+  # Integration test, only in tags, master and develop
+  - if [[ $TRAVIS_TAG != "" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
       yarn test:integration
     fi
 before_install:
