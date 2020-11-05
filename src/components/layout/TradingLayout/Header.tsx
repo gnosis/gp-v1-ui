@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 // Assets
-import LogoImage from 'assets/img/logo-mesa-v2.svg'
+import LogoImage from 'assets/img/logo-v2.svg'
 import PortfolioImage from 'assets/img/portfolio.svg'
 import PortfolioImageWhite from 'assets/img/portfolio-white.svg'
 import SettingsImage from 'assets/img/settings.svg'
@@ -24,11 +24,36 @@ const HeaderStyled = styled.header`
 
 // Move to LOGO component =================
 const Logo = styled.a`
-  width: 7.2rem;
-  height: 1.6rem;
+  width: auto;
+  height: 3rem;
+  transform: perspective(20rem) rotateY(0);
+  transform-style: preserve-3d;
+  transition: transform 1s ease-in-out;
+
+  &:hover {
+    animation-name: spin;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+  }
+
   > img {
     background: url(${LogoImage}) no-repeat center/contain;
     border: 0;
+    object-fit: contain;
+    width: inherit;
+    height: inherit;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: perspective(20rem) rotateY(0);
+    }
+    30% {
+      transform: perspective(20rem) rotateY(200deg);
+    }
+    100% {
+      transform: perspective(20rem) rotateY(720deg);
+    }
   }
 `
 // ========================================
@@ -37,7 +62,7 @@ const Logo = styled.a`
 const NavStyled = styled.ol`
   list-style: none;
   display: flex;
-  padding: 0 0 0 0 3.4rem;
+  padding: 0 0 0 1.6rem;
 
   > li {
     font-size: 1.6rem;
