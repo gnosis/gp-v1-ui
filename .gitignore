@@ -12,3 +12,7 @@ coverage
 yalc.lock
 # storybook
 storybook-static
+
+cypress/videos
+cypress/screenshots
+cypress/fixtures/example.json
