@@ -12,3 +12,4 @@ coverage
 yalc.lock
 # storybook
 storybook-static
+.stylelint-cache
