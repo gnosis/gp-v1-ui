@@ -54,7 +54,8 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
   const orderPageMatch = useRouteMatch('/order/')
 
   // providerInfo is cached, so ok to re-get on render
-  const { walletName, walletIcon } = walletApi.getProviderInfo() || {}
+  const { walletIcon } = walletApi.getProviderInfo() || {}
+  // walletname
 
   useNoScroll(showWallet)
 
