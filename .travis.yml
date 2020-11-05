@@ -11,6 +11,7 @@ cache:
     - .eslint-cache
     - .jest-cache
 script:
+  - yarn check-types
   - yarn test-coverage
   - yarn build
 before_install:

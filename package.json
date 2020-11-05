@@ -31,8 +31,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run verify",
-      "pre-push": "npm run check-types"
+      "pre-commit": "npm run verify"
     }
   },
   "author": "",
