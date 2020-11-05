@@ -11,7 +11,7 @@ cache:
     - .eslint-cache
     - .jest-cache
 script:
-  - yarn test-coverage
+  - yarn test:coverage
   - yarn build
 before_install:
   # Needed to deploy pull request and releases
