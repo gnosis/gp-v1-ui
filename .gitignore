@@ -12,4 +12,10 @@ coverage
 yalc.lock
 # storybook
 storybook-static
+.jest-cache
+.eslint-cache
 .stylelint-cache
+
+cypress/videos
+cypress/screenshots
+cypress/fixtures/example.json
