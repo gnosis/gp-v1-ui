@@ -5,10 +5,11 @@ node_js:
   # Sticky v12
   - '12'
 cache:
-    yarn: true
-    npm: false
-    directories:
-      - .jest-cache
+  yarn: true
+  npm: false
+  directories:
+    - .eslint-cache
+    - .jest-cache
 script:
   - yarn test-coverage
   - yarn build

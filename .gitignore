@@ -13,6 +13,7 @@ yalc.lock
 # storybook
 storybook-static
 .jest-cache
+.eslint-cache
 
 cypress/videos
 cypress/screenshots
