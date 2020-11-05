@@ -9,6 +9,7 @@ cache:
   npm: false
   directories:
     - .eslint-cache
+    - .jest-cache
 script:
   - yarn test-coverage
   - yarn build
