@@ -12,8 +12,9 @@ script:
   - yarn test-coverage
   - yarn build
   # Integration test, only in tags, master and develop
-  - if [[ $TRAVIS_TAG != "" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
-      yarn test:integration
+  - > 
+    if [[ $TRAVIS_TAG != "" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
+      yarn test:integration;
     fi
 before_install:
   # Needed to deploy pull request and releases
