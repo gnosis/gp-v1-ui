@@ -12,8 +12,8 @@ script:
   - yarn test-coverage
   - yarn build
   - if [[ $TRAVIS_TAG != "" || $TRAVIS_PULL_REQUEST != "true" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
-    yarn test:integration
-  fi
+      yarn test:integration
+    fi
 before_install:
   # Needed to deploy pull request and releases
   - sudo apt-get -y install python-pip python-dev
