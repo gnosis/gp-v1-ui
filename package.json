@@ -26,7 +26,7 @@
     "build-storybook": "build-storybook",
     "docs": "start-storybook --docs",
     "build-docs": "build-storybook --docs",
-    "check-types": "tsc --noEmit",
+    "check-types": "tsc --noEmit --incremental",
     "cypress": "cypress open"
   },
   "husky": {

@@ -15,6 +15,7 @@ storybook-static
 .jest-cache
 .eslint-cache
 .stylelint-cache
+tsconfig.tsbuildinfo
 
 cypress/videos
 cypress/screenshots
