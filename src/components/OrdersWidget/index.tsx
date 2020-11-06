@@ -419,7 +419,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
                   <CardTable
-                    $columns="3.2rem minmax(12.8rem,1fr) minmax(11rem,1fr) repeat(2, minmax(8rem, 0.5fr)) minmax(7.2rem,0.4fr) 5.5rem minmax(8.6rem,0.4fr)"
+                    $columns="3.2rem minmax(12.8rem,1fr) minmax(11rem,1fr) repeat(2, minmax(8rem, 0.5fr)) minmax(7.2rem,0.4fr) 5.5rem minmax(10.6rem,0.4fr)"
                     $gap="0 0.6rem"
                     $rowSeparation="0"
                   >

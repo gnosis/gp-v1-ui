@@ -33,7 +33,10 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
       price = buyOrderPriceInverse
       priceInverse = buyOrderPrice
     }
-    return [formatPrice(price), formatPrice(priceInverse)]
+
+    // set decimals to 5 places - default is 4 from @dex-js
+    // TODO: consider changing dex-js default to 5
+    return [formatPrice({ price, decimals: 5 }), formatPrice({ price: priceInverse, decimals: 5 })]
   }, [buyToken, sellToken, quoteToken, priceFraction])
 
   let priceDisplayed: string, quoteDisplayed: TokenDetails, baseDisplayed: TokenDetails
