@@ -50,5 +50,6 @@ module.exports = {
     browser: true,
     node: true,
     jest: true,
+    'cypress/globals': true,
   },
 }
