@@ -2,7 +2,7 @@ import React from 'react'
 import BigNumber from 'bignumber.js'
 
 import { PRICE_ESTIMATION_PRECISION } from 'const'
-import { invertPrice, TokenDex } from '@gnosis.pm/dex-js'
+import { formatAmount, invertPrice, parseAmount, TokenDex } from '@gnosis.pm/dex-js'
 
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
@@ -28,16 +28,26 @@ interface FormattedPrices {
 
 const LOW_PRICE_FLOOR = new BigNumber('0.0001')
 
-export function formatPriceToPrecision(price: BigNumber, useThreshold = false): string {
+interface FormatPriceOptions {
+  useThreshold?: boolean | undefined
+  decimals?: number | undefined
+}
+
+export function formatPriceWithFloor(
+  price: BigNumber,
+  { useThreshold = false, decimals = PRICE_ESTIMATION_PRECISION }: FormatPriceOptions,
+): string {
+  const priceAsBN = parseAmount(price.toString(10), 18)
   return price.gt(LOW_PRICE_FLOOR) || !useThreshold
-    ? price.toFixed(PRICE_ESTIMATION_PRECISION)
+    ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      formatAmount({ amount: priceAsBN!, precision: 18, decimals })
     : '< ' + LOW_PRICE_FLOOR.toString()
 }
 
 function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): FormattedPrices {
   if (price) {
-    const inversePriceLabel = formatPriceToPrecision(invertPrice(price), true)
-    const priceLabel = formatPriceToPrecision(price, true)
+    const inversePriceLabel = formatPriceWithFloor(invertPrice(price), { useThreshold: true })
+    const priceLabel = formatPriceWithFloor(price, { useThreshold: true })
     const inversePriceValue = invertPrice(price).toString(10)
     const priceValue = price.toString(10)
 
