@@ -10,6 +10,10 @@ export const UserWalletWrapper = styled.div`
   text-align: left;
   position: relative;
 
+  @media ${MEDIA.mediumDown} {
+    order: 1;
+  }
+
   .QRCode {
     border: 2rem solid #fff;
     border-radius: var(--border-radius);

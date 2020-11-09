@@ -13,6 +13,16 @@ export const UserWalletWrapper = styled.li`
   line-height: 1;
   text-align: left;
   position: relative;
+  margin: 0 2.4rem 0 0;
+  order: 2;
+
+  @media ${MEDIA.mediumDown} {
+    margin: 0 auto 0 0;
+
+    &::after {
+      content: none;
+    }
+  }
 
   .QRCode {
     border: 2rem solid #ffffff;
