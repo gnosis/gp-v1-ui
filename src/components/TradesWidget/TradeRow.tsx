@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react'
 import styled from 'styled-components'
 import { formatDistanceStrict } from 'date-fns'
+import BigNumber from 'bignumber.js'
 
 import { formatPrice, formatSmart, formatAmountFull, invertPrice, DEFAULT_PRECISION } from '@gnosis.pm/dex-js'
 
@@ -13,9 +14,8 @@ import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
 
 import { isTradeSettled, divideBN, formatPercentage, getMarket } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'
-import { MEDIA, ONE_BIG_NUMBER, ONE_HUNDRED_BIG_NUMBER } from 'const'
+import { DEFAULT_DECIMAL_PLACES, MEDIA, ONE_BIG_NUMBER, ONE_HUNDRED_BIG_NUMBER } from 'const'
 import { SwapIcon } from 'components/TradeWidget/SwapIcon'
-import BigNumber from 'bignumber.js'
 
 // minimum floor amount surplus must be greater than for it to display on frontend
 const SURPLUS_THRESHOLD = 0.01
@@ -238,7 +238,7 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
       >
         <SplitHeaderTitle>
           <div>
-            {formatPrice(marketFillPrice)} {quoteTokenLabel}
+            {formatPrice({ price: marketFillPrice, decimals: DEFAULT_DECIMAL_PLACES })} {quoteTokenLabel}
           </div>
           {surplus && surplus > SURPLUS_THRESHOLD && (
             <div className="surplusHighlight">+{surplus.toFixed(2)}% surplus</div>
@@ -273,7 +273,8 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
         data-label="Limit Price"
         title={marketLimitPrice ? formatPrice({ price: marketLimitPrice, decimals: 8 }) : 'N/A'}
       >
-        {marketLimitPrice ? formatPrice(marketLimitPrice) : 'N/A'} {quoteTokenLabel}
+        {marketLimitPrice ? formatPrice({ price: marketLimitPrice, decimals: DEFAULT_DECIMAL_PLACES }) : 'N/A'}{' '}
+        {quoteTokenLabel}
         <SwapIcon swap={(): void => setIsPriceInverted(!isPriceInverted)} />{' '}
       </td>
       <td data-label="Date" className="showResponsive" title={date.toLocaleString()}>
