@@ -1,25 +1,16 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-// -- This is a parent command --
-// Cypress.Commands.add("login", (email, password) => { ... })
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+/**
+ * Substitute for "visit" command. The original visit command should not be used, when the tests depend on the
+ * scroll, because cypress has an issue with "scroll-behaviour: smooth"
+ *
+ * See https://github.com/cypress-io/cypress/issues/3200#issuecomment-672788861
+ *
+ * @example cy.visitApp('/about')
+ */
+Cypress.Commands.add('visitApp', (url) => {
+  cy.visit(url)
+  cy.document().then((document) => {
+    const node = document.createElement('style')
+    node.innerHTML = 'html { scroll-behavior: inherit !important; }'
+    document.body.appendChild(node)
+  })
+})

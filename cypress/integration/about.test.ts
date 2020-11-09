@@ -1,7 +1,8 @@
 describe('About', () => {
   it('Navigates from link in the footer', () => {
-    // GIVEN: home page
-    cy.visit('/')
+    // GIVEN: At home page, scrolled to the bottom
+    cy.visitApp('/')
+    cy.scrollTo('bottom')
 
     // WHEN: Click on the "About" link in the footer
     cy.get('footer').contains('About').click()
@@ -12,7 +13,7 @@ describe('About', () => {
 
   it('Navigates using URL', () => {
     // GIVEN: about page
-    cy.visit('/about')
+    cy.visitApp('/about')
 
     // WHEN: -
     // THEN: There's the heading we expect
