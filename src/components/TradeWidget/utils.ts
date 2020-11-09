@@ -2,26 +2,26 @@ import { tokenListApi } from 'api'
 import { isAddress } from 'web3-utils'
 import { parseBigNumber, getToken } from 'utils'
 import { buildSearchQuery } from 'hooks/useQuery'
-import { encodeTokenSymbol } from '@gnosis.pm/dex-js'
+import { encodeTokenSymbol, formatAmount, parseAmount } from '@gnosis.pm/dex-js'
 
 import { BATCH_START_THRESHOLD } from './validationSchema'
 import { BATCH_TIME_IN_MS } from 'const'
 import { TokenDetails } from 'types'
-import { formatPriceWithFloor } from 'components/trade/PriceSuggestions/PriceSuggestionItem'
 
-export function calculateReceiveAmount(priceValue: string, sellValue: string): string {
+export function calculateReceiveAmount(priceValue: string, sellValue: string, precision: number): string {
   let receiveAmount = ''
   if (priceValue && sellValue) {
     const sellAmount = parseBigNumber(sellValue)
     const price = parseBigNumber(priceValue)
 
     if (sellAmount && price) {
-      const receiveBigNumber = sellAmount.dividedBy(price)
+      const receiveBigNumber = sellAmount.times(price)
+      const receiveAsBN = parseAmount(receiveBigNumber.toString(10), precision)
       // Format the "Receive at least" input amount same as PriceSuggestions price
       receiveAmount =
-        receiveBigNumber.isNaN() || !receiveBigNumber.isFinite()
+        !receiveAsBN || receiveBigNumber.isNaN() || !receiveBigNumber.isFinite()
           ? '0'
-          : formatPriceWithFloor(receiveBigNumber, { decimals: 18 })
+          : formatAmount({ amount: receiveAsBN, precision, decimals: precision, thousandSeparator: false })
     }
   }
 
