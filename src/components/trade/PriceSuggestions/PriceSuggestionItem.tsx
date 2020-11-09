@@ -1,8 +1,9 @@
 import React from 'react'
 import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
 
-import { PRICE_ESTIMATION_PRECISION } from 'const'
-import { formatAmount, invertPrice, parseAmount, TokenDex } from '@gnosis.pm/dex-js'
+import { DEFAULT_DECIMAL_PLACES } from 'const'
+import { formatAmount, formatAmountFull, invertPrice, parseAmount, TokenDex } from '@gnosis.pm/dex-js'
 
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
@@ -28,28 +29,34 @@ interface FormattedPrices {
 
 const LOW_PRICE_FLOOR = new BigNumber('0.0001')
 
-interface FormatPriceOptions {
-  useThreshold?: boolean | undefined
-  decimals?: number | undefined
-}
-
-export function formatPriceWithFloor(
-  price: BigNumber,
-  { useThreshold = false, decimals = PRICE_ESTIMATION_PRECISION }: FormatPriceOptions,
-): string {
+function formatPriceWithFloor(price: BigNumber): string {
   const priceAsBN = parseAmount(price.toString(10), 18)
-  return price.gt(LOW_PRICE_FLOOR) || !useThreshold
-    ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      formatAmount({ amount: priceAsBN!, precision: 18, decimals })
-    : '< ' + LOW_PRICE_FLOOR.toString()
+  if (!priceAsBN || priceAsBN.isZero()) return 'N/A'
+
+  const displayPrice = formatAmount({ amount: priceAsBN, precision: 18, decimals: DEFAULT_DECIMAL_PLACES })
+  return price.gt(LOW_PRICE_FLOOR) ? displayPrice : '< ' + LOW_PRICE_FLOOR.toString(10)
 }
 
-function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): FormattedPrices {
+interface GetPriceFormatted {
+  price: BigNumber | null
+  isPriceInverted: boolean
+  btDecimals: number
+  qtDecimals: number
+}
+
+function getPriceFormatted({ price, isPriceInverted, btDecimals, qtDecimals }: GetPriceFormatted): FormattedPrices {
   if (price) {
-    const inversePriceLabel = formatPriceWithFloor(invertPrice(price), { useThreshold: true })
-    const priceLabel = formatPriceWithFloor(price, { useThreshold: true })
-    const inversePriceValue = invertPrice(price).toString(10)
-    const priceValue = price.toString(10)
+    const inversePriceLabel = formatPriceWithFloor(invertPrice(price))
+    const priceLabel = formatPriceWithFloor(price)
+    const inversePriceBN = parseAmount(invertPrice(price).toString(10), btDecimals) as BN
+    const priceValueBN = parseAmount(price.toString(10), qtDecimals) as BN
+
+    const inversePriceValue = formatAmountFull({
+      amount: inversePriceBN,
+      precision: btDecimals,
+      thousandSeparator: false,
+    })
+    const priceValue = formatAmountFull({ amount: priceValueBN, precision: qtDecimals, thousandSeparator: false })
 
     if (isPriceInverted) {
       // Price is inverted
@@ -82,7 +89,12 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const { label, isPriceInverted, price, loading, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
 
   // Return raw, unformatted values to pass to price calculations
-  const { priceValue, inversePriceValue, priceLabel, inversePriceLabel } = getPriceFormatted(price, isPriceInverted)
+  const { priceValue, inversePriceValue, priceLabel, inversePriceLabel } = getPriceFormatted({
+    price,
+    isPriceInverted,
+    btDecimals: baseToken.decimals,
+    qtDecimals: quoteToken.decimals,
+  })
   const displayPrice = priceLabel === 'Infinity' || inversePriceLabel === 'Infinity' ? 'N/A' : priceLabel
   return (
     <>
@@ -91,7 +103,8 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
       </span>
       <button
         type="button"
-        title={isPriceInverted ? inversePriceValue : priceValue}
+        // PriceValue inverted above, no need to invert here
+        title={priceValue}
         disabled={loading || displayPrice === 'N/A'}
         onClick={(): void => onClickPrice(priceValue, inversePriceValue)}
       >
