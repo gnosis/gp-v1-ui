@@ -1,5 +1,4 @@
 import React from 'react'
-import BigNumber from 'bignumber.js'
 
 import { FormMessage } from 'components/common/FormMessage'
 import { HelpTooltip, HelpTooltipContainer } from 'components/Tooltip'
@@ -26,20 +25,15 @@ export const SimplePriceImpact: React.FC<SimplePriceImpactProps> = ({ className,
 )
 
 function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
-  const {
-    baseToken: { id: baseTokenId },
-    quoteToken: { id: quoteTokenId, decimals },
-    fillPrice,
-    ...rest
-  } = params
+  const { baseToken, quoteToken, fillPrice, ...rest } = params
 
   const { priceImpactSmart, priceImpactWarning, priceImpactClassName } = usePriceImpact({
     ...rest,
     // Match limitPrice and fillPrice precision + force round down last digit
-    // Necessary for value comparison when calcilating warnings
-    fillPrice: fillPrice?.decimalPlaces(decimals, BigNumber.ROUND_DOWN) || null,
-    baseTokenId,
-    quoteTokenId,
+    // Necessary for value comparison when reunnint determinePriceWarnings function
+    fillPrice,
+    baseToken,
+    quoteToken,
   })
 
   return (

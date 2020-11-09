@@ -282,6 +282,8 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
     ...baseProps,
     limitPrice: sellToken === quoteToken ? price : priceInverse,
     fillPrice,
+    baseToken,
+    quoteToken,
   })
 
   const renderWarnings = React.useCallback(() => {

@@ -1,12 +1,12 @@
 import React from 'react'
 import BigNumber from 'bignumber.js'
-import BN from 'bn.js'
 
 import { DEFAULT_DECIMAL_PLACES } from 'const'
-import { formatAmount, formatAmountFull, invertPrice, parseAmount, TokenDex } from '@gnosis.pm/dex-js'
+import { invertPrice, TokenDex } from '@gnosis.pm/dex-js'
 
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
+import { formatPriceWithFloor } from 'utils'
 
 export interface Props {
   label: string
@@ -27,41 +27,34 @@ interface FormattedPrices {
   inversePriceValue: string
 }
 
-const LOW_PRICE_FLOOR = new BigNumber('0.0001')
-
-function formatPriceWithFloor(price: BigNumber): string {
-  const priceAsBN = parseAmount(price.toString(10), 18)
-  if (!priceAsBN || priceAsBN.isZero()) return 'N/A'
-
-  const displayPrice = formatAmount({ amount: priceAsBN, precision: 18, decimals: DEFAULT_DECIMAL_PLACES })
-  return price.gt(LOW_PRICE_FLOOR) ? displayPrice : '< ' + LOW_PRICE_FLOOR.toString(10)
-}
-
 interface GetPriceFormatted {
   price: BigNumber | null
   isPriceInverted: boolean
+  baseTokenDecimals: number
+  quoteTokenDecimals: number
 }
 
-function getPriceFormatted({ price, isPriceInverted }: GetPriceFormatted): FormattedPrices {
+function getPriceFormatted({
+  price,
+  isPriceInverted,
+  baseTokenDecimals,
+  quoteTokenDecimals,
+}: GetPriceFormatted): FormattedPrices {
   if (price) {
     const inversePriceLabel = formatPriceWithFloor(invertPrice(price))
     const priceLabel = formatPriceWithFloor(price)
-    // Use full precision for accuracy and tightest price
-    const inversePriceBN = parseAmount(invertPrice(price).toString(10), 18) as BN
-    const priceValueBN = parseAmount(price.toString(10), 18) as BN
 
-    // Have to explicitly pass full precision when using object params
-    const inversePriceValue = formatAmountFull({
-      amount: inversePriceBN,
-      precision: 18,
-      thousandSeparator: false,
-    })
-    // Have to explicitly pass full precision when using object params
-    const priceValue = formatAmountFull({
-      amount: priceValueBN,
-      precision: 18,
-      thousandSeparator: false,
-    })
+    // Use long precision form for accuracy
+    // Use BigNumber's decimalPlaces(<# of decimal places to show>, ROUNDING_MODE)
+    // Rounds away 0's
+
+    // ROUNDING_MODE [1] => Rounds towards zero
+    // 1. new BigNumber(0.0016600425).decimalPlaces(9,1).toString(10) => "0.001660042"
+    // 2. new BigNumber(0.0016600000).decimalPlaces(9,1).toString(10) => "0.00166"
+    const inversePriceValue = invertPrice(price)
+      .decimalPlaces(Math.max(baseTokenDecimals, DEFAULT_DECIMAL_PLACES), 1)
+      .toString(10)
+    const priceValue = price.decimalPlaces(Math.max(quoteTokenDecimals, DEFAULT_DECIMAL_PLACES), 1).toString(10)
 
     if (isPriceInverted) {
       // Price is inverted
@@ -97,6 +90,8 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const { priceValue, inversePriceValue, priceLabel, inversePriceLabel } = getPriceFormatted({
     price,
     isPriceInverted,
+    baseTokenDecimals: baseToken.decimals,
+    quoteTokenDecimals: quoteToken.decimals,
   })
   const displayPrice = priceLabel === 'Infinity' || inversePriceLabel === 'Infinity' ? 'N/A' : priceLabel
   return (

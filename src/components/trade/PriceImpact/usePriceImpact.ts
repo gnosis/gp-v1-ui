@@ -8,7 +8,17 @@ import { calculatePriceImpact, determinePriceWarning, getImpactColourClass } fro
 import { UsePriceImpactParams, UsePriceImpactReturn } from './types'
 
 function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
-  const { networkId, baseTokenId, quoteTokenId, limitPrice, fillPrice } = params
+  const {
+    networkId,
+    baseToken: { id: baseTokenId, decimals: baseTokenDecimals },
+    quoteToken: { id: quoteTokenId, decimals: quoteTokenDecimals },
+    limitPrice,
+    fillPrice: preFillPrice,
+  } = params
+
+  // Format fill price to quoteToken decimals
+  // Facilitates comparing limit/fill price
+  const fillPrice = preFillPrice?.decimalPlaces(quoteTokenDecimals, 1) || null
 
   const { bestAskPrice } = useBestAsk({
     networkId,
@@ -32,7 +42,10 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
     }
 
     // Calculate any applicable trade warnings
-    const priceImpactWarning = determinePriceWarning({ limitPrice, fillPrice, bestAskPrice }, priceImpact)
+    const priceImpactWarning = determinePriceWarning(
+      { limitPrice, fillPrice, bestAskPrice, baseTokenDecimals, quoteTokenDecimals },
+      priceImpact,
+    )
     // Dynamic class for styling
     const priceImpactClassName = getImpactColourClass(priceImpact)
 
@@ -41,7 +54,7 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
       priceImpactClassName,
       priceImpactWarning,
     }
-  }, [bestAskPrice, fillPrice, limitPrice])
+  }, [baseTokenDecimals, bestAskPrice, fillPrice, limitPrice, quoteTokenDecimals])
 }
 
 export default usePriceImpact

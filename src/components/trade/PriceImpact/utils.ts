@@ -59,9 +59,10 @@ const getImpactColourClass = (impact: BigNumber | null): string => {
 }
 
 function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null): string | null {
-  const { limitPrice: limitPriceString, fillPrice, bestAskPrice } = params
+  const { limitPrice: limitPriceString, fillPrice, bestAskPrice, baseTokenDecimals, quoteTokenDecimals } = params
 
   const limitPrice = limitPriceString && parseBigNumber(limitPriceString)
+  const lowerPrecision = Math.min(baseTokenDecimals, quoteTokenDecimals)
 
   // No comparable prices, or user opting for suggested fill price
   // round values before comparing
@@ -73,7 +74,7 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
     !fillPrice ||
     !bestAskPrice ||
     // round to 5 places and check limit = fill
-    fillPrice.toFixed(12) === limitPrice.toFixed(12)
+    fillPrice.toFixed(lowerPrecision) === limitPrice.toFixed(lowerPrecision)
   )
     return null
 
