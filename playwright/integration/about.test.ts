@@ -23,6 +23,18 @@ describe('About', () => {
     expect(await page.title()).toBe('Gnosis Protocol Web')
   })
 
+  it('Navigates from link in the footer', async () => {
+    // GIVEN: At home page
+    await page.goto(baseURL)
+
+    // WHEN: Click on the "About" link in the footer
+    // can use css-selector + xpath syntax, with >> in-between
+    await page.click('footer >> text=About') // inside footer element with textContent='About'
+
+    // THEN: We navigate to the about page
+    expect(page.url()).toContain('/about')
+  })
+
   it('Navigates using URL', async () => {
     // GIVEN: about page
     await page.goto(baseURL + '/about')
