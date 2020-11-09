@@ -254,14 +254,16 @@ export const TradeRow: React.FC<TradeRowProps> = (params) => {
           precision: sellTokenDecimals,
         })}`}
       >
-        {formatSmart({ amount: sellAmount, precision: sellTokenDecimals })} {sellTokenLabel}
+        {formatSmart({ amount: sellAmount, decimals: DEFAULT_DECIMAL_PLACES, precision: sellTokenDecimals })}{' '}
+        {sellTokenLabel}
       </td>
       <td
         data-label="Bought"
         className="showResponsive"
         title={`${formatAmountFull({ amount: buyAmount, precision: buyTokenDecimals })}`}
       >
-        {formatSmart({ amount: buyAmount, precision: buyTokenDecimals })} {buyTokenLabel}
+        {formatSmart({ amount: buyAmount, decimals: DEFAULT_DECIMAL_PLACES, precision: buyTokenDecimals })}{' '}
+        {buyTokenLabel}
       </td>
       <td data-label="Type" title={typeColumnTitle}>
         <TypePill tradeType={type}>{type}</TypePill>

@@ -34,6 +34,7 @@ import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { SmartPrice } from 'components/common/SmartPrice'
+import { DEFAULT_DECIMAL_PLACES } from 'const'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
@@ -121,13 +122,22 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
   const { filledAmount, filledAmountBN } = useMemo(() => {
     const filledAmount = order.priceDenominator.sub(order.remainingAmount)
 
-    return { filledAmount: formatSmart(filledAmount, sellToken.decimals) || '0', filledAmountBN: filledAmount }
+    return {
+      filledAmount:
+        formatSmart({ amount: filledAmount, precision: sellToken.decimals, decimals: DEFAULT_DECIMAL_PLACES }) || '0',
+      filledAmountBN: filledAmount,
+    }
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
 
-  const totalAmount = useMemo(() => formatSmart(order.priceDenominator, sellToken.decimals) || '0', [
-    order.priceDenominator,
-    sellToken.decimals,
-  ])
+  const totalAmount = useMemo(
+    () =>
+      formatSmart({
+        amount: order.priceDenominator,
+        decimals: DEFAULT_DECIMAL_PLACES,
+        precision: sellToken.decimals,
+      }) || '0',
+    [order.priceDenominator, sellToken.decimals],
+  )
 
   let filledCellContent = 'no limit'
   let totalCellContent = 'no limit'

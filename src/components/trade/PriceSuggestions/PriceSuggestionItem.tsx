@@ -40,8 +40,6 @@ function formatPriceWithFloor(price: BigNumber): string {
 interface GetPriceFormatted {
   price: BigNumber | null
   isPriceInverted: boolean
-  btDecimals: number
-  qtDecimals: number
 }
 
 function getPriceFormatted({ price, isPriceInverted }: GetPriceFormatted): FormattedPrices {
@@ -99,8 +97,6 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const { priceValue, inversePriceValue, priceLabel, inversePriceLabel } = getPriceFormatted({
     price,
     isPriceInverted,
-    btDecimals: baseToken.decimals,
-    qtDecimals: quoteToken.decimals,
   })
   const displayPrice = priceLabel === 'Infinity' || inversePriceLabel === 'Infinity' ? 'N/A' : priceLabel
   return (
