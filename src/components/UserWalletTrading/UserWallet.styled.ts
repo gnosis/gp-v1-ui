@@ -1,5 +1,9 @@
 import styled from 'styled-components'
-import arrow from 'assets/img/arrow-white.svg'
+
+// Assets
+import walletIMGWhite from 'assets/img/wallet-v2-white.svg'
+
+// Styles
 import { MEDIA } from 'const'
 
 export const UserWalletWrapper = styled.li`
@@ -11,7 +15,7 @@ export const UserWalletWrapper = styled.li`
   position: relative;
 
   .QRCode {
-    border: 2rem solid #fff;
+    border: 2rem solid #ffffff;
     border-radius: var(--border-radius);
     box-sizing: content-box;
     margin: 1rem auto;
@@ -23,12 +27,12 @@ export const UserWalletItem = styled.div`
   flex-flow: column wrap;
   align-items: center;
   justify-content: flex-start;
-  margin: 0;
   white-space: initial;
   letter-spacing: 0;
   flex: 1 1 auto;
   padding: 0;
   box-sizing: border-box;
+  margin: 0 0 0 1rem;
 
   > a {
     line-height: 1;
@@ -75,29 +79,33 @@ export const BlockExplorerButton = styled(WalletButton)`
   }
 `
 
-export const LogInOutButton = styled(WalletButton)<{ $loggedIn?: boolean }>`
-  background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
-  color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
-  margin: 0;
-  font-family: var(--font-mono);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0;
-  flex: 1;
+export const LogInOutButton = styled.div<{ $loggedIn?: boolean }>`
+  background-image: ${(props): string => (props.$loggedIn ? 'none' : 'var(--color-button-gradient)')};
+  color: ${(props): string => (props.$loggedIn ? 'transparent' : 'var(--color-text-primary)')};
+  box-sizing: border-box;
 
   &:hover {
-    background: ${(props): string => (props.$loggedIn ? 'var(--color-button-danger)' : 'none')};
-    color: ${(props): string => (props.$loggedIn ? 'var(--color-text-button-hover)' : 'var(--color-text-primary)')};
-    filter: grayscale(1);
+    background-image: ${(props): string => (props.$loggedIn ? 'transparent' : 'var(--color-button-gradient-2)')};
   }
 
   > a {
-    width: 100%;
+    height: 100%;
     font-size: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
   }
 
-  @media ${MEDIA.mobile} {
-    font-size: ${(props): string | false => !props.$loggedIn && '1.2rem'};
-    padding: ${(props): string | false => !props.$loggedIn && '0'};
+  > a > i {
+    margin: 0 0.5rem 0 0;
+    height: 1.6rem;
+    width: 1.9rem;
+    object-fit: contain;
+    background: url(${walletIMGWhite}) no-repeat center/contain;
+  }
+
+  > a > svg {
+    margin: 0 0.8rem 0 0;
   }
 `
 
@@ -115,36 +123,16 @@ export const ConnectWallet = styled.div`
 
 export const UserAddress = styled.div`
   background: transparent;
+  display: flex;
+  flex-flow: row;
 `
 
 export const UserWalletToggler = styled(UserWalletItem)`
   cursor: pointer;
   margin: 0;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
   box-sizing: border-box;
   padding: 0 1rem;
-
-  &:hover::after {
-    opacity: 1;
-  }
-
-  &::after {
-    content: '';
-    background: url(${arrow}) no-repeat center/contain;
-    height: 1.1rem;
-    width: 1.4rem;
-    display: flex;
-    transform: rotate(90deg);
-    align-items: center;
-    justify-content: center;
-    align-content: center;
-    margin: 0 0 0 0.7rem;
-    opacity: 0.5;
-    transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(1, 0, 0, 1);
-  }
-  &.visible::after {
-    transform: rotate(-90deg);
-  }
 `
 
 export const WalletImage = styled.img`
@@ -234,13 +222,17 @@ export const UserWalletSlideWrapper = styled.div`
 `
 
 export const NetworkTitle = styled.div`
-  color: inherit;
-  position: absolute;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3rem;
-  top: -0.8rem;
-  white-space: nowrap;
+  box-sizing: border-box;
+  background-color: rgba(243, 132, 30, 0.05);
+  color: rgb(243, 132, 30);
+  font-weight: var(--font-weight-medium);
+  padding: 0.8rem 1.2rem;
+  margin: 0 1.2rem 0 -1rem;
+  border-radius: inherit;
+
+  &:empty {
+    display: none;
+  }
 `
 
 export const WalletName = styled.div`
