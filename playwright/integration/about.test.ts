@@ -23,4 +23,14 @@ describe('About', () => {
     expect(await page.title()).toBe('Gnosis Protocol Web')
   })
 
+  it('Navigates using URL', async () => {
+    // GIVEN: about page
+    await page.goto(baseURL + '/about')
+
+    // WHEN: heading is awailable
+    const headingText = await page.textContent('main h1:first-child')
+
+    // THEN: There's the heading we expect
+    expect(headingText).toContain('About Gnosis Protocol Web')
+  })
 })
