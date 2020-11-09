@@ -6,7 +6,7 @@ import QRCode from 'qrcode.react'
 
 // assets
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSignOutAlt, faSignInAlt, faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
+import { faCopy, faCheck, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons'
 
 // components
 import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
@@ -105,16 +105,16 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
       onClick = disconnectWallet
       content = (
         <>
-          <FontAwesomeIcon icon={faSignOutAlt} />
-          <strong> Disconnect Wallet</strong>
+          <i />
+          <span>Change wallet</span>
         </>
       )
     } else {
       onClick = connectWallet
       content = (
         <>
-          <FontAwesomeIcon icon={faSignInAlt} />
-          <strong> Connect Wallet</strong>
+          <i />
+          <span>Connect to a wallet</span>
         </>
       )
     }
@@ -130,20 +130,20 @@ const UserWallet: React.FC<RouteComponentProps> = (props: UserWalletProps) => {
     <UserWalletWrapper>
       {userAddress ? (
         <>
-          {/* Wallet logo + address + chevron */}
+          {/* Wallet logo + address + network title*/}
           <UserWalletToggler onClick={(): void => setShowWallet(!showWallet)} className={showWallet ? 'visible' : ''}>
-            {walletIcon ? <WalletImage src={walletIcon} /> : <EtherImage src={WalletImg} />}
+            {/* Network title */}
+            <NetworkTitle>
+              {/* Don't output MAINNET, only other networks. */}
+              {networkId
+                ? getNetworkFromId(networkId) === 'Mainnet'
+                  ? ''
+                  : getNetworkFromId(networkId)
+                : 'Unknown Network'}
+            </NetworkTitle>
             <UserAddress>
+              {walletIcon ? <WalletImage src={walletIcon} /> : <EtherImage src={WalletImg} />}
               {abbreviateString(userAddress, 6, 4)}
-              {/* Network */}
-              <NetworkTitle>
-                {/* Don't output MAINNET, only other networks. */}
-                {networkId
-                  ? getNetworkFromId(networkId) === 'Mainnet'
-                    ? ''
-                    : getNetworkFromId(networkId)
-                  : 'Unknown Network'}
-              </NetworkTitle>
             </UserAddress>
             {/* {walletName && <WalletName>{walletName}</WalletName>} */}
           </UserWalletToggler>

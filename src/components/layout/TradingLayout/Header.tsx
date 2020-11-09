@@ -29,11 +29,14 @@ const Logo = styled.a`
   transform: perspective(20rem) rotateY(0);
   transform-style: preserve-3d;
   transition: transform 1s ease-in-out;
+  padding: 0;
+  margin: 0 1.6rem 0 0;
 
   &:hover {
     animation-name: spin;
     animation-duration: 4s;
     animation-iteration-count: infinite;
+    animation-delay: 0.3s;
   }
 
   > img {
@@ -62,15 +65,17 @@ const Logo = styled.a`
 const NavStyled = styled.ol`
   list-style: none;
   display: flex;
-  padding: 0 0 0 1.6rem;
+  padding: 0;
 
   > li {
     font-size: 1.6rem;
     color: var(--color-text-secondary);
     background-color: transparent;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    border-radius: 0.6rem;
+    border-radius: 0.75rem;
     position: relative;
+    flex-flow: row;
+    display: flex;
   }
 
   > li.active,
@@ -84,6 +89,11 @@ const NavStyled = styled.ol`
     margin: 0 0.7rem 0 0;
   }
 
+  > li > div {
+    border-radius: inherit;
+  }
+
+  > li > div > a,
   > li > a {
     font-weight: var(--font-weight-normal);
     font-size: inherit;
@@ -95,6 +105,14 @@ const NavStyled = styled.ol`
     display: flex;
     align-items: center;
     position: relative;
+    font-family: inherit;
+    margin: 0;
+    border-radius: 0.6rem;
+  }
+
+  > li > div > a > i,
+  > li > a {
+    transition: width 0.3s ease-in-out, background 0.3s ease-in-out;
   }
 `
 // =======================================
@@ -132,7 +150,7 @@ const NavUserTools = styled(NavStyled)`
 const PortfolioLink = styled.li`
   > a::before {
     display: block;
-    margin: 0 0.5rem 0 0;
+    margin: 0 0.8rem 0 0;
     width: 1.6rem;
     height: 1.4rem;
     content: '';

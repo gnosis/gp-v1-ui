@@ -48,6 +48,8 @@ const DarkColors = `
 
   /* Buttons */
   --color-button-primary: #1E1F2B;
+  --color-button-gradient: linear-gradient(270deg, #8958FF 0%, #3F77FF 100%);
+  --color-button-gradient-2: linear-gradient(270deg, #8958FF 30%, #3F77FF 100%);
 
   --color-button-success: #00BE2E;
   --color-button-disabled: #3d4043;
