@@ -31,6 +31,7 @@
     "cypress": "cypress open",
     "cypress:run": "cypress run",
     "playwright": "jest --roots playwright",
+    "playwright:debug": "PWDEBUG=1 jest --roots playwright",
   },
   "husky": {
     "hooks": {
