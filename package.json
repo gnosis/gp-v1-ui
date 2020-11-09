@@ -29,7 +29,8 @@
     "build-docs": "build-storybook --docs",
     "check-types": "tsc --noEmit --incremental",
     "cypress": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "playwright": "jest --roots playwright",
   },
   "husky": {
     "hooks": {
