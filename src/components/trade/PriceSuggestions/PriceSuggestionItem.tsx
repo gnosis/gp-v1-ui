@@ -44,19 +44,26 @@ interface GetPriceFormatted {
   qtDecimals: number
 }
 
-function getPriceFormatted({ price, isPriceInverted, btDecimals, qtDecimals }: GetPriceFormatted): FormattedPrices {
+function getPriceFormatted({ price, isPriceInverted }: GetPriceFormatted): FormattedPrices {
   if (price) {
     const inversePriceLabel = formatPriceWithFloor(invertPrice(price))
     const priceLabel = formatPriceWithFloor(price)
-    const inversePriceBN = parseAmount(invertPrice(price).toString(10), btDecimals) as BN
-    const priceValueBN = parseAmount(price.toString(10), qtDecimals) as BN
+    // Use full precision for accuracy and tightest price
+    const inversePriceBN = parseAmount(invertPrice(price).toString(10), 18) as BN
+    const priceValueBN = parseAmount(price.toString(10), 18) as BN
 
+    // Have to explicitly pass full precision when using object params
     const inversePriceValue = formatAmountFull({
       amount: inversePriceBN,
-      precision: btDecimals,
+      precision: 18,
       thousandSeparator: false,
     })
-    const priceValue = formatAmountFull({ amount: priceValueBN, precision: qtDecimals, thousandSeparator: false })
+    // Have to explicitly pass full precision when using object params
+    const priceValue = formatAmountFull({
+      amount: priceValueBN,
+      precision: 18,
+      thousandSeparator: false,
+    })
 
     if (isPriceInverted) {
       // Price is inverted
