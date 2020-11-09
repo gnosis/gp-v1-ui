@@ -1,6 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
+// Helpers
+import { MEDIA } from 'const'
+
 // Assets
 import LogoImage from 'assets/img/logo-v2.svg'
 import PortfolioImage from 'assets/img/portfolio.svg'
@@ -67,6 +70,10 @@ const NavStyled = styled.ol`
   display: flex;
   padding: 0;
 
+  @media ${MEDIA.mediumDown} {
+    margin: 0 0 0 auto;
+  }
+
   > li {
     font-size: 1.6rem;
     color: var(--color-text-secondary);
@@ -83,10 +90,6 @@ const NavStyled = styled.ol`
     background-color: var(--color-button-primary);
     color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);
-  }
-
-  > li:not(:last-of-type) {
-    margin: 0 0.7rem 0 0;
   }
 
   > li > div {
@@ -122,13 +125,24 @@ const NavUserTools = styled(NavStyled)`
   margin: 0 0 0 auto;
   padding: 0;
 
+  @media ${MEDIA.mediumDown} {
+    flex-direction: row;
+    justify-content: flex-start;
+    justify-self: center;
+    padding: 1rem;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 99;
+    height: 7.2rem;
+    border-radius: 0;
+    background-color: var(--color-gradient-2);
+  }
+
   > li {
     display: flex;
     align-items: center;
-
-    &:not(:last-of-type) {
-      margin: 0 2.4rem 0 0;
-    }
 
     &:not(:last-of-type)::after {
       content: '';
@@ -141,6 +155,12 @@ const NavUserTools = styled(NavStyled)`
       right: -2.8rem;
     }
 
+    @media ${MEDIA.mediumDown} {
+      &:first-of-type::after {
+        content: none;
+      }
+    }
+
     > a {
       transition: background 0.2s ease-in-out;
     }
@@ -148,6 +168,12 @@ const NavUserTools = styled(NavStyled)`
 `
 
 const PortfolioLink = styled.li`
+  margin: 0 2.4rem 0 0;
+
+  @media ${MEDIA.mediumDown} {
+    order: 2;
+  }
+
   > a::before {
     display: block;
     margin: 0 0.8rem 0 0;
@@ -163,6 +189,9 @@ const PortfolioLink = styled.li`
 `
 
 const SettingsLink = styled.li`
+  margin: 0 2.4rem 0 0;
+  order: 3;
+
   > a {
     display: block;
     margin: 0;
@@ -178,6 +207,8 @@ const SettingsLink = styled.li`
 `
 
 const NotificationsLink = styled.li`
+  order: 4;
+
   > a {
     display: block;
     margin: 0;
@@ -210,10 +241,10 @@ export const Header: React.FC = () => (
       </li>
     </NavStyled>
     <NavUserTools>
+      <UserWallet />
       <PortfolioLink>
         <a href="#">Portfolio</a>
       </PortfolioLink>
-      <UserWallet />
       <SettingsLink>
         <a href="#" title="View Settings Menu"></a>
       </SettingsLink>
