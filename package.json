@@ -32,6 +32,7 @@
     "cypress:run": "cypress run",
     "playwright": "jest --roots playwright",
     "playwright:debug": "PWDEBUG=1 jest --roots playwright",
+    "playwright:record": "start-server-and-test start:dist http://localhost:8081 'playwright-cli codegen http://localhost:8081 -o output.js'",
     "test:playwright": "BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 playwright"
   },
   "husky": {
