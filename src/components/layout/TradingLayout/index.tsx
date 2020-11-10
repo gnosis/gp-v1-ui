@@ -1,12 +1,20 @@
 import React from 'react'
-import { Frame } from 'components/common/Frame'
 import { Header } from './Header'
+import GlobalStyles from 'styles/globalTrading'
+import { Frame } from 'components/common/Frame'
+
+const Footer: React.FC = () => (
+  <Frame>
+    <footer>Footer</footer>
+  </Frame>
+)
 
 export const TradingLayout: React.FC = ({ children }) => (
   <div>
-    <Header label="My Header" />
-    <Frame>{children}</Frame>
-    <Frame>My Footer</Frame>
+    <GlobalStyles />
+    <Header />
+    {children}
+    <Footer />
   </div>
 )
 
