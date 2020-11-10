@@ -14,7 +14,7 @@ import NotificationsImage from 'assets/img/bell.svg'
 import NotificationsImageWhite from 'assets/img/bell-white.svg'
 
 // Components
-import UserWallet from 'components/UserWalletTrading'
+import UserWallet from 'components/v2/UserWallet'
 
 const HeaderStyled = styled.header`
   height: 6.2rem;

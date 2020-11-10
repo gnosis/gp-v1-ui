@@ -18,6 +18,7 @@ export const UserWalletWrapper = styled.li`
 
   @media ${MEDIA.mediumDown} {
     margin: 0 auto 0 0;
+    order: 1;
 
     &::after {
       content: none;
