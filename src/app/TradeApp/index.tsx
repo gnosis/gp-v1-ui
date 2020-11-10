@@ -1,9 +1,16 @@
 import React from 'react'
 import { Route, Switch } from 'react-router-dom'
+import styled from 'styled-components'
+
+import { MEDIA } from 'const'
 
 import { GenericLayout } from 'components/layout'
 import { Menu } from 'components/layout/GenericLayout/Menu'
-import { Frame } from 'components/common/Frame'
+
+import PortfolioImage from 'assets/img/portfolio.svg'
+import PortfolioImageWhite from 'assets/img/portfolio-white.svg'
+
+import { NavTools } from 'components/layout/GenericLayout/NavTools'
 
 const NotFound = React.lazy(
   () =>
@@ -21,11 +28,26 @@ const Trading = React.lazy(
     ),
 )
 
-const NavTools: React.FC = () => (
-  <Frame>
-    <footer>Tools</footer>
-  </Frame>
-)
+const PortfolioLink = styled.li`
+  margin: 0 2.4rem 0 0;
+
+  @media ${MEDIA.mediumDown} {
+    order: 2;
+  }
+
+  > a::before {
+    display: block;
+    margin: 0 0.8rem 0 0;
+    width: 1.6rem;
+    height: 1.4rem;
+    content: '';
+    background: url(${PortfolioImage}) no-repeat center/contain;
+  }
+
+  &:hover > a::before {
+    background: url(${PortfolioImageWhite}) no-repeat center/contain;
+  }
+`
 
 export const TradeApp: React.FC = () => {
   const menu = (
@@ -42,7 +64,13 @@ export const TradeApp: React.FC = () => {
     </Menu>
   )
 
-  const navTools = <NavTools />
+  const navTools = (
+    <NavTools hasWallet hasNotifications hasSettings>
+      <PortfolioLink>
+        <a href="#">Portfolio</a>
+      </PortfolioLink>
+    </NavTools>
+  )
 
   return (
     <GenericLayout menu={menu} navTools={navTools}>
