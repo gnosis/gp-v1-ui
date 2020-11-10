@@ -11,7 +11,7 @@ import { amountToPrecisionDown } from 'utils'
 function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
   const {
     networkId,
-    baseToken: { id: baseTokenId, decimals: baseTokenDecimals },
+    baseToken: { id: baseTokenId },
     quoteToken: { id: quoteTokenId, decimals: quoteTokenDecimals },
     limitPrice,
     fillPrice: preFillPrice,
@@ -43,10 +43,7 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
     }
 
     // Calculate any applicable trade warnings
-    const priceImpactWarning = determinePriceWarning(
-      { limitPrice, fillPrice, bestAskPrice, baseTokenDecimals, quoteTokenDecimals },
-      priceImpact,
-    )
+    const priceImpactWarning = determinePriceWarning({ limitPrice, fillPrice, bestAskPrice }, priceImpact)
     // Dynamic class for styling
     const priceImpactClassName = getImpactColourClass(priceImpact)
 
@@ -55,7 +52,7 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
       priceImpactClassName,
       priceImpactWarning,
     }
-  }, [baseTokenDecimals, bestAskPrice, fillPrice, limitPrice, quoteTokenDecimals])
+  }, [bestAskPrice, fillPrice, limitPrice])
 }
 
 export default usePriceImpact

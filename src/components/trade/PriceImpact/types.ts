@@ -6,10 +6,8 @@ export interface PriceImpactArgsBase {
   bestAskPrice: BigNumber | null
 }
 
-export interface PriceImpactArgs extends PriceImpactArgsBase {
+export type PriceImpactArgs = PriceImpactArgsBase & {
   fillPrice: BigNumber | null
-  baseTokenDecimals: number
-  quoteTokenDecimals: number
 }
 
 export interface PriceImpactProps {

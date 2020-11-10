@@ -29,8 +29,6 @@ function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
 
   const { priceImpactSmart, priceImpactWarning, priceImpactClassName } = usePriceImpact({
     ...rest,
-    // Match limitPrice and fillPrice precision + force round down last digit
-    // Necessary for value comparison when reunnint determinePriceWarnings function
     fillPrice,
     baseToken,
     quoteToken,
