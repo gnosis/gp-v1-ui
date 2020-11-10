@@ -1,6 +1,6 @@
 import React from 'react'
 import { Header } from './Header'
-import GlobalStyles from 'styles/globalTrading'
+import GlobalStyles from './GlobalStyles'
 import { Frame } from 'components/common/Frame'
 
 const Footer: React.FC = () => (

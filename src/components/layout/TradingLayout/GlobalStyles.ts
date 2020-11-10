@@ -1,7 +1,6 @@
 import { createGlobalStyle } from 'styled-components'
-import fontFace from './fonts'
-import variables from './variablesTrading'
-import checkWhite from 'assets/img/check-white.svg'
+import fontFace from 'styles/fonts'
+import variables from './variablesCss'
 
 const GlobalStyles = createGlobalStyle`
   /* global root variables */
