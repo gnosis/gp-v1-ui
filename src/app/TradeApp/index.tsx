@@ -26,8 +26,14 @@ const Menu: React.FC = () => (
   </Frame>
 )
 
+const NavTools: React.FC = () => (
+  <Frame>
+    <footer>Tools</footer>
+  </Frame>
+)
+
 export const TradeApp: React.FC = () => (
-  <GenericLayout menu={<Menu />}>
+  <GenericLayout menu={<Menu />} navTools={<NavTools />}>
     <React.Suspense fallback={null}>
       <Switch>
         <Route path="/v2" exact component={Trading} />
