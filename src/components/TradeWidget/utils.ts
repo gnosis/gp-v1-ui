@@ -15,7 +15,7 @@ export function calculateReceiveAmount(priceValue: string, sellValue: string, re
     const price = parseBigNumber(priceValue)
 
     if (sellAmount && price) {
-      const receiveBigNumber = sellAmount.times(price)
+      const receiveBigNumber = sellAmount.div(price)
       const receiveAmountToPrecision = amountToPrecisionDown(receiveBigNumber, receiveTokenPrecision)
       // Format the "Receive at least" input amount same as PriceSuggestions price
       receiveAmount =

@@ -301,7 +301,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   useEffect(() => {
     if (priceValue && sellValue) {
       // If price is quoted in sell tokens, we use it, otherwise we use the inverse
-      const priceUsedForReceiveAmount = sellToken.address === quoteToken.address ? priceInverseValue : priceValue
+      const priceUsedForReceiveAmount = sellToken.address === quoteToken.address ? priceValue : priceInverseValue
       setValue(receiveInputId, calculateReceiveAmount(priceUsedForReceiveAmount, sellValue, receiveToken.decimals))
     }
   }, [
@@ -697,7 +697,7 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
             // SellAmount // Limit Price
             amount={debouncedSellValue}
             // Limit price needs to be shown as correct quote token
-            limitPrice={sellToken === quoteToken ? priceValue : priceInverseValue}
+            limitPrice={sellToken.address === quoteToken.address ? priceValue : priceInverseValue}
             // Price inversion
             isPriceInverted={isPriceInverted}
             onSwapPrices={swapPrices}
