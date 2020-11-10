@@ -1,12 +1,9 @@
-import BN from 'bn.js'
 import { useMemo } from 'react'
-import { formatSmart, parseAmount } from '@gnosis.pm/dex-js'
-
 import useBestAsk from 'hooks/useBestAsk'
 
 import { calculatePriceImpact, determinePriceWarning, getImpactColourClass } from './utils'
 import { UsePriceImpactParams, UsePriceImpactReturn } from './types'
-import { amountToPrecisionDown } from 'utils'
+import { amountToPrecisionDown, formatPercentage } from 'utils'
 
 function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
   const {
@@ -29,17 +26,13 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
 
   return useMemo(() => {
     const priceImpact = calculatePriceImpact({ bestAskPrice, limitPrice })
-    const priceImpactBN = priceImpact && (parseAmount(priceImpact.toString(), 4) as BN)
+
     // Smart format, if possible
     let priceImpactSmart: string
-    if (priceImpactBN && !priceImpactBN.isZero()) {
-      priceImpactSmart = formatSmart({
-        amount: priceImpactBN,
-        precision: 4,
-        smallLimit: '0.01',
-      })
+    if (priceImpact && !priceImpact.isZero()) {
+      priceImpactSmart = formatPercentage(priceImpact)
     } else {
-      priceImpactSmart = '0'
+      priceImpactSmart = '0%'
     }
 
     // Calculate any applicable trade warnings

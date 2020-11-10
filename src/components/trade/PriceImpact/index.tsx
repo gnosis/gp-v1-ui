@@ -20,7 +20,7 @@ const PriceImpactTooltip: React.FC = () => (
 
 export const SimplePriceImpact: React.FC<SimplePriceImpactProps> = ({ className, impactAmount }) => (
   <BoldColourTag className={className}>
-    <HelpTooltip tooltip={<PriceImpactTooltip />} /> {impactAmount}%
+    <HelpTooltip tooltip={<PriceImpactTooltip />} /> {impactAmount}
   </BoldColourTag>
 )
 

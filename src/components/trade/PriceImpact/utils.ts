@@ -1,17 +1,17 @@
 import BigNumber from 'bignumber.js'
 
 import { parseBigNumber } from 'utils'
-import { ONE_HUNDRED_BIG_NUMBER, ONE_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
+import { ONE_BIG_NUMBER, ZERO_BIG_NUMBER } from 'const'
 import { PriceImpactArgs, PriceImpactArgsBase } from './types'
 
 // Limit as to where price colour changes
-const HIGH_PRICE_IMPACT_THRESHOLD = new BigNumber(5) // 5%
-const MID_PRICE_IMPACT_THRESHOLD = new BigNumber(3) // 3%
-const LOW_PRICE_IMPACT_THRESHOLD = ONE_BIG_NUMBER // 1%
+const HIGH_PRICE_IMPACT_THRESHOLD = new BigNumber('0.05') // 5%
+const MID_PRICE_IMPACT_THRESHOLD = new BigNumber('0.03') // 3%
+const LOW_PRICE_IMPACT_THRESHOLD = new BigNumber('0.01') // 1%
 // TODO: remove for slippage toggle
 // 0.5% placeholder slippage
-const HIGH_PLACEHOLDER_SLIPPAGE = new BigNumber(1.05) // 5%
-const MID_PLACEHOLDER_SLIPPAGE = new BigNumber(1.03) // 3%
+const HIGH_PLACEHOLDER_SLIPPAGE = new BigNumber('1.05') // 5%
+const MID_PLACEHOLDER_SLIPPAGE = new BigNumber('1.03') // 3%
 
 enum ImpactLevel {
   NONE,
@@ -115,7 +115,7 @@ function calculatePriceImpact({ limitPrice: limitPriceString, bestAskPrice }: Pr
   if (!bestAskPrice || !limitPrice) return null
 
   // PRICE_IMPACT = 100 - (BEST_ASK / LIMIT_PRICE * 100)
-  const impact = ONE_HUNDRED_BIG_NUMBER.minus(bestAskPrice.div(limitPrice).times(ONE_HUNDRED_BIG_NUMBER))
+  const impact = ONE_BIG_NUMBER.minus(bestAskPrice.div(limitPrice))
   return impact.lt(ZERO_BIG_NUMBER) ? ZERO_BIG_NUMBER : impact
 }
 

@@ -137,13 +137,14 @@ export const formatTimeToFromBatch = (
  */
 export function formatPercentage(percentage: BigNumber): string {
   const displayPercentage = percentage.times(ONE_HUNDRED_BIG_NUMBER)
+
   let result = ''
   if (!displayPercentage.gte('0.01')) {
     result = '<0.01'
   } else if (displayPercentage.gt('99.99')) {
     result = '>99.99'
   } else {
-    result = displayPercentage.decimalPlaces(2, BigNumber.ROUND_FLOOR).toString(10)
+    result = amountToPrecisionDown(displayPercentage, 2).toString(10)
   }
   return result + '%'
 }
