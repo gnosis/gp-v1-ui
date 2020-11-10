@@ -7,7 +7,7 @@ import { ToastContainer } from 'setupToastify'
 import { encodeSymbol } from '@gnosis.pm/dex-js'
 import { assertNonNull } from 'utils'
 
-import { SwapLayout } from 'components/layout'
+import { LegacyTradeLayout } from 'components/layout'
 
 // Pages
 const About = React.lazy(
@@ -106,7 +106,7 @@ function getInitialUrl(): string {
 const initialUrl = getInitialUrl()
 
 export const LegacyTradeApp: React.FC = () => (
-  <SwapLayout>
+  <LegacyTradeLayout>
     <GlobalStyles />
     <ToastContainer />
     <React.Suspense fallback={null}>
@@ -125,5 +125,5 @@ export const LegacyTradeApp: React.FC = () => (
         <Route component={NotFound} />
       </Switch>
     </React.Suspense>
-  </SwapLayout>
+  </LegacyTradeLayout>
 )
