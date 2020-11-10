@@ -148,10 +148,55 @@ export function formatPercentage(percentage: BigNumber): string {
   return result + '%'
 }
 
+/**
+ * @function formatBigNumberToPrecisionAndRoundingFactory
+ *
+ * @description sets decimal places on BigNumber amount using current ROUDING_MODE selected. Removes any extra right padded zeroes.
+ *
+ * @example
+ * // 0.437300089
+ * amountToPrecisionDown(new BigNumber("0.437300089"), 5).toString(10) // => "0.4373" Note: it removes the extra "0" padded right
+ * amountToPrecisionDown(new BigNumber("0.437300089"), 2).toString(10) // => "0.43"   Note: it does NOT round to 0.44!
+ *
+ * @param ROUNDING_MODE BigNumber.RoundingMode
+ */
+export const formatBigNumberToPrecisionAndRoundingFactory = (ROUNDING_MODE: BigNumber.RoundingMode) => (
+  amount: BigNumber,
+  precision: number,
+): BigNumber => amount.decimalPlaces(precision, ROUNDING_MODE)
+
+/**
+ * @function amountToPrecisionDown
+ *
+ * @description Rounds DOWN - see example below
+ * @param amount BigNumber amount
+ * @param precision number of decimal places to show
+ *
+ * @example
+ * // 0.437300089
+ * amountToPrecisionDown(new BigNumber("0.437300089"), 5).toString(10) // => "0.4373" Note: it removes the extra "0" padded right
+ * amountToPrecisionDown(new BigNumber("0.437300089"), 2).toString(10) // => "0.43"   Note: it does NOT round to 0.44!
+ */
+export const amountToPrecisionDown = formatBigNumberToPrecisionAndRoundingFactory(BigNumber.ROUND_DOWN)
+
+/**
+ * @function amountToPrecisionUp
+ *
+ * @description Rounds UP - see example below
+ * @param amount BigNumber amount
+ * @param precision number of decimal places to show
+ *
+ * @example
+ * // 0.437300089
+ * amountToPrecisionUp(new BigNumber("0.437300089"), 5).toString(10) // => "0.4373" Note: it removes the extra "0" padded right
+ * amountToPrecisionUp(new BigNumber("0.437300089"), 3).toString(10) // => "0.44"   Note: it DOES round to 0.44 from 0.437!
+ */
+export const amountToPrecisionUp = formatBigNumberToPrecisionAndRoundingFactory(BigNumber.ROUND_UP)
+
 export function formatPriceWithFloor(price: BigNumber): string {
   const LOW_PRICE_FLOOR = new BigNumber('0.0001')
   if (!price || price.isZero()) return 'N/A'
 
-  const displayPrice = price.decimalPlaces(DEFAULT_DECIMAL_PLACES, 1).toString(10)
+  const displayPrice = amountToPrecisionDown(price, DEFAULT_DECIMAL_PLACES).toString(10)
   return price.gt(LOW_PRICE_FLOOR) ? displayPrice : '< ' + LOW_PRICE_FLOOR.toString(10)
 }

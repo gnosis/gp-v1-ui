@@ -6,6 +6,7 @@ import useBestAsk from 'hooks/useBestAsk'
 
 import { calculatePriceImpact, determinePriceWarning, getImpactColourClass } from './utils'
 import { UsePriceImpactParams, UsePriceImpactReturn } from './types'
+import { amountToPrecisionDown } from 'utils'
 
 function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
   const {
@@ -18,7 +19,7 @@ function usePriceImpact(params: UsePriceImpactParams): UsePriceImpactReturn {
 
   // Format fill price to quoteToken decimals
   // Facilitates comparing limit/fill price
-  const fillPrice = preFillPrice?.decimalPlaces(quoteTokenDecimals, 1) || null
+  const fillPrice = preFillPrice ? amountToPrecisionDown(preFillPrice, quoteTokenDecimals) : null
 
   const { bestAskPrice } = useBestAsk({
     networkId,

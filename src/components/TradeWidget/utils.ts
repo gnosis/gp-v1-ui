@@ -1,6 +1,6 @@
 import { tokenListApi } from 'api'
 import { isAddress } from 'web3-utils'
-import { parseBigNumber, getToken } from 'utils'
+import { parseBigNumber, getToken, amountToPrecisionDown } from 'utils'
 import { buildSearchQuery } from 'hooks/useQuery'
 import { encodeTokenSymbol } from '@gnosis.pm/dex-js'
 
@@ -16,12 +16,12 @@ export function calculateReceiveAmount(priceValue: string, sellValue: string, re
 
     if (sellAmount && price) {
       const receiveBigNumber = sellAmount.times(price)
-      const receiveAmountFormatted = receiveBigNumber.decimalPlaces(receiveTokenPrecision, 1)
+      const receiveAmountToPrecision = amountToPrecisionDown(receiveBigNumber, receiveTokenPrecision)
       // Format the "Receive at least" input amount same as PriceSuggestions price
       receiveAmount =
-        !receiveAmountFormatted || receiveAmountFormatted.isNaN() || !receiveAmountFormatted.isFinite()
+        receiveAmountToPrecision?.isNaN() || !receiveAmountToPrecision?.isFinite()
           ? '0'
-          : receiveAmountFormatted.toString(10)
+          : receiveAmountToPrecision.toString(10)
     }
   }
 
