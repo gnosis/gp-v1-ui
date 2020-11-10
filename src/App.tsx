@@ -16,7 +16,7 @@ import { assertNonNull } from 'utils'
 import { GlobalModalInstance } from 'components/OuterModal'
 
 // Main layout
-import { SwapLayout, TradingLayout } from 'components/layout'
+import { SwapLayout, GenericLayout } from 'components/layout'
 
 // Pages
 const About = React.lazy(
@@ -145,14 +145,14 @@ const App: React.FC = () => {
       <Router basename={process.env.BASE_URL}>
         <Switch>
           <Route path="/v2">
-            <TradingLayout>
+            <GenericLayout>
               <React.Suspense fallback={null}>
                 <Switch>
                   <Route path="/v2" exact component={Trading} />
                   <Route component={NotFound2} />
                 </Switch>
               </React.Suspense>
-            </TradingLayout>
+            </GenericLayout>
           </Route>
           <Route>
             <SwapLayout>
