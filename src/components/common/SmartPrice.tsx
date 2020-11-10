@@ -4,7 +4,8 @@ import BigNumber from 'bignumber.js'
 import { Fraction, TokenDetails } from 'types'
 
 import { SwapPrice } from 'components/common/SwapPrice'
-import { getMarket } from 'utils'
+import { amountToPrecisionUp, getMarket } from 'utils'
+import { DEFAULT_DECIMAL_PLACES } from 'const'
 
 interface Props {
   buyToken: TokenDetails
@@ -51,8 +52,11 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
 
   const [priceDisplay, priceDisplayFull] = useMemo(
     // Decimals here refers to decimal places to show. Not a precision issue
-    () => [formatPrice({ price: priceDisplayed, decimals: 5 }), formatPrice({ price: priceDisplayed, decimals: 18 })],
-    [priceDisplayed],
+    () => [
+      formatPrice({ price: priceDisplayed, decimals: DEFAULT_DECIMAL_PLACES }),
+      amountToPrecisionUp(priceDisplayed, (isPriceInverted ? baseToken : quoteToken).decimals).toString(10),
+    ],
+    [priceDisplayed, isPriceInverted, quoteToken, baseToken],
   )
 
   return (
