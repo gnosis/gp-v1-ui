@@ -34,7 +34,7 @@ import { DetailedAuctionElement } from 'api/exchange/ExchangeApi'
 import { OrderRowWrapper } from 'components/OrdersWidget/OrderRow.styled'
 import { displayTokenSymbolOrLink } from 'utils/display'
 import { SmartPrice } from 'components/common/SmartPrice'
-import { DEFAULT_DECIMAL_PLACES } from 'const'
+import { DEFAULT_DECIMALS } from 'const'
 
 const PendingLink: React.FC<Pick<Props, 'transactionHash'>> = (props) => {
   const { transactionHash } = props
@@ -124,7 +124,7 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
 
     return {
       filledAmount:
-        formatSmart({ amount: filledAmount, precision: sellToken.decimals, decimals: DEFAULT_DECIMAL_PLACES }) || '0',
+        formatSmart({ amount: filledAmount, precision: sellToken.decimals, decimals: DEFAULT_DECIMALS }) || '0',
       filledAmountBN: filledAmount,
     }
   }, [order.priceDenominator, order.remainingAmount, sellToken.decimals])
@@ -133,7 +133,7 @@ const Amounts: React.FC<AmountsProps> = ({ sellToken, order }) => {
     () =>
       formatSmart({
         amount: order.priceDenominator,
-        decimals: DEFAULT_DECIMAL_PLACES,
+        decimals: DEFAULT_DECIMALS,
         precision: sellToken.decimals,
       }) || '0',
     [order.priceDenominator, sellToken.decimals],

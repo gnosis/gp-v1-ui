@@ -7,7 +7,7 @@ export {
   BATCH_TIME,
   MAX_BATCH_ID,
   FEE_PERCENTAGE,
-  DEFAULT_DECIMALS,
+  DEFAULT_DECIMALS as OLD_DEFAULT_DECIMALS,
   DEFAULT_PRECISION,
   ZERO,
   ONE,
@@ -64,7 +64,7 @@ export const HIGHLIGHT_TIME = 5000
 export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
 export const PRICE_ESTIMATION_DEBOUNCE_TIME = 200
-export const DEFAULT_DECIMAL_PLACES = 5
+export const DEFAULT_DECIMALS = 5
 // The prices on the contract will update at max once every batch, which is 5min long
 export const PRICES_CACHE_TIME = 60 // in seconds
 

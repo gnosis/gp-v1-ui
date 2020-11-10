@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js'
-import { ONE_HUNDRED_BIG_NUMBER, BATCH_TIME_IN_MS, DEFAULT_DECIMAL_PLACES } from 'const'
+import { ONE_HUNDRED_BIG_NUMBER, BATCH_TIME_IN_MS, DEFAULT_DECIMALS } from 'const'
 import { batchIdToDate } from './time'
 
 export {
@@ -197,6 +197,6 @@ export function formatPriceWithFloor(price: BigNumber): string {
   const LOW_PRICE_FLOOR = new BigNumber('0.0001')
   if (!price || price.isZero()) return 'N/A'
 
-  const displayPrice = amountToPrecisionDown(price, DEFAULT_DECIMAL_PLACES).toString(10)
+  const displayPrice = amountToPrecisionDown(price, DEFAULT_DECIMALS).toString(10)
   return price.gt(LOW_PRICE_FLOOR) ? displayPrice : '< ' + LOW_PRICE_FLOOR.toString(10)
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import BigNumber from 'bignumber.js'
 
-import { DEFAULT_DECIMAL_PLACES } from 'const'
+import { DEFAULT_DECIMALS } from 'const'
 import { invertPrice, TokenDex } from '@gnosis.pm/dex-js'
 
 import Spinner from 'components/common/Spinner'
@@ -49,12 +49,12 @@ function getPriceFormatted({
     // See description on amountToPrecisionDown for more details/examples
     const inversePriceValue = amountToPrecisionDown(
       invertPrice(price),
-      // if DEFAULT_DECIMAL_PLACES > someToken.decimals, show higher of the two
+      // if DEFAULT_DECIMALS > someToken.decimals, show higher of the two
       // why? long form is used for calculation so a smaller precision aka less decimals would break math
-      Math.max(baseTokenDecimals, DEFAULT_DECIMAL_PLACES),
+      Math.max(baseTokenDecimals, DEFAULT_DECIMALS),
     ).toString(10)
 
-    const priceValue = amountToPrecisionDown(price, Math.max(quoteTokenDecimals, DEFAULT_DECIMAL_PLACES)).toString(10)
+    const priceValue = amountToPrecisionDown(price, Math.max(quoteTokenDecimals, DEFAULT_DECIMALS)).toString(10)
 
     if (isPriceInverted) {
       // Price is inverted

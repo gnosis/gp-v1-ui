@@ -5,7 +5,7 @@ import { Fraction, TokenDetails } from 'types'
 
 import { SwapPrice } from 'components/common/SwapPrice'
 import { amountToPrecisionUp, getMarket } from 'utils'
-import { DEFAULT_DECIMAL_PLACES } from 'const'
+import { DEFAULT_DECIMALS } from 'const'
 
 interface Props {
   buyToken: TokenDetails
@@ -53,7 +53,7 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
   const [priceDisplay, priceDisplayFull] = useMemo(
     // Decimals here refers to decimal places to show. Not a precision issue
     () => [
-      formatPrice({ price: priceDisplayed, decimals: DEFAULT_DECIMAL_PLACES }),
+      formatPrice({ price: priceDisplayed, decimals: DEFAULT_DECIMALS }),
       amountToPrecisionUp(priceDisplayed, (isPriceInverted ? baseToken : quoteToken).decimals).toString(10),
     ],
     [priceDisplayed, isPriceInverted, quoteToken, baseToken],
