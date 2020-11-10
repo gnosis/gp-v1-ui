@@ -2,6 +2,7 @@ import React from 'react'
 import { Route, Switch } from 'react-router-dom'
 
 import { GenericLayout } from 'components/layout'
+import { Menu } from 'components/layout/GenericLayout/Menu'
 import { Frame } from 'components/common/Frame'
 
 const NotFound = React.lazy(
@@ -20,25 +21,37 @@ const Trading = React.lazy(
     ),
 )
 
-const Menu: React.FC = () => (
-  <Frame>
-    <footer>Menu</footer>
-  </Frame>
-)
-
 const NavTools: React.FC = () => (
   <Frame>
     <footer>Tools</footer>
   </Frame>
 )
 
-export const TradeApp: React.FC = () => (
-  <GenericLayout menu={<Menu />} navTools={<NavTools />}>
-    <React.Suspense fallback={null}>
-      <Switch>
-        <Route path="/v2" exact component={Trading} />
-        <Route component={NotFound} />
-      </Switch>
-    </React.Suspense>
-  </GenericLayout>
-)
+export const TradeApp: React.FC = () => {
+  const menu = (
+    <Menu>
+      <li>
+        <a href="#">Trade</a>
+      </li>
+      <li>
+        <a href="#">Swap</a>
+      </li>
+      <li>
+        <a href="#">Liquidity</a>
+      </li>
+    </Menu>
+  )
+
+  const navTools = <NavTools />
+
+  return (
+    <GenericLayout menu={menu} navTools={navTools}>
+      <React.Suspense fallback={null}>
+        <Switch>
+          <Route path="/v2" exact component={Trading} />
+          <Route component={NotFound} />
+        </Switch>
+      </React.Suspense>
+    </GenericLayout>
+  )
+}
