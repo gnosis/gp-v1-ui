@@ -4,20 +4,26 @@ node_js:
   # TODO: stable (v13.0.1 at the time) breaks sha3 package compilation
   # Sticky v12
   - '12'
-cache: 'yarn'
+cache:
+  yarn: true
+  npm: false
+  directories:
+    - .eslint-cache
+    - .jest-cache
+    - ~/.cache
 script:
-  - yarn test-coverage
+  - yarn test:coverage
   - yarn build
+  # Integration test, only in tags, master and develop
+  - if [[ $TRAVIS_TAG != "" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
+      yarn test:integration;
+    fi
 before_install:
   # Needed to deploy pull request and releases
   - sudo apt-get -y install python-pip python-dev
   - pip install awscli --upgrade --user
   # use production url for price estimator on master or tagged
-  - export PRICE_ESTIMATOR_URL=$([[
-    $TRAVIS_BRANCH = master || \
-    $TRAVIS_BRANCH = release/* || \
-    $TRAVIS_BRANCH = hotfix/* || \
-    $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
+  - export PRICE_ESTIMATOR_URL=$([[ $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = release/* || $TRAVIS_BRANCH = hotfix/* || $TRAVIS_TAG != "" ]] && echo "production" || echo "develop")
 before_deploy:
   # zip ./dist folder if tag IS present
   - if [[ $TRAVIS_TAG != "" && $IPFS_HASH = "" ]]; then
