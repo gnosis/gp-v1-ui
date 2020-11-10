@@ -5,8 +5,6 @@ import { MEDIA } from 'const'
 import { NavStyled } from '../Menu'
 import { Frame } from 'components/common/Frame'
 
-// import PortfolioImage from 'assets/img/portfolio.svg'
-// import PortfolioImageWhite from 'assets/img/portfolio-white.svg'
 import SettingsImage from 'assets/img/settings.svg'
 import SettingsImageWhite from 'assets/img/settings-white.svg'
 import NotificationsImage from 'assets/img/bell.svg'
