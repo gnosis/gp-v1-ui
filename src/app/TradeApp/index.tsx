@@ -55,10 +55,10 @@ export const TradeApp: React.FC = () => {
         <Link to="/v2">Trade</Link>
       </li>
       <li>
-        <Link to="/v2/trade">Swap</Link>
+        <Link to="/v2/swap">Swap</Link>
       </li>
       <li>
-        <Link to="/v2/trade">Liquidity</Link>
+        <Link to="/v2/liquidity">Liquidity</Link>
       </li>
     </Menu>
   )
@@ -66,7 +66,7 @@ export const TradeApp: React.FC = () => {
   const navTools = (
     <NavTools hasWallet hasNotifications hasSettings>
       <PortfolioLink>
-        <a href="#">Portfolio</a>
+        <Link to="/v2/portfolio">Portfolio</Link>
       </PortfolioLink>
     </NavTools>
   )
