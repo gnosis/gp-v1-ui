@@ -1,9 +1,15 @@
 import React from 'react'
-import { Route, Switch, Link } from 'react-router-dom'
+import { Switch, Route, Link } from 'react-router-dom'
+import styled from 'styled-components'
+
+import { MEDIA } from 'const'
 
 import { GenericLayout } from 'components/layout'
 import { Menu } from 'components/layout/GenericLayout/Menu'
-import { Frame } from 'components/common/Frame'
+import { NavTools } from 'components/layout/GenericLayout/NavTools'
+
+import PortfolioImage from 'assets/img/portfolio.svg'
+import PortfolioImageWhite from 'assets/img/portfolio-white.svg'
 
 const NotFound = React.lazy(
   () =>
@@ -21,11 +27,26 @@ const Trading = React.lazy(
     ),
 )
 
-const NavTools: React.FC = () => (
-  <Frame>
-    <footer>Tools</footer>
-  </Frame>
-)
+const PortfolioLink = styled.li`
+  margin: 0 2.4rem 0 0;
+
+  @media ${MEDIA.mediumDown} {
+    order: 2;
+  }
+
+  > a::before {
+    display: block;
+    margin: 0 0.8rem 0 0;
+    width: 1.6rem;
+    height: 1.4rem;
+    content: '';
+    background: url(${PortfolioImage}) no-repeat center/contain;
+  }
+
+  &:hover > a::before {
+    background: url(${PortfolioImageWhite}) no-repeat center/contain;
+  }
+`
 
 export const TradeApp: React.FC = () => {
   const menu = (
@@ -34,15 +55,21 @@ export const TradeApp: React.FC = () => {
         <Link to="/v2">Trade</Link>
       </li>
       <li>
-        <Link to="/v2/trade">Swap</Link>
+        <Link to="/v2/swap">Swap</Link>
       </li>
       <li>
-        <Link to="/v2/trade">Liquidity</Link>
+        <Link to="/v2/liquidity">Liquidity</Link>
       </li>
     </Menu>
   )
 
-  const navTools = <NavTools />
+  const navTools = (
+    <NavTools hasWallet hasNotifications hasSettings>
+      <PortfolioLink>
+        <Link to="/v2/portfolio">Portfolio</Link>
+      </PortfolioLink>
+    </NavTools>
+  )
 
   return (
     <GenericLayout menu={menu} navTools={navTools}>
