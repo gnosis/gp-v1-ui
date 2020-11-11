@@ -16,7 +16,7 @@ import { assertNonNull } from 'utils'
 import { GlobalModalInstance } from 'components/OuterModal'
 
 // Main layout
-import { SwapLayout, GenericLayout } from 'components/layout'
+import { SwapLayout } from 'components/layout'
 
 // Pages
 const About = React.lazy(
@@ -40,14 +40,6 @@ const Trades = React.lazy(
     import(
       /* webpackChunkName: "Trade_chunk"*/
       'pages/Trades'
-    ),
-)
-
-const Trading = React.lazy(
-  () =>
-    import(
-      /* webpackChunkName: "Trade_chunk"*/
-      'pages/Trading'
     ),
 )
 
@@ -82,13 +74,7 @@ const NotFound = React.lazy(
       'pages/NotFound'
     ),
 )
-const NotFound2 = React.lazy(
-  () =>
-    import(
-      /* webpackChunkName: "Extra_routes_chunk"*/
-      'pages/NotFound2'
-    ),
-)
+
 const ConnectWallet = React.lazy(
   () =>
     import(
@@ -121,6 +107,7 @@ const Settings = React.lazy(
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
+import { TradeApp } from 'app/TradeApp'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
@@ -145,14 +132,7 @@ const App: React.FC = () => {
       <Router basename={process.env.BASE_URL}>
         <Switch>
           <Route path="/v2">
-            <GenericLayout>
-              <React.Suspense fallback={null}>
-                <Switch>
-                  <Route path="/v2" exact component={Trading} />
-                  <Route component={NotFound2} />
-                </Switch>
-              </React.Suspense>
-            </GenericLayout>
+            <TradeApp />
           </Route>
           <Route>
             <SwapLayout>
