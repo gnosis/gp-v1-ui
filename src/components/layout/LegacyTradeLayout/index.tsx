@@ -8,8 +8,8 @@ import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Layout: Subcomponents
-import Header from 'components/layout/SwapLayout/Header'
-import Footer from 'components/layout/SwapLayout/Footer'
+import Header from 'components/layout/LegacyTradeLayout/Header'
+import Footer from 'components/layout/LegacyTradeLayout/Footer'
 import LegalBanner from 'components/LegalBanner'
 import GlobalStyles from 'styles/global'
 
@@ -80,7 +80,7 @@ const navigation = [
   },
 ]
 
-export const SwapLayout: React.FC = ({ children }) => (
+export const LegacyTradeLayout: React.FC = ({ children }) => (
   <>
     <GlobalStyles />
     <Wrapper>
@@ -97,4 +97,4 @@ export const SwapLayout: React.FC = ({ children }) => (
   </>
 )
 
-export default SwapLayout
+export default LegacyTradeLayout
