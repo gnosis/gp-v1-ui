@@ -71,9 +71,7 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
     !limitPrice ||
     limitPrice.isZero() ||
     !fillPrice ||
-    !bestAskPrice ||
-    // round to 5 places and check limit = fill
-    fillPrice.toFixed(12) === limitPrice.toFixed(12)
+    !bestAskPrice
   )
     return null
 
@@ -108,7 +106,7 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
       return WARNINGS.MAYBE_FULLY_EXECUTED
     // CASE 4 & 3
     default:
-      return ''
+      return null
   }
 }
 
