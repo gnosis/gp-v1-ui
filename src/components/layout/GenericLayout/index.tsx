@@ -9,10 +9,15 @@ const Footer: React.FC = () => (
   </Frame>
 )
 
-export const GenericLayout: React.FC = ({ children }) => (
+interface Props {
+  menu?: React.ReactNode
+  navTools?: React.ReactNode
+}
+
+export const GenericLayout: React.FC<Props> = ({ children, menu, navTools }) => (
   <div>
     <GlobalStyles />
-    <Header />
+    <Header menu={menu} tools={navTools} />
     {children}
     <Footer />
   </div>

@@ -52,18 +52,15 @@ const Logo = styled.a`
 
 interface Props {
   menu?: React.ReactNode
-  navUserTools?: React.ReactNode
+  tools?: React.ReactNode
 }
 
-export const Header: React.FC<Props> = ({ menu, navUserTools }) => {
-  console.log('menu', menu)
-  return (
-    <HeaderStyled>
-      <Logo href="#">
-        <img src={LogoImage} />
-      </Logo>
-      {menu}
-      {navUserTools}
-    </HeaderStyled>
-  )
-}
+export const Header: React.FC<Props> = ({ menu, tools }) => (
+  <HeaderStyled>
+    <Logo href="#">
+      <img src={LogoImage} />
+    </Logo>
+    {menu}
+    {tools}
+  </HeaderStyled>
+)
