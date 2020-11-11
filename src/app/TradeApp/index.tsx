@@ -1,5 +1,5 @@
 import React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, Link } from 'react-router-dom'
 
 import { GenericLayout } from 'components/layout'
 import { Menu } from 'components/layout/GenericLayout/Menu'
@@ -31,13 +31,13 @@ export const TradeApp: React.FC = () => {
   const menu = (
     <Menu>
       <li>
-        <a href="#">Trade</a>
+        <Link to="/v2">Trade</Link>
       </li>
       <li>
-        <a href="#">Swap</a>
+        <Link to="/v2/trade">Swap</Link>
       </li>
       <li>
-        <a href="#">Liquidity</a>
+        <Link to="/v2/trade">Liquidity</Link>
       </li>
     </Menu>
   )
