@@ -1,16 +1,15 @@
 import React from 'react'
-import { Route, Switch } from 'react-router-dom'
+import { Switch, Route, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { MEDIA } from 'const'
 
 import { GenericLayout } from 'components/layout'
 import { Menu } from 'components/layout/GenericLayout/Menu'
+import { NavTools } from 'components/layout/GenericLayout/NavTools'
 
 import PortfolioImage from 'assets/img/portfolio.svg'
 import PortfolioImageWhite from 'assets/img/portfolio-white.svg'
-
-import { NavTools } from 'components/layout/GenericLayout/NavTools'
 
 const NotFound = React.lazy(
   () =>
@@ -53,13 +52,13 @@ export const TradeApp: React.FC = () => {
   const menu = (
     <Menu>
       <li>
-        <a href="#">Trade</a>
+        <Link to="/v2">Trade</Link>
       </li>
       <li>
-        <a href="#">Swap</a>
+        <Link to="/v2/trade">Swap</Link>
       </li>
       <li>
-        <a href="#">Liquidity</a>
+        <Link to="/v2/trade">Liquidity</Link>
       </li>
     </Menu>
   )
