@@ -267,14 +267,14 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
 
   const baseProps = {
     baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
     quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
     networkId,
   }
 
   const { priceEstimation: fillPrice } = usePriceEstimationWithSlippage({
     ...baseProps,
-    baseTokenDecimals: baseToken.decimals,
-    quoteTokenDecimals: quoteToken.decimals,
     amount: sellTokenAmount,
   })
 
