@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Link } from 'react-router-dom'
 
 // Assets
 import LogoImage from 'assets/img/logo-v2.svg'
@@ -13,7 +14,7 @@ const HeaderStyled = styled.header`
   border: 0.1rem solid var(--color-border);
 `
 
-const Logo = styled.a`
+const Logo = styled(Link)`
   width: auto;
   height: 3rem;
   transform: perspective(20rem) rotateY(0);
@@ -57,7 +58,7 @@ interface Props {
 
 export const Header: React.FC<Props> = ({ menu, tools }) => (
   <HeaderStyled>
-    <Logo href="#">
+    <Logo to="/v2" href="#">
       <img src={LogoImage} />
     </Logo>
     {menu}
