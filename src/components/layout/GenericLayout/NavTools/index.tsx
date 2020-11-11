@@ -41,7 +41,7 @@ const NotificationsLink = styled.li`
   }
 
   &:hover > a {
-    background: url(${NotificationsImageWhite}) no-repeat center/contain;
+    background-image: url(${NotificationsImageWhite});
   }
 `
 
