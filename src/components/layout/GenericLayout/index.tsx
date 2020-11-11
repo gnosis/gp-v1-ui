@@ -9,7 +9,7 @@ const Footer: React.FC = () => (
   </Frame>
 )
 
-export const TradingLayout: React.FC = ({ children }) => (
+export const GenericLayout: React.FC = ({ children }) => (
   <div>
     <GlobalStyles />
     <Header />
@@ -18,4 +18,4 @@ export const TradingLayout: React.FC = ({ children }) => (
   </div>
 )
 
-export default TradingLayout
+export default GenericLayout

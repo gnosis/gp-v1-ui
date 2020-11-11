@@ -1,3 +1,3 @@
 export { SwapLayout } from './SwapLayout/index'
-export { TradingLayout } from './TradingLayout'
+export { GenericLayout } from './GenericLayout'
 export * from './PageWrappers'
