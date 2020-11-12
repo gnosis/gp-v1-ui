@@ -23,6 +23,7 @@ export interface TokenDetails extends TokenDex {
   disabled?: boolean
   override?: TokenOverride
   priority?: number
+  display?: boolean
 }
 
 export interface BalanceDetails {

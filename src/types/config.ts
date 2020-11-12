@@ -61,6 +61,7 @@ export interface TokenOverride {
   reason?: string
   description?: string
   url?: string
+  display?: boolean
 }
 
 export interface DisabledTokens {
