@@ -299,6 +299,61 @@ export const composeProvider = <T extends Provider>(
     ),
   )
 
+  // Simple delay implementation
+  // engine.push(
+  //   createConditionalMiddleware(
+  //     (req) => req.method !== 'eth_sendTransaction',
+  //     async (req) => {
+  //       logDebug(`[composeProvider] Delaying ${req.id} call by 20ms`)
+  //       await delay(20)
+
+  //       // don't mark as handled
+  //       return false
+  //     },
+  //   ),
+  // )
+
+  // rate limit a function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function rateLimit<T extends (...args: any[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
+    const queue: Parameters<T>[] = []
+    let timer: NodeJS.Timeout | null = null
+
+    // escape hatch to monitor the queue
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).callsQueue = queue
+
+    function processQueue(): void {
+      const params = queue.shift()
+      if (params) fn(...params)
+      if (queue.length === 0 && timer) {
+        clearInterval(timer)
+        timer = null
+      }
+    }
+
+    return function limited(...args: Parameters<T>): void {
+      queue.push(args)
+      if (!timer) {
+        processQueue() // start immediately on the first invocation
+        timer = setInterval(processQueue, delay)
+      }
+    }
+  }
+
+  const passThroughMware: JsonRpcMiddleware = (_req, _res, next) => next()
+  const rateLimitedPassThrough = rateLimit(passThroughMware, 100) // a more visible delay of 100ms
+
+  engine.push((req, res, next, error) => {
+    // tx signing is wallet-dependent
+    if (req.method === 'eth_sendTransaction') {
+      return next()
+    }
+
+    // execute only once in _delay_ ms
+    rateLimitedPassThrough(req, res, next, error)
+  })
+
   const walletMiddleware = providerAsMiddleware(provider)
   engine.push(wrapInTimeout(walletMiddleware))
 
