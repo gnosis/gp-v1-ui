@@ -12,14 +12,6 @@ import { isWalletConnectProvider, Provider } from './providerUtils'
 import { logDebug } from 'utils'
 import { web3 } from 'api'
 
-import {
-  addTxPendingApproval,
-  areTxsPendingApproval,
-  openWaitForTxApprovalModal,
-  removeAllTxsPendingApproval,
-  removeTxPendingApproval,
-} from 'components/OuterModal'
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sanitizeErrorData = (jsonRpcError?: JsonRpcError<any>): void => {
   if (!jsonRpcError) return
