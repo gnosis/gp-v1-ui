@@ -225,6 +225,7 @@ export const WalletDrawerInnerWrapper = styled.div`
     }
   }
 
+  /* TODO: potentially unused */
   .buttons {
     text-align: center;
     padding-top: 1em;
