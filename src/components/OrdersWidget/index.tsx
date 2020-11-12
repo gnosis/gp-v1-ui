@@ -419,7 +419,7 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
               <div className="ordersContainer">
                 <CardWidgetWrapper className="widgetCardWrapper">
                   <CardTable
-                    $columns="3.2rem 5.5rem minmax(8.6rem, 0.3fr) repeat(2,1fr) minmax(5.2rem,0.6fr) minmax(8.6rem, 0.3fr)"
+                    $columns="3.2rem minmax(12.8rem,1fr) minmax(11rem,1fr) repeat(2, minmax(8rem, 0.5fr)) minmax(7.2rem,0.4fr) 5.5rem minmax(10.6rem,0.4fr)"
                     $gap="0 0.6rem"
                     $rowSeparation="0"
                   >
@@ -433,16 +433,18 @@ const OrdersWidget: React.FC<Props> = ({ displayOnly }) => {
                             disabled={deleting}
                           />
                         </th>
-                        <th>Order ID</th>
-                        <th>Market</th>
+                        {/* Token Pair Header (blank) */}
+                        <th />
                         <th>Limit price</th>
-                        <th className="filled">Filled / Total</th>
+                        <th className="filled">Filled</th>
+                        <th className="filled">Total</th>
                         <th
                           className="sortable"
                           onClick={(): void => setSortTopic((prev) => ({ ...prev, asc: !prev.asc }))}
                         >
                           Expires <FontAwesomeIcon size="xs" icon={!sortTopic.asc ? faChevronDown : faChevronUp} />
                         </th>
+                        <th>Order ID</th>
                         <th className="status">Status</th>
                       </tr>
                     </thead>

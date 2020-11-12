@@ -9,7 +9,7 @@ import { WrappedWidget } from 'components/TradeWidget/TradeWidget.styled'
 
 export const StepDescriptionWrapper = styled.div`
   width: 50%;
-  padding: 0 2.4rem 0 0;
+  padding: 0 1rem 0 0;
   box-sizing: border-box;
 
   .liqContent {
@@ -42,7 +42,6 @@ export const PoolingInterfaceWrapper = styled(WrappedWidget)`
     display: flex;
     flex-flow: column nowrap;
     padding: 2rem;
-    min-width: 51.4rem;
     max-width: 75rem;
 
     > h2 {

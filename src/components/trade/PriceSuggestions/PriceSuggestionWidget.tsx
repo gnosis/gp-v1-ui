@@ -2,15 +2,23 @@ import React, { useCallback } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { TradeFormData } from 'components/TradeWidget'
+import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+import PriceImpact from '../PriceImpact'
 
 import { usePriceEstimationWithSlippage } from 'hooks/usePriceEstimation'
-import { PriceSuggestions, Props as PriceSuggestionsProps } from './PriceSuggestions'
+
+import { isNonZeroNumber } from 'utils'
+import { invertPrice } from '@gnosis.pm/dex-js'
+import { TokenDetails } from 'types'
 
 interface Props
   extends Pick<PriceSuggestionsProps, 'baseToken' | 'quoteToken' | 'amount' | 'isPriceInverted' | 'onSwapPrices'> {
   networkId: number
   priceInputId: string
   priceInverseInputId: string
+  receiveToken: TokenDetails
+  sellToken: TokenDetails
+  limitPrice: string
 }
 
 export const PriceSuggestionWidget: React.FC<Props> = (props) => {
@@ -19,18 +27,21 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
     amount,
     baseToken,
     quoteToken,
+    receiveToken,
+    sellToken,
+    limitPrice,
     isPriceInverted,
     priceInputId,
     priceInverseInputId,
     onSwapPrices,
   } = props
-  const { id: baseTokenId, decimals: baseTokenDecimals } = baseToken
-  const { id: quoteTokenId, decimals: quoteTokenDecimals } = quoteToken
+  const { id: receiveTokenId, decimals: receiveTokenDecimals } = receiveToken
+  const { id: sellTokenId, decimals: sellTokenDecimals } = sellToken
 
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
-    (price: string, invertedPrice) => {
+    async (price: string, invertedPrice) => {
       if (isPriceInverted) {
         setValue(priceInverseInputId, price)
         setValue(priceInputId, invertedPrice)
@@ -38,46 +49,53 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
         setValue(priceInputId, price)
         setValue(priceInverseInputId, invertedPrice)
       }
-      trigger()
+      // stupid hack to fix validation
+      // otherwise trigger doesnt validate properly the new values
+      await new Promise((accept) => setTimeout(accept, 0))
+      return trigger()
     },
-    [isPriceInverted, trigger, setValue, priceInputId, priceInverseInputId],
+    [isPriceInverted, trigger, setValue, priceInverseInputId, priceInputId],
   )
 
-  const { priceEstimation: limitPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
+  const { priceEstimation: fillPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({
     networkId,
     amount: amount || '0',
-    baseTokenId,
-    baseTokenDecimals,
-    quoteTokenId,
-    quoteTokenDecimals,
+    baseTokenId: receiveTokenId,
+    baseTokenDecimals: receiveTokenDecimals,
+    quoteTokenId: sellTokenId,
+    quoteTokenDecimals: sellTokenDecimals,
   })
 
-  // TODO: Use best ask price instead
-  const { priceEstimation: bestAskPrice, isPriceLoading: bestAskPriceLoading } = usePriceEstimationWithSlippage({
-    networkId,
-    amount: '0',
-    baseTokenId,
-    baseTokenDecimals,
-    quoteTokenId,
-    quoteTokenDecimals,
-  })
+  // We need the price of the other token if the market was adjusted, otherwise prices will be wrong
+  const adjustedFillPrice = fillPrice && (sellToken === quoteToken ? fillPrice : invertPrice(fillPrice))
 
   return (
-    <PriceSuggestions
-      // Market
-      baseToken={baseToken}
-      quoteToken={quoteToken}
-      isPriceInverted={isPriceInverted}
-      // Order size
-      amount={amount}
-      // Prices
-      fillPrice={limitPrice}
-      fillPriceLoading={fillPriceLoading}
-      bestAskPrice={bestAskPrice}
-      bestAskPriceLoading={bestAskPriceLoading}
-      // Events
-      onClickPrice={updatePrices}
-      onSwapPrices={onSwapPrices}
-    />
+    <>
+      <PriceSuggestions
+        // Market
+        baseToken={baseToken}
+        quoteToken={quoteToken}
+        isPriceInverted={isPriceInverted}
+        // Order size
+        amount={amount}
+        // Prices
+        fillPrice={adjustedFillPrice}
+        fillPriceLoading={fillPriceLoading}
+        // Events
+        onClickPrice={updatePrices}
+        onSwapPrices={onSwapPrices}
+      />
+      {isNonZeroNumber(amount) && (
+        <PriceImpact
+          // Pass original tokenPair to check market adjustment
+          baseToken={receiveToken}
+          quoteToken={sellToken}
+          // Prices
+          limitPrice={limitPrice}
+          fillPrice={fillPrice}
+          networkId={networkId}
+        />
+      )}
+    </>
   )
 }

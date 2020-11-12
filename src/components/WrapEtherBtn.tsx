@@ -71,7 +71,7 @@ const ModalWrapper = styled(ModalBodyWrapper)`
       margin-bottom: 0.5rem;
       padding-left: -0.5;
       font-size: 1.3rem;
-      color: var(--color-background-modali);
+      color: var(--color-background-opaque-grey);
     }
 
     a {

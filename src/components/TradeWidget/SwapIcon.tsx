@@ -14,7 +14,7 @@ interface Props {
 
 export const SwapIcon: React.FC<Props> = ({ swap = (): null => null }) => {
   return (
-    <Wrapper onClick={swap}>
+    <Wrapper className="swapIcon" onClick={swap}>
       <FontAwesomeIcon icon={faRetweet} />
     </Wrapper>
   )
