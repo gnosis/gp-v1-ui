@@ -273,7 +273,10 @@ export function getTokensFactory(factoryParams: {
     const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
 
     // Get token details for each filtered token
-    const tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
+    let tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
+
+    // Remove the deprecated tokens that shouldn't even be displayed in the UI
+    tokenDetails = tokenDetails.filter((tokenDetails) => tokenDetails.display)
 
     // Sort tokens
     // note that sort mutates tokenDetails
