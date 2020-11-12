@@ -20,6 +20,10 @@ export const CenteredAndFramed = (DecoratedStory: () => StoryFnReactReturnType):
   </div>
 )
 
+export const WhiteBackground = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => (
+  <div style={{ backgroundColor: 'white' }}>{DecoratedStory()}</div>
+)
+
 const apolloClient = new ApolloClient({
   uri: 'https://api.thegraph.com/subgraphs/name/gnosis/protocol',
   cache: new InMemoryCache(),
