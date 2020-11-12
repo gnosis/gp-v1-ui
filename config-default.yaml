@@ -36,7 +36,7 @@ tcr:
     lists:
       - networkId: 1
         listId: 1
-        contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0'
+        contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0'        
 
       - networkId: 4
         contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b'
@@ -107,6 +107,7 @@ disabledTokens:
       description: This token is disabled for trading and depositing. sUSD will be deprecated and replaced by another token at the end of July 2020.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED
       url: https://docs.synthetix.io/integrations/guide/#proxy-deprecation
+      display: false # do not allow to use it, it will fail even trying to get the tokens
 
     - address: '0xC011A72400E58ecD99Ee497CF89E3775d4bd732F'
       name: Synthetix Network Token (deprecated)
@@ -114,6 +115,7 @@ disabledTokens:
       description: This token is disabled for trading and depositing. SNX will be deprecated and replaced by another token at the end of July 2020.  Go to https://www.synthetix.io for more information
       reason: DEPRECATED
       url: https://docs.synthetix.io/integrations/guide/#proxy-deprecation
+      display: false # do not allow to use it, it will fail even trying to get the tokens
 
     - address: '0x45804880De22913dAFE09f4980848ECE6EcbAf78'
       name: Paxos Gold
