@@ -8,6 +8,7 @@ import { logDebug, notEmpty, retry } from 'utils'
 import { TokenFromErc20Params } from './'
 import { safeTokenName, TokenErc20 } from '@gnosis.pm/dex-js'
 import { WETH_ADDRESS_MAINNET, WETH_ADDRESS_RINKEBY, WETH_ADDRESS_XDAI, WXDAI_ADDRESS_XDAI } from 'const'
+import { TokenOverride } from 'types/config'
 
 export function getTokensFactory(factoryParams: {
   tokenListApi: TokenList
@@ -143,6 +144,8 @@ export function getTokensFactory(factoryParams: {
     ])
 
     let filteredAddressAndIds: [string, number][]
+
+    // Filter using TCR or default list
     if (tcrAddressesSet.size > 0) {
       // If filtering by TCR
       logDebug(`[tokenListFactory][${networkId}] TCR contains ${tcrAddressesSet.size} addresses`)
@@ -162,6 +165,16 @@ export function getTokensFactory(factoryParams: {
           return tokenId !== undefined ? [token.address, tokenId] : null
         })
         .filter(notEmpty)
+    }
+
+    // Filter deprecated/incompatible tokens (display flag is "false")
+    const disabledTokens: TokenOverride[] | undefined = CONFIG.disabledTokens[networkId]
+    const notDisplayedTokens = disabledTokens
+      ?.filter((token) => token.display === false)
+      .map((token) => token.address.toLowerCase())
+    if (notDisplayedTokens && notDisplayedTokens.length > 0) {
+      const tokensToRemove = new Set(notDisplayedTokens)
+      filteredAddressAndIds = filteredAddressAndIds.filter(([token]) => !tokensToRemove.has(token.toLowerCase()))
     }
 
     return new Map<string, number>(filteredAddressAndIds)
@@ -273,10 +286,12 @@ export function getTokensFactory(factoryParams: {
     const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
 
     // Get token details for each filtered token
-    let tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
+    const tokenDetails = await _fetchTokenDetails(networkId, filteredAddressesAndIds, tokensConfig)
 
-    // Remove the deprecated tokens that shouldn't even be displayed in the UI
-    tokenDetails = tokenDetails.filter((tokenDetails) => tokenDetails.display)
+    // // Remove the deprecated tokens that shouldn't even be displayed in the UI
+    // console.log('anx', tokenDetails.map((t) => t.symbol).join(', '))
+    // tokenDetails = tokenDetails.filter((tokenDetails) => tokenDetails.display !== false)
+    // console.log('anx', tokenDetails.map((t) => t.symbol).join(', '))
 
     // Sort tokens
     // note that sort mutates tokenDetails

@@ -40,7 +40,6 @@ function addAdditionalTokenDetails(networkId: number): (token: TokenDetails) => 
     if (tokenOverride) {
       token.override = tokenOverride
       token.disabled = true
-      token.display = tokenOverride.display !== false
       // override only keys present in both token and tokenOverride
       Object.keys(token).forEach((key) => {
         if (tokenOverride[key] !== undefined) token[key] = tokenOverride[key]
