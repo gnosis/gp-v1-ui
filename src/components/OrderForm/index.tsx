@@ -5,7 +5,7 @@ import { TokenPairSelector } from 'components/TokenPairSelector'
 
 const OrderFormStyled = styled.div`
   display: flex;
-  background: lightgrey;
+  background: none;
   width: 31rem;
   flex-flow: column wrap;
   position: relative;
