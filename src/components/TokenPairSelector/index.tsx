@@ -5,7 +5,7 @@ import { TokenPairSelectorList } from 'components/TokenPairSelectorList'
 
 import ArrowWhite from 'assets/img/arrow-white.svg'
 
-const TokenPairSelectorStyled = styled.div`
+const Wrapper = styled.div`
   display: flex;
   width: 100%;
 
@@ -58,13 +58,13 @@ const TokenPairSelectorStyled = styled.div`
 `
 
 export const TokenPairSelector: React.FC = () => (
-  <TokenPairSelectorStyled>
+  <Wrapper>
     <button>
       <b>ETH/USDC</b>
       <i>Select Pair</i>
       <TokenPairSelectorList />
     </button>
-  </TokenPairSelectorStyled>
+  </Wrapper>
 )
 
 export default TokenPairSelector

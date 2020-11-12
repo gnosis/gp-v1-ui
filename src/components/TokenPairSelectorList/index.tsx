@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const TokenPairSelectorListStyled = styled.div`
+const Wrapper = styled.div`
   width: 100%;
   display: none;
   position: absolute;
@@ -10,8 +10,6 @@ const TokenPairSelectorListStyled = styled.div`
   background: yellow;
   left: 0;
 `
-export const TokenPairSelectorList: React.FC = () => (
-  <TokenPairSelectorListStyled>-Token Pair List Element -</TokenPairSelectorListStyled>
-)
+export const TokenPairSelectorList: React.FC = () => <Wrapper>-Token Pair List Element -</Wrapper>
 
 export default TokenPairSelectorList

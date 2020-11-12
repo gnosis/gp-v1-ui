@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { OrderForm } from 'components/OrderForm'
 
-const TradeInterface = styled.div`
+const Wrapper = styled.div`
   display: flex;
   overflow: hidden;
   flex: 1 1 auto;
@@ -14,9 +14,9 @@ const TradeInterface = styled.div`
 `
 
 export const Trading: React.FC = () => (
-  <TradeInterface>
+  <Wrapper>
     <OrderForm />
-  </TradeInterface>
+  </Wrapper>
 )
 
 export default Trading

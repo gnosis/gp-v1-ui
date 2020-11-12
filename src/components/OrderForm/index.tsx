@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { TokenPairSelector } from 'components/TokenPairSelector'
 
-const OrderFormStyled = styled.div`
+const Wrapper = styled.div`
   display: flex;
   background: none;
   width: 31rem;
@@ -13,9 +13,9 @@ const OrderFormStyled = styled.div`
   border-right: 0.1rem solid var(--color-border);
 `
 export const OrderForm: React.FC = () => (
-  <OrderFormStyled>
+  <Wrapper>
     <TokenPairSelector />
-  </OrderFormStyled>
+  </Wrapper>
 )
 
 export default OrderForm
