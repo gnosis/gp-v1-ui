@@ -1,20 +1,21 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Frame } from 'components/common/Frame'
 
-const Wrapper = styled.div`
-  h2 {
-    margin: 20px;
-  }
+import { OrderForm } from 'components/OrderForm'
 
-  text-align: center;
+const TradeInterface = styled.div`
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  min-height: 32rem;
+  flex: 1 1 auto;
+  height: calc(100vh - var(--height-default-bar));
 `
 
 export const Trading: React.FC = () => (
-  <Wrapper>
-    <h2>Trading page</h2>
-    <Frame>Trade page content</Frame>
-  </Wrapper>
+  <TradeInterface>
+    <OrderForm />
+  </TradeInterface>
 )
 
 export default Trading
