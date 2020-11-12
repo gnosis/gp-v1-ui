@@ -5,6 +5,14 @@ import { StoryFnReactReturnType } from '@storybook/react/dist/client/preview/typ
 import { ApolloProvider } from '@apollo/client'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
+import GlobalStylesCss from 'components/layout/GenericLayout/GlobalStyles'
+
+export const GlobalStyles = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => (
+  <>
+    <GlobalStylesCss />
+    {DecoratedStory()}
+  </>
+)
 
 export const CenteredAndFramed = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => (
   <div style={{ textAlign: 'center' }}>
