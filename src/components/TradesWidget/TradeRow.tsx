@@ -9,7 +9,7 @@ import { Trade, TradeType } from 'api/exchange/ExchangeApi'
 import { BlockExplorerLink } from 'components/common/BlockExplorerLink'
 import { EllipsisText } from 'components/common/EllipsisText'
 
-import { FoldableRowWrapper } from 'components/layout/SwapLayout/Card'
+import { FoldableRowWrapper } from 'components/layout/LegacyTradeLayout/Card'
 
 import { isTradeSettled, divideBN, formatPercentage, getMarket } from 'utils'
 import { displayTokenSymbolOrLink } from 'utils/display'

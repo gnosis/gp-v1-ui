@@ -1,11 +1,11 @@
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Meta } from '@storybook/react/types-6-0'
 
-import About from 'pages/About'
+import { Trading } from './Trading'
 
 export default {
-  title: 'Pages/About',
-  component: About,
+  title: 'TradeApp/Trading',
+  component: Trading,
 } as Meta
 
-export const Primary = About
+export const Primary = Trading
