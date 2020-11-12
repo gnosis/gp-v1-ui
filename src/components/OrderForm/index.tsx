@@ -10,6 +10,7 @@ const OrderFormStyled = styled.div`
   flex-flow: column wrap;
   position: relative;
   height: 100%;
+  border-right: 0.1rem solid var(--color-border);
 `
 export const OrderForm: React.FC = () => (
   <OrderFormStyled>
