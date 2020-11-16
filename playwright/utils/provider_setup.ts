@@ -18,10 +18,9 @@ const fileExists = (path: string): Promise<boolean> => {
 }
 
 const compileInjects = async (): Promise<void> => {
-  console.log('process.env.REBUILD_PW', process.env.REBUILD_PW)
   // only rebuild when no file found
-  // or when passed REBUILD_PW=1 env var
-  if (!process.env.REBUILD_PW && (await fileExists(path.resolve(__dirname, '../build/inject_provider.js')))) {
+  // or when passed PWREBUILD=1 env var
+  if (!process.env.PWREBUILD && (await fileExists(path.resolve(__dirname, '../build/inject_provider.js')))) {
     return
   }
 
