@@ -3,7 +3,12 @@ import { css } from 'styled-components'
 const AllColors = `
   /* HEIGHTS */
   --height-bar-default: 6.2rem;
+  --height-button-default: 3.4rem;
   /* ------------------------------ */
+
+  /* MISC */
+  --border-radius-default: .3rem;
+  --padding-container-default: 1.2rem;
 
   /* FONTS */
   --font-default: "Inter", "Helvetica Neue", Helvetica, sans-serif;
@@ -11,11 +16,19 @@ const AllColors = `
   --font-weight-normal: 400;
   --font-weight-medium: 500;
   --font-weight-bold: 700;
+  --font-size-default: 1.2rem;
+  --font-size-large: 1.4rem;
   /* ------------------------------ */
 `
 
 const DarkColors = `
   --color-primary: #1E1F2B;
+  --color-buy: var(--color-green);
+  --color-sell: var(--color-red);
+
+  /* Palette specific */
+  --color-green: #00C46E;
+  --color-red: #FF305B;
 
   /* Gradients */
   --color-gradient-1: #21222E;
