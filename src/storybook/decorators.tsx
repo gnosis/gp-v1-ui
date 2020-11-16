@@ -8,6 +8,31 @@ import { ApolloProvider } from '@apollo/client'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
 
+import { colors } from 'styles/theme'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
+
+import { ThemeProvider } from 'styled-components'
+
+export const DarkModeThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
+  const [darkMode, setDarkMode] = React.useState(false)
+  const theme = colors(darkMode)
+
+  const handleDarkMode = React.useCallback(() => setDarkMode((darkMode) => !darkMode), [])
+
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+        <Frame style={{ backgroundColor: 'lightgray' }}>{DecoratedStory()}</Frame>
+      </ThemeProvider>
+      <button onClick={handleDarkMode} style={{ marginLeft: '1rem' }}>
+        <FontAwesomeIcon icon={darkMode ? faSun : faMoon} /> {darkMode ? 'Light' : 'Dark'}
+      </button>
+    </>
+  )
+}
+
 export const Router = (DecoratedStory: () => JSX.Element): JSX.Element => (
   <MemoryRouter>{DecoratedStory()}</MemoryRouter>
 )
