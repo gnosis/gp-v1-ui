@@ -31,6 +31,7 @@
     "cypress": "cypress open",
     "cypress:run": "cypress run",
     "playwright": "jest --roots playwright --no-cache",
+    "playwright:rebuild": "ts-node ./playwright/utils/build_injects.ts",
     "playwright:debug": "PWDEBUG=1 jest --roots playwright",
     "playwright:record": "start-server-and-test start:dist http://localhost:8081 'playwright-cli codegen http://localhost:8081 -o output.js'",
     "test:playwright": "BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 playwright"
