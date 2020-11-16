@@ -166,7 +166,7 @@ export class DexPriceEstimatorApiImpl implements DexPriceEstimatorApi {
     if (batchId) {
       url += `&batchId=${batchId}`
     }
-    if (hops) {
+    if (hops !== undefined) {
       url += `&hops=${hops}`
     }
     return url
