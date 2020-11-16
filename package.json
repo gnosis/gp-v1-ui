@@ -99,6 +99,7 @@
     "@storybook/addon-knobs": "^6.0.21",
     "@storybook/addon-links": "^6.0.21",
     "@storybook/react": "^6.0.21",
+    "@truffle/hdwallet-provider": "^1.2.0",
     "@types/bn.js": "^4.11.6",
     "@types/combine-reducers": "^1.0.0",
     "@types/enzyme": "^3.10.4",
