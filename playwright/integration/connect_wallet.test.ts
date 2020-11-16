@@ -1,5 +1,12 @@
-import { page, baseURL } from '../utils/test_setup'
-import { account } from '../utils/provider_setup'
+import { baseURL } from '../utils/test_setup'
+import { account, setupProvider } from '../utils/provider_setup'
+import { Page } from 'playwright'
+
+let page: Page
+
+setupProvider((variables) => {
+  ;({ page } = variables)
+})
 
 describe('Connect Wallet', () => {
   it('Can connect a Wallet', async () => {

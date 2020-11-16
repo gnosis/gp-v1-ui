@@ -1,4 +1,11 @@
-import { page, baseURL } from '../utils/test_setup'
+import { Page } from 'playwright'
+import { setupTests, baseURL } from '../utils/test_setup'
+
+let page: Page
+
+setupTests((variables) => {
+  page = variables.page
+})
 
 describe('About', () => {
   it('Page has expected title', async () => {
