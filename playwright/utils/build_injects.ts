@@ -12,7 +12,7 @@ export const fileExists = (path: string): Promise<boolean> => {
 export const compileInjects = async (): Promise<void> => {
   console.log('path.resolve', path.resolve(__dirname, '../build/'))
   const compiler = webpack({
-    entry: path.resolve(__dirname, '../inject_provider.js'),
+    entry: path.resolve(__dirname, '../inject/inject_provider.js'),
     output: {
       path: path.resolve(__dirname, '../build/'),
       filename: 'inject_provider.js',
