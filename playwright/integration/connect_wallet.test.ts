@@ -16,8 +16,11 @@ describe('Connect Wallet', () => {
     await page.click('header >> text=Web3')
 
     // THEN: wallet connected & address available
-    //                          XPATH:    closest div ancestor of element with text "Copy address to clipboard"
-    const textWithAddress = await page.textContent('//*[text()="Copy address to clipboard"]//ancestor::div[1]')
+    // XPATH: most specific element with textContent starting with 0x and >= address.length
+    // matches account address inside Wallet popup
+    const textWithAddress = await page.textContent(
+      '(//html/body//*[starts-with(.,"0x") and string-length(.)>=42])[last()]',
+    )
 
     expect(textWithAddress).toContain(account.address)
   })
