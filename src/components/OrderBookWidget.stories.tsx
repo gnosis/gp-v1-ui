@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
 import { Story, Meta } from '@storybook/react/types-6-0'
 
-import { ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
+import { ORDER_BOOK_HOPS_MAX } from 'const'
 import OrderBookWidget, { OrderBookProps } from './OrderBookWidget'
 import {
   defaultNetworkId,
@@ -17,7 +17,7 @@ const defaultParams: OrderBookProps = {
   baseToken: baseTokenDefault,
   quoteToken: quoteTokenDefault,
   networkId: defaultNetworkId,
-  hops: ORDER_BOOK_HOPS_DEFAULT,
+  hops: undefined,
 }
 
 // with price-estimation endpoints

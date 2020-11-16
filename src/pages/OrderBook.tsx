@@ -8,7 +8,7 @@ import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { Input } from 'components/Input'
-import { MEDIA, ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
+import { MEDIA, ORDER_BOOK_HOPS_MAX } from 'const'
 import InputBox from 'components/InputBox'
 
 const OrderBookPage = styled(ContentPage)`
@@ -84,7 +84,7 @@ const OrderBook: React.FC = () => {
   const { tokens: tokenList } = useTokenList({ networkId: networkIdOrDefault })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
-  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT)
+  const [hops, setHops] = useSafeState()
   const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
 
   const tokensLoaded = tokenList.length !== 0
