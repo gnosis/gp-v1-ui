@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { TokenPairSelectorList } from 'components/TokenPairSelectorList'
+import TokenPairSelectorList from 'components/TokenPairSelectorList'
 
 import ArrowWhite from 'assets/img/arrow-white.svg'
 
@@ -57,7 +57,7 @@ const Wrapper = styled.div`
   }
 `
 
-export const TokenPairSelector: React.FC = () => (
+const TokenPairSelector: React.FC = () => (
   <Wrapper>
     <button>
       <b>ETH/USDC</b>

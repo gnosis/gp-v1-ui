@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { TokenPairSelector } from 'components/TokenPairSelector'
+import TokenPairSelector from 'components/TokenPairSelector'
 
 const Wrapper = styled.div`
   display: flex;
