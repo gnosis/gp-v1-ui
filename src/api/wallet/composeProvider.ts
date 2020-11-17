@@ -330,7 +330,7 @@ export const composeProvider = <T extends Provider>(
 
   if (CHAIN_CALLS_RATE_LIMIT > 0) {
     const passThroughMware: JsonRpcMiddleware = (_req, _res, next) => next()
-    const rateLimitedPassThrough = rateLimit(passThroughMware, 100) // a more visible delay of 100ms
+    const rateLimitedPassThrough = rateLimit(passThroughMware, CHAIN_CALLS_RATE_LIMIT) // a more visible delay of 100ms
 
     engine.push((req, res, next, error) => {
       // tx signing is wallet-dependent
