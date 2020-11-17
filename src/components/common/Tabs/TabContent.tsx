@@ -11,7 +11,7 @@ const TabContent: React.FC<Props> = (props) => {
   return (
     <div>
       {tabItems.map((tab) => {
-        return tab.id === activeTab ? tab.content : ''
+        return tab.id === activeTab ? tab.content : null
       })}
     </div>
   )
