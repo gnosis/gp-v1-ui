@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { formatPrice, formatAmount, invertPrice, formatAmountFull, getNetworkFromId } from '@gnosis.pm/dex-js'
 
 import FilterTools from 'components/FilterTools'
-import { CardTable } from 'components/layout/SwapLayout/Card'
+import { CardTable } from 'components/layout/LegacyTradeLayout/Card'
 import { ConnectWalletBanner } from 'components/ConnectWalletBanner'
 import { FileDownloaderLink } from 'components/FileDownloaderLink'
 import { StandaloneCardWrapper } from 'components/layout'

@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { Frame } from 'components/common/Frame'
 
 const Wrapper = styled.div`
   h2 {
@@ -11,13 +12,8 @@ const Wrapper = styled.div`
 
 export const Trading: React.FC = () => (
   <Wrapper>
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <h2>The Best Trading Experience</h2>
-    <img height="500" src="https://ipfs.rarible.com/ipfs/QmPEj5hLBKNSJeVQsdBM7gLUXexSWBxhSU3wwGYHgEyJqu" />
+    <h2>Trading page</h2>
+    <Frame>Trade page content</Frame>
   </Wrapper>
 )
 
