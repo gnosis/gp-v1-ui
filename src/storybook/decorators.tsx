@@ -19,7 +19,7 @@ export const DarkModeThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Ele
   const [darkMode, setDarkMode] = React.useState(false)
   const theme = colors(darkMode)
 
-  const handleDarkMode = React.useCallback(() => setDarkMode((darkMode) => !darkMode), [])
+  const handleDarkMode = (): void => setDarkMode((darkMode) => !darkMode)
 
   return (
     <>
