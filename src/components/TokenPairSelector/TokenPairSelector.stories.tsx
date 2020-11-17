@@ -13,4 +13,4 @@ export default {
   decorators: [RouterDecorator, GlobalStyles],
 } as Meta
 
-export const Normal: React.FC = () => <TokenPairSelector selectedPair="ETH/USDC" selectLabel="Select Pair" />
+export const Normal: Story = () => <TokenPairSelector selectedPair="ETH/USDC" selectLabel="Select Pair" />
