@@ -3,16 +3,16 @@ import { ColourTheme, ThemeType } from 'styles/theme'
 
 const { MAIN, SECONDARY } = ThemeType
 
-export const ButtonBase = styled.button.attrs(({ $alt, $border, theme }: { // $alt button theme toggle
-  $alt?: boolean; $border?: boolean; theme: ThemedStyledProps<ColourTheme, ColourTheme> }) => ({
-  // Handle button theming
-  button: {
-    bg1: !$alt ? theme.button[MAIN].bg1 : theme.button[SECONDARY].bg1,
-    bg1Hover: !$alt ? theme.button[MAIN].bg1Hover : theme.button[SECONDARY].bg1Hover,
-    text1: !$alt ? theme.button[MAIN].text1 : theme.button[SECONDARY].text1,
-    text1Hover: !$alt ? theme.button[MAIN].text1Hover : theme.button[SECONDARY].text1Hover,
-  },
-  // Show/Hide border toggle
+interface ButtonBaseProps {
+  // $alt button theme toggle
+  $alt?: boolean
+  $border?: boolean
+  theme: ThemedStyledProps<ColourTheme, ColourTheme>
+}
+
+export const ButtonBase = styled.button.attrs(({ $alt, $border, theme }: ButtonBaseProps) => ({
+  // Allow toggling buttons as ALT/MAIN and grab appropriate theme
+  button: theme.button[$alt ? SECONDARY : MAIN],
   $border,
 }))`
   border: 0.1rem solid;
