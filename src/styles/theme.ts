@@ -1,76 +1,3 @@
-const white = '#FFF'
-const blue = '#218DFF'
-const blueDark = '#0b66c6'
-const bgLight = '#edf2f7'
-const bgDark = '#2e2e2e'
-const blackLight = '#181a1b'
-
-export enum ThemeType {
-  MAIN = 'main',
-  SECONDARY = 'secondary',
-}
-
-type SubTheme = {
-  [key in ThemeType]: {
-    [prop: string]: string
-  }
-}
-
-interface ColourThemeBase {
-  [t: string]: SubTheme | string | undefined
-}
-
-export interface ColourTheme extends ColourThemeBase {
-  bg1: string
-  button: SubTheme
-}
-
-const darkTheme: ColourTheme = {
-  bg1: bgDark,
-  bg2: blackLight,
-  button: {
-    main: {
-      text1: blue,
-      text1Hover: white,
-      get bg1(): string {
-        return darkTheme.bg1
-      },
-      bg1Hover: blueDark,
-    },
-    secondary: {
-      text1: blueDark,
-      text1Hover: white,
-      bg1: bgDark,
-      bg1Hover: blueDark,
-    },
-  },
-}
-
-const lightTheme: ColourTheme = {
-  bg1: bgLight,
-  bg2: white,
-  button: {
-    main: {
-      text1: white,
-      text1Hover: white,
-      bg1: blue,
-      bg1Hover: blueDark,
-    },
-    secondary: {
-      text1: blue,
-      text1Hover: white,
-      bg1: bgLight,
-      bg1Hover: blue,
-    },
-  },
-}
-
-export const colors = (darkMode: boolean): ColourTheme => {
-  const theme = darkMode ? darkTheme : lightTheme
-
-  return theme
-}
-
 // FOR REFERENCE
 // const LightColors = `
 //   /* Background */
@@ -196,3 +123,43 @@ export const colors = (darkMode: boolean): ColourTheme => {
 //   --color-text-deleteOrders: #bdb6b5;
 //   --color-background-deleteOrders: #621b1b;
 // `
+
+/* const darkTheme: ColourTheme = {
+  bg1: bgDark,
+  bg2: blackLight,
+  button: {
+    main: {
+      text1: blue,
+      text1Hover: white,
+      get bg1(): string {
+        return darkTheme.bg1
+      },
+      bg1Hover: blueDark,
+    },
+    secondary: {
+      text1: blueDark,
+      text1Hover: white,
+      bg1: bgDark,
+      bg1Hover: blueDark,
+    },
+  },
+}
+
+const lightTheme: ColourTheme = {
+  bg1: bgLight,
+  bg2: white,
+  button: {
+    main: {
+      text1: white,
+      text1Hover: white,
+      bg1: blue,
+      bg1Hover: blueDark,
+    },
+    secondary: {
+      text1: blue,
+      text1Hover: white,
+      bg1: bgLight,
+      bg1Hover: blue,
+    },
+  },
+} */
