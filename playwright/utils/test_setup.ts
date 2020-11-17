@@ -5,6 +5,8 @@ export let page: Page
 
 export const baseURL = process.env.BASE_URL || 'http://localhost:8080'
 
+// PWDEBUG is playwright specific flag
+// sets up window.playwright and other stuff
 const isDebug = !!process.env.PWDEBUG
 let slowMo: number | undefined
 

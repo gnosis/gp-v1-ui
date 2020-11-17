@@ -9,6 +9,7 @@ export const fileExists = (path: string): Promise<boolean> => {
   )
 }
 
+// compile files tolater be injected in playwright browser
 export const compileInjects = async (): Promise<void> => {
   const compiler = webpack({
     entry: path.resolve(__dirname, '../inject/inject_provider.js'),
@@ -21,7 +22,6 @@ export const compileInjects = async (): Promise<void> => {
 
   await new Promise((resolve, reject) => {
     compiler.run((error, stats) => {
-      console.log('error', error)
       if (error) {
         return reject(error)
       }
@@ -31,6 +31,8 @@ export const compileInjects = async (): Promise<void> => {
   })
 }
 
+// allow to run standalone
+// ts-node .../build_injects.ts
 if (require.main === module) {
   compileInjects()
 }

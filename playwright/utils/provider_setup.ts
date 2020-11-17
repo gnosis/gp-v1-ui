@@ -13,11 +13,9 @@ declare global {
     injectProvider: (params: { pk: string; url: string }) => void
   }
 }
-
-// const Web3EthAccounts:  = ActualAccounts
-
+// workaround for wrong types
 const accountCreator = new ((Web3EthAccounts as unknown) as typeof AccountsType)()
-
+// random account
 export const account = accountCreator.create()
 
 beforeAll(async () => {
