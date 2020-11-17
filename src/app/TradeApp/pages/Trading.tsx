@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { OrderForm } from 'components/OrderForm'
+import OrderForm from 'components/OrderForm'
 
 const Wrapper = styled.div`
   display: flex;
