@@ -3,7 +3,7 @@ import { ColourTheme, ThemeType } from 'styles/theme'
 
 const { MAIN, SECONDARY } = ThemeType
 
-interface ButtonBaseProps {
+export interface ButtonBaseProps {
   // $alt button theme toggle
   $alt?: boolean
   $border?: boolean
