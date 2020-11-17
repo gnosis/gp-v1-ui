@@ -1,31 +1,7 @@
-import styled, { ThemedStyledProps } from 'styled-components'
-import { ColourTheme, ThemeType } from 'styles/theme'
+import styled from 'styled-components'
+import StyledButton from 'styles/common/StyledButton'
 
-const { MAIN, SECONDARY } = ThemeType
-
-export interface ButtonBaseProps {
-  // $alt button theme toggle
-  $alt?: boolean
-  $border?: boolean
-  theme: ThemedStyledProps<ColourTheme, ColourTheme>
-}
-
-export const ButtonBase = styled.button.attrs(({ $alt, $border, theme }: ButtonBaseProps) => ({
-  // Allow toggling buttons as ALT/MAIN and grab appropriate theme
-  button: theme.button[$alt ? SECONDARY : MAIN],
-  $border,
-}))`
-  border: 0.1rem solid;
-  border-color: ${({ $border, button }): string => ($border ? button.text1 : 'transparent')};
-  background-color: ${({ button }): string => button.bg1};
-  color: ${({ button }): string => button.text1};
-
-  &:hover {
-    border-color: ${({ button }): string => button.bg1Hover};
-    background-color: ${({ button }): string => button.bg1Hover};
-    color: ${({ button }): string => button.text1Hover};
-  }
-
+export const ButtonBase = styled(StyledButton)`
   border-radius: 2rem;
   cursor: pointer;
   font-weight: bold;
@@ -35,16 +11,6 @@ export const ButtonBase = styled.button.attrs(({ $alt, $border, theme }: ButtonB
   transition: all 0.2s ease-in-out;
   transition-property: color, background-color, border-color, opacity;
 
-  &.cancel {
-    background: transparent;
-    color: var(--color-text-active);
-
-    &:hover {
-      background-color: var(--color-background-button-hover);
-      color: var(--color-text-button-hover);
-    }
-  }
-
   &:disabled,
   &[disabled] {
     &:hover {
@@ -52,35 +18,6 @@ export const ButtonBase = styled.button.attrs(({ $alt, $border, theme }: ButtonB
     }
     opacity: 0.35;
     pointer-events: none;
-  }
-
-  &.success {
-    border-color: var(--color-button-success);
-    color: var(--color-button-success);
-    :hover {
-      background-color: var(--color-button-success);
-      border-color: var(--color-button-success);
-      color: var(--color-background-pageWrapper);
-    }
-  }
-
-  &.danger {
-    border-color: var(--color-button-danger);
-    color: var(--color-button-danger);
-    :hover {
-      background-color: var(--color-button-danger);
-      border-color: var(--color-button-danger);
-      color: var(--color-background-pageWrapper);
-    }
-  }
-
-  &.secondary {
-    border-color: var(--color-button-secondary);
-    color: var(--color-button-secondary);
-    :hover {
-      border-color: black;
-      color: black;
-    }
   }
 
   &.big {
