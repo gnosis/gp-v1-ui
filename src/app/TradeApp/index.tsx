@@ -44,7 +44,7 @@ const PortfolioLink = styled.li`
   }
 
   &:hover > a::before {
-    background: url(${PortfolioImageWhite}) no-repeat center/contain;
+    background-image: url(${PortfolioImageWhite});
   }
 `
 

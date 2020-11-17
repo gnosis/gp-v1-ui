@@ -1,19 +1,21 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Frame } from 'components/common/Frame'
+
+import OrderForm from 'components/OrderForm'
 
 const Wrapper = styled.div`
-  h2 {
-    margin: 20px;
-  }
-
-  text-align: center;
+  display: flex;
+  overflow: hidden;
+  flex: 1 1 auto;
+  width: 100%;
+  height: calc(100vh - var(--height-bar-default));
+  position: fixed;
+  top: var(--height-bar-default);
 `
 
 export const Trading: React.FC = () => (
   <Wrapper>
-    <h2>Trading page</h2>
-    <Frame>Trade page content</Frame>
+    <OrderForm />
   </Wrapper>
 )
 
