@@ -10,27 +10,23 @@ interface Props {
   tabItems: TabItemType[]
 }
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+
+  > ul {
+    list-style: none;
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 0;
+    justify-content: space-between;
+    width: 100%;
+  }
+`
+
 const Tabs: React.FC<Props> = (props) => {
   const [activeTab, setActiveTab] = useState<number>(1)
-
-  const onTabClick = (id: number): void => {
-    return setActiveTab(id)
-  }
-
-  const Wrapper = styled.div`
-    display: flex;
-    flex-flow: column;
-    width: 100%;
-
-    > ul {
-      list-style: none;
-      display: flex;
-      flex-flow: row nowrap;
-      padding: 0;
-      justify-content: space-between;
-      width: 100%;
-    }
-  `
 
   return (
     <Wrapper>
@@ -40,7 +36,7 @@ const Tabs: React.FC<Props> = (props) => {
             key={id}
             id={id}
             title={title}
-            onTabClick={(): void => onTabClick(id)}
+            onTabClick={(): void => setActiveTab(id)}
             isActive={activeTab === id}
             activeColor={activeColor}
           />

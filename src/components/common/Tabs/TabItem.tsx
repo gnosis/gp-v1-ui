@@ -38,7 +38,7 @@ const Wrapper = styled.li<WrapperProps>`
   }
 
   &.isActive {
-    background: ${(props): string => (props.activeColor || 'var(--color-primary)')};
+    background: ${(props): string => `var(${props.activeColor})` || 'var(--color-primary)'};
     color: var(--color-text-primary);
   }
 `
