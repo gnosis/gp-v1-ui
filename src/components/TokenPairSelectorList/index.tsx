@@ -10,6 +10,6 @@ const Wrapper = styled.div`
   background: yellow;
   left: 0;
 `
-export const TokenPairSelectorList: React.FC = () => <Wrapper>-Token Pair List Element -</Wrapper>
+const TokenPairSelectorList: React.FC = () => <Wrapper>-Token Pair List Element -</Wrapper>
 
 export default TokenPairSelectorList

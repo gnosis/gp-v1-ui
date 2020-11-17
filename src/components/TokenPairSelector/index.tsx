@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { TokenPairSelectorStyled as Wrapper } from './tokenPairSelector.styled'
-import { TokenPairSelectorList } from 'components/TokenPairSelectorList'
+import TokenPairSelectorList from 'components/TokenPairSelectorList'
 
 type selectorProps = {
   selectedPair: string

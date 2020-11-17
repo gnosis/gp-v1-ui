@@ -55,7 +55,15 @@ const schema = Joi.object({
       [REQUIRED]: 'Invalid sell amount',
       [GREATER]: 'Invalid sell amount',
     }),
-  receiveToken: Joi.number().unsafe().required(),
+  receiveToken: Joi.number()
+    .unsafe()
+    .greater(0)
+    .required()
+    .messages({
+      [BASE]: 'Invalid receive amount',
+      [REQUIRED]: 'Invalid receive amount',
+      [GREATER]: 'Invalid receive amount: adjust order parameters',
+    }),
   price: Joi.number()
     // allow unsafe JS numbers
     .unsafe()

@@ -63,20 +63,13 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
 
   const limitPrice = limitPriceString && parseBigNumber(limitPriceString)
 
-  // No comparable prices, or user opting for suggested fill price
-  // round values before comparing
-  if (
-    // if any of the limit/fill/bestAsk params are
-    // null or zero, return null
-    !limitPrice ||
-    limitPrice.isZero() ||
-    !fillPrice ||
-    !bestAskPrice ||
-    // round to 5 places and check limit = fill
-    fillPrice.toFixed(12) === limitPrice.toFixed(12)
-  )
+  // No calculatable prices: stop early
+  if (!limitPrice || limitPrice.isZero() || !fillPrice || !bestAskPrice) {
     return null
+  }
 
+  // Limit price BigNumber === Fill price BigNumber - order is optimised, no warnings
+  const fillPriceMatchesLimitPrice = limitPrice.eq(fillPrice)
   // Is user's limit price less than the suggested fill price?
   const orderWontBeFullyExecuted = limitPrice.lt(fillPrice)
   // Is user's limit price less than suggested fill price AND best ask?
@@ -95,6 +88,9 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
     !isPriceAboveDeepMarketThreshold && limitPrice.gte(fillPrice.times(MID_PLACEHOLDER_SLIPPAGE))
 
   switch (true) {
+    // CASE 4 & 3: price matches fill price, orders goes ahead
+    case fillPriceMatchesLimitPrice:
+      return null
     // CASE 6: Limit price is GREATER THAN Fill price AND upper threshold 5%
     case isPriceAboveDeepMarketThreshold:
       return WARNINGS.DEEP_MARKET
@@ -106,9 +102,8 @@ function determinePriceWarning(params: PriceImpactArgs, impact: BigNumber | null
     // CASE 2
     case isPriceMidImpactAndExecutable:
       return WARNINGS.MAYBE_FULLY_EXECUTED
-    // CASE 4 & 3
     default:
-      return ''
+      return null
   }
 }
 
