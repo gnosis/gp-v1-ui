@@ -4,28 +4,25 @@ const blueDark = '#0b66c6'
 const bgLight = '#edf2f7'
 const bgDark = '#2e2e2e'
 const blackLight = '#181a1b'
-// const black = '#000'
 
 export enum ThemeType {
   MAIN = 'main',
   SECONDARY = 'secondary',
 }
 
-interface ColourThemeBase {
-  [t: string]:
-    | {
-        [key in ThemeType]?:
-          | {
-              [prop: string]: string
-            }
-          | string
-          | undefined
-      }
-    | string
+type SubTheme = {
+  [key in ThemeType]: {
+    [prop: string]: string
+  }
 }
 
-export type ColourTheme = ColourThemeBase & {
+interface ColourThemeBase {
+  [t: string]: SubTheme | string | undefined
+}
+
+export interface ColourTheme extends ColourThemeBase {
   bg1: string
+  button: SubTheme
 }
 
 const darkTheme: ColourTheme = {
