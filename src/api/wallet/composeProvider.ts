@@ -19,6 +19,7 @@ import {
   removeAllTxsPendingApproval,
   removeTxPendingApproval,
 } from 'components/OuterModal'
+import { CHAIN_CALLS_RATE_LIMIT } from 'const'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sanitizeErrorData = (jsonRpcError?: JsonRpcError<any>): void => {
@@ -327,18 +328,20 @@ export const composeProvider = <T extends Provider>(
     }
   }
 
-  const passThroughMware: JsonRpcMiddleware = (_req, _res, next) => next()
-  const rateLimitedPassThrough = rateLimit(passThroughMware, 100) // a more visible delay of 100ms
+  if (CHAIN_CALLS_RATE_LIMIT > 0) {
+    const passThroughMware: JsonRpcMiddleware = (_req, _res, next) => next()
+    const rateLimitedPassThrough = rateLimit(passThroughMware, 100) // a more visible delay of 100ms
 
-  engine.push((req, res, next, error) => {
-    // tx signing is wallet-dependent
-    if (req.method === 'eth_sendTransaction') {
-      return next()
-    }
+    engine.push((req, res, next, error) => {
+      // tx signing is wallet-dependent
+      if (req.method === 'eth_sendTransaction') {
+        return next()
+      }
 
-    // execute only once in _delay_ ms
-    rateLimitedPassThrough(req, res, next, error)
-  })
+      // execute only once in CHAIN_CALLS_RATE_LIMIT ms
+      rateLimitedPassThrough(req, res, next, error)
+    })
+  }
 
   const walletMiddleware = providerAsMiddleware(provider)
   engine.push(wrapInTimeout(walletMiddleware))
