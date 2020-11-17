@@ -7,7 +7,6 @@ import { compileInjects, fileExists } from './build_injects'
 // get connection data from CONFIG
 const { config } = CONFIG.defaultProviderConfig
 const providerURL = 'ethNodeUrl' in config ? config.ethNodeUrl : 'https://rinkeby.infura.io/v3/' + config.infuraId
-console.log('url', providerURL)
 
 declare global {
   interface Window {
@@ -22,7 +21,6 @@ const accountCreator = new ((Web3EthAccounts as unknown) as typeof AccountsType)
 export const account = accountCreator.create()
 
 beforeAll(async () => {
-  console.log('PROVIDER SETUP')
   // only rebuild when no file found
   // or when passed PWREBUILD=1 env var
   if (process.env.PWREBUILD || !(await fileExists(path.resolve(__dirname, '../build/inject_provider.js')))) {

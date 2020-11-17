@@ -6,8 +6,7 @@ export let page: Page
 export const baseURL = process.env.BASE_URL || 'http://localhost:8080'
 
 const isDebug = !!process.env.PWDEBUG
-console.log('isDebug', isDebug)
-let slowMo: number | undefined = undefined
+let slowMo: number | undefined
 
 // timeout to have time to account for async nature of browser actions
 jest.setTimeout(15000)
@@ -21,13 +20,11 @@ if (isDebug) {
 }
 
 beforeAll(async () => {
-  console.log('BROWSER SETUP')
   // launch chrome,headless by default
   browser = await chromium.launch({ slowMo })
   context = await browser.newContext()
 })
 beforeEach(async () => {
-  console.log('PAGE SETUP')
   // new page per test
   page = await context.newPage()
 })
