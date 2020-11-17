@@ -1,9 +1,11 @@
 import { calculatePrice, formatPrice, invertPrice, safeTokenName } from '@gnosis.pm/dex-js'
 import React, { useMemo, useState } from 'react'
+import BigNumber from 'bignumber.js'
 import { Fraction, TokenDetails } from 'types'
 
 import { SwapPrice } from 'components/common/SwapPrice'
-import { getMarket } from 'utils'
+import { amountToPrecisionUp, getMarket } from 'utils'
+import { DEFAULT_DECIMALS } from 'const'
 
 interface Props {
   buyToken: TokenDetails
@@ -18,7 +20,7 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
     sellToken,
   ])
 
-  const [price, priceInverse] = useMemo((): string[] => {
+  const [price, priceInverse] = useMemo((): BigNumber[] => {
     const buyOrderPrice = calculatePrice({
       numerator: { amount: priceFraction.numerator, decimals: buyToken.decimals },
       denominator: { amount: priceFraction.denominator, decimals: sellToken.decimals },
@@ -33,10 +35,11 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
       price = buyOrderPriceInverse
       priceInverse = buyOrderPrice
     }
-    return [formatPrice(price), formatPrice(priceInverse)]
+
+    return [price, priceInverse]
   }, [buyToken, sellToken, quoteToken, priceFraction])
 
-  let priceDisplayed: string, quoteDisplayed: TokenDetails, baseDisplayed: TokenDetails
+  let priceDisplayed: BigNumber, quoteDisplayed: TokenDetails, baseDisplayed: TokenDetails
   if (isPriceInverted) {
     priceDisplayed = priceInverse
     quoteDisplayed = baseToken
@@ -47,9 +50,18 @@ export const SmartPrice: React.FC<Props> = ({ buyToken, sellToken, price: priceF
     baseDisplayed = baseToken
   }
 
+  const [priceDisplay, priceDisplayFull] = useMemo(
+    // Decimals here refers to decimal places to show. Not a precision issue
+    () => [
+      formatPrice({ price: priceDisplayed, decimals: DEFAULT_DECIMALS }),
+      amountToPrecisionUp(priceDisplayed, (isPriceInverted ? baseToken : quoteToken).decimals).toString(10),
+    ],
+    [priceDisplayed, isPriceInverted, quoteToken, baseToken],
+  )
+
   return (
-    <span title={`${priceDisplayed} ${safeTokenName(quoteDisplayed)} per ${safeTokenName(baseDisplayed)}`}>
-      {priceDisplayed}
+    <span title={`${priceDisplayFull} ${safeTokenName(quoteDisplayed)} per ${safeTokenName(baseDisplayed)}`}>
+      {priceDisplay}
       &nbsp;
       <SwapPrice
         baseToken={baseToken}
