@@ -1,5 +1,6 @@
 export default {
   white: '#FFF',
+  whiteDark: '#e9e9f0',
   blue: '#218DFF',
   blueDark: '#0b66c6',
   bgLight: '#edf2f7',
