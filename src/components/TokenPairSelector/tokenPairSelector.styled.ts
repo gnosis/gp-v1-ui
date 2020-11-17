@@ -19,8 +19,8 @@ export const TokenPairSelectorStyled = styled.div`
     box-sizing: border-box;
     border-bottom: 0.1rem solid var(--color-border);
     outline: 0;
-    cursor: pointer;
     transition: color 0.3s ease-in-out;
+    cursor: pointer;
 
     &:hover {
       color: var(--color-text-primary);
