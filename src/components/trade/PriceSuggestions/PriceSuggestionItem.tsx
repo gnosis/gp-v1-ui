@@ -1,11 +1,12 @@
 import React from 'react'
 import BigNumber from 'bignumber.js'
 
-import { PRICE_ESTIMATION_PRECISION } from 'const'
+import { DEFAULT_DECIMALS } from 'const'
 import { invertPrice, TokenDex } from '@gnosis.pm/dex-js'
 
 import Spinner from 'components/common/Spinner'
 import { SwapPrice } from 'components/common/SwapPrice'
+import { amountToPrecisionDown, formatPriceWithFloor } from 'utils'
 
 export interface Props {
   label: string
@@ -26,20 +27,34 @@ interface FormattedPrices {
   inversePriceValue: string
 }
 
-const LOW_PRICE_FLOOR = new BigNumber('0.0001')
-
-export function formatPriceToPrecision(price: BigNumber, useThreshold = false): string {
-  return price.gt(LOW_PRICE_FLOOR) || !useThreshold
-    ? price.toFixed(PRICE_ESTIMATION_PRECISION)
-    : '< ' + LOW_PRICE_FLOOR.toString()
+interface GetPriceFormatted {
+  price: BigNumber | null
+  isPriceInverted: boolean
+  baseTokenDecimals: number
+  quoteTokenDecimals: number
 }
 
-function getPriceFormatted(price: BigNumber | null, isPriceInverted: boolean): FormattedPrices {
+function getPriceFormatted({
+  price,
+  isPriceInverted,
+  baseTokenDecimals,
+  quoteTokenDecimals,
+}: GetPriceFormatted): FormattedPrices {
   if (price) {
-    const inversePriceLabel = formatPriceToPrecision(invertPrice(price), true)
-    const priceLabel = formatPriceToPrecision(price, true)
-    const inversePriceValue = invertPrice(price).toString(10)
-    const priceValue = price.toString(10)
+    const inversePriceLabel = formatPriceWithFloor(invertPrice(price))
+    const priceLabel = formatPriceWithFloor(price)
+
+    // Use long precision form for accuracy
+    // Rounds away 0's
+    // See description on amountToPrecisionDown for more details/examples
+    const inversePriceValue = amountToPrecisionDown(
+      invertPrice(price),
+      // if DEFAULT_DECIMALS > someToken.decimals, show higher of the two
+      // why? long form is used for calculation so a smaller precision aka less decimals would break math
+      Math.max(baseTokenDecimals, DEFAULT_DECIMALS),
+    ).toString(10)
+
+    const priceValue = amountToPrecisionDown(price, Math.max(quoteTokenDecimals, DEFAULT_DECIMALS)).toString(10)
 
     if (isPriceInverted) {
       // Price is inverted
@@ -72,7 +87,12 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
   const { label, isPriceInverted, price, loading, baseToken, quoteToken, onSwapPrices, onClickPrice } = props
 
   // Return raw, unformatted values to pass to price calculations
-  const { priceValue, inversePriceValue, priceLabel, inversePriceLabel } = getPriceFormatted(price, isPriceInverted)
+  const { priceValue, inversePriceValue, priceLabel, inversePriceLabel } = getPriceFormatted({
+    price,
+    isPriceInverted,
+    baseTokenDecimals: baseToken.decimals,
+    quoteTokenDecimals: quoteToken.decimals,
+  })
   const displayPrice = priceLabel === 'Infinity' || inversePriceLabel === 'Infinity' ? 'N/A' : priceLabel
   return (
     <>
@@ -81,7 +101,8 @@ export const PriceSuggestionItem: React.FC<Props> = (props) => {
       </span>
       <button
         type="button"
-        title={isPriceInverted ? inversePriceValue : priceValue}
+        // PriceValue inverted above, no need to invert here
+        title={priceValue}
         disabled={loading || displayPrice === 'N/A'}
         onClick={(): void => onClickPrice(priceValue, inversePriceValue)}
       >

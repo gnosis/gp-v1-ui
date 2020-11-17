@@ -25,16 +25,13 @@ export const SimplePriceImpact: React.FC<SimplePriceImpactProps> = ({ className,
 )
 
 function PriceImpact(params: PriceImpactProps): React.ReactElement | null {
-  const {
-    baseToken: { id: baseTokenId },
-    quoteToken: { id: quoteTokenId },
-    ...rest
-  } = params
+  const { baseToken, quoteToken, fillPrice, ...rest } = params
 
   const { priceImpactSmart, priceImpactWarning, priceImpactClassName } = usePriceImpact({
     ...rest,
-    baseTokenId,
-    quoteTokenId,
+    fillPrice,
+    baseToken,
+    quoteToken,
   })
 
   return (

@@ -32,7 +32,7 @@ const Wrapper = styled.div`
   padding: var(--padding-container-default);
 `
 
-export const OrderBuySell: React.FC = () => (
+const OrderBuySell: React.FC = () => (
   <Wrapper>
     <Tabs tabItems={tabItems} />
   </Wrapper>
