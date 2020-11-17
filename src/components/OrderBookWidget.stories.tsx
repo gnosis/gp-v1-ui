@@ -35,7 +35,7 @@ export default {
     quoteToken: { control: { type: 'select', options: tokenConfigSymbols } },
     hops: {
       control: {
-        type: 'inline-radio',
+        type: 'select',
         // [0, 1, ..., ORDER_BOOK_HOPS_MAX]
         options: Array.from({ length: ORDER_BOOK_HOPS_MAX + 1 }, (_, index) => index),
       },
