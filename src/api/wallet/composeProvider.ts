@@ -299,20 +299,6 @@ export const composeProvider = <T extends Provider>(
     ),
   )
 
-  // Simple delay implementation
-  // engine.push(
-  //   createConditionalMiddleware(
-  //     (req) => req.method !== 'eth_sendTransaction',
-  //     async (req) => {
-  //       logDebug(`[composeProvider] Delaying ${req.id} call by 20ms`)
-  //       await delay(20)
-
-  //       // don't mark as handled
-  //       return false
-  //     },
-  //   ),
-  // )
-
   // rate limit a function
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function rateLimit<T extends (...args: any[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
