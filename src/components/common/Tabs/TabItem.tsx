@@ -15,8 +15,8 @@ interface WrapperProps {
 }
 
 const Wrapper = styled.li<WrapperProps>`
-  background: ${(props): string => `var(${props.isActive ? props.activeColor : '--color-primary'})`};
-  color: ${(props): string => `var(--color-text-${props.isActive ? 'primary' : 'secondary2'})`};
+  background: ${({ isActive, activeColor }): string => `var(${isActive ? activeColor : '--color-primary'})`};
+  color: ${({ isActive }): string => `var(--color-text-${isActive ? 'primary' : 'secondary2'})`};
   height: var(--height-button-default);
   display: flex;
   align-items: center;
