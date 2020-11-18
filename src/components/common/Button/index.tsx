@@ -1,15 +1,22 @@
-import styled from 'styled-components'
-import StyledButton from 'styles/common/StyledButton'
+import React from 'react'
 
-export const ButtonBase = styled(StyledButton)`
+import styled from 'styled-components'
+import StyledButton, { ButtonVariations } from 'styles/common/StyledButton'
+
+export interface ButtonBaseProps {
+  kind?: keyof typeof ButtonVariations
+}
+
+export const ButtonBase = styled(StyledButton)<ButtonBaseProps>`
   border-radius: 2rem;
   cursor: pointer;
   font-weight: bold;
   outline: 0;
   padding: 0.5rem 1rem;
 
-  transition: all 0.2s ease-in-out;
-  transition-property: color, background-color, border-color, opacity;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+  transition-property: color, background-color, border-color, opacity, margin;
 
   &:disabled,
   &[disabled] {
@@ -30,3 +37,28 @@ export const ButtonBase = styled(StyledButton)`
     padding: 0.3rem 0.5rem;
   }
 `
+
+const ThemeButtonToggleWrapper = styled.div<{ $mode: boolean }>`
+  display: inline-flex;
+  width: 5rem;
+  background-color: gainsboro;
+  border-radius: 2rem;
+
+  > button {
+    width: 75%;
+    margin-left: ${({ $mode }): string | false => ($mode ? 'auto' : '0')};
+  }
+`
+
+export const ThemeButton: React.FC<
+  ButtonBaseProps & {
+    onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined
+    mode: boolean
+  }
+> = (props) => {
+  return (
+    <ThemeButtonToggleWrapper $mode={props.mode}>
+      <ButtonBase {...props} />
+    </ThemeButtonToggleWrapper>
+  )
+}

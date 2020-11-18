@@ -24,19 +24,20 @@ const { buttonBorder } = StyleSheet
 // Used in stories
 // Good to keep around altough not required
 export enum ButtonVariations {
-  'default',
-  'primary',
-  'secondary',
-  'danger',
-  'success',
-  'warning',
-  'cancel',
+  default,
+  primary,
+  secondary,
+  danger,
+  success,
+  warning,
+  cancel,
+  theme,
 }
 
 // Create our variated Button Theme
 // 'kind' refers to a prop on button
 // <ButtonBase kind="danger" />
-export const ButtonTheme = variants('mode', 'kind', {
+export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode', 'kind', {
   default: {
     light: css`
       color: ${white};
@@ -156,6 +157,26 @@ export const ButtonTheme = variants('mode', 'kind', {
       &:hover {
         color: ${whiteDark};
         background-color: ${blueDark};
+      }
+    `,
+  },
+  theme: {
+    light: css`
+      color: ${white};
+      background: lightsalmon;
+
+      &:hover {
+        color: ghostwhite;
+        background-color: darkorange;
+      }
+    `,
+    dark: css`
+      color: ghostwhite;
+      background: purple;
+
+      &:hover {
+        color: ${white};
+        background-color: darkpurple;
       }
     `,
   },
