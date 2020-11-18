@@ -204,8 +204,10 @@ export const composeProvider = <T extends Provider>(
           const gasLimit = await web3.eth
             .estimateGas({
               from: txConfig.from,
+              to: txConfig.to,
               gas: txConfig.gas,
               value: txConfig.value,
+              data: txConfig.data,
             })
             .catch((error) => {
               console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
