@@ -8,7 +8,7 @@ import useSafeState from 'hooks/useSafeState'
 import { TokenDetails } from 'types'
 import styled from 'styled-components'
 import { Input } from 'components/Input'
-import { MEDIA, ORDER_BOOK_HOPS_DEFAULT, ORDER_BOOK_HOPS_MAX } from 'const'
+import { MEDIA, ORDER_BOOK_HOPS_MAX } from 'const'
 import InputBox from 'components/InputBox'
 
 const OrderBookPage = styled(ContentPage)`
@@ -84,8 +84,19 @@ const OrderBook: React.FC = () => {
   const { tokens: tokenList } = useTokenList({ networkId: networkIdOrDefault })
   const [baseToken, setBaseToken] = useSafeState<TokenDetails | null>(null)
   const [quoteToken, setQuoteToken] = useSafeState<TokenDetails | null>(null)
-  const [hops, setHops] = useSafeState(ORDER_BOOK_HOPS_DEFAULT)
   const [batchId, setBatchId] = useSafeState<number | undefined>(undefined)
+  const [hopsValue, setHopsValue] = useSafeState('')
+  const hops = useMemo(() => {
+    if (hopsValue) {
+      const parsedHops = Number(hopsValue)
+
+      if (!Number.isNaN(parsedHops)) {
+        return parsedHops
+      }
+    }
+
+    return undefined
+  }, [hopsValue])
 
   const tokensLoaded = tokenList.length !== 0
   useEffect(() => {
@@ -132,16 +143,11 @@ const OrderBook: React.FC = () => {
           <InputBox>
             <label>Hops</label>
             <Input
-              value={hops}
+              value={hopsValue}
               type="number"
               min="0"
               max={ORDER_BOOK_HOPS_MAX.toString()}
-              onChange={(e: ChangeEvent<HTMLInputElement>): void => {
-                const hopsValue = e.target.value
-                if (hopsValue && !Number.isNaN(Number(hopsValue))) {
-                  setHops(Number(hopsValue))
-                }
-              }}
+              onChange={(e: ChangeEvent<HTMLInputElement>): void => setHopsValue(e.target.value)}
             />
           </InputBox>
         </span>
