@@ -30,6 +30,9 @@ assert(
 )
 
 const browserType = browserFlag ? availableBrowsers[browserFlag] : chromium
+
+const executablePath = process.env.EXECUTABLE_PATH
+
 // PWDEBUG is playwright specific flag
 // sets up window.playwright and other stuff
 const isDebug = !!process.env.PWDEBUG
