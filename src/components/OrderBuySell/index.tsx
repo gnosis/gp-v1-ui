@@ -9,8 +9,6 @@ export interface TabItemType {
   readonly activeColor?: string
 }
 
-// pass string props to indicate what content/component to show
-
 const tabItems: TabItemType[] = [
   {
     id: 1,
