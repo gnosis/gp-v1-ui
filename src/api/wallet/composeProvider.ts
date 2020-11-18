@@ -203,7 +203,6 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig.gas) {
           // Remove gasPrice from the estimation props, since they broke after last hardfork
           //  https://github.com/gnosis/dex-react/pull/1618
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { gasPrice, ...txConfigEstimation } = txConfig
           const gasLimit = await web3.eth.estimateGas(txConfigEstimation).catch((error) => {
             console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
