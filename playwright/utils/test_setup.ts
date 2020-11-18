@@ -1,10 +1,35 @@
-import { chromium, ChromiumBrowser, Page, BrowserContext } from 'playwright'
-export let browser: ChromiumBrowser
+import {
+  chromium,
+  firefox,
+  webkit,
+  ChromiumBrowser,
+  FirefoxBrowser,
+  WebKitBrowser,
+  BrowserType,
+  Page,
+  BrowserContext,
+} from 'playwright'
+import { assert } from '@gnosis.pm/dex-js'
+export let browser: ChromiumBrowser | FirefoxBrowser | WebKitBrowser
 export let context: BrowserContext
 export let page: Page
 
 export const baseURL = process.env.BASE_URL || 'http://localhost:8080'
 
+const availableBrowsers: Record<string, BrowserType<ChromiumBrowser | FirefoxBrowser | WebKitBrowser>> = {
+  chromium,
+  firefox,
+  webkit,
+}
+
+const browserFlag = process.env.BROWSER
+
+assert(
+  !browserFlag || browserFlag in availableBrowsers,
+  `unsupported environment variable BROWSER=${browserFlag}. Use ${Object.keys(availableBrowsers).join(', ')}`,
+)
+
+const browserType = browserFlag ? availableBrowsers[browserFlag] : chromium
 // PWDEBUG is playwright specific flag
 // sets up window.playwright and other stuff
 const isDebug = !!process.env.PWDEBUG
@@ -23,7 +48,7 @@ if (isDebug) {
 
 beforeAll(async () => {
   // launch chrome,headless by default
-  browser = await chromium.launch({ slowMo })
+  browser = await browserType.launch({ slowMo, executablePath })
   context = await browser.newContext()
 })
 beforeEach(async () => {
