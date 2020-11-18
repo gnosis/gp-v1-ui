@@ -3,20 +3,13 @@ import styled from 'styled-components'
 
 interface TabProps {
   title: string
-  readonly id: number
-  onTabClick: (arg: number) => void
-  isActive: boolean
-  readonly activeColor?: string
+  onTabClick: () => void
+  readonly activeColor: string | false
 }
 
-interface WrapperProps {
-  readonly activeColor?: string
-  isActive: boolean
-}
-
-const Wrapper = styled.li<WrapperProps>`
-  background: ${({ isActive, activeColor }): string => `var(${isActive ? activeColor : '--color-primary'})`};
-  color: ${({ isActive }): string => `var(--color-text-${isActive ? 'primary' : 'secondary2'})`};
+const Wrapper = styled.li<Pick<TabProps, 'activeColor'>>`
+  background: ${({ activeColor }): string => `var(${activeColor || '--color-primary'})`};
+  color: ${({ activeColor }): string => `var(--color-text-${activeColor ? 'primary' : 'secondary2'})`};
   height: var(--height-button-default);
   display: flex;
   align-items: center;
@@ -39,14 +32,10 @@ const Wrapper = styled.li<WrapperProps>`
   }
 `
 
-const TabItem: React.FC<TabProps> = (props) => {
-  const { onTabClick, id, title, isActive, activeColor } = props
-
-  return (
-    <Wrapper activeColor={activeColor} isActive={isActive} onClick={(): void => onTabClick(id)}>
-      {title}
-    </Wrapper>
-  )
-}
+const TabItem: React.FC<TabProps> = ({ onTabClick, title, activeColor }) => (
+  <Wrapper activeColor={activeColor} onClick={onTabClick}>
+    {title}
+  </Wrapper>
+)
 
 export default TabItem
