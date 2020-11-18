@@ -25,24 +25,22 @@ const Wrapper = styled.div`
   }
 `
 
-const Tabs: React.FC<Props> = (props) => {
-  const [activeTab, setActiveTab] = useState<number>(1)
+const Tabs: React.FC<Props> = ({ tabItems }) => {
+  const [activeTab, setActiveTab] = useState(1)
 
   return (
     <Wrapper>
       <ul>
-        {props.tabItems.map(({ id, title, activeColor }) => (
+        {tabItems.map(({ id, title, activeColor }) => (
           <TabItem
             key={id}
-            id={id}
             title={title}
             onTabClick={(): void => setActiveTab(id)}
-            isActive={activeTab === id}
-            activeColor={activeColor}
+            activeColor={activeTab === id && activeColor}
           />
         ))}
       </ul>
-      <TabContent tabItems={props.tabItems} activeTab={activeTab} />
+      <TabContent tabItems={tabItems} activeTab={activeTab} />
     </Wrapper>
   )
 }
