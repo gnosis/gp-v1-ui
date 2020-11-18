@@ -201,16 +201,13 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth
-            .estimateGas({
-              from: txConfig.from,
-              gas: txConfig.gas,
-              value: txConfig.value,
-            })
-            .catch((error) => {
-              console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
-              throw error
-            })
+          // gas breaks MMask estimation
+          const { gas: _, ...txConfigWithoutGas } = txConfig
+
+          const gasLimit = await web3.eth.estimateGas(txConfigWithoutGas).catch((error) => {
+            console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
+            throw error
+          })
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
           txConfig.gas = numberToHex(gasLimit)
         } else {
