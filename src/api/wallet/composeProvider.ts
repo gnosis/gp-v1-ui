@@ -201,18 +201,12 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth
-            .estimateGas({
-              from: txConfig.from,
-              to: txConfig.to,
-              gas: txConfig.gas,
-              value: txConfig.value,
-              data: txConfig.data,
-            })
-            .catch((error) => {
-              console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
-              throw error
-            })
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { gasPrice, ...otherProps } = txConfig
+          const gasLimit = await web3.eth.estimateGas(otherProps).catch((error) => {
+            console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
+            throw error
+          })
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
           txConfig.gas = numberToHex(gasLimit)
         } else {
