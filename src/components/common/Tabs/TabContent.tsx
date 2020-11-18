@@ -6,15 +6,12 @@ type Props = {
   activeTab: number
 }
 
-const TabContent: React.FC<Props> = (props) => {
-  const { tabItems, activeTab } = props
-  return (
-    <div>
-      {tabItems.map((tab) => {
-        return tab.id === activeTab ? tab.content : null
-      })}
-    </div>
-  )
-}
+const TabContent: React.FC<Props> = ({ tabItems, activeTab }) => (
+  <div>
+    {tabItems.map((tab) => {
+      return tab.id === activeTab ? tab.content : null
+    })}
+  </div>
+)
 
 export default TabContent

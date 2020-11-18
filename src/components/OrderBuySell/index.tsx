@@ -6,7 +6,7 @@ export interface TabItemType {
   readonly id: number
   title: string
   content: string
-  readonly activeColor?: string
+  readonly activeColor: string
 }
 
 const tabItems: TabItemType[] = [
