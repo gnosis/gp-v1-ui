@@ -39,7 +39,7 @@ const isDebug = !!process.env.PWDEBUG
 let slowMo: number | undefined
 
 // timeout to have time to account for async nature of browser actions
-jest.setTimeout(15000)
+jest.setTimeout(30000)
 if (isDebug) {
   // slow down playright actions
   slowMo = 2000
