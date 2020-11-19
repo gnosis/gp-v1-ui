@@ -13,14 +13,13 @@ export default {
   decorators: [ThemeToggler],
   argTypes: {
     label: { control: 'text' },
-    kind: { control: 'inline-radio', options: ButtonVariations },
-    as: {
-      control: null,
+    kind: {
+      control: 'inline-radio',
+      options: ButtonVariations,
     },
+    as: { control: null },
     theme: { control: null },
-    forwardedAs: {
-      control: null,
-    },
+    forwardedAs: { control: null },
   },
 } as Meta
 
