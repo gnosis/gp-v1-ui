@@ -14,9 +14,9 @@ interface WrapperProps {
   isActive: boolean
 }
 
-const Wrapper = styled.li<WrapperProps>`
+const Wrapper = styled.button<WrapperProps>`
   background: ${({ isActive, activeColor }): string => `var(${isActive ? activeColor : '--color-primary'})`};
-  color: ${({ isActive }): string => `var(--color-text-${isActive ? 'primary' : 'secondary2'})`};
+  color: ${({ isActive }): string => `var(--color-${isActive ? 'primary' : 'secondary2'})`};
   height: var(--height-button-default);
   display: flex;
   align-items: center;
@@ -25,8 +25,13 @@ const Wrapper = styled.li<WrapperProps>`
   font-size: var(--font-size-large);
   letter-spacing: 0.1rem;
   text-align: center;
+  appearance: none;
+  border: 0;
   justify-content: center;
   cursor: pointer;
+  outline: 0;
+
+  /* TODO: Provide alternative :focus styling because of using outline: 0; */
 
   &:first-of-type {
     border-top-left-radius: var(--border-radius-default);
@@ -43,7 +48,13 @@ const TabItem: React.FC<TabProps> = (props) => {
   const { onTabClick, id, title, isActive, activeColor } = props
 
   return (
-    <Wrapper activeColor={activeColor} isActive={isActive} onClick={(): void => onTabClick(id)}>
+    <Wrapper
+      role="tab"
+      activeColor={activeColor}
+      aria-selected={isActive}
+      isActive={isActive}
+      onClick={(): void => onTabClick(id)}
+    >
       {title}
     </Wrapper>
   )
