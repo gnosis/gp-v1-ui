@@ -7,13 +7,11 @@ describe('Connect Wallet', () => {
     await page.goto(baseURL)
 
     // WHEN: connected a Wallet
-    // Click text=/.*Connect Wallet.*/
-    await page.click('text=/.*Connect Wallet.*/')
-
-    await page.click('text=Web3')
+    await page.click('"Connect Wallet"')
+    await page.click('"Web3"')
 
     // WHEN: Wallet popup is open
-    await page.click('header >> text=Web3')
+    await page.click('header >> "Web3"')
 
     // THEN: wallet connected & address available
     // XPATH: closest ancestor with 0x* text of element with text "Copy address to clipboard"
