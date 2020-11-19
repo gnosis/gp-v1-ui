@@ -238,14 +238,14 @@ const Footer: React.FC = () => {
         <div className="version">
           <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
             Web: v{VERSION}
-          </a>{' '}
+          </a>
           <a
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks"
           >
             App Id: {CONFIG.appId}
-          </a>{' '}
+          </a>
           <a
             target="_blank"
             rel="noopener noreferrer"
