@@ -40,7 +40,7 @@ const Tabs: React.FC<Props> = ({ tabItems }) => {
           />
         ))}
       </ul>
-      <TabContent tabItems={tabItems} activeTab={activeTab} />
+      <TabContent content={tabItems.find((tab) => tab.id === activeTab)?.content} />
     </Wrapper>
   )
 }

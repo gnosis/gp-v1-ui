@@ -1,17 +1,9 @@
 import React from 'react'
-import { TabItemType } from 'components/OrderBuySell'
 
 type Props = {
-  tabItems: TabItemType[]
-  activeTab: number
+  content: string
 }
 
-const TabContent: React.FC<Props> = ({ tabItems, activeTab }) => (
-  <div>
-    {tabItems.map((tab) => {
-      return tab.id === activeTab ? tab.content : null
-    })}
-  </div>
-)
+const TabContent: React.FC<Props> = ({ content }) => <div>{content}</div>
 
 export default TabContent
