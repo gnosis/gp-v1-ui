@@ -1,5 +1,7 @@
-import styled, { css } from 'styled-components'
-import { ThemeValue, variants } from 'styled-theming'
+import React from 'react'
+
+import styled, { css, ThemeProvider } from 'styled-components'
+import { ThemeMap, ThemeValue, variants } from 'styled-theming'
 
 import ColourSheet from '../colours'
 import StyleSheet from '../styles'
@@ -23,7 +25,12 @@ const {
   disabledLightOpaque,
 } = ColourSheet
 
-const { buttonBorder } = StyleSheet
+const { buttonBorder, buttonFontSize } = StyleSheet
+
+type AppThemes = 'dark' | 'light'
+interface ThemeMode {
+  mode: AppThemes
+}
 
 // Used in stories
 // Good to keep around altough not required
@@ -195,22 +202,41 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
   },
 })
 
-/*
-TODO: consider adding:
-  &.small {
-    font-size: 0.6rem;
-    padding: 0.3rem 0.5rem;
-  }
+// Created a 'size' prop on buttons, default | small | big
+const ButtonSizes = variants('component', 'size', {
+  default: {
+    buttons: '',
+  },
+  small: {
+    buttons: css`
+      font-size: 0.6rem;
+      padding: 0.3rem 0.5rem;
+    `,
+  },
+  big: {
+    buttons: css`
+      font-size: 1.4rem;
+      padding: 0.65rem 1rem;
+    `,
+  },
+})
 
-  &.big {
-    font-size: 1.2rem;
-    padding: 0.65rem 1rem;
-  }
-*/
-
-export default styled.button`
+const ColouredButtonBase = styled.button`
   border: ${buttonBorder};
-
   /* Fold in theme css above */
   ${ButtonTheme}
 `
+
+const ColouredAndSizedButtonBase = styled(ColouredButtonBase)`
+  font-size: ${buttonFontSize};
+  ${ButtonSizes}
+`
+// Wrap ColouredAndSizedButtonsBase in it's own ThemeProvider which takes the toplevel app theme
+// ThemeProvider and interpolate over it's props
+const ThemedButtonBase: React.FC<React.ButtonHTMLAttributes<Element>> = (props) => (
+  <ThemeProvider theme={({ mode }: ThemeMode): ThemeMap => ({ mode, component: 'buttons' })}>
+    <ColouredAndSizedButtonBase {...props} />
+  </ThemeProvider>
+)
+
+export default ThemedButtonBase
