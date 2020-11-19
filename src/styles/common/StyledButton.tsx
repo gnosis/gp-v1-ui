@@ -46,6 +46,8 @@ export enum ButtonVariations {
   theme = 'theme',
 }
 
+export type ButtonSizeVariations = 'default' | 'small' | 'big'
+
 // Create our variated Button Theme
 // 'kind' refers to a prop on button
 // <ButtonBase kind="danger" />
