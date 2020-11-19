@@ -5,7 +5,8 @@ import Tabs from 'components/common/Tabs/Tabs'
 export interface TabItemType {
   readonly id: number
   title: string
-  content?: string | undefined
+  // content?: string | undefined
+  content?: any
   readonly activeColor: string
 }
 
