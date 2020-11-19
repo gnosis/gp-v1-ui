@@ -39,5 +39,4 @@
       "*": ["custom/*", "src/*"]
     }
   },
-  "exclude": ["cypress"]
 }
