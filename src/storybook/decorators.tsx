@@ -30,7 +30,7 @@ export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => 
       <ThemeProvider theme={theme}>
         <Frame style={{ background: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
         {/* Cheeky use of ButtonBase here :P */}
-        <ThemeButton kind={ButtonVariations.theme} onClick={handleDarkMode} mode={darkMode}>
+        <ThemeButton size="small" kind={ButtonVariations.theme} onClick={handleDarkMode} mode={darkMode}>
           <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
         </ThemeButton>
         <br />
