@@ -1,7 +1,7 @@
 import React from 'react'
 
 type Props = {
-  content: string
+  content?: string | undefined
 }
 
 const TabContent: React.FC<Props> = ({ content }) => <div>{content}</div>
