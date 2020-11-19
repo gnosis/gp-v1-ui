@@ -13,10 +13,8 @@ export default {
   decorators: [ThemeToggler],
   argTypes: {
     label: { control: 'text' },
-    kind: {
-      control: 'inline-radio',
-      options: ButtonVariations,
-    },
+    kind: { control: 'radio' },
+    size: { control: 'inline-radio' },
     as: { control: null },
     theme: { control: null },
     forwardedAs: { control: null },
@@ -68,4 +66,18 @@ DisabledButton.args = {
   label: 'Disabled Button',
   kind: ButtonVariations.disabled,
   disabled: true,
+}
+
+export const BigButton = Template.bind({})
+BigButton.args = {
+  label: 'Big Button',
+  kind: ButtonVariations.primary,
+  size: 'big',
+}
+
+export const SmolButton = Template.bind({})
+SmolButton.args = {
+  label: 'Smol Button',
+  kind: ButtonVariations.primary,
+  size: 'small',
 }
