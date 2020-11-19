@@ -31,35 +31,42 @@ const Template: Story<ButtonBaseProps & { label?: string | React.ReactNode }> = 
 export const PrimaryButton = Template.bind({})
 PrimaryButton.args = {
   label: 'Main Button',
-  kind: 'default',
+  kind: ButtonVariations.default,
 }
 
 export const SecondaryButton = Template.bind({})
 SecondaryButton.args = {
   label: 'Secondary Button',
-  kind: 'secondary',
+  kind: ButtonVariations.secondary,
 }
 
 export const SuccessButton = Template.bind({})
 SuccessButton.args = {
   label: 'Success Button',
-  kind: 'success',
+  kind: ButtonVariations.success,
 }
 
 export const WarningButton = Template.bind({})
 WarningButton.args = {
   label: 'Warning Button',
-  kind: 'warning',
+  kind: ButtonVariations.warning,
 }
 
 export const DangerButton = Template.bind({})
 DangerButton.args = {
   label: 'Danger Button',
-  kind: 'danger',
+  kind: ButtonVariations.danger,
 }
 
 export const CancelButton = Template.bind({})
 CancelButton.args = {
   label: 'Cancel Button',
-  kind: 'cancel',
+  kind: ButtonVariations.cancel,
+}
+
+export const DisabledButton = Template.bind({})
+DisabledButton.args = {
+  label: 'Disabled Button',
+  kind: ButtonVariations.disabled,
+  disabled: true,
 }

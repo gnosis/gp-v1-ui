@@ -13,11 +13,12 @@ import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
 
 import { ThemeButton } from 'components/common/Button'
 
-import { ThemeProvider } from 'styled-components'
 import COLOURS from 'styles/colours'
+import { ThemeProvider } from 'styled-components'
+import { ButtonVariations } from 'styles/common/StyledButton'
 
 export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
-  const [darkMode, setDarkMode] = React.useState(false)
+  const [darkMode, setDarkMode] = React.useState(true)
   const theme = {
     mode: darkMode ? 'dark' : 'light',
   }
@@ -29,7 +30,7 @@ export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => 
       <ThemeProvider theme={theme}>
         <Frame style={{ backgroundColor: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
         {/* Cheeky use of ButtonBase here :P */}
-        <ThemeButton kind="theme" onClick={handleDarkMode} mode={darkMode}>
+        <ThemeButton kind={ButtonVariations.theme} onClick={handleDarkMode} mode={darkMode}>
           <FontAwesomeIcon icon={darkMode ? faSun : faMoon} />
         </ThemeButton>
         <br />

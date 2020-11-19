@@ -3,7 +3,7 @@ import React from 'react'
 import styled from 'styled-components'
 import StyledButton, { ButtonVariations } from 'styles/common/StyledButton'
 
-export interface ButtonBaseProps {
+export interface ButtonBaseProps extends React.ButtonHTMLAttributes<Element> {
   kind?: keyof typeof ButtonVariations
 }
 
@@ -52,7 +52,6 @@ const ThemeButtonToggleWrapper = styled.div<{ $mode: boolean }>`
 
 export const ThemeButton: React.FC<
   ButtonBaseProps & {
-    onClick: ((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void) | undefined
     mode: boolean
   }
 > = (props) => {

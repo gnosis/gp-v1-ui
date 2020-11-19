@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components'
-import { variants } from 'styled-theming'
+import { ThemeValue, variants } from 'styled-theming'
 
 import ColourSheet from '../colours'
 import StyleSheet from '../styles'
@@ -24,14 +24,15 @@ const { buttonBorder } = StyleSheet
 // Used in stories
 // Good to keep around altough not required
 export enum ButtonVariations {
-  default,
-  primary,
-  secondary,
-  danger,
-  success,
-  warning,
-  cancel,
-  theme,
+  default = 'default',
+  primary = 'primary',
+  secondary = 'secondary',
+  danger = 'danger',
+  success = 'success',
+  warning = 'warning',
+  cancel = 'cancel',
+  disabled = 'disabled',
+  theme = 'theme',
 }
 
 // Create our variated Button Theme
@@ -159,6 +160,16 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
         background-color: ${blueDark};
       }
     `,
+  },
+  disabled: {
+    light: css`
+      color: ${white};
+      opacity: 0.5;
+      background: #000;
+    `,
+    get dark(): ThemeValue {
+      return this.light
+    },
   },
   theme: {
     light: css`
