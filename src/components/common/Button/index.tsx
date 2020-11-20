@@ -26,8 +26,8 @@ const {
 const { borderRadius, buttonBorder, buttonFontSize } = BASE_STYLES
 
 export interface ButtonBaseProps extends React.ButtonHTMLAttributes<Element> {
-  $type?: ButtonVariations
-  $size?: ButtonSizeVariations
+  _type?: ButtonVariations
+  _size?: ButtonSizeVariations
 }
 
 // Used in stories
@@ -48,7 +48,7 @@ export type ButtonSizeVariations = 'default' | 'small' | 'big'
 // Create our variated Button Theme
 // 'kind' refers to a prop on button
 // <ButtonBase kind="danger" />
-export const ButtonTheme = variants<'$type', ButtonVariations>('mode', '$type', {
+export const ButtonTheme = variants('mode', '_type', {
   default: {
     light: css`
       color: ${white};
@@ -202,7 +202,7 @@ export const ButtonTheme = variants<'$type', ButtonVariations>('mode', '$type', 
 })
 
 // Created a 'size' prop on buttons, default | small | big
-const ButtonSizes = variants('component', '$size', {
+const ButtonSizes = variants('component', '_size', {
   default: {
     buttons: '',
   },
@@ -271,10 +271,10 @@ export const ThemeToggle: React.FC<
   ButtonBaseProps & {
     mode: boolean
   }
-> = ({ mode, $size = 'small', $type = 'theme', children, ...rest }) => {
+> = ({ mode, _size = 'small', _type = 'theme', children, ...rest }) => {
   return (
     <ThemeButtonToggleWrapper $mode={mode}>
-      <ButtonBase {...rest} $size={$size} $type={$type}>
+      <ButtonBase {...rest} _size={_size} _type={_type}>
         {children}
       </ButtonBase>
     </ThemeButtonToggleWrapper>

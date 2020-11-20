@@ -34,7 +34,7 @@ export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => 
         </ThemeToggle>
         <br />
         <br />
-        <code>Current theme: {darkMode ? 'DARK' : 'LIGHT'}</code>
+        <code>Current theme: {theme.mode.toUpperCase()}</code>
       </ThemeProvider>
     </>
   )
