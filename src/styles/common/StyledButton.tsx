@@ -50,7 +50,7 @@ export type ButtonSizeVariations = 'default' | 'small' | 'big'
 // Create our variated Button Theme
 // 'kind' refers to a prop on button
 // <ButtonBase kind="danger" />
-export const ButtonTheme = variants<'kind', ButtonVariations>('mode', 'kind', {
+export const ButtonTheme = variants<'$type', ButtonVariations>('mode', '$type', {
   default: {
     light: css`
       color: ${white};
@@ -204,7 +204,7 @@ export const ButtonTheme = variants<'kind', ButtonVariations>('mode', 'kind', {
 })
 
 // Created a 'size' prop on buttons, default | small | big
-const ButtonSizes = variants('component', 'size', {
+const ButtonSizes = variants('component', '$size', {
   default: {
     buttons: '',
   },
