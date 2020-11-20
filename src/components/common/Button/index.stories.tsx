@@ -12,8 +12,8 @@ export default {
   decorators: [ThemeToggler],
   argTypes: {
     label: { control: 'text' },
-    _type: { control: 'radio' },
-    _size: { control: 'inline-radio' },
+    variation: { control: 'radio' },
+    size: { control: 'inline-radio' },
     as: { control: null },
     theme: { control: null },
     forwardedAs: { control: null },
@@ -27,56 +27,56 @@ const Template: Story<ButtonBaseProps & { label?: React.ReactNode }> = (args) =>
 export const PrimaryButton = Template.bind({})
 PrimaryButton.args = {
   label: 'Main Button',
-  _type: 'default',
+  variation: 'default',
 }
 
 export const SecondaryButton = Template.bind({})
 SecondaryButton.args = {
   label: 'Secondary Button',
-  _type: 'secondary',
+  variation: 'secondary',
 }
 
 export const SuccessButton = Template.bind({})
 SuccessButton.args = {
   label: 'Success Button',
-  _type: 'success',
+  variation: 'success',
 }
 
 export const WarningButton = Template.bind({})
 WarningButton.args = {
   label: 'Warning Button',
-  _type: 'warning',
+  variation: 'warning',
 }
 
 export const DangerButton = Template.bind({})
 DangerButton.args = {
   label: 'Danger Button',
-  _type: 'danger',
+  variation: 'danger',
 }
 
 export const CancelButton = Template.bind({})
 CancelButton.args = {
   label: 'Cancel Button',
-  _type: 'cancel',
+  variation: 'cancel',
 }
 
 export const DisabledButton = Template.bind({})
 DisabledButton.args = {
   label: 'Disabled Button',
-  _type: 'disabled',
+  variation: 'disabled',
   disabled: true,
 }
 
 export const BigButton = Template.bind({})
 BigButton.args = {
   label: 'Big Button',
-  _type: 'primary',
-  _size: 'big',
+  variation: 'primary',
+  size: 'big',
 }
 
 export const SmolButton = Template.bind({})
 SmolButton.args = {
   label: 'Smol Button',
-  _type: 'primary',
-  _size: 'small',
+  variation: 'primary',
+  size: 'small',
 }
