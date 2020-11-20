@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   flex-flow: column;
   width: 100%;
 
-  > ul {
+  > div {
     list-style: none;
     display: flex;
     flex-flow: row nowrap;
@@ -30,7 +30,7 @@ const Tabs: React.FC<Props> = (props) => {
 
   return (
     <Wrapper>
-      <ul>
+      <div role="tablist">
         {props.tabItems.map(({ id, title, activeColor }) => (
           <TabItem
             key={id}
@@ -41,7 +41,7 @@ const Tabs: React.FC<Props> = (props) => {
             activeColor={activeColor}
           />
         ))}
-      </ul>
+      </div>
       <TabContent tabItems={props.tabItems} activeTab={activeTab} />
     </Wrapper>
   )
