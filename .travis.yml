@@ -17,7 +17,6 @@ script:
   # Integration test, only in tags, master and develop
   - if [[ $TRAVIS_TAG != "" || $TRAVIS_BRANCH = master || $TRAVIS_BRANCH = develop ]]; then
       yarn test:integration;
-      yarn test:playwright;
     fi
 before_install:
   # Needed to deploy pull request and releases

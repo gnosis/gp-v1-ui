@@ -19,7 +19,6 @@
     "lint": "npm-run-all --parallel lint:*",
     "stats": "rimraf ./dist && NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "MOCK=true jest --cacheDirectory .jest-cache -o",
-    "test:integration": "CYPRESS_BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 cypress:run",
     "test:coverage": "MOCK=true jest --coverage --cache --cacheDirectory .jest-cache && cat ./coverage/lcov.info | coveralls",
     "verify": "npm-run-all --parallel lint:* test",
     "format": "prettier --write \"src/**/*.ts?(x)\" \"src/**/*.js?(x)\"",
@@ -35,7 +34,7 @@
     "playwright:rebuild": "ts-node ./playwright/utils/build_injects.ts",
     "playwright:debug": "PWDEBUG=1 jest --roots playwright --runInBand",
     "playwright:record": "start-server-and-test start:dist http://localhost:8081 'playwright-cli codegen http://localhost:8081 -o output.js'",
-    "test:playwright": "BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 playwright"
+    "test:integration": "BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 playwright"
   },
   "husky": {
     "hooks": {
