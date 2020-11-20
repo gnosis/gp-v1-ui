@@ -16,6 +16,10 @@ export let page: Page
 
 export const baseURL = process.env.BASE_URL || 'http://localhost:8080'
 
+// artificially delay the test to visually see what is going on
+// only used when debugging
+const VISUAL_ACTION_DELAY = 2000 // 2 sec
+
 const availableBrowsers: Record<string, BrowserType<ChromiumBrowser | FirefoxBrowser | WebKitBrowser>> = {
   chromium,
   firefox,
@@ -42,7 +46,7 @@ let slowMo: number | undefined
 jest.setTimeout(30000)
 if (isDebug) {
   // slow down playright actions
-  slowMo = 2000
+  slowMo = VISUAL_ACTION_DELAY
 } else {
   // close after only when not debugging
   afterAll(() => browser.close())
