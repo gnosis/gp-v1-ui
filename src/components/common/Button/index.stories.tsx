@@ -20,7 +20,7 @@ export default {
   },
 } as Meta
 
-const Template: Story<ButtonBaseProps & { label?: string | React.ReactNode }> = (args) => (
+const Template: Story<ButtonBaseProps & { label?: React.ReactNode }> = (args) => (
   <ButtonBase {...args}>{args.label}</ButtonBase>
 )
 
