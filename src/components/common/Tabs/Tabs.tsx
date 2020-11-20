@@ -29,9 +29,6 @@ const Tabs: React.FC<Props> = ({ tabItems }) => {
   const [activeTab, setActiveTab] = useState(0)
   const { content } = useMemo((): TabItemType => tabItems[activeTab], [activeTab, tabItems])
 
-  console.log(tabItems)
-  console.log('activeTab ==', activeTab)
-
   return (
     <Wrapper>
       <ul>
