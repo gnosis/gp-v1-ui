@@ -1,11 +1,12 @@
 import React from 'react'
 
 import styled from 'styled-components'
-import StyledButton, { ButtonVariations } from 'styles/common/StyledButton'
+import StyledButton, { ButtonVariations, ButtonSizeVariations } from 'styles/common/StyledButton'
 import styles from 'styles/styles'
 
 export interface ButtonBaseProps extends React.ButtonHTMLAttributes<Element> {
-  kind?: keyof typeof ButtonVariations
+  $type?: ButtonVariations
+  $size?: ButtonSizeVariations
 }
 
 export const ButtonBase = styled(StyledButton)<ButtonBaseProps>`
@@ -39,11 +40,11 @@ const ThemeButtonToggleWrapper = styled.div<{ $mode: boolean }>`
 
 export const ThemeButton: React.FC<
   ButtonBaseProps & {
-    mode: boolean
+    $mode: boolean
   }
 > = (props) => {
   return (
-    <ThemeButtonToggleWrapper $mode={props.mode}>
+    <ThemeButtonToggleWrapper $mode={props.$mode}>
       <ButtonBase {...props} />
     </ThemeButtonToggleWrapper>
   )
