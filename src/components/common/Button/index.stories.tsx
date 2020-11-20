@@ -5,7 +5,6 @@ import { Story, Meta } from '@storybook/react/types-6-0'
 import { ThemeToggler } from 'storybook/decorators'
 
 import { ButtonBase, ButtonBaseProps } from './'
-import { ButtonVariations } from 'styles/common/StyledButton'
 
 export default {
   title: 'Common/Button',
@@ -28,56 +27,56 @@ const Template: Story<ButtonBaseProps & { label?: string | React.ReactNode }> = 
 export const PrimaryButton = Template.bind({})
 PrimaryButton.args = {
   label: 'Main Button',
-  kind: ButtonVariations.default,
+  kind: 'default',
 }
 
 export const SecondaryButton = Template.bind({})
 SecondaryButton.args = {
   label: 'Secondary Button',
-  kind: ButtonVariations.secondary,
+  kind: 'secondary',
 }
 
 export const SuccessButton = Template.bind({})
 SuccessButton.args = {
   label: 'Success Button',
-  kind: ButtonVariations.success,
+  kind: 'success',
 }
 
 export const WarningButton = Template.bind({})
 WarningButton.args = {
   label: 'Warning Button',
-  kind: ButtonVariations.warning,
+  kind: 'warning',
 }
 
 export const DangerButton = Template.bind({})
 DangerButton.args = {
   label: 'Danger Button',
-  kind: ButtonVariations.danger,
+  kind: 'danger',
 }
 
 export const CancelButton = Template.bind({})
 CancelButton.args = {
   label: 'Cancel Button',
-  kind: ButtonVariations.cancel,
+  kind: 'cancel',
 }
 
 export const DisabledButton = Template.bind({})
 DisabledButton.args = {
   label: 'Disabled Button',
-  kind: ButtonVariations.disabled,
+  kind: 'disabled',
   disabled: true,
 }
 
 export const BigButton = Template.bind({})
 BigButton.args = {
   label: 'Big Button',
-  kind: ButtonVariations.primary,
+  kind: 'primary',
   size: 'big',
 }
 
 export const SmolButton = Template.bind({})
 SmolButton.args = {
   label: 'Smol Button',
-  kind: ButtonVariations.primary,
+  kind: 'primary',
   size: 'small',
 }

@@ -34,24 +34,23 @@ interface ThemeMode {
 
 // Used in stories
 // Good to keep around altough not required
-export enum ButtonVariations {
-  default = 'default',
-  primary = 'primary',
-  secondary = 'secondary',
-  danger = 'danger',
-  success = 'success',
-  warning = 'warning',
-  cancel = 'cancel',
-  disabled = 'disabled',
-  theme = 'theme',
-}
+export type ButtonVariations =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'success'
+  | 'warning'
+  | 'cancel'
+  | 'disabled'
+  | 'theme'
 
 export type ButtonSizeVariations = 'default' | 'small' | 'big'
 
 // Create our variated Button Theme
 // 'kind' refers to a prop on button
 // <ButtonBase kind="danger" />
-export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode', 'kind', {
+export const ButtonTheme = variants<'kind', ButtonVariations>('mode', 'kind', {
   default: {
     light: css`
       color: ${white};

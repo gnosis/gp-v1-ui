@@ -5,7 +5,7 @@ import StyledButton, { ButtonVariations, ButtonSizeVariations } from 'styles/com
 import styles from 'styles/styles'
 
 export interface ButtonBaseProps extends React.ButtonHTMLAttributes<Element> {
-  kind?: keyof typeof ButtonVariations
+  kind?: ButtonVariations
   size?: ButtonSizeVariations
 }
 
