@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { MEDIA } from 'const'
-import { CardWidgetWrapper } from 'components/layout/SwapLayout/Card'
+import { CardWidgetWrapper } from 'components/layout/LegacyTradeLayout/Card'
 import { StandaloneCardWrapper } from 'components/layout'
 
 // OrdersWidget outside wrapper

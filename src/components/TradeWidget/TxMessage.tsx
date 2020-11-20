@@ -265,23 +265,21 @@ export const TxMessage: React.FC<TxMessageProps> = ({ sellToken, receiveToken, n
   // Get canonical market
   const { baseToken, quoteToken } = useMemo(() => getMarket({ receiveToken, sellToken }), [receiveToken, sellToken])
 
-  const baseProps = {
-    baseTokenId: receiveToken.id,
-    quoteTokenId: sellToken.id,
-    networkId,
-  }
-
   const { priceEstimation: fillPrice } = usePriceEstimationWithSlippage({
-    ...baseProps,
-    baseTokenDecimals: baseToken.decimals,
-    quoteTokenDecimals: quoteToken.decimals,
+    baseTokenId: receiveToken.id,
+    baseTokenDecimals: receiveToken.decimals,
+    quoteTokenId: sellToken.id,
+    quoteTokenDecimals: sellToken.decimals,
     amount: sellTokenAmount,
+    networkId,
   })
 
   const { priceImpactSmart, priceImpactClassName, priceImpactWarning } = usePriceImpact({
-    ...baseProps,
+    networkId,
     limitPrice: sellToken === quoteToken ? price : priceInverse,
     fillPrice,
+    baseToken: receiveToken,
+    quoteToken: sellToken,
   })
 
   const renderWarnings = React.useCallback(() => {

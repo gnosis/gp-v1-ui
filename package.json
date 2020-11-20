@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/dex-react",
-  "version": "1.5.1",
+  "version": "1.6.4",
   "description": "",
   "main": "src/index.js",
   "sideEffects": false,
@@ -28,7 +28,8 @@
     "docs": "start-storybook --docs",
     "build-docs": "build-storybook --docs",
     "check-types": "tsc --noEmit --incremental",
-    "cypress": "cypress open",
+    "cypress": "CYPRESS_BASE_URL=http://localhost:8081 cypress open",
+    "cypress:dev": "cypress open",
     "cypress:run": "cypress run",
     "playwright": "jest --roots playwright",
     "playwright:rebuild": "ts-node ./playwright/utils/build_injects.ts",
