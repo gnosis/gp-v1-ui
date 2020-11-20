@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import Tabs from 'components/common/Tabs/Tabs'
 
 export interface TabItemType {
-  readonly id: number
   title: string
   content?: string | React.ReactNode
   readonly activeColor: string
@@ -11,13 +10,11 @@ export interface TabItemType {
 
 const tabItems: TabItemType[] = [
   {
-    id: 1,
     title: 'BUY',
     content: '- buy component -',
     activeColor: '--color-buy',
   },
   {
-    id: 2,
     title: 'SELL',
     content: '- sell component -',
     activeColor: '--color-sell',
