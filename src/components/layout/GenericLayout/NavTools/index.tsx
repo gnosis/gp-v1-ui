@@ -3,7 +3,9 @@ import styled from 'styled-components'
 
 import { MEDIA } from 'const'
 import { NavStyled } from '../Menu'
-import { Frame } from 'components/common/Frame'
+
+// Components
+import UserWallet from 'components/UserWallet'
 
 import SettingsImage from 'assets/img/settings.svg'
 import SettingsImageWhite from 'assets/img/settings-white.svg'
@@ -90,8 +92,6 @@ const Wrapper = styled(NavStyled)`
     }
   }
 `
-
-const UserWallet: React.FC = () => <Frame>User Wallet</Frame>
 
 type Props = React.PropsWithChildren<{
   hasWallet?: boolean
