@@ -13,32 +13,51 @@ import { useWalletConnection } from 'hooks/useWalletConnection'
 import { footerConfig } from '../Footer/config'
 
 const FooterStyled = styled.footer`
-  height: 6.2rem;
+  position: fixed;
+  font-size: 1.1rem;
+  bottom: 0;
+  height: 3rem;
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  padding: 0 2rem;
-  border: 0.1rem solid var(--color-border);
+  padding: 0 1rem;
+  border-top: 0.1rem solid var(--color-border);
+  flex: 1 1 auto;
+  background: var(--color-gradient-1);
+  width: 100%;
+  color: var(--color-text-secondary2);
+  justify-content: space-between;
 `
 
-const LinkWrapper = styled(BlockExplorerLink)`
-  margin: 0;
-  text-align: center;
-  border: 0.1rem solid #c5d3e0;
-  font-weight: var(--font-weight-bold);
-  font-size: 13px;
-  color: inherit;
-  letter-spacing: 0;
-  text-decoration: none;
-  padding: 1.4rem 2rem;
-  box-sizing: border-box;
-  border-radius: 6rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+const VerifiedButton = styled(BlockExplorerLink)`
+  margin: 0 auto 0 0.6rem;
+`
 
-  &:hover {
-    border: 0.1rem solid #29a745;
+const VersionsWrapper = styled.div`
+  display: flex;
+  margin: 0 0 0 auto;
+
+  > a {
+    text-decoration: none;
+
+    &:focus,
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  > a:not(:last-of-type) {
+    margin: 0 1.6rem 0 0;
+    flex-flow: row nowrap;
+    display: flex;
+    position: relative;
+
+    &::after {
+      content: '-';
+      position: absolute;
+      right: -1rem;
+      display: block;
+    }
   }
 `
 
@@ -61,7 +80,7 @@ export const Footer: React.FC<FooterType> = () => {
     <FooterStyled>
       {isBeta && 'This project is in beta. Use at your own risk.'}
       {contractAddress && networkId ? (
-        <LinkWrapper
+        <VerifiedButton
           type="contract"
           identifier={contractAddress}
           networkId={networkId}
@@ -70,27 +89,29 @@ export const Footer: React.FC<FooterType> = () => {
       ) : (
         ''
       )}
-      {url.web && VERSION ? (
-        <a target="_blank" rel="noopener noreferrer" href={url.web + VERSION}>
-          Web: v{VERSION}
-        </a>
-      ) : (
-        ''
-      )}
-      {url.appId && CONFIG.appId ? (
-        <a target="_blank" rel="noopener noreferrer" href={url.appId}>
-          App Id: {CONFIG.appId}
-        </a>
-      ) : (
-        ''
-      )}
-      {url.contracts && CONTRACT_VERSION ? (
-        <a target="_blank" rel="noopener noreferrer" href={url.contracts + CONTRACT_VERSION}>
-          Contracts: v{CONTRACT_VERSION}
-        </a>
-      ) : (
-        ''
-      )}
+      <VersionsWrapper>
+        {url.web && VERSION ? (
+          <a target="_blank" rel="noopener noreferrer" href={url.web + VERSION}>
+            Web: v{VERSION}
+          </a>
+        ) : (
+          ''
+        )}
+        {url.appId && CONFIG.appId ? (
+          <a target="_blank" rel="noopener noreferrer" href={url.appId}>
+            App Id: {CONFIG.appId}
+          </a>
+        ) : (
+          ''
+        )}
+        {url.contracts && CONTRACT_VERSION ? (
+          <a target="_blank" rel="noopener noreferrer" href={url.contracts + CONTRACT_VERSION}>
+            Contracts: v{CONTRACT_VERSION}
+          </a>
+        ) : (
+          ''
+        )}
+      </VersionsWrapper>
     </FooterStyled>
   )
 }

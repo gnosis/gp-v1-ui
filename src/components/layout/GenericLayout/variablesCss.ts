@@ -39,7 +39,7 @@ const DarkColors = `
 
   /* Text */
   --color-text-primary: #ffffff;
-  --color-text-secondary1: #EDEDED
+  --color-text-secondary1: #EDEDED;
   --color-text-secondary2: #9797B8;
 
 
