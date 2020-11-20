@@ -41,7 +41,7 @@ const Tabs: React.FC<Props> = ({ tabItems }) => {
           />
         ))}
       </ul>
-      <TabContent content={content && content} />
+      {content && <TabContent content={content} />}
     </Wrapper>
   )
 }
