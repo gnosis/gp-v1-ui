@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import OrderForm from 'components/OrderForm'
+// Components
+import { OrderForm } from 'components/OrderForm'
+import { OrderBookPanel } from 'components/OrderBookPanel'
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,9 +15,10 @@ const Wrapper = styled.div`
   top: var(--height-bar-default);
 `
 
-export const Trading: React.FC = () => (
+const Trading: React.FC = () => (
   <Wrapper>
     <OrderForm />
+    <OrderBookPanel />
   </Wrapper>
 )
 

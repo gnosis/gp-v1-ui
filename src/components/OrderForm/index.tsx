@@ -14,11 +14,9 @@ const Wrapper = styled.div`
   border-right: 0.1rem solid var(--color-border);
 `
 
-const OrderForm: React.FC = () => (
+export const OrderForm: React.FC = () => (
   <Wrapper>
     <TokenPairSelector selectedPair="ETH/USDC" selectLabel="Select Pair" />
     <OrderBuySell />
   </Wrapper>
 )
-
-export default OrderForm
