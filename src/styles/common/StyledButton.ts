@@ -17,6 +17,10 @@ const {
   dangerDark,
   bgLight,
   bgDark,
+  mainGradient,
+  mainGradientDarker,
+  disabledLight,
+  disabledLightOpaque,
 } = ColourSheet
 
 const { buttonBorder } = StyleSheet
@@ -42,19 +46,18 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
   default: {
     light: css`
       color: ${white};
-      background-color: ${blue};
+      background: ${mainGradient};
 
       &:hover {
-        background-color: ${blueDark};
+        background: ${mainGradientDarker};
       }
     `,
     dark: css`
-      color: ${blue};
-      background-color: ${bgDark};
+      color: ${white};
+      background: ${mainGradient};
 
       &:hover {
-        color: ${white};
-        background-color: ${blueDark};
+        background: ${mainGradientDarker};
       }
     `,
   },
@@ -64,40 +67,40 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
   secondary: {
     light: css`
       color: ${blue};
-      background-color: ${bgLight};
+      background: ${bgLight};
       border-color: ${blue};
 
       &:hover {
-        background-color: ${bgDark};
+        background: ${bgDark};
       }
     `,
     dark: css`
       color: ${blue};
-      background-color: ${bgDark};
+      background: ${bgDark};
       border-color: ${blue};
 
       &:hover {
         color: ${white};
-        background-color: ${blue};
+        background: ${blue};
       }
     `,
   },
   success: {
     light: css`
       color: ${white};
-      background-color: ${successLight};
+      background: ${successLight};
 
       &:hover {
-        background-color: ${successDark};
+        background: ${successDark};
         border-color: ${successDark};
       }
     `,
     dark: css`
       color: ${white};
-      background-color: ${successDark};
+      background: ${successDark};
 
       &:hover {
-        background-color: ${successLight};
+        background: ${successLight};
         border-color: ${successLight};
       }
     `,
@@ -105,19 +108,19 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
   danger: {
     light: css`
       color: ${white};
-      background-color: ${dangerLight};
+      background: ${dangerLight};
 
       &:hover {
-        background-color: ${dangerDark};
+        background: ${dangerDark};
         border-color: ${dangerDark};
       }
     `,
     dark: css`
       color: ${white};
-      background-color: ${dangerDark};
+      background: ${dangerDark};
 
       &:hover {
-        background-color: ${dangerLight};
+        background: ${dangerLight};
         border-color: ${dangerLight};
       }
     `,
@@ -125,19 +128,19 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
   warning: {
     light: css`
       color: ${white};
-      background-color: ${warningLight};
+      background: ${warningLight};
 
       &:hover {
-        background-color: ${warningDark};
+        background: ${warningDark};
         border-color: ${warningDark};
       }
     `,
     dark: css`
       color: ${white};
-      background-color: ${warningDark};
+      background: ${warningDark};
 
       &:hover {
-        background-color: ${warningLight};
+        background: ${warningLight};
         border-color: ${warningLight};
       }
     `,
@@ -148,7 +151,7 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
       background: transparent;
 
       &:hover {
-        background-color: ${blueDark};
+        background: ${blueDark};
       }
     `,
     dark: css`
@@ -157,18 +160,17 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
 
       &:hover {
         color: ${whiteDark};
-        background-color: ${blueDark};
+        background: ${blueDark};
       }
     `,
   },
   disabled: {
-    light: css`
-      color: ${white};
-      opacity: 0.5;
-      background: #000;
+    dark: css`
+      color: ${disabledLightOpaque};
+      background: ${disabledLight};
     `,
-    get dark(): ThemeValue {
-      return this.light
+    get light(): ThemeValue {
+      return this.dark
     },
   },
   theme: {
@@ -178,7 +180,7 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
 
       &:hover {
         color: ghostwhite;
-        background-color: darkorange;
+        background: darkorange;
       }
     `,
     dark: css`
@@ -187,11 +189,24 @@ export const ButtonTheme = variants<'kind', keyof typeof ButtonVariations>('mode
 
       &:hover {
         color: ${white};
-        background-color: darkpurple;
+        background: darkpurple;
       }
     `,
   },
 })
+
+/*
+TODO: consider adding:
+  &.small {
+    font-size: 0.6rem;
+    padding: 0.3rem 0.5rem;
+  }
+
+  &.big {
+    font-size: 1.2rem;
+    padding: 0.65rem 1rem;
+  }
+*/
 
 export default styled.button`
   border: ${buttonBorder};
