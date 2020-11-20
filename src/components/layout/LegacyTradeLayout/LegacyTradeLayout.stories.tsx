@@ -4,13 +4,13 @@ import React from 'react'
 import { Meta } from '@storybook/react/types-6-0'
 
 import { LegacyTradeLayout } from 'components/layout'
-import { RouterDecorator } from 'storybook/RouterDecorator'
+import { Router } from 'storybook/decorators'
 import { LoremIpsum } from 'storybook/LoremIpsum'
 
 export default {
   title: 'Layout/LegacyTradeLayout',
   component: LegacyTradeLayout,
-  decorators: [RouterDecorator],
+  decorators: [Router],
 } as Meta
 
 export const Normal: React.FC = () => (

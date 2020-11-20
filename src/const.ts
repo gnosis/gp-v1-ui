@@ -7,7 +7,7 @@ export {
   BATCH_TIME,
   MAX_BATCH_ID,
   FEE_PERCENTAGE,
-  DEFAULT_DECIMALS,
+  DEFAULT_DECIMALS as OLD_DEFAULT_DECIMALS,
   DEFAULT_PRECISION,
   ZERO,
   ONE,
@@ -64,7 +64,7 @@ export const HIGHLIGHT_TIME = 5000
 export const TOAST_NOTIFICATION_DURATION = 10000 // in milliseconds
 
 export const PRICE_ESTIMATION_DEBOUNCE_TIME = 200
-export const PRICE_ESTIMATION_PRECISION = 5
+export const DEFAULT_DECIMALS = 5
 // The prices on the contract will update at max once every batch, which is 5min long
 export const PRICES_CACHE_TIME = 60 // in seconds
 
@@ -166,8 +166,7 @@ export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
 export const WXDAI_ADDRESS_XDAI = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 export const WETH_ADDRESS_XDAI = '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'
 
-export const ORDER_BOOK_HOPS_DEFAULT = 2
-export const ORDER_BOOK_HOPS_MAX = 2
+export const ORDER_BOOK_HOPS_MAX = 30
 
 export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 // for stable reference

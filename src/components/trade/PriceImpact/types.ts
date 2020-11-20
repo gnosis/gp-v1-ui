@@ -1,13 +1,12 @@
 import BigNumber from 'bignumber.js'
 import { TokenDex } from '@gnosis.pm/dex-js'
-import { BestAskParams } from 'hooks/useBestAsk'
 
 export interface PriceImpactArgsBase {
   limitPrice?: string | null
   bestAskPrice: BigNumber | null
 }
 
-export interface PriceImpactArgs extends PriceImpactArgsBase {
+export type PriceImpactArgs = PriceImpactArgsBase & {
   fillPrice: BigNumber | null
 }
 
@@ -30,4 +29,4 @@ export interface UsePriceImpactReturn {
   priceImpactWarning: string | null
 }
 
-export type UsePriceImpactParams = BestAskParams & Pick<PriceImpactProps, 'limitPrice' | 'fillPrice'>
+export type UsePriceImpactParams = PriceImpactProps

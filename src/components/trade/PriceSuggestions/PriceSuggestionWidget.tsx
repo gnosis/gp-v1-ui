@@ -41,7 +41,7 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
   const { setValue, trigger } = useFormContext<TradeFormData>()
 
   const updatePrices = useCallback(
-    (price: string, invertedPrice) => {
+    async (price: string, invertedPrice) => {
       if (isPriceInverted) {
         setValue(priceInverseInputId, price)
         setValue(priceInputId, invertedPrice)
@@ -49,9 +49,12 @@ export const PriceSuggestionWidget: React.FC<Props> = (props) => {
         setValue(priceInputId, price)
         setValue(priceInverseInputId, invertedPrice)
       }
-      trigger()
+      // stupid hack to fix validation
+      // otherwise trigger doesnt validate properly the new values
+      await new Promise((accept) => setTimeout(accept, 0))
+      return trigger()
     },
-    [isPriceInverted, trigger, setValue, priceInputId, priceInverseInputId],
+    [isPriceInverted, trigger, setValue, priceInverseInputId, priceInputId],
   )
 
   const { priceEstimation: fillPrice, isPriceLoading: fillPriceLoading } = usePriceEstimationWithSlippage({

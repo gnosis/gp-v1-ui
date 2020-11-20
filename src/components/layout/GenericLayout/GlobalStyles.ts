@@ -15,7 +15,6 @@ const GlobalStyles = createGlobalStyle`
     font-size: 62.5%;
     line-height: 10px;
     font-family: var(--font-default);
-    /* background-color: var(--color-background); */
     background-image: linear-gradient(0deg, var(--color-gradient-1) 0%, var(--color-gradient-2) 100%);
     color: var(--color-text-primary);
     box-sizing: border-box;

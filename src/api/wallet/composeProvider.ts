@@ -20,6 +20,15 @@ import {
   removeTxPendingApproval,
 } from 'components/OuterModal'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sanitizeErrorData = (jsonRpcError?: JsonRpcError<any>): void => {
+  if (!jsonRpcError) return
+
+  if (jsonRpcError.data?.originalError) {
+    jsonRpcError.data = jsonRpcError.data.originalError.data
+  }
+}
+
 // custom providerAsMiddleware
 function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
   // WalletConnectProvider.sendAsync is web3-provider-engine.sendAsync
@@ -46,10 +55,17 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
         return
       }
 
-      provider.request(req).then((providerRes) => {
-        Object.assign(res, providerRes)
-        end()
-      }, end)
+      provider.request(req).then(
+        (providerRes) => {
+          Object.assign(res, providerRes)
+          sanitizeErrorData(res.error)
+          end()
+        },
+        (error) => {
+          sanitizeErrorData(error)
+          end(error)
+        },
+      )
     }
   }
 
@@ -62,7 +78,11 @@ function providerAsMiddleware(provider: Provider): JsonRpcMiddleware {
 
     provider[sendFName](req, (err: JsonRpcError<unknown>, providerRes: JsonRpcResponse<unknown>) => {
       // forward any error
-      if (err) return end(err)
+      if (err) {
+        sanitizeErrorData(err)
+        return end(err)
+      }
+      sanitizeErrorData(providerRes.error)
       // copy provider response onto original response
       Object.assign(res, providerRes)
       end()
@@ -257,7 +277,10 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth.estimateGas(txConfig).catch((error) => {
+          // Remove gasPrice from the estimation props, since they broke after last hardfork
+          //  https://github.com/gnosis/dex-react/pull/1618
+          const { gasPrice, ...txConfigEstimation } = txConfig
+          const gasLimit = await web3.eth.estimateGas(txConfigEstimation).catch((error) => {
             console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
             throw error
           })
