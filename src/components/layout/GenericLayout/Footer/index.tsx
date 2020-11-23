@@ -108,7 +108,7 @@ export const Footer: React.FC<FooterType> = () => {
             Contracts: v{CONTRACT_VERSION}
           </a>
         ) : (
-          ''
+          null
         )}
       </VersionsWrapper>
     </FooterStyled>
