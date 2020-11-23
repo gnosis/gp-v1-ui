@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import styled from 'styled-components'
 
 // Components
@@ -25,24 +25,24 @@ const Wrapper = styled.div`
   }
 `
 
-const Tabs: React.FC<Props> = (props) => {
-  const [activeTab, setActiveTab] = useState<number>(1)
+const Tabs: React.FC<Props> = ({ tabItems }) => {
+  const [activeTab, setActiveTab] = useState(0)
+  const { content } = useMemo((): TabItemType => tabItems[activeTab], [activeTab, tabItems])
 
   return (
     <Wrapper>
       <div role="tablist">
-        {props.tabItems.map(({ id, title, activeColor }) => (
+        {tabItems.map(({ title, activeColor }, index) => (
           <TabItem
-            key={id}
-            id={id}
+            key={index}
             title={title}
-            onTabClick={(): void => setActiveTab(id)}
-            isActive={activeTab === id}
-            activeColor={activeColor}
+            onTabClick={(): void => setActiveTab(index)}
+            activeColor={activeTab === index && activeColor}
           />
         ))}
       </div>
-      <TabContent tabItems={props.tabItems} activeTab={activeTab} />
+
+      {content && <TabContent content={content} />}
     </Wrapper>
   )
 }
