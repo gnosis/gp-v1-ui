@@ -94,7 +94,7 @@ export const Footer: React.FC<FooterType> = () => {
             Web: v{VERSION}
           </a>
         ) : (
-          ''
+          null
         )}
         {url.appId && CONFIG.appId ? (
           <a target="_blank" rel="noopener noreferrer" href={url.appId}>
