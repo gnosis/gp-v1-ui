@@ -189,7 +189,38 @@ const TradeWidgetContainer: React.FC = () => {
   // don't need to depend on more than network as everything else updates together
   // also avoids excessive setStates
 
-  if (!sellToken || !receiveToken) return <NoTokens>NO TOKENS FOUND</NoTokens>
+  const onTokensAdded = (newTokens: TokenDetails[]): void => {
+    const [firstToken, secondToken] = tokenAddressesToAdd
+    const sellToken = firstToken && newTokens.find(({ address }) => firstToken.toLowerCase() === address.toLowerCase())
+    const receiveToken =
+      secondToken && newTokens.find(({ address }) => secondToken.toLowerCase() === address.toLowerCase())
+
+    batchUpdateState(() => {
+      if (sellToken) setSellToken(sellToken)
+      if (receiveToken) setReceiveToken(receiveToken)
+      // if (sellToken) onSelectChangeSellToken(sellToken)
+      // if (receiveToken) onSelectChangeReceiveToken(receiveToken)
+    })
+  }
+
+  const tokenAddressesToAdd: string[] = useMemo(
+    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  ) // no deps, so that we only calc once on mount
+
+  if (!sellToken || !receiveToken) {
+    return (
+      <>
+        <TokensAdder
+          tokenAddresses={tokenAddressesToAdd}
+          networkId={networkIdOrDefault}
+          onTokensAdded={onTokensAdded}
+        />
+        <NoTokens>NO TOKENS FOUND</NoTokens>
+      </>
+    )
+  }
 
   return (
     <TradeWidget
@@ -605,24 +636,6 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
   const onSelectChangeSellToken = onSelectChangeFactory(setSellToken, receiveTokenBalance)
   const onSelectChangeReceiveToken = onSelectChangeFactory(setReceiveToken, sellTokenBalance)
 
-  const tokenAddressesToAdd: string[] = useMemo(
-    () => preprocessTokenAddressesToAdd([sellToken.symbol, receiveToken.symbol], networkIdOrDefault),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  ) // no deps, so that we only calc once on mount
-
-  const onTokensAdded = (newTokens: TokenDetails[]): void => {
-    const [firstToken, secondToken] = tokenAddressesToAdd
-    const sellToken = firstToken && newTokens.find(({ address }) => firstToken.toLowerCase() === address.toLowerCase())
-    const receiveToken =
-      secondToken && newTokens.find(({ address }) => secondToken.toLowerCase() === address.toLowerCase())
-
-    batchUpdateState(() => {
-      if (sellToken) onSelectChangeSellToken(sellToken)
-      if (receiveToken) onSelectChangeReceiveToken(receiveToken)
-    })
-  }
-
   const onConfirm = handleSubmit(onSubmit)
   const { toggleModal, modalProps } = useSubmitTxModal({
     onConfirm,
@@ -637,7 +650,6 @@ const TradeWidget: React.FC<TradeWidgetProps> = ({
 
   return (
     <WrappedWidget className={ordersVisible ? '' : 'expanded'}>
-      <TokensAdder tokenAddresses={tokenAddressesToAdd} networkId={networkIdOrDefault} onTokensAdded={onTokensAdded} />
       {/* Toggle Class 'expanded' on WrappedWidget on click of the <OrdersPanel> <button> */}
       <FormProvider {...methods}>
         <WrappedForm onSubmit={(e): void => e.preventDefault()} autoComplete="off" noValidate>
