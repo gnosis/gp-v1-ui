@@ -31,7 +31,7 @@ const Tabs: React.FC<Props> = ({ tabItems }) => {
 
   return (
     <Wrapper>
-      <ul>
+      <div role="tablist">
         {tabItems.map(({ title, activeColor }, index) => (
           <TabItem
             key={index}
@@ -40,7 +40,7 @@ const Tabs: React.FC<Props> = ({ tabItems }) => {
             activeColor={activeTab === index && activeColor}
           />
         ))}
-      </ul>
+      </div>
       {content && <TabContent content={content} />}
     </Wrapper>
   )

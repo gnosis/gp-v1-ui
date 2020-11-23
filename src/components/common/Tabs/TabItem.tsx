@@ -33,7 +33,7 @@ const Wrapper = styled.li<Pick<TabProps, 'activeColor'>>`
 `
 
 const TabItem: React.FC<TabProps> = ({ onTabClick, title, activeColor }) => (
-  <Wrapper activeColor={activeColor} onClick={onTabClick}>
+  <Wrapper role="tab" aria-selected={!!activeColor} activeColor={activeColor} onClick={onTabClick}>
     {title}
   </Wrapper>
 )
