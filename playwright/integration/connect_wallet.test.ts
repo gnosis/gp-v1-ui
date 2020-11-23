@@ -7,7 +7,7 @@ describe('Connect Wallet', () => {
     await page.goto(baseURL)
 
     // WHEN: connected a Wallet
-    await page.click('"Connect Wallet"')
+    await page.click('text=/Connect Wallet/')
     await page.click('"Web3"')
 
     // WHEN: Wallet popup is open
