@@ -7,18 +7,24 @@ interface TabProps {
   readonly activeColor: string | false
 }
 
-const Wrapper = styled.li<Pick<TabProps, 'activeColor'>>`
+const Wrapper = styled.button<Pick<TabProps, 'activeColor'>>`
   background: ${({ activeColor }): string => `var(${activeColor || '--color-primary'})`};
   color: ${({ activeColor }): string => `var(--color-text-${activeColor ? 'primary' : 'secondary2'})`};
   height: var(--height-button-default);
   display: flex;
   align-items: center;
+  justify-content: center;
   flex: 1 1 0;
+
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-large);
   letter-spacing: 0.1rem;
   text-align: center;
-  justify-content: center;
+
+  appearance: none;
+  border: 0;
+  outline: 0;
+
   cursor: pointer;
 
   &:first-of-type {
