@@ -17,7 +17,7 @@ import { PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network, TokenBalanceDetails } from 'types'
 
 // utils
-import { getToken, parseAmount, dateToBatchId, resolverFactory, logDebug, batchIdToDate } from 'utils'
+import { getToken, parseAmount, dateToBatchId, resolverFactory, logDebug, batchIdToDate, notEmpty } from 'utils'
 import {
   calculateValidityTimes,
   chooseTokenWithFallback,
@@ -190,10 +190,12 @@ const TradeWidgetContainer: React.FC = () => {
   // also avoids excessive setStates
 
   const onTokensAdded = (newTokens: TokenDetails[]): void => {
-    const [firstToken, secondToken] = tokenAddressesToAdd
-    const sellToken = firstToken && newTokens.find(({ address }) => firstToken.toLowerCase() === address.toLowerCase())
+    const { sellTokenAddress, receiveTokenAddress } = positionedAddedTokens
+    const sellToken =
+      sellTokenAddress && newTokens.find(({ address }) => sellTokenAddress.toLowerCase() === address.toLowerCase())
     const receiveToken =
-      secondToken && newTokens.find(({ address }) => secondToken.toLowerCase() === address.toLowerCase())
+      receiveTokenAddress &&
+      newTokens.find(({ address }) => receiveTokenAddress.toLowerCase() === address.toLowerCase())
 
     batchUpdateState(() => {
       if (sellToken) setSellToken(sellToken)
@@ -201,12 +203,23 @@ const TradeWidgetContainer: React.FC = () => {
     })
   }
 
-  const tokenAddressesToAdd: string[] = useMemo(
-    () => preprocessTokenAddressesToAdd([sellTokenSymbol, receiveTokenSymbol], networkIdOrDefault),
+  const { tokenAddressesToAdd, positionedAddedTokens } = useMemo(
+    () => {
+      const positionedTokensToAdd = preprocessTokenAddressesToAdd(
+        [sellTokenSymbol, receiveTokenSymbol],
+        networkIdOrDefault,
+      )
+      return {
+        tokenAddressesToAdd: positionedTokensToAdd.filter(notEmpty),
+        positionedAddedTokens: {
+          sellTokenAddress: sellTokenSymbol,
+          receiveTokenAddress: receiveTokenSymbol,
+        },
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   ) // no deps, so that we only calc once on mount
-
   if (!sellToken || !receiveToken) {
     return (
       <>
