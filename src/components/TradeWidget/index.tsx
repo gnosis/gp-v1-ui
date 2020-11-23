@@ -198,8 +198,6 @@ const TradeWidgetContainer: React.FC = () => {
     batchUpdateState(() => {
       if (sellToken) setSellToken(sellToken)
       if (receiveToken) setReceiveToken(receiveToken)
-      // if (sellToken) onSelectChangeSellToken(sellToken)
-      // if (receiveToken) onSelectChangeReceiveToken(receiveToken)
     })
   }
 
