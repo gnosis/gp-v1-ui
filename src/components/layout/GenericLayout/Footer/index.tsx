@@ -85,9 +85,7 @@ export const Footer: React.FC<FooterType> = () => {
           networkId={networkId}
           label={verifiedText ? verifiedText : 'View contract'}
         />
-      ) : (
-        ''
-      )}
+      ) : null}
       <VersionsWrapper>
         {url.web && VERSION ? (
           <a target="_blank" rel="noopener noreferrer" href={url.web + VERSION}>
@@ -98,9 +96,7 @@ export const Footer: React.FC<FooterType> = () => {
           <a target="_blank" rel="noopener noreferrer" href={url.appId}>
             App Id: {CONFIG.appId}
           </a>
-        ) : (
-          ''
-        )}
+        ) : null}
         {url.contracts && CONTRACT_VERSION ? (
           <a target="_blank" rel="noopener noreferrer" href={url.contracts + CONTRACT_VERSION}>
             Contracts: v{CONTRACT_VERSION}
