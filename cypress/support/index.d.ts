@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 declare namespace Cypress {
-  interface Chainable {
+  export interface Chainable {
     /**
      * Substitute for "visit" command. The original visit command should not be used, when the tests depend on the
      * scroll, because cypress has an issue with "scroll-behaviour: smooth
