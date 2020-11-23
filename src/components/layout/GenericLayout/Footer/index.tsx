@@ -93,9 +93,7 @@ export const Footer: React.FC<FooterType> = () => {
           <a target="_blank" rel="noopener noreferrer" href={url.web + VERSION}>
             Web: v{VERSION}
           </a>
-        ) : (
-          null
-        )}
+        ) : null}
         {url.appId && CONFIG.appId ? (
           <a target="_blank" rel="noopener noreferrer" href={url.appId}>
             App Id: {CONFIG.appId}
@@ -107,9 +105,7 @@ export const Footer: React.FC<FooterType> = () => {
           <a target="_blank" rel="noopener noreferrer" href={url.contracts + CONTRACT_VERSION}>
             Contracts: v{CONTRACT_VERSION}
           </a>
-        ) : (
-          null
-        )}
+        ) : null}
       </VersionsWrapper>
     </FooterStyled>
   )
