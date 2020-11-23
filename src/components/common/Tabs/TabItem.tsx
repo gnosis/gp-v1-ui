@@ -10,6 +10,7 @@ interface TabProps {
 const Wrapper = styled.button<Pick<TabProps, 'activeColor'>>`
   background: ${({ activeColor }): string => `var(${activeColor || '--color-primary'})`};
   color: ${({ activeColor }): string => `var(--color-text-${activeColor ? 'primary' : 'secondary2'})`};
+
   height: var(--height-button-default);
   display: flex;
   align-items: center;
@@ -26,6 +27,9 @@ const Wrapper = styled.button<Pick<TabProps, 'activeColor'>>`
   outline: 0;
 
   cursor: pointer;
+  outline: 0;
+
+  /* TODO: Provide alternative :focus styling because of using outline: 0; */
 
   &:first-of-type {
     border-top-left-radius: var(--border-radius-default);

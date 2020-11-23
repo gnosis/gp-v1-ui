@@ -15,7 +15,7 @@ const Wrapper = styled.div`
   flex-flow: column;
   width: 100%;
 
-  > ul {
+  > div {
     list-style: none;
     display: flex;
     flex-flow: row nowrap;
@@ -41,6 +41,7 @@ const Tabs: React.FC<Props> = ({ tabItems }) => {
           />
         ))}
       </div>
+
       {content && <TabContent content={content} />}
     </Wrapper>
   )
