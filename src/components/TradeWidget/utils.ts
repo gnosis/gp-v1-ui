@@ -28,19 +28,13 @@ export function calculateReceiveAmount(priceValue: string, sellValue: string, re
   return receiveAmount
 }
 
-export const preprocessTokenAddressesToAdd = (
-  addresses: (string | undefined)[],
-  networkId: number,
-): (string | null)[] => {
-  const tokenAddresses: (string | null)[] = []
+export const preprocessTokenAddressesToAdd = (addresses: (string | undefined)[], networkId: number): string[] => {
+  const tokenAddresses: string[] = []
   const addedSet = new Set()
 
   addresses.forEach((address) => {
-    if (!address) {
-      tokenAddresses.push(null)
-      return
-    }
     if (
+      address &&
       !addedSet.has(address) &&
       !tokenListApi.hasToken({ tokenAddress: address, networkId }) &&
       isAddress(address.toLowerCase())

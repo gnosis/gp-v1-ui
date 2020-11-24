@@ -17,7 +17,7 @@ import { PRICE_ESTIMATION_DEBOUNCE_TIME } from 'const'
 import { TokenDetails, Network, TokenBalanceDetails } from 'types'
 
 // utils
-import { getToken, parseAmount, dateToBatchId, resolverFactory, logDebug, batchIdToDate, notEmpty } from 'utils'
+import { getToken, parseAmount, dateToBatchId, resolverFactory, logDebug, batchIdToDate } from 'utils'
 import {
   calculateValidityTimes,
   chooseTokenWithFallback,
@@ -181,14 +181,6 @@ const TradeWidgetContainer: React.FC = () => {
   const [sellToken, setSellToken] = useState(sellTokenWithFallback)
   const [receiveToken, setReceiveToken] = useState(buyTokenWithFallback)
 
-  useEffect(() => {
-    setSellToken(sellTokenWithFallback)
-    setReceiveToken(buyTokenWithFallback)
-  }, [sellTokenWithFallback, buyTokenWithFallback])
-
-  // don't need to depend on more than network as everything else updates together
-  // also avoids excessive setStates
-
   const onTokensAdded = (newTokens: TokenDetails[]): void => {
     const { sellTokenAddress, receiveTokenAddress } = positionedAddedTokens
     const sellToken =
@@ -205,12 +197,12 @@ const TradeWidgetContainer: React.FC = () => {
 
   const { tokenAddressesToAdd, positionedAddedTokens } = useMemo(
     () => {
-      const positionedTokensToAdd = preprocessTokenAddressesToAdd(
+      const tokenAddressesToAdd = preprocessTokenAddressesToAdd(
         [sellTokenSymbol, receiveTokenSymbol],
         networkIdOrDefault,
       )
       return {
-        tokenAddressesToAdd: positionedTokensToAdd.filter(notEmpty),
+        tokenAddressesToAdd,
         positionedAddedTokens: {
           sellTokenAddress: sellTokenSymbol,
           receiveTokenAddress: receiveTokenSymbol,
