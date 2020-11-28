@@ -5,7 +5,7 @@ import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement, Trade, Order } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
-import { ORDER_FILLED_FACTOR, MINIMUM_ALLOWANCE_DECIMALS } from 'const'
+import { ORDER_FILLED_FACTOR, MINIMUM_ALLOWANCE_DECIMALS, DEFAULT_TIMEOUT } from 'const'
 import { TEN, ZERO } from '@gnosis.pm/dex-js'
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
@@ -210,3 +210,22 @@ export function notEmpty<TValue>(value: TValue | null | undefined): value is TVa
 }
 
 export const isNonZeroNumber = (value?: string | number): boolean => !!value && !!+value
+
+export interface TimeoutParams<T> {
+  time?: number
+  result?: T
+  timeoutErrorMsg?: string
+}
+
+export function timeout<T>(params: TimeoutParams<T>): Promise<T> {
+  const { time = DEFAULT_TIMEOUT, result, timeoutErrorMsg: timeoutMsg = 'Timeout' } = params
+  return new Promise((resolve, rejects) =>
+    setTimeout(() => {
+      if (result) {
+        resolve(result)
+      } else {
+        rejects(new Error(timeoutMsg))
+      }
+    }, time),
+  )
+}

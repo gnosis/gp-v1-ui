@@ -21,6 +21,7 @@ import { Network } from 'types'
 import { DisabledTokensMaps, TokenOverride, AddressToOverrideMap } from 'types/config'
 
 export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
+export const DEFAULT_TIMEOUT = 5000
 
 export const ZERO_BIG_NUMBER = new BigNumber(0)
 export const ONE_BIG_NUMBER = new BigNumber(1)
