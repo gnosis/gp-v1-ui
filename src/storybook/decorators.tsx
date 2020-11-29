@@ -11,14 +11,14 @@ import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
 
-import { ThemeButton } from 'components/common/Button'
-
-import COLOURS from 'styles/colours'
+import { ThemeToggle } from 'components/common/Button'
 import { ThemeProvider } from 'styled-components'
+
+import { COLOURS, MainAppTheme } from 'styles'
 
 export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
   const [darkMode, setDarkMode] = React.useState(true)
-  const theme = {
+  const theme: MainAppTheme = {
     mode: darkMode ? 'dark' : 'light',
   }
 
@@ -29,12 +29,12 @@ export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => 
       <ThemeProvider theme={theme}>
         <Frame style={{ background: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
         {/* Cheeky use of ButtonBase here :P */}
-        <ThemeButton $size="small" $type="theme" onClick={handleDarkMode} $mode={darkMode}>
+        <ThemeToggle onClick={handleDarkMode} mode={darkMode}>
           <FontAwesomeIcon icon={darkMode ? faMoon : faSun} />
-        </ThemeButton>
+        </ThemeToggle>
         <br />
         <br />
-        <code>Current theme: {darkMode ? 'DARK' : 'LIGHT'}</code>
+        <code>Current theme: {theme.mode.toUpperCase()}</code>
       </ThemeProvider>
     </>
   )
