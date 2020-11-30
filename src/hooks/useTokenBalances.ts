@@ -85,6 +85,8 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   assert(contractAddress, 'No valid contract address found. Stopping.')
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map((token) => {
+    const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
+
     // timoutPromise == Promise<never>, correctly determined to always throw
     const timeoutPromise = timeout({
       timeoutErrorMsg: 'Timeout fetching balances for ' + token.address,
@@ -92,7 +94,6 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
 
     const fetchBalancesPromise = fetchBalancesForToken(token, userAddress, contractAddress, networkId).then(
       (balance) => {
-        const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
         balanceCache[cacheKey] = balance
         return balance
       },
@@ -103,9 +104,6 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
 
     return balancePromise.catch((e) => {
       console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
-
-      const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
-
       const cachedValue = balanceCache[cacheKey]
       if (cachedValue) {
         logDebug('Using cached value for', token, userAddress, contractAddress)
