@@ -85,7 +85,8 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   assert(contractAddress, 'No valid contract address found. Stopping.')
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map((token) => {
-    const timeoutPromise = timeout<TokenBalanceDetails | null>({
+    // timoutPromise == Promise<never>, correctly determined to always throw
+    const timeoutPromise = timeout({
       timeoutErrorMsg: 'Timeout fetching balances for ' + token.address,
     })
 
@@ -97,6 +98,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
       },
     )
 
+    // balancePromise == Promise<TokenBalanceDetails | never> == Promise<TokenBalanceDetails> or throws
     const balancePromise = Promise.race([fetchBalancesPromise, timeoutPromise])
 
     return balancePromise.catch((e) => {
