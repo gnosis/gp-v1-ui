@@ -266,8 +266,12 @@ export function getTokensFactory(factoryParams: {
     }
   }
 
-  async function updateTokenDetails(networkId: number, numTokens: number): Promise<void> {
-    const tokensConfig = tokenListApi.getTokens(networkId)
+  async function updateTokenDetails(
+    networkId: number,
+    numTokens: number,
+    tokensConfig?: TokenDetails[],
+  ): Promise<void> {
+    tokensConfig = (tokensConfig?.length && tokensConfig) || tokenListApi.getTokens(networkId)
 
     // Get filtered ids and addresses
     const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
@@ -284,6 +288,32 @@ export function getTokensFactory(factoryParams: {
     tokenListApi.persistTokens({ networkId, tokenList: tokenDetails })
   }
 
+  async function filterAndFillTokenList(networkId: Network, tokensConfig: TokenDetails[]): Promise<TokenDetails[]> {
+    const tokensWithNoDetails: TokenDetails[] = []
+    const tokensWithDetails = tokensConfig.reduce<TokenDetails[]>((acc, token) => {
+      if (!token.name || !token.symbol) {
+        tokensWithNoDetails.push(token)
+        return acc
+      }
+
+      acc.push(token)
+      return acc
+    }, [])
+
+    let updatedTokens: TokenDetails[] = []
+
+    if (tokensWithNoDetails.length > 0) {
+      updatedTokens = await Promise.all(
+        tokensWithNoDetails.map(async (token) => ({
+          ...token,
+          ...(await getErc20DetailsOrAddress(networkId, token.address)),
+        })),
+      )
+    }
+
+    return tokensWithDetails.concat(updatedTokens)
+  }
+
   async function updateTokens(networkId: number): Promise<void> {
     areTokensUpdated.add(networkId)
 
@@ -293,16 +323,19 @@ export function getTokensFactory(factoryParams: {
       tokenListApi.setListReady(false)
 
       const numTokens = await retry(() => exchangeApi.getNumTokens(networkId))
-      const tokens = tokenListApi.getTokens(networkId)
+      const preTokens = tokenListApi.getTokens(networkId)
 
-      logDebug(`[tokenListFactory][${networkId}] Contract has ${numTokens}; local list has ${tokens.length}`)
+      logDebug(`[tokenListFactory][${networkId}] Contract has ${numTokens}; local list has ${preTokens.length}`)
+
+      // Check token list for any tokens with missing details and fill if so
+      const tokens = await filterAndFillTokenList(networkId, preTokens)
 
       // TODO: review this logic
       // why update tokenDetails when token list lengths don't match?
       // why would token IDs not also need to be updated?
       if (numTokens > tokens.length) {
         // When there are more tokens in the contract than locally, fetch the new tokens
-        await updateTokenDetails(networkId, numTokens)
+        await updateTokenDetails(networkId, numTokens, tokens)
       } else {
         // Otherwise, only update the ids
         await updateTokenIds(networkId, tokens)
