@@ -7,7 +7,7 @@ import { erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatSmart, logDebug, isTokenEnabled, timeout } from 'utils'
+import { formatSmart, logDebug, isTokenEnabled, timeout, notEmpty } from 'utils'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
@@ -117,7 +117,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   const balances = await Promise.all(balancePromises)
 
   // TODO: Would be better to show the errored tokens in error state
-  return balances.filter(Boolean) as TokenBalanceDetails[]
+  return balances.filter(notEmpty)
 }
 
 export const useTokenBalances = (passOnParams: Partial<UseTokenListParams> = {}): UseBalanceResult => {
