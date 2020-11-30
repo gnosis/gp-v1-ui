@@ -7,7 +7,7 @@ import { erc20Api, depositApi } from 'api'
 import useSafeState from './useSafeState'
 import { useWalletConnection } from './useWalletConnection'
 
-import { formatSmart, logDebug, isTokenEnabled, timeout } from 'utils'
+import { formatSmart, logDebug, isTokenEnabled, timeout, notEmpty } from 'utils'
 import { TokenBalanceDetails, TokenDetails } from 'types'
 import { WalletInfo } from 'api/wallet/WalletApi'
 import { PendingFlux } from 'api/deposit/DepositApi'
@@ -85,25 +85,25 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   assert(contractAddress, 'No valid contract address found. Stopping.')
 
   const balancePromises: Promise<TokenBalanceDetails | null>[] = tokens.map((token) => {
-    const timeoutPromise = timeout<TokenBalanceDetails | null>({
+    const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
+
+    // timoutPromise == Promise<never>, correctly determined to always throw
+    const timeoutPromise = timeout({
       timeoutErrorMsg: 'Timeout fetching balances for ' + token.address,
     })
 
     const fetchBalancesPromise = fetchBalancesForToken(token, userAddress, contractAddress, networkId).then(
       (balance) => {
-        const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
         balanceCache[cacheKey] = balance
         return balance
       },
     )
 
+    // balancePromise == Promise<TokenBalanceDetails | never> == Promise<TokenBalanceDetails> or throws
     const balancePromise = Promise.race([fetchBalancesPromise, timeoutPromise])
 
     return balancePromise.catch((e) => {
       console.error('[useTokenBalances] Error for', token, userAddress, contractAddress, e)
-
-      const cacheKey = constructCacheKey({ token, userAddress, contractAddress, networkId })
-
       const cachedValue = balanceCache[cacheKey]
       if (cachedValue) {
         logDebug('Using cached value for', token, userAddress, contractAddress)
@@ -117,7 +117,7 @@ async function _getBalances(walletInfo: WalletInfo, tokens: TokenDetails[]): Pro
   const balances = await Promise.all(balancePromises)
 
   // TODO: Would be better to show the errored tokens in error state
-  return balances.filter(Boolean) as TokenBalanceDetails[]
+  return balances.filter(notEmpty)
 }
 
 export const useTokenBalances = (passOnParams: Partial<UseTokenListParams> = {}): UseBalanceResult => {
