@@ -227,5 +227,5 @@ export async function timeout<T>(params: TimeoutParams<T>): Promise<T | never> {
   // provided defined result -- return it
   if (result !== undefined) return result
   // no defined result -- throw message
-  throw timeoutMsg
+  throw new Error(timeoutMsg)
 }
