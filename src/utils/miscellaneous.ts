@@ -220,13 +220,10 @@ export interface TimeoutParams<T> {
 
 export function timeout<T>(params: TimeoutParams<T>): Promise<T> {
   const { time = DEFAULT_TIMEOUT, result, timeoutErrorMsg: timeoutMsg = 'Timeout' } = params
-  return new Promise((resolve, rejects) =>
-    setTimeout(() => {
-      if (result) {
-        resolve(result)
-      } else {
-        rejects(new Error(timeoutMsg))
-      }
-    }, time),
-  )
+
+  await delay(time)
+  // provided defined result -- return it
+  if (result !== undefined) return result
+  // no defined result -- throw message
+  throw timeoutMsg
 }
