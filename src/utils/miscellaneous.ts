@@ -218,7 +218,9 @@ export interface TimeoutParams<T> {
   timeoutErrorMsg?: string
 }
 
-export function timeout<T>(params: TimeoutParams<T>): Promise<T> {
+export function timeout(params: TimeoutParams<undefined>): Promise<never> // never means function throws
+export function timeout<T>(params: TimeoutParams<T extends undefined ? never : T>): Promise<T>
+export async function timeout<T>(params: TimeoutParams<T>): Promise<T | never> {
   const { time = DEFAULT_TIMEOUT, result, timeoutErrorMsg: timeoutMsg = 'Timeout' } = params
 
   await delay(time)
