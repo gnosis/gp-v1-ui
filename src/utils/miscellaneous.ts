@@ -72,7 +72,8 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
   return token
 }
 
-export const delay = <T>(ms = 100, result?: T): Promise<T> => new Promise((resolve) => setTimeout(resolve, ms, result))
+export const delay = <T = void>(ms = 100, result?: T): Promise<T> =>
+  new Promise((resolve) => setTimeout(resolve, ms, result))
 
 /**
  * Uses images from https://github.com/trustwallet/tokens
