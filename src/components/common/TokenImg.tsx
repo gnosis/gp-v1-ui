@@ -13,9 +13,15 @@ const Wrapper = styled.img<WrapperProps>`
   padding: 2px;
   opacity: ${(props): number => (props.faded ? 0.4 : 1)};
 `
+// keep track of 404 token images
+// so we don't retry fetching them
+const failedTokenImages = new Set<string>()
 
 function _loadFallbackTokenImage(event: React.SyntheticEvent<HTMLImageElement>): void {
   const image = event.currentTarget
+
+  failedTokenImages.add(image.src)
+
   image.src = unknownTokenImg
 }
 
@@ -58,11 +64,14 @@ export const TokenImg: React.FC<Props> = (props) => {
     ? tokensIconsRequire(iconFile).default
     : getImageUrl(addressMainnet || address)
 
+  // if we know the image failed before, use fallback image right away
+  const imgSrc = iconFileUrl && !failedTokenImages.has(iconFileUrl) ? iconFileUrl : unknownTokenImg
+
   // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
   // https://github.com/gnosis/dex-react/issues/1442
   const safeName = safeTokenName({ address, symbol, name })
 
-  return <Wrapper alt={safeName} src={iconFileUrl} onError={_loadFallbackTokenImage} {...props} />
+  return <Wrapper alt={safeName} src={imgSrc} onError={_loadFallbackTokenImage} {...props} />
 }
 
 export const TokenImgWrapper = styled(TokenImg)`
