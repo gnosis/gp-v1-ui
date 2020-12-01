@@ -269,9 +269,9 @@ export function getTokensFactory(factoryParams: {
   async function updateTokenDetails(
     networkId: number,
     numTokens: number,
-    tokensConfig?: TokenDetails[],
+    tokensConfig: TokenDetails[] = [],
   ): Promise<void> {
-    tokensConfig = (tokensConfig?.length && tokensConfig) || tokenListApi.getTokens(networkId)
+    if (tokensConfig.length === 0) tokensConfig = tokenListApi.getTokens(networkId)
 
     // Get filtered ids and addresses
     const filteredAddressesAndIds = await _getFilteredIdsMap(networkId, numTokens, tokensConfig)
@@ -291,6 +291,11 @@ export function getTokensFactory(factoryParams: {
   async function filterAndFillTokenList(networkId: Network, tokensConfig: TokenDetails[]): Promise<TokenDetails[]> {
     const tokensWithNoDetails: TokenDetails[] = []
     const tokensWithDetails = tokensConfig.reduce<TokenDetails[]>((acc, token) => {
+      // fill in addressMainnet if not present and on Mainnet
+      if (networkId === Network.Mainnet && !token.addressMainnet) {
+        token.addressMainnet = token.address
+      }
+
       if (!token.name || !token.symbol) {
         tokensWithNoDetails.push(token)
         return acc
@@ -300,16 +305,15 @@ export function getTokensFactory(factoryParams: {
       return acc
     }, [])
 
-    let updatedTokens: TokenDetails[] = []
+    // bail out if no non-detailed tokens
+    if (tokensWithNoDetails.length === 0) return tokensWithDetails
 
-    if (tokensWithNoDetails.length > 0) {
-      updatedTokens = await Promise.all(
-        tokensWithNoDetails.map(async (token) => ({
-          ...token,
-          ...(await getErc20DetailsOrAddress(networkId, token.address)),
-        })),
-      )
-    }
+    const updatedTokens = await Promise.all(
+      tokensWithNoDetails.map(async (token) => ({
+        ...token,
+        ...(await getErc20DetailsOrAddress(networkId, token.address)),
+      })),
+    )
 
     return tokensWithDetails.concat(updatedTokens)
   }
