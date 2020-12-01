@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import styled from 'styled-components'
 
 import { getImageUrl, RequireContextMock, safeTokenName } from 'utils'
@@ -52,28 +52,31 @@ const tokensIconsFilesByAddress: Record<string, string> = tokensIconsRequire.key
   return acc
 }, {})
 
-export const TokenImg: React.FC<Props> = (props) => {
-  const { address, addressMainnet, symbol, name } = props
+type ImageLoadProps = Pick<React.ImgHTMLAttributes<HTMLImageElement>, 'src' | 'alt' | 'onError'>
 
-  let iconFile = tokensIconsFilesByAddress[address.toLowerCase()]
-  if (!iconFile && addressMainnet) {
-    iconFile = tokensIconsFilesByAddress[addressMainnet.toLowerCase()]
-  }
+const useFailOnceImage = ({ address, addressMainnet, symbol, name }: Omit<Props, 'faded'>): ImageLoadProps => {
+  return useMemo(() => {
+    let iconFile = tokensIconsFilesByAddress[address.toLowerCase()]
+    if (!iconFile && addressMainnet) {
+      iconFile = tokensIconsFilesByAddress[addressMainnet.toLowerCase()]
+    }
 
-  const iconFileUrl: string | undefined = iconFile
-    ? tokensIconsRequire(iconFile).default
-    : getImageUrl(addressMainnet || address)
+    const iconFileUrl: string | undefined = iconFile
+      ? tokensIconsRequire(iconFile).default
+      : getImageUrl(addressMainnet || address)
 
-  // if we know the image failed before, use fallback image right away
-  const imgSrc = iconFileUrl && !failedTokenImages.has(iconFileUrl) ? iconFileUrl : unknownTokenImg
+    // if we know the image failed before, use fallback image right away
+    const imgSrc = iconFileUrl && !failedTokenImages.has(iconFileUrl) ? iconFileUrl : unknownTokenImg
 
-  // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
-  // https://github.com/gnosis/dex-react/issues/1442
-  const safeName = safeTokenName({ address, symbol, name })
+    // TODO: Simplify safeTokenName signature, it doesn't need the addressMainnet or id!
+    // https://github.com/gnosis/dex-react/issues/1442
+    const safeName = safeTokenName({ address, symbol, name })
 
-  return <Wrapper alt={safeName} src={imgSrc} onError={_loadFallbackTokenImage} {...props} />
+    return { src: imgSrc, alt: safeName, onError: _loadFallbackTokenImage }
+  }, [address, addressMainnet, symbol, name])
 }
 
+  const imageProps = useFailOnceImage(props)
 export const TokenImgWrapper = styled(TokenImg)`
   margin: 0 1rem 0 0;
 `
