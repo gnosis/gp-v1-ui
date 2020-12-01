@@ -76,7 +76,14 @@ const useFailOnceImage = ({ address, addressMainnet, symbol, name }: Omit<Props,
   }, [address, addressMainnet, symbol, name])
 }
 
+export const TokenImg: React.FC<Props> = (props) => {
+  const { faded } = props
+
   const imageProps = useFailOnceImage(props)
+
+  return <Wrapper {...imageProps} faded={faded} />
+}
+
 export const TokenImgWrapper = styled(TokenImg)`
   margin: 0 1rem 0 0;
 `
