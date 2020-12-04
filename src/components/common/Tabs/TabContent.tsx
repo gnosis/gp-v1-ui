@@ -1,5 +1,5 @@
 import React from 'react'
-import { TabItemType } from 'components/OrderBuySell'
+import { TabItemType } from 'components/common/Tabs/Tabs'
 
 type Props = {
   tabItems: TabItemType[]

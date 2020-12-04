@@ -1,22 +1,35 @@
 import React from 'react'
 import styled from 'styled-components'
+import { TabThemeType } from 'components/common/Tabs/Tabs'
 
 interface TabProps {
   title: string
   readonly id: number
   onTabClick: (arg: number) => void
   isActive: boolean
-  readonly activeColor?: string
+  readonly activeBgColor?: string
+  readonly activeTextColor?: string
+  readonly theme?: TabThemeType
 }
 
 interface WrapperProps {
-  readonly activeColor?: string
+  readonly activeBgColor?: string
+  readonly activeTextColor?: string
   isActive: boolean
+  readonly theme?: TabThemeType
 }
 
 const Wrapper = styled.button<WrapperProps>`
-  background: ${({ isActive, activeColor }): string => `var(${isActive ? activeColor : '--color-primary'})`};
-  color: ${({ isActive }): string => `var(--color-${isActive ? 'primary' : 'secondary2'})`};
+  background: ${({ isActive, theme }): string =>
+    `var(${isActive && theme.activeBg ? theme.activeBg : theme.inactiveBg ? theme.inactiveBg : '--color-primary'})`};
+  color: ${({ isActive, theme }): string =>
+    `var(${
+      isActive && theme.activeText
+        ? theme.activeText
+        : !isActive && theme.inactiveText
+        ? theme.inactiveText
+        : '--color-text-secondary2'
+    })`};
   height: var(--height-button-default);
   display: flex;
   align-items: center;
@@ -41,20 +54,16 @@ const Wrapper = styled.button<WrapperProps>`
   &:last-of-type {
     border-top-right-radius: var(--border-radius-default);
     border-bottom-right-radius: var(--border-radius-default);
+    ${({ isActive, theme }): string | undefined =>
+      isActive && theme.activeBgAlt ? `background: var(${theme.activeBgAlt})` : undefined}
   }
 `
 
 const TabItem: React.FC<TabProps> = (props) => {
-  const { onTabClick, id, title, isActive, activeColor } = props
+  const { onTabClick, id, title, isActive, theme } = props
 
   return (
-    <Wrapper
-      role="tab"
-      activeColor={activeColor}
-      aria-selected={isActive}
-      isActive={isActive}
-      onClick={(): void => onTabClick(id)}
-    >
+    <Wrapper role="tab" aria-selected={isActive} isActive={isActive} onClick={(): void => onTabClick(id)} theme={theme}>
       {title}
     </Wrapper>
   )

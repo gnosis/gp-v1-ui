@@ -1,28 +1,27 @@
 import React from 'react'
 import styled from 'styled-components'
-import Tabs from 'components/common/Tabs/Tabs'
-
-export interface TabItemType {
-  readonly id: number
-  title: string
-  content: string
-  readonly activeColor?: string
-}
+import Tabs, { TabItemType, TabThemeType } from 'components/common/Tabs/Tabs'
 
 const tabItems: TabItemType[] = [
   {
     id: 1,
     title: 'BUY',
     content: '- buy component -',
-    activeColor: '--color-buy',
   },
   {
     id: 2,
     title: 'SELL',
     content: '- sell component -',
-    activeColor: '--color-sell',
   },
 ]
+
+const tabThemeConfig: TabThemeType = {
+  activeBg: '--color-long',
+  activeBgAlt: '--color-short',
+  inactiveBg: '--color-primary',
+  activeText: '--color-primary',
+  inactiveText: '--color-primary2',
+}
 
 const Wrapper = styled.div`
   display: flex;
@@ -32,7 +31,7 @@ const Wrapper = styled.div`
 
 const OrderBuySell: React.FC = () => (
   <Wrapper>
-    <Tabs tabItems={tabItems} />
+    <Tabs tabItems={tabItems} theme={tabThemeConfig} />
   </Wrapper>
 )
 
