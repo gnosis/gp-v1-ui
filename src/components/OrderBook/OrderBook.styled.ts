@@ -13,11 +13,14 @@ export const OrderBookStyled = styled.div`
 export const Header = styled.div`
   display: flex;
   justify-content: space-between;
-  height: 3.6rem;
+  height: var(--height-button-default);
   align-items: center;
   padding: 0 1rem;
   width: 100%;
   flex-flow: row nowrap;
+  border-bottom: 0.1rem solid var(--color-border);
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary2);
 
   > span:nth-of-type(1) {
     flex: 1 1 38%;
@@ -37,7 +40,6 @@ export const Header = styled.div`
 export const Book = styled.div`
   display: flex;
   flex-flow: column wrap;
-  padding: 0 1rem;
 `
 
 export const Orders = styled.div`
@@ -48,9 +50,9 @@ export const Orders = styled.div`
 export const Order = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 0.25rem 0;
   font-size: var(--font-size-small);
   cursor: pointer;
+  padding: 0.25rem 1rem;
 
   &:hover {
     background-color: var(--color-text-hover);
@@ -92,9 +94,10 @@ export const Order = styled.div`
 export const Spread = styled.div`
   display: flex;
   justify-content: space-between;
-  /* border-top: 0.1rem solid var(--color-border);
-  border-bottom: 0.1rem solid var(--color-border); */
-  padding: 1rem 0;
-  font-size: var(--font-size-large);
+  border-top: 0.1rem solid var(--color-border);
+  border-bottom: 0.1rem solid var(--color-border);
+  padding: 1rem;
+  font-size: var(--font-size-larger);
   color: var(--color-text-strong);
+  margin: 0.5rem 0;
 `

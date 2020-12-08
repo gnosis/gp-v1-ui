@@ -2,8 +2,8 @@ import { css } from 'styled-components'
 
 const AllColors = `
   /* HEIGHTS */
-  --height-bar-default: 6.2rem;
-  --height-button-default: 3.4rem;
+  --height-bar-default: 5.6rem;
+  --height-button-default: 3rem;
   /* ------------------------------ */
 
   /* MISC */
@@ -18,7 +18,9 @@ const AllColors = `
   --font-weight-bold: 700;
   --font-size-small: 1.1rem;
   --font-size-default: 1.2rem;
-  --font-size-large: 1.4rem;
+  --font-size-large: 1.3rem;
+  --font-size-larger: 1.4rem;
+  --font-size-xlarger: 1.5rem;
   /* ------------------------------ */
 `
 
@@ -27,7 +29,9 @@ const DarkColors = `
   --color-green: #00C46E;
   --color-red: #FF305B;
 
-  --color-primary: #1E1F2B;
+  // --color-primary: #1E1F2B;
+  --color-primary: #181923;
+  --color-transparent: transparent;
   --color-long: var(--color-green);
   --color-short: var(--color-red);
 
@@ -36,7 +40,7 @@ const DarkColors = `
   --color-gradient-2: #2C2D3F;
 
   /* Borders */
-  --color-border: #3A3B5A;
+  --color-border: #2e3148;
 
   /* Text */
   --color-text-primary: #ffffff;

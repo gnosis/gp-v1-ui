@@ -7,14 +7,10 @@ interface TabProps {
   readonly id: number
   onTabClick: (arg: number) => void
   isActive: boolean
-  readonly activeBgColor?: string
-  readonly activeTextColor?: string
   readonly theme?: TabThemeType
 }
 
 interface WrapperProps {
-  readonly activeBgColor?: string
-  readonly activeTextColor?: string
   isActive: boolean
   readonly theme?: TabThemeType
 }
@@ -34,12 +30,20 @@ const Wrapper = styled.button<WrapperProps>`
   display: flex;
   align-items: center;
   flex: 1 1 0;
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-large);
-  letter-spacing: 0.1rem;
+  font-weight: ${({ theme }): string => `${theme.fontWeight ? theme.fontWeight : 'var(--font-weight-bold)'}`};
+  font-size: ${({ theme }): string => `${theme.fontSize ? `var(${theme.fontSize})` : 'var(--font-size-large)'}`};
+  letter-spacing: ${({ theme }): string => `${theme.letterSpacing ? theme.letterSpacing : '0'}`};
+  border: 0;
+  border-bottom: ${({ isActive, theme }): string =>
+    `${
+      isActive && theme.activeBorder
+        ? `.1rem solid var(${theme.activeBorder})`
+        : !isActive && theme.inactiveBorder
+        ? `.1rem solid var(${theme.inactiveBorder})`
+        : 'none'
+    }`};
   text-align: center;
   appearance: none;
-  border: 0;
   justify-content: center;
   cursor: pointer;
   outline: 0;
@@ -47,13 +51,17 @@ const Wrapper = styled.button<WrapperProps>`
   /* TODO: Provide alternative :focus styling because of using outline: 0; */
 
   &:first-of-type {
-    border-top-left-radius: var(--border-radius-default);
-    border-bottom-left-radius: var(--border-radius-default);
+    border-top-left-radius: ${({ theme }): string =>
+      `${theme.borderRadius === false ? '0' : 'var(--border-radius-default)'}`};
+    border-bottom-left-radius: ${({ theme }): string =>
+      `${theme.borderRadius === false ? '0' : 'var(--border-radius-default)'}`};
   }
 
   &:last-of-type {
-    border-top-right-radius: var(--border-radius-default);
-    border-bottom-right-radius: var(--border-radius-default);
+    border-top-right-radius: ${({ theme }): string =>
+      `${theme.borderRadius === false ? '0' : 'var(--border-radius-default)'}`};
+    border-bottom-right-radius: ${({ theme }): string =>
+      `${theme.borderRadius === false ? '0' : 'var(--border-radius-default)'}`};
     ${({ isActive, theme }): string | undefined =>
       isActive && theme.activeBgAlt ? `background: var(${theme.activeBgAlt})` : undefined}
   }

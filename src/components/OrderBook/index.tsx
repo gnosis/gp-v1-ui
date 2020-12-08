@@ -9,8 +9,8 @@ export const OrderBook: React.FC<OrdersType> = ({ orders }) => {
   return (
     <Wrapper>
       <Header className="header">
-        <span>Price(USD)</span>
-        <span>Amount(ETH)</span>
+        <span>Price(USDT)</span>
+        <span>Amount(WETH)</span>
         <span>Total</span>
       </Header>
 
@@ -27,7 +27,7 @@ export const OrderBook: React.FC<OrdersType> = ({ orders }) => {
         </Orders>
 
         <Spread className="spread">
-          <span>{dummyPrice.last} USD</span>
+          <span>{dummyPrice.last} USDT</span>
           <span>{dummyPrice.spread}%</span>
         </Spread>
 

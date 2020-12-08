@@ -13,7 +13,7 @@ export const NavStyled = styled.ol`
   }
 
   > li {
-    font-size: 1.6rem;
+    font-size: var(--font-size-larger);
     color: var(--color-text-secondary2);
     background-color: transparent;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
@@ -25,7 +25,7 @@ export const NavStyled = styled.ol`
 
   > li.active,
   > li:hover {
-    background-color: var(--color-primary);
+    background-color: var(--color-gradient-2);
     color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);
   }

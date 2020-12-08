@@ -16,6 +16,12 @@ export interface TabThemeType {
   readonly inactiveBg?: string
   readonly activeText?: string
   readonly inactiveText?: string
+  readonly activeBorder?: string
+  readonly inactiveBorder?: string
+  readonly letterSpacing?: string
+  readonly fontWeight?: string
+  readonly fontSize?: string
+  readonly borderRadius?: boolean
 }
 interface Props {
   readonly tabItems: TabItemType[]

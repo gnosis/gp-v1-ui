@@ -6,12 +6,13 @@ import { Link } from 'react-router-dom'
 import LogoImage from 'assets/img/logo-v2.svg'
 
 const HeaderStyled = styled.header`
-  height: 6.2rem;
+  height: var(--height-bar-default);
   display: flex;
   align-items: center;
   box-sizing: border-box;
   padding: 0 2rem;
-  border: 0.1rem solid var(--color-border);
+  border-bottom: 0.1rem solid var(--color-border);
+  background: var(--color-primary);
 `
 
 const Logo = styled(Link)`

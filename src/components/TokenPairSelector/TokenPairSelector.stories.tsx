@@ -12,4 +12,4 @@ export default {
   decorators: [Router, GlobalStyles],
 } as Meta
 
-export const Normal: Story = () => <TokenPairSelector selectedPair="ETH/USDC" selectLabel="Select Pair" />
+export const Normal: Story = () => <TokenPairSelector selectedPair="WETH/USDT" selectLabel="Select Pair" />

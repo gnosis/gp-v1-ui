@@ -13,5 +13,5 @@ export const MarketNavBarStyled = styled.div`
   align-items: center;
   /* padding: var(--padding-container-default); */
   padding: 0 1.6rem;
-  font-size: var(--font-size-large);
+  font-size: var(--font-size-larger);
 `

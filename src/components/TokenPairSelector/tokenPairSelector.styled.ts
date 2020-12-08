@@ -27,13 +27,19 @@ export const TokenPairSelectorStyled = styled.div`
     }
   }
 
+  > button > img {
+    height: 1.8rem;
+    width: 1.8rem;
+    object-fit: contain;
+  }
+
   > button > b {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xlarger);
     letter-spacing: 0.03rem;
   }
 
   > button > i {
-    font-size: 1.2rem;
+    font-size: var(--font-size-default);
     font-style: normal;
     display: flex;
     flex-flow: row nowrap;

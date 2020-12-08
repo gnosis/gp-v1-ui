@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 
 const OrderForm: React.FC = () => (
   <Wrapper>
-    <TokenPairSelector selectedPair="ETH/USDC" selectLabel="Select Pair" />
+    <TokenPairSelector selectedPair="WETH/USDT" selectLabel="Select Pair" />
     <OrderBuySell />
   </Wrapper>
 )

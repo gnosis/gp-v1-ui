@@ -3,12 +3,18 @@ import styled from 'styled-components'
 
 import { MarketNavBarStyled as Wrapper } from './MarketNavBar.styled'
 
-const dummyMarketPrice = [370.96, 370.01, 369.3]
+const dummyMarketPrice = [370.96, 370.01, 369.33]
 
 const ActivePairInfo = styled.div`
   display: flex;
+  height: 100%;
+  align-items: center;
+
   > p {
     margin: 0 3.2rem 0 0;
+  }
+
+  > p > b {
     font-weight: var(--font-weight-bold);
   }
 
@@ -40,13 +46,16 @@ export const MarketNavBar: React.FC = () => {
     <Wrapper>
       <ActivePairInfo>
         <p>
-          {marketPrice} USDC <small>Mid market price</small>
+          <b>{marketPrice} USDT</b>
+          <small>Mid market price</small>
         </p>
         <p>
-          <PriceTicker>+1.32%</PriceTicker> <small>24h price</small>
+          <PriceTicker>+1.32%</PriceTicker>
+          <small>24h price</small>
         </p>
         <p>
-          32,4642 ETH <small>24h volume</small>
+          <b>32,4642 WETH</b>
+          <small>24h volume</small>
         </p>
       </ActivePairInfo>
     </Wrapper>

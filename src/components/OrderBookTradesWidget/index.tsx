@@ -21,10 +21,14 @@ const tabItems = (orders: OrderBookWidgetsProp['orders']): TabItemType[] => [
 
 // Provide a custom theme
 const tabThemeConfig: TabThemeType = {
-  activeBg: '--color-primary',
-  inactiveBg: '--color-gradient-2',
+  activeBg: '--color-transparent',
+  inactiveBg: '--color-transparent',
   activeText: '--color-text-primary',
   inactiveText: '--color-text-secondary2',
+  activeBorder: '--color-text-primary',
+  inactiveBorder: '--color-text-secondary2',
+  borderRadius: false,
+  fontSize: '--font-size-small',
 }
 
 const TabsWrapper = styled.div`
@@ -33,13 +37,19 @@ const TabsWrapper = styled.div`
   padding: 0;
 
   // Alternatively use a prop for setting a different bg color in the Tabs component
+  // eslint-disable-next-line prettier/prettier
   > div > div[role='tablist'] {
     background: var(--color-gradient-2);
-    padding: var(--padding-container-default);
+    padding: calc(var(--padding-container-default) / 2) var(--padding-container-default)
+      var(--padding-container-default);
+    justify-content: flex-end;
   }
 
   > div > div[role='tablist'] > button {
-    height: 3.2rem;
+    flex: 0 1 auto;
+    padding: 0 0.8rem;
+    line-height: 2;
+    height: auto;
   }
 `
 
