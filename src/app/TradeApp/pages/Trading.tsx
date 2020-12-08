@@ -25,21 +25,6 @@ const Wrapper = styled.div`
   align-items: start;
 `
 
-// type OrdersType = {
-//   orders: {
-//     buy: {
-//       p: number
-//       a: number
-//       t: number
-//     }
-//     sell: {
-//       p: number
-//       a: number
-//       t: number
-//     }
-//   }
-// }
-
 export const Trading: React.FC = () => {
   // Simulate fake orders
   const [orders, setOrders] = useState(dummyOrders)

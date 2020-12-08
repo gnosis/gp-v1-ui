@@ -1,7 +1,11 @@
 import React from 'react'
 import { OrderBookStyled as Wrapper, Header, Book, Orders, Order, Spread } from './OrderBook.styled'
+import { dummyOrders, dummyPrice } from 'components/OrderBook/dummyTradingData'
+interface OrdersType {
+  readonly orders?: typeof dummyOrders
+}
 
-export const OrderBook: React.FC = ({ orders }) => {
+export const OrderBook: React.FC<OrdersType> = ({ orders }) => {
   return (
     <Wrapper>
       <Header className="header">

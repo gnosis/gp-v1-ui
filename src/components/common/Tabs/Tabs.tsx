@@ -8,7 +8,7 @@ import TabContent from 'components/common/Tabs/TabContent'
 export interface TabItemType {
   readonly id: number
   readonly title: string
-  readonly content: string | React.ReactElement
+  readonly content: string | React.ReactNode
 }
 export interface TabThemeType {
   readonly activeBg?: string

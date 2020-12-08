@@ -4,8 +4,9 @@ import Tabs, { TabItemType, TabThemeType } from 'components/common/Tabs/Tabs'
 import OrderBook from 'components/OrderBook'
 import PairTradeHistory from 'components/PairTradeHistory'
 import { OrderBookTradesStyled as Wrapper } from './OrderBookTrades.styled'
+import { dummyOrders } from 'components/OrderBook/dummyTradingData'
 
-const tabItems = ({ orders }): TabItemType[] => [
+const tabItems = (orders: OrderBookWidgetsProp['orders']): TabItemType[] => [
   {
     id: 1,
     title: 'Orderbook',
@@ -42,10 +43,14 @@ const TabsWrapper = styled.div`
   }
 `
 
-export const OrderBookTradesWidget: React.FC = () => (
+interface OrderBookWidgetsProp {
+  readonly orders?: typeof dummyOrders
+}
+
+export const OrderBookTradesWidget: React.FC<OrderBookWidgetsProp> = ({ orders }) => (
   <Wrapper>
     <TabsWrapper>
-      <Tabs tabItems={tabItems} theme={tabThemeConfig} />
+      <Tabs tabItems={tabItems(orders)} theme={tabThemeConfig} />
     </TabsWrapper>
   </Wrapper>
 )
