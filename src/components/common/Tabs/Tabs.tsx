@@ -8,7 +8,8 @@ import TabContent from 'components/common/Tabs/TabContent'
 export interface TabItemType {
   readonly id: number
   readonly title: string
-  readonly content: string | React.ReactNode
+  readonly content: React.ReactNode
+  readonly count?: number
 }
 export interface TabThemeType {
   readonly activeBg?: string
@@ -35,7 +36,6 @@ const Wrapper = styled.div`
   height: 100%;
 
   > div {
-    list-style: none;
     display: flex;
     flex-flow: row nowrap;
     padding: 0;
@@ -51,7 +51,7 @@ const Tabs: React.FC<Props> = (props) => {
   return (
     <Wrapper>
       <div role="tablist">
-        {props.tabItems.map(({ id, title }) => (
+        {props.tabItems.map(({ id, title, count }) => (
           <TabItem
             key={id}
             id={id}
@@ -59,6 +59,7 @@ const Tabs: React.FC<Props> = (props) => {
             onTabClick={(): void => setActiveTab(id)}
             isActive={activeTab === id}
             theme={theme}
+            count={count}
           />
         ))}
       </div>

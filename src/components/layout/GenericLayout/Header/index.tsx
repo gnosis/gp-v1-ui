@@ -17,12 +17,15 @@ const HeaderStyled = styled.header`
 
 const Logo = styled(Link)`
   width: auto;
-  height: 3rem;
+  height: 76%;
   transform: perspective(20rem) rotateY(0);
   transform-style: preserve-3d;
   transition: transform 1s ease-in-out;
   padding: 0;
   margin: 0 1.6rem 0 0;
+  display: flex;
+  align-content: center;
+  justify-content: center;
 
   &:hover {
     animation-name: spin;
@@ -37,6 +40,7 @@ const Logo = styled(Link)`
     object-fit: contain;
     width: inherit;
     height: inherit;
+    margin: auto;
   }
 
   @keyframes spin {

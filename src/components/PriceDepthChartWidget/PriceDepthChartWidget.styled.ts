@@ -13,6 +13,6 @@ export const PriceDepthChartWidgetStyled = styled.div`
   /* ONLY to override the original Mesa V1 component. */
   > div:first-of-type {
     min-height: initial;
-    height: 60%;
+    height: 65%;
   }
 `

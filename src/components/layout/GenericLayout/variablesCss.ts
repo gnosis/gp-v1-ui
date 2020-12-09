@@ -2,7 +2,8 @@ import { css } from 'styled-components'
 
 const AllColors = `
   /* HEIGHTS */
-  --height-bar-default: 5.6rem;
+  --height-bar-default: 4.8rem;
+  --height-bar-small: 4rem;
   --height-button-default: 3rem;
   /* ------------------------------ */
 
@@ -61,6 +62,10 @@ const variables = css`
   :root {
     ${AllColors}
     ${DarkColors}
+  }
+
+  body {
+    overscroll-behavior-y: none;
   }
 `
 

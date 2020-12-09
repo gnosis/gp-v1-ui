@@ -8,6 +8,7 @@ interface TabProps {
   onTabClick: (arg: number) => void
   isActive: boolean
   readonly theme?: TabThemeType
+  readonly count?: number
 }
 
 interface WrapperProps {

@@ -1,7 +1,7 @@
 import React from 'react'
 
 import OrderBookWidget from 'components/OrderBookWidget'
-import OrdersWidget from 'components/OrdersWidget'
+import OrdersWidgetDemo from 'components/OrdersWidgetDemo'
 
 // Styled components
 import { PriceDepthChartWidgetStyled as Wrapper } from './PriceDepthChartWidget.styled'
@@ -33,7 +33,7 @@ const demo = {
 export const PriceDepthChartWidget: React.FC = () => (
   <Wrapper>
     <OrderBookWidget baseToken={demo.baseToken} quoteToken={demo.quoteToken} networkId={demo.networkId} />
-    <OrdersWidget displayOnly="regular" />
+    <OrdersWidgetDemo />
   </Wrapper>
 )
 
