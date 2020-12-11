@@ -1,9 +1,10 @@
 import styled from 'styled-components'
 
 export const OrdersWidgetDemo = styled.div`
-  height: 35%;
-  margin: auto;
+  height: 100%;
+  margin: 0;
   width: 100%;
+  grid-area: orders;
 
   > div > div[role='tablist'] {
     background: var(--color-gradient-2);

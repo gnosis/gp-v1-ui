@@ -8,9 +8,9 @@ export const NavStyled = styled.ol`
   display: flex;
   padding: 0;
 
-  @media ${MEDIA.mediumDown} {
+  /* @media ${MEDIA.mediumDown} {
     margin: 0 0 0 auto;
-  }
+  } */
 
   > li {
     font-size: var(--font-size-larger);

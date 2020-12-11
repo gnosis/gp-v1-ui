@@ -7,10 +7,12 @@ export const OrderBookStyled = styled.div`
   flex-flow: column wrap;
   font-size: var(--font-size-default);
   color: var(--color-text-secondary1);
-  /* overflow-y: scroll; */
 `
 
 export const Header = styled.div`
+  background: var(--color-primary);
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: space-between;
   height: var(--height-button-default);
@@ -21,6 +23,7 @@ export const Header = styled.div`
   border-bottom: 0.1rem solid var(--color-border);
   font-size: var(--font-size-small);
   color: var(--color-text-secondary2);
+  grid-area: orders-header;
 
   > span:nth-of-type(1) {
     flex: 1 1 38%;
@@ -38,13 +41,33 @@ export const Header = styled.div`
 `
 
 export const Book = styled.div`
-  display: flex;
-  flex-flow: column wrap;
+  overflow-y: auto;
+  height: 100%;
+  display: grid;
+  grid-template-areas:
+    'orders-header'
+    'orders-sell'
+    'orders-spread'
+    'orders-buy';
+  grid-template-columns: auto;
+  grid-template-rows: repeat(4, max-content);
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `
 
 export const Orders = styled.div`
   display: flex;
   flex-flow: column wrap;
+
+  &.sell {
+    grid-area: orders-sell;
+  }
+
+  &.buy {
+    grid-area: orders-buy;
+  }
 `
 
 export const Order = styled.div`

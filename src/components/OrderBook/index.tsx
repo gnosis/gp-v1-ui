@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import { OrderBookStyled as Wrapper, Header, Book, Orders, Order, Spread } from './OrderBook.styled'
 import { dummyOrders, dummyPrice } from 'components/OrderBook/dummyTradingData'
 interface OrdersType {
@@ -6,15 +6,25 @@ interface OrdersType {
 }
 
 export const OrderBook: React.FC<OrdersType> = ({ orders }) => {
+  const SpreadEl = useRef<HTMLInputElement>(null)
+  useEffect(() => {
+    SpreadEl.current &&
+      SpreadEl.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+        inline: 'center',
+      })
+  }, [])
+
   return (
     <Wrapper>
-      <Header className="header">
-        <span>Price(USDT)</span>
-        <span>Amount(WETH)</span>
-        <span>Total</span>
-      </Header>
-
       <Book>
+        <Header className="header">
+          <span>Price(USDT)</span>
+          <span>Amount(WETH)</span>
+          <span>Total</span>
+        </Header>
+
         <Orders className="sell">
           {orders &&
             orders.sell.map((order, i) => (
@@ -26,7 +36,7 @@ export const OrderBook: React.FC<OrdersType> = ({ orders }) => {
             ))}
         </Orders>
 
-        <Spread className="spread">
+        <Spread className="spread" ref={SpreadEl}>
           <span>{dummyPrice.last} USDT</span>
           <span>{dummyPrice.spread}%</span>
         </Spread>

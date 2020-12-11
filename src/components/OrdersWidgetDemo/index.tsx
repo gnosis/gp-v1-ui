@@ -31,7 +31,7 @@ const tabThemeConfig: TabThemeType = {
   inactiveBg: '--color-transparent',
   inactiveText: '--color-text-secondary2',
   fontWeight: '--font-weight-normal',
-  fontSize: '--font-size-small',
+  fontSize: '--font-size-default',
   letterSpacing: '0.03rem',
 }
 

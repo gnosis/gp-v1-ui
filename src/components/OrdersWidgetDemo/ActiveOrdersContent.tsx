@@ -7,11 +7,12 @@ const Wrapper = styled.div`
   position: relative;
   padding: 0;
   font-size: var(--font-size-default);
+  background: var(--color-primary);
 
   > table {
     margin: 0;
-    height: 100%;
-    padding: 0.5rem 0 1rem;
+    height: calc(100% - 8.8rem);
+    padding: 0;
     box-sizing: border-box;
     width: 100%;
     border-spacing: 0;
@@ -29,7 +30,6 @@ const Wrapper = styled.div`
   > table tr > td {
     padding: 0;
     color: var(--color-text-secondary2);
-    border-bottom: 0.1rem solid var(--color-border);
     transition: color 0.1s ease-in-out;
     box-sizing: border-box;
 
@@ -44,10 +44,12 @@ const Wrapper = styled.div`
 
     &.long {
       color: var(--color-long);
+      border-left: 2px solid var(--color-long);
     }
 
     &.short {
       color: var(--color-short);
+      border-left: 2px solid var(--color-short);
     }
 
     &.action {
@@ -60,7 +62,7 @@ const Wrapper = styled.div`
     grid-area: head-fixed;
     position: sticky;
     top: 0;
-    height: 2.4rem;
+    height: auto;
     display: flex;
     align-items: center;
   }
@@ -68,21 +70,25 @@ const Wrapper = styled.div`
   > table > thead > tr {
     color: var(--color-text-secondary2);
     display: grid;
-    width: 100%;
+    width: calc(100% - 0.6rem);
   }
 
   > table > thead > tr > th {
+    /* border: 1px solid grey; */
     font-weight: var(--font-weight-normal);
     &:not(:first-of-type) {
       text-align: right;
     }
+    /* &:last-of-type {
+      margin-right: 0.7rem;
+    } */
   }
 
   > table > tbody {
     grid-area: body-scrollable;
     overflow-y: auto;
     overflow-x: hidden;
-    height: auto;
+    height: 100%;
     box-sizing: border-box;
     padding: 0;
   }
@@ -91,21 +97,37 @@ const Wrapper = styled.div`
     display: grid;
     width: 100%;
     transition: background 0.1s ease-in-out;
+    border-bottom: 0.1rem solid var(--color-border);
     &:hover {
       background: var(--color-text-hover);
       > td {
         color: var(--color-text-primary);
       }
     }
+
+    &:last-of-type {
+      margin: 0 0 5rem;
+    }
   }
 
-  /* > table > tbody > tr > td {
-  } */
+  > table > thead > tr > th,
+  > table > tbody > tr > td {
+    height: 3rem;
+    /* border: 1px solid grey; */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    /* padding: 1rem 0; */
+
+    &:first-of-type {
+      padding-left: 1rem;
+      justify-content: flex-start;
+    }
+  }
 
   > table > thead > tr,
   > table > tbody > tr {
-    grid-template-columns: 3.6rem repeat(6, 1fr) 7rem;
-    white-space: nowrap;
+    grid-template-columns: 5rem minmax(14rem, 1fr) repeat(5, 1fr) 7rem;
     align-items: center;
   }
 `
@@ -128,8 +150,8 @@ export const ActiveOrdersContent: React.FC = () => {
             <th>Date</th>
             <th>Pair</th>
             <th>Limit price</th>
-            <th>Amount</th>
-            <th>Filled</th>
+            <th>Amount WETH</th>
+            <th>Filled WETH</th>
             <th>Epxires</th>
             <th>Status</th>
           </tr>
@@ -139,12 +161,12 @@ export const ActiveOrdersContent: React.FC = () => {
             <tr key={i}>
               <td className={i % 2 === 1 ? 'long' : 'short'}>{i % 2 === 1 ? 'Buy' : 'Sell'}</td>
               <td>01-10-2020 17:45:{i}2</td>
-              <td>WETH USDT</td>
-              <td>370.96 USDT</td>
+              <td>WETH/USDT</td>
+              <td>370.96</td>
               <td>
-                {i}.0{i} WETH
+                {i}.0{i}
               </td>
-              <td>{i} WETH</td>
+              <td>{i}</td>
               <td>Never</td>
               <td className="action">
                 Active <CancelledOrderButton>✕</CancelledOrderButton>

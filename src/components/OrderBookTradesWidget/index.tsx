@@ -28,7 +28,7 @@ const tabThemeConfig: TabThemeType = {
   activeBorder: '--color-text-primary',
   inactiveBorder: '--color-text-secondary2',
   borderRadius: false,
-  fontSize: '--font-size-small',
+  fontSize: '--font-size-default',
 }
 
 const TabsWrapper = styled.div`
@@ -50,6 +50,10 @@ const TabsWrapper = styled.div`
     padding: 0 0.8rem;
     line-height: 2;
     height: auto;
+  }
+
+  > div > div:last-of-type {
+    height: calc(100% - 8.4rem);
   }
 `
 
