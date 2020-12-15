@@ -11,7 +11,7 @@ export const PriceDepthChartWidgetStyled = styled.div`
   flex-flow: row wrap;
 
   /* ONLY to override the original Mesa V1 component. */
-  > div:first-of-type {
+  > div > div > div:last-of-type > div {
     min-height: initial;
     height: 100%;
   }
