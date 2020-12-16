@@ -1,6 +1,8 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import { createChart, CrosshairMode, IChartApi } from 'lightweight-charts'
+
+const body = document.body
 
 const Wrapper = styled.div`
   width: 100%;
@@ -9,6 +11,39 @@ const Wrapper = styled.div`
   > div {
     height: 100%;
     width: 100%;
+  }
+
+  #chart {
+    height: calc(100% - 3rem);
+  }
+`
+
+const IntervalWrapper = styled.span`
+  height: 3rem;
+  background: var(--color-primary);
+  width: 100%;
+  display: flex;
+  padding: 0 1rem;
+  border-bottom: 0.1rem solid var(--color-border);
+  font-size: var(--font-size-small);
+
+  > button {
+    appearance: none;
+    font-size: inherit;
+    border: 0;
+    cursor: pointer;
+    outline: 0;
+    background: none;
+    color: var(--color-text-secondary2);
+    transition: color 0.3s ease-in-out;
+  }
+
+  > button:hover {
+    color: var(--color-text-primary);
+  }
+
+  > button:not(:last-of-type) {
+    margin: 0 1rem 0 0;
   }
 `
 
@@ -406,172 +441,158 @@ const seriesData = {
   '1Y': yearData,
 }
 
+function createNewChart(mount: HTMLDivElement | string): IChartApi {
+  return createChart(mount, {
+    crosshair: {
+      horzLine: {
+        color: '#758696',
+        labelBackgroundColor: '#2C2D3F',
+        labelVisible: true,
+        style: 2,
+        visible: true,
+        width: 1,
+      },
+      vertLine: {
+        color: '#758696',
+        labelBackgroundColor: '#2C2D3F',
+        labelVisible: true,
+        style: 2,
+        visible: true,
+        width: 1,
+      },
+      mode: CrosshairMode.Normal,
+    },
+    rightPriceScale: {
+      scaleMargins: {
+        top: 0.1,
+        bottom: 0.1,
+      },
+      borderVisible: true,
+    },
+    layout: {
+      backgroundColor: 'transparent',
+      textColor: 'white',
+    },
+    grid: {
+      vertLines: {
+        color: 'rgba(42, 46, 57, 0.6)',
+      },
+      horzLines: {
+        color: 'rgba(42, 46, 57, 0.6)',
+      },
+    },
+  })
+}
+
+const chartConfig = {
+  localization: {
+    dateFormat: "dd MMM 'yy",
+    locale: 'en-US',
+  },
+  layout: {
+    backgroundColor: 'transparent',
+    textColor: 'white',
+    fontSize: 11,
+    fontFamily: '"Inter","Helvetica Neue",Helvetica,sans-serif',
+  },
+  timeScale: {
+    barSpacing: 10,
+    borderColor: '#2C2D3F',
+    borderVisible: true,
+    fixLeftEdge: false,
+    lockVisibleTimeRangeOnResize: true,
+    rightBarStaysOnScroll: true,
+    rightOffset: 1,
+    secondsVisible: true,
+    timeVisible: false,
+    visible: true,
+  },
+  overlayPriceScales: {
+    alignLabels: true,
+    borderColor: '#2B2B43',
+    borderVisible: true,
+    drawTicks: true,
+    entireTextOnly: false,
+    invertScale: false,
+    mode: 0,
+  },
+}
+
+const candleStickSeriesConfig = {
+  upColor: '#181923',
+  downColor: '#FF305B',
+  borderVisible: true,
+  wickVisible: true,
+  // borderColor: '#FF305B',
+  // wickColor: '#040405',
+  borderUpColor: '#00C46E',
+  borderDownColor: '#FF305B',
+  wickUpColor: '#00C46E',
+  wickDownColor: '#FF305B',
+}
+
+const histogramSeriesConfig = {
+  color: '#2C2D3F',
+  priceScaleId: '',
+  scaleMargins: {
+    top: 0.8,
+    bottom: 0,
+  },
+}
+
 const PriceChart: React.FC = () => {
-  const myRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const chartRef = useRef<HTMLDivElement>(null)
+  const resizeRef = useRef({ update: 0 })
   const [interval, setInterval] = useState('1D')
-  const [chartDimensions, setChartDimensions] = useState({})
-
-  // Handler to call on window resize
-  function handleResize(width: number, height: number): void {
-    // just to force a redraw of the chart on resize of the viewport
-    setChartDimensions({
-      w: width,
-      h: height,
-    })
-
-    // chart.resize(width, height)
-
-    console.log('Chartdimensions ====> ', chartDimensions)
-    console.log('handleResize called !!!!!')
-    console.log('new updated chartDimensions ==== ', chartDimensions)
-  }
-
-  useMemo(() => {
-    // resize observer (native JS)
-    const ro: ResizeObserver = new ResizeObserver((entries) => {
-      console.log(entries)
-      const cr = entries[0].contentRect
-      handleResize(cr.width, cr.height)
-    })
-
-    // if (myRef.current) {
-    //   ro.observe(myRef.current)
-    //   console.log('observer = mounted ------------------')
-    // }
-    console.log('ResizeObserver ====>>>>> ', ro)
-  }, [])
-
-  function createNewChart(mount: HTMLDivElement | string): IChartApi {
-    return createChart(mount, {
-      crosshair: {
-        horzLine: {
-          color: '#758696',
-          labelBackgroundColor: '#2C2D3F',
-          labelVisible: true,
-          style: 2,
-          visible: true,
-          width: 1,
-        },
-        vertLine: {
-          color: '#758696',
-          labelBackgroundColor: '#2C2D3F',
-          labelVisible: true,
-          style: 2,
-          visible: true,
-          width: 1,
-        },
-        mode: CrosshairMode.Normal,
-      },
-      rightPriceScale: {
-        scaleMargins: {
-          top: 0.1,
-          bottom: 0.1,
-        },
-        borderVisible: true,
-      },
-      layout: {
-        backgroundColor: 'transparent',
-        textColor: 'white',
-      },
-      grid: {
-        vertLines: {
-          color: 'rgba(42, 46, 57, 0.6)',
-        },
-        horzLines: {
-          color: 'rgba(42, 46, 57, 0.6)',
-        },
-      },
-    })
-  }
 
   useEffect(() => {
-    const chartMount = myRef.current
+    const ro: ResizeObserver = new ResizeObserver(() => {
+      resizeRef.current.update++
 
+      console.log('current update = ', resizeRef)
+      console.log('---- size changed ----')
+      console.log('new update = ', resizeRef)
+      console.log('---- size changed ----')
+    })
+
+    if (body) {
+      ro.observe(body)
+      console.log('observer = mounted ------------------')
+    }
+
+    return (): void => {
+      if (body) {
+        ro.unobserve(body)
+        console.log('unobserving ------ chartMount')
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    const chartMount = chartRef.current
     const chart = createNewChart(chartMount || 'empty')
-
-    chart.applyOptions({
-      localization: {
-        dateFormat: "dd MMM 'yy",
-        locale: 'en-US',
-      },
-      layout: {
-        backgroundColor: 'transparent',
-        textColor: 'white',
-        fontSize: 11,
-        fontFamily: '"Inter","Helvetica Neue",Helvetica,sans-serif',
-      },
-      timeScale: {
-        barSpacing: 10,
-        borderColor: '#2C2D3F',
-        borderVisible: true,
-        fixLeftEdge: false,
-        lockVisibleTimeRangeOnResize: true,
-        rightBarStaysOnScroll: true,
-        rightOffset: 1,
-        secondsVisible: true,
-        timeVisible: false,
-        visible: true,
-      },
-      overlayPriceScales: {
-        alignLabels: true,
-        borderColor: '#2B2B43',
-        borderVisible: true,
-        drawTicks: true,
-        entireTextOnly: false,
-        invertScale: false,
-        mode: 0,
-      },
-    })
-
-    const areaSeries = chart.addCandlestickSeries({
-      upColor: '#181923',
-      downColor: '#FF305B',
-      borderVisible: true,
-      wickVisible: true,
-      // borderColor: '#FF305B',
-      // wickColor: '#040405',
-      borderUpColor: '#00C46E',
-      borderDownColor: '#FF305B',
-      wickUpColor: '#00C46E',
-      wickDownColor: '#FF305B',
-    })
-
-    const volumeSeries = chart.addHistogramSeries({
-      color: '#2C2D3F',
-      priceFormat: {
-        type: 'volume',
-      },
-      priceScaleId: '',
-      scaleMargins: {
-        top: 0.8,
-        bottom: 0,
-      },
-    })
-
+    chart.applyOptions(chartConfig)
+    const areaSeries = chart.addCandlestickSeries(candleStickSeriesConfig)
+    const volumeSeries = chart.addHistogramSeries(histogramSeriesConfig)
     areaSeries.setData(seriesData[interval].price)
     volumeSeries.setData(seriesData[interval].volume)
 
     return (): void => {
-      // if (chartMount) {
-      //   ro.unobserve(chartMount)
-      //   console.log('unobserving ------ chartMount')
-      // }
       chart.remove()
     }
-  }, [interval])
+  }, [interval, resizeRef.current.update])
 
   return (
-    <Wrapper>
-      <span>
-        {/* {Object.entries(seriesData).forEach(([key, value]) => (
-          <button onClick={(): void => setInterval(value)}>{key}</button>
-        ))} */}
-        <button onClick={(): void => setInterval('1D')}>1D</button>
-        <button onClick={(): void => setInterval('1W')}>1W</button>
-        <button onClick={(): void => setInterval('1M')}>1M</button>
-        <button onClick={(): void => setInterval('1Y')}>1Y</button>
-      </span>
-      <div ref={myRef} id="chart" />
+    <Wrapper ref={bodyRef}>
+      <IntervalWrapper>
+        {Object.keys(seriesData).map((key, i) => (
+          <button key={i} onClick={(): void => setInterval(key)}>
+            {key}
+          </button>
+        ))}
+      </IntervalWrapper>
+      <div ref={chartRef} id="chart" />
     </Wrapper>
   )
 }
