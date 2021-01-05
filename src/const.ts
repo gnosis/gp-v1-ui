@@ -21,6 +21,7 @@ import { Network } from 'types'
 import { DisabledTokensMaps, TokenOverride, AddressToOverrideMap } from 'types/config'
 
 export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
+export const DEFAULT_TIMEOUT = 5000
 
 export const ZERO_BIG_NUMBER = new BigNumber(0)
 export const ONE_BIG_NUMBER = new BigNumber(1)
@@ -166,8 +167,7 @@ export const WETH_ADDRESS_RINKEBY = '0xc778417E063141139Fce010982780140Aa0cD5Ab'
 export const WXDAI_ADDRESS_XDAI = '0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d'
 export const WETH_ADDRESS_XDAI = '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1'
 
-export const ORDER_BOOK_HOPS_DEFAULT = 2
-export const ORDER_BOOK_HOPS_MAX = 2
+export const ORDER_BOOK_HOPS_MAX = 30
 
 export const REFRESH_WHEN_SECONDS_LEFT = 60 // 1min before batch done
 // for stable reference

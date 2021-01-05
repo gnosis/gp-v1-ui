@@ -20,3 +20,5 @@ tsconfig.tsbuildinfo
 cypress/videos
 cypress/screenshots
 cypress/fixtures/example.json
+
+playwright/build

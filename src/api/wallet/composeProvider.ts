@@ -277,16 +277,13 @@ export const composeProvider = <T extends Provider>(
         if (!txConfig) return false
 
         if (!txConfig.gas) {
-          const gasLimit = await web3.eth
-            .estimateGas({
-              from: txConfig.from,
-              gas: txConfig.gas,
-              value: txConfig.value,
-            })
-            .catch((error) => {
-              console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
-              throw error
-            })
+          // Remove gasPrice from the estimation props, since they broke after last hardfork
+          //  https://github.com/gnosis/dex-react/pull/1618
+          const { gasPrice, ...txConfigEstimation } = txConfig
+          const gasLimit = await web3.eth.estimateGas(txConfigEstimation).catch((error) => {
+            console.error('[composeProvider] Error estimating gas, probably failing transaction', txConfig)
+            throw error
+          })
           logDebug('[composeProvider] No gas Limit. Using estimation ' + gasLimit)
           txConfig.gas = numberToHex(gasLimit)
         } else {

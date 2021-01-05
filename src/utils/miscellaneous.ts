@@ -5,7 +5,7 @@ import { TokenDetails, Unpromise } from 'types'
 import { AssertionError } from 'assert'
 import { AuctionElement, Trade, Order } from 'api/exchange/ExchangeApi'
 import { batchIdToDate } from './time'
-import { ORDER_FILLED_FACTOR, MINIMUM_ALLOWANCE_DECIMALS } from 'const'
+import { ORDER_FILLED_FACTOR, MINIMUM_ALLOWANCE_DECIMALS, DEFAULT_TIMEOUT } from 'const'
 import { TEN, ZERO } from '@gnosis.pm/dex-js'
 
 export function assertNonNull<T>(val: T, message: string): asserts val is NonNullable<T> {
@@ -72,7 +72,8 @@ export function getToken<T extends TokenDetails, K extends keyof T>(
   return token
 }
 
-export const delay = <T>(ms = 100, result?: T): Promise<T> => new Promise((resolve) => setTimeout(resolve, ms, result))
+export const delay = <T = void>(ms = 100, result?: T): Promise<T> =>
+  new Promise((resolve) => setTimeout(resolve, ms, result))
 
 /**
  * Uses images from https://github.com/trustwallet/tokens
@@ -210,3 +211,21 @@ export function notEmpty<TValue>(value: TValue | null | undefined): value is TVa
 }
 
 export const isNonZeroNumber = (value?: string | number): boolean => !!value && !!+value
+
+export interface TimeoutParams<T> {
+  time?: number
+  result?: T
+  timeoutErrorMsg?: string
+}
+
+export function timeout(params: TimeoutParams<undefined>): Promise<never> // never means function throws
+export function timeout<T>(params: TimeoutParams<T extends undefined ? never : T>): Promise<T>
+export async function timeout<T>(params: TimeoutParams<T>): Promise<T | never> {
+  const { time = DEFAULT_TIMEOUT, result, timeoutErrorMsg: timeoutMsg = 'Timeout' } = params
+
+  await delay(time)
+  // provided defined result -- return it
+  if (result !== undefined) return result
+  // no defined result -- throw message
+  throw new Error(timeoutMsg)
+}
