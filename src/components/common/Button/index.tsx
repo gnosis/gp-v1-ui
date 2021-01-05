@@ -1,95 +1,282 @@
-import styled, { ThemedStyledProps } from 'styled-components'
-import { ColourTheme, ThemeType } from 'styles/theme'
+import React from 'react'
+import styled, { css, ThemeProvider } from 'styled-components'
+import { ThemeMap, ThemeValue, variants } from 'styled-theming'
 
-const { MAIN, SECONDARY } = ThemeType
+import { COLOURS, BASE_STYLES, MainAppTheme } from 'styles'
 
-export interface ButtonBaseProps {
-  // $alt button theme toggle
-  $alt?: boolean
-  $border?: boolean
-  theme: ThemedStyledProps<ColourTheme, ColourTheme>
+const {
+  white,
+  whiteDark,
+  blue,
+  blueDark,
+  successLight,
+  successDark,
+  warningLight,
+  warningDark,
+  dangerLight,
+  dangerDark,
+  bgLight,
+  bgDark,
+  mainGradient,
+  mainGradientDarker,
+  disabledLight,
+  disabledLightOpaque,
+} = COLOURS
+
+const { borderRadius, buttonBorder, buttonFontSize } = BASE_STYLES
+
+export interface ButtonBaseProps extends React.ButtonHTMLAttributes<Element> {
+  variant?: ButtonVariations
+  size?: ButtonSizeVariations
 }
 
-export const ButtonBase = styled.button.attrs(({ $alt, $border, theme }: ButtonBaseProps) => ({
-  // Allow toggling buttons as ALT/MAIN and grab appropriate theme
-  button: theme.button[$alt ? SECONDARY : MAIN],
-  $border,
-}))`
-  border: 0.1rem solid;
-  border-color: ${({ $border, button }): string => ($border ? button.text1 : 'transparent')};
-  background-color: ${({ button }): string => button.bg1};
-  color: ${({ button }): string => button.text1};
+// Used in stories
+// Good to keep around altough not required
+export type ButtonVariations =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'danger'
+  | 'success'
+  | 'warning'
+  | 'cancel'
+  | 'disabled'
+  | 'theme'
 
-  &:hover {
-    border-color: ${({ button }): string => button.bg1Hover};
-    background-color: ${({ button }): string => button.bg1Hover};
-    color: ${({ button }): string => button.text1Hover};
-  }
+export type ButtonSizeVariations = 'default' | 'small' | 'big'
 
-  border-radius: 2rem;
+// Create our variated Button Theme
+// 'kind' refers to a prop on button
+// <ButtonBase kind="danger" />
+export const ButtonTheme = variants('mode', 'variant', {
+  default: {
+    light: css`
+      color: ${white};
+      background: ${mainGradient};
+
+      &:hover {
+        background: ${mainGradientDarker};
+      }
+    `,
+    dark: css`
+      color: ${white};
+      background: ${mainGradient};
+
+      &:hover {
+        background: ${mainGradientDarker};
+      }
+    `,
+  },
+  get primary() {
+    return this.default
+  },
+  secondary: {
+    light: css`
+      color: ${blue};
+      background: ${bgLight};
+      border-color: ${blue};
+
+      &:hover {
+        background: ${bgDark};
+      }
+    `,
+    dark: css`
+      color: ${blue};
+      background: ${bgDark};
+      border-color: ${blue};
+
+      &:hover {
+        color: ${white};
+        background: ${blue};
+      }
+    `,
+  },
+  success: {
+    light: css`
+      color: ${white};
+      background: ${successLight};
+
+      &:hover {
+        background: ${successDark};
+        border-color: ${successDark};
+      }
+    `,
+    dark: css`
+      color: ${white};
+      background: ${successDark};
+
+      &:hover {
+        background: ${successLight};
+        border-color: ${successLight};
+      }
+    `,
+  },
+  danger: {
+    light: css`
+      color: ${white};
+      background: ${dangerLight};
+
+      &:hover {
+        background: ${dangerDark};
+        border-color: ${dangerDark};
+      }
+    `,
+    dark: css`
+      color: ${white};
+      background: ${dangerDark};
+
+      &:hover {
+        background: ${dangerLight};
+        border-color: ${dangerLight};
+      }
+    `,
+  },
+  warning: {
+    light: css`
+      color: ${white};
+      background: ${warningLight};
+
+      &:hover {
+        background: ${warningDark};
+        border-color: ${warningDark};
+      }
+    `,
+    dark: css`
+      color: ${white};
+      background: ${warningDark};
+
+      &:hover {
+        background: ${warningLight};
+        border-color: ${warningLight};
+      }
+    `,
+  },
+  cancel: {
+    light: css`
+      color: ${white};
+      background: transparent;
+
+      &:hover {
+        background: ${blueDark};
+      }
+    `,
+    dark: css`
+      color: ${blue};
+      background: transparent;
+
+      &:hover {
+        color: ${whiteDark};
+        background: ${blueDark};
+      }
+    `,
+  },
+  disabled: {
+    dark: css`
+      color: ${disabledLightOpaque};
+      background: ${disabledLight};
+    `,
+    get light(): ThemeValue {
+      return this.dark
+    },
+  },
+  theme: {
+    light: css`
+      color: ${white};
+      background: lightsalmon;
+
+      &:hover {
+        color: ghostwhite;
+        background: darkorange;
+      }
+    `,
+    dark: css`
+      color: ghostwhite;
+      background: purple;
+
+      &:hover {
+        color: ${white};
+        background: darkpurple;
+      }
+    `,
+  },
+})
+
+// Created a 'size' prop on buttons, default | small | big
+const ButtonSizes = variants('component', 'size', {
+  default: {
+    buttons: '',
+  },
+  small: {
+    buttons: css`
+      font-size: 0.6rem;
+      padding: 0.3rem 0.5rem;
+    `,
+  },
+  big: {
+    buttons: css`
+      font-size: 1.4rem;
+      padding: 0.65rem 1rem;
+    `,
+  },
+})
+
+const ColouredButtonBase = styled.button`
+  border: ${buttonBorder};
+  /* Fold in theme css above */
+  ${ButtonTheme}
+`
+
+const ColouredAndSizedButtonBase = styled(ColouredButtonBase)`
+  font-size: ${buttonFontSize};
+  ${ButtonSizes}
+`
+// Wrap ColouredAndSizedButtonsBase in it's own ThemeProvider which takes the toplevel app theme
+// ThemeProvider and interpolate over it's props
+const ThemeWrappedButtonBase: React.FC<React.ButtonHTMLAttributes<Element>> = ({ children, ...restProps }) => (
+  <ThemeProvider theme={({ mode }: MainAppTheme): ThemeMap => ({ mode, component: 'buttons' })}>
+    <ColouredAndSizedButtonBase {...restProps}>{children}</ColouredAndSizedButtonBase>
+  </ThemeProvider>
+)
+
+export const ButtonBase = styled(ThemeWrappedButtonBase)<ButtonBaseProps>`
+  border-radius: ${borderRadius};
   cursor: pointer;
   font-weight: bold;
   outline: 0;
   padding: 0.5rem 1rem;
 
-  transition: all 0.2s ease-in-out;
-  transition-property: color, background-color, border-color, opacity;
-
-  &.cancel {
-    background: transparent;
-    color: var(--color-text-active);
-
-    &:hover {
-      background-color: var(--color-background-button-hover);
-      color: var(--color-text-button-hover);
-    }
-  }
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+  transition-property: color, background, border-color, opacity, margin;
 
   &:disabled,
   &[disabled] {
-    &:hover {
-      background-color: var(--color-background-button-disabled-hover);
-    }
-    opacity: 0.35;
     pointer-events: none;
   }
+`
 
-  &.success {
-    border-color: var(--color-button-success);
-    color: var(--color-button-success);
-    :hover {
-      background-color: var(--color-button-success);
-      border-color: var(--color-button-success);
-      color: var(--color-background-pageWrapper);
-    }
-  }
+const ThemeButtonToggleWrapper = styled.div<{ $mode: boolean }>`
+  display: inline-flex;
+  width: 5rem;
+  background-color: gainsboro;
+  border-radius: 2rem;
 
-  &.danger {
-    border-color: var(--color-button-danger);
-    color: var(--color-button-danger);
-    :hover {
-      background-color: var(--color-button-danger);
-      border-color: var(--color-button-danger);
-      color: var(--color-background-pageWrapper);
-    }
-  }
-
-  &.secondary {
-    border-color: var(--color-button-secondary);
-    color: var(--color-button-secondary);
-    :hover {
-      border-color: black;
-      color: black;
-    }
-  }
-
-  &.big {
-    font-size: 1.2rem;
-    padding: 0.65rem 1rem;
-  }
-
-  &.small {
-    font-size: 0.6rem;
-    padding: 0.3rem 0.5rem;
+  > button {
+    width: 75%;
+    margin-left: ${({ $mode }): string => ($mode ? 'auto' : '0')};
   }
 `
+
+export const ThemeToggle: React.FC<
+  ButtonBaseProps & {
+    mode: boolean
+  }
+> = ({ mode, size = 'small', variant = 'theme', children, ...rest }) => {
+  return (
+    <ThemeButtonToggleWrapper $mode={mode}>
+      <ButtonBase {...rest} size={size} variant={variant}>
+        {children}
+      </ButtonBase>
+    </ThemeButtonToggleWrapper>
+  )
+}

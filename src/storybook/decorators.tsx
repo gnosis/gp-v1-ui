@@ -8,27 +8,34 @@ import { ApolloProvider } from '@apollo/client'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
 
-import { colors } from 'styles/theme'
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
 
+import { ThemeToggle } from 'components/common/Button'
 import { ThemeProvider } from 'styled-components'
 
-export const DarkModeThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
-  const [darkMode, setDarkMode] = React.useState(false)
-  const theme = colors(darkMode)
+import { COLOURS, MainAppTheme } from 'styles'
+
+export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
+  const [darkMode, setDarkMode] = React.useState(true)
+  const theme: MainAppTheme = {
+    mode: darkMode ? 'dark' : 'light',
+  }
 
   const handleDarkMode = (): void => setDarkMode((darkMode) => !darkMode)
 
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Frame style={{ backgroundColor: 'lightgray' }}>{DecoratedStory()}</Frame>
+        <Frame style={{ background: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
+        {/* Cheeky use of ButtonBase here :P */}
+        <ThemeToggle onClick={handleDarkMode} mode={darkMode}>
+          <FontAwesomeIcon icon={darkMode ? faMoon : faSun} />
+        </ThemeToggle>
+        <br />
+        <br />
+        <code>Current theme: {theme.mode.toUpperCase()}</code>
       </ThemeProvider>
-      <button onClick={handleDarkMode} style={{ marginLeft: '1rem' }}>
-        <FontAwesomeIcon icon={darkMode ? faSun : faMoon} /> {darkMode ? 'Light' : 'Dark'}
-      </button>
     </>
   )
 }
