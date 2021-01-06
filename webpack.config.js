@@ -22,6 +22,7 @@ const config = overrideEnvConfig(loadConfig())
 const { name: appName } = config
 
 module.exports = ({ stats = false } = {}) => ({
+  entry: [`./src/apps/swap-v1/index.tsx`],
   devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
