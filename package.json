@@ -1,6 +1,6 @@
 {
   "name": "@gnosis.pm/dex-react",
-  "version": "1.6.2",
+  "version": "1.6.7",
   "description": "",
   "main": "src/index.js",
   "sideEffects": false,
@@ -19,7 +19,6 @@
     "lint": "npm-run-all --parallel lint:*",
     "stats": "rimraf ./dist && NODE_ENV=production webpack --mode production --env.stats --profile --json > stats.json && webpack-bundle-analyzer ./stats.json ./dist",
     "test": "MOCK=true jest --cacheDirectory .jest-cache -o",
-    "test:integration": "CYPRESS_BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 cypress:run",
     "test:coverage": "MOCK=true jest --coverage --cache --cacheDirectory .jest-cache && cat ./coverage/lcov.info | coveralls",
     "verify": "npm-run-all --parallel lint:* test",
     "format": "prettier --write \"src/**/*.ts?(x)\" \"src/**/*.js?(x)\"",
@@ -30,7 +29,12 @@
     "check-types": "tsc --noEmit --incremental",
     "cypress": "CYPRESS_BASE_URL=http://localhost:8081 cypress open",
     "cypress:dev": "cypress open",
-    "cypress:run": "cypress run"
+    "cypress:run": "cypress run",
+    "playwright": "jest --roots playwright",
+    "playwright:rebuild": "ts-node ./playwright/utils/build_injects.ts",
+    "playwright:debug": "PWDEBUG=1 jest --roots playwright --runInBand",
+    "playwright:record": "start-server-and-test start:dist http://localhost:8081 'playwright-cli codegen http://localhost:8081 -o output.js'",
+    "test:integration": "BASE_URL=http://localhost:8081 start-server-and-test start:dist http://localhost:8081 playwright"
   },
   "husky": {
     "hooks": {
@@ -96,6 +100,7 @@
     "@storybook/addon-knobs": "^6.0.21",
     "@storybook/addon-links": "^6.0.21",
     "@storybook/react": "^6.0.21",
+    "@truffle/hdwallet-provider": "^1.2.0",
     "@types/bn.js": "^4.11.6",
     "@types/combine-reducers": "^1.0.0",
     "@types/enzyme": "^3.10.4",
@@ -144,6 +149,8 @@
     "jest": "^26.4.2",
     "jest-enzyme": "^7.1.2",
     "markdown-it-link-attributes": "^3.0.0",
+    "playwright": "^1.5.2",
+    "playwright-cli": "^0.152.0",
     "preload-webpack-plugin": "^3.0.0-beta.4",
     "prettier": "^2.1.2",
     "react-dev-utils": "^10.0.0",
@@ -160,6 +167,7 @@
     "stylelint-prettier": "^1.1.2",
     "ts-jest": "^26.4.1",
     "ts-loader": "^8.0.3",
+    "ts-node": "^9.0.0",
     "typescript": "^4.0.3",
     "webpack": "^4.41.6",
     "webpack-bundle-analyzer": "^3.6.0",

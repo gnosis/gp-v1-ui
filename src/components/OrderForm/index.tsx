@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import TokenPairSelector from 'components/TokenPairSelector'
+import OrderBuySell from 'components/OrderBuySell'
 
 const Wrapper = styled.div`
   display: flex;
@@ -12,9 +13,11 @@ const Wrapper = styled.div`
   height: 100%;
   border-right: 0.1rem solid var(--color-border);
 `
+
 const OrderForm: React.FC = () => (
   <Wrapper>
-    <TokenPairSelector />
+    <TokenPairSelector selectedPair="ETH/USDC" selectLabel="Select Pair" />
+    <OrderBuySell />
   </Wrapper>
 )
 

@@ -32,6 +32,7 @@ import useDataFilter from 'hooks/useDataFilter'
 // Reducer/Actions
 import { TokenLocalState } from 'reducers-actions'
 import { useWalletConnection } from 'hooks/useWalletConnection'
+import { web3 } from 'api'
 
 interface WithdrawState {
   amount: BN
@@ -227,7 +228,9 @@ interface BalanceDisplayProps extends TokenLocalState {
 const customFilterFnFactory = (searchTxt: string) => (token: TokenBalanceDetails): boolean => {
   if (searchTxt === '') return true
 
-  return checkTokenAgainstSearch(token, searchTxt)
+  const searchIsAddress = web3.utils.isAddress(searchTxt)
+
+  return checkTokenAgainstSearch(token, searchTxt, searchIsAddress)
 }
 
 const customHideZeroFilterFn = ({
