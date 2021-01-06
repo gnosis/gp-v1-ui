@@ -15,7 +15,7 @@ const NotFound = React.lazy(
   () =>
     import(
       /* webpackChunkName: "Extra_routes_chunk"*/
-      './pages/NotFound'
+      '../../apps/swap/pages/NotFound'
     ),
 )
 
@@ -23,7 +23,7 @@ const Trading = React.lazy(
   () =>
     import(
       /* webpackChunkName: "Trade_chunk"*/
-      './pages/Trading'
+      '../../apps/swap/pages/Trading'
     ),
 )
 

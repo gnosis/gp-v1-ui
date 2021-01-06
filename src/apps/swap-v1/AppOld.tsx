@@ -3,7 +3,7 @@ import 'types'
 import { hot } from 'react-hot-loader/root'
 import React from 'react'
 import { BrowserRouter, HashRouter, Route, Switch } from 'react-router-dom'
-import Console from './Console'
+import Console from '../../Console'
 
 import useNetworkCheck from 'hooks/useNetworkCheck'
 
@@ -12,8 +12,8 @@ import { GlobalModalInstance } from 'components/OuterModal'
 // Global State
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
-import { TradeApp } from 'app/TradeApp'
-import { LegacyTradeApp } from 'apps/swap-v1/LegacyTradeApp'
+import { TradeApp } from 'apps/swap/TradeApp'
+import { SwapAppV1 } from 'apps/swap-v1/SwapAppV1'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
@@ -31,7 +31,7 @@ const App: React.FC = () => {
             <TradeApp />
           </Route>
           <Route>
-            <LegacyTradeApp />
+            <SwapAppV1 />
           </Route>
         </Switch>
         {GlobalModalInstance}
