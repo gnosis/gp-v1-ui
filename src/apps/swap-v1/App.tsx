@@ -13,7 +13,7 @@ import { GlobalModalInstance } from 'components/OuterModal'
 import { withGlobalContext } from 'hooks/useGlobalState'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
 import { TradeApp } from 'app/TradeApp'
-import { LegacyTradeApp } from 'app/LegacyTradeApp'
+import { LegacyTradeApp } from 'apps/swap-v1/LegacyTradeApp'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS ? HashRouter : BrowserRouter
