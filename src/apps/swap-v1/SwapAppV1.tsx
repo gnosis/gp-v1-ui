@@ -11,7 +11,6 @@ import { assertNonNull } from 'utils'
 import useNetworkCheck from 'hooks/useNetworkCheck'
 import { ToastContainer } from 'setupToastify'
 import Console from 'Console'
-import { TradeApp } from 'app/TradeApp/TradeApp'
 import { GlobalModalInstance } from 'components/OuterModal'
 import { LegacyTradeLayout } from 'components/layout'
 import { rootReducer, INITIAL_STATE } from 'reducers-actions'
@@ -121,33 +120,26 @@ export const SwapAppV1: React.FC = () => {
   return (
     <>
       <Router basename={process.env.BASE_URL}>
-        <Switch>
-          <Route path="/v2">
-            <TradeApp />
-          </Route>
-          <Route>
-            <LegacyTradeLayout>
-              <GlobalStyles />
-              <ToastContainer />
-              <React.Suspense fallback={null}>
-                <Switch>
-                  <PrivateRoute path="/orders" exact component={Orders} />
-                  <Route path="/trade/:buy-:sell" component={Trade} />
-                  <PrivateRoute path="/liquidity" exact component={Strategies} />
-                  <PrivateRoute path="/wallet" exact component={Wallet} />
-                  <Route path="/about" exact component={About} />
-                  <Route path="/faq" exact component={FAQ} />
-                  <Route path="/book" exact component={OrderBook} />
-                  <Route path="/connect-wallet" exact component={ConnectWallet} />
-                  <Route path="/trades" exact component={Trades} />
-                  <Route path="/settings" exact component={Settings} />
-                  <Redirect from="/" to={initialUrl} />
-                  <Route component={NotFound} />
-                </Switch>
-              </React.Suspense>
-            </LegacyTradeLayout>
-          </Route>
-        </Switch>
+        <LegacyTradeLayout>
+          <GlobalStyles />
+          <ToastContainer />
+          <React.Suspense fallback={null}>
+            <Switch>
+              <PrivateRoute path="/orders" exact component={Orders} />
+              <Route path="/trade/:buy-:sell" component={Trade} />
+              <PrivateRoute path="/liquidity" exact component={Strategies} />
+              <PrivateRoute path="/wallet" exact component={Wallet} />
+              <Route path="/about" exact component={About} />
+              <Route path="/faq" exact component={FAQ} />
+              <Route path="/book" exact component={OrderBook} />
+              <Route path="/connect-wallet" exact component={ConnectWallet} />
+              <Route path="/trades" exact component={Trades} />
+              <Route path="/settings" exact component={Settings} />
+              <Redirect from="/" to={initialUrl} />
+              <Route component={NotFound} />
+            </Switch>
+          </React.Suspense>
+        </LegacyTradeLayout>
         {GlobalModalInstance}
       </Router>
       {process.env.NODE_ENV === 'development' && <Console />}
