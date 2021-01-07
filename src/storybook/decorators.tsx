@@ -16,6 +16,38 @@ export const GlobalStyles = (DecoratedStory: () => StoryFnReactReturnType): JSX.
   </>
 )
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
+
+import { ThemeToggle } from 'components/common/Button'
+import { ThemeProvider } from 'styled-components'
+
+import { COLOURS, MainAppTheme } from 'styles'
+
+export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
+  const [darkMode, setDarkMode] = React.useState(true)
+  const theme: MainAppTheme = {
+    mode: darkMode ? 'dark' : 'light',
+  }
+
+  const handleDarkMode = (): void => setDarkMode((darkMode) => !darkMode)
+
+  return (
+    <>
+      <ThemeProvider theme={theme}>
+        <Frame style={{ background: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
+        {/* Cheeky use of ButtonBase here :P */}
+        <ThemeToggle onClick={handleDarkMode} mode={darkMode}>
+          <FontAwesomeIcon icon={darkMode ? faMoon : faSun} />
+        </ThemeToggle>
+        <br />
+        <br />
+        <code>Current theme: {theme.mode.toUpperCase()}</code>
+      </ThemeProvider>
+    </>
+  )
+}
+
 export const Router = (DecoratedStory: () => JSX.Element): JSX.Element => (
   <MemoryRouter>{DecoratedStory()}</MemoryRouter>
 )

@@ -3,7 +3,7 @@ import 'react-hot-loader'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import App from 'App'
+import TradeApp from './TradeApp'
 
 const root = document.getElementById('root')
-ReactDOM.render(<App />, root)
+ReactDOM.render(<TradeApp />, root)

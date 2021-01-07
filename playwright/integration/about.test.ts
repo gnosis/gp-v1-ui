@@ -6,7 +6,7 @@ describe('About', () => {
     await page.goto(baseURL)
 
     // THEN: page has title
-    expect(await page.title()).toBe('Gnosis Protocol Web')
+    expect(await page.title()).toBe('Gnosis Protocol v1 Web')
   })
 
   it('Navigates from link in the footer', async () => {
@@ -29,6 +29,6 @@ describe('About', () => {
     const headingText = await page.textContent('main h1:first-child')
 
     // THEN: There's the heading we expect
-    expect(headingText).toContain('About Gnosis Protocol Web')
+    expect(headingText).toContain('About Gnosis Protocol v1 Web')
   })
 })

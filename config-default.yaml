@@ -7,21 +7,21 @@
 #       - You can override in the custom file any config that is defined here
 #       - For redefining components, or for more information, follow the instructions in ./README.md
 #   ⚙️Read more here:
-#       https://github.com/gnosis/dex-react/wiki/Config
+#       https://github.com/gnosis/gp-v1-ui/wiki/Config
 
 # App Id
 #   Identify the app. The IDs range from 1 until 256
 #   Every transaction sent to the blockchain will include the ID and some basic analytic info
 #
 #   ⚠️IMPORTANT: The ID must be unique per App/Client of Gnosis Protocol:
-#       https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
+#       https://github.com/gnosis/gp-v1-ui/wiki/App-Ids-for-Forks
 #   More information about forking the web:
-#       https://github.com/gnosis/dex-react/wiki/Fork-project
+#       https://github.com/gnosis/gp-v1-ui/wiki/Fork-project
 #
 #appId: 1
 
 # Name of the app
-name: Gnosis Protocol Web
+name: Gnosis Protocol v1 Web
 
 # Logo used for the favicon
 logoPath: './src/assets/img/logo.svg'

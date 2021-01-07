@@ -39,10 +39,10 @@ export const BATCH_SUBMISSION_CLOSE_TIME = 4 // in minutes
 export const MINIMUM_ALLOWANCE_DECIMALS = 10
 
 // Max App Id: Read more here:
-//    https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks
+//    https://github.com/gnosis/gp-v1-ui/wiki/App-Ids-for-Forks
 export const MAX_APP_ID = 255
 
-export const APP_NAME = 'Gnosis Protocol Web'
+export const APP_NAME = 'Gnosis Protocol v1 Web'
 
 export const ETHER_PNG =
   'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
@@ -52,7 +52,7 @@ export const DEFAULT_ORDER_DURATION = 6 // every batch takes 5min, we want it to
 
 // Placing FROM orders with validFrom === currentBatchId can fail if there's a new batch before the tx is mined.
 // To address that, we are adding a small delay to guarantee it won't fail.
-// For more info, see the issue https://github.com/gnosis/dex-react/issues/459 and
+// For more info, see the issue https://github.com/gnosis/gp-v1-ui/issues/459 and
 // the contract code https://github.com/gnosis/dex-contracts/blob/master/contracts/BatchExchange.sol#L557
 export const BATCHES_TO_WAIT = 3
 

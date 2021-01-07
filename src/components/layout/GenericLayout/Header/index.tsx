@@ -58,7 +58,7 @@ interface Props {
 
 export const Header: React.FC<Props> = ({ menu, tools }) => (
   <HeaderStyled>
-    <Logo to="/v2" href="#">
+    <Logo to="/" href="#">
       <img src={LogoImage} alt="Trading interface homepage" />
     </Logo>
     {menu}
