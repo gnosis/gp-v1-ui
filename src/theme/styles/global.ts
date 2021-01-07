@@ -3,6 +3,9 @@ import { createGlobalStyle, css } from 'styled-components'
 import fontFace from './fonts'
 import { web3ModalOverride } from './overrides'
 
+// TODO: remove for constants from colour palette later
+import variables from 'components/layout/GenericLayout/variablesCss'
+
 // TODO: replace these variables w/Colour constants (later):
 // --color-text-primary: #456483
 // --color-gradient-1: #21222E
@@ -38,6 +41,9 @@ const scrollbars = css`
 `
 
 export const StaticGlobalStyle = createGlobalStyle`
+  /* TEMPORARY: import variables */ 
+  ${variables}
+  
   /* Import font faces */
   ${fontFace}
 
@@ -56,42 +62,31 @@ export const StaticGlobalStyle = createGlobalStyle`
   }
 
   html, body {  
-    font-family: "Inter", "Helvetica Neue", Helvetica, sans-serif;
-    font-size: 62.5%;
-    color: #456483;
-    
     height: 100vh;
-    min-height: 100vh;
     width: 100vw;
-    min-width: 300px;
     margin: 0;
+    font-size: 62.5%;
     line-height: 10px;
-    
-    background-image: linear-gradient(0deg, #21222E, 0%, #2C2D3F, 100%);
-    
+    font-family: var(--font-default);
+    background-image: linear-gradient(0deg, var(--color-gradient-1) 0%, var(--color-gradient-2) 100%);
+    color: var(--color-text-primary);
     box-sizing: border-box;
-    
     scroll-behavior: smooth;
-    
     text-rendering: geometricPrecision;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  *::-moz-placeholder {
-    line-height: revert;
-  }
-
   *, *:before, *:after {
     box-sizing: inherit;
   }
-  
+
   a {   
     text-decoration: underline;
     cursor: pointer;
       &:link, 
       &:visited {
-        color: #218DFF;
+        color: var(--color-text-active);
       }
   }
 
@@ -99,19 +94,11 @@ export const StaticGlobalStyle = createGlobalStyle`
     margin: 0;
     margin: 0.5rem 0;
   }
-
   h1 {
     font-size: 3rem;
   }
-
   h2 {
     font-size: 2rem;
-  }
-
-  /* TODO: review this CSS below considering HTML/Body set font-size it's non-sensical */
-  #root {
-    height: 100%;
-    font-size: 1.3rem;
   }
   
   /* Overrides CSS - see overrides.ts file */
