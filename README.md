@@ -10,15 +10,18 @@ Develop:
 &nbsp;
 [![Coverage Status](https://coveralls.io/repos/github/gnosis/gp-v1-ui/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/gp-v1-ui?branch=develop)
 
-# Gnosis Protocol Web
+# Gnosis Protocol v1 Web
+
+> IMPORTANT: This repository is for the legacy Gnosis Protocol v1
+> For the UI for the latest version of the protocol go to https://github.com/gnosis/gp-swap-ui
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
-`Gnosis Protocol Web` is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
+`Gnosis Protocol v1 Web` is the first dapp built on the [Gnosis Protocol](https://docs.gnosis.io/protocol).
 
 Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximize liquidity.
 
-`Gnosis Protocol Web` allows users to:
+`Gnosis Protocol v1 Web` allows users to:
 
 - Create orders in [Gnosis Protocol](https://docs.gnosis.io/protocol)
 - See the balances for any token: available in their wallet and on the exchange
@@ -56,13 +59,13 @@ yarn test
 
 ## 🍴Fork it
 
-**Gnosis Protocol Web** can be forked, this way any project can use its own token list, rebrand it, add new pages or modify the existing ones.
+**Gnosis Protocol v1 Web** can be forked, this way any project can use its own token list, rebrand it, add new pages or modify the existing ones.
 
 Read more [here](https://github.com/gnosis/gp-v1-ui/wiki/Fork-project).
 
 ## 🎩 Customizing components
 
-**Gnosis Protocol Web** allows to redefine any React component, so you can add new pages, modify the existing ones, or modify the layout and styles.
+**Gnosis Protocol v1 Web** allows to redefine any React component, so you can add new pages, modify the existing ones, or modify the layout and styles.
 
 Learn about customizing components [here](https://github.com/gnosis/gp-v1-ui/wiki/Customize-Components).
 

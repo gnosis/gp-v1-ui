@@ -21,7 +21,7 @@
 #appId: 1
 
 # Name of the app
-name: Gnosis Protocol Web
+name: Gnosis Protocol v1 Web
 
 # Logo used for the favicon
 logoPath: './src/assets/img/logo.svg'
