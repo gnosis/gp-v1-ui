@@ -12,6 +12,9 @@ const dotenv = require('dotenv')
 const loadConfig = require('./src/loadConfig')
 const overrideEnvConfig = require('./src/overrideEnvConfig')
 
+const SWAP_APP_V1 = { name: 'swap-v1', title: null, filename: 'index.html' }
+const TRADE_APP = { name: 'trade', title: 'Gnosis Protocol Exchange', filename: 'trade.html' }
+
 // Setup env vars
 dotenv.config()
 
@@ -19,10 +22,43 @@ const isProduction = process.env.NODE_ENV == 'production'
 
 const baseUrl = isProduction ? '' : '/'
 const config = overrideEnvConfig(loadConfig())
-const { name: appName } = config
+const { name: appTitle } = config
+
+const apps = [SWAP_APP_V1, TRADE_APP]
+
+// Generate one entry point per app
+const entryPoints = apps.reduce((acc, app) => {
+  const { name } = app
+  acc[name] = `./src/apps/${name}/index.tsx`
+  return acc
+}, {})
+
+// Generate one HTML per app (with their specific entry point)
+const htmlPlugins = apps.map((app) => {
+  const { name, title, filename } = app
+  return new HtmlWebPackPlugin({
+    template: config.templatePath,
+    chunks: [name],
+    title: title || appTitle,
+    filename,
+    ipfsHack: isProduction,
+    minify: isProduction && {
+      removeComments: true,
+      collapseWhitespace: true,
+      removeRedundantAttributes: true,
+      useShortDoctype: true,
+      removeEmptyAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      keepClosingSlash: true,
+      minifyJS: true,
+      minifyCSS: true,
+      minifyURLs: true,
+    },
+  })
+})
 
 module.exports = ({ stats = false } = {}) => ({
-  entry: [`./src/apps/swap-v1/index.tsx`],
+  entry: entryPoints, // One entry points per app
   devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
@@ -126,31 +162,15 @@ module.exports = ({ stats = false } = {}) => ({
     callback()
   },
   plugins: [
-    new HtmlWebPackPlugin({
-      template: config.templatePath,
-      title: appName,
-      ipfsHack: isProduction,
-      minify: isProduction && {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
-    }),
+    ...htmlPlugins, // one html page per app
     new FaviconsWebpackPlugin({
       logo: config.logoPath,
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
-        appName: appName,
-        appDescription: appName,
-        developerName: appName,
+        appName: appTitle,
+        appDescription: appTitle,
+        developerName: appTitle,
         developerURL: null, // prevent retrieving from the nearest package.json
         background: '#dfe6ef',
         themeColor: '#476481',
