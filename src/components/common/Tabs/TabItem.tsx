@@ -27,7 +27,6 @@ const Wrapper = styled.button<Pick<TabProps, 'activeColor'>>`
   outline: 0;
 
   cursor: pointer;
-  outline: 0;
 
   /* TODO: Provide alternative :focus styling because of using outline: 0; */
 
