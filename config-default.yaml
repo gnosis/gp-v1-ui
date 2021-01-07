@@ -36,7 +36,8 @@ tcr:
     lists:
       - networkId: 1
         listId: 1
-        contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0'
+        # contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0' # Testing TCR with rare tokens
+        contractAddress: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8'
 
       - networkId: 4
         contractAddress: '0xBb840456546496E7640DC09ba9fE06E67C157E1b'
@@ -250,6 +251,7 @@ initialTokenList:
     decimals: 8
     addressByNetwork:
       '1': '0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599'
+      '100': '0x8e5bbbb09ed1ebde8674cda39a0c169401db4252'
 
   - id: 13
     name: Compound Dai

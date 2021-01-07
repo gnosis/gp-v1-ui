@@ -36,7 +36,7 @@ describe('Test config defaults', () => {
           {
             networkId: 1,
             listId: 1,
-            contractAddress: '0x1854dae560abb0f399d8badca456663ca5c309d0',
+            contractAddress: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
           },
           {
             networkId: 4,

@@ -39,4 +39,11 @@
       "*": ["custom/*", "src/*"]
     }
   },
+  "ts-node": {
+    // these options are overrides used only by ts-node
+    // same as --compilerOptions flag and TS_NODE_COMPILER_OPTIONS environment variable
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }
