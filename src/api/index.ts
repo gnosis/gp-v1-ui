@@ -36,10 +36,10 @@ import { ETH_NODE_URL } from 'const'
 export const getDefaultProvider = (): string | null => (process.env.NODE_ENV === 'test' ? null : ETH_NODE_URL)
 
 function createWeb3Api(): Web3 {
-  // TODO: Create an `EthereumApi` https://github.com/gnosis/dex-react/issues/331
+  // TODO: Create an `EthereumApi` https://github.com/gnosis/gp-v1-ui/issues/331
   const web3 = new Web3(getDefaultProvider())
   // `handleRevert = true` makes `require` failures to throw
-  // For more details see https://github.com/gnosis/dex-react/issues/511
+  // For more details see https://github.com/gnosis/gp-v1-ui/issues/511
   web3.eth['handleRevert'] = true
 
   if (process.env.MOCK_WEB3 === 'true') {
