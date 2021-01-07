@@ -13,7 +13,7 @@ const loadConfig = require('./src/loadConfig')
 const overrideEnvConfig = require('./src/overrideEnvConfig')
 
 const TRADE_APP = { name: 'trade', title: 'Gnosis Protocol Exchange', filename: 'trade.html' }
-const EXPLORER_APP = { name: 'explorer', title: 'Gnosis Protocol Explorer', filename: 'explore.html' }
+const EXPLORER_APP = { name: 'explorer', title: 'Gnosis Protocol Explorer', filename: 'explorer.html' }
 const SWAP_APP_V1 = { name: 'swap-v1', title: null, filename: 'index.html' }
 const ALL_APPS = [TRADE_APP, EXPLORER_APP, SWAP_APP_V1]
 
