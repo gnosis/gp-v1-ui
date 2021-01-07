@@ -6,7 +6,7 @@ describe('About', () => {
     await page.goto(baseURL)
 
     // THEN: page has title
-    expect(await page.title()).toBe('Gnosis Protocol Web')
+    expect(await page.title()).toBe('Gnosis Protocol v1 Web')
   })
 
   it('Navigates from link in the footer', async () => {
