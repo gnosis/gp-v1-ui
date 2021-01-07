@@ -54,11 +54,11 @@ const About: React.FC = () => {
         .<br />
         <div id="code-link">
           Check out the{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react">
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/gp-v1-ui">
             Source Code
           </a>{' '}
           and{' '}
-          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/dex-react/releases">
+          <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/gp-v1-ui/releases">
             Releases
           </a>
           .
@@ -75,7 +75,7 @@ const About: React.FC = () => {
       <ul>
         <li>
           {CONFIG.name}:&nbsp;
-          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/dex-react/tree/v' + VERSION}>
+          <a target="_blank" rel="noopener noreferrer" href={'https://github.com/gnosis/gp-v1-ui/tree/v' + VERSION}>
             v{VERSION}
           </a>{' '}
         </li>

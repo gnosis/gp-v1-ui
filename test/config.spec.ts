@@ -17,7 +17,7 @@ describe('Test config defaults', () => {
   })
 
   it('name', () => {
-    expect(CONFIG.name).toEqual('Gnosis Protocol Web')
+    expect(CONFIG.name).toEqual('Gnosis Protocol v1 Web')
   })
 
   it('logoPath', () => {
