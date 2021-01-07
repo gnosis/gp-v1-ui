@@ -29,7 +29,7 @@ Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximi
 
 ## 📚 Wiki
 
-Learn more about Gnosis Protocol Web in the [wiki](https://github.com/gnosis/gp-v1-ui/wiki).
+Learn more about Gnosis Protocol v1 Web in the [wiki](https://github.com/gnosis/gp-v1-ui/wiki).
 
 ## 🏃‍♀️ Run it locally
 
