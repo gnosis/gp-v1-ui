@@ -1,5 +1,7 @@
 import { css } from 'styled-components'
 
+// TODO: may not need any of this current CSS for V2
+
 export const web3ModalOverride = css`
   /* Web3Connect styling
   SUUUUPER lame and hacky, but don't feel like changing the Web3Conect code base to allow style passing
