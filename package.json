@@ -8,7 +8,10 @@
     "node": "12"
   },
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --mode development --hot --host 0.0.0.0 --disable-host-check",
+    "start": "npm run start:swap-v1",
+    "start:trade": "APP=trade npm run start:app",
+    "start:swap-v1": "APP=swap-v1 npm run start:app",
+    "start:app": "NODE_ENV=development webpack-dev-server --mode development --hot --host 0.0.0.0 --disable-host-check",
     "start:dist": "serve dist -s -l 8081",
     "mock": "MOCK=true yarn start",
     "build": "rimraf ./dist && NODE_ENV=production webpack --mode production",
