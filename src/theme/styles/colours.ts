@@ -1,8 +1,9 @@
-export const BASE_COLOURS = {
+import { Colors } from 'theme/types'
+
+export const BASE_COLOURS: Partial<Colors> = {
   // base
   white: '#FFF',
   black: '#000',
-  whiteDark: '#e9e9f0',
   red1: '#FF305B',
   red2: '#FF6871',
   red3: '#F82D3A',
@@ -15,12 +16,7 @@ export const BASE_COLOURS = {
   blue2: '#3F77FF',
 }
 
-export const BASE_GRADIENTS = {
-  gradient1: 'linear-gradient(270deg, #8958FF 0%, #3F77FF 100%);',
-  gradient2: 'linear-gradient(270deg, #8958FF 30%, #3F77FF 100%)',
-}
-
-export const LIGHT_COLOURS = {
+export const LIGHT_COLOURS: Partial<Colors> = {
   // text
   primaryText1: BASE_COLOURS.white,
   secondaryText1: '#EDEDED',
@@ -37,7 +33,7 @@ export const LIGHT_COLOURS = {
   gradient2: '#3F77FF',
 }
 
-export const DARK_COLOURS = {
+export const DARK_COLOURS: Partial<Colors> = {
   // text
   primaryText1: BASE_COLOURS.white,
   secondaryText1: '#EDEDED',
