@@ -17,7 +17,7 @@
     "mock": "MOCK=true yarn start",
     "build": "npm run build:swap-v1",
     "build:trade": "APP=trade npm run build:apps",
-    "build:explorer": "APP=trade npm run build:explorer",
+    "build:explorer": "APP=explorer npm run build:apps",
     "build:swap-v1": "APP=swap-v1 npm run build:apps",
     "build:apps": "rimraf ./dist && NODE_ENV=production webpack --mode production",
     "lint:js": "eslint src cypress --cache --cache-location .eslint-cache --ext .ts,.tsx,.js",
