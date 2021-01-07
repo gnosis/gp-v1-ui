@@ -1,14 +1,14 @@
-[![npm version](https://img.shields.io/npm/v/@gnosis.pm/dex-react.svg?style=flat)](https://npmjs.org/package/@gnosis.pm/dex-react 'View this project on npm')
+[![npm version](https://img.shields.io/npm/v/@gnosis.pm/gp-v1-ui.svg?style=flat)](https://npmjs.org/package/@gnosis.pm/gp-v1-ui 'View this project on npm')
 &nbsp;
-[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=develop)](https://travis-ci.org/gnosis/dex-react)
+[![Build Status](https://travis-ci.org/gnosis/gp-v1-ui.svg?branch=develop)](https://travis-ci.org/gnosis/gp-v1-ui)
 &nbsp;
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=master)](https://coveralls.io/github/gnosis/dex-react?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/gp-v1-ui/badge.svg?branch=master)](https://coveralls.io/github/gnosis/gp-v1-ui?branch=master)
 
 Develop:
 &nbsp;
-[![Build Status](https://travis-ci.org/gnosis/dex-react.svg?branch=develop)](https://travis-ci.org/gnosis/dex-react)
+[![Build Status](https://travis-ci.org/gnosis/gp-v1-ui.svg?branch=develop)](https://travis-ci.org/gnosis/gp-v1-ui)
 &nbsp;
-[![Coverage Status](https://coveralls.io/repos/github/gnosis/dex-react/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/dex-react?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/gnosis/gp-v1-ui/badge.svg?branch=develop)](https://coveralls.io/github/gnosis/gp-v1-ui?branch=develop)
 
 # Gnosis Protocol Web
 
@@ -26,7 +26,7 @@ Gnosis Protocol is a fully permissionless DEX that enables ring trades to maximi
 
 ## 📚 Wiki
 
-Learn more about Gnosis Protocol Web in the [wiki](https://github.com/gnosis/dex-react/wiki).
+Learn more about Gnosis Protocol Web in the [wiki](https://github.com/gnosis/gp-v1-ui/wiki).
 
 ## 🏃‍♀️ Run it locally
 
@@ -58,16 +58,16 @@ yarn test
 
 **Gnosis Protocol Web** can be forked, this way any project can use its own token list, rebrand it, add new pages or modify the existing ones.
 
-Read more [here](https://github.com/gnosis/dex-react/wiki/Fork-project).
+Read more [here](https://github.com/gnosis/gp-v1-ui/wiki/Fork-project).
 
 ## 🎩 Customizing components
 
 **Gnosis Protocol Web** allows to redefine any React component, so you can add new pages, modify the existing ones, or modify the layout and styles.
 
-Learn about customizing components [here](https://github.com/gnosis/dex-react/wiki/Customize-Components).
+Learn about customizing components [here](https://github.com/gnosis/gp-v1-ui/wiki/Customize-Components).
 
 ## 🖧 Supported networks
-App is currently compatible with Mainnet, Rinkeby, and xDAI. Please refer to the [wiki](https://github.com/gnosis/dex-react/wiki#-compatible-networks) for further information.
+App is currently compatible with Mainnet, Rinkeby, and xDAI. Please refer to the [wiki](https://github.com/gnosis/gp-v1-ui/wiki#-compatible-networks) for further information.
 
 ## 🦺 Testnet faucets
 
@@ -75,4 +75,4 @@ Test faucets allow to get some tokens for using them in a testnet.
 
 Gnosis Protocol is deployed and fully functional in Rinkeby testnet.
 
-Read more [here](https://github.com/gnosis/dex-react/wiki/Testnet-faucets).
+Read more [here](https://github.com/gnosis/gp-v1-ui/wiki/Testnet-faucets).

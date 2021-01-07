@@ -19,7 +19,7 @@ const NetworkErrorMessage: React.FC = () => (
     <br />
     <div>
       Click{' '}
-      <a href="https://github.com/gnosis/dex-react/wiki#-compatible-networks" target="_blank" rel="noopener noreferrer">
+      <a href="https://github.com/gnosis/gp-v1-ui/wiki#-compatible-networks" target="_blank" rel="noopener noreferrer">
         here
       </a>{' '}
       for more information
