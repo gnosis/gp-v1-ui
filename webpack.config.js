@@ -12,9 +12,10 @@ const dotenv = require('dotenv')
 const loadConfig = require('./src/loadConfig')
 const overrideEnvConfig = require('./src/overrideEnvConfig')
 
-const SWAP_APP_V1 = { name: 'swap-v1', title: null, filename: 'index.html' }
 const TRADE_APP = { name: 'trade', title: 'Gnosis Protocol Exchange', filename: 'trade.html' }
-const ALL_APPS = [SWAP_APP_V1, TRADE_APP]
+const EXPLORER_APP = { name: 'explorer', title: 'Gnosis Protocol Explorer', filename: 'explore.html' }
+const SWAP_APP_V1 = { name: 'swap-v1', title: null, filename: 'index.html' }
+const ALL_APPS = [TRADE_APP, EXPLORER_APP, SWAP_APP_V1]
 
 // Setup env vars
 dotenv.config()
@@ -46,6 +47,7 @@ function getSelectedApps() {
 
 // Get selected apps: all apps by default
 const apps = getSelectedApps()
+console.log('apps', apps)
 
 // Generate one entry point per app
 const entryPoints = apps.reduce((acc, app) => {
