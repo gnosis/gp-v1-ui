@@ -181,7 +181,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     logDebug('[Erc20Api] approve:', { spenderAddress, amount: amount.toString() })
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/gp-v1-ui/issues/231
     const tx = erc20.methods.approve(spenderAddress, amount.toString()).send({
       from: userAddress,
     })
@@ -205,7 +205,7 @@ export class Erc20ApiImpl implements Erc20Api {
 
     logDebug('[Erc20Api] transfer:', { toAddress, amount: amount.toString() })
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/gp-v1-ui/issues/231
     const tx = erc20.methods.transfer(toAddress, amount.toString()).send({
       from: userAddress,
     })

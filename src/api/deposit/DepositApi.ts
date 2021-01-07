@@ -151,7 +151,7 @@ export class DepositApiImpl implements DepositApi {
     const contract = await this._getContract(networkId)
     logDebug('[DepositApi] deposit:', { tokenAddress, amount: amount.toString() })
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/gp-v1-ui/issues/231
     const tx = contract.methods.deposit(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
@@ -172,7 +172,7 @@ export class DepositApiImpl implements DepositApi {
     const contract = await this._getContract(networkId)
     logDebug('[DepositApi] requestWithdraw:', { tokenAddress, amount: amount.toString() })
 
-    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/dex-react/issues/231
+    // TODO: Remove temporal fix for web3. See https://github.com/gnosis/gp-v1-ui/issues/231
     const tx = contract.methods.requestWithdraw(tokenAddress, amount.toString()).send({ from: userAddress })
 
     if (txOptionalParams?.onSentTransaction) {
