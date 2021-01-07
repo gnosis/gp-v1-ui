@@ -3,22 +3,23 @@ import { createGlobalStyle, css } from 'styled-components'
 import fontFace from './fonts'
 import { web3ModalOverride } from './overrides'
 
-// TODO: replace these variables:
+// TODO: replace these variables w/Colour constants (later):
 // --color-text-primary: #456483
 // --color-gradient-1: #21222E
 // --color-gradient-2: #2C2D3F
+// --color-background-selection: #218DFF
+// --color-text-active: #218DFF
 
 const selection = css`
   /* CSS for selecting text */
   *::selection {
-    background: var(--color-background-selection); /* WebKit/Blink Browsers */
-    color: var(--color-text-selection);
+    background: #218dff; /* WebKit/Blink Browsers */
   }
   *::-moz-selection {
-    background: var(--color-background-selection); /* Gecko Browsers */
+    background: #218dff; /* Gecko Browsers */
   }
   *::-webkit-selection {
-    background: var(--color-background-selection); /* Chrome Browsers */
+    background: #218dff; /* Chrome Browsers */
   }
   /* End CSS for selecting text */
 `
@@ -90,7 +91,7 @@ export const StaticGlobalStyle = createGlobalStyle`
     cursor: pointer;
       &:link, 
       &:visited {
-        color: var(--color-text-active);
+        color: #218DFF;
       }
   }
 
