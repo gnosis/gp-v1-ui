@@ -7,7 +7,7 @@ import { StoryFnReactReturnType } from '@storybook/react/dist/client/preview/typ
 import { ApolloProvider } from '@apollo/client'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
-import { StaticGlobalStyle } from 'theme'
+import { BASE_COLOURS, DARK_COLOURS, LIGHT_COLOURS, StaticGlobalStyle, Theme } from 'theme'
 
 export const GlobalStyles = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => (
   <>
@@ -20,22 +20,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
 
 import { ThemeToggle } from 'components/common/Button'
-import { ThemeProvider } from 'styled-components'
+import { DefaultTheme, ThemeProvider } from 'styled-components'
 
-import { COLOURS, MainAppTheme } from 'styles'
+// TODO: remove and implement a theme managing hook
+function useMockThemeManager(isDarkMode: boolean): DefaultTheme {
+  const mode = isDarkMode ? Theme.DARK : Theme.LIGHT
+  const COLOUR_PALETTE = isDarkMode ? DARK_COLOURS : LIGHT_COLOURS
+  return {
+    mode,
+    ...BASE_COLOURS,
+    ...COLOUR_PALETTE,
+  }
+}
 
 export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
   const [darkMode, setDarkMode] = React.useState(true)
-  const theme: MainAppTheme = {
-    mode: darkMode ? 'dark' : 'light',
-  }
+  // TODO: remove and implement a theme managing hook
+  const theme: DefaultTheme = useMockThemeManager(darkMode)
 
   const handleDarkMode = (): void => setDarkMode((darkMode) => !darkMode)
 
   return (
     <>
       <ThemeProvider theme={theme}>
-        <Frame style={{ background: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
+        <Frame style={{ background: theme.bg1 }}>{DecoratedStory()}</Frame>
         {/* Cheeky use of ButtonBase here :P */}
         <ThemeToggle onClick={handleDarkMode} mode={darkMode}>
           <FontAwesomeIcon icon={darkMode ? faMoon : faSun} />
