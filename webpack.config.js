@@ -26,12 +26,14 @@ const { name: appTitle } = config
 
 const apps = [SWAP_APP_V1, TRADE_APP]
 
+// Generate one entry point per app
 const entryPoints = apps.reduce((acc, app) => {
   const { name } = app
   acc[name] = `./src/apps/${name}/index.tsx`
   return acc
 }, {})
 
+// Generate one HTML per app (with their specific entry point)
 const htmlPlugins = apps.map((app) => {
   const { name, title, filename } = app
   return new HtmlWebPackPlugin({
@@ -56,7 +58,7 @@ const htmlPlugins = apps.map((app) => {
 })
 
 module.exports = ({ stats = false } = {}) => ({
-  entry: entryPoints,
+  entry: entryPoints, // One entry points per app
   devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
@@ -160,7 +162,7 @@ module.exports = ({ stats = false } = {}) => ({
     callback()
   },
   plugins: [
-    ...htmlPlugins,
+    ...htmlPlugins, // one html page per app
     new FaviconsWebpackPlugin({
       logo: config.logoPath,
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
