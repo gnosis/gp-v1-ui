@@ -2,8 +2,8 @@ import React from 'react'
 import styled from 'styled-components'
 
 interface ToggleSize {
-  width: string
-  height: string
+  width?: string
+  height?: string
 }
 
 type ToggleProps = React.InputHTMLAttributes<HTMLInputElement> & Partial<ToggleSize>
@@ -19,12 +19,10 @@ const ToggleBase: React.FC<ToggleProps> = ({ className, width, height, ...props 
   )
 }
 
-const defaultSize: ToggleSize = { width: '2.8em', height: '1em' }
-
 // don't pass on theme object, it'll get spread over input anyway
-const ToggleStyled = styled(ToggleBase).attrs((props) => ({ ...defaultSize, ...props, theme: undefined }))<ToggleSize>`
-  --span-width: ${(props): string => props.width};
-  --span-height: ${(props): string => props.height};
+const ToggleStyled = styled(ToggleBase)<ToggleSize>`
+  --span-width: ${({ width = '2.8em' }): string => width};
+  --span-height: ${({ height = '1em' }): string => height};
   /* easier to set vars once, than copy the whole func into each calc() */
   padding: 1em;
   cursor: pointer;

@@ -1,8 +1,8 @@
 import React from 'react'
-import styled, { css, ThemeProvider } from 'styled-components'
-import { ThemeMap, ThemeValue, variants } from 'styled-theming'
+import styled, { css, /* DefaultTheme, */ ThemeProvider } from 'styled-components'
+import { ThemeValue, variants } from 'styled-theming'
 
-import { COLOURS, BASE_STYLES, MainAppTheme } from 'styles'
+import { COLOURS, BASE_STYLES } from 'styles'
 
 const {
   white,
@@ -233,7 +233,9 @@ const ColouredAndSizedButtonBase = styled(ColouredButtonBase)`
 // Wrap ColouredAndSizedButtonsBase in it's own ThemeProvider which takes the toplevel app theme
 // ThemeProvider and interpolate over it's props
 const ThemeWrappedButtonBase: React.FC<React.ButtonHTMLAttributes<Element>> = ({ children, ...restProps }) => (
-  <ThemeProvider theme={({ mode }: MainAppTheme): ThemeMap => ({ mode, component: 'buttons' })}>
+  // TODO: fix when ThemePRovider is properly coded in
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  <ThemeProvider theme={({ mode }: any): any => ({ mode, components: 'button' })}>
     <ColouredAndSizedButtonBase {...restProps}>{children}</ColouredAndSizedButtonBase>
   </ThemeProvider>
 )
