@@ -12,6 +12,9 @@ const dotenv = require('dotenv')
 const loadConfig = require('./src/loadConfig')
 const overrideEnvConfig = require('./src/overrideEnvConfig')
 
+const SWAP_APP_V1 = { name: 'swap-v1', filename: 'index.html' }
+const TRADE_APP = { name: 'trade', filename: 'trade.html' }
+
 // Setup env vars
 dotenv.config()
 
@@ -19,10 +22,18 @@ const isProduction = process.env.NODE_ENV == 'production'
 
 const baseUrl = isProduction ? '' : '/'
 const config = overrideEnvConfig(loadConfig())
-const { name: appName } = config
+const { name: appTitle } = config
+
+const apps = [SWAP_APP_V1, TRADE_APP]
+
+const entryPoints = apps.reduce((acc, app) => {
+  const { name } = app
+  acc[name] = `./src/apps/${name}/index.tsx`
+  return acc
+}, {})
 
 module.exports = ({ stats = false } = {}) => ({
-  entry: [`./src/apps/swap-v1/index.tsx`],
+  entry: entryPoints,
   devtool: isProduction ? 'source-map' : 'eval-source-map',
   output: {
     path: __dirname + '/dist',
@@ -128,7 +139,7 @@ module.exports = ({ stats = false } = {}) => ({
   plugins: [
     new HtmlWebPackPlugin({
       template: config.templatePath,
-      title: appName,
+      title: appTitle,
       ipfsHack: isProduction,
       minify: isProduction && {
         removeComments: true,
@@ -148,9 +159,9 @@ module.exports = ({ stats = false } = {}) => ({
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
       devMode: 'webapp', // optional can be 'webapp' or 'light' - 'light' by default
       favicons: {
-        appName: appName,
-        appDescription: appName,
-        developerName: appName,
+        appName: appTitle,
+        appDescription: appTitle,
+        developerName: appTitle,
         developerURL: null, // prevent retrieving from the nearest package.json
         background: '#dfe6ef',
         themeColor: '#476481',
