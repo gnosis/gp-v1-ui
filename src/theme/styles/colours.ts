@@ -1,6 +1,4 @@
-import { Colors } from 'theme/types'
-
-export const BASE_COLOURS: Partial<Colors> = {
+export const BASE_COLOURS = {
   // base
   white: '#FFF',
   black: '#000',
@@ -16,9 +14,9 @@ export const BASE_COLOURS: Partial<Colors> = {
   blue2: '#3F77FF',
 }
 
-export const LIGHT_COLOURS: Partial<Colors> = {
+export const LIGHT_COLOURS = {
   // text
-  primaryText1: BASE_COLOURS.white,
+  primaryText1: '#FFF',
   secondaryText1: '#EDEDED',
   secondaryText2: '#9797B8',
   textDisabled: '#31323E',
@@ -33,9 +31,9 @@ export const LIGHT_COLOURS: Partial<Colors> = {
   gradient2: '#3F77FF',
 }
 
-export const DARK_COLOURS: Partial<Colors> = {
+export const DARK_COLOURS = {
   // text
-  primaryText1: BASE_COLOURS.white,
+  primaryText1: '#FFF',
   secondaryText1: '#EDEDED',
   secondaryText2: '#9797B8',
   textDisabled: '#31323E',
