@@ -12,8 +12,8 @@ const dotenv = require('dotenv')
 const loadConfig = require('./src/loadConfig')
 const overrideEnvConfig = require('./src/overrideEnvConfig')
 
-const SWAP_APP_V1 = { name: 'swap-v1', filename: 'index.html' }
-const TRADE_APP = { name: 'trade', filename: 'trade.html' }
+const SWAP_APP_V1 = { name: 'swap-v1', title: null, filename: 'index.html' }
+const TRADE_APP = { name: 'trade', title: 'Gnosis Protocol Exchange', filename: 'trade.html' }
 
 // Setup env vars
 dotenv.config()
@@ -31,6 +31,29 @@ const entryPoints = apps.reduce((acc, app) => {
   acc[name] = `./src/apps/${name}/index.tsx`
   return acc
 }, {})
+
+const htmlPlugins = apps.map((app) => {
+  const { name, title, filename } = app
+  return new HtmlWebPackPlugin({
+    template: config.templatePath,
+    chunks: [name],
+    title: title || appTitle,
+    filename,
+    ipfsHack: isProduction,
+    minify: isProduction && {
+      removeComments: true,
+      collapseWhitespace: true,
+      removeRedundantAttributes: true,
+      useShortDoctype: true,
+      removeEmptyAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      keepClosingSlash: true,
+      minifyJS: true,
+      minifyCSS: true,
+      minifyURLs: true,
+    },
+  })
+})
 
 module.exports = ({ stats = false } = {}) => ({
   entry: entryPoints,
@@ -137,23 +160,7 @@ module.exports = ({ stats = false } = {}) => ({
     callback()
   },
   plugins: [
-    new HtmlWebPackPlugin({
-      template: config.templatePath,
-      title: appTitle,
-      ipfsHack: isProduction,
-      minify: isProduction && {
-        removeComments: true,
-        collapseWhitespace: true,
-        removeRedundantAttributes: true,
-        useShortDoctype: true,
-        removeEmptyAttributes: true,
-        removeStyleLinkTypeAttributes: true,
-        keepClosingSlash: true,
-        minifyJS: true,
-        minifyCSS: true,
-        minifyURLs: true,
-      },
-    }),
+    ...htmlPlugins,
     new FaviconsWebpackPlugin({
       logo: config.logoPath,
       mode: 'webapp', // optional can be 'webapp' or 'light' - 'webapp' by default
