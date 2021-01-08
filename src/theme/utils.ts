@@ -10,6 +10,8 @@ export function getThemePalette(colourTheme: Theme): Colors {
     case Theme.DARK:
       THEME_COLOURS = DARK_COLOURS
       break
+    default:
+      THEME_COLOURS = DARK_COLOURS
   }
   return {
     ...BASE_COLOURS,
