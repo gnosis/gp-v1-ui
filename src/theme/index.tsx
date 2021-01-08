@@ -9,7 +9,10 @@ import { getThemePalette } from './utils'
 import { useThemeMode } from 'hooks/useThemeManager'
 
 // Extension/override of styled-components' ThemeProvider but with our own constructed theme object
-const ThemeProvider: React.FC<{ themeExtension: DefaultTheme['components'] }> = ({ children, themeExtension }) => {
+const ThemeProvider: React.FC<{ componentKey: Partial<DefaultTheme['componentKey']> }> = ({
+  children,
+  componentKey,
+}) => {
   const themeMode = useThemeMode()
 
   const themeObject = useMemo(() => {
@@ -22,11 +25,11 @@ const ThemeProvider: React.FC<{ themeExtension: DefaultTheme['components'] }> = 
       // unfold in any extensions
       // for example to make big/small buttons -> see src/components/Button ThemeWrappedButtonBase
       // to see it in action
-      components: themeExtension,
+      componentKey,
     }
 
     return computedTheme
-  }, [themeMode, themeExtension])
+  }, [themeMode, componentKey])
 
   // We want to pass the ThemeProvider theme to all children implicitly, no need to manually pass it
   return (
