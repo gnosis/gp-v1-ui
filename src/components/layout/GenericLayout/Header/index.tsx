@@ -6,22 +6,26 @@ import { Link } from 'react-router-dom'
 import LogoImage from 'assets/img/logo-v2.svg'
 
 const HeaderStyled = styled.header`
-  height: 6.2rem;
+  height: var(--height-bar-default);
   display: flex;
   align-items: center;
   box-sizing: border-box;
   padding: 0 2rem;
-  border: 0.1rem solid var(--color-border);
+  border-bottom: 0.1rem solid var(--color-border);
+  background: var(--color-primary);
 `
 
 const Logo = styled(Link)`
   width: auto;
-  height: 3rem;
+  height: 76%;
   transform: perspective(20rem) rotateY(0);
   transform-style: preserve-3d;
   transition: transform 1s ease-in-out;
   padding: 0;
   margin: 0 1.6rem 0 0;
+  display: flex;
+  align-content: center;
+  justify-content: center;
 
   &:hover {
     animation-name: spin;
@@ -36,6 +40,7 @@ const Logo = styled(Link)`
     object-fit: contain;
     width: inherit;
     height: inherit;
+    margin: auto;
   }
 
   @keyframes spin {

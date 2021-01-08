@@ -1,22 +1,40 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 // Components
-import { TabItemType } from 'components/OrderBuySell'
 import TabItem from 'components/common/Tabs/TabItem'
 import TabContent from 'components/common/Tabs/TabContent'
 
+export interface TabItemType {
+  readonly id: number
+  readonly title: string
+  readonly content: React.ReactNode
+  readonly count?: number
+}
+export interface TabThemeType {
+  readonly activeBg?: string
+  readonly activeBgAlt?: string
+  readonly inactiveBg?: string
+  readonly activeText?: string
+  readonly inactiveText?: string
+  readonly activeBorder?: string
+  readonly inactiveBorder?: string
+  readonly letterSpacing?: string
+  readonly fontWeight?: string
+  readonly fontSize?: string
+  readonly borderRadius?: boolean
+}
 interface Props {
-  tabItems: TabItemType[]
+  readonly tabItems: TabItemType[]
+  readonly theme?: TabThemeType
 }
 
 const Wrapper = styled.div`
   display: flex;
   flex-flow: column;
   width: 100%;
-
+  height: 100%;
   > div {
-    list-style: none;
     display: flex;
     flex-flow: row nowrap;
     padding: 0;
@@ -25,24 +43,26 @@ const Wrapper = styled.div`
   }
 `
 
-const Tabs: React.FC<Props> = ({ tabItems }) => {
-  const [activeTab, setActiveTab] = useState(0)
-  const { content } = useMemo((): TabItemType => tabItems[activeTab], [activeTab, tabItems])
+const Tabs: React.FC<Props> = (props) => {
+  const [activeTab, setActiveTab] = useState<number>(1)
+  const theme = props.theme ? props.theme : undefined
 
   return (
     <Wrapper>
-      <div role="tablist">
-        {tabItems.map(({ title, activeColor }, index) => (
+      <div role="tablist" className="tablist">
+        {props.tabItems.map(({ id, title, count }) => (
           <TabItem
-            key={index}
+            key={id}
+            id={id}
             title={title}
-            onTabClick={(): void => setActiveTab(index)}
-            activeColor={activeTab === index && activeColor}
+            onTabClick={(): void => setActiveTab(id)}
+            isActive={activeTab === id}
+            theme={theme}
+            count={count}
           />
         ))}
       </div>
-
-      {content && <TabContent content={content} />}
+      <TabContent tabItems={props.tabItems} activeTab={activeTab} />
     </Wrapper>
   )
 }

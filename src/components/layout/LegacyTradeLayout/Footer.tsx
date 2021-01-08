@@ -241,7 +241,7 @@ const Footer: React.FC = () => {
           </a>{' '}
           <a target="_blank" rel="noopener noreferrer" href="https://github.com/gnosis/gp-v1-ui/wiki/App-Ids-for-Forks">
             App Id: {CONFIG.appId}
-          </a>{' '}
+          </a>
           <a
             target="_blank"
             rel="noopener noreferrer"
