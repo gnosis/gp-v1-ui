@@ -36,16 +36,14 @@ const TabsWrapper = styled.div`
   width: 100%;
   padding: 0;
 
-  // Alternatively use a prop for setting a different bg color in the Tabs component
-  // eslint-disable-next-line prettier/prettier
-  > div > div[role='tablist'] {
+  > div > div.tablist {
     background: var(--color-gradient-2);
     padding: calc(var(--padding-container-default) / 2) var(--padding-container-default)
       var(--padding-container-default);
     justify-content: flex-end;
   }
 
-  > div > div[role='tablist'] > button {
+  > div > div.tablist > button {
     flex: 0 1 auto;
     padding: 0 0.8rem;
     line-height: 2;

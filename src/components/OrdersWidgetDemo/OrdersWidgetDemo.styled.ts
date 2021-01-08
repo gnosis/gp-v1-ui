@@ -6,7 +6,7 @@ export const OrdersWidgetDemo = styled.div`
   width: 100%;
   grid-area: orders;
 
-  > div > div[role='tablist'] {
+  > div > div.tablist {
     background: var(--color-gradient-2);
     justify-content: flex-start;
     align-items: center;
@@ -20,7 +20,7 @@ export const OrdersWidgetDemo = styled.div`
     position: relative;
   }
 
-  > div > div[role='tablist'] > button {
+  > div > div.tablist > button {
     flex: 0 1 auto;
     padding: 0.7rem;
     height: auto;

@@ -49,7 +49,7 @@ export const StepTitle: React.FC<Pick<ProgressBarProps, 'step'>> = ({ step }) =>
         }
       case 2:
         // TODO: Add Link
-        // https://github.com/gnosis/dex-react/issues/615
+        // https://github.com/gnosis/gp-v1-ui/issues/615
         return {
           title: '2. Define your spread and review:',
           subtext: (

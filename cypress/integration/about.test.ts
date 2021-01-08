@@ -17,6 +17,6 @@ describe('About', () => {
 
     // WHEN: -
     // THEN: There's the heading we expect
-    cy.get('main h1:first').contains('About Gnosis Protocol Web')
+    cy.get('main h1:first').contains('About Gnosis Protocol v1 Web')
   })
 })

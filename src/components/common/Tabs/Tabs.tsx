@@ -34,7 +34,6 @@ const Wrapper = styled.div`
   flex-flow: column;
   width: 100%;
   height: 100%;
-
   > div {
     display: flex;
     flex-flow: row nowrap;
@@ -50,7 +49,7 @@ const Tabs: React.FC<Props> = (props) => {
 
   return (
     <Wrapper>
-      <div role="tablist">
+      <div role="tablist" className="tablist">
         {props.tabItems.map(({ id, title, count }) => (
           <TabItem
             key={id}

@@ -15,7 +15,7 @@ function getAppId(config) {
   }
 
   if (error) {
-    throw new Error(error + '. Read more in https://github.com/gnosis/dex-react/wiki/App-Ids-for-Forks')
+    throw new Error(error + '. Read more in https://github.com/gnosis/gp-v1-ui/wiki/App-Ids-for-Forks')
   }
 
   return appId
