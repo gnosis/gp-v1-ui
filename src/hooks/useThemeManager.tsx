@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { updateTheme } from 'reducers-actions/user'
+import { updateTheme } from 'reducers-actions/theme'
 import useGlobalState from './useGlobalState'
 
 import { Theme } from 'theme'
@@ -8,7 +8,7 @@ import { Theme } from 'theme'
 export const useThemeMode = (): Theme => {
   const [state] = useGlobalState()
 
-  return useMemo(() => state.user?.theme || Theme.AUTO, [state.user.theme])
+  return useMemo(() => state.theme || Theme.DARK, [state.theme])
 }
 
 export function useThemeManager(): [Theme, (newTheme: Theme) => void] {
@@ -17,7 +17,7 @@ export function useThemeManager(): [Theme, (newTheme: Theme) => void] {
 
   const setNewTheme = useCallback(
     (newTheme: Theme) => {
-      dispatch(updateTheme({ theme: newTheme }))
+      dispatch(updateTheme(newTheme))
     },
     [dispatch],
   )

@@ -20,7 +20,12 @@ import {
   INITIAL_LOCAL_TOKENS_STATE as localTokens,
   sideEffect as LocalTokensSideEffect,
 } from './localTokens'
-import { reducer as UserReducer, UserState, INITIAL_USER_STATE as user, sideEffect as UserSideEffect } from './user'
+import {
+  reducer as ThemeReducer,
+  ThemeState,
+  INITIAL_THEME_STATE as theme,
+  sideEffect as ThemeSideEffect,
+} from './theme'
 
 export * from './tokenRow'
 
@@ -40,7 +45,7 @@ export interface GlobalState {
   trade: TradeState
   trades: TradesState
   localTokens: LocalTokensState
-  user: UserState
+  theme: ThemeState
 }
 
 /**********************************
@@ -58,7 +63,7 @@ export const INITIAL_STATE = (): GlobalState => {
     trade,
     trades,
     localTokens,
-    user,
+    theme,
   }
 }
 
@@ -95,5 +100,5 @@ export const rootReducer = combineReducers({
   trade: TradeReducer,
   trades: addSideEffect(TradesReducer, TradesSideEffect),
   localTokens: addSideEffect(LocalTokensReducer, LocalTokensSideEffect),
-  user: addSideEffect(UserReducer, UserSideEffect),
+  theme: addSideEffect(ThemeReducer, ThemeSideEffect),
 })
