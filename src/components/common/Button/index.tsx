@@ -202,18 +202,18 @@ export const ButtonTheme = variants('mode', 'variant', {
 })
 
 // Created a 'size' prop on buttons, default | small | big
-const ButtonSizes = variants('component', 'size', {
+const ButtonSizes = variants('componentKey', 'size', {
   default: {
-    buttons: '',
+    button: '',
   },
   small: {
-    buttons: css`
+    button: css`
       font-size: 0.6rem;
       padding: 0.3rem 0.5rem;
     `,
   },
   big: {
-    buttons: css`
+    button: css`
       font-size: 1.4rem;
       padding: 0.65rem 1rem;
     `,
@@ -235,7 +235,7 @@ const ColouredAndSizedButtonBase = styled(ColouredButtonBase)`
 const ThemeWrappedButtonBase: React.FC<React.ButtonHTMLAttributes<Element>> = ({ children, ...restProps }) => (
   // TODO: fix when ThemePRovider is properly coded in
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  <ThemeProvider theme={({ mode }: any): any => ({ mode, components: 'button' })}>
+  <ThemeProvider theme={({ mode }: any): any => ({ mode, componentKey: 'button' })}>
     <ColouredAndSizedButtonBase {...restProps}>{children}</ColouredAndSizedButtonBase>
   </ThemeProvider>
 )

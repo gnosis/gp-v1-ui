@@ -45,6 +45,6 @@ declare module 'styled-components' {
     // theming
     mode: Theme
     // used to key in on component variants
-    components?: keyof JSX.IntrinsicElements | React.ComponentType<Record<string, unknown>>
+    componentKey?: keyof JSX.IntrinsicElements
   }
 }
