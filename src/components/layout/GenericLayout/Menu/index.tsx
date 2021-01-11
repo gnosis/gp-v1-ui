@@ -8,12 +8,12 @@ export const NavStyled = styled.ol`
   display: flex;
   padding: 0;
 
-  @media ${MEDIA.mediumDown} {
+  /* @media ${MEDIA.mediumDown} {
     margin: 0 0 0 auto;
-  }
+  } */
 
   > li {
-    font-size: 1.6rem;
+    font-size: var(--font-size-larger);
     color: var(--color-text-secondary2);
     background-color: transparent;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
@@ -25,7 +25,7 @@ export const NavStyled = styled.ol`
 
   > li.active,
   > li:hover {
-    background-color: var(--color-primary);
+    background-color: var(--color-gradient-2);
     color: var(--color-text-primary);
     font-weight: var(--font-weight-medium);
   }

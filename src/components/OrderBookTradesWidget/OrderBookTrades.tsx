@@ -4,12 +4,12 @@ import React from 'react'
 import { Meta, Story } from '@storybook/react/types-6-0'
 
 import { GlobalStyles, Router } from 'storybook/decorators'
-import { TokenPairSelector } from 'components/TokenPairSelector'
+import { OrderBookTradesWidget } from 'components/OrderBookTradesWidget'
 
 export default {
-  title: 'component/TokenPairSelector',
-  component: TokenPairSelector,
+  title: 'component/OrderBookTrades',
+  component: OrderBookTradesWidget,
   decorators: [Router, GlobalStyles],
 } as Meta
 
-export const Normal: Story = () => <TokenPairSelector selectedPair="WETH/USDT" selectLabel="Select Pair" />
+export const Normal: Story = () => <OrderBookTradesWidget />

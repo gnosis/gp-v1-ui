@@ -3,8 +3,11 @@ import styled from 'styled-components'
 
 import { MEDIA } from 'const'
 import { NavStyled } from '../Menu'
-import { Frame } from 'components/common/Frame'
 
+// Components
+import UserWallet from 'components/UserWallet'
+
+// Assets
 import SettingsImage from 'assets/img/settings.svg'
 import SettingsImageWhite from 'assets/img/settings-white.svg'
 import NotificationsImage from 'assets/img/bell.svg'
@@ -49,7 +52,7 @@ const Wrapper = styled(NavStyled)`
   margin: 0 0 0 auto;
   padding: 0;
 
-  @media ${MEDIA.mediumDown} {
+  /* @media ${MEDIA.mediumDown} {
     flex-direction: row;
     justify-content: flex-start;
     justify-self: center;
@@ -62,7 +65,7 @@ const Wrapper = styled(NavStyled)`
     height: 7.2rem;
     border-radius: 0;
     background-color: var(--color-gradient-2);
-  }
+  } */
 
   > li {
     display: flex;
@@ -79,19 +82,17 @@ const Wrapper = styled(NavStyled)`
       right: -2.8rem;
     }
 
-    @media ${MEDIA.mediumDown} {
+    /* @media ${MEDIA.mediumDown} {
       &:first-of-type::after {
         content: none;
       }
-    }
+    } */
 
     > a {
       transition: background 0.2s ease-in-out;
     }
   }
 `
-
-const UserWallet: React.FC = () => <Frame>User Wallet</Frame>
 
 type Props = React.PropsWithChildren<{
   hasWallet?: boolean
