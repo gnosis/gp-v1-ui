@@ -33,7 +33,6 @@ export interface Colors {
 }
 
 export enum Theme {
-  AUTO = 'AUTO',
   DARK = 'DARK',
   LIGHT = 'LIGHT',
 }
