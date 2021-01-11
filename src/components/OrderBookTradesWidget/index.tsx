@@ -62,7 +62,7 @@ interface OrderBookWidgetsProp {
 export const OrderBookTradesWidget: React.FC<OrderBookWidgetsProp> = ({ orders }) => (
   <Wrapper>
     <TabsWrapper>
-      <Tabs tabItems={tabItems(orders)} theme={tabThemeConfig} />
+      <Tabs tabItems={tabItems(orders)} tabTheme={tabThemeConfig} />
     </TabsWrapper>
   </Wrapper>
 )
