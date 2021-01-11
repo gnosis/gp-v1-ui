@@ -1,15 +1,15 @@
 import React from 'react'
-import { Header } from './Header'
+
+// Styles
 import GlobalStyles from './GlobalStyles'
-import { Frame } from 'components/common/Frame'
 
-const Footer: React.FC = () => (
-  <Frame>
-    <footer>Footer</footer>
-  </Frame>
-)
+// Header
+import { Header } from './Header'
 
-interface Props {
+// Footer
+import { Footer } from './Footer'
+
+export interface Props {
   menu?: React.ReactNode
   navTools?: React.ReactNode
 }

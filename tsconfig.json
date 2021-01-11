@@ -32,7 +32,8 @@
     "types": [
       "jest",
       "node",
-      "webpack-env"
+      "webpack-env",
+      "resize-observer-browser"
     ],
     "baseUrl": ".",
     "paths": {

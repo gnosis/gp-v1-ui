@@ -19,6 +19,7 @@ import {
   removeAllTxsPendingApproval,
   removeTxPendingApproval,
 } from 'components/OuterModal'
+import { CHAIN_CALLS_RATE_LIMIT } from 'const'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sanitizeErrorData = (jsonRpcError?: JsonRpcError<any>): void => {
@@ -298,6 +299,50 @@ export const composeProvider = <T extends Provider>(
       },
     ),
   )
+
+  // rate limit a function
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function rateLimit<T extends (...args: any[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
+    const queue: Parameters<T>[] = []
+    let timer: NodeJS.Timeout | null = null
+
+    // escape hatch to monitor the queue
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(window as any).callsQueue = queue
+
+    function processQueue(): void {
+      const params = queue.shift()
+      if (params) fn(...params)
+      if (queue.length === 0 && timer) {
+        clearInterval(timer)
+        timer = null
+      }
+    }
+
+    return function limited(...args: Parameters<T>): void {
+      queue.push(args)
+      if (!timer) {
+        processQueue() // start immediately on the first invocation
+        timer = setInterval(processQueue, delay)
+      }
+    }
+  }
+
+  if (CHAIN_CALLS_RATE_LIMIT > 0) {
+    const passThroughMware: JsonRpcMiddleware = (_req, _res, next) => next()
+    // consecutive calls with CHAIN_CALLS_RATE_LIMIT in between
+    const rateLimitedPassThrough = rateLimit(passThroughMware, CHAIN_CALLS_RATE_LIMIT)
+
+    engine.push((req, res, next, error) => {
+      // tx signing is wallet-dependent
+      if (req.method === 'eth_sendTransaction') {
+        return next()
+      }
+
+      // execute only once in CHAIN_CALLS_RATE_LIMIT ms
+      rateLimitedPassThrough(req, res, next, error)
+    })
+  }
 
   const walletMiddleware = providerAsMiddleware(provider)
   engine.push(wrapInTimeout(walletMiddleware))

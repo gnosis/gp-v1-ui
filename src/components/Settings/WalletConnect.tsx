@@ -4,7 +4,7 @@ import { UseFormMethods, FieldErrors } from 'react-hook-form'
 import { ErrorMessage } from '@hookform/error-message'
 import styled from 'styled-components'
 
-import { SettingsFormData, CustomResolverResult } from 'apps/swap-v1/pages/Settings'
+import { SettingsFormData, CustomResolverResult } from 'apps/gp-v1/pages/Settings'
 import { InputBox } from 'components/InputBox'
 import { Input } from 'components/Input'
 

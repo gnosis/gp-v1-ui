@@ -23,6 +23,8 @@ import { DisabledTokensMaps, TokenOverride, AddressToOverrideMap } from 'types/c
 export const BATCH_TIME_IN_MS = BATCH_TIME * 1000
 export const DEFAULT_TIMEOUT = 5000
 
+export const CHAIN_CALLS_RATE_LIMIT = 0 // ms between blockchain calls, 0 = disabled
+
 export const ZERO_BIG_NUMBER = new BigNumber(0)
 export const ONE_BIG_NUMBER = new BigNumber(1)
 export const TEN_BIG_NUMBER = new BigNumber(10)
