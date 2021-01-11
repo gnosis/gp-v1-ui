@@ -3,13 +3,22 @@ export * from './types'
 export * from './utils'
 
 import React, { useMemo } from 'react'
-import { DefaultTheme, ThemeProvider as StyledComponentsThemeProvider } from 'styled-components'
+import {
+  DefaultTheme,
+  isStyledComponent,
+  StyledComponent,
+  ThemeProvider as StyledComponentsThemeProvider,
+} from 'styled-components'
 
 import { getThemePalette } from './utils'
 import { useThemeMode } from 'hooks/useThemeManager'
 
+// This type is all React.ReactElement & StyledComponents combined
+type ReactOrStyledNode = React.ReactElement &
+  StyledComponent<keyof JSX.IntrinsicElements, Record<string, unknown>, Record<string, unknown>, never>
+
 // Extension/override of styled-components' ThemeProvider but with our own constructed theme object
-const ThemeProvider: React.FC<{ componentKey: Partial<DefaultTheme['componentKey']> }> = ({
+const ThemeProvider: React.FC<{ componentKey?: Partial<DefaultTheme['componentKey']> }> = ({
   children,
   componentKey,
 }) => {
@@ -34,11 +43,14 @@ const ThemeProvider: React.FC<{ componentKey: Partial<DefaultTheme['componentKey
   // We want to pass the ThemeProvider theme to all children implicitly, no need to manually pass it
   return (
     <StyledComponentsThemeProvider theme={themeObject}>
-      {React.Children.map(
-        children,
-        (childWithTheme) =>
-          // make sure child is a valid react element as children by default can be type string|null|number
-          React.isValidElement(childWithTheme) && React.cloneElement(childWithTheme, { theme: themeObject }),
+      {React.Children.map(children, (child: ReactOrStyledNode) =>
+        // is not null/undefined/0
+        React.isValidElement(child) || isStyledComponent(child)
+          ? React.cloneElement(child, {
+              theme: themeObject,
+            })
+          : // if not, don't pass props and just return
+            child,
       )}
     </StyledComponentsThemeProvider>
   )
