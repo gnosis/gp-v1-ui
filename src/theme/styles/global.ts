@@ -67,9 +67,11 @@ export const StaticGlobalStyle = createGlobalStyle`
     margin: 0;
     font-size: 62.5%;
     line-height: 10px;
+    /* TODO: change the next 3 lines to be in themed global */
     font-family: var(--font-default);
     background-image: linear-gradient(0deg, var(--color-gradient-1) 0%, var(--color-gradient-2) 100%);
     color: var(--color-text-primary);
+    /* End TODO */
     box-sizing: border-box;
     scroll-behavior: smooth;
     text-rendering: geometricPrecision;

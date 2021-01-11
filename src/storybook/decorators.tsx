@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { MemoryRouter } from 'react-router'
 
 // also exported from '@storybook/react' if you can deal with breaking changes in 6.1
@@ -7,7 +7,16 @@ import { StoryFnReactReturnType } from '@storybook/react/dist/client/preview/typ
 import { ApolloProvider } from '@apollo/client'
 import { ApolloClient, InMemoryCache } from '@apollo/client'
 import { useForm, FormProvider, UseFormOptions } from 'react-hook-form'
-import { StaticGlobalStyle } from 'theme'
+import { getThemePalette, StaticGlobalStyle, Theme } from 'theme'
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMoon, faLightbulb } from '@fortawesome/free-regular-svg-icons'
+
+import { ThemeToggle } from 'components/common/Button'
+import { useThemeManager } from 'hooks/useThemeManager'
+
+import { withGlobalContext } from 'hooks/useGlobalState'
+import { INITIAL_STATE, rootReducer } from 'reducers-actions'
 
 export const GlobalStyles = (DecoratedStory: () => StoryFnReactReturnType): JSX.Element => (
   <>
@@ -16,37 +25,31 @@ export const GlobalStyles = (DecoratedStory: () => StoryFnReactReturnType): JSX.
   </>
 )
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMoon, faSun } from '@fortawesome/free-regular-svg-icons'
+const ThemeTogglerUnwrapped: React.FC = ({ children }) => {
+  const [themeMode, setThemeMode] = useThemeManager()
+  const [themePalette, isDarkMode] = useMemo(() => [getThemePalette(themeMode), themeMode === Theme.DARK], [themeMode])
 
-import { ThemeToggle } from 'components/common/Button'
-import { ThemeProvider } from 'styled-components'
-
-import { COLOURS, MainAppTheme } from 'styles'
-
-export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => {
-  const [darkMode, setDarkMode] = React.useState(true)
-  const theme: MainAppTheme = {
-    mode: darkMode ? 'dark' : 'light',
-  }
-
-  const handleDarkMode = (): void => setDarkMode((darkMode) => !darkMode)
+  const handleDarkMode = (): void => setThemeMode(themeMode === Theme.DARK ? Theme.LIGHT : Theme.DARK)
 
   return (
     <>
-      <ThemeProvider theme={theme}>
-        <Frame style={{ background: darkMode ? COLOURS.bgDark : COLOURS.bgLight }}>{DecoratedStory()}</Frame>
-        {/* Cheeky use of ButtonBase here :P */}
-        <ThemeToggle onClick={handleDarkMode} mode={darkMode}>
-          <FontAwesomeIcon icon={darkMode ? faMoon : faSun} />
-        </ThemeToggle>
-        <br />
-        <br />
-        <code>Current theme: {theme.mode.toUpperCase()}</code>
-      </ThemeProvider>
+      <Frame style={{ background: themePalette.bg1 }}>{children}</Frame>
+      {/* Cheeky use of ButtonBase here :P */}
+      <ThemeToggle onClick={handleDarkMode} mode={isDarkMode}>
+        <FontAwesomeIcon icon={isDarkMode ? faMoon : faLightbulb} />
+      </ThemeToggle>
+      <br />
+      <br />
+      <code>Current theme: {themeMode.toUpperCase()}</code>
     </>
   )
 }
+const WrappedThemeToggler: React.FC = withGlobalContext(ThemeTogglerUnwrapped, INITIAL_STATE, rootReducer)
+
+// Redux aware ThemeToggler - necessary for Theme
+export const ThemeToggler = (DecoratedStory: () => JSX.Element): JSX.Element => (
+  <WrappedThemeToggler>{DecoratedStory()}</WrappedThemeToggler>
+)
 
 export const Router = (DecoratedStory: () => JSX.Element): JSX.Element => (
   <MemoryRouter>{DecoratedStory()}</MemoryRouter>

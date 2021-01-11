@@ -1,6 +1,6 @@
 import { Actions } from 'reducers-actions'
 
-export const enum ActionTypes {
+export enum ActionTypes {
   SET_ENABLING = 'enabling',
   SET_ENABLED = 'enabled',
   SET_CLAIMING = 'claiming',
