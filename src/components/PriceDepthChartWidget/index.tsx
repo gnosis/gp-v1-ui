@@ -45,7 +45,7 @@ const tabItems = (): TabItemType[] => [
   },
 ]
 
-// Provide a custom theme
+// Provide a custom tabTheme
 const tabThemeConfig: TabThemeType = {
   activeBg: '--color-transparent',
   inactiveBg: '--color-transparent',
@@ -84,7 +84,7 @@ const TabsWrapper = styled.div`
 export const PriceDepthChartWidget: React.FC = () => (
   <Wrapper>
     <TabsWrapper>
-      <Tabs tabItems={tabItems()} theme={tabThemeConfig} />
+      <Tabs tabItems={tabItems()} tabTheme={tabThemeConfig} />
     </TabsWrapper>
   </Wrapper>
 )

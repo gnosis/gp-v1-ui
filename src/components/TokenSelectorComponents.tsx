@@ -35,7 +35,8 @@ export const MenuList: ComponentType<MenuListComponentProps<any>> = (props) => {
         selectCurrent()
       }
 
-      onKeyDown?.(e)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onKeyDown?.(e as any)
     },
     [onKeyDown, selectCurrent],
   )

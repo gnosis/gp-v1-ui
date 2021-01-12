@@ -31,7 +31,7 @@ const Wrapper = styled.div`
 
 const OrderBuySell: React.FC = () => (
   <Wrapper>
-    <Tabs tabItems={tabItems} theme={tabThemeConfig} />
+    <Tabs tabItems={tabItems} tabTheme={tabThemeConfig} />
   </Wrapper>
 )
 

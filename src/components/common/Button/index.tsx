@@ -1,8 +1,9 @@
 import React from 'react'
-import styled, { css, ThemeProvider } from 'styled-components'
-import { ThemeMap, ThemeValue, variants } from 'styled-theming'
+import styled, { css } from 'styled-components'
+import { ThemeValue, variants } from 'styled-theming'
 
-import { COLOURS, BASE_STYLES, MainAppTheme } from 'styles'
+import { COLOURS, BASE_STYLES } from 'styles'
+import ThemeProvider, { Theme } from 'theme'
 
 const {
   white,
@@ -50,7 +51,7 @@ export type ButtonSizeVariations = 'default' | 'small' | 'big'
 // <ButtonBase kind="danger" />
 export const ButtonTheme = variants('mode', 'variant', {
   default: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${white};
       background: ${mainGradient};
 
@@ -58,7 +59,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         background: ${mainGradientDarker};
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ${white};
       background: ${mainGradient};
 
@@ -71,7 +72,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     return this.default
   },
   secondary: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${blue};
       background: ${bgLight};
       border-color: ${blue};
@@ -80,7 +81,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         background: ${bgDark};
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ${blue};
       background: ${bgDark};
       border-color: ${blue};
@@ -92,7 +93,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     `,
   },
   success: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${white};
       background: ${successLight};
 
@@ -101,7 +102,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         border-color: ${successDark};
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ${white};
       background: ${successDark};
 
@@ -112,7 +113,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     `,
   },
   danger: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${white};
       background: ${dangerLight};
 
@@ -121,7 +122,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         border-color: ${dangerDark};
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ${white};
       background: ${dangerDark};
 
@@ -132,7 +133,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     `,
   },
   warning: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${white};
       background: ${warningLight};
 
@@ -141,7 +142,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         border-color: ${warningDark};
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ${white};
       background: ${warningDark};
 
@@ -152,7 +153,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     `,
   },
   cancel: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${white};
       background: transparent;
 
@@ -160,7 +161,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         background: ${blueDark};
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ${blue};
       background: transparent;
 
@@ -171,7 +172,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     `,
   },
   disabled: {
-    dark: css`
+    [Theme.DARK]: css`
       color: ${disabledLightOpaque};
       background: ${disabledLight};
     `,
@@ -180,7 +181,7 @@ export const ButtonTheme = variants('mode', 'variant', {
     },
   },
   theme: {
-    light: css`
+    [Theme.LIGHT]: css`
       color: ${white};
       background: lightsalmon;
 
@@ -189,7 +190,7 @@ export const ButtonTheme = variants('mode', 'variant', {
         background: darkorange;
       }
     `,
-    dark: css`
+    [Theme.DARK]: css`
       color: ghostwhite;
       background: purple;
 
@@ -202,18 +203,18 @@ export const ButtonTheme = variants('mode', 'variant', {
 })
 
 // Created a 'size' prop on buttons, default | small | big
-const ButtonSizes = variants('component', 'size', {
+const ButtonSizes = variants('componentKey', 'size', {
   default: {
-    buttons: '',
+    button: '',
   },
   small: {
-    buttons: css`
+    button: css`
       font-size: 0.6rem;
       padding: 0.3rem 0.5rem;
     `,
   },
   big: {
-    buttons: css`
+    button: css`
       font-size: 1.4rem;
       padding: 0.65rem 1rem;
     `,
@@ -233,7 +234,7 @@ const ColouredAndSizedButtonBase = styled(ColouredButtonBase)`
 // Wrap ColouredAndSizedButtonsBase in it's own ThemeProvider which takes the toplevel app theme
 // ThemeProvider and interpolate over it's props
 const ThemeWrappedButtonBase: React.FC<React.ButtonHTMLAttributes<Element>> = ({ children, ...restProps }) => (
-  <ThemeProvider theme={({ mode }: MainAppTheme): ThemeMap => ({ mode, component: 'buttons' })}>
+  <ThemeProvider componentKey="button">
     <ColouredAndSizedButtonBase {...restProps}>{children}</ColouredAndSizedButtonBase>
   </ThemeProvider>
 )

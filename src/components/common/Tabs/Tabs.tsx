@@ -26,7 +26,7 @@ export interface TabThemeType {
 }
 interface Props {
   readonly tabItems: TabItemType[]
-  readonly theme?: TabThemeType
+  readonly tabTheme: TabThemeType
 }
 
 const Wrapper = styled.div`
@@ -45,7 +45,7 @@ const Wrapper = styled.div`
 
 const Tabs: React.FC<Props> = (props) => {
   const [activeTab, setActiveTab] = useState<number>(1)
-  const theme = props.theme ? props.theme : undefined
+  const { tabTheme } = props
 
   return (
     <Wrapper>
@@ -57,7 +57,7 @@ const Tabs: React.FC<Props> = (props) => {
             title={title}
             onTabClick={(): void => setActiveTab(id)}
             isActive={activeTab === id}
-            theme={theme}
+            tabTheme={tabTheme}
             count={count}
           />
         ))}

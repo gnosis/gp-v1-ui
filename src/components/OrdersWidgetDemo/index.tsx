@@ -3,7 +3,7 @@ import Tabs, { TabItemType, TabThemeType } from 'components/common/Tabs/Tabs'
 import { OrdersWidgetDemo as Wrapper } from './OrdersWidgetDemo.styled'
 import { ActiveOrdersContent } from './ActiveOrdersContent'
 
-const tabItems = (): TabItemType[] => [
+const tabItems: TabItemType[] = [
   {
     id: 1,
     title: 'Active Orders',
@@ -38,7 +38,7 @@ const tabThemeConfig: TabThemeType = {
 const OrdersWidgetDemo: React.FC = () => {
   return (
     <Wrapper>
-      <Tabs tabItems={tabItems()} theme={tabThemeConfig} />
+      <Tabs tabItems={tabItems} tabTheme={tabThemeConfig} />
     </Wrapper>
   )
 }
