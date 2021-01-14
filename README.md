@@ -13,7 +13,7 @@ Develop:
 # Gnosis Protocol v1 Web
 
 > IMPORTANT: This repository is for the legacy Gnosis Protocol v1
-> For the UI for the latest version of the protocol go to: https://github.com/gnosis/gp-swap-ui
+> For the protocol latest version UI go to: https://github.com/gnosis/gp-ui
 
 <img align="right" width="350" src="./docs/screenshot.png">
 
