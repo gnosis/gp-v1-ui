@@ -60,6 +60,7 @@ deploy:
     bucket: $DEV_BUCKET_NAME
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
+    region: $AWS_REGION
     skip_cleanup: true
     local_dir: dist
     on:
@@ -69,6 +70,7 @@ deploy:
     bucket: $STAGING_BUCKET_NAME
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
+    region: $AWS_REGION
     skip_cleanup: true
     local_dir: dist
     upload-dir: current
@@ -80,6 +82,7 @@ deploy:
     bucket: $STAGING_BUCKET_NAME
     access_key_id: $AWS_ACCESS_KEY_ID
     secret_access_key: $AWS_SECRET_ACCESS_KEY
+    region: $AWS_REGION
     skip_cleanup: true
     local_dir: dist
     upload-dir: releases/$TRAVIS_TAG
